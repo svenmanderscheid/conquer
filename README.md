@@ -34,9 +34,10 @@ The "no framework" choice is deliberate. The owner wants to read every line of c
 
 ```
 .
+├── CLAUDE.md               # Orientation for Claude Code (read first)
 ├── docs/                   # Specification documents
 │   ├── SPEC.md            # Master specification (4,170+ lines)
-│   ├── CLAUDE.md          # Pointer file for Claude Code sessions
+│   ├── HOSTINGER_SETUP.md # Deployment guide
 │   └── Conquer_Asset_Specifications.pdf
 ├── data/                   # Single source of truth for game data
 │   ├── monsters.json      # 58 monster entries with drops
@@ -92,10 +93,10 @@ git pull origin main
 
 ### Working with Claude Code
 
-This project is designed to be co-developed with Claude (Anthropic's AI assistant). The `docs/CLAUDE.md` file tells Claude what to read first. Typical workflow:
+This project is designed to be co-developed with Claude (Anthropic's AI assistant). The `CLAUDE.md` file at the repo root tells Claude what to read first. Typical workflow:
 
 1. Open Claude Code in the repo root
-2. Claude reads `docs/CLAUDE.md` automatically
+2. Claude reads `CLAUDE.md` automatically
 3. Ask Claude to implement an issue from the GitHub backlog
 4. Claude reads `docs/SPEC.md` for the relevant section
 5. Claude writes the code, runs tests, commits
