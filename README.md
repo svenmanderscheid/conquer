@@ -43,14 +43,13 @@ The "no framework" choice is deliberate. The owner wants to read every line of c
 │   ├── charms.json        # 24 charms × drop distribution
 │   ├── world_spawn.json   # Hourly cron spawn rates per sector
 │   └── buildings/         # (coming Sprint 1) — per-building configs
-├── src/                    # PHP source code
-├── public/                 # Web-accessible files
-│   ├── index.php          # Front controller
-│   └── assets/            # Sprites, icons, fonts (eventually)
-├── config/                 # Environment configs (gitignored secrets)
-├── migrations/             # SQL migration files
-├── cron/                   # Background job scripts
-└── tests/                  # PHPUnit / custom test scripts
+├── src/                    # PHP source code (web-blocked via .htaccess)
+├── index.php               # Front controller (entry point for all requests)
+├── assets/                 # Sprites, icons, fonts (web-accessible)
+├── config/                 # Environment configs (gitignored secrets, web-blocked)
+├── migrations/             # SQL migration files (web-blocked)
+├── cron/                   # Background job scripts (web-blocked)
+└── tests/                  # PHPUnit / custom test scripts (web-blocked)
 ```
 
 ## Getting started
@@ -74,8 +73,8 @@ cp config/database.example.php config/database.php
 # Run migrations (Sprint 1 deliverable — not yet implemented)
 php migrations/run.php
 
-# Start built-in PHP server
-php -S localhost:8080 -t public/
+# Start built-in PHP server (flat layout — no -t needed, current dir is webroot)
+php -S localhost:8080
 
 # Visit http://localhost:8080
 ```

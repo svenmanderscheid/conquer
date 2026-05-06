@@ -1,123 +1,140 @@
-# Hostinger Setup Guide — Conquer
+# Hostinger Setup Guide — Conquer (Flat Layout)
 
 Deployment configuration for `conquer.svenmanderscheid.lu`.
 
-## Current Hostinger setup (as configured)
+## Current setup
 
 - **Subdomain:** `conquer.svenmanderscheid.lu`
 - **Repo location:** `/home/u171686647/domains/svenmanderscheid.lu/public_html/conquer`
 - **GitHub repo:** `git@github.com:svenmanderscheid/conquer.git`
-- **Auto-deploy:** Hostinger pulls from GitHub when you push (via Webhook)
+- **Branch tracked:** `main`
+- **Auto-deploy:** Yes (via Hostinger webhook)
 
-## CRITICAL: Document Root Configuration
+## Repo layout — flat
 
-This is the most important step. **Your repo has the structure:**
+This repository uses a **flat layout** where the entire repo is the document root. This is required because Hostinger Shared Hosting on this plan does not allow setting the document root to a subdirectory.
 
 ```
-conquer/                  ← Hostinger pulls everything here
-├── public/               ← THIS is what should be served on the web
-│   ├── index.php
-│   ├── .htaccess
-│   └── assets/
-├── src/                  ← MUST NOT be web-accessible
-├── data/                 ← MUST NOT be web-accessible
-├── config/               ← MUST NOT be web-accessible (contains secrets)
-└── ...
+public_html/conquer/                    ← Both Hostinger install path AND web document root
+├── index.php                           ← Entry point (web-accessible)
+├── .htaccess                           ← Security + URL rewriting
+├── assets/                             ← Sprites, icons, fonts (web-accessible)
+├── src/                                ← BLOCKED via .htaccess
+│   └── .htaccess  (Require all denied)
+├── data/                               ← BLOCKED via .htaccess
+│   └── .htaccess  (Require all denied)
+├── config/                             ← BLOCKED via .htaccess (contains secrets!)
+│   └── .htaccess  (Require all denied)
+├── migrations/                         ← BLOCKED via .htaccess
+├── cron/                               ← BLOCKED via .htaccess
+├── tests/                              ← BLOCKED via .htaccess
+└── docs/                               ← BLOCKED via .htaccess
 ```
 
-You have **two options** to handle this. **Option A is strongly preferred.**
+**How security works in this setup:**
 
----
+1. The root `.htaccess` blocks any URL matching `^/(src|config|migrations|cron|tests|docs|data|...)/.*$` with a 403
+2. Each protected folder has its own `.htaccess` with `Require all denied` (defense in depth — even if root htaccess fails)
+3. The root `.htaccess` also blocks all dotfiles (`.git`, `.env`) and dangerous extensions (`.md`, `.sql`, etc.)
 
-### Option A — Change document root to `/conquer/public/` (PREFERRED)
+## Deployment workflow
 
-This is the cleanest, most secure setup. The web server only sees `/public/` and the rest of the repo is invisible to the internet.
+### Initial push
 
-**Steps:**
-
-1. Log into Hostinger Control Panel
-2. Go to **Domains → Subdomains**
-3. Find `conquer.svenmanderscheid.lu`
-4. Click **Manage** or **Edit**
-5. Change **Document Root** from:
-   ```
-   public_html/conquer
-   ```
-   to:
-   ```
-   public_html/conquer/public
-   ```
-6. Save and wait 1-2 minutes for the change to take effect
-7. **Delete the root `.htaccess`** from your repo (it's only needed for Option B):
-   ```bash
-   git rm .htaccess
-   git commit -m "Remove root .htaccess — using Option A document root"
-   git push
-   ```
-
-**Verify:** Visit `https://conquer.svenmanderscheid.lu/` — you should see the "Conquer — Coming Soon" page. Then verify security:
-
-- `https://conquer.svenmanderscheid.lu/data/charms.json` → should give **403 Forbidden** or **404 Not Found**
-- `https://conquer.svenmanderscheid.lu/src/Autoloader.php` → should give **403 Forbidden** or **404 Not Found**
-
----
-
-### Option B — Keep document root at `/conquer/`, use root .htaccess fallback
-
-If you can't or don't want to change the document root, the repo includes a root `.htaccess` file that rewrites all requests into `/public/`.
-
-**This works**, but is less secure because:
-- A misconfigured `.htaccess` could leak files
-- Apache must process the rewrite rule for every request (tiny perf cost)
-
-**Steps:**
-
-1. Verify the root `.htaccess` exists in the repo (it should, from the initial commit)
-2. Verify per-folder `.htaccess` files exist in `src/`, `data/`, `config/`, `migrations/`, `cron/`, `tests/`, `docs/` — each containing `Require all denied`
-3. Visit `https://conquer.svenmanderscheid.lu/` — you should see "Conquer — Coming Soon"
-4. **Test security manually:**
-   - `https://conquer.svenmanderscheid.lu/data/charms.json` → must be 403
-   - `https://conquer.svenmanderscheid.lu/src/README.md` → must be 403
-   - `https://conquer.svenmanderscheid.lu/config/database.example.php` → must be 403
-   - `https://conquer.svenmanderscheid.lu/.git/config` → must be 403
-   - `https://conquer.svenmanderscheid.lu/SPEC.md` → must be 403
-
-**If any of these return file content, the security is broken — switch to Option A.**
-
----
-
-## Database Setup
-
-Before the app can do anything beyond the placeholder page, you need a MySQL database.
-
-### Steps in Hostinger panel
-
-1. Go to **Databases → MySQL Databases**
-2. Click **Create New Database**
-3. Database name: `u171686647_conquer` (Hostinger prepends your username)
-4. Username: `u171686647_conquer_app`
-5. Password: generate a strong random one (save it!)
-6. Click **Create**
-
-### Configure the app
-
-SSH into your Hostinger account:
+After cloning the repo template locally:
 
 ```bash
-ssh u171686647@your-hostinger-host
+mkdir -p ~/projects/conquer
+cd ~/projects/conquer
+tar -xzf ~/Downloads/conquer-repo.tar.gz
 
+# Verify commits
+git log --oneline
+
+# Optionally re-author commits
+git commit --amend --author="Sven Manderscheid <sven@svenmanderscheid.lu>" --no-edit
+
+# Push to GitHub
+git remote add origin git@github.com:svenmanderscheid/conquer.git
+git push -u origin main
+```
+
+Hostinger's webhook fires automatically on push. Within ~30 seconds, the new code is live at `conquer.svenmanderscheid.lu`.
+
+### Daily workflow
+
+```bash
+git checkout dev
+git checkout -b feature/auth-system
+
+# ... write code locally, test in XAMPP ...
+
+git push origin feature/auth-system
+# PR feature/auth-system → dev on GitHub, merge after review
+
+# When dev is stable, release to production:
+git checkout main
+git merge dev --no-ff
+git push origin main
+# Hostinger auto-deploys to conquer.svenmanderscheid.lu
+```
+
+## After first deploy — verify
+
+Visit `https://conquer.svenmanderscheid.lu/`. You should see:
+
+- Big "Conquer" gradient title
+- "working codename — final name TBD" subtitle
+- "Sprint 0 — Foundation in progress" status
+- PHP version + server time at bottom
+
+### Critical security check
+
+Test these URLs — **all must return 403 Forbidden**:
+
+| URL | Expected |
+|---|---|
+| `https://conquer.svenmanderscheid.lu/data/charms.json` | 403 |
+| `https://conquer.svenmanderscheid.lu/data/monsters.json` | 403 |
+| `https://conquer.svenmanderscheid.lu/src/` | 403 |
+| `https://conquer.svenmanderscheid.lu/src/README.md` | 403 |
+| `https://conquer.svenmanderscheid.lu/config/` | 403 |
+| `https://conquer.svenmanderscheid.lu/config/database.example.php` | 403 |
+| `https://conquer.svenmanderscheid.lu/.git/config` | 403 |
+| `https://conquer.svenmanderscheid.lu/.gitignore` | 403 |
+| `https://conquer.svenmanderscheid.lu/SPEC.md` | 403 (if it exists at root) |
+| `https://conquer.svenmanderscheid.lu/README.md` | 403 |
+| `https://conquer.svenmanderscheid.lu/docs/SPEC.md` | 403 |
+
+**If ANY of these returns content, security is broken.** Check:
+1. `.htaccess` exists at the root and is correctly deployed
+2. The per-folder `.htaccess` files exist in `src/`, `data/`, `config/`, etc.
+3. Apache `mod_rewrite` and `AllowOverride All` are enabled (Hostinger defaults — should be fine)
+
+## Database setup (one-time)
+
+In Hostinger panel:
+
+1. **Databases → MySQL Databases → Create New**
+2. Database name: `u171686647_conquer` (Hostinger prepends your account prefix)
+3. User: `u171686647_conquer_app`
+4. Password: generate strong random — **save it!**
+
+SSH to Hostinger:
+
+```bash
+ssh u171686647@your-hostinger-ssh-host
 cd domains/svenmanderscheid.lu/public_html/conquer
 
-# Copy config templates
+# Copy config templates (these are gitignored, so they stay only on the server)
 cp config/database.example.php config/database.php
 cp config/app.example.php config/app.php
 
-# Edit database config
+# Edit production database credentials
 nano config/database.php
 ```
 
-In `config/database.php`, set:
-
+Set:
 ```php
 'host'     => 'localhost',
 'database' => 'u171686647_conquer',
@@ -125,126 +142,122 @@ In `config/database.php`, set:
 'password' => 'YOUR_GENERATED_PASSWORD',
 ```
 
-In `config/app.php`, set:
+Edit app config:
+```bash
+nano config/app.php
+```
 
+Set:
 ```php
 'env' => 'production',
 'debug' => false,
 'base_url' => 'https://conquer.svenmanderscheid.lu',
 ```
 
-These files are gitignored, so they stay on the server only. Safe.
-
----
+These config files are in `.gitignore` so they live only on the server — Hostinger pulls won't overwrite them, GitHub never sees the credentials.
 
 ## SSL Certificate (HTTPS)
 
-1. In Hostinger panel: **Security → SSL**
+1. Hostinger panel → **Security → SSL**
 2. Find `conquer.svenmanderscheid.lu`
-3. Install free **Let's Encrypt** certificate (usually one-click)
+3. Install free **Let's Encrypt** certificate (one-click)
 4. Wait 5-10 min for activation
-5. Once verified working, **enable HTTPS forced redirect** in your `.htaccess`:
-
-   In either `/conquer/.htaccess` (Option B) or `/conquer/public/.htaccess` (Option A), uncomment:
+5. Verify HTTPS works in browser
+6. Once verified, **enable HTTPS forced redirect** — uncomment in `.htaccess`:
    ```apache
    RewriteCond %{HTTPS} off
    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
    ```
-
    Commit and push so it deploys.
 
----
+## Branching strategy
 
-## GitHub Auto-Deploy Workflow
+```
+main          ← production (Hostinger watches this branch) — only merge tested code
+  ↑
+dev           ← integration branch
+  ↑
+feature/*     ← per-feature branches
+```
 
-Since the subdomain is connected to GitHub:
-
-1. You make changes locally
-2. Push to `main` (or whatever branch Hostinger watches)
-3. Hostinger's webhook fires
-4. Hostinger pulls the new code into `/conquer/`
-5. Site is updated — usually within 30 seconds
-
-**Recommended branching:**
-
-- `main` ← what Hostinger pulls — production-ready only
-- `dev` ← integration branch for active work
-- `feature/*` ← per-feature branches
-
-Workflow:
+Daily:
 ```bash
-# Daily work
 git checkout dev
-git checkout -b feature/auth-system
-# ... code, commit ...
-git push origin feature/auth-system
-# Open PR to dev on GitHub, merge
+git pull
+git checkout -b feature/something
 
-# Release to production
+# work locally with XAMPP, test, iterate
+
+git push -u origin feature/something
+# PR on GitHub: feature/something → dev → merge
+
+# Periodic releases to production:
 git checkout main
-git merge dev
+git merge dev --no-ff
 git push origin main
 # Hostinger auto-deploys
 ```
 
----
-
 ## Troubleshooting
 
-### "Site shows the file structure / directory listing"
+### "Site shows directory listing"
 
-The `Options -Indexes` directive in `.htaccess` should prevent this. If you see it:
-- Check that your `.htaccess` actually got pushed
-- On Hostinger, check that mod_rewrite is enabled (it should be by default)
+`Options -Indexes` in `.htaccess` should prevent this. If you see it:
+- Verify `.htaccess` got pushed (`https://conquer.svenmanderscheid.lu/.htaccess` should return 403, not the file content)
+- In Hostinger panel: ensure mod_rewrite is enabled (default on)
 
-### "Site shows raw PHP code instead of executing"
+### "Site shows raw PHP code"
 
-PHP is not configured for that domain. In Hostinger panel:
-- **Hosting → Manage → Advanced → PHP Configuration**
+PHP isn't configured for the domain:
+- Hostinger panel → **Hosting → Manage → Advanced → PHP Configuration**
 - Verify PHP version is 8.2+
-- Verify it's set as the handler for the domain
+- Verify it's set as the handler
 
-### "Can't connect to MySQL"
+### "Webhook didn't fire after git push"
 
-- Check `config/database.php` host — on Hostinger it's usually `localhost`, sometimes `127.0.0.1`
-- Verify the username includes the `u171686647_` prefix
-- Check the password doesn't have special chars that need escaping
-
-### "Webhook didn't fire after push"
-
-- In Hostinger panel: **Advanced → Git → Manage**
+- Hostinger panel → **Advanced → Git → Manage Repository**
 - Click **Auto-Deploy → View Webhook URL**
-- Go to GitHub repo → Settings → Webhooks
-- Verify the webhook URL is correctly set
-- Check **Recent Deliveries** in GitHub — failed deliveries show why
+- GitHub repo → **Settings → Webhooks**
+- Verify webhook URL matches
+- Click **Recent Deliveries** to see failures and reasons
 
-### "Changes appear in repo but not on site"
+### "Push works but site doesn't update"
 
-- Hostinger may have hit a deploy error. Check:
-  - **Advanced → Git → Manage Repository → Deploy Logs**
-- Sometimes a manual **Deploy Now** button click is needed
+Hostinger had a deploy error. Check:
+- **Advanced → Git → Manage Repository → Deploy Logs**
+- Sometimes a manual **Deploy Now** is needed
 
----
+### "Can't connect to MySQL from PHP"
 
-## Performance and Caching Notes
+- Check `config/database.php` host — `localhost` usually works on Hostinger
+- Username must include `u171686647_` prefix
+- If password has special chars (`@`, `&`, etc.), test by escaping them
 
-- The repo includes asset caching headers in `public/.htaccess` (30 days for images/fonts)
+### "/data/charms.json returns 200 instead of 403"
+
+Critical security failure. Immediate steps:
+1. SSH and verify `data/.htaccess` exists with `Require all denied`
+2. Test: `curl -I https://conquer.svenmanderscheid.lu/data/charms.json`
+3. If still 200, the per-folder htaccess isn't being processed
+4. Check that `AllowOverride All` is set (Hostinger default — should work)
+5. Worst case: rename `data/charms.json` to `data/charms.json.dat` so it's not served as JSON
+
+## Performance and caching
+
+- Asset caching headers in root `.htaccess` (30 days for images/fonts)
 - For game data files (`/data/*.json`), caching is set to 0 — these are loaded server-side via PHP, not directly served
-- Once you're at meaningful traffic levels, consider Cloudflare in front of Hostinger for free CDN + DDoS protection
+- At meaningful traffic, consider Cloudflare in front of Hostinger for free CDN + DDoS protection
 
----
+## Pre-Sprint-1 checklist
 
-## Summary Checklist
+- [ ] Repo pushed to GitHub
+- [ ] First Hostinger deploy worked — placeholder page shows on subdomain
+- [ ] All 11 security URLs return 403 (run the table above)
+- [ ] MySQL database created
+- [ ] `config/database.php` configured on server
+- [ ] `config/app.php` configured (env=production, debug=false)
+- [ ] SSL installed
+- [ ] HTTPS forced redirect enabled
+- [ ] PHP 8.2+ confirmed via placeholder page footer
 
-Before considering deployment "done":
-
-- [ ] Subdomain `conquer.svenmanderscheid.lu` resolves
-- [ ] Document root configured (Option A preferred — `public/` subfolder)
-- [ ] GitHub auto-deploy webhook is firing
-- [ ] First push results in updated site
-- [ ] `https://conquer.svenmanderscheid.lu/` shows "Coming Soon" placeholder
-- [ ] Security check: `/data/`, `/src/`, `/config/`, `/.git/` all return 403
-- [ ] MySQL database created and configured in `config/database.php`
-- [ ] SSL certificate installed and active
-- [ ] HTTPS redirect enabled (after SSL verified)
-- [ ] PHP 8.2+ confirmed via `<?= PHP_VERSION ?>` on placeholder page
+Once all boxes are checked, ready for Sprint 1.

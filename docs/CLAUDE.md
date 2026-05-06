@@ -46,7 +46,7 @@ Conventions:
 - PDO for all database access (no ORM)
 - Strict types (`declare(strict_types=1);`) at the top of every PHP file
 - All input validated server-side; never trust the client
-- HTML/CSS/JS in `public/` is mostly inline-script-tag Alpine.js, no build step
+- HTML/CSS/JS lives at the repo root (flat layout for shared hosting compatibility); is mostly inline-script-tag Alpine.js, no build step
 - Game data loaded once at request start via `src/GameData.php` which JSON-decodes the `data/*.json` files into PHP arrays
 - All time stored as UTC datetimes in MySQL; converted to user TZ only at display layer
 
@@ -72,7 +72,7 @@ Conventions:
 ### Implementing a new API endpoint
 
 1. Read `docs/SPEC.md` §23 for the API conventions
-2. Add the route to `public/api/index.php`
+2. Add the route to `api/index.php` (or wherever the API router lives at the root)
 3. Add the handler class to `src/Api/Handlers/`
 4. All endpoints must:
    - Validate session (use `src/Auth/Session.php`)

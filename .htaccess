@@ -1,47 +1,104 @@
 # ============================================================================
-# Conquer — Root .htaccess
+# Conquer — Root .htaccess (Flat Layout)
 # ============================================================================
 #
-# This file exists as a SAFETY NET for shared hosting environments where the
-# document root cannot easily be changed (e.g. some Hostinger plans).
+# This is the document root .htaccess. The repository uses a flat layout:
+# index.php and assets/ are at the root, while sensitive folders (src/,
+# data/, config/, etc.) sit alongside them but are blocked from web access
+# by their own per-folder .htaccess files.
 #
-# PREFERRED SETUP: Change the subdomain's document root in Hostinger panel to
-# point at /conquer/public/ — then this file does nothing and you should
-# delete it. See docs/HOSTINGER_SETUP.md.
-#
-# FALLBACK: If you keep document root at /conquer/, this .htaccess rewrites
-# all requests to /public/, which makes the URL `conquer.svenmanderscheid.lu/`
-# correctly serve `public/index.php`.
-#
-# IMPORTANT: This file ONLY makes the routing work. It does NOT prevent
-# direct access to /src/, /data/, /config/ etc. Each of those folders needs
-# its own deny-all .htaccess (which is already provided in this repo).
+# This setup is required when the hosting provider doesn't allow the
+# document root to be set to a subdirectory (e.g. shared Hostinger plans).
 # ============================================================================
 
+# Front controller pattern — route all non-existing requests to index.php
 RewriteEngine On
 
-# Don't rewrite if the request is already going to /public/
-RewriteCond %{REQUEST_URI} !^/public/
-
-# Don't rewrite if it's a real file or directory at the root
-# (lets you serve e.g. robots.txt or favicon.ico from root if needed)
+# Don't rewrite if the request is for a real file or directory
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 
-# Rewrite all other requests into /public/
-RewriteRule ^(.*)$ public/$1 [L]
-
-# Special case: also handle requests to "/" itself
-RewriteCond %{REQUEST_URI} ^/$
-RewriteRule ^$ public/ [L]
-
-# ============================================================================
-# Block access to sensitive top-level files in the repo root
-# ============================================================================
-<FilesMatch "(^\.|composer\.(json|lock)|package(-lock)?\.json|README\.md|.*\.md|.*\.bak|.*\.old|.*\.swp|.*\.sql)$">
-    Require all denied
-</FilesMatch>
+# Route everything else through index.php
+RewriteRule ^(.*)$ index.php [QSA,L]
 
 # Force HTTPS once SSL cert is installed (uncomment after SSL is verified)
 # RewriteCond %{HTTPS} off
 # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# ============================================================================
+# Security headers
+# ============================================================================
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    Header set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+</IfModule>
+
+# ============================================================================
+# Block dangerous file types at the root
+# ============================================================================
+
+# Hidden files (.git, .env, .htaccess itself, etc.)
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+# Common sensitive files
+<FilesMatch "(composer\.(json|lock)|package(-lock)?\.json|README\.md|CHANGELOG.*|.*\.md|.*\.bak|.*\.old|.*\.swp|.*\.sql|.*\.yml|.*\.yaml|.*\.toml)$">
+    Require all denied
+</FilesMatch>
+
+# Block direct PHP execution in upload/cache directories (defense in depth)
+<DirectoryMatch "^.*/(uploads|user-content|cache|tmp)/">
+    <FilesMatch "\.(php|phtml|php3|php4|php5|php7|phar)$">
+        Require all denied
+    </FilesMatch>
+</DirectoryMatch>
+
+# ============================================================================
+# Block access to non-public folders even though they live in webroot
+# (Each of these folders also has its own deny-all .htaccess for redundancy)
+# ============================================================================
+RedirectMatch 403 ^/(src|config|migrations|cron|tests|docs|data|vendor|node_modules|logs|sessions|cache|tmp|\.github|\.git)/.*$
+RedirectMatch 403 ^/(src|config|migrations|cron|tests|docs|data|vendor|node_modules|logs|sessions|cache|tmp|\.github|\.git)$
+
+# ============================================================================
+# Performance — caching for static assets
+# ============================================================================
+<IfModule mod_expires.c>
+    ExpiresActive On
+    
+    # Images — long cache
+    ExpiresByType image/png "access plus 30 days"
+    ExpiresByType image/jpeg "access plus 30 days"
+    ExpiresByType image/webp "access plus 30 days"
+    ExpiresByType image/svg+xml "access plus 30 days"
+    ExpiresByType image/x-icon "access plus 30 days"
+    
+    # Fonts
+    ExpiresByType font/woff2 "access plus 30 days"
+    ExpiresByType font/woff "access plus 30 days"
+    ExpiresByType font/ttf "access plus 30 days"
+    
+    # CSS / JS — short cache during dev, long after launch
+    ExpiresByType text/css "access plus 1 day"
+    ExpiresByType application/javascript "access plus 1 day"
+    
+    # JSON game data — must revalidate (game balance changes)
+    ExpiresByType application/json "access plus 0 seconds"
+</IfModule>
+
+# ============================================================================
+# Compression
+# ============================================================================
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript
+    AddOutputFilterByType DEFLATE application/javascript application/json application/xml
+    AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+# ============================================================================
+# Disable directory listing
+# ============================================================================
+Options -Indexes
