@@ -1,0 +1,86 @@
+# ============================================================================
+# Conquer — .htaccess (Hostinger Apache config)
+# ============================================================================
+# This file lives at the document root.
+# Hostinger serves from public_html/ — symlink or place public/ contents there.
+# ============================================================================
+
+# Redirect all requests to index.php (front controller pattern)
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# Force HTTPS (uncomment after SSL cert is installed)
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# ============================================================================
+# Security headers
+# ============================================================================
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    Header set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+    
+    # CSP — adjust as frontend evolves
+    # Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'"
+</IfModule>
+
+# ============================================================================
+# Block access to sensitive files and folders
+# ============================================================================
+
+# Block .env, .git, config files etc.
+<FilesMatch "(^\.|composer\.(json|lock)|package(-lock)?\.json|\.htaccess|\.htpasswd|\.git.*|\.env.*|.*\.bak|.*\.old|.*\.swp)$">
+    Require all denied
+</FilesMatch>
+
+# Block direct PHP execution in upload directories
+<DirectoryMatch "^.*/(uploads|user-content|cache|tmp)/">
+    <FilesMatch "\.(php|phtml|php3|php4|php5|php7|phar)$">
+        Require all denied
+    </FilesMatch>
+</DirectoryMatch>
+
+# Block access to non-public folders even if mistakenly placed in webroot
+RedirectMatch 403 ^/(src|config|migrations|cron|tests|docs|data|vendor|node_modules|logs)/.*$
+
+# ============================================================================
+# Performance — caching for static assets
+# ============================================================================
+<IfModule mod_expires.c>
+    ExpiresActive On
+    
+    # Images — long cache
+    ExpiresByType image/png "access plus 30 days"
+    ExpiresByType image/jpeg "access plus 30 days"
+    ExpiresByType image/webp "access plus 30 days"
+    ExpiresByType image/svg+xml "access plus 30 days"
+    
+    # Fonts
+    ExpiresByType font/woff2 "access plus 30 days"
+    ExpiresByType font/woff "access plus 30 days"
+    
+    # CSS / JS — short cache during dev, long after launch
+    ExpiresByType text/css "access plus 1 day"
+    ExpiresByType application/javascript "access plus 1 day"
+    
+    # JSON game data — must revalidate (game balance changes)
+    ExpiresByType application/json "access plus 0 seconds"
+</IfModule>
+
+# ============================================================================
+# Compression
+# ============================================================================
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript
+    AddOutputFilterByType DEFLATE application/javascript application/json application/xml
+    AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+# ============================================================================
+# Disable directory listing
+# ============================================================================
+Options -Indexes

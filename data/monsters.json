@@ -1,0 +1,3926 @@
+{
+  "version": "1.4",
+  "description": "Ascendancy monster definitions and drop tables. Values are nerfed from LoK source data (~50-80% reduction on Build/Research SP) to match Castle L26-30 ×1.30/×1.50 multiplier curve and World Speed Factor 2.0. Pacing target: F2P Endgame (Castle L25 + T4 + 6 Treasure Slots) in 3-5 months.",
+  "balance_notes": {
+    "speedup_separation": "Solo monsters drop ONLY Train/Recover SPs. Build/Research SPs are gated behind Treasure Goblin (rare solo spawn) and Dragon Rallies. This is the central balance lever — keeps alliance content meaningful.",
+    "drop_quantity_reduction": "vs LoK original: Solo monster SP quantity ~50% nerfed, Dragon Build/Research SP quantity ~80% nerfed. Probabilities mostly preserved or upped to 100% for guaranteed-feel.",
+    "treasure_goblin_role": "F2P-essential. Rare spawn (1-2 per kingdom sector per hour), 30min despawn. Guaranteed Build+Research SP drops. Solo path to alliance-equivalent content.",
+    "charm_drops": "Charms drop ONLY from Orc/Skeleton/Golem (Solo standard monsters). Per §14.14: 4-tier rarity distribution by monster level. Lv 0-3: Normal-dominated (no Legendary). Lv 4-6: Normal+Epic mix (no Legendary). Lv 7-8: Epic-dominated, 20-25% Legendary chance. Lv 9-10: 50/50 Epic/Legendary. Stat category is uniform random across 8 categories. Other monsters (Goblin/Deathkar/Dragons/Magdar) have their own valuable drop pools and do NOT drop charms.",
+    "gems_drops": "All monsters drop GEMS (per §14.15). Solo monsters: 15% chance × 10/30/40 by tier. Goblin: 50% chance × 30/50/75. Deathkar: 30% chance × 50/100. Dragons: 50% chance × 100/200/300 by level. Magdar: 100% chance × 500/1000/2000. Calibrated for active F2P income of 80-200 GEMS/day, supporting the no-pay-to-win pillar."
+  },
+  "monsters": [
+    {
+      "code": 20200101,
+      "name": "Orc",
+      "type": "solo",
+      "level": 0,
+      "amount": 100,
+      "action_point_cost": 10,
+      "stats": {
+        "hp": 50,
+        "attack": 20,
+        "defense": 10
+      },
+      "power_per_unit": 2,
+      "drops": [
+        {
+          "item_code": 10101013,
+          "count": 5,
+          "probability": 1.0,
+          "label": "5× resource pack"
+        },
+        {
+          "item_code": 10101001,
+          "count": 1,
+          "probability": 0.08,
+          "label": "small food"
+        },
+        {
+          "item_code": 10104024,
+          "count": 1,
+          "probability": 0.01,
+          "label": "T1 troop pack"
+        },
+        {
+          "item_code": 10103032,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Train SP 15min"
+        },
+        {
+          "item_code": 10103042,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Recover SP 15min"
+        }
+      ],
+      "respawn_minutes": 15,
+      "spawn_rarity": "common",
+      "charm_drop": {
+        "base_drop_chance": 0.3,
+        "rarity_distribution": {
+          "normal": 0.82,
+          "epic": 0.18,
+          "legendary": 0.0
+        },
+        "stat_category_roll": "uniform_random_8_categories",
+        "tier": "low"
+      },
+      "gems_drop": {
+        "chance": 0.15,
+        "amount": 10,
+        "tier_label": "solo_low"
+      }
+    },
+    {
+      "code": 20200102,
+      "name": "Orc",
+      "type": "solo",
+      "level": 1,
+      "amount": 500,
+      "action_point_cost": 10,
+      "stats": {
+        "hp": 85,
+        "attack": 32,
+        "defense": 17
+      },
+      "power_per_unit": 5,
+      "drops": [
+        {
+          "item_code": 10101014,
+          "count": 5,
+          "probability": 1.0,
+          "label": "5× resource pack"
+        },
+        {
+          "item_code": 10101001,
+          "count": 1,
+          "probability": 0.08,
+          "label": "small food"
+        },
+        {
+          "item_code": 10104024,
+          "count": 1,
+          "probability": 0.01,
+          "label": "T1 troop pack"
+        },
+        {
+          "item_code": 10103032,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Train SP 15min"
+        },
+        {
+          "item_code": 10103042,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Recover SP 15min"
+        },
+        {
+          "item_code": 10601001,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Normal Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 15,
+      "spawn_rarity": "common",
+      "charm_drop": {
+        "base_drop_chance": 0.3,
+        "rarity_distribution": {
+          "normal": 0.82,
+          "epic": 0.18,
+          "legendary": 0.0
+        },
+        "stat_category_roll": "uniform_random_8_categories",
+        "tier": "low"
+      },
+      "gems_drop": {
+        "chance": 0.15,
+        "amount": 10,
+        "tier_label": "solo_low"
+      }
+    },
+    {
+      "code": 20200103,
+      "name": "Orc",
+      "type": "solo",
+      "level": 2,
+      "amount": 1500,
+      "action_point_cost": 10,
+      "stats": {
+        "hp": 120,
+        "attack": 44,
+        "defense": 24
+      },
+      "power_per_unit": 8,
+      "drops": [
+        {
+          "item_code": 10101015,
+          "count": 10,
+          "probability": 1.0,
+          "label": "10× resource pack"
+        },
+        {
+          "item_code": 10101001,
+          "count": 2,
+          "probability": 0.08,
+          "label": "small food"
+        },
+        {
+          "item_code": 10104024,
+          "count": 1,
+          "probability": 0.02,
+          "label": "T1 troop pack"
+        },
+        {
+          "item_code": 10103032,
+          "count": 6,
+          "probability": 0.5,
+          "label": "Train SP 15min"
+        },
+        {
+          "item_code": 10103042,
+          "count": 6,
+          "probability": 0.5,
+          "label": "Recover SP 15min"
+        },
+        {
+          "item_code": 10601001,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Normal Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 15,
+      "spawn_rarity": "common",
+      "charm_drop": {
+        "base_drop_chance": 0.3,
+        "rarity_distribution": {
+          "normal": 0.82,
+          "epic": 0.18,
+          "legendary": 0.0
+        },
+        "stat_category_roll": "uniform_random_8_categories",
+        "tier": "low"
+      },
+      "gems_drop": {
+        "chance": 0.15,
+        "amount": 10,
+        "tier_label": "solo_low"
+      }
+    },
+    {
+      "code": 20200104,
+      "name": "Orc",
+      "type": "solo",
+      "level": 3,
+      "amount": 4500,
+      "action_point_cost": 10,
+      "stats": {
+        "hp": 155,
+        "attack": 56,
+        "defense": 31
+      },
+      "power_per_unit": 11,
+      "drops": [
+        {
+          "item_code": 10101016,
+          "count": 15,
+          "probability": 1.0,
+          "label": "15× resource pack"
+        },
+        {
+          "item_code": 10101001,
+          "count": 3,
+          "probability": 0.08,
+          "label": "small food"
+        },
+        {
+          "item_code": 10104024,
+          "count": 1,
+          "probability": 0.03,
+          "label": "T1 troop pack"
+        },
+        {
+          "item_code": 10103032,
+          "count": 9,
+          "probability": 0.5,
+          "label": "Train SP 15min"
+        },
+        {
+          "item_code": 10103042,
+          "count": 9,
+          "probability": 0.5,
+          "label": "Recover SP 15min"
+        },
+        {
+          "item_code": 10601001,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Normal Treasure Fragment"
+        },
+        {
+          "item_code": 10602002,
+          "count": 3,
+          "probability": 0.25,
+          "label": "Rare Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 15,
+      "spawn_rarity": "common",
+      "charm_drop": {
+        "base_drop_chance": 0.3,
+        "rarity_distribution": {
+          "normal": 0.82,
+          "epic": 0.18,
+          "legendary": 0.0
+        },
+        "stat_category_roll": "uniform_random_8_categories",
+        "tier": "low"
+      },
+      "gems_drop": {
+        "chance": 0.15,
+        "amount": 10,
+        "tier_label": "solo_low"
+      }
+    },
+    {
+      "code": 20200105,
+      "name": "Orc",
+      "type": "solo",
+      "level": 4,
+      "amount": 13500,
+      "action_point_cost": 10,
+      "stats": {
+        "hp": 190,
+        "attack": 68,
+        "defense": 38
+      },
+      "power_per_unit": 14,
+      "drops": [
+        {
+          "item_code": 10101017,
+          "count": 20,
+          "probability": 1.0,
+          "label": "20× resource pack"
+        },
+        {
+          "item_code": 10101001,
+          "count": 4,
+          "probability": 0.08,
+          "label": "small food"
+        },
+        {
+          "item_code": 10104024,
+          "count": 1,
+          "probability": 0.04,
+          "label": "T1 troop pack"
+        },
+        {
+          "item_code": 10103032,
+          "count": 12,
+          "probability": 0.5,
+          "label": "Train SP 15min"
+        },
+        {
+          "item_code": 10103042,
+          "count": 12,
+          "probability": 0.5,
+          "label": "Recover SP 15min"
+        },
+        {
+          "item_code": 10601001,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Normal Treasure Fragment"
+        },
+        {
+          "item_code": 10602002,
+          "count": 3,
+          "probability": 0.25,
+          "label": "Rare Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 15,
+      "spawn_rarity": "common",
+      "charm_drop": {
+        "base_drop_chance": 0.3,
+        "rarity_distribution": {
+          "normal": 0.7,
+          "epic": 0.3,
+          "legendary": 0.0
+        },
+        "stat_category_roll": "uniform_random_8_categories",
+        "tier": "mid"
+      },
+      "gems_drop": {
+        "chance": 0.15,
+        "amount": 30,
+        "tier_label": "solo_mid"
+      }
+    },
+    {
+      "code": 20200106,
+      "name": "Orc",
+      "type": "solo",
+      "level": 5,
+      "amount": 40500,
+      "action_point_cost": 10,
+      "stats": {
+        "hp": 225,
+        "attack": 80,
+        "defense": 45
+      },
+      "power_per_unit": 17,
+      "drops": [
+        {
+          "item_code": 10101017,
+          "count": 25,
+          "probability": 1.0,
+          "label": "25× resource pack"
+        },
+        {
+          "item_code": 10101001,
+          "count": 5,
+          "probability": 0.08,
+          "label": "small food"
+        },
+        {
+          "item_code": 10104024,
+          "count": 1,
+          "probability": 0.05,
+          "label": "T1 troop pack"
+        },
+        {
+          "item_code": 10103032,
+          "count": 15,
+          "probability": 0.5,
+          "label": "Train SP 15min"
+        },
+        {
+          "item_code": 10103042,
+          "count": 15,
+          "probability": 0.5,
+          "label": "Recover SP 15min"
+        },
+        {
+          "item_code": 10601001,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Normal Treasure Fragment"
+        },
+        {
+          "item_code": 10602002,
+          "count": 3,
+          "probability": 0.25,
+          "label": "Rare Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 15,
+      "spawn_rarity": "common",
+      "charm_drop": {
+        "base_drop_chance": 0.3,
+        "rarity_distribution": {
+          "normal": 0.7,
+          "epic": 0.3,
+          "legendary": 0.0
+        },
+        "stat_category_roll": "uniform_random_8_categories",
+        "tier": "mid"
+      },
+      "gems_drop": {
+        "chance": 0.15,
+        "amount": 30,
+        "tier_label": "solo_mid"
+      }
+    },
+    {
+      "code": 20200107,
+      "name": "Orc",
+      "type": "solo",
+      "level": 6,
+      "amount": 121500,
+      "action_point_cost": 10,
+      "stats": {
+        "hp": 260,
+        "attack": 92,
+        "defense": 52
+      },
+      "power_per_unit": 20,
+      "drops": [
+        {
+          "item_code": 10101018,
+          "count": 30,
+          "probability": 1.0,
+          "label": "30× resource pack"
+        },
+        {
+          "item_code": 10101001,
+          "count": 6,
+          "probability": 0.08,
+          "label": "small food"
+        },
+        {
+          "item_code": 10104024,
+          "count": 1,
+          "probability": 0.06,
+          "label": "T1 troop pack"
+        },
+        {
+          "item_code": 10103032,
+          "count": 18,
+          "probability": 0.5,
+          "label": "Train SP 15min"
+        },
+        {
+          "item_code": 10103042,
+          "count": 18,
+          "probability": 0.5,
+          "label": "Recover SP 15min"
+        },
+        {
+          "item_code": 10601001,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Normal Treasure Fragment"
+        },
+        {
+          "item_code": 10602002,
+          "count": 3,
+          "probability": 0.25,
+          "label": "Rare Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 15,
+      "spawn_rarity": "common",
+      "charm_drop": {
+        "base_drop_chance": 0.3,
+        "rarity_distribution": {
+          "normal": 0.7,
+          "epic": 0.3,
+          "legendary": 0.0
+        },
+        "stat_category_roll": "uniform_random_8_categories",
+        "tier": "mid"
+      },
+      "gems_drop": {
+        "chance": 0.15,
+        "amount": 30,
+        "tier_label": "solo_mid"
+      }
+    },
+    {
+      "code": 20200108,
+      "name": "Orc",
+      "type": "solo",
+      "level": 7,
+      "amount": 121500,
+      "action_point_cost": 10,
+      "stats": {
+        "hp": 295,
+        "attack": 104,
+        "defense": 59
+      },
+      "power_per_unit": 23,
+      "drops": [
+        {
+          "item_code": 10101018,
+          "count": 35,
+          "probability": 1.0,
+          "label": "35× resource pack"
+        },
+        {
+          "item_code": 10101001,
+          "count": 7,
+          "probability": 0.08,
+          "label": "small food"
+        },
+        {
+          "item_code": 10104024,
+          "count": 1,
+          "probability": 0.07,
+          "label": "T1 troop pack"
+        },
+        {
+          "item_code": 10103032,
+          "count": 21,
+          "probability": 0.5,
+          "label": "Train SP 15min"
+        },
+        {
+          "item_code": 10103042,
+          "count": 21,
+          "probability": 0.5,
+          "label": "Recover SP 15min"
+        },
+        {
+          "item_code": 10601001,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Normal Treasure Fragment"
+        },
+        {
+          "item_code": 10602002,
+          "count": 3,
+          "probability": 0.25,
+          "label": "Rare Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 15,
+      "spawn_rarity": "common",
+      "charm_drop": {
+        "base_drop_chance": 0.3,
+        "rarity_distribution": {
+          "normal": 0.0,
+          "epic": 0.8,
+          "legendary": 0.2
+        },
+        "stat_category_roll": "uniform_random_8_categories",
+        "tier": "high"
+      },
+      "gems_drop": {
+        "chance": 0.15,
+        "amount": 40,
+        "tier_label": "solo_high"
+      }
+    },
+    {
+      "code": 20200109,
+      "name": "Orc",
+      "type": "solo",
+      "level": 8,
+      "amount": 121500,
+      "action_point_cost": 10,
+      "stats": {
+        "hp": 330,
+        "attack": 116,
+        "defense": 66
+      },
+      "power_per_unit": 26,
+      "drops": [
+        {
+          "item_code": 10101019,
+          "count": 35,
+          "probability": 1.0,
+          "label": "35× resource pack"
+        },
+        {
+          "item_code": 10101001,
+          "count": 8,
+          "probability": 0.08,
+          "label": "small food"
+        },
+        {
+          "item_code": 10104024,
+          "count": 1,
+          "probability": 0.08,
+          "label": "T1 troop pack"
+        },
+        {
+          "item_code": 10103032,
+          "count": 24,
+          "probability": 0.5,
+          "label": "Train SP 15min"
+        },
+        {
+          "item_code": 10103042,
+          "count": 24,
+          "probability": 0.5,
+          "label": "Recover SP 15min"
+        },
+        {
+          "item_code": 10601001,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Normal Treasure Fragment"
+        },
+        {
+          "item_code": 10602002,
+          "count": 3,
+          "probability": 0.25,
+          "label": "Rare Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 15,
+      "spawn_rarity": "common",
+      "charm_drop": {
+        "base_drop_chance": 0.3,
+        "rarity_distribution": {
+          "normal": 0.0,
+          "epic": 0.8,
+          "legendary": 0.2
+        },
+        "stat_category_roll": "uniform_random_8_categories",
+        "tier": "high"
+      },
+      "gems_drop": {
+        "chance": 0.15,
+        "amount": 40,
+        "tier_label": "solo_high"
+      }
+    },
+    {
+      "code": 20200110,
+      "name": "Orc",
+      "type": "solo",
+      "level": 9,
+      "amount": 121500,
+      "action_point_cost": 10,
+      "stats": {
+        "hp": 365,
+        "attack": 128,
+        "defense": 73
+      },
+      "power_per_unit": 29,
+      "drops": [
+        {
+          "item_code": 10101019,
+          "count": 35,
+          "probability": 1.0,
+          "label": "35× resource pack"
+        },
+        {
+          "item_code": 10101001,
+          "count": 9,
+          "probability": 0.08,
+          "label": "small food"
+        },
+        {
+          "item_code": 10104024,
+          "count": 1,
+          "probability": 0.09,
+          "label": "T1 troop pack"
+        },
+        {
+          "item_code": 10103032,
+          "count": 25,
+          "probability": 0.5,
+          "label": "Train SP 15min"
+        },
+        {
+          "item_code": 10103042,
+          "count": 25,
+          "probability": 0.5,
+          "label": "Recover SP 15min"
+        },
+        {
+          "item_code": 10601001,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Normal Treasure Fragment"
+        },
+        {
+          "item_code": 10602002,
+          "count": 3,
+          "probability": 0.25,
+          "label": "Rare Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 15,
+      "spawn_rarity": "common",
+      "charm_drop": {
+        "base_drop_chance": 0.3,
+        "rarity_distribution": {
+          "normal": 0.0,
+          "epic": 0.5,
+          "legendary": 0.5
+        },
+        "stat_category_roll": "uniform_random_8_categories",
+        "tier": "endgame"
+      },
+      "gems_drop": {
+        "chance": 0.15,
+        "amount": 40,
+        "tier_label": "solo_high"
+      }
+    },
+    {
+      "code": 20200111,
+      "name": "Orc",
+      "type": "solo",
+      "level": 10,
+      "amount": 121500,
+      "action_point_cost": 10,
+      "stats": {
+        "hp": 400,
+        "attack": 140,
+        "defense": 80
+      },
+      "power_per_unit": 32,
+      "drops": [
+        {
+          "item_code": 10101020,
+          "count": 35,
+          "probability": 1.0,
+          "label": "35× resource pack"
+        },
+        {
+          "item_code": 10101001,
+          "count": 10,
+          "probability": 0.08,
+          "label": "small food"
+        },
+        {
+          "item_code": 10104024,
+          "count": 1,
+          "probability": 0.1,
+          "label": "T1 troop pack"
+        },
+        {
+          "item_code": 10103032,
+          "count": 25,
+          "probability": 0.5,
+          "label": "Train SP 15min"
+        },
+        {
+          "item_code": 10103042,
+          "count": 25,
+          "probability": 0.5,
+          "label": "Recover SP 15min"
+        },
+        {
+          "item_code": 10601001,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Normal Treasure Fragment"
+        },
+        {
+          "item_code": 10602002,
+          "count": 3,
+          "probability": 0.25,
+          "label": "Rare Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 15,
+      "spawn_rarity": "common",
+      "charm_drop": {
+        "base_drop_chance": 0.3,
+        "rarity_distribution": {
+          "normal": 0.0,
+          "epic": 0.5,
+          "legendary": 0.5
+        },
+        "stat_category_roll": "uniform_random_8_categories",
+        "tier": "endgame"
+      },
+      "gems_drop": {
+        "chance": 0.15,
+        "amount": 40,
+        "tier_label": "solo_high"
+      }
+    },
+    {
+      "code": 20200201,
+      "name": "Skeleton",
+      "type": "solo",
+      "level": 1,
+      "amount": 500,
+      "action_point_cost": 10,
+      "stats": {
+        "hp": 105,
+        "attack": 40,
+        "defense": 21
+      },
+      "power_per_unit": 5,
+      "drops": [
+        {
+          "item_code": 10101014,
+          "count": 5,
+          "probability": 1.0,
+          "label": "5× resource pack"
+        },
+        {
+          "item_code": 10101001,
+          "count": 1,
+          "probability": 0.08,
+          "label": "small food"
+        },
+        {
+          "item_code": 10104024,
+          "count": 1,
+          "probability": 0.01,
+          "label": "T1 troop pack"
+        },
+        {
+          "item_code": 10103032,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Train SP 15min"
+        },
+        {
+          "item_code": 10103042,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Recover SP 15min"
+        },
+        {
+          "item_code": 10601001,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Normal Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 15,
+      "spawn_rarity": "common",
+      "charm_drop": {
+        "base_drop_chance": 0.3,
+        "rarity_distribution": {
+          "normal": 0.75,
+          "epic": 0.25,
+          "legendary": 0.0
+        },
+        "stat_category_roll": "uniform_random_8_categories",
+        "tier": "low"
+      },
+      "gems_drop": {
+        "chance": 0.15,
+        "amount": 10,
+        "tier_label": "solo_low"
+      }
+    },
+    {
+      "code": 20200202,
+      "name": "Skeleton",
+      "type": "solo",
+      "level": 2,
+      "amount": 1500,
+      "action_point_cost": 10,
+      "stats": {
+        "hp": 130,
+        "attack": 50,
+        "defense": 27
+      },
+      "power_per_unit": 8,
+      "drops": [
+        {
+          "item_code": 10101015,
+          "count": 10,
+          "probability": 1.0,
+          "label": "10× resource pack"
+        },
+        {
+          "item_code": 10101001,
+          "count": 2,
+          "probability": 0.08,
+          "label": "small food"
+        },
+        {
+          "item_code": 10104024,
+          "count": 1,
+          "probability": 0.02,
+          "label": "T1 troop pack"
+        },
+        {
+          "item_code": 10103032,
+          "count": 6,
+          "probability": 0.5,
+          "label": "Train SP 15min"
+        },
+        {
+          "item_code": 10103042,
+          "count": 6,
+          "probability": 0.5,
+          "label": "Recover SP 15min"
+        },
+        {
+          "item_code": 10601001,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Normal Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 15,
+      "spawn_rarity": "common",
+      "charm_drop": {
+        "base_drop_chance": 0.3,
+        "rarity_distribution": {
+          "normal": 0.75,
+          "epic": 0.25,
+          "legendary": 0.0
+        },
+        "stat_category_roll": "uniform_random_8_categories",
+        "tier": "low"
+      },
+      "gems_drop": {
+        "chance": 0.15,
+        "amount": 10,
+        "tier_label": "solo_low"
+      }
+    },
+    {
+      "code": 20200203,
+      "name": "Skeleton",
+      "type": "solo",
+      "level": 3,
+      "amount": 4500,
+      "action_point_cost": 10,
+      "stats": {
+        "hp": 155,
+        "attack": 60,
+        "defense": 33
+      },
+      "power_per_unit": 11,
+      "drops": [
+        {
+          "item_code": 10101016,
+          "count": 15,
+          "probability": 1.0,
+          "label": "15× resource pack"
+        },
+        {
+          "item_code": 10101001,
+          "count": 3,
+          "probability": 0.08,
+          "label": "small food"
+        },
+        {
+          "item_code": 10104024,
+          "count": 1,
+          "probability": 0.03,
+          "label": "T1 troop pack"
+        },
+        {
+          "item_code": 10103032,
+          "count": 9,
+          "probability": 0.5,
+          "label": "Train SP 15min"
+        },
+        {
+          "item_code": 10103042,
+          "count": 9,
+          "probability": 0.5,
+          "label": "Recover SP 15min"
+        },
+        {
+          "item_code": 10601001,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Normal Treasure Fragment"
+        },
+        {
+          "item_code": 10602002,
+          "count": 3,
+          "probability": 0.25,
+          "label": "Rare Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 15,
+      "spawn_rarity": "common",
+      "charm_drop": {
+        "base_drop_chance": 0.3,
+        "rarity_distribution": {
+          "normal": 0.75,
+          "epic": 0.25,
+          "legendary": 0.0
+        },
+        "stat_category_roll": "uniform_random_8_categories",
+        "tier": "low"
+      },
+      "gems_drop": {
+        "chance": 0.15,
+        "amount": 10,
+        "tier_label": "solo_low"
+      }
+    },
+    {
+      "code": 20200204,
+      "name": "Skeleton",
+      "type": "solo",
+      "level": 4,
+      "amount": 13500,
+      "action_point_cost": 10,
+      "stats": {
+        "hp": 180,
+        "attack": 70,
+        "defense": 39
+      },
+      "power_per_unit": 14,
+      "drops": [
+        {
+          "item_code": 10101017,
+          "count": 20,
+          "probability": 1.0,
+          "label": "20× resource pack"
+        },
+        {
+          "item_code": 10101001,
+          "count": 4,
+          "probability": 0.08,
+          "label": "small food"
+        },
+        {
+          "item_code": 10104024,
+          "count": 1,
+          "probability": 0.04,
+          "label": "T1 troop pack"
+        },
+        {
+          "item_code": 10103032,
+          "count": 12,
+          "probability": 0.5,
+          "label": "Train SP 15min"
+        },
+        {
+          "item_code": 10103042,
+          "count": 12,
+          "probability": 0.5,
+          "label": "Recover SP 15min"
+        },
+        {
+          "item_code": 10601001,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Normal Treasure Fragment"
+        },
+        {
+          "item_code": 10602002,
+          "count": 3,
+          "probability": 0.25,
+          "label": "Rare Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 15,
+      "spawn_rarity": "common",
+      "charm_drop": {
+        "base_drop_chance": 0.3,
+        "rarity_distribution": {
+          "normal": 0.65,
+          "epic": 0.35,
+          "legendary": 0.0
+        },
+        "stat_category_roll": "uniform_random_8_categories",
+        "tier": "mid"
+      },
+      "gems_drop": {
+        "chance": 0.15,
+        "amount": 30,
+        "tier_label": "solo_mid"
+      }
+    },
+    {
+      "code": 20200205,
+      "name": "Skeleton",
+      "type": "solo",
+      "level": 5,
+      "amount": 40500,
+      "action_point_cost": 10,
+      "stats": {
+        "hp": 205,
+        "attack": 80,
+        "defense": 45
+      },
+      "power_per_unit": 17,
+      "drops": [
+        {
+          "item_code": 10101017,
+          "count": 25,
+          "probability": 1.0,
+          "label": "25× resource pack"
+        },
+        {
+          "item_code": 10101001,
+          "count": 5,
+          "probability": 0.08,
+          "label": "small food"
+        },
+        {
+          "item_code": 10104024,
+          "count": 1,
+          "probability": 0.05,
+          "label": "T1 troop pack"
+        },
+        {
+          "item_code": 10103032,
+          "count": 15,
+          "probability": 0.5,
+          "label": "Train SP 15min"
+        },
+        {
+          "item_code": 10103042,
+          "count": 15,
+          "probability": 0.5,
+          "label": "Recover SP 15min"
+        },
+        {
+          "item_code": 10601001,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Normal Treasure Fragment"
+        },
+        {
+          "item_code": 10602002,
+          "count": 3,
+          "probability": 0.25,
+          "label": "Rare Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 15,
+      "spawn_rarity": "common",
+      "charm_drop": {
+        "base_drop_chance": 0.3,
+        "rarity_distribution": {
+          "normal": 0.65,
+          "epic": 0.35,
+          "legendary": 0.0
+        },
+        "stat_category_roll": "uniform_random_8_categories",
+        "tier": "mid"
+      },
+      "gems_drop": {
+        "chance": 0.15,
+        "amount": 30,
+        "tier_label": "solo_mid"
+      }
+    },
+    {
+      "code": 20200206,
+      "name": "Skeleton",
+      "type": "solo",
+      "level": 6,
+      "amount": 121500,
+      "action_point_cost": 10,
+      "stats": {
+        "hp": 230,
+        "attack": 90,
+        "defense": 51
+      },
+      "power_per_unit": 20,
+      "drops": [
+        {
+          "item_code": 10101018,
+          "count": 30,
+          "probability": 1.0,
+          "label": "30× resource pack"
+        },
+        {
+          "item_code": 10101001,
+          "count": 6,
+          "probability": 0.08,
+          "label": "small food"
+        },
+        {
+          "item_code": 10104024,
+          "count": 1,
+          "probability": 0.06,
+          "label": "T1 troop pack"
+        },
+        {
+          "item_code": 10103032,
+          "count": 18,
+          "probability": 0.5,
+          "label": "Train SP 15min"
+        },
+        {
+          "item_code": 10103042,
+          "count": 18,
+          "probability": 0.5,
+          "label": "Recover SP 15min"
+        },
+        {
+          "item_code": 10601001,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Normal Treasure Fragment"
+        },
+        {
+          "item_code": 10602002,
+          "count": 3,
+          "probability": 0.25,
+          "label": "Rare Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 15,
+      "spawn_rarity": "common",
+      "charm_drop": {
+        "base_drop_chance": 0.3,
+        "rarity_distribution": {
+          "normal": 0.65,
+          "epic": 0.35,
+          "legendary": 0.0
+        },
+        "stat_category_roll": "uniform_random_8_categories",
+        "tier": "mid"
+      },
+      "gems_drop": {
+        "chance": 0.15,
+        "amount": 30,
+        "tier_label": "solo_mid"
+      }
+    },
+    {
+      "code": 20200207,
+      "name": "Skeleton",
+      "type": "solo",
+      "level": 7,
+      "amount": 121500,
+      "action_point_cost": 10,
+      "stats": {
+        "hp": 255,
+        "attack": 100,
+        "defense": 57
+      },
+      "power_per_unit": 23,
+      "drops": [
+        {
+          "item_code": 10101018,
+          "count": 35,
+          "probability": 1.0,
+          "label": "35× resource pack"
+        },
+        {
+          "item_code": 10101001,
+          "count": 7,
+          "probability": 0.08,
+          "label": "small food"
+        },
+        {
+          "item_code": 10104024,
+          "count": 1,
+          "probability": 0.07,
+          "label": "T1 troop pack"
+        },
+        {
+          "item_code": 10103032,
+          "count": 21,
+          "probability": 0.5,
+          "label": "Train SP 15min"
+        },
+        {
+          "item_code": 10103042,
+          "count": 21,
+          "probability": 0.5,
+          "label": "Recover SP 15min"
+        },
+        {
+          "item_code": 10601001,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Normal Treasure Fragment"
+        },
+        {
+          "item_code": 10602002,
+          "count": 3,
+          "probability": 0.25,
+          "label": "Rare Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 15,
+      "spawn_rarity": "common",
+      "charm_drop": {
+        "base_drop_chance": 0.3,
+        "rarity_distribution": {
+          "normal": 0.0,
+          "epic": 0.75,
+          "legendary": 0.25
+        },
+        "stat_category_roll": "uniform_random_8_categories",
+        "tier": "high"
+      },
+      "gems_drop": {
+        "chance": 0.15,
+        "amount": 40,
+        "tier_label": "solo_high"
+      }
+    },
+    {
+      "code": 20200208,
+      "name": "Skeleton",
+      "type": "solo",
+      "level": 8,
+      "amount": 121500,
+      "action_point_cost": 10,
+      "stats": {
+        "hp": 280,
+        "attack": 110,
+        "defense": 63
+      },
+      "power_per_unit": 26,
+      "drops": [
+        {
+          "item_code": 10101019,
+          "count": 35,
+          "probability": 1.0,
+          "label": "35× resource pack"
+        },
+        {
+          "item_code": 10101001,
+          "count": 8,
+          "probability": 0.08,
+          "label": "small food"
+        },
+        {
+          "item_code": 10104024,
+          "count": 1,
+          "probability": 0.08,
+          "label": "T1 troop pack"
+        },
+        {
+          "item_code": 10103032,
+          "count": 24,
+          "probability": 0.5,
+          "label": "Train SP 15min"
+        },
+        {
+          "item_code": 10103042,
+          "count": 24,
+          "probability": 0.5,
+          "label": "Recover SP 15min"
+        },
+        {
+          "item_code": 10601001,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Normal Treasure Fragment"
+        },
+        {
+          "item_code": 10602002,
+          "count": 3,
+          "probability": 0.25,
+          "label": "Rare Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 15,
+      "spawn_rarity": "common",
+      "charm_drop": {
+        "base_drop_chance": 0.3,
+        "rarity_distribution": {
+          "normal": 0.0,
+          "epic": 0.75,
+          "legendary": 0.25
+        },
+        "stat_category_roll": "uniform_random_8_categories",
+        "tier": "high"
+      },
+      "gems_drop": {
+        "chance": 0.15,
+        "amount": 40,
+        "tier_label": "solo_high"
+      }
+    },
+    {
+      "code": 20200209,
+      "name": "Skeleton",
+      "type": "solo",
+      "level": 9,
+      "amount": 121500,
+      "action_point_cost": 10,
+      "stats": {
+        "hp": 305,
+        "attack": 120,
+        "defense": 69
+      },
+      "power_per_unit": 29,
+      "drops": [
+        {
+          "item_code": 10101019,
+          "count": 35,
+          "probability": 1.0,
+          "label": "35× resource pack"
+        },
+        {
+          "item_code": 10101001,
+          "count": 9,
+          "probability": 0.08,
+          "label": "small food"
+        },
+        {
+          "item_code": 10104024,
+          "count": 1,
+          "probability": 0.09,
+          "label": "T1 troop pack"
+        },
+        {
+          "item_code": 10103032,
+          "count": 25,
+          "probability": 0.5,
+          "label": "Train SP 15min"
+        },
+        {
+          "item_code": 10103042,
+          "count": 25,
+          "probability": 0.5,
+          "label": "Recover SP 15min"
+        },
+        {
+          "item_code": 10601001,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Normal Treasure Fragment"
+        },
+        {
+          "item_code": 10602002,
+          "count": 3,
+          "probability": 0.25,
+          "label": "Rare Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 15,
+      "spawn_rarity": "common",
+      "charm_drop": {
+        "base_drop_chance": 0.3,
+        "rarity_distribution": {
+          "normal": 0.0,
+          "epic": 0.5,
+          "legendary": 0.5
+        },
+        "stat_category_roll": "uniform_random_8_categories",
+        "tier": "endgame"
+      },
+      "gems_drop": {
+        "chance": 0.15,
+        "amount": 40,
+        "tier_label": "solo_high"
+      }
+    },
+    {
+      "code": 20200210,
+      "name": "Skeleton",
+      "type": "solo",
+      "level": 10,
+      "amount": 121500,
+      "action_point_cost": 10,
+      "stats": {
+        "hp": 330,
+        "attack": 130,
+        "defense": 75
+      },
+      "power_per_unit": 32,
+      "drops": [
+        {
+          "item_code": 10101020,
+          "count": 35,
+          "probability": 1.0,
+          "label": "35× resource pack"
+        },
+        {
+          "item_code": 10101001,
+          "count": 10,
+          "probability": 0.08,
+          "label": "small food"
+        },
+        {
+          "item_code": 10104024,
+          "count": 1,
+          "probability": 0.1,
+          "label": "T1 troop pack"
+        },
+        {
+          "item_code": 10103032,
+          "count": 25,
+          "probability": 0.5,
+          "label": "Train SP 15min"
+        },
+        {
+          "item_code": 10103042,
+          "count": 25,
+          "probability": 0.5,
+          "label": "Recover SP 15min"
+        },
+        {
+          "item_code": 10601001,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Normal Treasure Fragment"
+        },
+        {
+          "item_code": 10602002,
+          "count": 3,
+          "probability": 0.25,
+          "label": "Rare Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 15,
+      "spawn_rarity": "common",
+      "charm_drop": {
+        "base_drop_chance": 0.3,
+        "rarity_distribution": {
+          "normal": 0.0,
+          "epic": 0.5,
+          "legendary": 0.5
+        },
+        "stat_category_roll": "uniform_random_8_categories",
+        "tier": "endgame"
+      },
+      "gems_drop": {
+        "chance": 0.15,
+        "amount": 40,
+        "tier_label": "solo_high"
+      }
+    },
+    {
+      "code": 20200301,
+      "name": "Golem",
+      "type": "solo",
+      "level": 1,
+      "amount": 500,
+      "action_point_cost": 10,
+      "stats": {
+        "hp": 130,
+        "attack": 23,
+        "defense": 35
+      },
+      "power_per_unit": 5,
+      "drops": [
+        {
+          "item_code": 10101025,
+          "count": 5,
+          "probability": 1.0,
+          "label": "5× resource pack"
+        },
+        {
+          "item_code": 10101001,
+          "count": 1,
+          "probability": 0.08,
+          "label": "small food"
+        },
+        {
+          "item_code": 10104024,
+          "count": 1,
+          "probability": 0.01,
+          "label": "T1 troop pack"
+        },
+        {
+          "item_code": 10103032,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Train SP 15min"
+        },
+        {
+          "item_code": 10103042,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Recover SP 15min"
+        },
+        {
+          "item_code": 10601001,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Normal Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 15,
+      "spawn_rarity": "common",
+      "charm_drop": {
+        "base_drop_chance": 0.3,
+        "rarity_distribution": {
+          "normal": 0.75,
+          "epic": 0.25,
+          "legendary": 0.0
+        },
+        "stat_category_roll": "uniform_random_8_categories",
+        "tier": "low"
+      },
+      "gems_drop": {
+        "chance": 0.15,
+        "amount": 10,
+        "tier_label": "solo_low"
+      }
+    },
+    {
+      "code": 20200302,
+      "name": "Golem",
+      "type": "solo",
+      "level": 2,
+      "amount": 1500,
+      "action_point_cost": 10,
+      "stats": {
+        "hp": 150,
+        "attack": 31,
+        "defense": 45
+      },
+      "power_per_unit": 8,
+      "drops": [
+        {
+          "item_code": 10101026,
+          "count": 10,
+          "probability": 1.0,
+          "label": "10× resource pack"
+        },
+        {
+          "item_code": 10101001,
+          "count": 2,
+          "probability": 0.08,
+          "label": "small food"
+        },
+        {
+          "item_code": 10104024,
+          "count": 1,
+          "probability": 0.02,
+          "label": "T1 troop pack"
+        },
+        {
+          "item_code": 10103032,
+          "count": 6,
+          "probability": 0.5,
+          "label": "Train SP 15min"
+        },
+        {
+          "item_code": 10103042,
+          "count": 6,
+          "probability": 0.5,
+          "label": "Recover SP 15min"
+        },
+        {
+          "item_code": 10601001,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Normal Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 15,
+      "spawn_rarity": "common",
+      "charm_drop": {
+        "base_drop_chance": 0.3,
+        "rarity_distribution": {
+          "normal": 0.75,
+          "epic": 0.25,
+          "legendary": 0.0
+        },
+        "stat_category_roll": "uniform_random_8_categories",
+        "tier": "low"
+      },
+      "gems_drop": {
+        "chance": 0.15,
+        "amount": 10,
+        "tier_label": "solo_low"
+      }
+    },
+    {
+      "code": 20200303,
+      "name": "Golem",
+      "type": "solo",
+      "level": 3,
+      "amount": 4500,
+      "action_point_cost": 10,
+      "stats": {
+        "hp": 170,
+        "attack": 39,
+        "defense": 55
+      },
+      "power_per_unit": 11,
+      "drops": [
+        {
+          "item_code": 10101027,
+          "count": 15,
+          "probability": 1.0,
+          "label": "15× resource pack"
+        },
+        {
+          "item_code": 10101001,
+          "count": 3,
+          "probability": 0.08,
+          "label": "small food"
+        },
+        {
+          "item_code": 10104024,
+          "count": 1,
+          "probability": 0.03,
+          "label": "T1 troop pack"
+        },
+        {
+          "item_code": 10103032,
+          "count": 9,
+          "probability": 0.5,
+          "label": "Train SP 15min"
+        },
+        {
+          "item_code": 10103042,
+          "count": 9,
+          "probability": 0.5,
+          "label": "Recover SP 15min"
+        },
+        {
+          "item_code": 10601001,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Normal Treasure Fragment"
+        },
+        {
+          "item_code": 10602002,
+          "count": 3,
+          "probability": 0.25,
+          "label": "Rare Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 15,
+      "spawn_rarity": "common",
+      "charm_drop": {
+        "base_drop_chance": 0.3,
+        "rarity_distribution": {
+          "normal": 0.75,
+          "epic": 0.25,
+          "legendary": 0.0
+        },
+        "stat_category_roll": "uniform_random_8_categories",
+        "tier": "low"
+      },
+      "gems_drop": {
+        "chance": 0.15,
+        "amount": 10,
+        "tier_label": "solo_low"
+      }
+    },
+    {
+      "code": 20200304,
+      "name": "Golem",
+      "type": "solo",
+      "level": 4,
+      "amount": 13500,
+      "action_point_cost": 10,
+      "stats": {
+        "hp": 190,
+        "attack": 47,
+        "defense": 65
+      },
+      "power_per_unit": 14,
+      "drops": [
+        {
+          "item_code": 10101028,
+          "count": 20,
+          "probability": 1.0,
+          "label": "20× resource pack"
+        },
+        {
+          "item_code": 10101001,
+          "count": 4,
+          "probability": 0.08,
+          "label": "small food"
+        },
+        {
+          "item_code": 10104024,
+          "count": 1,
+          "probability": 0.04,
+          "label": "T1 troop pack"
+        },
+        {
+          "item_code": 10103032,
+          "count": 12,
+          "probability": 0.5,
+          "label": "Train SP 15min"
+        },
+        {
+          "item_code": 10103042,
+          "count": 12,
+          "probability": 0.5,
+          "label": "Recover SP 15min"
+        },
+        {
+          "item_code": 10601001,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Normal Treasure Fragment"
+        },
+        {
+          "item_code": 10602002,
+          "count": 3,
+          "probability": 0.25,
+          "label": "Rare Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 15,
+      "spawn_rarity": "common",
+      "charm_drop": {
+        "base_drop_chance": 0.3,
+        "rarity_distribution": {
+          "normal": 0.65,
+          "epic": 0.35,
+          "legendary": 0.0
+        },
+        "stat_category_roll": "uniform_random_8_categories",
+        "tier": "mid"
+      },
+      "gems_drop": {
+        "chance": 0.15,
+        "amount": 30,
+        "tier_label": "solo_mid"
+      }
+    },
+    {
+      "code": 20200305,
+      "name": "Golem",
+      "type": "solo",
+      "level": 5,
+      "amount": 40500,
+      "action_point_cost": 10,
+      "stats": {
+        "hp": 210,
+        "attack": 55,
+        "defense": 75
+      },
+      "power_per_unit": 17,
+      "drops": [
+        {
+          "item_code": 10101029,
+          "count": 25,
+          "probability": 1.0,
+          "label": "25× resource pack"
+        },
+        {
+          "item_code": 10101001,
+          "count": 5,
+          "probability": 0.08,
+          "label": "small food"
+        },
+        {
+          "item_code": 10104024,
+          "count": 1,
+          "probability": 0.05,
+          "label": "T1 troop pack"
+        },
+        {
+          "item_code": 10103032,
+          "count": 15,
+          "probability": 0.5,
+          "label": "Train SP 15min"
+        },
+        {
+          "item_code": 10103042,
+          "count": 15,
+          "probability": 0.5,
+          "label": "Recover SP 15min"
+        },
+        {
+          "item_code": 10601001,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Normal Treasure Fragment"
+        },
+        {
+          "item_code": 10602002,
+          "count": 3,
+          "probability": 0.25,
+          "label": "Rare Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 15,
+      "spawn_rarity": "common",
+      "charm_drop": {
+        "base_drop_chance": 0.3,
+        "rarity_distribution": {
+          "normal": 0.65,
+          "epic": 0.35,
+          "legendary": 0.0
+        },
+        "stat_category_roll": "uniform_random_8_categories",
+        "tier": "mid"
+      },
+      "gems_drop": {
+        "chance": 0.15,
+        "amount": 30,
+        "tier_label": "solo_mid"
+      }
+    },
+    {
+      "code": 20200306,
+      "name": "Golem",
+      "type": "solo",
+      "level": 6,
+      "amount": 121500,
+      "action_point_cost": 10,
+      "stats": {
+        "hp": 230,
+        "attack": 63,
+        "defense": 85
+      },
+      "power_per_unit": 20,
+      "drops": [
+        {
+          "item_code": 10101029,
+          "count": 30,
+          "probability": 1.0,
+          "label": "30× resource pack"
+        },
+        {
+          "item_code": 10101001,
+          "count": 6,
+          "probability": 0.08,
+          "label": "small food"
+        },
+        {
+          "item_code": 10104024,
+          "count": 1,
+          "probability": 0.06,
+          "label": "T1 troop pack"
+        },
+        {
+          "item_code": 10103032,
+          "count": 18,
+          "probability": 0.5,
+          "label": "Train SP 15min"
+        },
+        {
+          "item_code": 10103042,
+          "count": 18,
+          "probability": 0.5,
+          "label": "Recover SP 15min"
+        },
+        {
+          "item_code": 10601001,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Normal Treasure Fragment"
+        },
+        {
+          "item_code": 10602002,
+          "count": 3,
+          "probability": 0.25,
+          "label": "Rare Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 15,
+      "spawn_rarity": "common",
+      "charm_drop": {
+        "base_drop_chance": 0.3,
+        "rarity_distribution": {
+          "normal": 0.65,
+          "epic": 0.35,
+          "legendary": 0.0
+        },
+        "stat_category_roll": "uniform_random_8_categories",
+        "tier": "mid"
+      },
+      "gems_drop": {
+        "chance": 0.15,
+        "amount": 30,
+        "tier_label": "solo_mid"
+      }
+    },
+    {
+      "code": 20200307,
+      "name": "Golem",
+      "type": "solo",
+      "level": 7,
+      "amount": 121500,
+      "action_point_cost": 10,
+      "stats": {
+        "hp": 250,
+        "attack": 71,
+        "defense": 95
+      },
+      "power_per_unit": 23,
+      "drops": [
+        {
+          "item_code": 10101030,
+          "count": 35,
+          "probability": 1.0,
+          "label": "35× resource pack"
+        },
+        {
+          "item_code": 10101001,
+          "count": 7,
+          "probability": 0.08,
+          "label": "small food"
+        },
+        {
+          "item_code": 10104024,
+          "count": 1,
+          "probability": 0.07,
+          "label": "T1 troop pack"
+        },
+        {
+          "item_code": 10103032,
+          "count": 21,
+          "probability": 0.5,
+          "label": "Train SP 15min"
+        },
+        {
+          "item_code": 10103042,
+          "count": 21,
+          "probability": 0.5,
+          "label": "Recover SP 15min"
+        },
+        {
+          "item_code": 10601001,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Normal Treasure Fragment"
+        },
+        {
+          "item_code": 10602002,
+          "count": 3,
+          "probability": 0.25,
+          "label": "Rare Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 15,
+      "spawn_rarity": "common",
+      "charm_drop": {
+        "base_drop_chance": 0.3,
+        "rarity_distribution": {
+          "normal": 0.0,
+          "epic": 0.75,
+          "legendary": 0.25
+        },
+        "stat_category_roll": "uniform_random_8_categories",
+        "tier": "high"
+      },
+      "gems_drop": {
+        "chance": 0.15,
+        "amount": 40,
+        "tier_label": "solo_high"
+      }
+    },
+    {
+      "code": 20200308,
+      "name": "Golem",
+      "type": "solo",
+      "level": 8,
+      "amount": 121500,
+      "action_point_cost": 10,
+      "stats": {
+        "hp": 270,
+        "attack": 79,
+        "defense": 105
+      },
+      "power_per_unit": 26,
+      "drops": [
+        {
+          "item_code": 10101030,
+          "count": 35,
+          "probability": 1.0,
+          "label": "35× resource pack"
+        },
+        {
+          "item_code": 10101001,
+          "count": 8,
+          "probability": 0.08,
+          "label": "small food"
+        },
+        {
+          "item_code": 10104024,
+          "count": 1,
+          "probability": 0.08,
+          "label": "T1 troop pack"
+        },
+        {
+          "item_code": 10103032,
+          "count": 24,
+          "probability": 0.5,
+          "label": "Train SP 15min"
+        },
+        {
+          "item_code": 10103042,
+          "count": 24,
+          "probability": 0.5,
+          "label": "Recover SP 15min"
+        },
+        {
+          "item_code": 10601001,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Normal Treasure Fragment"
+        },
+        {
+          "item_code": 10602002,
+          "count": 3,
+          "probability": 0.25,
+          "label": "Rare Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 15,
+      "spawn_rarity": "common",
+      "charm_drop": {
+        "base_drop_chance": 0.3,
+        "rarity_distribution": {
+          "normal": 0.0,
+          "epic": 0.75,
+          "legendary": 0.25
+        },
+        "stat_category_roll": "uniform_random_8_categories",
+        "tier": "high"
+      },
+      "gems_drop": {
+        "chance": 0.15,
+        "amount": 40,
+        "tier_label": "solo_high"
+      }
+    },
+    {
+      "code": 20200309,
+      "name": "Golem",
+      "type": "solo",
+      "level": 9,
+      "amount": 121500,
+      "action_point_cost": 10,
+      "stats": {
+        "hp": 290,
+        "attack": 87,
+        "defense": 115
+      },
+      "power_per_unit": 29,
+      "drops": [
+        {
+          "item_code": 10101031,
+          "count": 35,
+          "probability": 1.0,
+          "label": "35× resource pack"
+        },
+        {
+          "item_code": 10101001,
+          "count": 9,
+          "probability": 0.08,
+          "label": "small food"
+        },
+        {
+          "item_code": 10104024,
+          "count": 1,
+          "probability": 0.09,
+          "label": "T1 troop pack"
+        },
+        {
+          "item_code": 10103032,
+          "count": 25,
+          "probability": 0.5,
+          "label": "Train SP 15min"
+        },
+        {
+          "item_code": 10103042,
+          "count": 25,
+          "probability": 0.5,
+          "label": "Recover SP 15min"
+        },
+        {
+          "item_code": 10601001,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Normal Treasure Fragment"
+        },
+        {
+          "item_code": 10602002,
+          "count": 3,
+          "probability": 0.25,
+          "label": "Rare Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 15,
+      "spawn_rarity": "common",
+      "charm_drop": {
+        "base_drop_chance": 0.3,
+        "rarity_distribution": {
+          "normal": 0.0,
+          "epic": 0.5,
+          "legendary": 0.5
+        },
+        "stat_category_roll": "uniform_random_8_categories",
+        "tier": "endgame"
+      },
+      "gems_drop": {
+        "chance": 0.15,
+        "amount": 40,
+        "tier_label": "solo_high"
+      }
+    },
+    {
+      "code": 20200310,
+      "name": "Golem",
+      "type": "solo",
+      "level": 10,
+      "amount": 121500,
+      "action_point_cost": 10,
+      "stats": {
+        "hp": 310,
+        "attack": 95,
+        "defense": 125
+      },
+      "power_per_unit": 32,
+      "drops": [
+        {
+          "item_code": 10101031,
+          "count": 35,
+          "probability": 1.0,
+          "label": "35× resource pack"
+        },
+        {
+          "item_code": 10101001,
+          "count": 10,
+          "probability": 0.08,
+          "label": "small food"
+        },
+        {
+          "item_code": 10104024,
+          "count": 1,
+          "probability": 0.1,
+          "label": "T1 troop pack"
+        },
+        {
+          "item_code": 10103032,
+          "count": 25,
+          "probability": 0.5,
+          "label": "Train SP 15min"
+        },
+        {
+          "item_code": 10103042,
+          "count": 25,
+          "probability": 0.5,
+          "label": "Recover SP 15min"
+        },
+        {
+          "item_code": 10601001,
+          "count": 3,
+          "probability": 0.5,
+          "label": "Normal Treasure Fragment"
+        },
+        {
+          "item_code": 10602002,
+          "count": 3,
+          "probability": 0.25,
+          "label": "Rare Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 15,
+      "spawn_rarity": "common",
+      "charm_drop": {
+        "base_drop_chance": 0.3,
+        "rarity_distribution": {
+          "normal": 0.0,
+          "epic": 0.5,
+          "legendary": 0.5
+        },
+        "stat_category_roll": "uniform_random_8_categories",
+        "tier": "endgame"
+      },
+      "gems_drop": {
+        "chance": 0.15,
+        "amount": 40,
+        "tier_label": "solo_high"
+      }
+    },
+    {
+      "code": 20200401,
+      "name": "Treasure Goblin",
+      "type": "solo",
+      "level": 1,
+      "amount": 200,
+      "action_point_cost": 20,
+      "stats": {
+        "hp": 80,
+        "attack": 35,
+        "defense": 20
+      },
+      "power_per_unit": 5,
+      "drops": [
+        {
+          "item_code": 10101039,
+          "count": 5,
+          "probability": 1.0,
+          "label": "Gold 1k × 5"
+        },
+        {
+          "item_code": 10103013,
+          "count": 1,
+          "probability": 1.0,
+          "label": "Build Speedup 30min"
+        },
+        {
+          "item_code": 10103023,
+          "count": 1,
+          "probability": 1.0,
+          "label": "Research Speedup 30min"
+        },
+        {
+          "item_code": 10602002,
+          "count": 1,
+          "probability": 0.3,
+          "label": "Rare Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 60,
+      "spawn_rarity": "rare",
+      "despawn_minutes": 30,
+      "gems_drop": {
+        "chance": 0.5,
+        "amount": 30,
+        "tier_label": "goblin_easy"
+      }
+    },
+    {
+      "code": 20200402,
+      "name": "Treasure Goblin",
+      "type": "solo",
+      "level": 2,
+      "amount": 500,
+      "action_point_cost": 20,
+      "stats": {
+        "hp": 120,
+        "attack": 50,
+        "defense": 30
+      },
+      "power_per_unit": 10,
+      "drops": [
+        {
+          "item_code": 10101040,
+          "count": 5,
+          "probability": 1.0,
+          "label": "Gold 5k × 5"
+        },
+        {
+          "item_code": 10103013,
+          "count": 2,
+          "probability": 1.0,
+          "label": "Build Speedup 30min × 2"
+        },
+        {
+          "item_code": 10103023,
+          "count": 2,
+          "probability": 1.0,
+          "label": "Research Speedup 30min × 2"
+        },
+        {
+          "item_code": 10602002,
+          "count": 1,
+          "probability": 0.4,
+          "label": "Rare Treasure Fragment"
+        },
+        {
+          "item_code": 10603023,
+          "count": 1,
+          "probability": 0.1,
+          "label": "Epic Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 60,
+      "spawn_rarity": "rare",
+      "despawn_minutes": 30,
+      "gems_drop": {
+        "chance": 0.5,
+        "amount": 30,
+        "tier_label": "goblin_easy"
+      }
+    },
+    {
+      "code": 20200403,
+      "name": "Treasure Goblin",
+      "type": "solo",
+      "level": 3,
+      "amount": 1500,
+      "action_point_cost": 20,
+      "stats": {
+        "hp": 180,
+        "attack": 75,
+        "defense": 50
+      },
+      "power_per_unit": 18,
+      "drops": [
+        {
+          "item_code": 10101041,
+          "count": 5,
+          "probability": 1.0,
+          "label": "Gold 10k × 5"
+        },
+        {
+          "item_code": 10103014,
+          "count": 1,
+          "probability": 1.0,
+          "label": "Build Speedup 1h"
+        },
+        {
+          "item_code": 10103024,
+          "count": 1,
+          "probability": 1.0,
+          "label": "Research Speedup 1h"
+        },
+        {
+          "item_code": 10603023,
+          "count": 1,
+          "probability": 0.3,
+          "label": "Epic Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 60,
+      "spawn_rarity": "rare",
+      "despawn_minutes": 30,
+      "gems_drop": {
+        "chance": 0.5,
+        "amount": 50,
+        "tier_label": "goblin_standard"
+      }
+    },
+    {
+      "code": 20200404,
+      "name": "Treasure Goblin",
+      "type": "solo",
+      "level": 4,
+      "amount": 5000,
+      "action_point_cost": 20,
+      "stats": {
+        "hp": 250,
+        "attack": 110,
+        "defense": 75
+      },
+      "power_per_unit": 30,
+      "drops": [
+        {
+          "item_code": 10101042,
+          "count": 5,
+          "probability": 1.0,
+          "label": "Gold 50k × 5"
+        },
+        {
+          "item_code": 10103014,
+          "count": 2,
+          "probability": 1.0,
+          "label": "Build Speedup 1h × 2"
+        },
+        {
+          "item_code": 10103024,
+          "count": 2,
+          "probability": 1.0,
+          "label": "Research Speedup 1h × 2"
+        },
+        {
+          "item_code": 10603023,
+          "count": 1,
+          "probability": 0.4,
+          "label": "Epic Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 60,
+      "spawn_rarity": "rare",
+      "despawn_minutes": 30,
+      "gems_drop": {
+        "chance": 0.5,
+        "amount": 75,
+        "tier_label": "goblin_endgame"
+      }
+    },
+    {
+      "code": 20200405,
+      "name": "Treasure Goblin",
+      "type": "solo",
+      "level": 5,
+      "amount": 15000,
+      "action_point_cost": 20,
+      "stats": {
+        "hp": 320,
+        "attack": 150,
+        "defense": 110
+      },
+      "power_per_unit": 50,
+      "drops": [
+        {
+          "item_code": 10101043,
+          "count": 5,
+          "probability": 1.0,
+          "label": "Gold 100k × 5"
+        },
+        {
+          "item_code": 10103015,
+          "count": 1,
+          "probability": 1.0,
+          "label": "Build Speedup 3h"
+        },
+        {
+          "item_code": 10103025,
+          "count": 1,
+          "probability": 1.0,
+          "label": "Research Speedup 3h"
+        },
+        {
+          "item_code": 10603023,
+          "count": 1,
+          "probability": 0.5,
+          "label": "Epic Treasure Fragment"
+        },
+        {
+          "item_code": 10604001,
+          "count": 1,
+          "probability": 0.1,
+          "label": "Legendary Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 60,
+      "spawn_rarity": "rare",
+      "despawn_minutes": 30,
+      "gems_drop": {
+        "chance": 0.5,
+        "amount": 75,
+        "tier_label": "goblin_endgame"
+      }
+    },
+    {
+      "code": 20200501,
+      "name": "Deathkar",
+      "type": "rally",
+      "level": 1,
+      "amount": 30000,
+      "action_point_cost": 25,
+      "stats": {
+        "hp": 157,
+        "attack": 110,
+        "defense": 72
+      },
+      "power_per_unit": 7,
+      "drops": [
+        {
+          "item_code": 10101040,
+          "count": 5,
+          "probability": 1.0,
+          "label": "Gold 5k × 5"
+        },
+        {
+          "item_code": 10103033,
+          "count": 1,
+          "probability": 1.0,
+          "label": "Train SP 30min × 1"
+        },
+        {
+          "item_code": 10103043,
+          "count": 1,
+          "probability": 1.0,
+          "label": "Recover SP 30min × 1"
+        },
+        {
+          "item_code": 10101007,
+          "count": 1,
+          "probability": 0.2,
+          "label": "Food 100k"
+        },
+        {
+          "item_code": 10104022,
+          "count": 1,
+          "probability": 0.3,
+          "label": "Gold Chest"
+        }
+      ],
+      "respawn_minutes": 120,
+      "spawn_rarity": "uncommon",
+      "alliance_gift": {
+        "item_code": 10104022,
+        "count": 1
+      },
+      "gems_drop": {
+        "chance": 0.3,
+        "amount": 50,
+        "tier_label": "rally_mid"
+      }
+    },
+    {
+      "code": 20200502,
+      "name": "Deathkar",
+      "type": "rally",
+      "level": 2,
+      "amount": 60000,
+      "action_point_cost": 25,
+      "stats": {
+        "hp": 184,
+        "attack": 140,
+        "defense": 94
+      },
+      "power_per_unit": 11,
+      "drops": [
+        {
+          "item_code": 10101040,
+          "count": 10,
+          "probability": 1.0,
+          "label": "Gold 5k × 10"
+        },
+        {
+          "item_code": 10103033,
+          "count": 2,
+          "probability": 1.0,
+          "label": "Train SP 30min × 2"
+        },
+        {
+          "item_code": 10103043,
+          "count": 2,
+          "probability": 1.0,
+          "label": "Recover SP 30min × 2"
+        },
+        {
+          "item_code": 10101007,
+          "count": 2,
+          "probability": 0.2,
+          "label": "Food 100k"
+        },
+        {
+          "item_code": 10104022,
+          "count": 1,
+          "probability": 0.3,
+          "label": "Gold Chest"
+        }
+      ],
+      "respawn_minutes": 120,
+      "spawn_rarity": "uncommon",
+      "alliance_gift": {
+        "item_code": 10104022,
+        "count": 1
+      },
+      "gems_drop": {
+        "chance": 0.3,
+        "amount": 50,
+        "tier_label": "rally_mid"
+      }
+    },
+    {
+      "code": 20200503,
+      "name": "Deathkar",
+      "type": "rally",
+      "level": 3,
+      "amount": 120000,
+      "action_point_cost": 25,
+      "stats": {
+        "hp": 211,
+        "attack": 170,
+        "defense": 116
+      },
+      "power_per_unit": 15,
+      "drops": [
+        {
+          "item_code": 10101040,
+          "count": 15,
+          "probability": 1.0,
+          "label": "Gold 5k × 15"
+        },
+        {
+          "item_code": 10103033,
+          "count": 2,
+          "probability": 1.0,
+          "label": "Train SP 30min × 2"
+        },
+        {
+          "item_code": 10103043,
+          "count": 2,
+          "probability": 1.0,
+          "label": "Recover SP 30min × 2"
+        },
+        {
+          "item_code": 10101007,
+          "count": 3,
+          "probability": 0.2,
+          "label": "Food 100k"
+        },
+        {
+          "item_code": 10104022,
+          "count": 1,
+          "probability": 0.3,
+          "label": "Gold Chest"
+        },
+        {
+          "item_code": 10604001,
+          "count": 1,
+          "probability": 0.4,
+          "label": "Legendary Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 120,
+      "spawn_rarity": "uncommon",
+      "alliance_gift": {
+        "item_code": 10104022,
+        "count": 1
+      },
+      "gems_drop": {
+        "chance": 0.3,
+        "amount": 50,
+        "tier_label": "rally_mid"
+      }
+    },
+    {
+      "code": 20200504,
+      "name": "Deathkar",
+      "type": "rally",
+      "level": 4,
+      "amount": 240000,
+      "action_point_cost": 25,
+      "stats": {
+        "hp": 238,
+        "attack": 200,
+        "defense": 138
+      },
+      "power_per_unit": 19,
+      "drops": [
+        {
+          "item_code": 10101040,
+          "count": 20,
+          "probability": 1.0,
+          "label": "Gold 5k × 20"
+        },
+        {
+          "item_code": 10103033,
+          "count": 3,
+          "probability": 1.0,
+          "label": "Train SP 30min × 3"
+        },
+        {
+          "item_code": 10103043,
+          "count": 3,
+          "probability": 1.0,
+          "label": "Recover SP 30min × 3"
+        },
+        {
+          "item_code": 10101007,
+          "count": 4,
+          "probability": 0.2,
+          "label": "Food 100k"
+        },
+        {
+          "item_code": 10104022,
+          "count": 2,
+          "probability": 0.3,
+          "label": "Gold Chest"
+        },
+        {
+          "item_code": 10604001,
+          "count": 1,
+          "probability": 0.4,
+          "label": "Legendary Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 120,
+      "spawn_rarity": "uncommon",
+      "alliance_gift": {
+        "item_code": 10104022,
+        "count": 2
+      },
+      "gems_drop": {
+        "chance": 0.3,
+        "amount": 50,
+        "tier_label": "rally_mid"
+      }
+    },
+    {
+      "code": 20200505,
+      "name": "Deathkar",
+      "type": "rally",
+      "level": 5,
+      "amount": 480000,
+      "action_point_cost": 25,
+      "stats": {
+        "hp": 265,
+        "attack": 230,
+        "defense": 160
+      },
+      "power_per_unit": 23,
+      "drops": [
+        {
+          "item_code": 10101040,
+          "count": 25,
+          "probability": 1.0,
+          "label": "Gold 5k × 25"
+        },
+        {
+          "item_code": 10103033,
+          "count": 3,
+          "probability": 1.0,
+          "label": "Train SP 30min × 3"
+        },
+        {
+          "item_code": 10103043,
+          "count": 3,
+          "probability": 1.0,
+          "label": "Recover SP 30min × 3"
+        },
+        {
+          "item_code": 10101007,
+          "count": 5,
+          "probability": 0.2,
+          "label": "Food 100k"
+        },
+        {
+          "item_code": 10104022,
+          "count": 2,
+          "probability": 0.3,
+          "label": "Gold Chest"
+        },
+        {
+          "item_code": 10604001,
+          "count": 1,
+          "probability": 0.4,
+          "label": "Legendary Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 120,
+      "spawn_rarity": "uncommon",
+      "alliance_gift": {
+        "item_code": 10104022,
+        "count": 2
+      },
+      "gems_drop": {
+        "chance": 0.3,
+        "amount": 50,
+        "tier_label": "rally_mid"
+      }
+    },
+    {
+      "code": 20200506,
+      "name": "Deathkar",
+      "type": "rally",
+      "level": 6,
+      "amount": 960000,
+      "action_point_cost": 25,
+      "stats": {
+        "hp": 292,
+        "attack": 260,
+        "defense": 182
+      },
+      "power_per_unit": 27,
+      "drops": [
+        {
+          "item_code": 10101040,
+          "count": 30,
+          "probability": 1.0,
+          "label": "Gold 5k × 30"
+        },
+        {
+          "item_code": 10103033,
+          "count": 4,
+          "probability": 1.0,
+          "label": "Train SP 30min × 4"
+        },
+        {
+          "item_code": 10103043,
+          "count": 4,
+          "probability": 1.0,
+          "label": "Recover SP 30min × 4"
+        },
+        {
+          "item_code": 10101007,
+          "count": 6,
+          "probability": 0.2,
+          "label": "Food 100k"
+        },
+        {
+          "item_code": 10104022,
+          "count": 3,
+          "probability": 0.3,
+          "label": "Gold Chest"
+        },
+        {
+          "item_code": 10604001,
+          "count": 1,
+          "probability": 0.4,
+          "label": "Legendary Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 120,
+      "spawn_rarity": "uncommon",
+      "alliance_gift": {
+        "item_code": 10104022,
+        "count": 3
+      },
+      "gems_drop": {
+        "chance": 0.3,
+        "amount": 100,
+        "tier_label": "rally_high"
+      }
+    },
+    {
+      "code": 20200507,
+      "name": "Deathkar",
+      "type": "rally",
+      "level": 7,
+      "amount": 960000,
+      "action_point_cost": 25,
+      "stats": {
+        "hp": 319,
+        "attack": 290,
+        "defense": 204
+      },
+      "power_per_unit": 31,
+      "drops": [
+        {
+          "item_code": 10101040,
+          "count": 35,
+          "probability": 1.0,
+          "label": "Gold 5k × 35"
+        },
+        {
+          "item_code": 10103033,
+          "count": 4,
+          "probability": 1.0,
+          "label": "Train SP 30min × 4"
+        },
+        {
+          "item_code": 10103043,
+          "count": 4,
+          "probability": 1.0,
+          "label": "Recover SP 30min × 4"
+        },
+        {
+          "item_code": 10101007,
+          "count": 7,
+          "probability": 0.2,
+          "label": "Food 100k"
+        },
+        {
+          "item_code": 10104022,
+          "count": 3,
+          "probability": 0.3,
+          "label": "Gold Chest"
+        },
+        {
+          "item_code": 10604001,
+          "count": 1,
+          "probability": 0.4,
+          "label": "Legendary Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 120,
+      "spawn_rarity": "uncommon",
+      "alliance_gift": {
+        "item_code": 10104022,
+        "count": 3
+      },
+      "gems_drop": {
+        "chance": 0.3,
+        "amount": 100,
+        "tier_label": "rally_high"
+      }
+    },
+    {
+      "code": 20200508,
+      "name": "Deathkar",
+      "type": "rally",
+      "level": 8,
+      "amount": 960000,
+      "action_point_cost": 25,
+      "stats": {
+        "hp": 346,
+        "attack": 320,
+        "defense": 226
+      },
+      "power_per_unit": 35,
+      "drops": [
+        {
+          "item_code": 10101040,
+          "count": 35,
+          "probability": 1.0,
+          "label": "Gold 5k × 35"
+        },
+        {
+          "item_code": 10103033,
+          "count": 4,
+          "probability": 1.0,
+          "label": "Train SP 30min × 4"
+        },
+        {
+          "item_code": 10103043,
+          "count": 4,
+          "probability": 1.0,
+          "label": "Recover SP 30min × 4"
+        },
+        {
+          "item_code": 10101007,
+          "count": 8,
+          "probability": 0.2,
+          "label": "Food 100k"
+        },
+        {
+          "item_code": 10104022,
+          "count": 4,
+          "probability": 0.3,
+          "label": "Gold Chest"
+        },
+        {
+          "item_code": 10604001,
+          "count": 2,
+          "probability": 0.4,
+          "label": "Legendary Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 120,
+      "spawn_rarity": "uncommon",
+      "alliance_gift": {
+        "item_code": 10104022,
+        "count": 4
+      },
+      "gems_drop": {
+        "chance": 0.3,
+        "amount": 100,
+        "tier_label": "rally_high"
+      }
+    },
+    {
+      "code": 20200509,
+      "name": "Deathkar",
+      "type": "rally",
+      "level": 9,
+      "amount": 960000,
+      "action_point_cost": 25,
+      "stats": {
+        "hp": 373,
+        "attack": 350,
+        "defense": 248
+      },
+      "power_per_unit": 39,
+      "drops": [
+        {
+          "item_code": 10101040,
+          "count": 35,
+          "probability": 1.0,
+          "label": "Gold 5k × 35"
+        },
+        {
+          "item_code": 10103033,
+          "count": 4,
+          "probability": 1.0,
+          "label": "Train SP 30min × 4"
+        },
+        {
+          "item_code": 10103043,
+          "count": 4,
+          "probability": 1.0,
+          "label": "Recover SP 30min × 4"
+        },
+        {
+          "item_code": 10101007,
+          "count": 9,
+          "probability": 0.2,
+          "label": "Food 100k"
+        },
+        {
+          "item_code": 10104022,
+          "count": 4,
+          "probability": 0.3,
+          "label": "Gold Chest"
+        },
+        {
+          "item_code": 10604001,
+          "count": 2,
+          "probability": 0.4,
+          "label": "Legendary Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 120,
+      "spawn_rarity": "uncommon",
+      "alliance_gift": {
+        "item_code": 10104022,
+        "count": 4
+      },
+      "gems_drop": {
+        "chance": 0.3,
+        "amount": 100,
+        "tier_label": "rally_high"
+      }
+    },
+    {
+      "code": 20200510,
+      "name": "Deathkar",
+      "type": "rally",
+      "level": 10,
+      "amount": 960000,
+      "action_point_cost": 25,
+      "stats": {
+        "hp": 400,
+        "attack": 380,
+        "defense": 270
+      },
+      "power_per_unit": 43,
+      "drops": [
+        {
+          "item_code": 10101040,
+          "count": 35,
+          "probability": 1.0,
+          "label": "Gold 5k × 35"
+        },
+        {
+          "item_code": 10103033,
+          "count": 4,
+          "probability": 1.0,
+          "label": "Train SP 30min × 4"
+        },
+        {
+          "item_code": 10103043,
+          "count": 4,
+          "probability": 1.0,
+          "label": "Recover SP 30min × 4"
+        },
+        {
+          "item_code": 10101007,
+          "count": 10,
+          "probability": 0.2,
+          "label": "Food 100k"
+        },
+        {
+          "item_code": 10104022,
+          "count": 5,
+          "probability": 0.3,
+          "label": "Gold Chest"
+        },
+        {
+          "item_code": 10604001,
+          "count": 2,
+          "probability": 0.4,
+          "label": "Legendary Treasure Fragment"
+        }
+      ],
+      "respawn_minutes": 120,
+      "spawn_rarity": "uncommon",
+      "alliance_gift": {
+        "item_code": 10104022,
+        "count": 5
+      },
+      "gems_drop": {
+        "chance": 0.3,
+        "amount": 100,
+        "tier_label": "rally_high"
+      }
+    },
+    {
+      "code": 20200601,
+      "name": "Green Dragon",
+      "type": "rally",
+      "level": 1,
+      "amount": 600000,
+      "action_point_cost": 40,
+      "stats": {
+        "hp": 200,
+        "attack": 130,
+        "defense": 105
+      },
+      "power_per_unit": 20,
+      "drops": [
+        {
+          "item_code": 10101014,
+          "count": 5,
+          "probability": 1.0
+        },
+        {
+          "item_code": 10103013,
+          "count": 1,
+          "probability": 1.0,
+          "label": "Build Speedup 30min"
+        },
+        {
+          "item_code": 10103023,
+          "count": 1,
+          "probability": 1.0,
+          "label": "Research Speedup 30min"
+        },
+        {
+          "item_code": 10603023,
+          "count": 1,
+          "probability": 0.3,
+          "label": "Epic Fragment"
+        },
+        {
+          "item_code": 10104022,
+          "count": 3,
+          "probability": 0.3,
+          "label": "Gold Chest"
+        }
+      ],
+      "respawn_minutes": 240,
+      "spawn_rarity": "rare",
+      "alliance_gift": {
+        "item_code": 10104022,
+        "count": 5
+      },
+      "gems_drop": {
+        "chance": 0.5,
+        "amount": 100,
+        "tier_label": "rally_endgame"
+      }
+    },
+    {
+      "code": 20200602,
+      "name": "Green Dragon",
+      "type": "rally",
+      "level": 2,
+      "amount": 1200000,
+      "action_point_cost": 40,
+      "stats": {
+        "hp": 220,
+        "attack": 160,
+        "defense": 130
+      },
+      "power_per_unit": 25,
+      "drops": [
+        {
+          "item_code": 10101015,
+          "count": 5,
+          "probability": 1.0
+        },
+        {
+          "item_code": 10103013,
+          "count": 2,
+          "probability": 1.0,
+          "label": "Build Speedup 30min × 2"
+        },
+        {
+          "item_code": 10103023,
+          "count": 2,
+          "probability": 1.0,
+          "label": "Research Speedup 30min × 2"
+        },
+        {
+          "item_code": 10603023,
+          "count": 1,
+          "probability": 0.35,
+          "label": "Epic Fragment"
+        },
+        {
+          "item_code": 10104022,
+          "count": 3,
+          "probability": 0.3,
+          "label": "Gold Chest"
+        },
+        {
+          "item_code": 10104023,
+          "count": 1,
+          "probability": 0.02,
+          "label": "Platinum Chest"
+        }
+      ],
+      "respawn_minutes": 240,
+      "spawn_rarity": "rare",
+      "alliance_gift": {
+        "item_code": 10104022,
+        "count": 10
+      },
+      "gems_drop": {
+        "chance": 0.5,
+        "amount": 200,
+        "tier_label": "rally_endgame"
+      }
+    },
+    {
+      "code": 20200603,
+      "name": "Green Dragon",
+      "type": "rally",
+      "level": 3,
+      "amount": 1800000,
+      "action_point_cost": 40,
+      "stats": {
+        "hp": 240,
+        "attack": 190,
+        "defense": 155
+      },
+      "power_per_unit": 30,
+      "drops": [
+        {
+          "item_code": 10101016,
+          "count": 15,
+          "probability": 1.0,
+          "label": "Lumber 5k × 15"
+        },
+        {
+          "item_code": 10103013,
+          "count": 2,
+          "probability": 1.0,
+          "label": "Build Speedup 30min × 2"
+        },
+        {
+          "item_code": 10103023,
+          "count": 2,
+          "probability": 1.0,
+          "label": "Research Speedup 30min × 2"
+        },
+        {
+          "item_code": 10603023,
+          "count": 1,
+          "probability": 0.4,
+          "label": "Epic Fragment"
+        },
+        {
+          "item_code": 10104022,
+          "count": 3,
+          "probability": 0.3,
+          "label": "Gold Chest"
+        },
+        {
+          "item_code": 10104023,
+          "count": 1,
+          "probability": 0.03,
+          "label": "Platinum Chest"
+        }
+      ],
+      "respawn_minutes": 240,
+      "spawn_rarity": "rare",
+      "alliance_gift": {
+        "item_code": 10104022,
+        "count": 15
+      },
+      "gems_drop": {
+        "chance": 0.5,
+        "amount": 300,
+        "tier_label": "rally_endgame"
+      }
+    },
+    {
+      "code": 20200701,
+      "name": "Red Dragon",
+      "type": "rally",
+      "level": 1,
+      "amount": 1000000,
+      "action_point_cost": 40,
+      "stats": {
+        "hp": 270,
+        "attack": 170,
+        "defense": 115
+      },
+      "power_per_unit": 25,
+      "drops": [
+        {
+          "item_code": 10101042,
+          "count": 5,
+          "probability": 1.0,
+          "label": "Gold 50k × 5"
+        },
+        {
+          "item_code": 10103034,
+          "count": 5,
+          "probability": 1.0,
+          "label": "Train SP 1h × 5"
+        },
+        {
+          "item_code": 10103044,
+          "count": 5,
+          "probability": 1.0,
+          "label": "Recover SP 1h × 5"
+        },
+        {
+          "item_code": 10603023,
+          "count": 1,
+          "probability": 0.3,
+          "label": "Epic Fragment"
+        },
+        {
+          "item_code": 10104022,
+          "count": 5,
+          "probability": 0.3,
+          "label": "Gold Chest × 5"
+        },
+        {
+          "item_code": 10101002,
+          "count": 1,
+          "probability": 0.05,
+          "label": "Food 500"
+        }
+      ],
+      "respawn_minutes": 240,
+      "spawn_rarity": "rare",
+      "alliance_gift": {
+        "item_code": 10104022,
+        "count": 5
+      },
+      "gems_drop": {
+        "chance": 0.5,
+        "amount": 100,
+        "tier_label": "rally_endgame"
+      }
+    },
+    {
+      "code": 20200702,
+      "name": "Red Dragon",
+      "type": "rally",
+      "level": 2,
+      "amount": 2000000,
+      "action_point_cost": 40,
+      "stats": {
+        "hp": 300,
+        "attack": 200,
+        "defense": 140
+      },
+      "power_per_unit": 30,
+      "drops": [
+        {
+          "item_code": 10101043,
+          "count": 2,
+          "probability": 1.0,
+          "label": "Gold 100k × 2"
+        },
+        {
+          "item_code": 10103034,
+          "count": 5,
+          "probability": 1.0,
+          "label": "Train SP 1h × 5"
+        },
+        {
+          "item_code": 10103044,
+          "count": 5,
+          "probability": 1.0,
+          "label": "Recover SP 1h × 5"
+        },
+        {
+          "item_code": 10603023,
+          "count": 1,
+          "probability": 0.35,
+          "label": "Epic Fragment"
+        },
+        {
+          "item_code": 10104022,
+          "count": 5,
+          "probability": 0.4,
+          "label": "Gold Chest × 5"
+        },
+        {
+          "item_code": 10101008,
+          "count": 1,
+          "probability": 0.15,
+          "label": "Food 500k"
+        }
+      ],
+      "respawn_minutes": 240,
+      "spawn_rarity": "rare",
+      "alliance_gift": {
+        "item_code": 10104022,
+        "count": 10
+      },
+      "gems_drop": {
+        "chance": 0.5,
+        "amount": 200,
+        "tier_label": "rally_endgame"
+      }
+    },
+    {
+      "code": 20200703,
+      "name": "Red Dragon",
+      "type": "rally",
+      "level": 3,
+      "amount": 3000000,
+      "action_point_cost": 40,
+      "stats": {
+        "hp": 330,
+        "attack": 230,
+        "defense": 165
+      },
+      "power_per_unit": 35,
+      "drops": [
+        {
+          "item_code": 10101043,
+          "count": 2,
+          "probability": 1.0,
+          "label": "Gold 100k × 2"
+        },
+        {
+          "item_code": 10103034,
+          "count": 5,
+          "probability": 1.0,
+          "label": "Train SP 1h × 5"
+        },
+        {
+          "item_code": 10103044,
+          "count": 5,
+          "probability": 1.0,
+          "label": "Recover SP 1h × 5"
+        },
+        {
+          "item_code": 10603023,
+          "count": 1,
+          "probability": 0.4,
+          "label": "Epic Fragment"
+        },
+        {
+          "item_code": 10104022,
+          "count": 5,
+          "probability": 0.4,
+          "label": "Gold Chest × 5"
+        },
+        {
+          "item_code": 10101008,
+          "count": 1,
+          "probability": 0.3,
+          "label": "Food 500k"
+        },
+        {
+          "item_code": 10104023,
+          "count": 1,
+          "probability": 0.02,
+          "label": "Platinum Chest"
+        }
+      ],
+      "respawn_minutes": 240,
+      "spawn_rarity": "rare",
+      "alliance_gift": {
+        "item_code": 10104022,
+        "count": 15
+      },
+      "gems_drop": {
+        "chance": 0.5,
+        "amount": 300,
+        "tier_label": "rally_endgame"
+      }
+    },
+    {
+      "code": 20200801,
+      "name": "Gold Dragon",
+      "type": "rally",
+      "level": 1,
+      "amount": 600000,
+      "action_point_cost": 40,
+      "stats": {
+        "hp": 275,
+        "attack": 150,
+        "defense": 125
+      },
+      "power_per_unit": 25,
+      "drops": [
+        {
+          "item_code": 10101041,
+          "count": 5,
+          "probability": 1.0,
+          "label": "Gold 10k × 5"
+        },
+        {
+          "item_code": 10103013,
+          "count": 1,
+          "probability": 1.0,
+          "label": "Build SP 30min"
+        },
+        {
+          "item_code": 10103023,
+          "count": 1,
+          "probability": 1.0,
+          "label": "Research SP 30min"
+        },
+        {
+          "item_code": 10603023,
+          "count": 1,
+          "probability": 0.3,
+          "label": "Epic Fragment"
+        },
+        {
+          "item_code": 10104022,
+          "count": 3,
+          "probability": 0.3,
+          "label": "Gold Chest"
+        }
+      ],
+      "respawn_minutes": 240,
+      "spawn_rarity": "rare",
+      "alliance_gift": {
+        "item_code": 10104022,
+        "count": 5
+      },
+      "gems_drop": {
+        "chance": 0.5,
+        "amount": 100,
+        "tier_label": "rally_endgame"
+      }
+    },
+    {
+      "code": 20200802,
+      "name": "Gold Dragon",
+      "type": "rally",
+      "level": 2,
+      "amount": 1200000,
+      "action_point_cost": 40,
+      "stats": {
+        "hp": 300,
+        "attack": 180,
+        "defense": 150
+      },
+      "power_per_unit": 30,
+      "drops": [
+        {
+          "item_code": 10101042,
+          "count": 5,
+          "probability": 1.0,
+          "label": "Gold 50k × 5"
+        },
+        {
+          "item_code": 10103013,
+          "count": 2,
+          "probability": 1.0,
+          "label": "Build SP 30min × 2"
+        },
+        {
+          "item_code": 10103023,
+          "count": 2,
+          "probability": 1.0,
+          "label": "Research SP 30min × 2"
+        },
+        {
+          "item_code": 10603023,
+          "count": 1,
+          "probability": 0.35,
+          "label": "Epic Fragment"
+        },
+        {
+          "item_code": 10104022,
+          "count": 3,
+          "probability": 0.4,
+          "label": "Gold Chest"
+        },
+        {
+          "item_code": 10104023,
+          "count": 1,
+          "probability": 0.02,
+          "label": "Platinum Chest"
+        }
+      ],
+      "respawn_minutes": 240,
+      "spawn_rarity": "rare",
+      "alliance_gift": {
+        "item_code": 10104022,
+        "count": 10
+      },
+      "gems_drop": {
+        "chance": 0.5,
+        "amount": 200,
+        "tier_label": "rally_endgame"
+      }
+    },
+    {
+      "code": 20200803,
+      "name": "Gold Dragon",
+      "type": "rally",
+      "level": 3,
+      "amount": 1800000,
+      "action_point_cost": 40,
+      "stats": {
+        "hp": 325,
+        "attack": 210,
+        "defense": 175
+      },
+      "power_per_unit": 35,
+      "drops": [
+        {
+          "item_code": 10101043,
+          "count": 5,
+          "probability": 1.0,
+          "label": "Gold 100k × 5"
+        },
+        {
+          "item_code": 10103013,
+          "count": 3,
+          "probability": 1.0,
+          "label": "Build SP 30min × 3"
+        },
+        {
+          "item_code": 10103023,
+          "count": 3,
+          "probability": 1.0,
+          "label": "Research SP 30min × 3"
+        },
+        {
+          "item_code": 10603023,
+          "count": 1,
+          "probability": 0.45,
+          "label": "Epic Fragment"
+        },
+        {
+          "item_code": 10104022,
+          "count": 3,
+          "probability": 0.45,
+          "label": "Gold Chest"
+        },
+        {
+          "item_code": 10104023,
+          "count": 1,
+          "probability": 0.03,
+          "label": "Platinum Chest"
+        },
+        {
+          "item_code": 10604001,
+          "count": 1,
+          "probability": 0.1,
+          "label": "Legendary Fragment"
+        }
+      ],
+      "respawn_minutes": 240,
+      "spawn_rarity": "rare",
+      "alliance_gift": {
+        "item_code": 10104022,
+        "count": 15
+      },
+      "gems_drop": {
+        "chance": 0.5,
+        "amount": 300,
+        "tier_label": "rally_endgame"
+      }
+    },
+    {
+      "code": 20200901,
+      "name": "Magdar",
+      "type": "rally",
+      "level": 1,
+      "amount": 1200000,
+      "action_point_cost": 50,
+      "stats": {
+        "hp": 270,
+        "attack": 195,
+        "defense": 150
+      },
+      "power_per_unit": 30,
+      "drops": [
+        {
+          "item_code": 10104100,
+          "count": 1,
+          "probability": 1.0,
+          "label": "Magdar Token A"
+        },
+        {
+          "item_code": 10104104,
+          "count": 1,
+          "probability": 1.0,
+          "label": "Magdar Token B"
+        },
+        {
+          "item_code": 10104024,
+          "count": 1,
+          "probability": 1.0,
+          "label": "T1 Troop Pack"
+        },
+        {
+          "item_code": 10604001,
+          "count": 1,
+          "probability": 0.2,
+          "label": "Legendary Fragment"
+        },
+        {
+          "item_code": 10104022,
+          "count": 5,
+          "probability": 0.3,
+          "label": "Gold Chest × 5"
+        },
+        {
+          "item_code": 10104023,
+          "count": 1,
+          "probability": 0.03,
+          "label": "Platinum Chest"
+        }
+      ],
+      "respawn_minutes": 480,
+      "spawn_rarity": "legendary",
+      "alliance_gift": {
+        "item_code": 10104023,
+        "count": 1
+      },
+      "gems_drop": {
+        "chance": 1.0,
+        "amount": 500,
+        "tier_label": "apex"
+      }
+    },
+    {
+      "code": 20200902,
+      "name": "Magdar",
+      "type": "rally",
+      "level": 2,
+      "amount": 2400000,
+      "action_point_cost": 50,
+      "stats": {
+        "hp": 300,
+        "attack": 230,
+        "defense": 180
+      },
+      "power_per_unit": 30,
+      "drops": [
+        {
+          "item_code": 10104100,
+          "count": 2,
+          "probability": 1.0,
+          "label": "Magdar Token A × 2"
+        },
+        {
+          "item_code": 10104104,
+          "count": 2,
+          "probability": 1.0,
+          "label": "Magdar Token B × 2"
+        },
+        {
+          "item_code": 10104024,
+          "count": 2,
+          "probability": 1.0,
+          "label": "T1 Troop Pack × 2"
+        },
+        {
+          "item_code": 10604001,
+          "count": 1,
+          "probability": 0.3,
+          "label": "Legendary Fragment"
+        },
+        {
+          "item_code": 10605001,
+          "count": 1,
+          "probability": 0.05,
+          "label": "Mythic Treasure Fragment"
+        },
+        {
+          "item_code": 10104022,
+          "count": 5,
+          "probability": 0.45,
+          "label": "Gold Chest × 5"
+        },
+        {
+          "item_code": 10104023,
+          "count": 1,
+          "probability": 0.05,
+          "label": "Platinum Chest"
+        }
+      ],
+      "respawn_minutes": 480,
+      "spawn_rarity": "legendary",
+      "alliance_gift": {
+        "item_code": 10104023,
+        "count": 2
+      },
+      "gems_drop": {
+        "chance": 1.0,
+        "amount": 1000,
+        "tier_label": "apex"
+      }
+    },
+    {
+      "code": 20200903,
+      "name": "Magdar",
+      "type": "rally",
+      "level": 3,
+      "amount": 3600000,
+      "action_point_cost": 50,
+      "stats": {
+        "hp": 330,
+        "attack": 265,
+        "defense": 210
+      },
+      "power_per_unit": 30,
+      "drops": [
+        {
+          "item_code": 10104100,
+          "count": 2,
+          "probability": 1.0,
+          "label": "Magdar Token A × 2"
+        },
+        {
+          "item_code": 10104104,
+          "count": 2,
+          "probability": 1.0,
+          "label": "Magdar Token B × 2"
+        },
+        {
+          "item_code": 10104024,
+          "count": 3,
+          "probability": 1.0,
+          "label": "T1 Troop Pack × 3"
+        },
+        {
+          "item_code": 10604001,
+          "count": 1,
+          "probability": 0.4,
+          "label": "Legendary Fragment"
+        },
+        {
+          "item_code": 10605001,
+          "count": 1,
+          "probability": 0.08,
+          "label": "Mythic Treasure Fragment"
+        },
+        {
+          "item_code": 10104022,
+          "count": 5,
+          "probability": 0.4,
+          "label": "Gold Chest × 5"
+        },
+        {
+          "item_code": 10104023,
+          "count": 1,
+          "probability": 0.08,
+          "label": "Platinum Chest"
+        }
+      ],
+      "respawn_minutes": 480,
+      "spawn_rarity": "legendary",
+      "alliance_gift": {
+        "item_code": 10104023,
+        "count": 3
+      },
+      "gems_drop": {
+        "chance": 1.0,
+        "amount": 2000,
+        "tier_label": "apex"
+      }
+    }
+  ]
+}

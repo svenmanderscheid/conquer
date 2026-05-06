@@ -1,0 +1,581 @@
+{
+  "version": "1.0",
+  "description": "Ascendancy charm definitions. Charms are temporary single-stat buffs that drop from solo monsters (Orc, Skeleton, Golem only). 8 stat categories × 3 grades = 24 charm types. Players activate charms manually; one charm per stat category can be active simultaneously, but multiple categories stack.",
+  "rules": {
+    "drop_chance_per_kill": 0.3,
+    "stat_category_roll": "uniform_random",
+    "rarity_roll": "weighted_per_monster_tier (see drop_distribution)",
+    "active_charms_max": 8,
+    "tradable": false,
+    "duration_pause_when_offline": false
+  },
+  "stat_categories": [
+    {
+      "id": "construction",
+      "label": "Construction Speed",
+      "description": "Reduces building upgrade time",
+      "icon_theme": "Hammer + gear icon"
+    },
+    {
+      "id": "research",
+      "label": "Research Speed",
+      "description": "Reduces research time at the Academy",
+      "icon_theme": "Open book with glowing rune"
+    },
+    {
+      "id": "troops_hp",
+      "label": "Troops HP",
+      "description": "Increases all troop hit points",
+      "icon_theme": "Heart shield"
+    },
+    {
+      "id": "troops_attack",
+      "label": "Troops Attack",
+      "description": "Increases all troop attack power",
+      "icon_theme": "Crossed swords"
+    },
+    {
+      "id": "troops_defense",
+      "label": "Troops Defense",
+      "description": "Increases all troop defense",
+      "icon_theme": "Tower shield"
+    },
+    {
+      "id": "carry",
+      "label": "Carry Capacity",
+      "description": "Increases troop resource haul capacity",
+      "icon_theme": "Loaded saddlebag"
+    },
+    {
+      "id": "march_speed",
+      "label": "March Speed",
+      "description": "Increases troop march speed",
+      "icon_theme": "Winged boot / arrow"
+    },
+    {
+      "id": "gathering",
+      "label": "Gathering Speed",
+      "description": "Increases all-resource gathering speed",
+      "icon_theme": "Sickle / harvest tool"
+    }
+  ],
+  "grades": [
+    {
+      "id": "normal",
+      "label": "Normal",
+      "color": "grey",
+      "boost": 0.03,
+      "duration_minutes": 30
+    },
+    {
+      "id": "epic",
+      "label": "Epic",
+      "color": "purple",
+      "boost": 0.05,
+      "duration_minutes": 120
+    },
+    {
+      "id": "legendary",
+      "label": "Legendary",
+      "color": "gold",
+      "boost": 0.1,
+      "duration_minutes": 240
+    }
+  ],
+  "charms": [
+    {
+      "id": 10700001,
+      "stat_category": "construction",
+      "grade": "normal",
+      "label": "Normal Construction Speed Charm",
+      "description": "Reduces building upgrade time",
+      "boost_percent": 3.0,
+      "duration_seconds": 1800,
+      "duration_label": "30 minutes",
+      "color_theme": "grey",
+      "icon": "charm_construction_normal.png",
+      "icon_theme_description": "Hammer + gear icon",
+      "tradable": false,
+      "stackable": false
+    },
+    {
+      "id": 10700002,
+      "stat_category": "construction",
+      "grade": "epic",
+      "label": "Epic Construction Speed Charm",
+      "description": "Reduces building upgrade time",
+      "boost_percent": 5.0,
+      "duration_seconds": 7200,
+      "duration_label": "2 hours",
+      "color_theme": "purple",
+      "icon": "charm_construction_epic.png",
+      "icon_theme_description": "Hammer + gear icon",
+      "tradable": false,
+      "stackable": false
+    },
+    {
+      "id": 10700003,
+      "stat_category": "construction",
+      "grade": "legendary",
+      "label": "Legendary Construction Speed Charm",
+      "description": "Reduces building upgrade time",
+      "boost_percent": 10.0,
+      "duration_seconds": 14400,
+      "duration_label": "4 hours",
+      "color_theme": "gold",
+      "icon": "charm_construction_legendary.png",
+      "icon_theme_description": "Hammer + gear icon",
+      "tradable": false,
+      "stackable": false
+    },
+    {
+      "id": 10700004,
+      "stat_category": "research",
+      "grade": "normal",
+      "label": "Normal Research Speed Charm",
+      "description": "Reduces research time at the Academy",
+      "boost_percent": 3.0,
+      "duration_seconds": 1800,
+      "duration_label": "30 minutes",
+      "color_theme": "grey",
+      "icon": "charm_research_normal.png",
+      "icon_theme_description": "Open book with glowing rune",
+      "tradable": false,
+      "stackable": false
+    },
+    {
+      "id": 10700005,
+      "stat_category": "research",
+      "grade": "epic",
+      "label": "Epic Research Speed Charm",
+      "description": "Reduces research time at the Academy",
+      "boost_percent": 5.0,
+      "duration_seconds": 7200,
+      "duration_label": "2 hours",
+      "color_theme": "purple",
+      "icon": "charm_research_epic.png",
+      "icon_theme_description": "Open book with glowing rune",
+      "tradable": false,
+      "stackable": false
+    },
+    {
+      "id": 10700006,
+      "stat_category": "research",
+      "grade": "legendary",
+      "label": "Legendary Research Speed Charm",
+      "description": "Reduces research time at the Academy",
+      "boost_percent": 10.0,
+      "duration_seconds": 14400,
+      "duration_label": "4 hours",
+      "color_theme": "gold",
+      "icon": "charm_research_legendary.png",
+      "icon_theme_description": "Open book with glowing rune",
+      "tradable": false,
+      "stackable": false
+    },
+    {
+      "id": 10700007,
+      "stat_category": "troops_hp",
+      "grade": "normal",
+      "label": "Normal Troops HP Charm",
+      "description": "Increases all troop hit points",
+      "boost_percent": 3.0,
+      "duration_seconds": 1800,
+      "duration_label": "30 minutes",
+      "color_theme": "grey",
+      "icon": "charm_troops_hp_normal.png",
+      "icon_theme_description": "Heart shield",
+      "tradable": false,
+      "stackable": false
+    },
+    {
+      "id": 10700008,
+      "stat_category": "troops_hp",
+      "grade": "epic",
+      "label": "Epic Troops HP Charm",
+      "description": "Increases all troop hit points",
+      "boost_percent": 5.0,
+      "duration_seconds": 7200,
+      "duration_label": "2 hours",
+      "color_theme": "purple",
+      "icon": "charm_troops_hp_epic.png",
+      "icon_theme_description": "Heart shield",
+      "tradable": false,
+      "stackable": false
+    },
+    {
+      "id": 10700009,
+      "stat_category": "troops_hp",
+      "grade": "legendary",
+      "label": "Legendary Troops HP Charm",
+      "description": "Increases all troop hit points",
+      "boost_percent": 10.0,
+      "duration_seconds": 14400,
+      "duration_label": "4 hours",
+      "color_theme": "gold",
+      "icon": "charm_troops_hp_legendary.png",
+      "icon_theme_description": "Heart shield",
+      "tradable": false,
+      "stackable": false
+    },
+    {
+      "id": 10700010,
+      "stat_category": "troops_attack",
+      "grade": "normal",
+      "label": "Normal Troops Attack Charm",
+      "description": "Increases all troop attack power",
+      "boost_percent": 3.0,
+      "duration_seconds": 1800,
+      "duration_label": "30 minutes",
+      "color_theme": "grey",
+      "icon": "charm_troops_attack_normal.png",
+      "icon_theme_description": "Crossed swords",
+      "tradable": false,
+      "stackable": false
+    },
+    {
+      "id": 10700011,
+      "stat_category": "troops_attack",
+      "grade": "epic",
+      "label": "Epic Troops Attack Charm",
+      "description": "Increases all troop attack power",
+      "boost_percent": 5.0,
+      "duration_seconds": 7200,
+      "duration_label": "2 hours",
+      "color_theme": "purple",
+      "icon": "charm_troops_attack_epic.png",
+      "icon_theme_description": "Crossed swords",
+      "tradable": false,
+      "stackable": false
+    },
+    {
+      "id": 10700012,
+      "stat_category": "troops_attack",
+      "grade": "legendary",
+      "label": "Legendary Troops Attack Charm",
+      "description": "Increases all troop attack power",
+      "boost_percent": 10.0,
+      "duration_seconds": 14400,
+      "duration_label": "4 hours",
+      "color_theme": "gold",
+      "icon": "charm_troops_attack_legendary.png",
+      "icon_theme_description": "Crossed swords",
+      "tradable": false,
+      "stackable": false
+    },
+    {
+      "id": 10700013,
+      "stat_category": "troops_defense",
+      "grade": "normal",
+      "label": "Normal Troops Defense Charm",
+      "description": "Increases all troop defense",
+      "boost_percent": 3.0,
+      "duration_seconds": 1800,
+      "duration_label": "30 minutes",
+      "color_theme": "grey",
+      "icon": "charm_troops_defense_normal.png",
+      "icon_theme_description": "Tower shield",
+      "tradable": false,
+      "stackable": false
+    },
+    {
+      "id": 10700014,
+      "stat_category": "troops_defense",
+      "grade": "epic",
+      "label": "Epic Troops Defense Charm",
+      "description": "Increases all troop defense",
+      "boost_percent": 5.0,
+      "duration_seconds": 7200,
+      "duration_label": "2 hours",
+      "color_theme": "purple",
+      "icon": "charm_troops_defense_epic.png",
+      "icon_theme_description": "Tower shield",
+      "tradable": false,
+      "stackable": false
+    },
+    {
+      "id": 10700015,
+      "stat_category": "troops_defense",
+      "grade": "legendary",
+      "label": "Legendary Troops Defense Charm",
+      "description": "Increases all troop defense",
+      "boost_percent": 10.0,
+      "duration_seconds": 14400,
+      "duration_label": "4 hours",
+      "color_theme": "gold",
+      "icon": "charm_troops_defense_legendary.png",
+      "icon_theme_description": "Tower shield",
+      "tradable": false,
+      "stackable": false
+    },
+    {
+      "id": 10700016,
+      "stat_category": "carry",
+      "grade": "normal",
+      "label": "Normal Carry Capacity Charm",
+      "description": "Increases troop resource haul capacity",
+      "boost_percent": 3.0,
+      "duration_seconds": 1800,
+      "duration_label": "30 minutes",
+      "color_theme": "grey",
+      "icon": "charm_carry_normal.png",
+      "icon_theme_description": "Loaded saddlebag",
+      "tradable": false,
+      "stackable": false
+    },
+    {
+      "id": 10700017,
+      "stat_category": "carry",
+      "grade": "epic",
+      "label": "Epic Carry Capacity Charm",
+      "description": "Increases troop resource haul capacity",
+      "boost_percent": 5.0,
+      "duration_seconds": 7200,
+      "duration_label": "2 hours",
+      "color_theme": "purple",
+      "icon": "charm_carry_epic.png",
+      "icon_theme_description": "Loaded saddlebag",
+      "tradable": false,
+      "stackable": false
+    },
+    {
+      "id": 10700018,
+      "stat_category": "carry",
+      "grade": "legendary",
+      "label": "Legendary Carry Capacity Charm",
+      "description": "Increases troop resource haul capacity",
+      "boost_percent": 10.0,
+      "duration_seconds": 14400,
+      "duration_label": "4 hours",
+      "color_theme": "gold",
+      "icon": "charm_carry_legendary.png",
+      "icon_theme_description": "Loaded saddlebag",
+      "tradable": false,
+      "stackable": false
+    },
+    {
+      "id": 10700019,
+      "stat_category": "march_speed",
+      "grade": "normal",
+      "label": "Normal March Speed Charm",
+      "description": "Increases troop march speed",
+      "boost_percent": 3.0,
+      "duration_seconds": 1800,
+      "duration_label": "30 minutes",
+      "color_theme": "grey",
+      "icon": "charm_march_speed_normal.png",
+      "icon_theme_description": "Winged boot / arrow",
+      "tradable": false,
+      "stackable": false
+    },
+    {
+      "id": 10700020,
+      "stat_category": "march_speed",
+      "grade": "epic",
+      "label": "Epic March Speed Charm",
+      "description": "Increases troop march speed",
+      "boost_percent": 5.0,
+      "duration_seconds": 7200,
+      "duration_label": "2 hours",
+      "color_theme": "purple",
+      "icon": "charm_march_speed_epic.png",
+      "icon_theme_description": "Winged boot / arrow",
+      "tradable": false,
+      "stackable": false
+    },
+    {
+      "id": 10700021,
+      "stat_category": "march_speed",
+      "grade": "legendary",
+      "label": "Legendary March Speed Charm",
+      "description": "Increases troop march speed",
+      "boost_percent": 10.0,
+      "duration_seconds": 14400,
+      "duration_label": "4 hours",
+      "color_theme": "gold",
+      "icon": "charm_march_speed_legendary.png",
+      "icon_theme_description": "Winged boot / arrow",
+      "tradable": false,
+      "stackable": false
+    },
+    {
+      "id": 10700022,
+      "stat_category": "gathering",
+      "grade": "normal",
+      "label": "Normal Gathering Speed Charm",
+      "description": "Increases all-resource gathering speed",
+      "boost_percent": 3.0,
+      "duration_seconds": 1800,
+      "duration_label": "30 minutes",
+      "color_theme": "grey",
+      "icon": "charm_gathering_normal.png",
+      "icon_theme_description": "Sickle / harvest tool",
+      "tradable": false,
+      "stackable": false
+    },
+    {
+      "id": 10700023,
+      "stat_category": "gathering",
+      "grade": "epic",
+      "label": "Epic Gathering Speed Charm",
+      "description": "Increases all-resource gathering speed",
+      "boost_percent": 5.0,
+      "duration_seconds": 7200,
+      "duration_label": "2 hours",
+      "color_theme": "purple",
+      "icon": "charm_gathering_epic.png",
+      "icon_theme_description": "Sickle / harvest tool",
+      "tradable": false,
+      "stackable": false
+    },
+    {
+      "id": 10700024,
+      "stat_category": "gathering",
+      "grade": "legendary",
+      "label": "Legendary Gathering Speed Charm",
+      "description": "Increases all-resource gathering speed",
+      "boost_percent": 10.0,
+      "duration_seconds": 14400,
+      "duration_label": "4 hours",
+      "color_theme": "gold",
+      "icon": "charm_gathering_legendary.png",
+      "icon_theme_description": "Sickle / harvest tool",
+      "tradable": false,
+      "stackable": false
+    }
+  ],
+  "drop_distribution": {
+    "_description": "Per-monster charm rarity rolls. Only Orc/Skeleton/Golem drop charms. Stat category is uniform random across all 8 categories.",
+    "_base_drop_chance": 0.3,
+    "by_monster_and_level": [
+      {
+        "monster": "Orc",
+        "level_min": 0,
+        "level_max": 3,
+        "rarity_distribution": {
+          "normal": 0.82,
+          "epic": 0.18,
+          "legendary": 0.0
+        }
+      },
+      {
+        "monster": "Orc",
+        "level_min": 4,
+        "level_max": 6,
+        "rarity_distribution": {
+          "normal": 0.7,
+          "epic": 0.3,
+          "legendary": 0.0
+        }
+      },
+      {
+        "monster": "Orc",
+        "level_min": 7,
+        "level_max": 8,
+        "rarity_distribution": {
+          "normal": 0.0,
+          "epic": 0.8,
+          "legendary": 0.2
+        }
+      },
+      {
+        "monster": "Orc",
+        "level_min": 9,
+        "level_max": 10,
+        "rarity_distribution": {
+          "normal": 0.0,
+          "epic": 0.5,
+          "legendary": 0.5
+        }
+      },
+      {
+        "monster": "Skeleton",
+        "level_min": 1,
+        "level_max": 3,
+        "rarity_distribution": {
+          "normal": 0.75,
+          "epic": 0.25,
+          "legendary": 0.0
+        }
+      },
+      {
+        "monster": "Skeleton",
+        "level_min": 4,
+        "level_max": 6,
+        "rarity_distribution": {
+          "normal": 0.65,
+          "epic": 0.35,
+          "legendary": 0.0
+        }
+      },
+      {
+        "monster": "Skeleton",
+        "level_min": 7,
+        "level_max": 8,
+        "rarity_distribution": {
+          "normal": 0.0,
+          "epic": 0.75,
+          "legendary": 0.25
+        }
+      },
+      {
+        "monster": "Skeleton",
+        "level_min": 9,
+        "level_max": 10,
+        "rarity_distribution": {
+          "normal": 0.0,
+          "epic": 0.5,
+          "legendary": 0.5
+        }
+      },
+      {
+        "monster": "Golem",
+        "level_min": 1,
+        "level_max": 3,
+        "rarity_distribution": {
+          "normal": 0.75,
+          "epic": 0.25,
+          "legendary": 0.0
+        }
+      },
+      {
+        "monster": "Golem",
+        "level_min": 4,
+        "level_max": 6,
+        "rarity_distribution": {
+          "normal": 0.65,
+          "epic": 0.35,
+          "legendary": 0.0
+        }
+      },
+      {
+        "monster": "Golem",
+        "level_min": 7,
+        "level_max": 8,
+        "rarity_distribution": {
+          "normal": 0.0,
+          "epic": 0.75,
+          "legendary": 0.25
+        }
+      },
+      {
+        "monster": "Golem",
+        "level_min": 9,
+        "level_max": 10,
+        "rarity_distribution": {
+          "normal": 0.0,
+          "epic": 0.5,
+          "legendary": 0.5
+        }
+      }
+    ],
+    "_excluded_monsters": [
+      "Treasure Goblin",
+      "Deathkar",
+      "Green Dragon",
+      "Red Dragon",
+      "Gold Dragon",
+      "Magdar"
+    ]
+  }
+}

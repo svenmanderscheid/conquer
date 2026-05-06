@@ -1,0 +1,889 @@
+{
+  "version": "1.0",
+  "description": "Ascendancy world spawn configuration. Defines hourly spawn rates and per-sector caps for all map entities (resource mines, GEM nodes, monsters). Cron `world_spawn_tick.php` runs at xx:00 UTC every hour, iterates all 8 sectors per world, and spawns entities per the rates below. Total field objects + monsters per active world: ~50,000-100,000 in steady state.",
+  "spawn_rules": {
+    "schedule": "0 * * * *",
+    "schedule_description": "Hourly cron tick at xx:00 UTC server-wide",
+    "placement_constraints": {
+      "min_distance_from_player_city_tiles": 5,
+      "min_distance_from_shrine_tiles": 30,
+      "blocked_terrain": [
+        "water",
+        "mountains"
+      ],
+      "high_level_entity_center_bias": true,
+      "high_level_threshold": "lv >= 7 for monsters; tier == 'endgame' for resources"
+    },
+    "despawn_check_schedule": "*/5 * * * *",
+    "despawn_check_description": "Every 5 minutes — remove entities past their despawn timer",
+    "fractional_rate_handling": "If rate >= 1: spawn_count = floor(rate) + (1 if random() < (rate - floor(rate)) else 0). If rate < 1: spawn_count = 1 if random() < rate else 0. Then min(spawn_count, sector_cap - current_count)."
+  },
+  "sector_caps": {
+    "_description": "Maximum concurrent entities per sector. Spawn tick skips entity type if cap reached.",
+    "resource_mines_combined": 800,
+    "gem_nodes_combined": 10,
+    "solo_monsters_combined": 500,
+    "treasure_goblins_combined": 80,
+    "deathkar_combined": 30,
+    "dragons_combined": 5,
+    "magdar_combined": 1
+  },
+  "field_objects": [
+    {
+      "code": 20100101,
+      "type": "farm",
+      "label": "Farm Lv 1",
+      "level": 1,
+      "spawn_per_sector_per_hour": 20.0,
+      "despawn_hours": 24,
+      "tier": "low"
+    },
+    {
+      "code": 20100102,
+      "type": "farm",
+      "label": "Farm Lv 2",
+      "level": 2,
+      "spawn_per_sector_per_hour": 20.0,
+      "despawn_hours": 24,
+      "tier": "low"
+    },
+    {
+      "code": 20100103,
+      "type": "farm",
+      "label": "Farm Lv 3",
+      "level": 3,
+      "spawn_per_sector_per_hour": 20.0,
+      "despawn_hours": 24,
+      "tier": "low"
+    },
+    {
+      "code": 20100104,
+      "type": "farm",
+      "label": "Farm Lv 4",
+      "level": 4,
+      "spawn_per_sector_per_hour": 13.333,
+      "despawn_hours": 24,
+      "tier": "mid"
+    },
+    {
+      "code": 20100105,
+      "type": "farm",
+      "label": "Farm Lv 5",
+      "level": 5,
+      "spawn_per_sector_per_hour": 13.333,
+      "despawn_hours": 24,
+      "tier": "mid"
+    },
+    {
+      "code": 20100106,
+      "type": "farm",
+      "label": "Farm Lv 6",
+      "level": 6,
+      "spawn_per_sector_per_hour": 13.333,
+      "despawn_hours": 24,
+      "tier": "mid"
+    },
+    {
+      "code": 20100107,
+      "type": "farm",
+      "label": "Farm Lv 7",
+      "level": 7,
+      "spawn_per_sector_per_hour": 10.0,
+      "despawn_hours": 24,
+      "tier": "high"
+    },
+    {
+      "code": 20100108,
+      "type": "farm",
+      "label": "Farm Lv 8",
+      "level": 8,
+      "spawn_per_sector_per_hour": 10.0,
+      "despawn_hours": 24,
+      "tier": "high"
+    },
+    {
+      "code": 20100109,
+      "type": "farm",
+      "label": "Farm Lv 9",
+      "level": 9,
+      "spawn_per_sector_per_hour": 5.0,
+      "despawn_hours": 24,
+      "tier": "endgame"
+    },
+    {
+      "code": 20100110,
+      "type": "farm",
+      "label": "Farm Lv 10",
+      "level": 10,
+      "spawn_per_sector_per_hour": 5.0,
+      "despawn_hours": 24,
+      "tier": "endgame"
+    },
+    {
+      "code": 20100201,
+      "type": "forest",
+      "label": "Forest Lv 1",
+      "level": 1,
+      "spawn_per_sector_per_hour": 20.0,
+      "despawn_hours": 24,
+      "tier": "low"
+    },
+    {
+      "code": 20100202,
+      "type": "forest",
+      "label": "Forest Lv 2",
+      "level": 2,
+      "spawn_per_sector_per_hour": 20.0,
+      "despawn_hours": 24,
+      "tier": "low"
+    },
+    {
+      "code": 20100203,
+      "type": "forest",
+      "label": "Forest Lv 3",
+      "level": 3,
+      "spawn_per_sector_per_hour": 20.0,
+      "despawn_hours": 24,
+      "tier": "low"
+    },
+    {
+      "code": 20100204,
+      "type": "forest",
+      "label": "Forest Lv 4",
+      "level": 4,
+      "spawn_per_sector_per_hour": 13.333,
+      "despawn_hours": 24,
+      "tier": "mid"
+    },
+    {
+      "code": 20100205,
+      "type": "forest",
+      "label": "Forest Lv 5",
+      "level": 5,
+      "spawn_per_sector_per_hour": 13.333,
+      "despawn_hours": 24,
+      "tier": "mid"
+    },
+    {
+      "code": 20100206,
+      "type": "forest",
+      "label": "Forest Lv 6",
+      "level": 6,
+      "spawn_per_sector_per_hour": 13.333,
+      "despawn_hours": 24,
+      "tier": "mid"
+    },
+    {
+      "code": 20100207,
+      "type": "forest",
+      "label": "Forest Lv 7",
+      "level": 7,
+      "spawn_per_sector_per_hour": 10.0,
+      "despawn_hours": 24,
+      "tier": "high"
+    },
+    {
+      "code": 20100208,
+      "type": "forest",
+      "label": "Forest Lv 8",
+      "level": 8,
+      "spawn_per_sector_per_hour": 10.0,
+      "despawn_hours": 24,
+      "tier": "high"
+    },
+    {
+      "code": 20100209,
+      "type": "forest",
+      "label": "Forest Lv 9",
+      "level": 9,
+      "spawn_per_sector_per_hour": 5.0,
+      "despawn_hours": 24,
+      "tier": "endgame"
+    },
+    {
+      "code": 20100210,
+      "type": "forest",
+      "label": "Forest Lv 10",
+      "level": 10,
+      "spawn_per_sector_per_hour": 5.0,
+      "despawn_hours": 24,
+      "tier": "endgame"
+    },
+    {
+      "code": 20100301,
+      "type": "quarry",
+      "label": "Quarry Lv 1",
+      "level": 1,
+      "spawn_per_sector_per_hour": 20.0,
+      "despawn_hours": 24,
+      "tier": "low"
+    },
+    {
+      "code": 20100302,
+      "type": "quarry",
+      "label": "Quarry Lv 2",
+      "level": 2,
+      "spawn_per_sector_per_hour": 20.0,
+      "despawn_hours": 24,
+      "tier": "low"
+    },
+    {
+      "code": 20100303,
+      "type": "quarry",
+      "label": "Quarry Lv 3",
+      "level": 3,
+      "spawn_per_sector_per_hour": 20.0,
+      "despawn_hours": 24,
+      "tier": "low"
+    },
+    {
+      "code": 20100304,
+      "type": "quarry",
+      "label": "Quarry Lv 4",
+      "level": 4,
+      "spawn_per_sector_per_hour": 13.333,
+      "despawn_hours": 24,
+      "tier": "mid"
+    },
+    {
+      "code": 20100305,
+      "type": "quarry",
+      "label": "Quarry Lv 5",
+      "level": 5,
+      "spawn_per_sector_per_hour": 13.333,
+      "despawn_hours": 24,
+      "tier": "mid"
+    },
+    {
+      "code": 20100306,
+      "type": "quarry",
+      "label": "Quarry Lv 6",
+      "level": 6,
+      "spawn_per_sector_per_hour": 13.333,
+      "despawn_hours": 24,
+      "tier": "mid"
+    },
+    {
+      "code": 20100307,
+      "type": "quarry",
+      "label": "Quarry Lv 7",
+      "level": 7,
+      "spawn_per_sector_per_hour": 10.0,
+      "despawn_hours": 24,
+      "tier": "high"
+    },
+    {
+      "code": 20100308,
+      "type": "quarry",
+      "label": "Quarry Lv 8",
+      "level": 8,
+      "spawn_per_sector_per_hour": 10.0,
+      "despawn_hours": 24,
+      "tier": "high"
+    },
+    {
+      "code": 20100309,
+      "type": "quarry",
+      "label": "Quarry Lv 9",
+      "level": 9,
+      "spawn_per_sector_per_hour": 5.0,
+      "despawn_hours": 24,
+      "tier": "endgame"
+    },
+    {
+      "code": 20100310,
+      "type": "quarry",
+      "label": "Quarry Lv 10",
+      "level": 10,
+      "spawn_per_sector_per_hour": 5.0,
+      "despawn_hours": 24,
+      "tier": "endgame"
+    },
+    {
+      "code": 20100401,
+      "type": "gold_mine",
+      "label": "Gold Mine Lv 1",
+      "level": 1,
+      "spawn_per_sector_per_hour": 20.0,
+      "despawn_hours": 24,
+      "tier": "low"
+    },
+    {
+      "code": 20100402,
+      "type": "gold_mine",
+      "label": "Gold Mine Lv 2",
+      "level": 2,
+      "spawn_per_sector_per_hour": 20.0,
+      "despawn_hours": 24,
+      "tier": "low"
+    },
+    {
+      "code": 20100403,
+      "type": "gold_mine",
+      "label": "Gold Mine Lv 3",
+      "level": 3,
+      "spawn_per_sector_per_hour": 20.0,
+      "despawn_hours": 24,
+      "tier": "low"
+    },
+    {
+      "code": 20100404,
+      "type": "gold_mine",
+      "label": "Gold Mine Lv 4",
+      "level": 4,
+      "spawn_per_sector_per_hour": 13.333,
+      "despawn_hours": 24,
+      "tier": "mid"
+    },
+    {
+      "code": 20100405,
+      "type": "gold_mine",
+      "label": "Gold Mine Lv 5",
+      "level": 5,
+      "spawn_per_sector_per_hour": 13.333,
+      "despawn_hours": 24,
+      "tier": "mid"
+    },
+    {
+      "code": 20100406,
+      "type": "gold_mine",
+      "label": "Gold Mine Lv 6",
+      "level": 6,
+      "spawn_per_sector_per_hour": 13.333,
+      "despawn_hours": 24,
+      "tier": "mid"
+    },
+    {
+      "code": 20100407,
+      "type": "gold_mine",
+      "label": "Gold Mine Lv 7",
+      "level": 7,
+      "spawn_per_sector_per_hour": 10.0,
+      "despawn_hours": 24,
+      "tier": "high"
+    },
+    {
+      "code": 20100408,
+      "type": "gold_mine",
+      "label": "Gold Mine Lv 8",
+      "level": 8,
+      "spawn_per_sector_per_hour": 10.0,
+      "despawn_hours": 24,
+      "tier": "high"
+    },
+    {
+      "code": 20100409,
+      "type": "gold_mine",
+      "label": "Gold Mine Lv 9",
+      "level": 9,
+      "spawn_per_sector_per_hour": 5.0,
+      "despawn_hours": 24,
+      "tier": "endgame"
+    },
+    {
+      "code": 20100410,
+      "type": "gold_mine",
+      "label": "Gold Mine Lv 10",
+      "level": 10,
+      "spawn_per_sector_per_hour": 5.0,
+      "despawn_hours": 24,
+      "tier": "endgame"
+    },
+    {
+      "code": 20100501,
+      "type": "gem_node",
+      "label": "Gem Node Lv 1 (50 GEMS)",
+      "level": 1,
+      "drop_gems": 50,
+      "spawn_per_sector_per_hour": 1.0,
+      "despawn_hours": 12,
+      "tier": "rare"
+    },
+    {
+      "code": 20100502,
+      "type": "gem_node",
+      "label": "Gem Node Lv 2 (100 GEMS)",
+      "level": 2,
+      "drop_gems": 100,
+      "spawn_per_sector_per_hour": 0.4,
+      "despawn_hours": 12,
+      "tier": "very_rare"
+    },
+    {
+      "code": 20100503,
+      "type": "gem_node",
+      "label": "Gem Node Lv 3 (200 GEMS)",
+      "level": 3,
+      "drop_gems": 200,
+      "spawn_per_sector_per_hour": 0.1,
+      "despawn_hours": 12,
+      "tier": "ultra_rare"
+    }
+  ],
+  "monsters": [
+    {
+      "monster": "Orc",
+      "code": 20200100,
+      "level": 0,
+      "spawn_per_sector_per_hour": 7.5,
+      "despawn_hours": 12,
+      "tier": "low"
+    },
+    {
+      "monster": "Orc",
+      "code": 20200101,
+      "level": 1,
+      "spawn_per_sector_per_hour": 7.5,
+      "despawn_hours": 12,
+      "tier": "low"
+    },
+    {
+      "monster": "Orc",
+      "code": 20200102,
+      "level": 2,
+      "spawn_per_sector_per_hour": 7.5,
+      "despawn_hours": 12,
+      "tier": "low"
+    },
+    {
+      "monster": "Orc",
+      "code": 20200103,
+      "level": 3,
+      "spawn_per_sector_per_hour": 7.5,
+      "despawn_hours": 12,
+      "tier": "low"
+    },
+    {
+      "monster": "Orc",
+      "code": 20200104,
+      "level": 4,
+      "spawn_per_sector_per_hour": 8.333,
+      "despawn_hours": 12,
+      "tier": "mid"
+    },
+    {
+      "monster": "Orc",
+      "code": 20200105,
+      "level": 5,
+      "spawn_per_sector_per_hour": 8.333,
+      "despawn_hours": 12,
+      "tier": "mid"
+    },
+    {
+      "monster": "Orc",
+      "code": 20200106,
+      "level": 6,
+      "spawn_per_sector_per_hour": 8.333,
+      "despawn_hours": 12,
+      "tier": "mid"
+    },
+    {
+      "monster": "Orc",
+      "code": 20200107,
+      "level": 7,
+      "spawn_per_sector_per_hour": 7.5,
+      "despawn_hours": 12,
+      "tier": "high"
+    },
+    {
+      "monster": "Orc",
+      "code": 20200108,
+      "level": 8,
+      "spawn_per_sector_per_hour": 7.5,
+      "despawn_hours": 12,
+      "tier": "high"
+    },
+    {
+      "monster": "Orc",
+      "code": 20200109,
+      "level": 9,
+      "spawn_per_sector_per_hour": 4.0,
+      "despawn_hours": 12,
+      "tier": "endgame"
+    },
+    {
+      "monster": "Orc",
+      "code": 20200110,
+      "level": 10,
+      "spawn_per_sector_per_hour": 4.0,
+      "despawn_hours": 12,
+      "tier": "endgame"
+    },
+    {
+      "monster": "Skeleton",
+      "code": 20200201,
+      "level": 1,
+      "spawn_per_sector_per_hour": 10.0,
+      "despawn_hours": 12,
+      "tier": "low"
+    },
+    {
+      "monster": "Skeleton",
+      "code": 20200202,
+      "level": 2,
+      "spawn_per_sector_per_hour": 10.0,
+      "despawn_hours": 12,
+      "tier": "low"
+    },
+    {
+      "monster": "Skeleton",
+      "code": 20200203,
+      "level": 3,
+      "spawn_per_sector_per_hour": 10.0,
+      "despawn_hours": 12,
+      "tier": "low"
+    },
+    {
+      "monster": "Skeleton",
+      "code": 20200204,
+      "level": 4,
+      "spawn_per_sector_per_hour": 8.333,
+      "despawn_hours": 12,
+      "tier": "mid"
+    },
+    {
+      "monster": "Skeleton",
+      "code": 20200205,
+      "level": 5,
+      "spawn_per_sector_per_hour": 8.333,
+      "despawn_hours": 12,
+      "tier": "mid"
+    },
+    {
+      "monster": "Skeleton",
+      "code": 20200206,
+      "level": 6,
+      "spawn_per_sector_per_hour": 8.333,
+      "despawn_hours": 12,
+      "tier": "mid"
+    },
+    {
+      "monster": "Skeleton",
+      "code": 20200207,
+      "level": 7,
+      "spawn_per_sector_per_hour": 7.5,
+      "despawn_hours": 12,
+      "tier": "high"
+    },
+    {
+      "monster": "Skeleton",
+      "code": 20200208,
+      "level": 8,
+      "spawn_per_sector_per_hour": 7.5,
+      "despawn_hours": 12,
+      "tier": "high"
+    },
+    {
+      "monster": "Skeleton",
+      "code": 20200209,
+      "level": 9,
+      "spawn_per_sector_per_hour": 4.0,
+      "despawn_hours": 12,
+      "tier": "endgame"
+    },
+    {
+      "monster": "Skeleton",
+      "code": 20200210,
+      "level": 10,
+      "spawn_per_sector_per_hour": 4.0,
+      "despawn_hours": 12,
+      "tier": "endgame"
+    },
+    {
+      "monster": "Golem",
+      "code": 20200301,
+      "level": 1,
+      "spawn_per_sector_per_hour": 10.0,
+      "despawn_hours": 12,
+      "tier": "low"
+    },
+    {
+      "monster": "Golem",
+      "code": 20200302,
+      "level": 2,
+      "spawn_per_sector_per_hour": 10.0,
+      "despawn_hours": 12,
+      "tier": "low"
+    },
+    {
+      "monster": "Golem",
+      "code": 20200303,
+      "level": 3,
+      "spawn_per_sector_per_hour": 10.0,
+      "despawn_hours": 12,
+      "tier": "low"
+    },
+    {
+      "monster": "Golem",
+      "code": 20200304,
+      "level": 4,
+      "spawn_per_sector_per_hour": 8.333,
+      "despawn_hours": 12,
+      "tier": "mid"
+    },
+    {
+      "monster": "Golem",
+      "code": 20200305,
+      "level": 5,
+      "spawn_per_sector_per_hour": 8.333,
+      "despawn_hours": 12,
+      "tier": "mid"
+    },
+    {
+      "monster": "Golem",
+      "code": 20200306,
+      "level": 6,
+      "spawn_per_sector_per_hour": 8.333,
+      "despawn_hours": 12,
+      "tier": "mid"
+    },
+    {
+      "monster": "Golem",
+      "code": 20200307,
+      "level": 7,
+      "spawn_per_sector_per_hour": 7.5,
+      "despawn_hours": 12,
+      "tier": "high"
+    },
+    {
+      "monster": "Golem",
+      "code": 20200308,
+      "level": 8,
+      "spawn_per_sector_per_hour": 7.5,
+      "despawn_hours": 12,
+      "tier": "high"
+    },
+    {
+      "monster": "Golem",
+      "code": 20200309,
+      "level": 9,
+      "spawn_per_sector_per_hour": 4.0,
+      "despawn_hours": 12,
+      "tier": "endgame"
+    },
+    {
+      "monster": "Golem",
+      "code": 20200310,
+      "level": 10,
+      "spawn_per_sector_per_hour": 4.0,
+      "despawn_hours": 12,
+      "tier": "endgame"
+    },
+    {
+      "monster": "Treasure Goblin",
+      "code": 20200401,
+      "level": 1,
+      "spawn_per_sector_per_hour": 3.0,
+      "despawn_hours": 0.5,
+      "tier": "rare_easy"
+    },
+    {
+      "monster": "Treasure Goblin",
+      "code": 20200402,
+      "level": 2,
+      "spawn_per_sector_per_hour": 3.0,
+      "despawn_hours": 0.5,
+      "tier": "rare_easy"
+    },
+    {
+      "monster": "Treasure Goblin",
+      "code": 20200403,
+      "level": 3,
+      "spawn_per_sector_per_hour": 4.0,
+      "despawn_hours": 0.5,
+      "tier": "rare_standard"
+    },
+    {
+      "monster": "Treasure Goblin",
+      "code": 20200404,
+      "level": 4,
+      "spawn_per_sector_per_hour": 2.0,
+      "despawn_hours": 0.5,
+      "tier": "rare_mid"
+    },
+    {
+      "monster": "Treasure Goblin",
+      "code": 20200405,
+      "level": 5,
+      "spawn_per_sector_per_hour": 1.0,
+      "despawn_hours": 0.5,
+      "tier": "rare_endgame"
+    },
+    {
+      "monster": "Deathkar",
+      "code": 20200501,
+      "level": 1,
+      "spawn_per_sector_per_hour": 0.667,
+      "despawn_hours": 12,
+      "tier": "rally_mid"
+    },
+    {
+      "monster": "Deathkar",
+      "code": 20200502,
+      "level": 2,
+      "spawn_per_sector_per_hour": 0.667,
+      "despawn_hours": 12,
+      "tier": "rally_mid"
+    },
+    {
+      "monster": "Deathkar",
+      "code": 20200503,
+      "level": 3,
+      "spawn_per_sector_per_hour": 0.667,
+      "despawn_hours": 12,
+      "tier": "rally_mid"
+    },
+    {
+      "monster": "Deathkar",
+      "code": 20200504,
+      "level": 4,
+      "spawn_per_sector_per_hour": 0.333,
+      "despawn_hours": 12,
+      "tier": "rally_mid"
+    },
+    {
+      "monster": "Deathkar",
+      "code": 20200505,
+      "level": 5,
+      "spawn_per_sector_per_hour": 0.333,
+      "despawn_hours": 12,
+      "tier": "rally_mid"
+    },
+    {
+      "monster": "Deathkar",
+      "code": 20200506,
+      "level": 6,
+      "spawn_per_sector_per_hour": 0.333,
+      "despawn_hours": 12,
+      "tier": "rally_high"
+    },
+    {
+      "monster": "Deathkar",
+      "code": 20200507,
+      "level": 7,
+      "spawn_per_sector_per_hour": 0.075,
+      "despawn_hours": 12,
+      "tier": "rally_high"
+    },
+    {
+      "monster": "Deathkar",
+      "code": 20200508,
+      "level": 8,
+      "spawn_per_sector_per_hour": 0.075,
+      "despawn_hours": 12,
+      "tier": "rally_high"
+    },
+    {
+      "monster": "Deathkar",
+      "code": 20200509,
+      "level": 9,
+      "spawn_per_sector_per_hour": 0.075,
+      "despawn_hours": 12,
+      "tier": "rally_high"
+    },
+    {
+      "monster": "Deathkar",
+      "code": 20200510,
+      "level": 10,
+      "spawn_per_sector_per_hour": 0.075,
+      "despawn_hours": 12,
+      "tier": "rally_high"
+    },
+    {
+      "monster": "Green Dragon",
+      "code": 20200601,
+      "level": 1,
+      "spawn_per_sector_per_hour": 0.5,
+      "despawn_hours": 12,
+      "tier": "rally_endgame"
+    },
+    {
+      "monster": "Green Dragon",
+      "code": 20200602,
+      "level": 2,
+      "spawn_per_sector_per_hour": 0.2,
+      "despawn_hours": 12,
+      "tier": "rally_endgame"
+    },
+    {
+      "monster": "Green Dragon",
+      "code": 20200603,
+      "level": 3,
+      "spawn_per_sector_per_hour": 0.05,
+      "despawn_hours": 12,
+      "tier": "rally_endgame"
+    },
+    {
+      "monster": "Red Dragon",
+      "code": 20200701,
+      "level": 1,
+      "spawn_per_sector_per_hour": 0.5,
+      "despawn_hours": 12,
+      "tier": "rally_endgame"
+    },
+    {
+      "monster": "Red Dragon",
+      "code": 20200702,
+      "level": 2,
+      "spawn_per_sector_per_hour": 0.2,
+      "despawn_hours": 12,
+      "tier": "rally_endgame"
+    },
+    {
+      "monster": "Red Dragon",
+      "code": 20200703,
+      "level": 3,
+      "spawn_per_sector_per_hour": 0.05,
+      "despawn_hours": 12,
+      "tier": "rally_endgame"
+    },
+    {
+      "monster": "Gold Dragon",
+      "code": 20200801,
+      "level": 1,
+      "spawn_per_sector_per_hour": 0.5,
+      "despawn_hours": 12,
+      "tier": "rally_endgame"
+    },
+    {
+      "monster": "Gold Dragon",
+      "code": 20200802,
+      "level": 2,
+      "spawn_per_sector_per_hour": 0.2,
+      "despawn_hours": 12,
+      "tier": "rally_endgame"
+    },
+    {
+      "monster": "Gold Dragon",
+      "code": 20200803,
+      "level": 3,
+      "spawn_per_sector_per_hour": 0.05,
+      "despawn_hours": 12,
+      "tier": "rally_endgame"
+    },
+    {
+      "monster": "Magdar",
+      "code": 20200901,
+      "level": 1,
+      "spawn_per_sector_per_hour": 0.05,
+      "despawn_hours": 24,
+      "tier": "apex"
+    },
+    {
+      "monster": "Magdar",
+      "code": 20200902,
+      "level": 2,
+      "spawn_per_sector_per_hour": 0.02,
+      "despawn_hours": 24,
+      "tier": "apex"
+    },
+    {
+      "monster": "Magdar",
+      "code": 20200903,
+      "level": 3,
+      "spawn_per_sector_per_hour": 0.005,
+      "despawn_hours": 24,
+      "tier": "apex"
+    }
+  ]
+}

@@ -1,0 +1,105 @@
+# ============================================================================
+# Conquer — .gitignore
+# ============================================================================
+
+# Secrets and local config (NEVER commit)
+config/database.php
+config/secrets.php
+config/local.php
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+
+# Uploads (user-generated content)
+public/uploads/
+public/user-content/
+
+# Cache
+cache/
+*.cache
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+*~
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sublime-workspace
+*.sublime-project
+.phpunit.result.cache
+
+# Composer (if added later)
+vendor/
+composer.phar
+composer.lock
+
+# NPM (if any frontend tooling added — not currently planned)
+node_modules/
+package-lock.json
+yarn.lock
+.npm/
+
+# Build artifacts (none expected — no build step planned)
+dist/
+build/
+
+# Generated assets that shouldn't be in source
+public/assets/atlases/
+public/assets/generated/
+
+# Testing
+.phpunit.cache
+coverage/
+*.cov
+
+# Database dumps
+*.sql.gz
+*.sql.bak
+dump.sql
+
+# Session files (if local file-based sessions)
+sessions/
+
+# Hostinger-specific
+.htaccess.bak
+error_log
+access_log
+
+# Editor temp
+*.orig
+*.rej
+
+# Migration locks
+migrations/.lock
+
+# Asset source files (designer working files; ship only the .png)
+*.psd
+*.ai
+*.aseprite
+*.sketch
+*.fig
+
+# Large binary assets (use Git LFS if needed)
+*.mp4
+*.mov
+*.zip
+*.tar.gz
+
+# Local development scripts
+scripts/local-*.sh
+local-*.php
