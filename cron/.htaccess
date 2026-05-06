@@ -1,0 +1,3 @@
+# Block all direct web access to this folder
+# Cron scripts — run via CLI only, never via HTTP
+Require all denied

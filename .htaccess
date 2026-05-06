@@ -1,0 +1,47 @@
+# ============================================================================
+# Conquer — Root .htaccess
+# ============================================================================
+#
+# This file exists as a SAFETY NET for shared hosting environments where the
+# document root cannot easily be changed (e.g. some Hostinger plans).
+#
+# PREFERRED SETUP: Change the subdomain's document root in Hostinger panel to
+# point at /conquer/public/ — then this file does nothing and you should
+# delete it. See docs/HOSTINGER_SETUP.md.
+#
+# FALLBACK: If you keep document root at /conquer/, this .htaccess rewrites
+# all requests to /public/, which makes the URL `conquer.svenmanderscheid.lu/`
+# correctly serve `public/index.php`.
+#
+# IMPORTANT: This file ONLY makes the routing work. It does NOT prevent
+# direct access to /src/, /data/, /config/ etc. Each of those folders needs
+# its own deny-all .htaccess (which is already provided in this repo).
+# ============================================================================
+
+RewriteEngine On
+
+# Don't rewrite if the request is already going to /public/
+RewriteCond %{REQUEST_URI} !^/public/
+
+# Don't rewrite if it's a real file or directory at the root
+# (lets you serve e.g. robots.txt or favicon.ico from root if needed)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Rewrite all other requests into /public/
+RewriteRule ^(.*)$ public/$1 [L]
+
+# Special case: also handle requests to "/" itself
+RewriteCond %{REQUEST_URI} ^/$
+RewriteRule ^$ public/ [L]
+
+# ============================================================================
+# Block access to sensitive top-level files in the repo root
+# ============================================================================
+<FilesMatch "(^\.|composer\.(json|lock)|package(-lock)?\.json|README\.md|.*\.md|.*\.bak|.*\.old|.*\.swp|.*\.sql)$">
+    Require all denied
+</FilesMatch>
+
+# Force HTTPS once SSL cert is installed (uncomment after SSL is verified)
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]

@@ -1,0 +1,4 @@
+# Block all direct web access to this folder
+# Documentation — internal only, not for public consumption
+# (The README.md on GitHub is the public-facing doc)
+Require all denied

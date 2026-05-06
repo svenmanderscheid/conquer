@@ -1,0 +1,3 @@
+# Block all direct web access to this folder
+# DB migrations — never serve, run via CLI only
+Require all denied

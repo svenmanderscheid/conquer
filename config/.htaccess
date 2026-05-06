@@ -1,0 +1,3 @@
+# Block all direct web access to this folder
+# Configuration files — may contain secrets
+Require all denied
