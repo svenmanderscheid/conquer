@@ -17,9 +17,16 @@ namespace Conquer;
 final class Bootstrap
 {
     private static bool $initialized = false;
+    private static array $config = [];
 
     // Static-only class — no instantiation.
     private function __construct() {}
+
+    /** Returns the loaded app config (available after init()). */
+    public static function getConfig(): array
+    {
+        return self::$config;
+    }
 
     public static function init(string $rootDir): void
     {
@@ -28,7 +35,8 @@ final class Bootstrap
         }
 
         // 1. Load config (Autoloader not yet available — plain require)
-        $config = self::loadConfig($rootDir);
+        $config       = self::loadConfig($rootDir);
+        self::$config = $config;
 
         // 2. Configure PHP
         $env = $config['env'] ?? 'production';

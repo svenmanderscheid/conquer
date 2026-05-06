@@ -46,6 +46,22 @@ return [
         'sessions' => __DIR__ . '/../sessions',
     ],
     
+    // OAuth — register apps at:
+    //   Google:  https://console.cloud.google.com/apis/credentials
+    //   Discord: https://discord.com/developers/applications
+    'oauth' => [
+        'google' => [
+            'client_id'     => '',   // CHANGE ME
+            'client_secret' => '',   // CHANGE ME
+            'redirect_uri'  => 'http://conquer.local/auth/google/callback',
+        ],
+        'discord' => [
+            'client_id'     => '',   // CHANGE ME
+            'client_secret' => '',   // CHANGE ME
+            'redirect_uri'  => 'http://conquer.local/auth/discord/callback',
+        ],
+    ],
+
     // Locale
     'default_locale' => 'en',
     'available_locales' => ['en', 'de', 'fr'],
