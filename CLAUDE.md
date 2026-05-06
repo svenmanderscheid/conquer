@@ -188,6 +188,19 @@ HTTP status codes still matter (200 for success, 400 for validation, 401 for aut
 - JS in `assets/js/main.js` (Alpine.js + vanilla — no jQuery)
 - Inline `<script>` and `<style>` only for tiny page-specific tweaks
 
+### Pixelart conventions
+
+The game uses a **pixelart aesthetic** — see `docs/Conquer_Asset_Specifications.pdf` for the full guide. Key rules for code:
+
+- **All sprites use the 32-color palette** at `data/palette/conquer-32.gpl`. Don't introduce new colors.
+- **Renderer must use `image-rendering: pixelated`** (CSS) and integer-only zoom (1×, 2×, 3×, 4×). Fractional zooms produce blurry output.
+- **Sprites are organized by set:** `assets/sprites/<set>/<category>/<name>.png`. The active set is read from `assets/sprites/active.json` (currently always `pixel`).
+- **The renderer should fall back** to the default set when a sprite is missing in the active set (per `active.json`'s `fallback_to_default: true`).
+- **Tile base size is 32×32 px** — smaller than typical browser strategy games, but right for pixelart readability.
+- **Monsters: 32×32 (standard) / 48×48 (dragons) / 64×64 (Magdar)** on the map. Battle sprites are 2× map size.
+- **Animations are sprite sheets** (horizontal layout, frame_count × frame_width per row). Loaded by the renderer with sub-rect drawing.
+- **Don't reference sprite paths directly in code** — use `Conquer\Assets\SpriteResolver` (Sprint 2 deliverable) which handles set-resolution and fallbacks.
+
 ## Local development
 
 The owner uses XAMPP on Windows at `C:\xampp\htdocs\conquer\`.

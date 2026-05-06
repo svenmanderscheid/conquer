@@ -1,0 +1,50 @@
+{
+    "_comment": "Metadata for the 'pixel' sprite set. Read by the renderer to set up scaling and dimensions.",
+    "name": "Pixel — 32-color SNES style",
+    "version": "1.0.0",
+    "author": "Sven Manderscheid",
+    "description": "The default Conquer aesthetic — pixelart with a curated 32-color palette, inspired by 16-bit SNES-era fantasy games and modern indie pixel-strategy titles.",
+    "palette": "data/palette/conquer-32.gpl",
+    
+    "dimensions": {
+        "tile_size": 32,
+        "city_size": 64,
+        "monster_size": 32,
+        "monster_dragon_size": 48,
+        "monster_boss_size": 64,
+        "shrine_size": 128,
+        "battle_monster_size": 64,
+        "battle_dragon_size": 96,
+        "battle_boss_size": 128,
+        "battle_troop_size": 48,
+        "treasure_icon_size": 48,
+        "charm_icon_size": 32,
+        "building_icon_size": 96,
+        "ui_icon_default_size": 32
+    },
+    
+    "rendering": {
+        "scaling": "nearest-neighbor",
+        "anti_aliasing": false,
+        "supported_zoom_levels": [1, 2, 3, 4],
+        "default_zoom_desktop": 2,
+        "default_zoom_mobile": 1
+    },
+    
+    "completeness": {
+        "status": "incomplete",
+        "completed_categories": [],
+        "missing_categories": [
+            "terrain",
+            "cities",
+            "conquest",
+            "field_objects",
+            "monsters",
+            "troops",
+            "treasures",
+            "charms",
+            "ui",
+            "buildings"
+        ]
+    }
+}

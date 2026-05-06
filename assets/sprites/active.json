@@ -1,0 +1,8 @@
+{
+    "_comment": "Defines which sprite set the game uses. The renderer reads this on each request.",
+    "_version": "1.0",
+    "default_set": "pixel",
+    "available_sets": ["pixel"],
+    "user_selectable": false,
+    "fallback_to_default": true
+}

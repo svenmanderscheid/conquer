@@ -1,0 +1,61 @@
+GIMP Palette
+Name: Conquer 32
+Columns: 8
+# Conquer pixel art palette — 32 colors
+# Curated for a fantasy strategy MMO aesthetic
+# Inspired by AAP-64 and DB32 community palettes
+# Author: Sven Manderscheid
+# Version: 1.0.0
+# Date: 2026-05-04
+#
+# Group 1: Skin / Earth (4)
+244 214 160	Skin Light
+200 149 113	Skin Mid
+140  90  60	Skin Dark
+ 42  26  20	Hair Black
+#
+# Group 2: Stone / Grey (4)
+214 212 204	Stone Light
+156 154 142	Stone Mid
+ 94  91  80	Stone Dark
+ 42  40  35	Stone Black
+#
+# Group 3: Wood / Brown (4)
+200 153 104	Wood Light
+140 100  55	Wood Mid
+ 94  63  31	Wood Dark
+ 58  36  16	Wood Deep
+#
+# Group 4: Grass / Green (4)
+164 214  94	Grass Light
+107 167  58	Grass Mid
+ 61 107  30	Grass Dark
+ 31  61  16	Grass Deep
+#
+# Group 5: Water / Blue (4)
+124 196 224	Water Light
+ 61 138 176	Water Mid
+ 31  88 120	Water Dark
+ 14  44  64	Water Deep
+#
+# Group 6: Fire / Red (3)
+255 184  74	Fire Light
+224  99  26	Fire Mid
+156  46  16	Fire Dark
+#
+# Group 7: Magic / Purple (3)
+201 124 255	Magic Light
+124  61 168	Magic Mid
+ 61  31  94	Magic Dark
+#
+# Group 8: Gold / Yellow (3)
+255 230 106	Gold Light
+212 160  32	Gold Mid
+124  94  16	Gold Dark
+#
+# Group 9: Pure (2)
+250 250 250	White
+ 10  10  20	Black
+#
+# Group 10: UI Accent (1)
+ 94 212 214	UI Cyan

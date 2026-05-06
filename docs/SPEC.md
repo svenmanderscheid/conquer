@@ -2,8 +2,8 @@
 
 **Project:** Conquer (working codename) — a browser-based 4X strategy MMO  
 **Owner:** Sven Manderscheid (Ekki)  
-**Spec version:** 1.5  
-**Last updated:** 2026-05-04  
+**Spec version:** 1.6  
+**Last updated:** 2026-05-06  
 **Inspiration:** League of Kingdoms (sunsetting May 2026). Mechanics blueprint, not a clone — names, art, lore, balancing diverge.
 
 > ⚠️ **NAMING NOTE:** "Conquer" is an **internal working codename** for this project. The final marketing name is undecided and will be chosen later (likely after an EU trademark lawyer review for €500-1500). All references to "Conquer" throughout this spec should be understood as placeholders for the final game name. The codename is used in: GitHub repo, file names, internal documentation, and development environment. When the final name is chosen, a global find-and-replace will be performed across all project artifacts.
@@ -4137,30 +4137,80 @@ The game is heavily inspired by LoK. Names, art, lore are being re-themed. Is mo
 
 ---
 
-## 28. Asset Specifications
+## 28. Asset Specifications &amp; Visual Style
 
-A complete reference for all visual assets needed for the game ships as a separate document: **`Conquer_Asset_Specifications.pdf`**. This 16-page document covers:
+### 28.1 Visual style decision: Pixelart
 
-- Map design philosophy (top-down 2D quadratic tile grid, 64×64 px tiles)
-- Sprite size reference for all element types
-- Detailed counts and visual descriptions per category (terrain, cities, monsters, treasures, charms, UI)
-- AI generation prompts for static sprites (per monster, per troop tier, per terrain type)
-- AI animation prompts for monster idle/attack/death animations
-- Production tips (style guide, color palettes, free asset sources, sprite sheet packing)
-- File organization and naming conventions
-- Sprint 0 minimum asset plan (~25-40 hours = playable prototype)
+Conquer uses a **pixelart aesthetic** — specifically a 16-bit-era SNES-style with a curated 32-color palette. This decision was made after evaluating three options (HD/3D rendered, hand-drawn 2D, pixelart) against the project constraints (solo developer, hobby project, hostinger shared hosting, AI-assisted asset workflow, 24-month roadmap).
 
-**Total MVP asset count: ~330 sprites, estimated 230-375 designer hours.**
+Reference games for visual direction: **Kingdom Two Crowns**, **Songs of Conquest**, **Mindustry**, **Stardew Valley** (UI).
 
-The PDF is the canonical reference for all sprite work — refer to it when commissioning art, evaluating AI-generated assets, or planning asset sprints. Update the PDF when significant changes occur (new monsters, new building tiers, etc.) and bump the asset spec version.
+Style rules (enforced):
+- **32-color palette** — all sprites must use only colors from `data/palette/conquer-32.gpl`
+- **No anti-aliasing** — crisp pixel edges only
+- **Soft 1-pixel outlines** — not hard black borders
+- **Top-left light source** — soft shadows on opposite side
+- **Integer-only zoom** — 1×, 2×, 3×, 4× (nearest-neighbor scaling)
+
+### 28.2 Sprite-set architecture (re-skinnable)
+
+Sprites are organized in named **sets** under `assets/sprites/<set>/`. The active set is configured in `assets/sprites/active.json`. The default and only initial set is `pixel`.
+
+This architecture allows future visual styles (hand-drawn, hd-pixel, seasonal variants like `pixel-winter`) to be added without code changes. Phase 1 ships with only `pixel`. Phase 2+ may add user-selectable sets.
+
+```
+assets/sprites/
+├── active.json           # which set(s) are enabled
+├── pixel/                # the default 32-color pixelart set
+│   ├── manifest.json     # version, palette ref, dimensions
+│   ├── terrain/, monsters/, buildings/, etc.
+└── (future sets)
+```
+
+The renderer resolves sprites through `Conquer\Assets\SpriteResolver` (Sprint 2 deliverable):
+1. Read `active.json` → get active set name
+2. Read `<set>/manifest.json` → get dimensions and metadata
+3. For each sprite request: try active set first, fall back to default if missing
+
+### 28.3 Asset Specifications PDF
+
+The complete reference is at `docs/Conquer_Asset_Specifications.pdf` (Pixelart Edition, v2.0). It covers:
+
+- Art direction and reference games
+- The complete 32-color palette with semantic groups
+- Sprite size reference for all element types (32×32 base, 48×48 dragons, 64×64 boss/city, 128×128 shrine)
+- Re-skinnable sprite-set architecture details
+- AI generation prompts tuned for pixelart (Stable Diffusion, Midjourney workflow)
+- Pixelart animation conventions (4-8 frame loops, sprite sheet format)
+- Tools: Aseprite ($20), Piskel (free), LibreSprite (free)
+- Production estimates and Sprint 0 minimal asset plan
+
+**Total MVP asset count: ~330 sprites, estimated 180-285 designer hours** (less than HD because pixelart is faster per sprite).
+
+### 28.4 Sprint 0 asset plan (validation phase)
+
+Before producing the full ~330 sprites, validate the style with a minimal set:
+
+| Asset | Purpose | Time |
+|---|---|---|
+| Conquer 32-color palette (.gpl) | Foundation | 1-2h |
+| 6 base terrain tiles | Map renders | 4-8h |
+| 1 player city Tier 1 | Player sees their city | 2-4h |
+| 1 monster (Orc T1) + idle anim | Validates animation pipeline | 3-5h |
+| 10 UI icons | Game is interactable | 3-5h |
+| 5 sample treasures | Treasure system testable | 3-5h |
+
+**Sprint 0 total: ~16-29 hours = playable pixelart prototype.**
+
+Deploy to `assets/sprites/pixel/`, render in-engine, screenshot, evaluate on desktop AND mobile. Iterate the palette and base sizes BEFORE producing 300 more sprites. The asset PDF is the single reference document — update its version when significant changes occur.
 
 ---
 
 ## End of Specification
 
-This document is **v1.5** of the Conquer specification.
+This document is **v1.6** of the Conquer specification.
 
-Updates and amendments should bump the version (1.6, 1.7, ...) and append a changelog at the bottom of this file.
+Updates and amendments should bump the version (1.7, 1.8, ...) and append a changelog at the bottom of this file.
 
 ### Changelog
 
@@ -4172,4 +4222,5 @@ Updates and amendments should bump the version (1.6, 1.7, ...) and append a chan
 | 1.3 | 2026-05-04 | Sven Manderscheid + Claude | Drop economy rebalanced: nerfed solo monster SP quantities by ~50%, dragon Build/Research SP by ~80% to match compressed build curve. Added §14.10 Drop Economy Overview, §14.11 Speedup Sources Matrix, §14.12 Pacing Reference (F2P Endgame target 3-5 months for Castle L25), §14.13 Treasure Goblin spec (NEW solo monster, F2P Build/Research SP source), §14.14 Charm drops clarification. New `data/monsters.json` shipped alongside spec. Updated §14.3 monster type list (Goblin Lv 1-5, not 1-10). |
 | 1.4 | 2026-05-04 | Sven Manderscheid + Claude | **Crystal resource removed completely** (§3.6 rewritten as T5/Mythic costs note, §3.7 GEMS expanded with full F2P income table, §6.4 crystal_gathering_speed removed, §7.4 Crystal Mine entry removed, §22 schema crystal column removed, §27 OQ-6 rewritten). T5 troops now cost only standard resources. **GEMS drops from monsters added** (15% chance × 10/30/40 GEMS for solo, scaling for rally/boss monsters — see §14.15). **Charm drop table finalized** (4-tier per Lv: 0-3/4-6/7-8/9-10, only Orc/Skeleton/Golem drop charms — see §14.14). **F2P Endgame target updated to ~12 months for Castle L30 + T5** (§14.12 rewritten to match owner's design intent). **§7.10 World Spawn System added** with full hourly cron-tick spawn table for all entity types per sector. Goblin spawn rates updated to 6/4/2/1 per sector/h (Lv 1-5). **§28 Asset Specifications added** — references new asset specification PDF companion document (16 pages, all sprite specs + AI prompts + monster animation prompts). New `data/charms.json` ships with this version; `data/monsters.json` updated with charm_drop blocks per finalized table and gems_drop blocks per all monsters; new `data/world_spawn.json` ships with spawn rates and caps. |
 | 1.5 | 2026-05-04 | Sven Manderscheid + Claude | **Project renamed from "Ascendancy" to "Conquer"**. After extensive trademark/domain research showed "Ascendancy" was heavily conflict-laden (Logic Factory 1995 4X, OneMoreTurnGames 2025 Kickstarter, Natures Ascendancy EU TM, Path of Exile association, ascendancy.com premium-priced), the project owner decided to use **"Conquer" as a temporary internal working codename** for the duration of development. The final marketing name will be chosen later, likely with assistance from an EU trademark lawyer (€500-1500 for proper recherche). All 17 occurrences of "Ascendancy" in this spec have been replaced with "Conquer". The asset specification PDF has been renamed to `Conquer_Asset_Specifications.pdf`. **No technical changes** in this version — this is purely a project-name rebrand. All gameplay mechanics, balance values, drop tables, and roadmap items remain unchanged from v1.4. |
+| 1.6 | 2026-05-06 | Sven Manderscheid + Claude | **Visual style decision: Pixelart**. The game adopts a pixelart aesthetic (16-bit SNES-style with curated 32-color palette) inspired by Kingdom Two Crowns, Songs of Conquest, and Mindustry. **§28 rewritten** with three sub-sections: 28.1 Visual style decision, 28.2 Sprite-set architecture (re-skinnable via `assets/sprites/<set>/` with `active.json` controlling the active set), 28.3 Asset Specifications PDF reference, 28.4 Sprint 0 asset plan. The asset specifications PDF has been **completely rewritten** as v2.0 Pixelart Edition (18 pages) — includes the full 32-color palette specification, pixelart-tuned AI generation prompts, 4-8 frame animation conventions, and tools recommendations (Aseprite, Piskel). New artifacts shipped with this version: `data/palette/conquer-32.gpl` (GIMP/Aseprite palette file), `assets/sprites/active.json` (active set config), `assets/sprites/pixel/manifest.json` (set metadata), and the empty folder structure for the `pixel` sprite set. Tile base size reduced from 64×64 to 32×32 px for better pixelart readability and mobile fit. CLAUDE.md updated with pixelart conventions for code (`image-rendering: pixelated` requirement, integer-only zoom, sprite-set resolution via `Conquer\Assets\SpriteResolver` Sprint 2 deliverable). **No game mechanics changed** — this is purely a visual direction commitment. |
 
