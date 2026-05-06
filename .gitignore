@@ -4,6 +4,7 @@
 
 # Secrets and local config (NEVER commit)
 config/database.php
+config/app.php
 config/secrets.php
 config/local.php
 .env
@@ -102,3 +103,5 @@ migrations/.lock
 # Local development scripts
 scripts/local-*.sh
 local-*.php
+
+asset-workflow/

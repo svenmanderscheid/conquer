@@ -1,0 +1,82 @@
+{
+    "_comment": "Maps Kenney Tiny Town tile filenames to Conquer game elements. The renderer reads this to know which physical PNG file to load for which logical sprite. When we replace Kenney with Conquer pixel art, only this file changes — game code stays the same.",
+    "_version": "1.0.0",
+    "_pack_source": "Kenney Tiny Town (https://kenney.nl/assets/tiny-town)",
+    "_tile_size": 16,
+    "_render_scale": 2,
+    "_total_tiles_used": 47,
+    
+    "terrain": {
+        "plains_01": "raw/tile_0000.png",
+        "plains_02": "raw/tile_0001.png",
+        "plains_03": "raw/tile_0002.png",
+        "plains_04": "raw/tile_0003.png",
+        "_note": "Tiles 0000-0003 are 4 grass variants — perfect for plains_01-04 in our spec"
+    },
+    
+    "trees_and_forest": {
+        "tree_small_1": "raw/tile_0004.png",
+        "tree_small_2": "raw/tile_0005.png",
+        "tree_medium": "raw/tile_0006.png",
+        "tree_large": "raw/tile_0007.png",
+        "tree_dark_1": "raw/tile_0008.png",
+        "tree_dark_2": "raw/tile_0009.png",
+        "bush_small": "raw/tile_0010.png",
+        "_note": "Used as field objects (forest tiles) and visual decoration. Place over grass terrain."
+    },
+    
+    "decorations": {
+        "mushroom_red": "raw/tile_0011.png",
+        "rock_small": "raw/tile_0012.png",
+        "flower_grass": "raw/tile_0013.png",
+        "_note": "Decorative overlays on grass — useful for visual variety on the map"
+    },
+    
+    "buildings": {
+        "house_blue_roof": "raw/tile_0044.png",
+        "house_blue_roof_alt": "raw/tile_0045.png",
+        "house_red_roof": "raw/tile_0046.png",
+        "house_red_roof_alt": "raw/tile_0047.png",
+        "_note": "These are 16x16 segments — buildings span multiple tiles. Use for player city tiers 1-2."
+    },
+    
+    "city_castle": {
+        "castle_tower_blue": "raw/tile_0048.png",
+        "castle_wall_blue": "raw/tile_0049.png",
+        "castle_door": "raw/tile_0050.png",
+        "_note": "Higher-tier player city visual elements. Combine for tier 3-4 castles."
+    },
+    
+    "walls_and_fences": {
+        "fence_wood_horizontal": "raw/tile_0014.png",
+        "fence_wood_vertical": "raw/tile_0015.png",
+        "fence_wood_post": "raw/tile_0016.png",
+        "fence_stone": "raw/tile_0017.png",
+        "_note": "Wall tiles for player city tier 1 (wooden palisade) and tier 2+ (stone)"
+    },
+    
+    "doors_and_gates": {
+        "door_wood": "raw/tile_0108.png",
+        "door_stone": "raw/tile_0109.png",
+        "gate_arch": "raw/tile_0110.png",
+        "_note": "Detail elements for buildings and city entrances"
+    },
+    
+    "items_treasures": {
+        "key_gold": "raw/tile_0120.png",
+        "coins_pile": "raw/tile_0121.png",
+        "treasure_chest": "raw/tile_0122.png",
+        "potion": "raw/tile_0123.png",
+        "shield_wood": "raw/tile_0124.png",
+        "sword_basic": "raw/tile_0125.png",
+        "_note": "Use as treasure-grade icons (Normal grade) and inventory items"
+    },
+    
+    "_unmapped_tiles": "raw/ contains 132 total tiles. The mappings above use ~30 of them. Remaining tiles in raw/ are available for future use — reference them by tile_XXXX.png filename when needed.",
+    
+    "_usage_in_code": {
+        "example_php": "$spriteResolver->resolve('plains_01')  // returns: assets/sprites/kenney-tiny-town/raw/tile_0000.png",
+        "example_html": "<img src='/assets/sprites/kenney-tiny-town/raw/tile_0000.png' style='image-rendering: pixelated; width: 32px; height: 32px;'>",
+        "_note": "The renderer reads this mapping file, finds the logical name (e.g. 'plains_01'), looks up the physical file (e.g. 'raw/tile_0000.png'), and serves it."
+    }
+}

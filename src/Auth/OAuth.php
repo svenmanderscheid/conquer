@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Conquer\Auth;
 
 use Conquer\Db\Connection;
+use Conquer\Game\City\CityState;
 use Conquer\Logger;
 
 /**
@@ -259,7 +260,7 @@ final class OAuth
             }
         }
 
-        // 3. Brand new player
+        // 3. Brand new player — create account + default city in world 1
         $username = $this->uniqueUsername($db, $user['display_name']);
 
         $playerId = $db->transaction(
@@ -275,6 +276,9 @@ final class OAuth
                     [$playerId, $provider, $user['provider_user_id']],
                 );
 
+                // Create default city in world 1 (Sprint 1 — single world).
+                self::createDefaultCity($db, $playerId, $username);
+
                 return $playerId;
             },
         );
@@ -284,6 +288,60 @@ final class OAuth
         );
 
         return $playerId;
+    }
+
+    /**
+     * Creates a default city with all 13 buildings at level 1 in world 1.
+     * Sprint 1 convenience — production will use an explicit world-join flow.
+     */
+    private static function createDefaultCity(Connection $db, int $playerId, string $username): void
+    {
+        // Pick random map coordinates (avoid edges — 50 tile buffer).
+        $coord = self::randomCoord($db);
+
+        $cityName = $username . "'s City";
+        $db->execute(
+            'INSERT INTO cities
+                 (player_id, world_id, name, coord_x, coord_y,
+                  food, lumber, stone, gold,
+                  wall_hp_current, wall_hp_max, castle_level)
+             VALUES (?, 1, ?, ?, ?, 10000, 10000, 10000, 5000, 5000, 5000, 1)',
+            [$playerId, $cityName, $coord['x'], $coord['y']],
+        );
+        $cityId = $db->lastInsertId();
+
+        // Insert all 13 buildings at level 1.
+        foreach (CityState::BUILDING_CODES as $code) {
+            $db->execute(
+                'INSERT INTO city_buildings (city_id, building_code, level) VALUES (?, ?, 1)',
+                [$cityId, $code],
+            );
+        }
+    }
+
+    /**
+     * Finds a random unoccupied map coordinate (50–974 range, world 1).
+     * Retries up to 20 times before giving up.
+     *
+     * @return array{x: int, y: int}
+     */
+    private static function randomCoord(Connection $db): array
+    {
+        for ($i = 0; $i < 20; $i++) {
+            $x = random_int(50, 974);
+            $y = random_int(50, 974);
+
+            $taken = $db->query(
+                'SELECT 1 FROM cities WHERE world_id = 1 AND coord_x = ? AND coord_y = ?',
+                [$x, $y],
+            )->fetch();
+
+            if ($taken === false) {
+                return ['x' => $x, 'y' => $y];
+            }
+        }
+
+        throw new \RuntimeException('Could not find a free map coordinate after 20 attempts.');
     }
 
     /**

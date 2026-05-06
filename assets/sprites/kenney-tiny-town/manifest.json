@@ -1,0 +1,52 @@
+{
+    "_comment": "Metadata for the Kenney Tiny Town sprite set. This is a temporary placeholder set used during early development. Will be replaced by the 'pixel' set as Conquer-native sprites are produced.",
+    "name": "Kenney Tiny Town",
+    "version": "1.0.0",
+    "author": "Kenney Vleugels (kenney.nl)",
+    "description": "CC0-licensed pixel art sprite pack from Kenney. Used as placeholder assets during early development to allow renderer testing without blocking on asset production. Will be replaced by Conquer-native pixel art ('pixel' set) over time.",
+    "source_url": "https://kenney.nl/assets/tiny-town",
+    "license": "CC0 1.0 Universal (Public Domain)",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    
+    "dimensions": {
+        "tile_size": 16,
+        "city_size": 32,
+        "monster_size": 16,
+        "building_icon_size": 32,
+        "ui_icon_default_size": 16,
+        "_note": "Tiny Town is natively 16x16 px. The renderer should scale these up 2x (nearest-neighbor) to match Conquer's 32x32 logical tile size."
+    },
+    
+    "rendering": {
+        "scaling": "nearest-neighbor",
+        "anti_aliasing": false,
+        "render_scale_factor": 2,
+        "supported_zoom_levels": [1, 2, 3, 4],
+        "default_zoom_desktop": 2,
+        "default_zoom_mobile": 1
+    },
+    
+    "completeness": {
+        "status": "partial",
+        "completed_categories": [
+            "terrain (grass)",
+            "trees",
+            "buildings",
+            "walls",
+            "doors",
+            "decorations",
+            "items"
+        ],
+        "missing_categories": [
+            "water (no water tiles in this pack)",
+            "monsters",
+            "troops",
+            "treasures (limited)",
+            "charms",
+            "ui_full",
+            "battle_sprites",
+            "shrines"
+        ],
+        "_note": "This pack is for Phase 0 prototyping only. Use it to validate the renderer and tile system. Replace with proper Conquer pixel art before public release."
+    }
+}

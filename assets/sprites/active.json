@@ -1,8 +1,9 @@
 {
-    "_comment": "Defines which sprite set the game uses. The renderer reads this on each request.",
-    "_version": "1.0",
-    "default_set": "pixel",
-    "available_sets": ["pixel"],
+    "_comment": "Defines which sprite set the game uses. The renderer reads this on each request. We currently default to kenney-tiny-town because it has actual tile files; pixel/ is empty until we produce Conquer-native pixel art.",
+    "_version": "1.1",
+    "_changelog": "v1.1: Switched default from 'pixel' to 'kenney-tiny-town' because pixel/ has no sprites yet. Will switch back when pixel/ is populated.",
+    "default_set": "kenney-tiny-town",
+    "available_sets": ["kenney-tiny-town"],
     "user_selectable": false,
     "fallback_to_default": true
 }
