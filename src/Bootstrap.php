@@ -12,6 +12,7 @@ namespace Conquer;
  *   3. Register Autoloader
  *   4. Initialize Logger
  *   5. Register error / exception handlers
+ *   6. Initialize DB connection (non-fatal if config/database.php is missing)
  */
 final class Bootstrap
 {
@@ -52,11 +53,27 @@ final class Bootstrap
         // 5. Register error / exception handlers
         self::registerHandlers($env);
 
+        // 6. Initialize DB connection (optional — site stays up without it)
+        self::initDb($rootDir);
+
         self::$initialized = true;
         Logger::getInstance()->info('Bootstrap initialized [env=' . $env . ']');
     }
 
     // -------------------------------------------------------------------------
+
+    private static function initDb(string $rootDir): void
+    {
+        try {
+            \Conquer\Db\Connection::init($rootDir);
+            Logger::getInstance()->debug('DB connection established');
+        } catch (\RuntimeException $e) {
+            // config/database.php missing — expected in fresh dev setups
+            Logger::getInstance()->warn('DB unavailable: ' . $e->getMessage());
+        } catch (\PDOException $e) {
+            Logger::getInstance()->error('DB connection failed: ' . $e->getMessage());
+        }
+    }
 
     private static function loadConfig(string $rootDir): array
     {
