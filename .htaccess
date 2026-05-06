@@ -49,13 +49,6 @@ RewriteRule ^(.*)$ index.php [QSA,L]
     Require all denied
 </FilesMatch>
 
-# Block direct PHP execution in upload/cache directories (defense in depth)
-<DirectoryMatch "^.*/(uploads|user-content|cache|tmp)/">
-    <FilesMatch "\.(php|phtml|php3|php4|php5|php7|phar)$">
-        Require all denied
-    </FilesMatch>
-</DirectoryMatch>
-
 # ============================================================================
 # Block access to non-public folders even though they live in webroot
 # (Each of these folders also has its own deny-all .htaccess for redundancy)

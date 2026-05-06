@@ -4,12 +4,39 @@ declare(strict_types=1);
 /**
  * Conquer — Front Controller
  *
- * This is a Sprint 0 placeholder. Real routing is implemented in Sprint 1.
+ * Every request enters here. Bootstrap initializes the application,
+ * then a stub router dispatches to the appropriate handler.
  *
- * For now, just shows a welcome page proving the deployment works.
+ * Sprint 1: Router is a stub — API returns 501, everything else gets
+ * the landing page. Real routing lands in Task 1.6.
  */
 
-// Show a friendly placeholder page
+define('ROOT_DIR', __DIR__);
+
+require_once ROOT_DIR . '/src/Bootstrap.php';
+\Conquer\Bootstrap::init(ROOT_DIR);
+
+// ---------------------------------------------------------------------------
+// Stub router (replaced in Task 1.6)
+// ---------------------------------------------------------------------------
+
+$path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+$path = '/' . ltrim((string) $path, '/');
+
+if (str_starts_with($path, '/api/')) {
+    http_response_code(501);
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode([
+        'ok'      => false,
+        'error'   => 'not_implemented',
+        'message' => 'API endpoints are not yet available.',
+    ]);
+    exit;
+}
+
+// ---------------------------------------------------------------------------
+// Landing page (Sprint 0 placeholder — kept until city view is ready)
+// ---------------------------------------------------------------------------
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -18,6 +45,7 @@ declare(strict_types=1);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conquer — Coming Soon</title>
     <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: system-ui, -apple-system, sans-serif;
             background: #0f172a;
@@ -26,17 +54,11 @@ declare(strict_types=1);
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            margin: 0;
             padding: 20px;
-            box-sizing: border-box;
         }
-        .container {
-            text-align: center;
-            max-width: 600px;
-        }
+        .container { text-align: center; max-width: 600px; }
         h1 {
             font-size: 4rem;
-            margin: 0;
             background: linear-gradient(135deg, #0ea5e9, #8b5cf6);
             -webkit-background-clip: text;
             background-clip: text;
@@ -63,40 +85,31 @@ declare(strict_types=1);
             color: #94a3b8;
             margin-top: 1rem;
         }
-        .status::before {
-            content: '●';
-            color: #f59e0b;
-            margin-right: 0.5rem;
-        }
+        .status::before { content: '●'; color: #22c55e; margin-right: 0.5rem; }
         footer {
             margin-top: 3rem;
             font-size: 0.85rem;
             color: #475569;
         }
-        a {
-            color: #0ea5e9;
-            text-decoration: none;
-        }
-        a:hover {
-            color: #38bdf8;
-        }
+        a { color: #0ea5e9; text-decoration: none; }
+        a:hover { color: #38bdf8; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Conquer</h1>
         <div class="codename">working codename — final name TBD</div>
-        
+
         <p>
             A browser-based 4X strategy MMO inspired by League of Kingdoms.
             <br>
             Built with care, no pay-to-win, no shortcuts.
         </p>
-        
-        <div class="status">Sprint 0 — Foundation in progress</div>
-        
+
+        <div class="status">Sprint 1 — Authentication &amp; City View in progress</div>
+
         <footer>
-            PHP <?= PHP_VERSION ?> · 
+            PHP <?= PHP_VERSION ?> ·
             Server time: <?= gmdate('Y-m-d H:i:s') ?> UTC
             <br>
             <a href="https://github.com/svenmanderscheid/conquer">github.com/svenmanderscheid/conquer</a>

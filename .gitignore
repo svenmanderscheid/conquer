@@ -10,8 +10,7 @@ config/local.php
 .env.local
 .env.*.local
 
-# Logs
-logs/
+# Logs (directory tracked for .gitkeep and .htaccess; log files ignored)
 *.log
 
 # Uploads (user-generated content)
