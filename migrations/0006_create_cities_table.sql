@@ -1,0 +1,30 @@
+-- Cities (one per player per world).
+-- Schema: SPEC.md §22.1
+CREATE TABLE cities (
+    id                   INT PRIMARY KEY AUTO_INCREMENT,
+    player_id            INT NOT NULL,
+    world_id             INT NOT NULL,
+    name                 VARCHAR(50) NOT NULL,
+    coord_x              SMALLINT NOT NULL,
+    coord_y              SMALLINT NOT NULL,
+    is_hidden            TINYINT(1) DEFAULT 0,
+    is_shielded          TINYINT(1) DEFAULT 0,
+    shield_expires_at    DATETIME NULL,
+    food                 BIGINT DEFAULT 10000,
+    lumber               BIGINT DEFAULT 10000,
+    stone                BIGINT DEFAULT 10000,
+    gold                 BIGINT DEFAULT 5000,
+    last_resource_update DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    wall_hp_current      INT DEFAULT 5000,
+    wall_hp_max          INT DEFAULT 5000,
+    wall_last_update     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    castle_level         TINYINT DEFAULT 1,
+    power                BIGINT DEFAULT 0,
+    action_points        SMALLINT DEFAULT 100,
+    ap_last_update       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY one_city_per_world (player_id, world_id),
+    UNIQUE KEY no_overlapping_cities (world_id, coord_x, coord_y),
+    INDEX (world_id, is_hidden, coord_x, coord_y),
+    FOREIGN KEY (player_id) REFERENCES players(id),
+    FOREIGN KEY (world_id) REFERENCES worlds(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
