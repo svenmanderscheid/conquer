@@ -320,16 +320,21 @@ final class OAuth
     }
 
     /**
-     * Finds a random unoccupied map coordinate (50–974 range, world 1).
-     * Retries up to 20 times before giving up.
+     * Finds a random unoccupied map coordinate within the active world bounds.
+     * Uses a 10-tile buffer from each edge. Retries up to 20 times before giving up.
      *
      * @return array{x: int, y: int}
      */
     private static function randomCoord(Connection $db): array
     {
+        $world = $db->query('SELECT map_size FROM worlds WHERE id = 1')->fetch();
+        $size  = (int) ($world['map_size'] ?? 256);
+        $min   = 10;
+        $max   = $size - 10 - 1;
+
         for ($i = 0; $i < 20; $i++) {
-            $x = random_int(50, 974);
-            $y = random_int(50, 974);
+            $x = random_int($min, $max);
+            $y = random_int($min, $max);
 
             $taken = $db->query(
                 'SELECT 1 FROM cities WHERE world_id = 1 AND coord_x = ? AND coord_y = ?',

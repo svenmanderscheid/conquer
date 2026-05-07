@@ -35,6 +35,11 @@ if (str_starts_with($path, '/api/')) {
     $router->get('/api/city/state',              [\Conquer\Api\Handlers\CityHandler::class, 'state']);
     $router->post('/api/city/upgrade-building',  [\Conquer\Api\Handlers\CityHandler::class, 'upgradeBuilding']);
 
+    // Map
+    $router->get('/api/map/info',            [\Conquer\Api\Handlers\MapHandler::class, 'info']);
+    $router->get('/api/map/tiles',           [\Conquer\Api\Handlers\MapHandler::class, 'tiles']);
+    $router->get('/api/map/tile/:x/:y',      [\Conquer\Api\Handlers\MapHandler::class, 'tile']);
+
     if (!$router->dispatch($method, $path)) {
         \Conquer\Api\Response::error(404, 'NOT_FOUND', 'API endpoint not found.');
     }
@@ -84,6 +89,20 @@ if (preg_match('#^/auth/(google|discord)/callback$#', $path, $m)) {
 if ($path === '/auth/logout') {
     \Conquer\Auth\Session::destroy();
     header('Location: /');
+    exit;
+}
+
+// ---------------------------------------------------------------------------
+// Map view (Sprint 2)
+// ---------------------------------------------------------------------------
+
+if ($path === '/map') {
+    $session = \Conquer\Auth\Session::current();
+    if ($session === null) {
+        header('Location: /');
+        exit;
+    }
+    require ROOT_DIR . '/views/map.php';
     exit;
 }
 
