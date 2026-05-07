@@ -26,15 +26,12 @@ const ConquerMap = (() => {
     let MAP_SIZE = 256; // overwritten by init() from the API response
 
     // Terrain type IDs
-    const T = { WATER: 0, DESERT: 1, PLAINS: 2, FOREST: 3, MOUNTAINS: 4, SNOW: 5 };
+    // Fallback colours while custom tiles load
+    // plains_01/02/03 → green, plains_04 → sand
+    const TILE_FILL = ['#5cb83c', '#5cb83c', '#5cb83c', '#c8a050'];
 
-    // Fallback solid colours (minimap + terrain types without a sprite)
-    // Index order matches T: WATER, DESERT, PLAINS, FOREST, MOUNTAINS, (unused)
-    const FILL   = ['#1e6896', '#c8a050', '#5cb83c', '#2a6a2a', '#7a7060', '#7a7060'];
-    const BORDER = ['#155276', '#a07830', '#3a9820', '#1a4a1a', '#5a5040', '#5a5040'];
-
-    // Pre-parsed RGB values for minimap ImageData painting
-    const FILL_RGB = FILL.map(hex => ({
+    // Minimap RGB for each tile index
+    const TILE_RGB = TILE_FILL.map(hex => ({
         r: parseInt(hex.slice(1, 3), 16),
         g: parseInt(hex.slice(3, 5), 16),
         b: parseInt(hex.slice(5, 7), 16),
@@ -45,77 +42,43 @@ const ConquerMap = (() => {
     //   tilemap_packed.png — 12 cols × 11 rows, 16×16 tiles, 1px gap → 17px stride
     // -------------------------------------------------------------------------
 
-    const ATLAS_SRC  = '/assets/sprites/kenney-tiny-town/Tilemap/tilemap_packed.png';
-    const ATLAS_COLS = 12;
-    const ATLAS_TILE = 16;
-    const ATLAS_STEP = 17;   // 16px tile + 1px gap
-
-    // Which atlas tile indices to use per terrain type (null = colour fill)
-    const TERRAIN_TILES = {
-        [T.WATER]:     null,
-        [T.DESERT]:    [12, 13],
-        [T.PLAINS]:    [0, 1, 2],
-        [T.FOREST]:    [0, 1, 2],   // grass base; tree drawn on top
-        [T.MOUNTAINS]: null,
-        [T.SNOW]:      null,
-    };
-    const TREE_TILES = [4, 5, 6];   // pine, round green, dark green
-
     // -------------------------------------------------------------------------
-    // Terrain — seeded value noise (no external libraries)
+    // Custom terrain tiles (user-created 32×32 PNGs)
+    //   plains_01–03 → 90%   plains_04 → 10%
     // -------------------------------------------------------------------------
 
-    function gridHash(seed, gx, gy) {
+    const TERRAIN_IMG_SRCS = [
+        '/assets/sprites/terrain/plains_01.png',
+        '/assets/sprites/terrain/plains_02.png',
+        '/assets/sprites/terrain/plains_03.png',
+        '/assets/sprites/terrain/plains_04.png',  // desert / sand
+    ];
+
+    let terrainImgs = [];
+    // Per-image loaded flags — no single point of failure
+    let terrainLoaded = [];
+
+    // -------------------------------------------------------------------------
+    // Tile selection — position-stable hash, no biomes, no water
+    //   plains_01/02/03 (idx 0-2) → 90%
+    //   plains_04       (idx 3)   → 10%
+    // -------------------------------------------------------------------------
+
+    function tileHash(seed, gx, gy) {
         let h = (seed ^ (Math.imul(gx, 374761393) + Math.imul(gy, 668265263))) >>> 0;
         h = Math.imul(h ^ (h >>> 13), 1274126177) >>> 0;
-        return (h ^ (h >>> 16)) / 0xFFFFFFFF;
+        // Divide by 2^32 so result is always in [0, 0.9999…] — never exactly 1.0
+        return ((h ^ (h >>> 16)) >>> 0) / 0x100000000;
     }
 
-    function valueNoise(seed, x, y, scale) {
-        const gx = Math.floor(x / scale), gy = Math.floor(y / scale);
-        const fx = x / scale - gx,         fy = y / scale - gy;
-        const ux = fx * fx * (3 - 2 * fx), uy = fy * fy * (3 - 2 * fy);
-        const v00 = gridHash(seed, gx,     gy);
-        const v10 = gridHash(seed, gx + 1, gy);
-        const v01 = gridHash(seed, gx,     gy + 1);
-        const v11 = gridHash(seed, gx + 1, gy + 1);
-        return v00*(1-ux)*(1-uy) + v10*ux*(1-uy) + v01*(1-ux)*uy + v11*ux*uy;
+    function getTileIdx(seed, tx, ty) {
+        const r = tileHash(seed, tx, ty);
+        if (r < 0.02) return 3;          // plains_04 —  2%
+        const r2 = tileHash(seed + 1, tx, ty);
+        if (r2 < 0.61) return 0;         // plains_01 — ~60%
+        if (r2 < 0.81) return 1;         // plains_02 — ~20%
+        return 2;                        // plains_03 — ~18%
     }
-
-    /**
-     * Two-axis noise biome system.
-     *
-     * height   (large scale) → water / mountain boundaries
-     * moisture (large scale) → desert / forest boundaries
-     *
-     * Target distribution: Plains 50%, Forest 25%, Mountain 15%, Water 5%, Desert 5%
-     * Biomes form natural clusters because both noise fields use large base scales.
-     *
-     * Octave weights 0.55 / 0.30 / 0.15 give a range of roughly [0, 1] that clusters
-     * around 0.5 (bell-shaped). Thresholds below are tuned to hit the % targets.
-     */
-    function terrain(seed, tx, ty) {
-        const s = MAP_SIZE;
-
-        // Height — controls elevation (water in valleys, mountains on peaks)
-        const h = valueNoise(seed,      tx, ty, s * 0.38) * 0.55
-                + valueNoise(seed + 1,  tx, ty, s * 0.16) * 0.30
-                + valueNoise(seed + 2,  tx, ty, s * 0.06) * 0.15;
-
-        // Moisture — independent axis (arid ↔ lush)
-        const m = valueNoise(seed + 50, tx, ty, s * 0.28) * 0.55
-                + valueNoise(seed + 51, tx, ty, s * 0.11) * 0.30
-                + valueNoise(seed + 52, tx, ty, s * 0.04) * 0.15;
-
-        if (h < 0.22)              return T.WATER;      // ~5%  deep water / lakes
-        if (h > 0.75)              return T.MOUNTAINS;  // ~15% high elevation
-        if (m < 0.20 && h < 0.62) return T.DESERT;     // ~5%  arid lowlands
-        if (m > 0.65)              return T.FOREST;     // ~25% humid / lush areas
-        return T.PLAINS;                                // ~50% default
-    }
-
-    // Alias so the rest of the code stays readable
-    function getTerrain(seed, tx, ty) { return terrain(seed, tx, ty); }
 
     // -------------------------------------------------------------------------
     // State
@@ -124,9 +87,9 @@ const ConquerMap = (() => {
     // Main canvas
     let canvas, ctx;
     // Minimap canvas
-    let minimap, mmCtx, mmImgData;
-    // Atlas
-    let atlasImg = null, atlasReady = false;
+    let minimap, mmCtx, mmImgData, mmFullCanvas;
+
+    const MM_ZOOM = 2; // show half the world at a time — adjust for more/less zoom
 
     let seed, myCity;
     let onTileInfo, onHover;
@@ -173,7 +136,7 @@ const ConquerMap = (() => {
         ctx   = canvas.getContext('2d');
         mmCtx = minimap.getContext('2d');
 
-        loadAtlas();
+        loadTerrainTiles();
         resizeMain();
         window.addEventListener('resize', resizeMain);
 
@@ -190,20 +153,26 @@ const ConquerMap = (() => {
         requestAnimationFrame(loop);
     }
 
-    function loadAtlas() {
-        atlasImg = new Image();
-        atlasImg.onload = () => { atlasReady = true; };
-        atlasImg.src = ATLAS_SRC;
+    function loadTerrainTiles() {
+        terrainLoaded = new Array(TERRAIN_IMG_SRCS.length).fill(false);
+        terrainImgs   = TERRAIN_IMG_SRCS.map((src, i) => {
+            const img = new Image();
+            img.onload  = () => { terrainLoaded[i] = true; };
+            img.onerror = () => { console.warn('[terrain] failed to load: ' + src); };
+            img.src = src;
+            return img;
+        });
     }
 
-    function drawAtlasTile(tileIdx, destX, destY, destSize) {
-        const col = tileIdx % ATLAS_COLS;
-        const row = Math.floor(tileIdx / ATLAS_COLS);
-        ctx.drawImage(
-            atlasImg,
-            col * ATLAS_STEP, row * ATLAS_STEP, ATLAS_TILE, ATLAS_TILE,
-            Math.round(destX), Math.round(destY), destSize, destSize
-        );
+    // Draw custom terrain tile, or fall back to a solid colour while loading
+    function drawTerrainTile(imgIdx, destX, destY, destSize) {
+        const dx = Math.round(destX), dy = Math.round(destY);
+        if (terrainLoaded[imgIdx]) {
+            ctx.drawImage(terrainImgs[imgIdx], dx, dy, destSize, destSize);
+        } else {
+            ctx.fillStyle = imgIdx === 3 ? '#c8a050' : '#5cb83c';
+            ctx.fillRect(dx, dy, destSize, destSize);
+        }
     }
 
     function resizeMain() {
@@ -216,20 +185,26 @@ const ConquerMap = (() => {
     // -------------------------------------------------------------------------
 
     function buildMinimapTerrain() {
-        const size   = minimap.offsetWidth  || 256;
+        const size = minimap.offsetWidth || 256;
         minimap.width  = size;
         minimap.height = size;
+        mmCtx = minimap.getContext('2d');
 
-        const scale  = MAP_SIZE / size; // world tiles per minimap pixel
-        const imgData = mmCtx.createImageData(size, size);
-        const data    = imgData.data;
+        // Render full 1:1 world map into an off-screen canvas
+        mmFullCanvas = document.createElement('canvas');
+        mmFullCanvas.width  = size;
+        mmFullCanvas.height = size;
+        const fCtx  = mmFullCanvas.getContext('2d');
+        const scale = MAP_SIZE / size;
+        const img   = fCtx.createImageData(size, size);
+        const data  = img.data;
 
         for (let py = 0; py < size; py++) {
             for (let px = 0; px < size; px++) {
                 const tx  = Math.floor(px * scale);
                 const ty  = Math.floor(py * scale);
-                const t   = getTerrain(seed, tx, ty);
-                const rgb = FILL_RGB[t];
+                const idx = getTileIdx(seed, tx, ty);
+                const rgb = TILE_RGB[idx] ?? TILE_RGB[0];
                 const i   = (py * size + px) * 4;
                 data[i]     = rgb.r;
                 data[i + 1] = rgb.g;
@@ -237,7 +212,27 @@ const ConquerMap = (() => {
                 data[i + 3] = 255;
             }
         }
-        mmImgData = imgData;
+        fCtx.putImageData(img, 0, 0);
+        mmImgData = img; // truthy flag used by renderMinimap guard
+    }
+
+    // Returns the current zoomed view region of the full minimap canvas
+    function mmViewRegion() {
+        const mmSize   = minimap.width || 256;
+        const s        = tileSize();
+        const cx       = (camX + canvas.width  / 2) / s;
+        const cy       = (camY + canvas.height / 2) / s;
+        const viewTiles = MAP_SIZE / MM_ZOOM;
+        const imgScale  = mmSize / MAP_SIZE;        // full-canvas px per world tile
+        const viewPx    = viewTiles * imgScale;     // source rect size in full-canvas px
+        let   sx = (cx - viewTiles / 2) * imgScale;
+        let   sy = (cy - viewTiles / 2) * imgScale;
+        sx = Math.max(0, Math.min(mmSize - viewPx, sx));
+        sy = Math.max(0, Math.min(mmSize - viewPx, sy));
+        const worldOffX = sx / imgScale;            // world tile at minimap left edge
+        const worldOffY = sy / imgScale;
+        const pxPerTile = mmSize / viewTiles;       // minimap px per world tile (zoomed)
+        return { sx, sy, viewPx, worldOffX, worldOffY, pxPerTile, mmSize };
     }
 
     // -------------------------------------------------------------------------
@@ -266,26 +261,9 @@ const ConquerMap = (() => {
         for (let ty = y0; ty <= y1; ty++) {
             for (let tx = x0; tx <= x1; tx++) {
                 if (tx < 0 || ty < 0 || tx >= MAP_SIZE || ty >= MAP_SIZE) continue;
-                const t   = getTerrain(seed, tx, ty);
-                const px  = tx * s - camX;
-                const py  = ty * s - camY;
-                const ids = TERRAIN_TILES[t];
-
-                if (ids && atlasReady) {
-                    // Pick a stable variant per tile using position hash
-                    const v = ids[Math.floor(gridHash(seed + 77, tx, ty) * ids.length)];
-                    drawAtlasTile(v, px, py, s);
-
-                    // Forest: overlay a tree on ~60 % of tiles
-                    if (t === T.FOREST && gridHash(seed + 78, tx, ty) > 0.40) {
-                        const tree = TREE_TILES[Math.floor(gridHash(seed + 79, tx, ty) * TREE_TILES.length)];
-                        drawAtlasTile(tree, px, py, s);
-                    }
-                } else {
-                    // Colour fill for water / snow / mountains (no sprite in pack)
-                    ctx.fillStyle = FILL[t];
-                    ctx.fillRect(px, py, s, s);
-                }
+                const px = tx * s - camX;
+                const py = ty * s - camY;
+                drawTerrainTile(getTileIdx(seed, tx, ty), px, py, s);
             }
         }
 
@@ -365,17 +343,20 @@ const ConquerMap = (() => {
     // ---- Minimap ----
 
     function renderMinimap() {
-        if (!mmImgData) return;
-        const mmSize = minimap.width;
-        const scale  = mmSize / MAP_SIZE; // minimap px per world tile
+        if (!mmFullCanvas) buildMinimapTerrain();
+        if (!mmFullCanvas) return;
 
-        // Draw cached terrain
-        mmCtx.putImageData(mmImgData, 0, 0);
+        const { sx, sy, viewPx, worldOffX, worldOffY, pxPerTile, mmSize } = mmViewRegion();
 
-        // Draw entity dots (2px each)
+        // Draw zoomed terrain slice
+        mmCtx.imageSmoothingEnabled = false;
+        mmCtx.drawImage(mmFullCanvas, sx, sy, viewPx, viewPx, 0, 0, mmSize, mmSize);
+
+        // Entity dots
         for (const e of Object.values(entities)) {
-            const mx = Math.round(e.x * scale);
-            const my = Math.round(e.y * scale);
+            const mx = Math.round((e.x - worldOffX) * pxPerTile);
+            const my = Math.round((e.y - worldOffY) * pxPerTile);
+            if (mx < -2 || my < -2 || mx > mmSize + 2 || my > mmSize + 2) continue;
             if      (e.type === 'city')     mmCtx.fillStyle = '#f59e0b';
             else if (e.type === 'monster')  mmCtx.fillStyle = '#ef4444';
             else if (e.type === 'resource') mmCtx.fillStyle = '#22c55e';
@@ -386,23 +367,18 @@ const ConquerMap = (() => {
 
         // My city marker
         if (myCity) {
-            const mx = Math.round(myCity.x * scale);
-            const my = Math.round(myCity.y * scale);
-            mmCtx.fillStyle   = '#ffffff';
+            const mx = Math.round((myCity.x - worldOffX) * pxPerTile);
+            const my = Math.round((myCity.y - worldOffY) * pxPerTile);
+            mmCtx.fillStyle = '#ffffff';
             mmCtx.fillRect(mx - 2, my - 2, 5, 5);
         }
 
         // Viewport rectangle
         const s   = tileSize();
-        const vx0 = Math.max(0, camX / s);
-        const vy0 = Math.max(0, camY / s);
-        const vx1 = Math.min(MAP_SIZE, (camX + canvas.width)  / s);
-        const vy1 = Math.min(MAP_SIZE, (camY + canvas.height) / s);
-
-        const rx = Math.round(vx0 * scale);
-        const ry = Math.round(vy0 * scale);
-        const rw = Math.max(2, Math.round((vx1 - vx0) * scale));
-        const rh = Math.max(2, Math.round((vy1 - vy0) * scale));
+        const rx  = Math.round((camX / s - worldOffX) * pxPerTile);
+        const ry  = Math.round((camY / s - worldOffY) * pxPerTile);
+        const rw  = Math.max(2, Math.round((canvas.width  / s) * pxPerTile));
+        const rh  = Math.max(2, Math.round((canvas.height / s) * pxPerTile));
 
         mmCtx.strokeStyle = '#ffffff';
         mmCtx.lineWidth   = 1.5;
@@ -453,8 +429,11 @@ const ConquerMap = (() => {
         canvas.addEventListener('touchmove',  onTouchMove,  { passive: false });
         canvas.addEventListener('touchend',   onTouchEnd);
 
-        // Minimap
-        minimap.addEventListener('click', onMinimapClick);
+        // Minimap — drag to scroll
+        minimap.addEventListener('mousedown',  onMinimapDown);
+        minimap.addEventListener('mousemove',  onMinimapMove);
+        minimap.addEventListener('mouseup',    onMinimapUp);
+        minimap.addEventListener('mouseleave', onMinimapUp);
     }
 
     function onMouseDown(e) {
@@ -518,18 +497,40 @@ const ConquerMap = (() => {
         } catch { onTileInfo(null); }
     }
 
-    // ---- Minimap click → jump ----
+    // ---- Minimap drag → scroll ----
 
-    function onMinimapClick(e) {
-        const rect  = minimap.getBoundingClientRect();
-        const mx    = e.clientX - rect.left, my = e.clientY - rect.top;
-        const scale = MAP_SIZE / minimap.width;  // world tiles per minimap px
-        const tx    = Math.floor(mx * scale);
-        const ty    = Math.floor(my * scale);
-        const s     = tileSize();
+    let mmDragging = false;
+
+    function mmEventToWorld(e) {
+        const rect = minimap.getBoundingClientRect();
+        const mx   = (e.clientX - rect.left) * (minimap.width  / rect.width);
+        const my   = (e.clientY - rect.top)  * (minimap.height / rect.height);
+        const { worldOffX, worldOffY, pxPerTile } = mmViewRegion();
+        return { tx: worldOffX + mx / pxPerTile, ty: worldOffY + my / pxPerTile };
+    }
+
+    function onMinimapDown(e) {
+        mmDragging = true;
+        minimap.style.cursor = 'grabbing';
+        const { tx, ty } = mmEventToWorld(e);
+        const s = tileSize();
         camX = tx * s - canvas.width  / 2;
         camY = ty * s - canvas.height / 2;
         clampCamera(); lastVP = ''; scheduleFetch();
+    }
+
+    function onMinimapMove(e) {
+        if (!mmDragging) return;
+        const { tx, ty } = mmEventToWorld(e);
+        const s = tileSize();
+        camX = tx * s - canvas.width  / 2;
+        camY = ty * s - canvas.height / 2;
+        clampCamera(); lastVP = ''; scheduleFetch();
+    }
+
+    function onMinimapUp() {
+        mmDragging = false;
+        minimap.style.cursor = 'crosshair';
     }
 
     // ---- Touch ----

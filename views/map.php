@@ -291,7 +291,7 @@ declare(strict_types=1);
     </aside>
 </div><!-- #app -->
 
-<script src="/assets/js/map.js"></script>
+<script src="/assets/js/map.js?v=<?= filemtime(ROOT_DIR . '/assets/js/map.js') ?>"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <script>
     function mapApp() {

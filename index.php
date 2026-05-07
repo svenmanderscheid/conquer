@@ -129,6 +129,34 @@ if ($path === '/city') {
 }
 
 // ---------------------------------------------------------------------------
+// Building detail / upgrade page — /city/building/:code
+// ---------------------------------------------------------------------------
+
+if (preg_match('#^/city/building/([a-z_]+)$#', $path, $m)) {
+    $session = \Conquer\Auth\Session::current();
+    if ($session === null) {
+        header('Location: /');
+        exit;
+    }
+
+    $buildingCode = $m[1];
+
+    if (!in_array($buildingCode, \Conquer\Game\City\CityState::BUILDING_CODES, true)) {
+        header('Location: /city');
+        exit;
+    }
+
+    $state = \Conquer\Game\City\CityState::loadForPlayer((int) $session['player_id']);
+    if ($state === null) {
+        header('Location: /');
+        exit;
+    }
+
+    require ROOT_DIR . '/views/building.php';
+    exit;
+}
+
+// ---------------------------------------------------------------------------
 // Landing page — redirect logged-in players straight to their city
 // ---------------------------------------------------------------------------
 
