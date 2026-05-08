@@ -20,16 +20,6 @@ $queue      = $state['build_queue'];
 $troops     = $state['troops']     ?? [];
 $troopQueue = $state['troop_queue'] ?? [];
 
-// Gem cost for instant-build: 1 gem per minute remaining (min 1)
-$instantGemCost = 0;
-if ($queueEntry !== null) {
-    $secsLeft       = max(0, strtotime($queueEntry['finishes_at']) - time());
-    $instantGemCost = max(1, (int) ceil($secsLeft / 60));
-}
-
-// Player gems (from session)
-$playerGems = (int) ($session['gems'] ?? 0);
-
 $building = $buildings[$buildingCode] ?? null;
 if ($building === null) {
     header('Location: /city');
@@ -47,6 +37,16 @@ foreach ($queue as $entry) {
         break;
     }
 }
+
+// Gem cost for instant-build: 1 gem per minute remaining (min 1)
+$instantGemCost = 0;
+if ($queueEntry !== null) {
+    $secsLeft       = max(0, strtotime($queueEntry['finishes_at']) - time());
+    $instantGemCost = max(1, (int) ceil($secsLeft / 60));
+}
+
+// Player gems (from session)
+$playerGems = (int) ($session['gems'] ?? 0);
 
 $name     = CityState::BUILDING_NAMES[$buildingCode] ?? ucwords(str_replace('_', ' ', $buildingCode));
 $cost     = BuildingData::getCost($buildingCode, $nextLevel);
