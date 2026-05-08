@@ -198,6 +198,12 @@ if (preg_match('#^/city/building/([a-z_]+)$#', $path, $m)) {
 
     $buildingCode = $m[1];
 
+    // Academy → Forschungsbaum
+    if ($buildingCode === 'academy') {
+        header('Location: /research');
+        exit;
+    }
+
     if (!in_array($buildingCode, \Conquer\Game\City\CityState::BUILDING_CODES, true)) {
         header('Location: /city');
         exit;
