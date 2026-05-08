@@ -162,6 +162,108 @@ foreach ($buildings as $code => $building) {
             z-index: 30;
             white-space: nowrap;
         }
+
+        /* ── Building Popup ── */
+        #building-popup {
+            position: fixed;
+            display: none;
+            z-index: 200;
+            width: 172px;
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            border: 2px solid #f59e0b;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.75), 0 0 0 1px rgba(245,158,11,0.2);
+        }
+        .bp-banner {
+            background: linear-gradient(180deg, #ea580c 0%, #9a3412 100%);
+            padding: 7px 10px 5px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.82rem;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            border-bottom: 1px solid #7c2d12;
+        }
+        .bp-level {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #fbbf24;
+            padding: 5px 4px 2px;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+        }
+        .bp-actions {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 10px 12px;
+        }
+        .bp-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none;
+            color: #e2e8f0;
+            flex: 1;
+        }
+        .bp-btn-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: #1e3a5f;
+            border: 2px solid #3b82f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.05rem;
+            transition: border-color .15s, background .15s, transform .1s;
+        }
+        .bp-btn:hover .bp-btn-icon {
+            border-color: #f59e0b;
+            background: #292d3e;
+            transform: scale(1.08);
+        }
+        .bp-btn-label {
+            font-size: 0.6rem;
+            color: #94a3b8;
+            text-align: center;
+            white-space: nowrap;
+        }
+        /* Arrow pointing left toward building */
+        #building-popup::before {
+            content: '';
+            position: absolute;
+            left: -9px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+            border-right: 9px solid #f59e0b;
+        }
+        #building-popup::after {
+            content: '';
+            position: absolute;
+            left: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            border-right: 7px solid #1e293b;
+        }
+        #building-popup.popup-left::before {
+            left: auto; right: -9px;
+            border-right: none;
+            border-left: 9px solid #f59e0b;
+        }
+        #building-popup.popup-left::after {
+            left: auto; right: -6px;
+            border-right: none;
+            border-left: 7px solid #0f172a;
+        }
     </style>
 </head>
 <body>
@@ -192,6 +294,13 @@ foreach ($buildings as $code => $building) {
 </div>
 
 <div id="city-tooltip"></div>
+
+<!-- Building action popup -->
+<div id="building-popup">
+    <div class="bp-banner" id="bp-name">—</div>
+    <div class="bp-level" id="bp-level">Lv.1</div>
+    <div class="bp-actions" id="bp-actions"></div>
+</div>
 
 </div><!-- #game -->
 
@@ -277,6 +386,97 @@ atlas.onload = () => { atlasReady = true; };
 atlas.src = ATLAS_SRC;
 
 // ---------------------------------------------------------------------------
+// Building display names & function actions
+// ---------------------------------------------------------------------------
+const BUILDING_NAMES = {
+    castle:           'Castle',
+    farm:             'Farm',
+    storage:          'Storage',
+    treasure_house:   'Treasure House',
+    quarry:           'Quarry',
+    academy:          'Academy',
+    wall:             'Wall',
+    trading_post:     'Trading Post',
+    gold_mine:        'Gold Mine',
+    lumber_camp:      'Lumber Camp',
+    barrack:          'Barracks',
+    hall_of_alliance: 'Hall of Alliance',
+    hospital:         'Hospital',
+};
+
+// Buildings with a dedicated "function" button (3rd icon).
+const BUILDING_FUNCS = {
+    academy:          { icon: '🔬', label: 'Research', url: '/research' },
+    barrack:          { icon: '⚔️',  label: 'Training', url: '/city/building/barrack' },
+    hospital:         { icon: '💊', label: 'Heal',     url: '/city/building/hospital' },
+    trading_post:     { icon: '📦', label: 'Trade',    url: '/city/building/trading_post' },
+    hall_of_alliance: { icon: '🤝', label: 'Alliance', url: '/city/building/hall_of_alliance' },
+};
+
+// ---------------------------------------------------------------------------
+// Popup helpers
+// ---------------------------------------------------------------------------
+const popup     = document.getElementById('building-popup');
+const bpName    = document.getElementById('bp-name');
+const bpLevel   = document.getElementById('bp-level');
+const bpActions = document.getElementById('bp-actions');
+
+function openPopup(building, clientX, clientY) {
+    const data  = BUILDINGS_DATA[building.code];
+    const level = data?.level ?? 1;
+    const lbl   = data?.inQueue ? `Lv.${level} → ${data.levelTo}` : `Lv.${level}`;
+    const name  = BUILDING_NAMES[building.code] ?? building.code.replace(/_/g, ' ');
+    const func  = BUILDING_FUNCS[building.code] ?? null;
+
+    bpName.textContent  = name;
+    bpLevel.textContent = lbl;
+
+    // Build action buttons
+    const btn = (href, icon, label) =>
+        `<a class="bp-btn" href="${href}">
+            <div class="bp-btn-icon">${icon}</div>
+            <div class="bp-btn-label">${label}</div>
+         </a>`;
+
+    bpActions.innerHTML =
+        btn(`/city/building/${building.code}`, '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#93c5fd" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>', 'Info') +
+        btn(`/city/building/${building.code}`, '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>', 'Upgrade') +
+        (func ? btn(func.url, func.icon, func.label) : '');
+
+    // Position popup to the right of the click point (flip left if near edge)
+    popup.style.display = 'block';
+    const pw = popup.offsetWidth;
+    const ph = popup.offsetHeight;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const margin = 16;
+
+    let left = clientX + margin;
+    let top  = clientY - ph / 2;
+
+    const flipLeft = left + pw > vw - 10;
+    popup.classList.toggle('popup-left', flipLeft);
+    if (flipLeft) left = clientX - pw - margin;
+
+    if (top < 80) top = 80;                  // stay below nav
+    if (top + ph > vh - 10) top = vh - ph - 10;
+
+    popup.style.left = left + 'px';
+    popup.style.top  = top  + 'px';
+}
+
+function closePopup() {
+    popup.style.display = 'none';
+}
+
+// Close popup when clicking outside of it (not on canvas—canvas handles itself)
+document.addEventListener('click', (e) => {
+    if (popup.style.display !== 'none' && !popup.contains(e.target) && e.target !== canvas) {
+        closePopup();
+    }
+});
+
+// ---------------------------------------------------------------------------
 // Interaction state
 // ---------------------------------------------------------------------------
 let hoveredCode = null;
@@ -291,14 +491,14 @@ canvas.addEventListener('mousemove', (e) => {
     if (hit) {
         canvas.style.cursor = 'pointer';
         hoveredCode = hit.code;
-        const data = BUILDINGS_DATA[hit.code];
+        const data  = BUILDINGS_DATA[hit.code];
+        const name  = BUILDING_NAMES[hit.code] ?? hit.code.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        const level = data ? 'Lv.' + data.level : '';
+        const queue = data?.inQueue ? ' ⏳→' + data.levelTo : '';
         tooltip.style.display = 'block';
         tooltip.style.left  = (e.clientX + 14) + 'px';
         tooltip.style.top   = (e.clientY - 10) + 'px';
-        const name  = hit.code.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-        const level = data ? 'LV.' + data.level : '';
-        const queue = data?.inQueue ? ' ⏳→' + data.levelTo : '';
-        tooltip.textContent = name + '  ' + level + queue + '  — click to manage';
+        tooltip.textContent = name + '  ' + level + queue;
     } else {
         canvas.style.cursor = 'default';
         hoveredCode = null;
@@ -318,7 +518,10 @@ canvas.addEventListener('click', (e) => {
     const my   = (e.clientY - rect.top)  * (canvas.height / rect.height);
     const hit  = hitTest(mx, my);
     if (hit) {
-        window.location.href = '/city/building/' + hit.code;
+        tooltip.style.display = 'none';
+        openPopup(hit, e.clientX, e.clientY);
+    } else {
+        closePopup();
     }
 });
 
