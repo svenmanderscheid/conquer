@@ -311,6 +311,16 @@ declare(strict_types=1);
                                         </div>
                                     </template>
                                 </div>
+
+                                <!-- Drop table -->
+                                <template x-if="tileInfo.occupant.drops && tileInfo.occupant.drops.length">
+                                    <div style="margin-top:8px">
+                                        <div style="font-size:0.65rem;color:#475569;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px">Drops</div>
+                                        <template x-for="drop in tileInfo.occupant.drops" :key="drop">
+                                            <div style="font-size:0.72rem;color:#64748b;padding:2px 0;border-bottom:1px solid #0f172a" x-text="drop"></div>
+                                        </template>
+                                    </div>
+                                </template>
                             </div>
                         </template>
 

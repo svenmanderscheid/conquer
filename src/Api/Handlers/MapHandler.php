@@ -223,6 +223,15 @@ final class MapHandler
                     ? (int) round($stats['stats']['hp'] * $stats['amount'])
                     : (int) $monster['hp_current'];
 
+                // Summarise drops as label strings (e.g. "5× resource pack (100%)")
+                $drops = [];
+                if ($stats !== null && isset($stats['drops'])) {
+                    foreach ($stats['drops'] as $drop) {
+                        $pct     = (int) round(($drop['probability'] ?? 0) * 100);
+                        $drops[] = $drop['count'] . '× ' . $drop['label'] . ' (' . $pct . '%)';
+                    }
+                }
+
                 $occ = [
                     'type'       => 'monster',
                     'name'       => $name,
@@ -232,6 +241,7 @@ final class MapHandler
                     'attack'     => $stats['stats']['attack']  ?? null,
                     'defense'    => $stats['stats']['defense'] ?? null,
                     'amount'     => $stats['amount']           ?? null,
+                    'drops'      => $drops,
                 ];
             }
         }
