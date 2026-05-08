@@ -61,11 +61,7 @@ function resolveHp(int $code, array $hpByNameLevel): int
         default => null,
     };
     if ($name === null) return $level * 5000;
-    // monsters.json level is 0-indexed vs world_spawn level (1-indexed)
-    $jsonLevel = $level - 1;
-    return $hpByNameLevel["{$name}_{$jsonLevel}"]
-        ?? $hpByNameLevel["{$name}_{$level}"]
-        ?? $level * 5000;
+    return $hpByNameLevel["{$name}_{$level}"] ?? $level * 5000;
 }
 
 // ---------------------------------------------------------------------------

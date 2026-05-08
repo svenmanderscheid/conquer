@@ -267,8 +267,8 @@ function resolveMonsterDef(int $code): array
     $name     = $spawn['name']  ?? 'Unknown';
     $level    = $spawn['level'] ?? 1;
 
-    $statsKey  = $name . '_' . ($level - 1);
-    $statEntry = $cache['stats'][$statsKey] ?? $cache['stats'][$name . '_' . $level] ?? null;
+    $statsKey  = $name . '_' . $level;
+    $statEntry = $cache['stats'][$statsKey] ?? null;
 
     return [
         'name'   => $name,

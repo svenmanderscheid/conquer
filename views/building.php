@@ -133,7 +133,8 @@ $tile = $tileDefs[$buildingCode] ?? 0;
         #game {
             width: 100%;
             max-width: 1280px;
-            min-height: 100vh;
+            min-height: calc(100vh - 72px);
+            margin-top: 72px;
             display: flex;
             flex-direction: column;
             background: var(--bg);
@@ -482,6 +483,7 @@ $tile = $tileDefs[$buildingCode] ?? 0;
     </style>
 </head>
 <body>
+<?php require __DIR__ . '/partials/nav.php'; ?>
 <div id="game">
 
 <header class="topbar">

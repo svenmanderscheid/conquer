@@ -33,7 +33,8 @@ declare(strict_types=1);
             display: flex;
             width: 100%;
             max-width: 1280px;
-            height: 100%;
+            height: calc(100% - 72px);
+            margin-top: 72px;
         }
 
         /* ── Left: detail map ── */
@@ -213,17 +214,33 @@ declare(strict_types=1);
         .modal-sub   { font-size: 0.7rem; color: #64748b; text-transform: uppercase;
                        letter-spacing: 0.08em; margin: 0.75rem 0 0.4rem; }
         .troop-pick  {
-            display: flex; align-items: center; gap: 0.5rem;
             background: #0f172a; border: 1px solid #334155;
             border-radius: 6px; padding: 0.5rem 0.6rem; margin-bottom: 0.4rem;
         }
-        .troop-pick-name { flex: 1; font-size: 0.82rem; font-weight: 600; }
-        .troop-pick-avail { font-size: 0.72rem; color: #64748b; }
-        .troop-pick-input {
-            width: 72px; padding: 0.25rem 0.4rem; border-radius: 4px;
-            border: 1px solid #334155; background: #1e293b;
-            color: #e2e8f0; font-size: 0.82rem; text-align: right;
+        .troop-pick-header {
+            display: flex; justify-content: space-between; align-items: baseline;
+            margin-bottom: 0.35rem;
         }
+        .troop-pick-name  { font-size: 0.82rem; font-weight: 600; }
+        .troop-pick-avail { font-size: 0.72rem; color: #64748b; }
+        .troop-pick-controls {
+            display: flex; align-items: center; gap: 0.4rem;
+        }
+        .troop-pick-slider {
+            flex: 1; accent-color: #ef4444; cursor: pointer; height: 4px;
+        }
+        .troop-pick-slider:disabled { opacity: 0.3; cursor: not-allowed; }
+        .troop-pick-input {
+            width: 68px; padding: 0.2rem 0.35rem; border-radius: 4px;
+            border: 1px solid #334155; background: #1e293b;
+            color: #e2e8f0; font-size: 0.8rem; text-align: right;
+        }
+        .troop-pick-max {
+            padding: 0.2rem 0.45rem; border-radius: 4px; font-size: 0.72rem;
+            background: #1e293b; border: 1px solid #475569;
+            color: #94a3b8; cursor: pointer; white-space: nowrap;
+        }
+        .troop-pick-max:hover { border-color: #ef4444; color: #ef4444; }
         .modal-actions { display: flex; gap: 0.5rem; margin-top: 1rem; }
         .modal-btn {
             flex: 1; padding: 0.55rem; border-radius: 6px; border: none;
@@ -246,15 +263,20 @@ declare(strict_types=1);
         /* ── Active march badge ── */
         .march-badge {
             display: flex; justify-content: space-between; align-items: center;
-            background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3);
             border-radius: 6px; padding: 0.35rem 0.55rem; margin-bottom: 0.4rem;
             font-size: 0.72rem;
         }
-        .march-badge-label { color: #e2e8f0; font-weight: 600; }
-        .march-badge-state { color: #ef4444; }
+        .march-badge.monster  { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.35); }
+        .march-badge.pvp      { background: rgba(127,29,29,0.2); border: 1px solid rgba(153,27,27,0.5);  }
+        .march-badge.return   { background: rgba(226,232,240,0.07); border: 1px solid rgba(226,232,240,0.25); }
+        .march-badge-label    { color: #e2e8f0; font-weight: 600; }
+        .march-badge-state    { color: #ef4444; font-variant-numeric: tabular-nums; }
+        .march-badge.return .march-badge-state { color: #e2e8f0; }
+        .march-badge.pvp    .march-badge-state { color: #fca5a5; }
     </style>
 </head>
 <body x-data="mapApp()" x-init="boot()">
+<?php require __DIR__ . '/partials/nav.php'; ?>
 <div id="app">
 
     <!-- ── Left: Detail Map ── -->
@@ -455,11 +477,21 @@ declare(strict_types=1);
         <div class="panel" x-show="marches.length > 0">
             <div class="panel-title">Aktive Märsche</div>
             <template x-for="m in marches" :key="m.id">
-                <div class="march-badge">
+                <div class="march-badge"
+                     :class="m.state === 'returning' ? 'return' : (m.march_type == 5 ? 'monster' : 'pvp')">
                     <span class="march-badge-label">
-                        ⚔ Monster (<span x-text="m.target_x + ',' + m.target_y"></span>)
+                        <template x-if="m.state === 'marching' && m.march_type == 5">
+                            <span>⚔ Monster (<span x-text="m.target_x + ',' + m.target_y"></span>)</span>
+                        </template>
+                        <template x-if="m.state === 'marching' && m.march_type != 5">
+                            <span>⚔ Dorf (<span x-text="m.target_x + ',' + m.target_y"></span>)</span>
+                        </template>
+                        <template x-if="m.state === 'returning'">
+                            <span>↩ Rückkehr</span>
+                        </template>
                     </span>
-                    <span class="march-badge-state" x-text="m.state === 'marching' ? '→' : '←'"></span>
+                    <span class="march-badge-state"
+                          x-text="marchEta(m, tick)"></span>
                 </div>
             </template>
         </div>
@@ -485,14 +517,24 @@ declare(strict_types=1);
 
                 <template x-for="t in attackTroops" :key="t.code">
                     <div class="troop-pick">
-                        <div>
-                            <div class="troop-pick-name" x-text="t.name"></div>
-                            <div class="troop-pick-avail" x-text="'Verfügbar: ' + t.available.toLocaleString()"></div>
+                        <div class="troop-pick-header">
+                            <span class="troop-pick-name" x-text="t.name"></span>
+                            <span class="troop-pick-avail"
+                                  x-text="(t.toSend || 0).toLocaleString() + ' / ' + t.available.toLocaleString()"></span>
                         </div>
-                        <input type="number" class="troop-pick-input"
-                               min="0" :max="t.available"
-                               x-model.number="t.toSend"
-                               :disabled="t.available === 0">
+                        <div class="troop-pick-controls">
+                            <input type="range" class="troop-pick-slider"
+                                   min="0" :max="t.available" step="1"
+                                   x-model.number="t.toSend"
+                                   :disabled="t.available === 0">
+                            <input type="number" class="troop-pick-input"
+                                   min="0" :max="t.available"
+                                   x-model.number="t.toSend"
+                                   :disabled="t.available === 0">
+                            <button class="troop-pick-max"
+                                    :disabled="t.available === 0"
+                                    @click="t.toSend = t.available">Max</button>
+                        </div>
                     </div>
                 </template>
 
@@ -527,6 +569,7 @@ function mapApp() {
         tileInfo:     null,
         hoverTile:    '',
         marches:      [],
+        tick:         0,
 
         // Attack modal state
         attackModal:   false,
@@ -551,6 +594,21 @@ function mapApp() {
             return { S: '#f59e0b', A: '#a78bfa', B: '#60a5fa', C: '#94a3b8' }[tier] ?? '#94a3b8';
         },
 
+        // Returns "Xm Ys" remaining time; tick parameter forces Alpine reactivity each second
+        marchEta(m, _tick) {
+            const target = m.state === 'marching'
+                ? m.arrival_time
+                : m.return_time;
+            if (!target) return '';
+            const secsLeft = Math.max(0, Math.round(
+                (new Date(target.replace(' ', 'T') + 'Z').getTime() - Date.now()) / 1000
+            ));
+            if (secsLeft === 0) return 'Ankunft...';
+            const m_ = Math.floor(secsLeft / 60);
+            const s  = secsLeft % 60;
+            return m_ > 0 ? `${m_}m ${s}s` : `${s}s`;
+        },
+
         async boot() {
             const r = await fetch('/api/map/info');
             const j = await r.json();
@@ -569,6 +627,7 @@ function mapApp() {
             });
             this.zoom = ConquerMap.currentZoom();
             this.pollMarches();
+            setInterval(() => this.tick++, 1000);
         },
 
         doZoomIn()   { ConquerMap.zoomIn();     this.zoom = ConquerMap.currentZoom(); },
@@ -580,9 +639,12 @@ function mapApp() {
             try {
                 const r = await fetch('/api/march/list');
                 const j = await r.json();
-                if (j.ok) this.marches = j.data.marches;
+                if (j.ok) {
+                    this.marches = j.data.marches;
+                    ConquerMap.setMarches(j.data.marches);
+                }
             } catch {}
-            setTimeout(() => this.pollMarches(), 15000);
+            setTimeout(() => this.pollMarches(), 5000);
         },
 
         // ── Attack modal ──────────────────────────────────────────────────────

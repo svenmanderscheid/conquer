@@ -130,6 +130,9 @@ const ConquerMap = (() => {
     // Selected tile (shows border + keeps info panel open)
     let selectedTile = null;
 
+    // Active marches for line overlay
+    let activeMarches = [];
+
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
@@ -306,6 +309,9 @@ const ConquerMap = (() => {
             drawEntity(e, px, py, s);
         }
 
+        // March lines overlay
+        drawMarches(s);
+
         // Selected tile border
         if (selectedTile !== null) {
             const px        = Math.round(selectedTile.x * s - camX);
@@ -324,6 +330,102 @@ const ConquerMap = (() => {
             ctx.strokeRect(bx + 1, by + 1, bw - 2, bh - 2);
             ctx.restore();
         }
+    }
+
+    // Parse a UTC datetime string from MySQL ("2026-05-08 12:34:56") to a JS timestamp
+    function parseUTC(str) {
+        return new Date(str.replace(' ', 'T') + 'Z').getTime();
+    }
+
+    function drawMarches(s) {
+        if (!myCity || activeMarches.length === 0) return;
+        const now = Date.now();
+
+        ctx.save();
+        ctx.imageSmoothingEnabled = false;
+
+        for (const march of activeMarches) {
+            const state = march.state;
+            if (state !== 'marching' && state !== 'returning') continue;
+
+            // Origin = player city center, target = march destination center
+            const ox = myCity.x * s + s / 2 - camX;
+            const oy = myCity.y * s + s / 2 - camY;
+            const tx = march.target_x * s + s / 2 - camX;
+            const ty = march.target_y * s + s / 2 - camY;
+
+            // Skip if both endpoints are far off screen
+            const margin = s * 4;
+            const onScreen = (v, max) => v > -margin && v < max + margin;
+            if (!onScreen(ox, canvas.width) && !onScreen(tx, canvas.width)) continue;
+            if (!onScreen(oy, canvas.height) && !onScreen(ty, canvas.height)) continue;
+
+            const isMarching  = state === 'marching';
+            const isMonster   = (march.march_type === 5 || march.march_type === '5');
+            // Colors: monster attack = bright red, player attack = dark red, returning = white
+            const lineColor = isMarching
+                ? (isMonster ? '#ef4444' : '#7f1d1d')
+                : '#e2e8f0';
+            const dotColor  = isMarching
+                ? (isMonster ? '#fca5a5' : '#fca5a5')
+                : '#ffffff';
+
+            // Dashed line
+            ctx.beginPath();
+            ctx.setLineDash([Math.max(4, s * 0.15), Math.max(4, s * 0.15)]);
+            ctx.strokeStyle = lineColor;
+            ctx.lineWidth   = Math.max(1.5, s * 0.06);
+            ctx.globalAlpha = 0.75;
+            ctx.moveTo(ox, oy);
+            ctx.lineTo(tx, ty);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Animated dot progress
+            let progress = 0;
+            if (isMarching) {
+                const dep = parseUTC(march.departure_time);
+                const arr = parseUTC(march.arrival_time);
+                progress  = arr > dep ? Math.min(1, (now - dep) / (arr - dep)) : 1;
+            } else {
+                const arr = parseUTC(march.arrival_time);
+                const ret = parseUTC(march.return_time);
+                progress  = ret > arr ? Math.min(1, (now - arr) / (ret - arr)) : 1;
+            }
+
+            // Dot moves origin→target (marching) or target→origin (returning)
+            const [fromX, fromY, toX, toY] = isMarching
+                ? [ox, oy, tx, ty]
+                : [tx, ty, ox, oy];
+
+            const dotX = fromX + (toX - fromX) * progress;
+            const dotY = fromY + (toY - fromY) * progress;
+            const r    = Math.max(4, s * 0.2);
+
+            ctx.globalAlpha = 1;
+            ctx.beginPath();
+            ctx.arc(dotX, dotY, r, 0, Math.PI * 2);
+            ctx.fillStyle   = dotColor;
+            ctx.strokeStyle = lineColor;
+            ctx.lineWidth   = Math.max(1, s * 0.04);
+            ctx.fill();
+            ctx.stroke();
+
+            // Arrowhead at destination
+            const angle = Math.atan2(toY - fromY, toX - fromX);
+            const al    = Math.max(8, s * 0.3);
+            ctx.beginPath();
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - al * Math.cos(angle - 0.4), toY - al * Math.sin(angle - 0.4));
+            ctx.lineTo(toX - al * Math.cos(angle + 0.4), toY - al * Math.sin(angle + 0.4));
+            ctx.closePath();
+            ctx.fillStyle   = lineColor;
+            ctx.globalAlpha = 0.9;
+            ctx.fill();
+        }
+
+        ctx.globalAlpha = 1;
+        ctx.restore();
     }
 
     function drawEntity(e, px, py, s) {
@@ -728,6 +830,7 @@ const ConquerMap = (() => {
     function zoomIn()  { applyZoom(zoomIdx + 1, canvas.width / 2, canvas.height / 2); }
     function zoomOut() { applyZoom(zoomIdx - 1, canvas.width / 2, canvas.height / 2); }
     function currentZoom() { return ZOOM_LEVELS[zoomIdx]; }
+    function setMarches(marches) { activeMarches = marches || []; }
 
-    return { init, jumpToCity, zoomIn, zoomOut, currentZoom };
+    return { init, jumpToCity, zoomIn, zoomOut, currentZoom, setMarches };
 })();

@@ -7,6 +7,7 @@ use Conquer\Api\Response;
 use Conquer\Auth\Session;
 use Conquer\Game\City\CityState;
 use Conquer\Game\March\MarchDispatcher;
+use Conquer\Game\March\MarchTick;
 
 /**
  * Handles /api/march/* endpoints.
@@ -82,7 +83,12 @@ final class MarchHandler
             Response::error(401, 'UNAUTHENTICATED', 'Not logged in.');
         }
 
-        $marches = MarchDispatcher::listActive((int) $session['player_id']);
+        $playerId = (int) $session['player_id'];
+
+        // Lazy tick — resolve arrived/returning marches without needing a cron job.
+        MarchTick::runForPlayer($playerId);
+
+        $marches = MarchDispatcher::listActive($playerId);
 
         // Decode troops_json for each march.
         foreach ($marches as &$m) {

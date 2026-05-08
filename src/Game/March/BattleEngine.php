@@ -67,44 +67,43 @@ final class BattleEngine
 
         $attackerAbsorption = max(1, $attackerAbsorption);
 
-        // ── Loss ratios (SPEC §9.5) ───────────────────────────────────────────
-        $attackerLossRatio = min(1.0, $monsterAtkPool   / $attackerAbsorption);
-        $monsterLossRatio  = min(1.0, $attackerDamage   / $monsterAbsorption);
+        // ── Monster damage + outcome ──────────────────────────────────────────
+        $monsterLossRatio = min(1.0, $attackerDamage / $monsterAbsorption);
+        $hpDamage         = (int) round($hpCurrent * $monsterLossRatio);
+        $newMonsterHp     = max(0, $hpCurrent - $hpDamage);
+        $monsterKilled    = $newMonsterHp === 0;
+
+        // Win  → attacker dealt enough damage to kill the monster → no troop losses.
+        // Loss → monster survives → troops retreat injured (proportional to how
+        //         outmatched the attacker was, capped at 80% injuries).
+        if ($monsterKilled) {
+            $attackerLossRatio = 0.0;
+            $outcome           = 'attacker_wins';
+        } else {
+            $attackerLossRatio = min(0.8, $monsterAtkPool / $attackerAbsorption);
+            $outcome           = 'defender_wins';
+        }
 
         // ── Attacker losses (per troop type, proportional) ───────────────────
         $attackerLosses    = [];
         $attackerSurvivors = [];
 
         foreach ($troopDetails as $code => $info) {
-            $lost = (int) floor($info['count'] * $attackerLossRatio);
+            $lost = (int) round($info['count'] * $attackerLossRatio);
             $attackerLosses[$code]    = $lost;
             $attackerSurvivors[$code] = $info['count'] - $lost;
-        }
-
-        // ── Monster HP after battle ───────────────────────────────────────────
-        $hpDamage     = (int) round($hpCurrent * $monsterLossRatio);
-        $newMonsterHp = max(0, $hpCurrent - $hpDamage);
-        $monsterKilled = $newMonsterHp === 0;
-
-        // ── Determine outcome ─────────────────────────────────────────────────
-        if ($monsterLossRatio > $attackerLossRatio) {
-            $outcome = 'attacker_wins';
-        } elseif ($attackerLossRatio > $monsterLossRatio) {
-            $outcome = 'defender_wins';
-        } else {
-            $outcome = 'draw';
         }
 
         // ── Build report data ─────────────────────────────────────────────────
         $reportTroops = [];
         foreach ($troopDetails as $code => $info) {
             $reportTroops[] = [
-                'code'      => $code,
-                'name'      => $info['def']['name'],
-                'tier'      => $info['def']['tier'],
-                'sent'      => $info['count'],
-                'lost'      => $attackerLosses[$code],
-                'survived'  => $attackerSurvivors[$code],
+                'code'     => $code,
+                'name'     => $info['def']['name'],
+                'tier'     => $info['def']['tier'],
+                'sent'     => $info['count'],
+                'injured'  => $attackerLosses[$code],
+                'survived' => $attackerSurvivors[$code],
             ];
         }
 
@@ -115,8 +114,8 @@ final class BattleEngine
             'monster_killed'      => $monsterKilled,
             'monster_atk_pool'    => round($monsterAtkPool),
             'attacker_damage'     => round($attackerDamage),
-            'attacker_loss_ratio' => round($attackerLossRatio, 4),
-            'monster_loss_ratio'  => round($monsterLossRatio, 4),
+            'attacker_injury_ratio' => round($attackerLossRatio, 4),
+            'monster_loss_ratio'    => round($monsterLossRatio, 4),
             'troops'              => $reportTroops,
             'outcome'             => $outcome,
         ];

@@ -72,7 +72,8 @@ foreach ($buildings as $code => $building) {
         #game {
             width: 100%;
             max-width: 1280px;
-            height: 100%;
+            height: calc(100% - 72px);
+            margin-top: 72px;
             display: flex;
             flex-direction: column;
             background: var(--bg);
@@ -164,6 +165,7 @@ foreach ($buildings as $code => $building) {
     </style>
 </head>
 <body>
+<?php require __DIR__ . '/partials/nav.php'; ?>
 <div id="game">
 
 <header class="topbar">
