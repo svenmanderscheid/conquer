@@ -548,6 +548,7 @@ HTML;
         .tree-scroll {
             flex: 1;
             overflow-x: auto;
+            cursor: grab;
             overflow-y: auto;
             padding: 24px;
             scrollbar-width: thin;
@@ -1292,12 +1293,46 @@ function showToast(msg, type) {
     toastTimer = setTimeout(() => { el.style.display = 'none'; }, 3500);
 }
 
+// ── Drag-to-scroll ────────────────────────────────────────────────────────────
+function enableDragScroll(el) {
+    let dragging = false;
+    let startX, startY, scrollLeft, scrollTop;
+
+    el.addEventListener('mousedown', (e) => {
+        if (e.button !== 0) return;
+        dragging  = true;
+        startX    = e.clientX;
+        startY    = e.clientY;
+        scrollLeft = el.scrollLeft;
+        scrollTop  = el.scrollTop;
+        el.style.cursor = 'grabbing';
+        el.style.userSelect = 'none';
+    });
+
+    window.addEventListener('mousemove', (e) => {
+        if (!dragging) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        el.scrollLeft = scrollLeft - dx;
+        el.scrollTop  = scrollTop  - dy;
+    });
+
+    window.addEventListener('mouseup', () => {
+        if (!dragging) return;
+        dragging = false;
+        el.style.cursor = '';
+        el.style.userSelect = '';
+    });
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
     // Draw initial SVG connections for battle tab
     drawConnections('canvas-battle', BATTLE_CONNECTIONS);
     // Start ETA display
     updateQueueEta();
+    // Enable drag-to-scroll on all tree scroll containers
+    document.querySelectorAll('.tree-scroll').forEach(enableDragScroll);
 });
 </script>
 </body>
