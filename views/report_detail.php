@@ -38,24 +38,34 @@ $playerStats = $db->query(
     [$playerId],
 )->fetch() ?: [];
 
-// ── Attacker combat totals (calculated from troops sent) ──────────────────────
+// ── Attacker combat totals ────────────────────────────────────────────────────
 $totalSent       = 0;
 $totalAtk        = 0;
 $totalHp         = 0;
 $totalDef        = 0;
 $totalAbsorption = 0;
+$totalInjured    = 0;
+$totalSurvived   = 0;
 
 foreach ($troops as $t) {
-    $sent = (int) ($t['sent'] ?? 0);
-    $def  = TroopData::get((int) $t['code']);
-    if ($def === null || $sent <= 0) continue;
-    $totalSent       += $sent;
-    $totalAtk        += $sent * (float) $def['attack'];
-    $totalHp         += $sent * (float) $def['hp'];
-    $totalDef        += $sent * (float) $def['defense'];
-    $totalAbsorption += $sent * ((float) $def['hp'] + (float) $def['defense']);
+    $sent    = (int) ($t['sent']     ?? 0);
+    $injured = (int) ($t['injured']  ?? $t['lost'] ?? 0);
+    $surv    = (int) ($t['survived'] ?? 0);
+    $def     = TroopData::get((int) $t['code']);
+
+    $totalSent     += $sent;
+    $totalInjured  += $injured;
+    $totalSurvived += $surv;
+
+    if ($def !== null && $sent > 0) {
+        $totalAtk        += $sent * (float) $def['attack'];
+        $totalHp         += $sent * (float) $def['hp'];
+        $totalDef        += $sent * (float) $def['defense'];
+        $totalAbsorption += $sent * ((float) $def['hp'] + (float) $def['defense']);
+    }
 }
 
+// ── Outcome helpers ───────────────────────────────────────────────────────────
 $isWin  = $outcome === 'attacker_wins';
 $isDraw = $outcome === 'draw';
 
@@ -70,7 +80,16 @@ $outcomeColor = match($outcome) {
     default         => '#f59e0b',
 };
 
-$fmt = fn(mixed $n): string => number_format((int)$n, 0, '.', ',');
+// Monster side
+$monsterName    = $data['monster_name']      ?? 'Monster';
+$monsterHpBefore = (int) ($data['monster_hp_before'] ?? 0);
+$monsterHpAfter  = (int) ($data['monster_hp_after']  ?? 0);
+$monsterKilled   = (bool) ($data['monster_killed']   ?? false);
+$monsterAtk      = (int) round((float) ($data['monster_atk_pool'] ?? 0));
+$monsterLossPct  = round(($data['monster_loss_ratio'] ?? 0) * 100, 1);
+
+$fmt = fn(mixed $n): string => number_format((int) $n, 0, '.', ',');
+$fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
 ?>
 <!DOCTYPE html>
 <html lang="de">
@@ -82,19 +101,25 @@ $fmt = fn(mixed $n): string => number_format((int)$n, 0, '.', ',');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-            --bg:      #0f172a;
-            --surface: #1e293b;
-            --border:  #334155;
-            --text:    #e2e8f0;
-            --muted:   #94a3b8;
-            --gold:    #f59e0b;
+            --bg:      #0a0e1a;
+            --surface: #111827;
+            --surface2: #1a2235;
+            --border:  #1e3a5f;
+            --border2: #2a4a7f;
+            --text:    #d1dce8;
+            --muted:   #6b82a0;
+            --gold:    #d4a017;
+            --gold2:   #f0c040;
             --green:   #22c55e;
-            --red:     #ef4444;
+            --red:     #dc2626;
+            --red2:    #ef4444;
+            --blue:    #1e4080;
+            --blue2:   #2563a8;
         }
 
         html, body {
             min-height: 100%;
-            background: #000;
+            background: var(--bg);
             color: var(--text);
             font-family: system-ui, -apple-system, sans-serif;
             display: flex;
@@ -103,25 +128,24 @@ $fmt = fn(mixed $n): string => number_format((int)$n, 0, '.', ',');
 
         #game {
             width: 100%;
-            max-width: 1280px;
+            max-width: 960px;
             min-height: calc(100vh - 72px);
             margin-top: 72px;
             display: flex;
             flex-direction: column;
-            background: var(--bg);
+            gap: 0;
         }
 
-        /* ── Top bar ── */
+        /* ── Top back bar ── */
         .topbar {
-            flex: 0 0 48px;
             background: var(--surface);
             border-bottom: 1px solid var(--border);
-            padding: 0 1.25rem;
+            padding: 0.5rem 1.25rem;
             display: flex;
             align-items: center;
             gap: 0.75rem;
+            flex-wrap: wrap;
         }
-        .topbar-title { font-size: 0.95rem; font-weight: 700; color: var(--gold); }
         .topbar-back {
             padding: 0.25rem 0.75rem;
             border-radius: 5px;
@@ -132,108 +156,314 @@ $fmt = fn(mixed $n): string => number_format((int)$n, 0, '.', ',');
             font-size: 0.78rem;
         }
         .topbar-back:hover { border-color: var(--gold); color: var(--gold); }
+        .topbar-id { font-size: 0.82rem; color: var(--gold); font-weight: 700; }
+        .topbar-date { font-size: 0.75rem; color: var(--muted); margin-left: auto; }
 
-        /* ── Content ── */
-        .content {
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.25rem;
-        }
-
-        /* ── Outcome banner ── */
-        .outcome-banner {
-            border-radius: 10px;
-            padding: 1.25rem 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-            border: 1px solid;
-        }
-        .outcome-banner.win  { background: rgba(34,197,94,0.08);  border-color: rgba(34,197,94,0.3);  }
-        .outcome-banner.loss { background: rgba(239,68,68,0.08);  border-color: rgba(239,68,68,0.3);  }
-        .outcome-banner.draw { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.3); }
-
-        .outcome-label {
-            font-size: 1.6rem;
-            font-weight: 800;
-            letter-spacing: 0.04em;
-        }
-        .outcome-meta {
-            text-align: right;
-            font-size: 0.8rem;
-            color: var(--muted);
-            line-height: 1.6;
-        }
-
-        /* ── Cards ── */
-        .cards {
+        /* ── VS Header ── */
+        .vs-header {
+            background: linear-gradient(180deg, #0d1e3a 0%, #0a1628 100%);
+            border-bottom: 2px solid var(--border2);
+            padding: 1.25rem 1.5rem 1rem;
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
             gap: 1rem;
         }
-        @media (max-width: 640px) { .cards { grid-template-columns: 1fr; } }
 
-        .card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1rem 1.25rem;
+        .vs-side { display: flex; flex-direction: column; gap: 0.25rem; }
+        .vs-side.right { align-items: flex-end; }
+
+        .vs-player-name {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--gold2);
+            letter-spacing: 0.02em;
         }
-        .card-title {
-            font-size: 0.68rem;
+        .vs-power {
+            font-size: 0.82rem;
+            color: var(--muted);
+        }
+        .vs-power strong { color: var(--text); }
+
+        .vs-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.06em;
+        }
+        .vs-badge.win  { background: rgba(34,197,94,0.15); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+        .vs-badge.loss { background: rgba(220,38,38,0.15); color: var(--red2);  border: 1px solid rgba(220,38,38,0.3); }
+        .vs-badge.draw { background: rgba(212,160,23,0.15); color: var(--gold); border: 1px solid rgba(212,160,23,0.3); }
+
+        .vs-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .vs-icon {
+            font-size: 2rem;
+            line-height: 1;
+        }
+        .vs-text {
+            font-size: 0.65rem;
+            font-weight: 800;
             color: var(--muted);
-            margin-bottom: 0.75rem;
-            padding-bottom: 0.5rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+        .vs-coords {
+            font-size: 0.7rem;
+            color: var(--muted);
+            background: var(--surface);
+            padding: 0.15rem 0.5rem;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+        }
+
+        .vs-monster-name {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--red2);
+            letter-spacing: 0.02em;
+        }
+
+        /* ── Section header ── */
+        .section-header {
+            background: linear-gradient(90deg, var(--blue) 0%, transparent 100%);
+            padding: 0.35rem 1.25rem;
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: #7ab4e0;
+            border-top: 1px solid var(--border2);
             border-bottom: 1px solid var(--border);
         }
 
-        /* ── Monster card ── */
-        .monster-name {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--gold);
-            margin-bottom: 0.6rem;
+        /* ── Troops Lost comparison ── */
+        .troops-lost {
+            display: grid;
+            grid-template-columns: 1fr 1px 1fr;
+            background: var(--surface);
         }
-        .monster-stat-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            padding: 0.25rem 0;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
+        .troops-lost-col {
+            padding: 1rem 1.5rem;
         }
-        .monster-stat-row:last-child { border-bottom: none; }
-        .stat-label { color: var(--muted); }
-        .stat-val   { font-weight: 600; font-variant-numeric: tabular-nums; }
-
-        /* HP bar */
-        .hp-bar-wrap {
-            margin-top: 0.75rem;
+        .troops-lost-divider {
+            background: var(--border);
         }
-        .hp-bar-label {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.72rem;
+        .troops-lost-title {
+            font-size: 0.62rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
             color: var(--muted);
-            margin-bottom: 0.3rem;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.4rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .tl-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.3rem 0;
+            font-size: 0.82rem;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+        .tl-row:last-child { border-bottom: none; }
+        .tl-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--muted);
+        }
+        .tl-val { font-weight: 700; font-variant-numeric: tabular-nums; }
+        .tl-val.green { color: var(--green); }
+        .tl-val.red   { color: var(--red2); }
+        .tl-val.gold  { color: var(--gold2); }
+        .tl-val.muted { color: var(--muted); }
+
+        /* ── Troops Info grid ── */
+        .troops-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            padding: 1rem 1.25rem;
+            background: var(--surface2);
+            align-items: flex-end;
+        }
+        .troop-chip {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .troop-chip-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 6px;
+            border: 2px solid var(--border2);
+            background: var(--surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            position: relative;
+        }
+        .troop-chip-tier {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            background: var(--blue);
+            color: var(--gold2);
+            font-size: 0.55rem;
+            font-weight: 800;
+            padding: 0.05rem 0.25rem;
+            border-radius: 3px;
+            border: 1px solid var(--border2);
+        }
+        .troop-chip-count {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text);
+            font-variant-numeric: tabular-nums;
+        }
+        .troop-chip-injured {
+            font-size: 0.65rem;
+            color: var(--red2);
+            font-weight: 700;
+        }
+        .troop-chip-name {
+            font-size: 0.6rem;
+            color: var(--muted);
+            text-align: center;
+            max-width: 56px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .troops-info-total {
+            margin-left: auto;
+            text-align: right;
+            align-self: center;
+        }
+        .troops-info-total-label {
+            font-size: 0.6rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        .troops-info-total-val {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--gold2);
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ── Monster stats ── */
+        .monster-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0;
+            background: var(--surface);
+        }
+        .mstat {
+            flex: 1 1 150px;
+            padding: 0.85rem 1.25rem;
+            border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        .mstat:last-child { border-right: none; }
+        .mstat-label {
+            font-size: 0.6rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+            margin-bottom: 0.25rem;
+        }
+        .mstat-val {
+            font-size: 1rem;
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ── HP bar ── */
+        .hp-bar-wrap { margin-top: 0.5rem; }
+        .hp-bar-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.65rem;
+            color: var(--muted);
+            margin-bottom: 0.2rem;
         }
         .hp-bar-track {
-            height: 8px;
-            background: var(--border);
-            border-radius: 4px;
+            height: 6px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 3px;
             overflow: hidden;
         }
         .hp-bar-fill {
             height: 100%;
-            border-radius: 4px;
-            transition: width 0.3s;
+            border-radius: 3px;
+            background: var(--red2);
         }
 
-        /* ── Troops table ── */
+        /* ── Combat totals ── */
+        .combat-totals {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            background: var(--surface2);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        .ctotal {
+            padding: 0.85rem 1.25rem;
+            border-right: 1px solid var(--border);
+        }
+        .ctotal:last-child { border-right: none; }
+        .ctotal-label {
+            font-size: 0.6rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+            margin-bottom: 0.25rem;
+        }
+        .ctotal-val {
+            font-size: 1rem;
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ── Player profile ── */
+        .player-profile {
+            background: var(--surface);
+            padding: 1rem 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            align-items: center;
+        }
+        .pp-field { display: flex; flex-direction: column; gap: 0.15rem; }
+        .pp-label {
+            font-size: 0.6rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+        }
+        .pp-val { font-size: 0.92rem; font-weight: 700; }
+
+        /* ── Troops detail table ── */
+        .section-body { background: var(--surface); }
         .troop-table {
             width: 100%;
             border-collapse: collapse;
@@ -241,56 +471,45 @@ $fmt = fn(mixed $n): string => number_format((int)$n, 0, '.', ',');
         }
         .troop-table th {
             text-align: left;
-            padding: 0.4rem 0.5rem;
+            padding: 0.5rem 1.25rem;
             color: var(--muted);
-            font-size: 0.68rem;
-            font-weight: 700;
+            font-size: 0.62rem;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.06em;
+            letter-spacing: 0.08em;
             border-bottom: 1px solid var(--border);
+            background: var(--surface2);
         }
         .troop-table td {
-            padding: 0.5rem 0.5rem;
+            padding: 0.55rem 1.25rem;
             border-bottom: 1px solid rgba(255,255,255,0.04);
         }
         .troop-table tr:last-child td { border-bottom: none; }
-        .troop-survived { color: var(--green); font-weight: 600; }
-        .troop-injured  { color: var(--red);   font-weight: 600; }
+        .troop-table tfoot td {
+            border-top: 1px solid var(--border);
+            padding-top: 0.6rem;
+            font-weight: 700;
+        }
         .tier-badge {
             display: inline-block;
             padding: 0.1rem 0.35rem;
             border-radius: 3px;
-            font-size: 0.65rem;
-            font-weight: 700;
-            background: rgba(245,158,11,0.15);
-            color: var(--gold);
-            border: 1px solid rgba(245,158,11,0.3);
+            font-size: 0.62rem;
+            font-weight: 800;
+            background: rgba(37,99,168,0.3);
+            color: var(--gold2);
+            border: 1px solid rgba(37,99,168,0.5);
         }
+        .val-green { color: var(--green); font-weight: 700; }
+        .val-red   { color: var(--red2);  font-weight: 700; }
+        .val-muted { color: var(--muted); }
 
-        /* ── Combat stats card ── */
-        .combat-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.35rem 0;
-            font-size: 0.8rem;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
-        }
-        .combat-row:last-child { border-bottom: none; }
-        .combat-label { color: var(--muted); }
-        .combat-val   { font-weight: 600; font-variant-numeric: tabular-nums; }
-
-        /* ── Coord info ── */
-        .coord-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            padding: 0.25rem 0.75rem;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 999px;
-            font-size: 0.78rem;
-            color: var(--muted);
+        @media (max-width: 640px) {
+            .vs-header { grid-template-columns: 1fr auto 1fr; gap: 0.5rem; }
+            .vs-player-name, .vs-monster-name { font-size: 0.95rem; }
+            .troops-lost { grid-template-columns: 1fr; }
+            .troops-lost-divider { height: 1px; width: 100%; }
+            .troops-info-total { margin-left: 0; text-align: left; }
         }
     </style>
 </head>
@@ -298,242 +517,274 @@ $fmt = fn(mixed $n): string => number_format((int)$n, 0, '.', ',');
 <?php require __DIR__ . '/partials/nav.php'; ?>
 <div id="game">
 
-    <header class="topbar">
-        <a href="/reports" class="topbar-back">← Zurück</a>
-        <span class="topbar-title">📜 Kampfbericht #<?= $reportId ?></span>
-        <span class="coord-chip">
-            📍 <?= (int)$row['target_x'] ?>, <?= (int)$row['target_y'] ?>
-        </span>
-        <span style="color:var(--muted);font-size:0.78rem;margin-left:auto">
-            <?= htmlspecialchars($row['created_at']) ?> UTC
-        </span>
-    </header>
-
-    <div class="content">
-
-        <!-- Outcome banner -->
-        <div class="outcome-banner <?= $isWin ? 'win' : ($isDraw ? 'draw' : 'loss') ?>">
-            <div>
-                <div class="outcome-label" style="color:<?= $outcomeColor ?>">
-                    <?= $isWin ? '⚔ ' : ($isDraw ? '🤝 ' : '💀 ') ?><?= $outcomeText ?>
-                </div>
-                <div style="font-size:0.82rem;color:var(--muted);margin-top:0.2rem">
-                    <?= htmlspecialchars($data['monster_name'] ?? 'Unbekanntes Monster') ?>
-                    <?php if ($data['monster_killed'] ?? false): ?>
-                        — <span style="color:var(--green)">Monster besiegt</span>
-                    <?php elseif (!$isWin): ?>
-                        — <span style="color:var(--red)">Monster überlebt</span>
-                    <?php endif ?>
-                </div>
-            </div>
-            <div class="outcome-meta">
-                Schaden: <?= $fmt($data['attacker_damage'] ?? 0) ?><br>
-                Monster-HP: <?= $fmt($data['monster_hp_before'] ?? 0) ?>
-                → <?= $fmt($data['monster_hp_after'] ?? 0) ?>
-            </div>
-        </div>
-
-        <div class="cards">
-
-            <!-- Monster card -->
-            <div class="card">
-                <div class="card-title">Monster</div>
-                <div class="monster-name">
-                    <?= htmlspecialchars($data['monster_name'] ?? '?') ?>
-                </div>
-
-                <div class="hp-bar-wrap">
-                    <div class="hp-bar-label">
-                        <span>HP vor dem Kampf</span>
-                        <span><?= $fmt($data['monster_hp_before'] ?? 0) ?></span>
-                    </div>
-                    <div class="hp-bar-track">
-                        <?php
-                            $hpBefore = (int)($data['monster_hp_before'] ?? 1);
-                            $hpAfter  = (int)($data['monster_hp_after']  ?? 0);
-                            $pct      = $hpBefore > 0 ? round($hpAfter / $hpBefore * 100) : 0;
-                        ?>
-                        <div class="hp-bar-fill" style="width:100%;background:#ef4444"></div>
-                    </div>
-                    <div class="hp-bar-label" style="margin-top:0.4rem">
-                        <span>HP nach dem Kampf</span>
-                        <span><?= $fmt($hpAfter) ?> (<?= $pct ?>%)</span>
-                    </div>
-                    <div class="hp-bar-track">
-                        <div class="hp-bar-fill"
-                             style="width:<?= $pct ?>%;background:<?= $pct === 0 ? '#334155' : '#ef4444' ?>"></div>
-                    </div>
-                </div>
-
-                <div style="margin-top:0.75rem">
-                    <div class="monster-stat-row">
-                        <span class="stat-label">Angriffskraft</span>
-                        <span class="stat-val"><?= $fmt($data['monster_atk_pool'] ?? 0) ?></span>
-                    </div>
-                    <div class="monster-stat-row">
-                        <span class="stat-label">Status</span>
-                        <span class="stat-val" style="color:<?= ($data['monster_killed'] ?? false) ? 'var(--green)' : 'var(--red)' ?>">
-                            <?= ($data['monster_killed'] ?? false) ? 'Besiegt' : 'Überlebt' ?>
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Combat stats card -->
-            <div class="card">
-                <div class="card-title">Kampfstatistik</div>
-                <div class="combat-row">
-                    <span class="combat-label">Gesamtschaden (Angreifer)</span>
-                    <span class="combat-val" style="color:var(--gold)"><?= $fmt($data['attacker_damage'] ?? 0) ?></span>
-                </div>
-                <div class="combat-row">
-                    <span class="combat-label">Monster Angriff</span>
-                    <span class="combat-val"><?= $fmt($data['monster_atk_pool'] ?? 0) ?></span>
-                </div>
-                <div class="combat-row">
-                    <span class="combat-label">Verwundungsrate</span>
-                    <?php $injRate = round(($data['attacker_injury_ratio'] ?? 0) * 100, 1); ?>
-                    <span class="combat-val" style="color:<?= $injRate > 0 ? 'var(--red)' : 'var(--green)' ?>">
-                        <?= $injRate ?>%
-                    </span>
-                </div>
-                <div class="combat-row">
-                    <span class="combat-label">Monster HP zerstört</span>
-                    <span class="combat-val"><?= round(($data['monster_loss_ratio'] ?? 0) * 100, 1) ?>%</span>
-                </div>
-                <div class="combat-row">
-                    <span class="combat-label">Koordinaten</span>
-                    <span class="combat-val"><?= (int)$row['target_x'] ?>, <?= (int)$row['target_y'] ?></span>
-                </div>
-                <div class="combat-row">
-                    <span class="combat-label">Ergebnis</span>
-                    <span class="combat-val" style="color:<?= $outcomeColor ?>"><?= $outcomeText ?></span>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Troops detail -->
-        <?php if (!empty($troops)): ?>
-        <div class="card">
-            <div class="card-title">Truppen</div>
-            <table class="troop-table">
-                <thead>
-                    <tr>
-                        <th>Einheit</th>
-                        <th>Tier</th>
-                        <th style="text-align:right">Gesendet</th>
-                        <th style="text-align:right">Verletzt</th>
-                        <th style="text-align:right">Zurückgekehrt</th>
-                    </tr>
-                </thead>
-                <tbody>
-                <?php foreach ($troops as $t): ?>
-                    <?php
-                        $injured  = (int)($t['injured']  ?? $t['lost'] ?? 0);
-                        $survived = (int)($t['survived'] ?? 0);
-                        $sent     = (int)($t['sent']     ?? 0);
-                    ?>
-                    <tr>
-                        <td><?= htmlspecialchars($t['name'] ?? '?') ?></td>
-                        <td><span class="tier-badge">T<?= (int)($t['tier'] ?? 1) ?></span></td>
-                        <td style="text-align:right"><?= $fmt($sent) ?></td>
-                        <td style="text-align:right">
-                            <?php if ($injured > 0): ?>
-                                <span class="troop-injured">-<?= $fmt($injured) ?></span>
-                            <?php else: ?>
-                                <span style="color:var(--muted)">—</span>
-                            <?php endif ?>
-                        </td>
-                        <td style="text-align:right">
-                            <span class="troop-survived"><?= $fmt($survived) ?></span>
-                        </td>
-                    </tr>
-                <?php endforeach ?>
-                </tbody>
-                <tfoot>
-                    <tr style="border-top: 1px solid var(--border)">
-                        <td colspan="2" style="padding-top:0.5rem;color:var(--muted);font-size:0.75rem">Gesamt</td>
-                        <td style="text-align:right;padding-top:0.5rem;font-weight:700">
-                            <?= $fmt(array_sum(array_column($troops, 'sent'))) ?>
-                        </td>
-                        <td style="text-align:right;padding-top:0.5rem">
-                            <?php $totalInjured = array_sum(array_map(fn($t) => $t['injured'] ?? $t['lost'] ?? 0, $troops)); ?>
-                            <?php if ($totalInjured > 0): ?>
-                                <span class="troop-injured">-<?= $fmt($totalInjured) ?></span>
-                            <?php else: ?>
-                                <span style="color:var(--green)">—</span>
-                            <?php endif ?>
-                        </td>
-                        <td style="text-align:right;padding-top:0.5rem">
-                            <span class="troop-survived font-weight:700">
-                                <?= $fmt(array_sum(array_column($troops, 'survived'))) ?>
-                            </span>
-                        </td>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
-        <?php endif ?>
-
-        <!-- Attacker stats -->
-        <div class="cards">
-
-            <!-- Combat power -->
-            <div class="card">
-                <div class="card-title">Kampfwerte der gesendeten Truppen</div>
-                <div class="combat-row">
-                    <span class="combat-label">Truppen gesamt</span>
-                    <span class="combat-val"><?= $fmt($totalSent) ?></span>
-                </div>
-                <div class="combat-row">
-                    <span class="combat-label">Gesamt-Angriff</span>
-                    <span class="combat-val" style="color:var(--red)"><?= $fmt($totalAtk) ?></span>
-                </div>
-                <div class="combat-row">
-                    <span class="combat-label">Gesamt-HP</span>
-                    <span class="combat-val"><?= $fmt($totalHp) ?></span>
-                </div>
-                <div class="combat-row">
-                    <span class="combat-label">Gesamt-Verteidigung</span>
-                    <span class="combat-val"><?= $fmt($totalDef) ?></span>
-                </div>
-                <div class="combat-row">
-                    <span class="combat-label">Absorption (HP + Def)</span>
-                    <span class="combat-val" style="color:var(--gold)"><?= $fmt($totalAbsorption) ?></span>
-                </div>
-            </div>
-
-            <!-- Player profile -->
-            <?php if (!empty($playerStats)): ?>
-            <div class="card">
-                <div class="card-title">Angreifer</div>
-                <div class="combat-row">
-                    <span class="combat-label">Spieler</span>
-                    <span class="combat-val"><?= htmlspecialchars($playerStats['username'] ?? '') ?></span>
-                </div>
-                <div class="combat-row">
-                    <span class="combat-label">Stadt</span>
-                    <span class="combat-val"><?= htmlspecialchars($playerStats['city_name'] ?? '') ?></span>
-                </div>
-                <div class="combat-row">
-                    <span class="combat-label">Schlosslevel</span>
-                    <span class="combat-val">Lv <?= (int)($playerStats['castle_level'] ?? 1) ?></span>
-                </div>
-                <div class="combat-row">
-                    <span class="combat-label">Macht</span>
-                    <span class="combat-val" style="color:var(--gold)"><?= $fmt($playerStats['power'] ?? 0) ?></span>
-                </div>
-                <div class="combat-row">
-                    <span class="combat-label">VIP</span>
-                    <span class="combat-val">Lv <?= (int)($playerStats['vip_level'] ?? 0) ?></span>
-                </div>
-            </div>
-            <?php endif ?>
-
-        </div>
-
+    <!-- Back bar -->
+    <div class="topbar">
+        <a href="/reports" class="topbar-back">← Alle Berichte</a>
+        <span class="topbar-id">📜 Kampfbericht #<?= $reportId ?></span>
+        <span class="topbar-date"><?= htmlspecialchars($row['created_at']) ?> UTC</span>
     </div>
+
+    <!-- VS Header -->
+    <div class="vs-header">
+        <div class="vs-side">
+            <div class="vs-player-name"><?= htmlspecialchars($playerStats['username'] ?? 'Spieler') ?></div>
+            <div class="vs-power">Macht: <strong><?= $fmt($playerStats['power'] ?? 0) ?></strong></div>
+            <div class="vs-power">Schloss Lv <?= (int)($playerStats['castle_level'] ?? 1) ?> · <?= htmlspecialchars($playerStats['city_name'] ?? '') ?></div>
+            <div style="margin-top:0.35rem">
+                <span class="vs-badge <?= $isWin ? 'win' : ($isDraw ? 'draw' : 'loss') ?>">
+                    <?= $isWin ? '⚔ Sieg' : ($isDraw ? '🤝 Unentschieden' : '💀 Niederlage') ?>
+                </span>
+            </div>
+        </div>
+
+        <div class="vs-center">
+            <div class="vs-icon">⚔</div>
+            <div class="vs-text">VS</div>
+            <div class="vs-coords">📍 <?= (int)$row['target_x'] ?>, <?= (int)$row['target_y'] ?></div>
+        </div>
+
+        <div class="vs-side right">
+            <div class="vs-monster-name"><?= htmlspecialchars($monsterName) ?></div>
+            <div class="vs-power">HP: <strong><?= $fmt($monsterHpBefore) ?></strong></div>
+            <div class="vs-power">Angriffskraft: <strong><?= $fmt($monsterAtk) ?></strong></div>
+            <div style="margin-top:0.35rem; text-align: right">
+                <span class="vs-badge <?= $monsterKilled ? 'win' : 'loss' ?>">
+                    <?= $monsterKilled ? '💀 Besiegt' : '⚡ Überlebt' ?>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- TRUPPEN-VERLUSTE -->
+    <div class="section-header">Truppen-Verluste</div>
+    <div class="troops-lost">
+        <!-- Attacker column -->
+        <div class="troops-lost-col">
+            <div class="troops-lost-title">Angreifer</div>
+            <div class="tl-row">
+                <span class="tl-label">Macht</span>
+                <span class="tl-val gold"><?= $fmt($playerStats['power'] ?? 0) ?></span>
+            </div>
+            <div class="tl-row">
+                <span class="tl-label">Truppen</span>
+                <span class="tl-val"><?= $fmt($totalSent) ?></span>
+            </div>
+            <div class="tl-row">
+                <span class="tl-label">Verletzt</span>
+                <span class="tl-val <?= $totalInjured > 0 ? 'red' : 'green' ?>">
+                    <?= $totalInjured > 0 ? $fmt($totalInjured) : '—' ?>
+                </span>
+            </div>
+            <div class="tl-row">
+                <span class="tl-label">Tod</span>
+                <span class="tl-val muted">0</span>
+            </div>
+            <div class="tl-row">
+                <span class="tl-label">Verbleibend</span>
+                <span class="tl-val green"><?= $fmt($totalSurvived) ?></span>
+            </div>
+        </div>
+
+        <div class="troops-lost-divider"></div>
+
+        <!-- Monster column -->
+        <div class="troops-lost-col">
+            <div class="troops-lost-title">Monster</div>
+            <div class="tl-row">
+                <span class="tl-label">HP vor Kampf</span>
+                <span class="tl-val gold"><?= $fmt($monsterHpBefore) ?></span>
+            </div>
+            <div class="tl-row">
+                <span class="tl-label">Schaden erhalten</span>
+                <span class="tl-val red"><?= $fmt((int)($data['attacker_damage'] ?? 0)) ?></span>
+            </div>
+            <div class="tl-row">
+                <span class="tl-label">HP zerstört</span>
+                <span class="tl-val <?= $monsterLossPct >= 100 ? 'green' : 'red' ?>">
+                    <?= $monsterLossPct ?>%
+                </span>
+            </div>
+            <div class="tl-row">
+                <span class="tl-label">HP verbleibend</span>
+                <span class="tl-val <?= $monsterKilled ? 'muted' : 'red' ?>">
+                    <?= $monsterKilled ? '0' : $fmt($monsterHpAfter) ?>
+                </span>
+            </div>
+            <div class="tl-row">
+                <span class="tl-label">Status</span>
+                <span class="tl-val <?= $monsterKilled ? 'green' : 'red' ?>">
+                    <?= $monsterKilled ? 'Besiegt' : 'Überlebt' ?>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- HP-Bar Monster -->
+    <?php if ($monsterHpBefore > 0): ?>
+    <div style="background:var(--surface);padding:0 1.5rem 1rem;border-bottom:1px solid var(--border)">
+        <div class="hp-bar-wrap">
+            <div class="hp-bar-labels">
+                <span><?= $fmt($monsterHpAfter) ?> HP verbleibend</span>
+                <span><?= $fmt($monsterHpBefore) ?> HP gesamt</span>
+            </div>
+            <div class="hp-bar-track">
+                <?php $pct = $monsterHpBefore > 0 ? max(0, round($monsterHpAfter / $monsterHpBefore * 100)) : 0; ?>
+                <div class="hp-bar-fill" style="width:<?= $pct ?>%"></div>
+            </div>
+        </div>
+    </div>
+    <?php endif ?>
+
+    <!-- TRUPPEN INFO -->
+    <?php if (!empty($troops)): ?>
+    <div class="section-header">Truppen Info</div>
+    <div class="troops-info">
+        <?php
+        $troopEmoji = fn(int $tier): string => match(true) {
+            $tier >= 4 => '🐉',
+            $tier >= 3 => '⚔',
+            $tier >= 2 => '🛡',
+            default    => '🗡',
+        };
+        ?>
+        <?php foreach ($troops as $t): ?>
+            <?php
+                $injured = (int)($t['injured'] ?? $t['lost'] ?? 0);
+                $tier    = (int)($t['tier'] ?? 1);
+            ?>
+            <div class="troop-chip">
+                <div class="troop-chip-icon">
+                    <?= $troopEmoji($tier) ?>
+                    <span class="troop-chip-tier">T<?= $tier ?></span>
+                </div>
+                <div class="troop-chip-count"><?= $fmt($t['sent']) ?></div>
+                <?php if ($injured > 0): ?>
+                    <div class="troop-chip-injured">-<?= $fmt($injured) ?></div>
+                <?php endif ?>
+                <div class="troop-chip-name"><?= htmlspecialchars($t['name'] ?? '?') ?></div>
+            </div>
+        <?php endforeach ?>
+        <div class="troops-info-total">
+            <div class="troops-info-total-label">Gesamt</div>
+            <div class="troops-info-total-val"><?= $fmt($totalSent) ?></div>
+        </div>
+    </div>
+    <?php endif ?>
+
+    <!-- KAMPFWERTE DER TRUPPEN -->
+    <div class="section-header">Kampfwerte der gesendeten Truppen</div>
+    <div class="combat-totals">
+        <div class="ctotal">
+            <div class="ctotal-label">Angriff gesamt</div>
+            <div class="ctotal-val" style="color:var(--red2)"><?= $fmtF($totalAtk) ?></div>
+        </div>
+        <div class="ctotal">
+            <div class="ctotal-label">HP gesamt</div>
+            <div class="ctotal-val"><?= $fmtF($totalHp) ?></div>
+        </div>
+        <div class="ctotal">
+            <div class="ctotal-label">Verteidigung</div>
+            <div class="ctotal-val"><?= $fmtF($totalDef) ?></div>
+        </div>
+        <div class="ctotal">
+            <div class="ctotal-label">Absorption (HP+Def)</div>
+            <div class="ctotal-val" style="color:var(--gold2)"><?= $fmtF($totalAbsorption) ?></div>
+        </div>
+        <div class="ctotal">
+            <div class="ctotal-label">Verwundungsrate</div>
+            <?php $injPct = round(($data['attacker_injury_ratio'] ?? 0) * 100, 1); ?>
+            <div class="ctotal-val" style="color:<?= $injPct > 0 ? 'var(--red2)' : 'var(--green)' ?>">
+                <?= $injPct ?>%
+            </div>
+        </div>
+    </div>
+
+    <!-- TRUPPEN DETAIL TABELLE -->
+    <?php if (!empty($troops)): ?>
+    <div class="section-header">Truppen Detail</div>
+    <div class="section-body">
+        <table class="troop-table">
+            <thead>
+                <tr>
+                    <th>Einheit</th>
+                    <th>Tier</th>
+                    <th style="text-align:right">Gesendet</th>
+                    <th style="text-align:right">Verletzt</th>
+                    <th style="text-align:right">Zurückgekehrt</th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php foreach ($troops as $t): ?>
+                <?php
+                    $injured  = (int)($t['injured']  ?? $t['lost'] ?? 0);
+                    $survived = (int)($t['survived'] ?? 0);
+                    $sent     = (int)($t['sent']     ?? 0);
+                ?>
+                <tr>
+                    <td><?= htmlspecialchars($t['name'] ?? '?') ?></td>
+                    <td><span class="tier-badge">T<?= (int)($t['tier'] ?? 1) ?></span></td>
+                    <td style="text-align:right"><?= $fmt($sent) ?></td>
+                    <td style="text-align:right">
+                        <?php if ($injured > 0): ?>
+                            <span class="val-red">-<?= $fmt($injured) ?></span>
+                        <?php else: ?>
+                            <span class="val-muted">—</span>
+                        <?php endif ?>
+                    </td>
+                    <td style="text-align:right">
+                        <span class="val-green"><?= $fmt($survived) ?></span>
+                    </td>
+                </tr>
+            <?php endforeach ?>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="2" style="color:var(--muted);font-size:0.75rem">Gesamt</td>
+                    <td style="text-align:right"><?= $fmt($totalSent) ?></td>
+                    <td style="text-align:right">
+                        <?php if ($totalInjured > 0): ?>
+                            <span class="val-red">-<?= $fmt($totalInjured) ?></span>
+                        <?php else: ?>
+                            <span class="val-muted">—</span>
+                        <?php endif ?>
+                    </td>
+                    <td style="text-align:right">
+                        <span class="val-green"><?= $fmt($totalSurvived) ?></span>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <?php endif ?>
+
+    <!-- ANGREIFER PROFIL -->
+    <?php if (!empty($playerStats)): ?>
+    <div class="section-header">Angreifer</div>
+    <div class="player-profile">
+        <div class="pp-field">
+            <div class="pp-label">Spieler</div>
+            <div class="pp-val"><?= htmlspecialchars($playerStats['username'] ?? '') ?></div>
+        </div>
+        <div class="pp-field">
+            <div class="pp-label">Stadt</div>
+            <div class="pp-val"><?= htmlspecialchars($playerStats['city_name'] ?? '') ?></div>
+        </div>
+        <div class="pp-field">
+            <div class="pp-label">Schlosslevel</div>
+            <div class="pp-val">Lv <?= (int)($playerStats['castle_level'] ?? 1) ?></div>
+        </div>
+        <div class="pp-field">
+            <div class="pp-label">Macht</div>
+            <div class="pp-val" style="color:var(--gold2)"><?= $fmt($playerStats['power'] ?? 0) ?></div>
+        </div>
+        <div class="pp-field">
+            <div class="pp-label">VIP</div>
+            <div class="pp-val">Lv <?= (int)($playerStats['vip_level'] ?? 0) ?></div>
+        </div>
+    </div>
+    <?php endif ?>
+
+    <div style="height:2rem"></div>
 </div>
 </body>
 </html>
