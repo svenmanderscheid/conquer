@@ -569,16 +569,33 @@ const ConquerMap = (() => {
         const { x, y } = screenToTile(sx, sy);
         if (x < 0 || y < 0 || x >= MAP_SIZE || y >= MAP_SIZE) return;
 
-        // Mark tile as selected immediately (shows border while loading)
-        // Check entity cache to know if it's a monster (2×2 border)
-        const cachedEntity = entities[`${x},${y}`];
-        selectedTile = { x, y, isMonster: cachedEntity?.type === 'monster' };
+        // For 2×2 monsters (anchor = bottom-left tile), a click on any of the
+        // 4 occupied tiles should resolve to the anchor.
+        // Candidates: the clicked tile itself, and the 3 other possible anchor
+        // positions whose 2×2 block would cover (x, y).
+        let tileX = x, tileY = y;
+        const candidates = [
+            [x,     y    ],  // bottom-left  (direct hit)
+            [x - 1, y    ],  // bottom-right → anchor one tile left
+            [x,     y + 1],  // top-left     → anchor one tile below
+            [x - 1, y + 1],  // top-right    → anchor is bottom-left
+        ];
+        for (const [ax, ay] of candidates) {
+            if (entities[`${ax},${ay}`]?.type === 'monster') {
+                tileX = ax;
+                tileY = ay;
+                break;
+            }
+        }
+
+        const isMonster = entities[`${tileX},${tileY}`]?.type === 'monster';
+        selectedTile    = { x: tileX, y: tileY, isMonster };
 
         // Optimistically show coords while loading
-        onTileInfo({ x, y, occupant: null });
+        onTileInfo({ x: tileX, y: tileY, occupant: null });
 
         try {
-            const r   = await fetch(`/api/map/tile/${x}/${y}`);
+            const r   = await fetch(`/api/map/tile/${tileX}/${tileY}`);
             const txt = await r.text();
             let j;
             try {
@@ -589,9 +606,8 @@ const ConquerMap = (() => {
             }
             if (j.ok) {
                 onTileInfo(j.data);
-                // Refine selection border once we know the real occupant type
-                if (selectedTile && selectedTile.x === x && selectedTile.y === y) {
-                    selectedTile = { x, y, isMonster: j.data.occupant?.type === 'monster' };
+                if (selectedTile && selectedTile.x === tileX && selectedTile.y === tileY) {
+                    selectedTile = { x: tileX, y: tileY, isMonster: j.data.occupant?.type === 'monster' };
                 }
             } else {
                 console.warn('[map] tile API error:', j.error);
