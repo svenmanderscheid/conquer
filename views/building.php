@@ -82,23 +82,28 @@ foreach ($castleReqs as $reqCode => $reqLevel) {
     }
 }
 
-// Tile definitions (must match city.php)
-$tileDefs = [
-    'castle'           => [96, 97, 108, 109],   // 2×2 composite
-    'farm'             => 5,
-    'storage'          => 36,
-    'treasure_house'   => 122,
-    'quarry'           => 12,
-    'academy'          => 110,
-    'wall'             => 17,
-    'trading_post'     => 84,
-    'gold_mine'        => 120,
-    'lumber_camp'      => 6,
-    'barrack'          => 44,
-    'hall_of_alliance' => 49,
-    'hospital'         => 45,
+// Custom pixel sprites (assets/sprites/pixel/buildings/)
+$spriteFiles = [
+    'castle'           => 'castle.png',
+    'farm'             => 'farm.png',
+    'storage'          => 'storage.png',
+    'treasure_house'   => 'treasure_house.png',
+    'quarry'           => 'quarry.png',
+    'academy'          => 'academy.png',
+    'wall'             => 'wall_corner.png',
+    'trading_post'     => 'trading_post.png',
+    'gold_mine'        => 'gold_mine.png',
+    'lumber_camp'      => 'lumber_camp.png',
+    'barrack'          => 'barracks.png',
+    'hall_of_alliance' => 'hall_of_alliance.png',
+    'hospital'         => 'hospital.png',
 ];
-$tile = $tileDefs[$buildingCode] ?? 0;
+
+$spriteBase = '/assets/sprites/pixel/buildings/';
+$spriteSrc  = $spriteBase . ($spriteFiles[$buildingCode] ?? 'castle.png');
+
+$buildingSpriteSrc = static fn(string $code): string =>
+    '/assets/sprites/pixel/buildings/' . ($spriteFiles[$code] ?? 'castle.png');
 
 // ---------------------------------------------------------------------------
 // Building descriptions
@@ -251,10 +256,11 @@ $isModal = isset($_GET['modal']);
             padding: 20px 0 10px;
         }
 
-        #bldg-canvas {
+        #bldg-img {
             image-rendering: pixelated;
             width: 160px;
             height: 160px;
+            object-fit: contain;
             background: rgba(255,255,255,0.02);
             border-radius: 4px;
         }
@@ -420,10 +426,11 @@ $isModal = isset($_GET['modal']);
             justify-content: center;
         }
 
-        #icon-canvas {
+        #icon-img {
             image-rendering: pixelated;
             width: 80px;
             height: 80px;
+            object-fit: contain;
             background: rgba(255,255,255,0.02);
             border-radius: 4px;
             border: 1px solid #2a3a55;
@@ -563,10 +570,11 @@ $isModal = isset($_GET['modal']);
         .prereq-card.met   { border-color: #166534; }
         .prereq-card.unmet { border-color: #7f1d1d; }
 
-        .prereq-canvas-wrap canvas {
+        .prereq-canvas-wrap img {
             image-rendering: pixelated;
             width: 36px;
             height: 36px;
+            object-fit: contain;
             display: block;
         }
 
@@ -856,9 +864,9 @@ $isModal = isset($_GET['modal']);
                 <!-- Red name banner -->
                 <div class="bldg-banner"><?= htmlspecialchars($name) ?></div>
 
-                <!-- Large canvas -->
+                <!-- Large sprite -->
                 <div class="bldg-canvas-wrap">
-                    <canvas id="bldg-canvas" width="160" height="160"></canvas>
+                    <img id="bldg-img" src="<?= htmlspecialchars($spriteSrc) ?>" alt="<?= htmlspecialchars($name) ?>">
                 </div>
 
                 <!-- Level badge -->
@@ -921,7 +929,7 @@ $isModal = isset($_GET['modal']);
                     <!-- Left sub-column: icon + level transition + new bonuses -->
                     <div class="sub-left">
                         <div class="icon-canvas-wrap">
-                            <canvas id="icon-canvas" width="80" height="80"></canvas>
+                            <img id="icon-img" src="<?= htmlspecialchars($spriteSrc) ?>" alt="<?= htmlspecialchars($name) ?>">
                         </div>
 
                         <div class="sub-bldg-name"><?= htmlspecialchars($name) ?></div>
@@ -974,10 +982,9 @@ $isModal = isset($_GET['modal']);
                             <?php foreach ($castleReqs as $reqCode => $reqLevel):
                                 $hasLevel = (int)($buildings[$reqCode]['level'] ?? 0);
                                 $isMetCard = $hasLevel >= $reqLevel;
-                                $cardCls = $isMetCard ? 'met' : 'unmet';
-                                $reqName = CityState::BUILDING_NAMES[$reqCode] ?? ucwords(str_replace('_', ' ', $reqCode));
-                                $reqTile = $tileDefs[$reqCode] ?? 0;
-                                $reqTileJson = is_array($reqTile) ? json_encode($reqTile) : (int)$reqTile;
+                                $cardCls   = $isMetCard ? 'met' : 'unmet';
+                                $reqName   = CityState::BUILDING_NAMES[$reqCode] ?? ucwords(str_replace('_', ' ', $reqCode));
+                                $reqSprite = $buildingSpriteSrc($reqCode);
                             ?>
                             <?php if ($isModal): ?>
                             <button class="prereq-card <?= $cardCls ?>"
@@ -988,9 +995,8 @@ $isModal = isset($_GET['modal']);
                                class="prereq-card <?= $cardCls ?>">
                             <?php endif ?>
                                 <div class="prereq-canvas-wrap">
-                                    <canvas class="prereq-tile-canvas"
-                                            width="36" height="36"
-                                            data-tile="<?= htmlspecialchars((string)$reqTileJson) ?>"></canvas>
+                                    <img src="<?= htmlspecialchars($reqSprite) ?>"
+                                         alt="<?= htmlspecialchars($reqName) ?>">
                                 </div>
                                 <div class="prereq-card-name"><?= htmlspecialchars($reqName) ?></div>
                                 <div class="prereq-lv-badge <?= $cardCls ?>">
@@ -1147,86 +1153,6 @@ $isModal = isset($_GET['modal']);
 <script>
 (function () {
 'use strict';
-
-// ---------------------------------------------------------------------------
-// Atlas sprite rendering
-// ---------------------------------------------------------------------------
-const ATLAS_SRC  = '/assets/sprites/kenney-tiny-town/Tilemap/tilemap_packed.png';
-const ATLAS_TILE = 16;
-const ATLAS_STEP = 17;
-const ATLAS_COLS = 12;
-
-const TILE   = <?= is_array($tile) ? json_encode($tile) : (int) $tile ?>;
-const IS_2X2 = Array.isArray(TILE);
-
-const atlas = new Image();
-
-function drawTileOnCtx(ctx, idx, dx, dy, size) {
-    const sx = (idx % ATLAS_COLS) * ATLAS_STEP;
-    const sy = Math.floor(idx / ATLAS_COLS) * ATLAS_STEP;
-    ctx.drawImage(atlas, sx, sy, ATLAS_TILE, ATLAS_TILE, dx, dy, size, size);
-}
-
-function renderMainCanvas() {
-    const canvas = document.getElementById('bldg-canvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    ctx.imageSmoothingEnabled = false;
-    ctx.clearRect(0, 0, 160, 160);
-
-    if (IS_2X2) {
-        drawTileOnCtx(ctx, TILE[0],  0,  0, 80);
-        drawTileOnCtx(ctx, TILE[1], 80,  0, 80);
-        drawTileOnCtx(ctx, TILE[2],  0, 80, 80);
-        drawTileOnCtx(ctx, TILE[3], 80, 80, 80);
-    } else {
-        drawTileOnCtx(ctx, TILE, 0, 0, 160);
-    }
-}
-
-function renderIconCanvas() {
-    const canvas = document.getElementById('icon-canvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    ctx.imageSmoothingEnabled = false;
-    ctx.clearRect(0, 0, 80, 80);
-
-    if (IS_2X2) {
-        drawTileOnCtx(ctx, TILE[0],  0,  0, 40);
-        drawTileOnCtx(ctx, TILE[1], 40,  0, 40);
-        drawTileOnCtx(ctx, TILE[2],  0, 40, 40);
-        drawTileOnCtx(ctx, TILE[3], 40, 40, 40);
-    } else {
-        drawTileOnCtx(ctx, TILE, 0, 0, 80);
-    }
-}
-
-function renderPrereqCanvases() {
-    document.querySelectorAll('.prereq-tile-canvas').forEach(canvas => {
-        const raw  = canvas.dataset.tile;
-        let tileId;
-        try { tileId = JSON.parse(raw); } catch { tileId = parseInt(raw, 10); }
-        const is2x2 = Array.isArray(tileId);
-        const ctx   = canvas.getContext('2d');
-        ctx.imageSmoothingEnabled = false;
-        ctx.clearRect(0, 0, 36, 36);
-        if (is2x2) {
-            drawTileOnCtx(ctx, tileId[0],  0,  0, 18);
-            drawTileOnCtx(ctx, tileId[1], 18,  0, 18);
-            drawTileOnCtx(ctx, tileId[2],  0, 18, 18);
-            drawTileOnCtx(ctx, tileId[3], 18, 18, 18);
-        } else {
-            drawTileOnCtx(ctx, tileId, 0, 0, 36);
-        }
-    });
-}
-
-atlas.onload = () => {
-    renderMainCanvas();
-    renderIconCanvas();
-    renderPrereqCanvases();
-};
-atlas.src = ATLAS_SRC;
 
 // ---------------------------------------------------------------------------
 // Upgrade button
