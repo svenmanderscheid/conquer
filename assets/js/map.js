@@ -518,12 +518,22 @@ const ConquerMap = (() => {
         onTileInfo({ x, y, occupant: null });
 
         try {
-            const r = await fetch(`/api/map/tile/${x}/${y}`);
-            const j = await r.json();
-            if (j.ok) onTileInfo(j.data);
-            // j.ok = false leaves the optimistic {x, y, occupant:null} in place
-        } catch {
-            // Network/parse error: keep whatever is shown, don't blank the panel
+            const r   = await fetch(`/api/map/tile/${x}/${y}`);
+            const txt = await r.text();
+            let j;
+            try {
+                j = JSON.parse(txt);
+            } catch {
+                console.error('[map] tile API returned invalid JSON:', txt.slice(0, 300));
+                return;
+            }
+            if (j.ok) {
+                onTileInfo(j.data);
+            } else {
+                console.warn('[map] tile API error:', j.error);
+            }
+        } catch (err) {
+            console.error('[map] tile fetch failed:', err);
         }
     }
 
