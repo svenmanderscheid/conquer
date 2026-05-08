@@ -349,26 +349,26 @@ const BLDG_SIZE = 96;    // px for regular buildings (6× zoom from 16px)
 const CAST_SIZE = 192;   // castle 2×2 composite (each sub-tile = 96px)
 
 const BUILDING_DEFS = [
-    // Castle — center, 2×2 composite
-    { code: 'castle',             tile: [96, 97, 108, 109], x: 544, y: 204, size: CAST_SIZE },
+    // Castle — center
+    { code: 'castle',           sprite: 'castle.png',           x: 544, y: 204, size: CAST_SIZE },
 
     // Top row
-    { code: 'farm',               tile:   5, x:   80, y:  60, size: BLDG_SIZE },
-    { code: 'storage',            tile:  36, x:  248, y:  60, size: BLDG_SIZE },
-    { code: 'treasure_house',     tile: 122, x:  936, y:  60, size: BLDG_SIZE },
-    { code: 'quarry',             tile:  12, x: 1104, y:  60, size: BLDG_SIZE },
+    { code: 'farm',             sprite: 'farm.png',             x:   80, y:  60, size: BLDG_SIZE },
+    { code: 'storage',          sprite: 'storage.png',          x:  248, y:  60, size: BLDG_SIZE },
+    { code: 'treasure_house',   sprite: 'treasure_house.png',   x:  936, y:  60, size: BLDG_SIZE },
+    { code: 'quarry',           sprite: 'quarry.png',           x: 1104, y:  60, size: BLDG_SIZE },
 
     // Middle flanks
-    { code: 'academy',            tile: 110, x:   80, y: 248, size: BLDG_SIZE },
-    { code: 'wall',               tile:  17, x:  248, y: 248, size: BLDG_SIZE },
-    { code: 'trading_post',       tile:  84, x:  936, y: 248, size: BLDG_SIZE },
-    { code: 'gold_mine',          tile: 120, x: 1104, y: 248, size: BLDG_SIZE },
+    { code: 'academy',          sprite: 'academy.png',          x:   80, y: 248, size: BLDG_SIZE },
+    { code: 'wall',             sprite: 'wall_corner.png',      x:  248, y: 248, size: BLDG_SIZE },
+    { code: 'trading_post',     sprite: 'trading_post.png',     x:  936, y: 248, size: BLDG_SIZE },
+    { code: 'gold_mine',        sprite: 'gold_mine.png',        x: 1104, y: 248, size: BLDG_SIZE },
 
     // Bottom row
-    { code: 'lumber_camp',        tile:   6, x:   80, y: 452, size: BLDG_SIZE },
-    { code: 'barrack',            tile:  44, x:  248, y: 452, size: BLDG_SIZE },
-    { code: 'hall_of_alliance',   tile:  49, x:  592, y: 456, size: BLDG_SIZE },
-    { code: 'hospital',           tile:  45, x:  936, y: 452, size: BLDG_SIZE },
+    { code: 'lumber_camp',      sprite: 'lumber_camp.png',      x:   80, y: 452, size: BLDG_SIZE },
+    { code: 'barrack',          sprite: 'barracks.png',         x:  248, y: 452, size: BLDG_SIZE },
+    { code: 'hall_of_alliance', sprite: 'hall_of_alliance.png', x:  592, y: 456, size: BLDG_SIZE },
+    { code: 'hospital',         sprite: 'hospital.png',         x:  936, y: 452, size: BLDG_SIZE },
 ];
 
 // Grass tile variants for background
@@ -394,12 +394,23 @@ resizeCanvas();
 window.addEventListener('resize', () => { resizeCanvas(); });
 
 // ---------------------------------------------------------------------------
-// Atlas load
+// Atlas load (grass background only)
 // ---------------------------------------------------------------------------
 const atlas = new Image();
 let atlasReady = false;
 atlas.onload = () => { atlasReady = true; };
 atlas.src = ATLAS_SRC;
+
+// ---------------------------------------------------------------------------
+// Building sprites — preload all custom PNGs
+// ---------------------------------------------------------------------------
+const SPRITE_BASE = '/assets/sprites/pixel/buildings/';
+const sprites = {};
+BUILDING_DEFS.forEach(b => {
+    const img = new Image();
+    img.src = SPRITE_BASE + b.sprite;
+    sprites[b.code] = img;
+});
 
 // ---------------------------------------------------------------------------
 // Building display names & function actions
@@ -574,17 +585,14 @@ function render() {
     const tileW = Math.ceil(canvas.width  / 32) + 1;
     const tileH = Math.ceil(canvas.height / 32) + 1;
 
-    // Grass background
-    for (let ty = 0; ty < tileH; ty++) {
-        for (let tx = 0; tx < tileW; tx++) {
-            const variant = GRASS_TILES[(tx * 7 + ty * 13) % 3];
-            drawTile(variant, tx * 32, ty * 32, 32);
+    // Grass background (atlas)
+    if (atlasReady) {
+        for (let ty = 0; ty < tileH; ty++) {
+            for (let tx = 0; tx < tileW; tx++) {
+                const variant = GRASS_TILES[(tx * 7 + ty * 13) % 3];
+                drawTile(variant, tx * 32, ty * 32, 32);
+            }
         }
-    }
-
-    if (!atlasReady) {
-        requestAnimationFrame(render);
-        return;
     }
 
     // Buildings
@@ -601,16 +609,10 @@ function render() {
         ctx.fill();
         ctx.restore();
 
-        // Draw sprite
-        if (Array.isArray(b.tile)) {
-            // 2×2 composite (castle)
-            const half = b.size / 2;
-            drawTile(b.tile[0], b.x,        b.y,        half);
-            drawTile(b.tile[1], b.x + half,  b.y,        half);
-            drawTile(b.tile[2], b.x,        b.y + half,  half);
-            drawTile(b.tile[3], b.x + half,  b.y + half,  half);
-        } else {
-            drawTile(b.tile, b.x, b.y, b.size);
+        // Draw custom sprite
+        const img = sprites[b.code];
+        if (img?.complete && img.naturalWidth > 0) {
+            ctx.drawImage(img, b.x, b.y, b.size, b.size);
         }
 
         // Queue pulse outline
