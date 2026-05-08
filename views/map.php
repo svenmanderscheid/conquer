@@ -153,9 +153,41 @@ declare(strict_types=1);
         #tile-info {
             font-size: 0.78rem; color: #64748b; min-height: 60px;
         }
-        .tile-info-row { margin-bottom: 4px; }
-        .tile-info-row strong { color: #94a3b8; }
+        .tile-info-row { margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center; }
+        .tile-info-row .lbl { color: #475569; }
+        .tile-info-row .val { color: #94a3b8; font-weight: 600; text-align: right; }
         .tile-info-empty { color: #334155; font-style: italic; }
+        .tile-info-name {
+            font-size: 0.9rem; font-weight: 700; color: #e2e8f0;
+            margin-bottom: 8px; padding-bottom: 6px;
+            border-bottom: 1px solid #1e293b;
+        }
+        /* HP bar */
+        .hp-bar-wrap {
+            margin-bottom: 8px;
+        }
+        .hp-bar-label {
+            display: flex; justify-content: space-between;
+            font-size: 0.7rem; color: #64748b; margin-bottom: 3px;
+        }
+        .hp-bar-track {
+            height: 6px; background: #1e293b; border-radius: 3px; overflow: hidden;
+        }
+        .hp-bar-fill {
+            height: 100%; border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        /* Stats mini-grid */
+        .stats-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 4px 8px; margin-top: 6px;
+        }
+        .stat-cell {
+            background: #0f172a; border: 1px solid #1e293b; border-radius: 4px;
+            padding: 4px 6px; text-align: center;
+        }
+        .stat-cell .stat-val { font-size: 0.85rem; font-weight: 700; color: #e2e8f0; }
+        .stat-cell .stat-lbl { font-size: 0.62rem; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; }
     </style>
 </head>
 <body x-data="mapApp()" x-init="boot()">
@@ -202,62 +234,116 @@ declare(strict_types=1);
         <div class="panel">
             <div class="panel-title">Tile Info</div>
             <div id="tile-info">
+
+                <!-- No selection yet -->
                 <template x-if="!tileInfo">
-                    <div class="tile-info-empty">Click a tile to inspect it</div>
+                    <div class="tile-info-empty">Klicke auf ein Tile um Details zu sehen</div>
                 </template>
+
                 <template x-if="tileInfo">
                     <div>
-                        <div class="tile-info-row">
-                            Coords: <strong x-text="tileInfo.x + ', ' + tileInfo.y"></strong>
+                        <!-- Coordinates always shown -->
+                        <div class="tile-info-row" style="margin-bottom:8px">
+                            <span class="lbl">Koordinaten</span>
+                            <span class="val" x-text="tileInfo.x + ', ' + tileInfo.y"></span>
                         </div>
+
+                        <!-- Empty tile -->
                         <template x-if="!tileInfo.occupant">
-                            <div class="tile-info-row" style="color:#334155;font-style:italic">Empty</div>
+                            <div class="tile-info-empty">Leeres Tile</div>
                         </template>
+
+                        <!-- City -->
                         <template x-if="tileInfo.occupant?.type === 'city'">
                             <div>
-                                <div class="tile-info-row">
-                                    Type: <strong style="color:#f59e0b">City</strong>
+                                <div class="tile-info-name" style="color:#f59e0b">
+                                    🏰 <span x-text="tileInfo.occupant.name"></span>
                                 </div>
                                 <div class="tile-info-row">
-                                    Name: <strong x-text="tileInfo.occupant.name"></strong>
+                                    <span class="lbl">Spieler</span>
+                                    <span class="val" x-text="tileInfo.occupant.player"></span>
                                 </div>
                                 <div class="tile-info-row">
-                                    Player: <strong x-text="tileInfo.occupant.player"></strong>
+                                    <span class="lbl">Castle</span>
+                                    <span class="val" x-text="'Lv ' + tileInfo.occupant.level"></span>
                                 </div>
                                 <div class="tile-info-row">
-                                    Castle: <strong x-text="'Lv ' + tileInfo.occupant.level"></strong>
-                                </div>
-                                <div class="tile-info-row">
-                                    Power: <strong x-text="(tileInfo.occupant.power ?? 0).toLocaleString()"></strong>
+                                    <span class="lbl">Power</span>
+                                    <span class="val" x-text="(tileInfo.occupant.power ?? 0).toLocaleString()"></span>
                                 </div>
                             </div>
                         </template>
+
+                        <!-- Monster -->
                         <template x-if="tileInfo.occupant?.type === 'monster'">
                             <div>
-                                <div class="tile-info-row">
-                                    Type: <strong style="color:#ef4444">Monster</strong>
+                                <div class="tile-info-name" style="color:#ef4444">
+                                    ☠ <span x-text="tileInfo.occupant.name + ' Lv ' + tileInfo.occupant.level"></span>
                                 </div>
-                                <div class="tile-info-row">
-                                    Name: <strong x-text="monsterLabel(tileInfo.occupant.monster_code)"></strong>
+
+                                <!-- HP bar -->
+                                <div class="hp-bar-wrap">
+                                    <div class="hp-bar-label">
+                                        <span>HP</span>
+                                        <span x-text="tileInfo.occupant.hp_current.toLocaleString() + ' / ' + tileInfo.occupant.hp_max.toLocaleString()"></span>
+                                    </div>
+                                    <div class="hp-bar-track">
+                                        <div class="hp-bar-fill" style="background:#ef4444"
+                                             :style="'width:' + Math.round(tileInfo.occupant.hp_current / tileInfo.occupant.hp_max * 100) + '%'">
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="tile-info-row">
-                                    HP: <strong x-text="tileInfo.occupant.hp_current.toLocaleString()"></strong>
+
+                                <!-- Attack / Defense / Unit count -->
+                                <div class="stats-grid">
+                                    <div class="stat-cell">
+                                        <div class="stat-val" x-text="tileInfo.occupant.attack ?? '—'"></div>
+                                        <div class="stat-lbl">Angriff</div>
+                                    </div>
+                                    <div class="stat-cell">
+                                        <div class="stat-val" x-text="tileInfo.occupant.defense ?? '—'"></div>
+                                        <div class="stat-lbl">Verteidigung</div>
+                                    </div>
+                                    <template x-if="tileInfo.occupant.amount">
+                                        <div class="stat-cell" style="grid-column: span 2">
+                                            <div class="stat-val" x-text="tileInfo.occupant.amount.toLocaleString()"></div>
+                                            <div class="stat-lbl">Einheiten</div>
+                                        </div>
+                                    </template>
                                 </div>
                             </div>
                         </template>
+
+                        <!-- Resource node -->
                         <template x-if="tileInfo.occupant?.type === 'resource'">
                             <div>
-                                <div class="tile-info-row">
-                                    Type: <strong style="color:#22c55e">Resource Node</strong>
+                                <div class="tile-info-name" style="color:#22c55e">
+                                    ◆ <span x-text="tileInfo.occupant.label"></span>
                                 </div>
                                 <div class="tile-info-row">
-                                    Code: <strong x-text="tileInfo.occupant.object_code"></strong>
-                                </div>
-                                <div class="tile-info-row">
-                                    Remaining: <strong x-text="tileInfo.occupant.remaining"></strong>
+                                    <span class="lbl">Verbleibend</span>
+                                    <span class="val" x-text="(tileInfo.occupant.remaining ?? 0).toLocaleString()"></span>
                                 </div>
                             </div>
                         </template>
+
+                        <!-- Shrine -->
+                        <template x-if="tileInfo.occupant?.type === 'shrine'">
+                            <div>
+                                <div class="tile-info-name" :style="'color:' + shrineColor(tileInfo.occupant.tier)">
+                                    ⬠ Shrine <span x-text="tileInfo.occupant.shrine_code"></span>
+                                </div>
+                                <div class="tile-info-row">
+                                    <span class="lbl">Tier</span>
+                                    <span class="val" :style="'color:' + shrineColor(tileInfo.occupant.tier)" x-text="tileInfo.occupant.tier"></span>
+                                </div>
+                                <div class="tile-info-row">
+                                    <span class="lbl">Besitzer</span>
+                                    <span class="val" x-text="tileInfo.occupant.owner_alliance_id ? 'Allianz #' + tileInfo.occupant.owner_alliance_id : 'Frei'"></span>
+                                </div>
+                            </div>
+                        </template>
+
                     </div>
                 </template>
             </div>
@@ -319,6 +405,10 @@ declare(strict_types=1);
                 const level = code % 100;
                 const name  = this.MONSTER_TYPES[type] ?? 'Unknown';
                 return `${name} Lv ${level}`;
+            },
+
+            shrineColor(tier) {
+                return { S: '#f59e0b', A: '#a78bfa', B: '#60a5fa', C: '#94a3b8' }[tier] ?? '#94a3b8';
             },
 
             async boot() {

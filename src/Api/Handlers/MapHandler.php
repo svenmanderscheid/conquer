@@ -208,10 +208,30 @@ final class MapHandler
             )->fetch();
 
             if ($monster !== false) {
+                $code  = (int) $monster['monster_code'];
+                $defs  = self::monsterDefs();
+                $spawn = $defs['byCode'][$code] ?? null;
+
+                $name  = $spawn['name']  ?? 'Unknown';
+                $level = $spawn['level'] ?? ($code % 100);
+
+                // monsters.json is 0-indexed vs world_spawn (Lv 1 in spawn = Lv 0 in json)
+                $statsKey = $name . '_' . ($level - 1);
+                $stats    = $defs['stats'][$statsKey] ?? $defs['stats'][$name . '_' . $level] ?? null;
+
+                $hpMax  = $stats !== null
+                    ? (int) round($stats['stats']['hp'] * $stats['amount'])
+                    : (int) $monster['hp_current'];
+
                 $occ = [
-                    'type'         => 'monster',
-                    'monster_code' => (int) $monster['monster_code'],
-                    'hp_current'   => (int) $monster['hp_current'],
+                    'type'       => 'monster',
+                    'name'       => $name,
+                    'level'      => $level,
+                    'hp_current' => (int) $monster['hp_current'],
+                    'hp_max'     => $hpMax,
+                    'attack'     => $stats['stats']['attack']  ?? null,
+                    'defense'    => $stats['stats']['defense'] ?? null,
+                    'amount'     => $stats['amount']           ?? null,
                 ];
             }
         }
@@ -223,9 +243,12 @@ final class MapHandler
             )->fetch();
 
             if ($obj !== false) {
+                $code   = (int) $obj['object_code'];
+                $labels = self::fieldObjectLabels();
                 $occ = [
                     'type'        => 'resource',
-                    'object_code' => (int) $obj['object_code'],
+                    'object_code' => $code,
+                    'label'       => $labels[$code] ?? 'Resource Node',
                     'remaining'   => (int) $obj['remaining'],
                 ];
             }
@@ -248,5 +271,52 @@ final class MapHandler
         }
 
         Response::ok(['x' => $x, 'y' => $y, 'occupant' => $occ]);
+    }
+
+    /**
+     * Load monster definitions once per request.
+     *
+     * Returns:
+     *   'byCode' — world_spawn code → ['name', 'level']
+     *   'stats'  — "Name_level" → monsters.json entry (0-indexed levels)
+     */
+    private static function monsterDefs(): array
+    {
+        static $cache = null;
+        if ($cache !== null) return $cache;
+
+        $spawnCfg    = json_decode((string) file_get_contents(ROOT_DIR . '/data/world_spawn.json'), true);
+        $monstersCfg = json_decode((string) file_get_contents(ROOT_DIR . '/data/monsters.json'), true);
+
+        $byCode = [];
+        foreach ($spawnCfg['monsters'] as $m) {
+            $byCode[(int) $m['code']] = ['name' => $m['monster'], 'level' => (int) $m['level']];
+        }
+
+        $stats = [];
+        foreach ($monstersCfg['monsters'] as $m) {
+            $stats[$m['name'] . '_' . $m['level']] = $m;
+        }
+
+        $cache = ['byCode' => $byCode, 'stats' => $stats];
+        return $cache;
+    }
+
+    /**
+     * Load field_object labels once per request.
+     * Returns code → label string (e.g. 20100101 → "Farm Lv 1").
+     */
+    private static function fieldObjectLabels(): array
+    {
+        static $cache = null;
+        if ($cache !== null) return $cache;
+
+        $spawnCfg = json_decode((string) file_get_contents(ROOT_DIR . '/data/world_spawn.json'), true);
+        $labels   = [];
+        foreach ($spawnCfg['field_objects'] as $obj) {
+            $labels[(int) $obj['code']] = $obj['label'];
+        }
+        $cache = $labels;
+        return $cache;
     }
 }
