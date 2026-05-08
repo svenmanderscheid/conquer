@@ -198,8 +198,8 @@ if (preg_match('#^/city/building/([a-z_]+)$#', $path, $m)) {
 
     $buildingCode = $m[1];
 
-    // Academy → Forschungsbaum
-    if ($buildingCode === 'academy') {
+    // Academy → Forschungsbaum (außer im Modal-Modus, wo das Upgrade-Fenster gezeigt wird)
+    if ($buildingCode === 'academy' && !isset($_GET['modal'])) {
         header('Location: /research');
         exit;
     }

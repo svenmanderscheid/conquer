@@ -661,71 +661,275 @@ HTML;
             animation: pulse-dot 1s infinite;
         }
 
-        /* ── Detail panel ── */
-        .detail-panel {
-            flex-shrink: 0;
-            background: #1e293b;
-            border-top: 2px solid #334155;
-            padding: 12px 16px;
+        /* ── Research modal ── */
+        .rm-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.65);
             display: flex;
-            gap: 16px;
             align-items: center;
-            min-height: 100px;
-            max-height: 140px;
+            justify-content: center;
+            z-index: 5000;
         }
-        .dp-header {
+        .rm-card {
+            background: #0f172a;
+            border: 2px solid #d4a017;
+            border-radius: 10px;
+            width: 400px;
+            max-width: calc(100vw - 24px);
+            box-shadow: 0 12px 48px rgba(0,0,0,.85);
             display: flex;
             flex-direction: column;
-            gap: 2px;
-            min-width: 180px;
+            overflow: hidden;
         }
-        .dp-name  { font-size: 0.92rem; font-weight: 700; color: #fbbf24; }
-        .dp-level { font-size: 0.75rem; color: #94a3b8; }
-        .dp-close {
-            background: none; border: none;
-            color: #64748b; cursor: pointer;
-            font-size: 1.1rem; align-self: flex-start;
-            margin-top: 2px;
-        }
-        .dp-close:hover { color: #ef4444; }
-        .dp-body {
-            flex: 1;
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 8px;
-            font-size: 0.75rem;
-            color: #94a3b8;
+        .rm-header {
+            background: linear-gradient(90deg, #1c1400 0%, #2a1f00 100%);
+            border-bottom: 1px solid #6b4e00;
+            padding: 10px 14px;
+            display: flex;
             align-items: center;
+            justify-content: space-between;
         }
-        .dp-effect { color: #22c55e; font-weight: 600; }
-        .dp-lock   { color: #ef4444; }
-        .dp-actions { display: flex; flex-direction: column; gap: 6px; }
-        .dp-btn-start {
-            padding: 8px 18px;
+        .rm-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #fbbf24;
+        }
+        .rm-close {
+            background: none;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .rm-close:hover { color: #ef4444; background: rgba(239,68,68,.1); }
+        .rm-body {
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .rm-top {
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+        }
+        .rm-icon-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            flex-shrink: 0;
+        }
+        .rm-icon {
+            width: 80px;
+            height: 80px;
+            background: #1a1200;
+            border: 2px solid #d4a017;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+        .rm-bar-wrap {
+            width: 80px;
+            height: 7px;
+            background: #1e293b;
+            border-radius: 4px;
+            border: 1px solid #334155;
+            overflow: hidden;
+        }
+        .rm-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #d4a017, #fbbf24);
+            border-radius: 4px;
+            transition: width .3s;
+        }
+        .rm-bar-text {
+            font-size: 0.65rem;
+            color: #94a3b8;
+        }
+        .rm-right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 0;
+        }
+        .rm-level-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+        .rm-lv-cur  { color: #94a3b8; }
+        .rm-lv-arr  { color: #f59e0b; font-size: 1.1rem; }
+        .rm-lv-next { color: #fbbf24; }
+        .rm-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .rm-stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(34,197,94,.07);
+            border: 1px solid rgba(34,197,94,.2);
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 0.78rem;
+            color: #94a3b8;
+        }
+        .rm-stat-val {
+            font-weight: 700;
+            color: #22c55e;
+        }
+        .rm-time-row {
+            font-size: 0.72rem;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .rm-section-heading {
+            font-size: 0.62rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            color: #475569;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #1e293b;
+        }
+        .rm-resources {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+        }
+        .rm-res-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.73rem;
+            padding: 5px 8px;
+            background: #0f1e30;
+            border-radius: 4px;
+            border: 1px solid #1e3a5f;
+        }
+        .rm-res-row.ok  { border-color: rgba(34,197,94,.35); }
+        .rm-res-row.nok { border-color: rgba(239,68,68,.35); color: #fca5a5; }
+        .rm-res-amount { margin-left: auto; font-weight: 700; }
+        .rm-res-check  { font-size: 0.8rem; margin-left: 4px; }
+        .rm-academy {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 7px 10px;
+            background: #0f1e30;
+            border-radius: 6px;
+            border: 1px solid #1e3a5f;
+            font-size: 0.78rem;
+            cursor: pointer;
+            transition: background .12s;
+        }
+        .rm-academy:hover { background: #162032; }
+        .rm-academy.nok { border-color: rgba(239,68,68,.4); }
+        .rm-academy.ok  { border-color: rgba(34,197,94,.35); }
+        .rm-acad-icon { font-size: 1.4rem; line-height: 1; }
+        .rm-acad-text { flex: 1; color: #94a3b8; }
+        .rm-acad-badge {
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: #1e293b;
+            color: #64748b;
+        }
+        .rm-acad-badge.nok { background: rgba(239,68,68,.15); color: #ef4444; }
+        .rm-acad-badge.ok  { background: rgba(34,197,94,.15); color: #22c55e; }
+        .rm-req-list {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .rm-req-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 10px;
+            background: #0f1e30;
+            border-radius: 5px;
+            border: 1px solid #1e3a5f;
+            font-size: 0.76rem;
+            cursor: pointer;
+            transition: background .12s;
+        }
+        .rm-req-row:hover { background: #162032; }
+        .rm-req-row.ok  { border-color: rgba(34,197,94,.35); }
+        .rm-req-row.nok { border-color: rgba(239,68,68,.35); }
+        .rm-req-icon { font-size: 1rem; line-height: 1; }
+        .rm-req-name { flex: 1; color: #94a3b8; }
+        .rm-req-badge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 10px;
+        }
+        .rm-req-badge.ok  { background: rgba(34,197,94,.15); color: #22c55e; }
+        .rm-req-badge.nok { background: rgba(239,68,68,.15); color: #ef4444; }
+        .rm-lock-msg {
+            font-size: 0.74rem;
+            color: #fca5a5;
+            padding: 6px 10px;
+            background: rgba(239,68,68,.07);
+            border-radius: 5px;
+            border: 1px solid rgba(239,68,68,.2);
+        }
+        .rm-actions {
+            display: flex;
+            gap: 8px;
+            padding: 12px 14px;
+            border-top: 1px solid #1e293b;
+        }
+        .rm-btn-start {
+            flex: 1;
+            padding: 10px;
             background: #0ea5e9;
             border: none;
             border-radius: 6px;
             color: #fff;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
-            font-size: 0.82rem;
-            white-space: nowrap;
+            font-size: 0.85rem;
         }
-        .dp-btn-start:hover:not(:disabled) { background: #0284c7; }
-        .dp-btn-start:disabled { background: #1e3a4f; color: #64748b; cursor: default; }
-        .dp-btn-instant {
-            padding: 8px 14px;
+        .rm-btn-start:hover:not(:disabled) { background: #0284c7; }
+        .rm-btn-start:disabled { background: #1e3a4f; color: #64748b; cursor: default; }
+        .rm-btn-instant {
+            flex: 1;
+            padding: 10px;
             background: #7c3aed;
             border: none;
             border-radius: 6px;
             color: #fff;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
-            font-size: 0.82rem;
-            white-space: nowrap;
+            font-size: 0.85rem;
         }
-        .dp-btn-instant:hover:not(:disabled) { background: #6d28d9; }
-        .dp-btn-instant:disabled { background: #2d1b69; color: #64748b; cursor: default; }
+        .rm-btn-instant:hover:not(:disabled) { background: #6d28d9; }
+        .rm-btn-instant:disabled { background: #2d1b69; color: #64748b; cursor: default; }
+        .rm-maxed-bar {
+            text-align: center;
+            padding: 12px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #fbbf24;
+            background: rgba(251,191,36,.06);
+            border-top: 1px solid rgba(251,191,36,.2);
+        }
 
         /* ── Buffs tab ── */
         .buffs-scroll {
@@ -810,25 +1014,6 @@ HTML;
                 <?= renderNodes($battleGrid, $allNodes, $researchLevels, $queueRow, $academyLevel) ?>
             </div>
         </div>
-
-        <!-- Detail panel for battle tab -->
-        <div class="detail-panel" id="detail-panel-battle" style="display:none">
-            <div class="dp-header">
-                <span class="dp-name" id="dp-name-battle">—</span>
-                <span class="dp-level" id="dp-level-battle">Lv. 0/0</span>
-                <button class="dp-close" onclick="closeDetail()">&#x2715;</button>
-            </div>
-            <div class="dp-body">
-                <div class="dp-effect" id="dp-effect-battle"></div>
-                <div id="dp-costs-battle" style="font-size:.72rem;color:#94a3b8"></div>
-                <div id="dp-time-battle" style="font-size:.72rem;color:#64748b"></div>
-                <div class="dp-lock" id="dp-lock-battle"></div>
-            </div>
-            <div class="dp-actions">
-                <button class="dp-btn-start" id="dp-btn-start-battle" disabled>Erforschen</button>
-                <button class="dp-btn-instant" id="dp-btn-instant-battle" disabled>Sofort (? &#x1F48E;)</button>
-            </div>
-        </div>
     </div>
 
     <!-- ── PRODUCTION TAB ── -->
@@ -840,24 +1025,6 @@ HTML;
                 <?= renderNodes($productionGrid, $allNodes, $researchLevels, $queueRow, $academyLevel) ?>
             </div>
         </div>
-
-        <div class="detail-panel" id="detail-panel-production" style="display:none">
-            <div class="dp-header">
-                <span class="dp-name" id="dp-name-production">—</span>
-                <span class="dp-level" id="dp-level-production">Lv. 0/0</span>
-                <button class="dp-close" onclick="closeDetail()">&#x2715;</button>
-            </div>
-            <div class="dp-body">
-                <div class="dp-effect" id="dp-effect-production"></div>
-                <div id="dp-costs-production" style="font-size:.72rem;color:#94a3b8"></div>
-                <div id="dp-time-production" style="font-size:.72rem;color:#64748b"></div>
-                <div class="dp-lock" id="dp-lock-production"></div>
-            </div>
-            <div class="dp-actions">
-                <button class="dp-btn-start" id="dp-btn-start-production" disabled>Erforschen</button>
-                <button class="dp-btn-instant" id="dp-btn-instant-production" disabled>Sofort (? &#x1F48E;)</button>
-            </div>
-        </div>
     </div>
 
     <!-- ── ADVANCED TAB ── -->
@@ -867,24 +1034,6 @@ HTML;
                  style="width:4090px;height:290px">
                 <svg class="tree-svg" id="svg-advanced" width="4090" height="290"></svg>
                 <?= renderNodes($advancedGrid, $allNodes, $researchLevels, $queueRow, $academyLevel) ?>
-            </div>
-        </div>
-
-        <div class="detail-panel" id="detail-panel-advanced" style="display:none">
-            <div class="dp-header">
-                <span class="dp-name" id="dp-name-advanced">—</span>
-                <span class="dp-level" id="dp-level-advanced">Lv. 0/0</span>
-                <button class="dp-close" onclick="closeDetail()">&#x2715;</button>
-            </div>
-            <div class="dp-body">
-                <div class="dp-effect" id="dp-effect-advanced"></div>
-                <div id="dp-costs-advanced" style="font-size:.72rem;color:#94a3b8"></div>
-                <div id="dp-time-advanced" style="font-size:.72rem;color:#64748b"></div>
-                <div class="dp-lock" id="dp-lock-advanced"></div>
-            </div>
-            <div class="dp-actions">
-                <button class="dp-btn-start" id="dp-btn-start-advanced" disabled>Erforschen</button>
-                <button class="dp-btn-instant" id="dp-btn-instant-advanced" disabled>Sofort (? &#x1F48E;)</button>
             </div>
         </div>
     </div>
@@ -929,6 +1078,46 @@ HTML;
     </div>
 
 </div><!-- #game -->
+
+<!-- Research modal -->
+<div class="rm-overlay" id="research-modal" style="display:none" onclick="rmOverlayClick(event)">
+    <div class="rm-card">
+        <div class="rm-header">
+            <span class="rm-title" id="rm-title">—</span>
+            <button class="rm-close" onclick="closeDetail()">&#x2715;</button>
+        </div>
+        <div class="rm-body" id="rm-body">
+            <!-- top: icon col + level/effect -->
+            <div class="rm-top">
+                <div class="rm-icon-col">
+                    <div class="rm-icon" id="rm-icon">&#x1F4CA;</div>
+                    <div class="rm-bar-wrap"><div class="rm-bar-fill" id="rm-bar-fill" style="width:0%"></div></div>
+                    <div class="rm-bar-text" id="rm-bar-text">0/0</div>
+                </div>
+                <div class="rm-right">
+                    <div class="rm-level-row">
+                        <span class="rm-lv-cur" id="rm-lv-cur">Lv.0</span>
+                        <span class="rm-lv-arr">&#x2192;</span>
+                        <span class="rm-lv-next" id="rm-lv-next">Lv.1</span>
+                    </div>
+                    <div class="rm-stats" id="rm-stats"></div>
+                    <div class="rm-time-row" id="rm-time-row" style="display:none">&#x23F1; <span id="rm-time-val"></span></div>
+                </div>
+            </div>
+            <!-- prerequisite section -->
+            <div class="rm-section-heading" id="rm-prereq-heading">Forschungsvoraussetzung</div>
+            <div class="rm-resources" id="rm-resources"></div>
+            <div class="rm-req-list" id="rm-research-reqs"></div>
+            <div class="rm-academy" id="rm-academy" style="display:none"></div>
+            <div class="rm-lock-msg" id="rm-lock-msg" style="display:none"></div>
+        </div>
+        <div class="rm-actions" id="rm-actions">
+            <button class="rm-btn-start" id="rm-btn-start" disabled>Erforschen</button>
+            <button class="rm-btn-instant" id="rm-btn-instant" disabled>Sofort (? &#x1F48E;)</button>
+        </div>
+        <div class="rm-maxed-bar" id="rm-maxed-bar" style="display:none">&#x2713; Maximal erforscht</div>
+    </div>
+</div>
 
 <!-- Toast -->
 <div class="toast" id="toast"></div>
@@ -1047,103 +1236,226 @@ function selectNode(code) {
 function closeDetail() {
     selectedCode = null;
     document.querySelectorAll('.node-card').forEach(el => el.classList.remove('selected'));
-    ['battle', 'production', 'advanced'].forEach(t => {
-        const dp = document.getElementById('detail-panel-' + t);
-        if (dp) dp.style.display = 'none';
-    });
+    document.getElementById('research-modal').style.display = 'none';
 }
 
-// ── Detail panel ──────────────────────────────────────────────────────────────
+function rmOverlayClick(e) {
+    if (e.target === e.currentTarget) closeDetail();
+}
+
+// ── Icon helper (mirrors PHP nodeIcon) ───────────────────────────────────────
+function nodeIconJS(node) {
+    if (node.type === 'unlock') return '&#x1F513;';
+    const stat = node.stat ?? '';
+    const cat  = node.category ?? '';
+    if (stat.includes('hp'))  return '&#x2764;&#xFE0F;';
+    if (stat.includes('atk')) return '&#x2694;&#xFE0F;';
+    if (stat.includes('def')) return '&#x1F6E1;&#xFE0F;';
+    if (stat.includes('spd')) return '&#x1F4A8;';
+    if (cat === 'production')     return '&#x2699;&#xFE0F;';
+    if (cat === 'counter')        return '&#x1F3AF;';
+    if (cat === 'castle_defense') return '&#x1F3F0;';
+    if (cat === 'rally')          return '&#x1F6A9;';
+    if (cat === 'composed')       return '&#x26A1;';
+    return '&#x1F4CA;';
+}
+
+// ── Modal detail panel ────────────────────────────────────────────────────────
 function renderDetailPanel(code) {
     const node = RES_DATA.nodes[code];
-    if (!node) return;
+    if (!node || activeTab === 'buffs') return;
 
     const curLv   = research[code] ?? 0;
     const maxLv   = node.max_level;
     const nextLv  = curLv + 1;
     const isMaxed = curLv >= maxLv;
-    const entry   = node.levels.find(l => l.level === nextLv) ?? null;
+    const entry   = isMaxed ? null : (node.levels.find(l => l.level === nextLv) ?? null);
+    const pct     = maxLv > 0 ? Math.round(curLv / maxLv * 100) : 0;
 
-    // Determine which tab panel is active
-    const t = activeTab;
-    if (t === 'buffs') return;
+    // Header
+    document.getElementById('rm-title').textContent = node.name;
+    document.getElementById('rm-icon').innerHTML    = nodeIconJS(node);
 
-    const dpEl     = document.getElementById('detail-panel-' + t);
-    const nameEl   = document.getElementById('dp-name-' + t);
-    const levelEl  = document.getElementById('dp-level-' + t);
-    const effectEl = document.getElementById('dp-effect-' + t);
-    const costsEl  = document.getElementById('dp-costs-' + t);
-    const timeEl   = document.getElementById('dp-time-' + t);
-    const lockEl   = document.getElementById('dp-lock-' + t);
-    const btnStart = document.getElementById('dp-btn-start-' + t);
-    const btnInst  = document.getElementById('dp-btn-instant-' + t);
+    // Progress bar + label
+    document.getElementById('rm-bar-fill').style.width = pct + '%';
+    document.getElementById('rm-bar-text').textContent  = curLv + '/' + maxLv;
 
-    nameEl.textContent  = node.name;
-    levelEl.textContent = `Lv. ${curLv} / ${maxLv}`;
+    // Level arrows
+    document.getElementById('rm-lv-cur').textContent  = 'Lv.' + curLv;
+    document.getElementById('rm-lv-next').textContent = isMaxed ? '&#x2713;' : 'Lv.' + nextLv;
+
+    const statsEl    = document.getElementById('rm-stats');
+    const timeRowEl  = document.getElementById('rm-time-row');
+    const timeValEl  = document.getElementById('rm-time-val');
+    const resEl      = document.getElementById('rm-resources');
+    const resReqsEl  = document.getElementById('rm-research-reqs');
+    const acadEl     = document.getElementById('rm-academy');
+    const lockMsgEl  = document.getElementById('rm-lock-msg');
+    const actionsEl  = document.getElementById('rm-actions');
+    const maxedEl    = document.getElementById('rm-maxed-bar');
+    const prereqHdg  = document.getElementById('rm-prereq-heading');
 
     if (isMaxed) {
-        effectEl.textContent = '✓ Maximal erforscht';
-        costsEl.textContent  = '';
-        timeEl.textContent   = '';
-        lockEl.textContent   = '';
-        btnStart.disabled    = true;
-        btnInst.disabled     = true;
+        statsEl.innerHTML       = '';
+        timeRowEl.style.display = 'none';
+        resEl.innerHTML         = '';
+        resReqsEl.innerHTML     = '';
+        acadEl.style.display    = 'none';
+        lockMsgEl.style.display = 'none';
+        prereqHdg.style.display = 'none';
+        actionsEl.style.display = 'none';
+        maxedEl.style.display   = '';
     } else {
-        // Effect text
+        actionsEl.style.display = '';
+        maxedEl.style.display   = 'none';
+
+        // Effect stat row
         if (entry) {
             const v = parseFloat(entry.ability_value);
             const flatStats = ['march_size', 'hospital_capacity', 'troops_storage',
                                'infantry_storage', 'ranged_storage', 'cavalry_storage'];
+            let effectText;
             if (node.type === 'unlock') {
-                effectEl.textContent = `Schaltet Einheit frei (Lv ${nextLv})`;
+                effectText = 'Schaltet Einheit frei';
             } else if (flatStats.includes(node.stat) || flatStats.includes(code)) {
-                effectEl.textContent = `+${Math.round(v).toLocaleString('de')} (Lv ${nextLv})`;
+                effectText = '+' + Math.round(v).toLocaleString('de');
             } else {
-                effectEl.textContent = `+${(v * 100).toFixed(1)}% (Lv ${nextLv})`;
+                effectText = '+' + (v * 100).toFixed(1) + '%';
             }
+            statsEl.innerHTML = `<div class="rm-stat-row"><span>${node.name}</span><span class="rm-stat-val">${effectText}</span></div>`;
+
+            // Research time
+            timeValEl.textContent = fmtSec(entry.time ?? 0);
+            timeRowEl.style.display = '';
         } else {
-            effectEl.textContent = '';
+            statsEl.innerHTML = '';
+            timeRowEl.style.display = 'none';
         }
 
-        // Costs
+        // Resource costs with have/need check
         if (entry) {
-            const r = entry.resources ?? {};
-            const fmt = n => Number(n).toLocaleString('de');
-            costsEl.innerHTML =
-                `&#x1F33E;&thinsp;${fmt(r.food ?? 0)} &nbsp;` +
-                `&#x1FAB5;&thinsp;${fmt(r.lumber ?? 0)} &nbsp;` +
-                `&#x1FAA8;&thinsp;${fmt(r.stone ?? 0)} &nbsp;` +
-                `&#x1FA99;&thinsp;${fmt(r.gold ?? 0)}`;
-            timeEl.textContent = '⏱ ' + fmtSec(entry.time ?? 0);
+            const r    = entry.resources ?? {};
+            const city = RES_DATA.city;
+            const fmt  = n => Number(n).toLocaleString('de');
+            const items = [
+                { icon: '&#x1F33E;', label: 'Nahrung', val: r.food   ?? 0, have: city.food   },
+                { icon: '&#x1FAB5;', label: 'Holz',    val: r.lumber ?? 0, have: city.lumber },
+                { icon: '&#x1FAA8;', label: 'Stein',   val: r.stone  ?? 0, have: city.stone  },
+                { icon: '&#x1FA99;', label: 'Gold',    val: r.gold   ?? 0, have: city.gold   },
+            ].filter(i => i.val > 0);
+
+            resEl.innerHTML = items.map(i => {
+                const ok = parseInt(i.have) >= i.val;
+                return `<div class="rm-res-row ${ok ? 'ok' : 'nok'}">
+                    <span>${i.icon}</span>
+                    <span>${i.label}</span>
+                    <span class="rm-res-amount">${fmt(i.val)}</span>
+                    <span class="rm-res-check">${ok ? '&#x2713;' : '&#x2717;'}</span>
+                </div>`;
+            }).join('');
         } else {
-            costsEl.textContent = '';
-            timeEl.textContent  = '';
+            resEl.innerHTML = '';
         }
 
-        // Lock reason
-        const lockReason = getLockReason(code, nextLv, node);
-        lockEl.textContent = lockReason;
+        // Research prerequisites
+        const researchReqs = (entry?.requirements ?? []).filter(r => r.type === 'research');
+        if (researchReqs.length > 0) {
+            resReqsEl.innerHTML = researchReqs.map(req => {
+                const needed   = req.level ?? 1;
+                const have     = research[req.code] ?? 0;
+                const ok       = have >= needed;
+                const reqNode  = RES_DATA.nodes[req.code];
+                const reqName  = reqNode?.name ?? req.code;
+                return `<div class="rm-req-row ${ok ? 'ok' : 'nok'}" onclick="jumpToNode('${req.code}')">
+                    <span class="rm-req-icon">&#x1F52C;</span>
+                    <span class="rm-req-name">${reqName}</span>
+                    <span class="rm-req-badge ${ok ? 'ok' : 'nok'}">Lv ${needed} (${ok ? '&#x2713;' : have + '/' + needed})</span>
+                    <span style="color:#64748b;font-size:.7rem;margin-left:auto">&#x2192;</span>
+                </div>`;
+            }).join('');
+        } else {
+            resReqsEl.innerHTML = '';
+        }
 
-        // Buttons
-        const inQueue  = queue !== null;
-        const canStart = !lockReason && !inQueue && entry !== null;
+        // Academy requirement
+        let reqAcadLevel = 0;
+        if (entry) {
+            for (const req of entry.requirements ?? []) {
+                if (req.type === 'academy') { reqAcadLevel = req.level; break; }
+            }
+        }
+        if (reqAcadLevel > 0) {
+            const ok = academyLevel >= reqAcadLevel;
+            acadEl.className = 'rm-academy ' + (ok ? 'ok' : 'nok');
+            acadEl.onclick   = () => { window.location.href = '/city/building/academy'; };
+            acadEl.innerHTML = `<span class="rm-acad-icon">&#x1F3DB;</span>
+                <span class="rm-acad-text">Akademie erforderlich</span>
+                <span class="rm-acad-badge ${ok ? 'ok' : 'nok'}">Lv ${reqAcadLevel}</span>
+                <span style="color:#64748b;font-size:.7rem;margin-left:auto">&#x2192;</span>`;
+            acadEl.style.display = '';
+        } else {
+            acadEl.style.display = 'none';
+        }
+
+        // Hide prereq heading if there's nothing to show
+        const hasPrereqs = researchReqs.length > 0 || reqAcadLevel > 0 || (entry?.resources && Object.values(entry.resources).some(v => v > 0));
+        prereqHdg.style.display = hasPrereqs ? '' : 'none';
+
+        // Lock message only for unmet non-visual prereqs (fallback)
+        lockMsgEl.style.display = 'none';
+
+        // Action buttons
+        const lockReason = getLockReason(code, nextLv, node);
+        const inQueue    = queue !== null;
+        const canStart   = !lockReason && !inQueue && entry !== null;
+        const btnStart = document.getElementById('rm-btn-start');
+        const btnInst  = document.getElementById('rm-btn-instant');
+
         btnStart.disabled = !canStart;
         btnStart.onclick  = canStart ? () => startResearch(code, nextLv) : null;
 
         if (inQueue && queue.code === code) {
-            const secsLeft = Math.max(0, Math.floor((new Date(queue.finishes_at.replace(' ', 'T') + 'Z') - Date.now()) / 1000));
-            const gemCost  = Math.max(1, Math.ceil(secsLeft / 60));
+            const secsLeft = Math.max(0, Math.floor(
+                (new Date(queue.finishes_at.replace(' ', 'T') + 'Z') - Date.now()) / 1000
+            ));
+            const gemCost = Math.max(1, Math.ceil(secsLeft / 60));
             btnInst.disabled    = false;
-            btnInst.textContent = `Sofort (${gemCost} 💎)`;
+            btnInst.innerHTML   = `Sofort (${gemCost} &#x1F48E;)`;
             btnInst.onclick     = () => instantFinish();
         } else {
-            btnInst.disabled    = true;
-            btnInst.textContent = 'Sofort (? 💎)';
-            btnInst.onclick     = null;
+            btnInst.disabled  = true;
+            btnInst.innerHTML = 'Sofort (? &#x1F48E;)';
+            btnInst.onclick   = null;
         }
     }
 
-    dpEl.style.display = 'flex';
+    document.getElementById('research-modal').style.display = 'flex';
+}
+
+// ── Jump to a research node ───────────────────────────────────────────────────
+function jumpToNode(code) {
+    const card = document.querySelector(`.node-card[data-code="${code}"]`);
+    if (!card) return;
+
+    const canvas = card.closest('.tree-canvas');
+    if (!canvas) return;
+
+    const tab = canvas.id.replace('canvas-', '');
+
+    if (tab !== activeTab) {
+        switchTab(tab); // calls closeDetail internally
+    } else {
+        closeDetail();
+    }
+
+    requestAnimationFrame(() => {
+        const scroll = canvas.closest('.tree-scroll');
+        if (scroll) {
+            scroll.scrollLeft = Math.max(0, card.offsetLeft - scroll.clientWidth  / 2 + card.offsetWidth  / 2);
+            scroll.scrollTop  = Math.max(0, card.offsetTop  - scroll.clientHeight / 2 + card.offsetHeight / 2);
+        }
+        selectNode(code);
+    });
 }
 
 function getLockReason(code, nextLv, node) {
@@ -1199,9 +1511,7 @@ async function startResearch(code, levelTo) {
         if (j.ok) {
             queue = j.data.queue ?? null;
             showToast('Forschung gestartet!', 'ok');
-            // Update banner
             updateBanner();
-            // Re-render detail panel
             if (selectedCode) renderDetailPanel(selectedCode);
         } else {
             showToast(j.message ?? j.error ?? 'Fehler', 'err');
@@ -1241,7 +1551,6 @@ async function pollState() {
         queue        = j.data.queue    ?? null;
         academyLevel = j.data.academy_level ?? academyLevel;
         updateBanner();
-        // Update node card levels in DOM
         refreshNodeCards();
         if (selectedCode) renderDetailPanel(selectedCode);
     } catch {}
@@ -1327,11 +1636,8 @@ function enableDragScroll(el) {
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-    // Draw initial SVG connections for battle tab
     drawConnections('canvas-battle', BATTLE_CONNECTIONS);
-    // Start ETA display
     updateQueueEta();
-    // Enable drag-to-scroll on all tree scroll containers
     document.querySelectorAll('.tree-scroll').forEach(enableDragScroll);
 });
 </script>

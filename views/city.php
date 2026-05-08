@@ -264,6 +264,22 @@ foreach ($buildings as $code => $building) {
             border-right: none;
             border-left: 7px solid #0f172a;
         }
+
+        /* ── Building modal overlay ── */
+        #bldg-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.72);
+            z-index: 4000;
+            align-items: flex-start;
+            justify-content: center;
+            overflow-y: auto;
+            padding: 20px 8px;
+        }
+        #bldg-wrap {
+            width: 100%;
+            max-width: 960px;
+        }
     </style>
 </head>
 <body>
@@ -438,9 +454,15 @@ function openPopup(building, clientX, clientY) {
             <div class="bp-btn-label">${label}</div>
          </a>`;
 
+    const btnModal = (code, icon, label) =>
+        `<button class="bp-btn" onclick="openBuildingModal('${code}')" style="background:none;border:none;cursor:pointer">
+            <div class="bp-btn-icon">${icon}</div>
+            <div class="bp-btn-label">${label}</div>
+         </button>`;
+
     bpActions.innerHTML =
-        btn(`/city/building/${building.code}`, '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#93c5fd" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>', 'Info') +
-        btn(`/city/building/${building.code}`, '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>', 'Upgrade') +
+        btnModal(building.code, '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#93c5fd" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>', 'Info') +
+        btnModal(building.code, '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>', 'Upgrade') +
         (func ? btn(func.url, func.icon, func.label) : '');
 
     // Position popup to the right of the click point (flip left if near edge)
@@ -654,7 +676,58 @@ render();
 
 // Refresh every 30s to update resource counts in topbar
 setTimeout(() => window.location.reload(), 30_000);
+
+// ---------------------------------------------------------------------------
+// Building modal overlay
+// ---------------------------------------------------------------------------
+async function openBuildingModal(code) {
+    closePopup();
+    const overlay = document.getElementById('bldg-overlay');
+    const wrap    = document.getElementById('bldg-wrap');
+    wrap.innerHTML = '<p style="color:#64748b;text-align:center;padding:60px 0;font-family:system-ui">Laden…</p>';
+    overlay.style.display = 'flex';
+
+    const r    = await fetch(`/city/building/${code}?modal=1`);
+    const html = await r.text();
+
+    const parser = new DOMParser();
+    const doc    = parser.parseFromString(html, 'text/html');
+
+    wrap.innerHTML = '';
+
+    // DOMParser moves <style> to <head> — copy it back first
+    doc.head.querySelectorAll('style').forEach(s => {
+        const ns = document.createElement('style');
+        ns.textContent = s.textContent;
+        wrap.appendChild(ns);
+    });
+
+    // Body content (skip scripts — they need re-creation to execute)
+    doc.body.childNodes.forEach(node => {
+        if (node.tagName !== 'SCRIPT') {
+            wrap.appendChild(document.importNode(node, true));
+        }
+    });
+
+    // Re-create scripts so they actually execute
+    doc.querySelectorAll('script').forEach(s => {
+        const ns = document.createElement('script');
+        ns.textContent = s.textContent;
+        wrap.appendChild(ns);
+    });
+}
+
+function closeBldgModal(e) {
+    if (e && e.target !== e.currentTarget) return;
+    document.getElementById('bldg-overlay').style.display = 'none';
+    document.getElementById('bldg-wrap').innerHTML = '';
+}
+window.closeBldgModal   = closeBldgModal;
+window.openBuildingModal = openBuildingModal;
 </script>
 
+<div id="bldg-overlay" style="display:none" onclick="closeBldgModal(event)">
+    <div id="bldg-wrap"></div>
+</div>
 </body>
 </html>

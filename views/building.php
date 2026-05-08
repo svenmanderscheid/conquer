@@ -99,583 +99,1053 @@ $tileDefs = [
     'hospital'         => 45,
 ];
 $tile = $tileDefs[$buildingCode] ?? 0;
+
+// ---------------------------------------------------------------------------
+// Building descriptions
+// ---------------------------------------------------------------------------
+$bldgDesc = [
+    'castle'           => 'Das Herz deiner Stadt. Das Castle-Level bestimmt das maximale Level aller anderen Gebäude.',
+    'academy'          => 'Ort des Wissens. Ermöglicht Forschungen zur Stärkung von Truppen und Produktion.',
+    'barrack'          => 'Hier werden deine Truppen ausgebildet. Höheres Level entsperrt stärkere Einheiten.',
+    'farm'             => 'Produziert stetig Nahrung für Stadt und Truppen.',
+    'lumber_camp'      => 'Schlägt Holz für Bauten und Forschungen.',
+    'quarry'           => 'Fördert Stein für alle Upgrades.',
+    'gold_mine'        => 'Baut Gold ab — die wichtigste Währung im Spiel.',
+    'storage'          => 'Erhöht die maximale Lagerkapazität deiner Ressourcen.',
+    'treasure_house'   => 'Schützt Ressourcen vor feindlichen Überfällen.',
+    'wall'             => 'Erste Verteidigungslinie deiner Stadt.',
+    'trading_post'     => 'Ermöglicht Handel und Ressourcentausch.',
+    'hall_of_alliance' => 'Zugang zu Allianzen und gemeinsamen Aktionen.',
+    'hospital'         => 'Heilt verwundete Truppen nach Kämpfen.',
+];
+$desc = $bldgDesc[$buildingCode] ?? 'Gebäude deiner Stadt.';
+
+// Key bonus per building at a given level [label, value]
+function bldgBonuses(string $code, int $lv): array {
+    if ($lv <= 0) return [];
+    return match($code) {
+        'academy'          => [['Forschungsgeschwindigkeit', '+' . $lv . '.0%'],   ['Power', number_format($lv * 740)]],
+        'castle'           => [['Max. Gebäudelevel',         (string)$lv],          ['Power', number_format($lv * 2000)]],
+        'farm'             => [['Nahrungsproduktion',         number_format($lv * 500) . '/h'], ['Power', number_format($lv * 300)]],
+        'lumber_camp'      => [['Holzproduktion',             number_format($lv * 500) . '/h'], ['Power', number_format($lv * 300)]],
+        'quarry'           => [['Steinproduktion',            number_format($lv * 500) . '/h'], ['Power', number_format($lv * 300)]],
+        'gold_mine'        => [['Goldproduktion',             number_format($lv * 250) . '/h'], ['Power', number_format($lv * 400)]],
+        'storage'          => [['Lagerkapazität',             '+' . number_format($lv * 50000)],['Power', number_format($lv * 200)]],
+        'barrack'          => [['Trainingsslots',             (string)$lv],          ['Power', number_format($lv * 800)]],
+        'wall'             => [['Stadtverteidigung',          '+' . ($lv * 200)],    ['Power', number_format($lv * 600)]],
+        'hospital'         => [['Heilungskapazität',          number_format($lv * 1000)], ['Power', number_format($lv * 350)]],
+        'treasure_house'   => [['Ressourcenschutz',           number_format($lv * 10000)],['Power', number_format($lv * 250)]],
+        'trading_post'     => [['Handelslimit',               number_format($lv * 5000) . '/h'], ['Power', number_format($lv * 300)]],
+        'hall_of_alliance' => [['Allianzkapazität',           (string)($lv * 5)],    ['Power', number_format($lv * 500)]],
+        default            => [['Power', number_format($lv * 500)]],
+    };
+}
+
+// K-format helper
+function fmtK(int|float $n): string {
+    if ($n >= 1000) return number_format($n / 1000, 1) . 'k';
+    return (string)(int)$n;
+}
+
+$currentBonuses = bldgBonuses($buildingCode, $currentLevel);
+$nextBonuses    = bldgBonuses($buildingCode, $nextLevel);
+
+// Resource rows for the upgrade requirements panel
+$resRows = [
+    ['emoji' => '🌾', 'name' => 'Nahrung',  'have' => (int)$city['food'],   'need' => (int)$cost['food']],
+    ['emoji' => '🪵', 'name' => 'Holz',     'have' => (int)$city['lumber'], 'need' => (int)$cost['lumber']],
+    ['emoji' => '🪨', 'name' => 'Stein',    'have' => (int)$city['stone'],  'need' => (int)$cost['stone']],
+    ['emoji' => '💰', 'name' => 'Gold',     'have' => (int)$city['gold'],   'need' => (int)$cost['gold']],
+];
+
+// Seconds remaining in queue
+$secsLeft = 0;
+if ($queueEntry !== null) {
+    $secsLeft = max(0, strtotime($queueEntry['finishes_at']) - time());
+}
+
+$isModal = isset($_GET['modal']);
 ?>
+<?php if (!$isModal): ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conquer — <?= htmlspecialchars($name) ?></title>
-    <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<?php endif ?>
+<style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<?php if (!$isModal): ?>
+    html, body {
+        min-height: 100vh;
+        background: #060c18;
+        color: #e2e8f0;
+        font-family: system-ui, -apple-system, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
 
-        :root {
-            --bg:      #0f172a;
-            --surface: #1e293b;
-            --border:  #334155;
-            --text:    #e2e8f0;
-            --muted:   #94a3b8;
-            --accent:  #0ea5e9;
-            --gold:    #f59e0b;
-            --green:   #22c55e;
-            --red:     #ef4444;
-        }
+    /* ── Page wrapper ── */
+    .page-wrap {
+        width: 100%;
+        margin-top: 84px; /* nav 72px + 12px gap */
+        margin-bottom: 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0 8px;
+    }
+<?php endif ?>
 
-        html, body {
-            min-height: 100%;
-            background: #000;
-            color: var(--text);
-            font-family: system-ui, -apple-system, sans-serif;
-            display: flex;
-            justify-content: center;
-        }
-
-        #game {
+        /* ── Modal card ── */
+        .modal-card {
             width: 100%;
-            max-width: 1280px;
-            min-height: calc(100vh - 72px);
-            margin-top: 72px;
+            max-width: min(960px, calc(100vw - 16px));
+            background: #111827;
+            border: 1px solid #2a3a55;
+            border-radius: 10px;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            background: var(--bg);
         }
 
-        /* ── Top bar ── */
-        .topbar {
-            flex: 0 0 48px;
-            height: 48px;
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            padding: 0 1rem;
+        /* ── Two-panel body ── */
+        .modal-body {
             display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .topbar-title {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--accent);
-            white-space: nowrap;
-            text-decoration: none;
-        }
-
-        .resources {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
             flex: 1;
+            min-height: 0;
         }
 
-        .res {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 5px;
-            padding: 0.2rem 0.5rem;
-            font-size: 0.78rem;
-        }
-
-        .topbar-actions {
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-        }
-
-        .btn {
-            padding: 0.25rem 0.65rem;
-            border-radius: 5px;
-            font-size: 0.78rem;
-            cursor: pointer;
-            border: 1px solid var(--border);
-            background: var(--bg);
-            color: var(--muted);
-            text-decoration: none;
-            display: inline-block;
-        }
-        .btn:hover { border-color: var(--accent); color: var(--accent); }
-
-        /* ── Main layout ── */
-        .main {
-            flex: 1;
-            padding-top: 2rem;
-            padding-bottom: 2rem;
-            display: flex;
-            justify-content: center;
-        }
-
-        .card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 2rem;
-            width: 100%;
-            max-width: 480px;
-            margin: 0 1rem;
-        }
-
-        /* ── Building sprite ── */
-        .sprite-wrap {
+        /* ────────────────────────────────────────
+           LEFT PANEL
+        ──────────────────────────────────────── */
+        .left-panel {
+            width: 280px;
+            flex-shrink: 0;
+            background: #0c1220;
+            border-right: 1px solid #2a3a55;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1.75rem;
+        }
+
+        /* Red name banner */
+        .bldg-banner {
+            background: linear-gradient(180deg, #b91c1c 0%, #7f1d1d 100%);
+            border-bottom: 2px solid #d4a017;
+            padding: 10px 14px;
+            text-align: center;
+            font-size: 0.78rem;
+            font-weight: 900;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: #fff;
+            line-height: 1.3;
+        }
+
+        /* Large canvas area */
+        .bldg-canvas-wrap {
+            display: flex;
+            justify-content: center;
+            padding: 20px 0 10px;
         }
 
         #bldg-canvas {
             image-rendering: pixelated;
-            border-radius: 8px;
-            background: rgba(255,255,255,0.03);
+            width: 160px;
+            height: 160px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 4px;
         }
 
-        .bldg-name {
-            font-size: 1.4rem;
-            font-weight: 700;
-            letter-spacing: 0.03em;
-        }
-
-        .bldg-level {
-            font-size: 0.9rem;
-            color: var(--muted);
-        }
-
-        /* ── Section headings ── */
-        .section-title {
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--muted);
-            margin-bottom: 0.6rem;
-        }
-
-        /* ── Cost grid ── */
-        .costs {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .cost-item {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 0.45rem 0.65rem;
+        /* Level badge */
+        .level-badge-wrap {
             display: flex;
+            justify-content: center;
+            margin: 8px 0 6px;
+        }
+
+        .level-badge {
+            display: inline-flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
+            padding: 5px 18px;
+            clip-path: polygon(12px 0%, calc(100% - 12px) 0%, 100% 50%, calc(100% - 12px) 100%, 12px 100%, 0% 50%);
+            color: #fbbf24;
+            background: #0c1220;
+            border: 2px solid #d4a017;
             font-size: 0.82rem;
-        }
-
-        .cost-item.lacking {
-            border-color: var(--red);
-            background: rgba(239,68,68,0.08);
-        }
-
-        .cost-label { color: var(--muted); }
-        .cost-value { font-weight: 600; font-variant-numeric: tabular-nums; }
-        .cost-item.lacking .cost-value { color: var(--red); }
-
-        /* ── Build time ── */
-        .build-time {
-            text-align: center;
-            font-size: 0.85rem;
-            color: var(--muted);
-            margin-bottom: 1.5rem;
-        }
-
-        .build-time span {
-            color: var(--accent);
-            font-weight: 600;
-        }
-
-        /* ── Requirements ── */
-        .reqs {
-            background: rgba(239,68,68,0.07);
-            border: 1px solid rgba(239,68,68,0.3);
-            border-radius: 8px;
-            padding: 0.8rem 1rem;
-            margin-bottom: 1.25rem;
-            font-size: 0.82rem;
-        }
-
-        .reqs p { margin-bottom: 0.3rem; color: var(--muted); }
-        .reqs ul { list-style: none; padding: 0; }
-        .reqs li { color: var(--red); padding: 0.15rem 0; }
-        .reqs li::before { content: '✗  '; }
-
-        /* ── Upgrade button ── */
-        .btn-upgrade {
-            width: 100%;
-            padding: 0.75rem;
-            border-radius: 8px;
-            font-size: 1rem;
             font-weight: 700;
-            cursor: pointer;
-            border: none;
-            background: var(--accent);
-            color: #fff;
-            transition: opacity .15s;
-        }
-
-        .btn-upgrade:hover:not(:disabled) { opacity: 0.85; }
-        .btn-upgrade:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
-
-        /* ── Queue banner ── */
-        .queue-banner {
-            background: rgba(245,158,11,0.1);
-            border: 1px solid var(--gold);
-            border-radius: 8px;
-            padding: 0.8rem 1rem;
-            text-align: center;
-            font-size: 0.88rem;
-            color: var(--gold);
-        }
-
-        .queue-banner strong { display: block; font-size: 1rem; margin-bottom: 0.2rem; }
-        #countdown { font-weight: 600; }
-
-        /* ── Toast ── */
-        #toast {
-            position: fixed;
-            bottom: 1.5rem;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 0.6rem 1.2rem;
-            font-size: 0.85rem;
-            display: none;
-            z-index: 50;
+            letter-spacing: .05em;
             white-space: nowrap;
         }
-        #toast.ok  { border-color: var(--green); color: var(--green); }
-        #toast.err { border-color: var(--red);   color: var(--red);   }
 
-        /* ── Troop training section ── */
-        .troop-section {
-            margin-top: 2rem;
+        /* Description */
+        .bldg-desc {
+            font-size: 0.74rem;
+            color: #64748b;
+            padding: 6px 14px 10px;
+            line-height: 1.5;
+            text-align: center;
+        }
+
+        /* Divider */
+        .left-divider {
+            border: none;
+            border-top: 1px solid #1e2d42;
+            margin: 0 10px;
+        }
+
+        /* Current bonuses */
+        .bonus-section {
+            padding: 10px 14px 8px;
+            flex: 1;
+        }
+
+        .bonus-section-title {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+
+        .bonus-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 3px 0;
+            font-size: 0.76rem;
+        }
+
+        .bonus-label { color: #94a3b8; }
+        .bonus-val   { color: #22c55e; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+        .no-bonus {
+            font-size: 0.73rem;
+            color: #475569;
+            font-style: italic;
+        }
+
+        /* Back button at bottom of left panel */
+        .left-back {
+            padding: 10px 14px;
+            border-top: 1px solid #1e2d42;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 0.78rem;
+            transition: color .15s;
+        }
+
+        .btn-back:hover { color: #94a3b8; }
+
+        /* ────────────────────────────────────────
+           RIGHT PANEL
+        ──────────────────────────────────────── */
+        .right-panel {
+            flex: 1;
+            min-width: 0;
+            background: #111827;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Tab bar */
+        .tab-bar {
+            height: 40px;
+            background: #0c1220;
+            border-bottom: 1px solid #2a3a55;
+            display: flex;
+            align-items: stretch;
+        }
+
+        .tab-item {
+            display: inline-flex;
+            align-items: center;
+            padding: 0 18px;
+            font-size: 0.73rem;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: #fbbf24;
+            border-bottom: 2px solid #fbbf24;
+            white-space: nowrap;
+        }
+
+        .tab-spacer { flex: 1; }
+
+        .tab-close {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 1.1rem;
+            border-left: 1px solid #2a3a55;
+            transition: color .15s, background .15s;
+        }
+
+        .tab-close:hover { color: #ef4444; background: rgba(239,68,68,0.08); }
+
+        /* Main content area */
+        .right-content {
+            flex: 1;
+            background: #0f172a;
+            display: flex;
+            min-height: 0;
+        }
+
+        /* ── Left sub-column (info) ── */
+        .sub-left {
+            width: 220px;
+            flex-shrink: 0;
+            padding: 18px 16px;
+            border-right: 1px solid #1e2d42;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .icon-canvas-wrap {
+            display: flex;
+            justify-content: center;
+        }
+
+        #icon-canvas {
+            image-rendering: pixelated;
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 4px;
+            border: 1px solid #2a3a55;
+        }
+
+        .sub-bldg-name {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #e2e8f0;
+            text-align: center;
+        }
+
+        .level-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #94a3b8;
+        }
+
+        .level-arrow .arrow {
+            color: #fbbf24;
+            font-size: 1rem;
+        }
+
+        .level-num { color: #e2e8f0; }
+
+        .new-bonuses-title {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        /* In-queue state sub-left */
+        .queue-label {
+            font-size: 0.78rem;
+            color: #fbbf24;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .queue-cd-wrap {
+            text-align: center;
+        }
+
+        #countdown {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #fbbf24;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ── Right sub-column (requirements) ── */
+        .sub-right {
+            flex: 1;
+            min-width: 0;
+            padding: 18px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .reqs-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .reqs-title::before {
+            content: '≡';
+            font-size: 1rem;
+            color: #475569;
+        }
+
+        /* Resource rows */
+        .res-req-row {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 6px 10px;
+            border-radius: 5px;
+            border: 1px solid #2a3a55;
+            font-size: 0.8rem;
+            background: #111827;
+        }
+
+        .res-req-row.ok  { border-color: #166534; background: rgba(34,197,94,0.06); }
+        .res-req-row.bad { border-color: #7f1d1d; background: rgba(239,68,68,0.06); }
+
+        .res-check { font-size: 0.85rem; width: 16px; text-align: center; flex-shrink: 0; }
+        .res-emoji { font-size: 1rem; flex-shrink: 0; }
+        .res-name  { color: #94a3b8; flex: 1; }
+
+        .res-amounts {
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+            font-size: 0.78rem;
+        }
+
+        .res-req-row.ok  .res-amounts { color: #22c55e; }
+        .res-req-row.bad .res-amounts { color: #ef4444; }
+
+        /* Castle prereq cards */
+        .prereq-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .prereq-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 6px;
+            border-radius: 5px;
+            border: 1px solid #2a3a55;
+            background: #111827;
+            text-decoration: none;
+            transition: border-color .15s, background .15s;
+            cursor: pointer;
+        }
+
+        .prereq-card:hover { border-color: #3d5278; background: #162032; }
+        .prereq-card.met   { border-color: #166534; }
+        .prereq-card.unmet { border-color: #7f1d1d; }
+
+        .prereq-canvas-wrap canvas {
+            image-rendering: pixelated;
+            width: 36px;
+            height: 36px;
+            display: block;
+        }
+
+        .prereq-card-name {
+            font-size: 0.65rem;
+            color: #94a3b8;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .prereq-lv-badge {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 1px 6px;
+            border-radius: 3px;
+        }
+
+        .prereq-lv-badge.met   { background: #166534; color: #86efac; }
+        .prereq-lv-badge.unmet { background: #7f1d1d; color: #fca5a5; }
+
+        /* ────────────────────────────────────────
+           BOTTOM ACTION BAR
+        ──────────────────────────────────────── */
+        .action-bar {
+            height: 68px;
+            border-top: 1px solid #2a3a55;
+            display: flex;
+            background: #0c1220;
+            overflow: hidden;
+        }
+
+        .action-btn {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            border: none;
+            cursor: pointer;
+            padding: 0 12px;
+            transition: opacity .15s, filter .15s;
+            font-family: inherit;
+        }
+
+        .action-btn:hover:not(:disabled) { filter: brightness(1.12); }
+        .action-btn:disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(0.5); }
+
+        .action-btn + .action-btn {
+            border-left: 1px solid #2a3a55;
+        }
+
+        .action-btn-top {
+            font-size: 0.72rem;
+            color: rgba(255,255,255,0.75);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        .action-btn-label {
+            font-size: 0.9rem;
+            font-weight: 900;
+            letter-spacing: .06em;
+            color: #fff;
+            white-space: nowrap;
+        }
+
+        /* Instant button — orange */
+        .btn-instant {
+            background: linear-gradient(180deg, #f97316 0%, #c2410c 100%);
+        }
+
+        /* Upgrade button — blue */
+        .btn-upgrade-action {
+            background: linear-gradient(180deg, #2563eb 0%, #1e3a8a 100%);
+        }
+
+        /* ────────────────────────────────────────
+           BARRACK SECTION (below modal)
+        ──────────────────────────────────────── */
+        .barrack-section {
+            width: 100%;
+            max-width: min(960px, calc(100vw - 16px));
+            margin-top: 16px;
+            background: #111827;
+            border: 1px solid #2a3a55;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .barrack-section-header {
+            background: #0c1220;
+            border-bottom: 1px solid #2a3a55;
+            padding: 10px 16px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            color: #64748b;
+        }
+
+        .barrack-inner {
+            padding: 12px 16px 16px;
         }
 
         .troop-row {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 0.9rem 1rem;
-            margin-bottom: 0.6rem;
+            background: #0f172a;
+            border: 1px solid #2a3a55;
+            border-radius: 7px;
+            padding: 12px 14px;
+            margin-bottom: 8px;
         }
 
-        .troop-row.locked {
-            opacity: 0.5;
-        }
+        .troop-row.locked { opacity: 0.45; }
 
         .troop-header {
             display: flex;
             align-items: center;
-            gap: 0.6rem;
-            margin-bottom: 0.6rem;
+            gap: 8px;
+            margin-bottom: 8px;
         }
 
         .troop-badge {
-            font-size: 0.65rem;
+            font-size: 0.62rem;
             font-weight: 700;
-            padding: 0.1rem 0.4rem;
-            border-radius: 4px;
-            background: var(--accent);
+            padding: 2px 5px;
+            border-radius: 3px;
+            background: #0ea5e9;
             color: #fff;
         }
 
         .troop-badge.cav { background: #8b5cf6; }
         .troop-badge.rgd { background: #22c55e; }
 
-        .troop-name {
-            font-weight: 600;
-            font-size: 0.92rem;
-            flex: 1;
-        }
-
-        .troop-count {
-            font-size: 0.82rem;
-            color: var(--muted);
-        }
+        .troop-name  { font-weight: 600; font-size: 0.9rem; flex: 1; }
+        .troop-count { font-size: 0.78rem; color: #64748b; }
 
         .troop-stats {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 0.3rem;
-            font-size: 0.72rem;
-            color: var(--muted);
-            margin-bottom: 0.75rem;
+            gap: 4px;
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-bottom: 8px;
         }
 
-        .troop-stat span { color: var(--text); font-weight: 600; }
+        .troop-stats span { color: #e2e8f0; font-weight: 600; }
 
         .troop-cost {
             display: flex;
-            gap: 0.5rem;
-            font-size: 0.72rem;
-            color: var(--muted);
-            margin-bottom: 0.75rem;
+            gap: 8px;
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-bottom: 10px;
             flex-wrap: wrap;
         }
 
-        .troop-cost span { color: var(--text); }
+        .troop-cost span { color: #e2e8f0; }
 
         .train-row {
             display: flex;
-            gap: 0.5rem;
+            gap: 6px;
             align-items: center;
         }
 
         .train-input {
-            width: 80px;
-            padding: 0.3rem 0.5rem;
+            width: 76px;
+            padding: 4px 8px;
             border-radius: 5px;
-            border: 1px solid var(--border);
-            background: var(--surface);
-            color: var(--text);
-            font-size: 0.85rem;
+            border: 1px solid #2a3a55;
+            background: #1e293b;
+            color: #e2e8f0;
+            font-size: 0.83rem;
         }
 
         .btn-train {
             flex: 1;
-            padding: 0.35rem 0.8rem;
+            padding: 5px 12px;
             border-radius: 5px;
-            font-size: 0.82rem;
-            font-weight: 600;
+            font-size: 0.8rem;
+            font-weight: 700;
             cursor: pointer;
             border: none;
-            background: var(--accent);
+            background: linear-gradient(180deg, #0ea5e9, #0369a1);
             color: #fff;
+            transition: opacity .15s;
         }
 
         .btn-train:hover:not(:disabled) { opacity: 0.85; }
-        .btn-train:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+        .btn-train:disabled { background: #1e293b; color: #475569; cursor: not-allowed; }
 
         .lock-msg {
-            font-size: 0.75rem;
-            color: var(--muted);
+            font-size: 0.73rem;
+            color: #475569;
             font-style: italic;
         }
 
-        .troop-queue-list {
-            margin-top: 1.2rem;
+        .troop-queue-list { margin-top: 14px; }
+
+        .troop-queue-title {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            color: #64748b;
+            margin-bottom: 6px;
         }
 
         .queue-item {
-            background: rgba(245,158,11,0.08);
-            border: 1px solid var(--gold);
-            border-radius: 6px;
-            padding: 0.6rem 0.8rem;
-            margin-bottom: 0.5rem;
-            font-size: 0.82rem;
+            background: rgba(251,191,36,0.06);
+            border: 1px solid #d4a017;
+            border-radius: 5px;
+            padding: 7px 10px;
+            margin-bottom: 5px;
+            font-size: 0.8rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .queue-item-cd { color: var(--gold); font-weight: 600; }
+        .queue-item-cd { color: #fbbf24; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+        /* ────────────────────────────────────────
+           TOAST
+        ──────────────────────────────────────── */
+        #bm-toast {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 7px 16px;
+            font-size: 0.85rem;
+            display: none;
+            z-index: 9000;
+            white-space: nowrap;
+        }
+
+        #bm-toast.ok  { border-color: #22c55e; color: #22c55e; }
+        #bm-toast.err { border-color: #ef4444; color: #ef4444; }
+
+        /* ────────────────────────────────────────
+           RESPONSIVE — stack panels on narrow
+        ──────────────────────────────────────── */
+        @media (max-width: 600px) {
+            .modal-body { flex-direction: column; }
+
+            .left-panel {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #2a3a55;
+            }
+
+            .bldg-canvas-wrap { padding: 14px 0 8px; }
+
+            .right-content { flex-direction: column; }
+
+            .sub-left {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #1e2d42;
+            }
+
+            .action-btn-label { font-size: 0.76rem; }
+        }
     </style>
+<?php if (!$isModal): ?>
 </head>
 <body>
 <?php require __DIR__ . '/partials/nav.php'; ?>
-<div id="game">
+<div class="page-wrap">
+<?php endif ?>
+    <div class="modal-card">
 
-<header class="topbar">
-    <a href="/city" class="topbar-title">⚔ <?= htmlspecialchars($city['name']) ?></a>
+        <!-- ── Modal body: two panels ── -->
+        <div class="modal-body">
 
-    <div class="resources">
-        <div class="res">🌾 <?= $fmt($city['food']) ?></div>
-        <div class="res">🪵 <?= $fmt($city['lumber']) ?></div>
-        <div class="res">🪨 <?= $fmt($city['stone']) ?></div>
-        <div class="res">💰 <?= $fmt($city['gold']) ?></div>
-    </div>
+            <!-- ════════════════════════════════
+                 LEFT PANEL
+            ════════════════════════════════ -->
+            <div class="left-panel">
 
-    <div class="topbar-actions">
-        <a href="/map" class="btn">🗺 Map</a>
-        <span style="font-size:.78rem;color:var(--muted)"><?= htmlspecialchars($session['username']) ?></span>
-        <form method="post" action="/auth/logout" style="display:inline">
-            <button type="submit" class="btn">Logout</button>
-        </form>
-    </div>
-</header>
+                <!-- Red name banner -->
+                <div class="bldg-banner"><?= htmlspecialchars($name) ?></div>
 
-<div class="main">
-    <div class="card">
+                <!-- Large canvas -->
+                <div class="bldg-canvas-wrap">
+                    <canvas id="bldg-canvas" width="160" height="160"></canvas>
+                </div>
 
-        <div style="margin-bottom:1.25rem">
-            <a href="/city" class="btn">← Zurück zur Stadt</a>
-        </div>
+                <!-- Level badge -->
+                <div class="level-badge-wrap">
+                    <div class="level-badge">◆ Lv.<?= $currentLevel ?> ◆</div>
+                </div>
 
-        <!-- Building sprite + name -->
-        <div class="sprite-wrap">
-            <canvas id="bldg-canvas" width="192" height="192"></canvas>
-            <div class="bldg-name"><?= htmlspecialchars($name) ?></div>
-            <div class="bldg-level">Level <?= $currentLevel ?><?= $queueEntry ? ' → ' . (int)$queueEntry['level_to'] . ' (im Bau)' : '' ?></div>
-        </div>
+                <!-- Description -->
+                <p class="bldg-desc"><?= htmlspecialchars($desc) ?></p>
 
-        <?php if ($queueEntry !== null): ?>
-        <!-- In der Queue -->
-        <div class="queue-banner">
-            <strong>Upgrade läuft...</strong>
-            Level <?= (int)$queueEntry['level_to'] ?> fertig in
-            <span id="countdown" data-finish="<?= strtotime($queueEntry['finishes_at']) ?>">—</span>
-        </div>
+                <hr class="left-divider">
 
-        <button
-            id="btn-instant"
-            class="btn-upgrade"
-            style="margin-top:0.75rem;background:#8b5cf6"
-            data-queue-id="<?= (int)$queueEntry['id'] ?>"
-            data-gem-cost="<?= $instantGemCost ?>"
-            <?= $playerGems < $instantGemCost ? 'disabled' : '' ?>
-        >
-            <?php if ($playerGems < $instantGemCost): ?>
-                💎 <?= number_format($instantGemCost) ?> Gems fehlen (du: <?= number_format($playerGems) ?>)
-            <?php else: ?>
-                💎 Sofort fertig (<?= number_format($instantGemCost) ?> Gems)
-            <?php endif ?>
-        </button>
+                <!-- Current bonuses -->
+                <div class="bonus-section">
+                    <div class="bonus-section-title">Aktuelle Boni</div>
+                    <?php if ($currentLevel > 0 && !empty($currentBonuses)): ?>
+                        <?php foreach ($currentBonuses as [$label, $val]): ?>
+                        <div class="bonus-row">
+                            <span class="bonus-label"><?= htmlspecialchars($label) ?></span>
+                            <span class="bonus-val"><?= htmlspecialchars($val) ?></span>
+                        </div>
+                        <?php endforeach ?>
+                    <?php else: ?>
+                        <div class="no-bonus">Kein aktiver Bonus (Lv.0)</div>
+                    <?php endif ?>
+                </div>
 
-        <?php else: ?>
-        <!-- Upgrade-Infos -->
-        <div class="section-title">Upgrade auf Level <?= $nextLevel ?></div>
+                <!-- Back link -->
+                <div class="left-back">
+                    <?php if ($isModal): ?>
+                    <button class="btn-back" onclick="window.closeBldgModal?.()" style="background:none;border:none;cursor:pointer;color:#e2e8f0">← Zurück</button>
+                    <?php else: ?>
+                    <a href="/city" class="btn-back">← Zurück</a>
+                    <?php endif ?>
+                </div>
 
-        <div class="costs">
-            <div class="cost-item<?= $city['food']   < $cost['food']   ? ' lacking' : '' ?>">
-                <span class="cost-label">🌾 Nahrung</span>
-                <span class="cost-value"><?= $fmt($cost['food']) ?></span>
-            </div>
-            <div class="cost-item<?= $city['lumber'] < $cost['lumber'] ? ' lacking' : '' ?>">
-                <span class="cost-label">🪵 Holz</span>
-                <span class="cost-value"><?= $fmt($cost['lumber']) ?></span>
-            </div>
-            <div class="cost-item<?= $city['stone']  < $cost['stone']  ? ' lacking' : '' ?>">
-                <span class="cost-label">🪨 Stein</span>
-                <span class="cost-value"><?= $fmt($cost['stone']) ?></span>
-            </div>
-            <div class="cost-item<?= $city['gold']   < $cost['gold']   ? ' lacking' : '' ?>">
-                <span class="cost-label">💰 Gold</span>
-                <span class="cost-value"><?= $fmt($cost['gold']) ?></span>
-            </div>
-        </div>
+            </div><!-- /left-panel -->
 
-        <div class="build-time">Bauzeit: <span><?= fmtTime($buildSec) ?></span></div>
+            <!-- ════════════════════════════════
+                 RIGHT PANEL
+            ════════════════════════════════ -->
+            <div class="right-panel">
 
-        <?php if (!$reqsMet): ?>
-        <div class="reqs">
-            <p>Voraussetzungen nicht erfüllt:</p>
-            <ul>
-                <?php foreach ($reqsUnmet as $rc => $ri): ?>
-                <li><?= htmlspecialchars(CityState::BUILDING_NAMES[$rc] ?? $rc) ?> auf Level <?= $ri['need'] ?> (du: <?= $ri['have'] ?>)</li>
-                <?php endforeach ?>
-            </ul>
-        </div>
-        <?php endif ?>
+                <!-- Tab bar -->
+                <div class="tab-bar">
+                    <div class="tab-item">
+                        <?= $queueEntry !== null ? 'UPGRADE LÄUFT' : 'LEVEL UP' ?>
+                    </div>
+                    <div class="tab-spacer"></div>
+                    <?php if ($isModal): ?>
+                    <button class="tab-close" onclick="window.closeBldgModal?.()" title="Schließen" style="background:none;border:none;cursor:pointer">✕</button>
+                    <?php else: ?>
+                    <a href="/city" class="tab-close" title="Schließen">✕</a>
+                    <?php endif ?>
+                </div>
 
-        <button
-            id="btn-upgrade"
-            class="btn-upgrade"
-            <?= (!$canAfford || !$reqsMet) ? 'disabled' : '' ?>
-            data-code="<?= htmlspecialchars($buildingCode) ?>"
-        >
-            <?php if (!$canAfford): ?>
-                Zu wenig Ressourcen
-            <?php elseif (!$reqsMet): ?>
-                Voraussetzungen fehlen
-            <?php else: ?>
-                Upgrade starten
-            <?php endif ?>
-        </button>
+                <!-- Content: two sub-columns -->
+                <div class="right-content">
 
-        <?php endif ?>
+                    <!-- Left sub-column: icon + level transition + new bonuses -->
+                    <div class="sub-left">
+                        <div class="icon-canvas-wrap">
+                            <canvas id="icon-canvas" width="80" height="80"></canvas>
+                        </div>
 
-    </div>
-</div>
+                        <div class="sub-bldg-name"><?= htmlspecialchars($name) ?></div>
 
-<?php if ($buildingCode === 'barrack'):
-    $academyLevel = (int) ($buildings['academy']['level'] ?? 1);
-    $barrackLevel = (int) ($buildings['barrack']['level'] ?? 1);
-    $allTroops    = TroopData::all();
-    $typeName     = [1 => 'INF', 2 => 'RGD', 3 => 'CAV'];
-    $typeClass    = [1 => '', 2 => 'rgd', 3 => 'cav'];
-?>
-<div style="width:100%;max-width:480px;margin:1.5rem auto 0;padding:0 1rem">
+                        <div class="level-arrow">
+                            <span class="level-num">Lv.<?= $currentLevel ?></span>
+                            <span class="arrow">→</span>
+                            <span class="level-num">Lv.<?= $nextLevel ?></span>
+                        </div>
 
-    <div class="section-title">Truppen ausbilden</div>
+                        <?php if ($queueEntry !== null): ?>
+                            <div class="queue-label">In Bau...</div>
+                            <div class="queue-cd-wrap">
+                                <div id="countdown"
+                                     data-finish="<?= strtotime($queueEntry['finishes_at']) ?>">—</div>
+                            </div>
+                        <?php else: ?>
+                            <div class="new-bonuses-title">Neue Boni:</div>
+                            <?php foreach ($nextBonuses as [$label, $val]): ?>
+                            <div class="bonus-row">
+                                <span class="bonus-label" style="font-size:.74rem"><?= htmlspecialchars($label) ?></span>
+                                <span class="bonus-val" style="font-size:.74rem"><?= htmlspecialchars($val) ?></span>
+                            </div>
+                            <?php endforeach ?>
+                        <?php endif ?>
+                    </div>
 
-    <?php foreach ($allTroops as $t):
-        $unlocked = TroopData::isUnlocked((int)$t['code'], $barrackLevel, $academyLevel);
-        $inCity   = (int) ($troops[(int)$t['code']] ?? 0);
-        $badge    = $typeClass[$t['type']] ?? '';
+                    <!-- Right sub-column: requirements -->
+                    <div class="sub-right">
+                        <div class="reqs-title">Bauvoraussetzung</div>
+
+                        <?php foreach ($resRows as $r):
+                            $ok = ($r['have'] >= $r['need']);
+                            $cls = $ok ? 'ok' : 'bad';
+                            $check = $ok ? '✓' : '✗';
+                        ?>
+                        <div class="res-req-row <?= $cls ?>">
+                            <span class="res-check" style="color:<?= $ok ? '#22c55e' : '#ef4444' ?>"><?= $check ?></span>
+                            <span class="res-emoji"><?= $r['emoji'] ?></span>
+                            <span class="res-name"><?= $r['name'] ?></span>
+                            <span class="res-amounts">
+                                <?= fmtK($r['have']) ?> / <?= fmtK($r['need']) ?>
+                            </span>
+                        </div>
+                        <?php endforeach ?>
+
+                        <?php if (!empty($castleReqs)): ?>
+                        <div class="new-bonuses-title" style="margin-top:6px">Gebäude-Voraussetzungen</div>
+                        <div class="prereq-cards">
+                            <?php foreach ($castleReqs as $reqCode => $reqLevel):
+                                $hasLevel = (int)($buildings[$reqCode]['level'] ?? 0);
+                                $isMetCard = $hasLevel >= $reqLevel;
+                                $cardCls = $isMetCard ? 'met' : 'unmet';
+                                $reqName = CityState::BUILDING_NAMES[$reqCode] ?? ucwords(str_replace('_', ' ', $reqCode));
+                                $reqTile = $tileDefs[$reqCode] ?? 0;
+                                $reqTileJson = is_array($reqTile) ? json_encode($reqTile) : (int)$reqTile;
+                            ?>
+                            <?php if ($isModal): ?>
+                            <button class="prereq-card <?= $cardCls ?>"
+                                    onclick="window.openBuildingModal?.('<?= htmlspecialchars($reqCode) ?>')"
+                                    style="background:none;border:none;cursor:pointer;text-align:center">
+                            <?php else: ?>
+                            <a href="/city/building/<?= htmlspecialchars($reqCode) ?>"
+                               class="prereq-card <?= $cardCls ?>">
+                            <?php endif ?>
+                                <div class="prereq-canvas-wrap">
+                                    <canvas class="prereq-tile-canvas"
+                                            width="36" height="36"
+                                            data-tile="<?= htmlspecialchars((string)$reqTileJson) ?>"></canvas>
+                                </div>
+                                <div class="prereq-card-name"><?= htmlspecialchars($reqName) ?></div>
+                                <div class="prereq-lv-badge <?= $cardCls ?>">
+                                    <?= $isMetCard ? '✓' : '✗' ?> Lv.<?= $reqLevel ?>
+                                </div>
+                            <?php if ($isModal): ?>
+                            </button>
+                            <?php else: ?>
+                            </a>
+                            <?php endif ?>
+                            <?php endforeach ?>
+                        </div>
+                        <?php endif ?>
+
+                    </div><!-- /sub-right -->
+
+                </div><!-- /right-content -->
+
+                <!-- ── Bottom action bar ── -->
+                <div class="action-bar">
+                    <?php
+                    // Instant button: enabled only when this building is in queue AND player has gems
+                    $instantEnabled = ($queueEntry !== null) && ($playerGems >= $instantGemCost);
+                    ?>
+                    <button
+                        id="btn-instant"
+                        class="action-btn btn-instant"
+                        <?= !$instantEnabled ? 'disabled' : '' ?>
+                        data-queue-id="<?= $queueEntry !== null ? (int)$queueEntry['id'] : '' ?>"
+                        data-gem-cost="<?= $instantGemCost ?>"
+                    >
+                        <span class="action-btn-top">
+                            💎 <?= number_format($instantGemCost) ?> Gems
+                        </span>
+                        <span class="action-btn-label">SOFORT UPGRADEN</span>
+                    </button>
+
+                    <?php
+                    // Upgrade button: disabled if in queue, can't afford, or reqs not met
+                    $upgradeDisabled = ($queueEntry !== null) || !$canAfford || !$reqsMet;
+                    $upgradeLabel = 'UPGRADE STARTEN';
+                    $upgradeTopLine = '⏱ ' . fmtTime($buildSec);
+                    if ($queueEntry !== null) {
+                        $upgradeLabel   = 'FERTIG IN';
+                        $upgradeTopLine = '⏱ ' . fmtTime($secsLeft);
+                    } elseif (!$canAfford) {
+                        $upgradeLabel   = 'ZU WENIG RESSOURCEN';
+                        $upgradeTopLine = '⏱ ' . fmtTime($buildSec);
+                    } elseif (!$reqsMet) {
+                        $upgradeLabel   = 'VORAUSSETZUNGEN FEHLEN';
+                        $upgradeTopLine = '⏱ ' . fmtTime($buildSec);
+                    }
+                    ?>
+                    <button
+                        id="btn-upgrade"
+                        class="action-btn btn-upgrade-action"
+                        <?= $upgradeDisabled ? 'disabled' : '' ?>
+                        data-code="<?= htmlspecialchars($buildingCode) ?>"
+                    >
+                        <span class="action-btn-top"><?= htmlspecialchars($upgradeTopLine) ?></span>
+                        <span class="action-btn-label"><?= htmlspecialchars($upgradeLabel) ?></span>
+                    </button>
+                </div><!-- /action-bar -->
+
+            </div><!-- /right-panel -->
+
+        </div><!-- /modal-body -->
+
+    </div><!-- /modal-card -->
+
+    <!-- ════════════════════════════════════════
+         BARRACK SECTION (below modal)
+    ════════════════════════════════════════ -->
+    <?php if ($buildingCode === 'barrack'):
+        $academyLevel = (int) ($buildings['academy']['level'] ?? 1);
+        $barrackLevel = (int) ($buildings['barrack']['level'] ?? 1);
+        $allTroops    = TroopData::all();
+        $typeName     = [1 => 'INF', 2 => 'RGD', 3 => 'CAV'];
+        $typeClass    = [1 => '', 2 => 'rgd', 3 => 'cav'];
     ?>
-    <div class="troop-row<?= $unlocked ? '' : ' locked' ?>">
-        <div class="troop-header">
-            <span class="troop-badge <?= $badge ?>"><?= $typeName[$t['type']] ?> T<?= (int)$t['tier'] ?></span>
-            <span class="troop-name"><?= htmlspecialchars($t['name']) ?></span>
-            <span class="troop-count">In Stadt: <?= number_format($inCity, 0, '.', ',') ?></span>
-        </div>
+    <div class="barrack-section">
+        <div class="barrack-section-header">Truppen ausbilden</div>
+        <div class="barrack-inner">
 
-        <div class="troop-stats">
-            <div>HP <span><?= (int)$t['hp'] ?></span></div>
-            <div>ATK <span><?= (int)$t['attack'] ?></span></div>
-            <div>DEF <span><?= (int)$t['defense'] ?></span></div>
-            <div>SPD <span><?= (int)$t['speed'] ?></span></div>
-        </div>
+            <?php foreach ($allTroops as $t):
+                $unlocked = TroopData::isUnlocked((int)$t['code'], $barrackLevel, $academyLevel);
+                $inCity   = (int) ($troops[(int)$t['code']] ?? 0);
+                $badge    = $typeClass[$t['type']] ?? '';
+            ?>
+            <div class="troop-row<?= $unlocked ? '' : ' locked' ?>">
+                <div class="troop-header">
+                    <span class="troop-badge <?= $badge ?>"><?= $typeName[$t['type']] ?> T<?= (int)$t['tier'] ?></span>
+                    <span class="troop-name"><?= htmlspecialchars($t['name']) ?></span>
+                    <span class="troop-count">In Stadt: <?= number_format($inCity, 0, '.', ',') ?></span>
+                </div>
 
-        <div class="troop-cost">
-            <?php if ($t['need_food']   > 0): ?><span>🌾 <?= (int)$t['need_food'] ?></span><?php endif ?>
-            <?php if ($t['need_lumber'] > 0): ?><span>🪵 <?= (int)$t['need_lumber'] ?></span><?php endif ?>
-            <?php if ($t['need_stone']  > 0): ?><span>🪨 <?= (int)$t['need_stone'] ?></span><?php endif ?>
-            <?php if ($t['need_gold']   > 0): ?><span>💰 <?= (int)$t['need_gold'] ?></span><?php endif ?>
-            <span>⏱ <?= fmtTime((int)$t['time']) ?>/Einheit</span>
-        </div>
+                <div class="troop-stats">
+                    <div>HP <span><?= (int)$t['hp'] ?></span></div>
+                    <div>ATK <span><?= (int)$t['attack'] ?></span></div>
+                    <div>DEF <span><?= (int)$t['defense'] ?></span></div>
+                    <div>SPD <span><?= (int)$t['speed'] ?></span></div>
+                </div>
 
-        <?php if ($unlocked): ?>
-        <div class="train-row">
-            <input type="number" class="train-input" min="1" max="9999" value="100"
-                   id="count-<?= (int)$t['code'] ?>">
-            <button class="btn-train"
-                    data-code="<?= (int)$t['code'] ?>"
-                    data-name="<?= htmlspecialchars($t['name']) ?>">
-                Ausbilden
-            </button>
-        </div>
-        <?php else: ?>
-        <div class="lock-msg">🔒 Erfordert Academy Level <?= (int)$t['unlock_academy'] ?></div>
-        <?php endif ?>
-    </div>
-    <?php endforeach ?>
+                <div class="troop-cost">
+                    <?php if ($t['need_food']   > 0): ?><span>🌾 <?= (int)$t['need_food'] ?></span><?php endif ?>
+                    <?php if ($t['need_lumber'] > 0): ?><span>🪵 <?= (int)$t['need_lumber'] ?></span><?php endif ?>
+                    <?php if ($t['need_stone']  > 0): ?><span>🪨 <?= (int)$t['need_stone'] ?></span><?php endif ?>
+                    <?php if ($t['need_gold']   > 0): ?><span>💰 <?= (int)$t['need_gold'] ?></span><?php endif ?>
+                    <span>⏱ <?= fmtTime((int)$t['time']) ?>/Einheit</span>
+                </div>
 
-    <?php if (!empty($troopQueue)): ?>
-    <div class="troop-queue-list">
-        <div class="section-title" style="margin-top:1.25rem">Trainings-Queue</div>
-        <?php foreach ($troopQueue as $qe):
-            $qTroop = TroopData::get((int)$qe['troop_code']);
-            $qName  = $qTroop['name'] ?? ('Code ' . $qe['troop_code']);
-        ?>
-        <div class="queue-item">
-            <div><?= (int)$qe['count'] ?>× <?= htmlspecialchars($qName) ?> (Slot <?= (int)$qe['barrack_slot'] ?>)</div>
-            <div class="queue-item-cd"
-                 data-finish="<?= strtotime($qe['finishes_at']) ?>">—</div>
-        </div>
-        <?php endforeach ?>
-    </div>
+                <?php if ($unlocked): ?>
+                <div class="train-row">
+                    <input type="number" class="train-input" min="1" max="9999" value="100"
+                           id="count-<?= (int)$t['code'] ?>">
+                    <button class="btn-train"
+                            data-code="<?= (int)$t['code'] ?>"
+                            data-name="<?= htmlspecialchars($t['name']) ?>">
+                        Ausbilden
+                    </button>
+                </div>
+                <?php else: ?>
+                <div class="lock-msg">🔒 Erfordert Academy Level <?= (int)$t['unlock_academy'] ?></div>
+                <?php endif ?>
+            </div>
+            <?php endforeach ?>
+
+            <?php if (!empty($troopQueue)): ?>
+            <div class="troop-queue-list">
+                <div class="troop-queue-title">Trainings-Queue</div>
+                <?php foreach ($troopQueue as $qe):
+                    $qTroop = TroopData::get((int)$qe['troop_code']);
+                    $qName  = $qTroop['name'] ?? ('Code ' . $qe['troop_code']);
+                ?>
+                <div class="queue-item">
+                    <div><?= (int)$qe['count'] ?>× <?= htmlspecialchars($qName) ?> (Slot <?= (int)$qe['barrack_slot'] ?>)</div>
+                    <div class="queue-item-cd"
+                         data-finish="<?= strtotime($qe['finishes_at']) ?>">—</div>
+                </div>
+                <?php endforeach ?>
+            </div>
+            <?php endif ?>
+
+        </div><!-- /barrack-inner -->
+    </div><!-- /barrack-section -->
     <?php endif ?>
 
-</div>
+<?php if (!$isModal): ?>
+</div><!-- /page-wrap -->
 <?php endif ?>
 
-<div id="toast"></div>
-
-</div><!-- #game -->
+<div id="bm-toast"></div>
 
 <script>
+(function () {
 'use strict';
 
 // ---------------------------------------------------------------------------
@@ -686,45 +1156,89 @@ const ATLAS_TILE = 16;
 const ATLAS_STEP = 17;
 const ATLAS_COLS = 12;
 
-const canvas = document.getElementById('bldg-canvas');
-const ctx    = canvas.getContext('2d');
-ctx.imageSmoothingEnabled = false;
-
-const atlas = new Image();
-
 const TILE   = <?= is_array($tile) ? json_encode($tile) : (int) $tile ?>;
 const IS_2X2 = Array.isArray(TILE);
 
-atlas.onload = () => {
-    ctx.clearRect(0, 0, 192, 192);
+const atlas = new Image();
 
-    function drawTile(idx, dx, dy, size) {
-        const sx = (idx % ATLAS_COLS) * ATLAS_STEP;
-        const sy = Math.floor(idx / ATLAS_COLS) * ATLAS_STEP;
-        ctx.drawImage(atlas, sx, sy, ATLAS_TILE, ATLAS_TILE, dx, dy, size, size);
-    }
+function drawTileOnCtx(ctx, idx, dx, dy, size) {
+    const sx = (idx % ATLAS_COLS) * ATLAS_STEP;
+    const sy = Math.floor(idx / ATLAS_COLS) * ATLAS_STEP;
+    ctx.drawImage(atlas, sx, sy, ATLAS_TILE, ATLAS_TILE, dx, dy, size, size);
+}
+
+function renderMainCanvas() {
+    const canvas = document.getElementById('bldg-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+    ctx.clearRect(0, 0, 160, 160);
 
     if (IS_2X2) {
-        drawTile(TILE[0],  0,  0, 96);
-        drawTile(TILE[1], 96,  0, 96);
-        drawTile(TILE[2],  0, 96, 96);
-        drawTile(TILE[3], 96, 96, 96);
+        drawTileOnCtx(ctx, TILE[0],  0,  0, 80);
+        drawTileOnCtx(ctx, TILE[1], 80,  0, 80);
+        drawTileOnCtx(ctx, TILE[2],  0, 80, 80);
+        drawTileOnCtx(ctx, TILE[3], 80, 80, 80);
     } else {
-        drawTile(TILE, 0, 0, 192);
+        drawTileOnCtx(ctx, TILE, 0, 0, 160);
     }
+}
+
+function renderIconCanvas() {
+    const canvas = document.getElementById('icon-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+    ctx.clearRect(0, 0, 80, 80);
+
+    if (IS_2X2) {
+        drawTileOnCtx(ctx, TILE[0],  0,  0, 40);
+        drawTileOnCtx(ctx, TILE[1], 40,  0, 40);
+        drawTileOnCtx(ctx, TILE[2],  0, 40, 40);
+        drawTileOnCtx(ctx, TILE[3], 40, 40, 40);
+    } else {
+        drawTileOnCtx(ctx, TILE, 0, 0, 80);
+    }
+}
+
+function renderPrereqCanvases() {
+    document.querySelectorAll('.prereq-tile-canvas').forEach(canvas => {
+        const raw  = canvas.dataset.tile;
+        let tileId;
+        try { tileId = JSON.parse(raw); } catch { tileId = parseInt(raw, 10); }
+        const is2x2 = Array.isArray(tileId);
+        const ctx   = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = false;
+        ctx.clearRect(0, 0, 36, 36);
+        if (is2x2) {
+            drawTileOnCtx(ctx, tileId[0],  0,  0, 18);
+            drawTileOnCtx(ctx, tileId[1], 18,  0, 18);
+            drawTileOnCtx(ctx, tileId[2],  0, 18, 18);
+            drawTileOnCtx(ctx, tileId[3], 18, 18, 18);
+        } else {
+            drawTileOnCtx(ctx, tileId, 0, 0, 36);
+        }
+    });
+}
+
+atlas.onload = () => {
+    renderMainCanvas();
+    renderIconCanvas();
+    renderPrereqCanvases();
 };
 atlas.src = ATLAS_SRC;
 
 // ---------------------------------------------------------------------------
 // Upgrade button
 // ---------------------------------------------------------------------------
-const btn      = document.getElementById('btn-upgrade');
-const CSRF     = <?= json_encode($session['csrf_token']) ?>;
+const btnUpgrade = document.getElementById('btn-upgrade');
+const CSRF       = <?= json_encode($session['csrf_token']) ?>;
 
-if (btn) {
-    btn.addEventListener('click', async () => {
-        btn.disabled = true;
-        btn.textContent = 'Wird gestartet…';
+if (btnUpgrade) {
+    btnUpgrade.addEventListener('click', async () => {
+        btnUpgrade.disabled = true;
+        const lbl = btnUpgrade.querySelector('.action-btn-label');
+        if (lbl) lbl.textContent = 'WIRD GESTARTET…';
 
         try {
             const res  = await fetch('/api/city/upgrade-building', {
@@ -733,7 +1247,7 @@ if (btn) {
                     'Content-Type': 'application/json',
                     'X-CSRF-Token': CSRF,
                 },
-                body: JSON.stringify({ building_code: btn.dataset.code }),
+                body: JSON.stringify({ building_code: btnUpgrade.dataset.code }),
             });
             const json = await res.json();
 
@@ -742,19 +1256,19 @@ if (btn) {
                 setTimeout(() => window.location.reload(), 800);
             } else {
                 showToast(json.error?.message ?? json.error?.code ?? 'Fehler', 'err');
-                btn.disabled = false;
-                btn.textContent = 'Upgrade starten';
+                btnUpgrade.disabled = false;
+                if (lbl) lbl.textContent = 'UPGRADE STARTEN';
             }
         } catch (e) {
             showToast('Netzwerkfehler', 'err');
-            btn.disabled = false;
-            btn.textContent = 'Upgrade starten';
+            btnUpgrade.disabled = false;
+            if (lbl) lbl.textContent = 'UPGRADE STARTEN';
         }
     });
 }
 
 // ---------------------------------------------------------------------------
-// Queue countdown
+// Queue countdown (build)
 // ---------------------------------------------------------------------------
 const cdEl = document.getElementById('countdown');
 
@@ -795,7 +1309,8 @@ if (btnInstant) {
         if (!confirm('💎 ' + cost.toLocaleString() + ' Gems verwenden um sofort fertig zu bauen?')) return;
 
         btnInstant.disabled = true;
-        btnInstant.textContent = '…';
+        const lbl = btnInstant.querySelector('.action-btn-label');
+        if (lbl) lbl.textContent = '…';
 
         try {
             const res  = await fetch('/api/city/instant-build/' + queueId, {
@@ -810,11 +1325,12 @@ if (btnInstant) {
             } else {
                 showToast(json.error?.message ?? json.error ?? 'Fehler', 'err');
                 btnInstant.disabled = false;
-                btnInstant.textContent = '💎 Sofort fertig (' + cost.toLocaleString() + ' Gems)';
+                if (lbl) lbl.textContent = 'SOFORT UPGRADEN';
             }
         } catch (e) {
             showToast('Netzwerkfehler', 'err');
             btnInstant.disabled = false;
+            if (lbl) lbl.textContent = 'SOFORT UPGRADEN';
         }
     });
 }
@@ -866,7 +1382,7 @@ document.querySelectorAll('.btn-train').forEach(btn => {
 });
 
 // ---------------------------------------------------------------------------
-// Queue countdowns (training queue items)
+// Queue countdowns (training queue)
 // ---------------------------------------------------------------------------
 function updateQueueCountdowns() {
     document.querySelectorAll('.queue-item-cd').forEach(el => {
@@ -893,13 +1409,15 @@ setInterval(updateQueueCountdowns, 1000);
 // Toast helper
 // ---------------------------------------------------------------------------
 function showToast(msg, type) {
-    const t = document.getElementById('toast');
+    const t = document.getElementById('bm-toast');
     t.textContent = msg;
     t.className   = type;
     t.style.display = 'block';
     setTimeout(() => { t.style.display = 'none'; }, 3000);
 }
+})();
 </script>
-
+<?php if (!$isModal): ?>
 </body>
 </html>
+<?php endif ?>
