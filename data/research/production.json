@@ -1,125 +1,6067 @@
 {
-  "version": 1,
-  "tree": "production",
   "nodes": [
     {
       "code": "food_production",
       "name": "Food Production",
+      "row": "food",
       "category": "production",
       "stat": "food_production",
       "type": "buff",
       "max_level": 5,
       "levels": [
-        {"level": 1, "ability_value": 0.02, "time": 60,    "power": 50,  "resources": {"food": 300,   "lumber": 200,   "stone": 400,   "gold": 1000},  "requirements": [{"type": "academy", "level": 1}]},
-        {"level": 2, "ability_value": 0.04, "time": 300,   "power": 100, "resources": {"food": 900,   "lumber": 600,   "stone": 1200,  "gold": 3000},  "requirements": [{"type": "academy", "level": 1}]},
-        {"level": 3, "ability_value": 0.06, "time": 1800,  "power": 150, "resources": {"food": 2700,  "lumber": 1800,  "stone": 3600,  "gold": 9000},  "requirements": [{"type": "academy", "level": 1}]},
-        {"level": 4, "ability_value": 0.08, "time": 7200,  "power": 200, "resources": {"food": 8100,  "lumber": 5400,  "stone": 10800, "gold": 27000}, "requirements": [{"type": "academy", "level": 1}]},
-        {"level": 5, "ability_value": 0.10, "time": 21600, "power": 250, "resources": {"food": 24300, "lumber": 16200, "stone": 32400, "gold": 81000}, "requirements": [{"type": "academy", "level": 1}]}
+        {
+          "level": 1,
+          "ability_value": 0.02,
+          "time": 3,
+          "power": 50,
+          "resources": {
+            "food": 250,
+            "lumber": 500,
+            "stone": 500,
+            "gold": 1500
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 1
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.05,
+          "time": 90,
+          "power": 110,
+          "resources": {
+            "food": 300,
+            "lumber": 600,
+            "stone": 600,
+            "gold": 1800
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 1
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "food_production"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.1,
+          "time": 138,
+          "power": 290,
+          "resources": {
+            "food": 700,
+            "lumber": 1400,
+            "stone": 1400,
+            "gold": 4200
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 2
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "food_production"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.15,
+          "time": 204,
+          "power": 490,
+          "resources": {
+            "food": 850,
+            "lumber": 1700,
+            "stone": 1700,
+            "gold": 5100
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 2
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "food_production"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.25,
+          "time": 306,
+          "power": 1010,
+          "resources": {
+            "food": 1575,
+            "lumber": 3150,
+            "stone": 3150,
+            "gold": 9450
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 3
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "food_production"
+            }
+          ]
+        }
       ]
     },
     {
-      "code": "lumber_production",
-      "name": "Lumber Production",
+      "code": "food_capacity",
+      "name": "Food Capacity",
+      "row": "food",
       "category": "production",
-      "stat": "lumber_production",
+      "stat": "food_capacity",
       "type": "buff",
       "max_level": 5,
       "levels": [
-        {"level": 1, "ability_value": 0.02, "time": 60,    "power": 50,  "resources": {"food": 300,   "lumber": 200,   "stone": 400,   "gold": 1000},  "requirements": [{"type": "academy", "level": 1}]},
-        {"level": 2, "ability_value": 0.04, "time": 300,   "power": 100, "resources": {"food": 900,   "lumber": 600,   "stone": 1200,  "gold": 3000},  "requirements": [{"type": "academy", "level": 1}]},
-        {"level": 3, "ability_value": 0.06, "time": 1800,  "power": 150, "resources": {"food": 2700,  "lumber": 1800,  "stone": 3600,  "gold": 9000},  "requirements": [{"type": "academy", "level": 1}]},
-        {"level": 4, "ability_value": 0.08, "time": 7200,  "power": 200, "resources": {"food": 8100,  "lumber": 5400,  "stone": 10800, "gold": 27000}, "requirements": [{"type": "academy", "level": 1}]},
-        {"level": 5, "ability_value": 0.10, "time": 21600, "power": 250, "resources": {"food": 24300, "lumber": 16200, "stone": 32400, "gold": 81000}, "requirements": [{"type": "academy", "level": 1}]}
+        {
+          "level": 1,
+          "ability_value": 0.02,
+          "time": 900,
+          "power": 440,
+          "resources": {
+            "food": 4500,
+            "lumber": 9000,
+            "stone": 9000,
+            "gold": 27000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 5
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "gold_production"
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.05,
+          "time": 1350,
+          "power": 920,
+          "resources": {
+            "food": 5400,
+            "lumber": 10800,
+            "stone": 10800,
+            "gold": 32400
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 5
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "food_capacity"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.1,
+          "time": 2070,
+          "power": 2080,
+          "resources": {
+            "food": 7560,
+            "lumber": 15120,
+            "stone": 15120,
+            "gold": 45360
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 6
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "food_capacity"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.15,
+          "time": 3060,
+          "power": 3360,
+          "resources": {
+            "food": 9180,
+            "lumber": 18360,
+            "stone": 18360,
+            "gold": 55080
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 6
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "food_capacity"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.25,
+          "time": 4590,
+          "power": 5640,
+          "resources": {
+            "food": 13230,
+            "lumber": 26460,
+            "stone": 26460,
+            "gold": 79380
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 7
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "food_capacity"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "food_gathering_speed",
+      "name": "Food Gathering Speed",
+      "row": "food",
+      "category": "production",
+      "stat": "food_gathering_speed",
+      "type": "buff",
+      "max_level": 5,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 0.02,
+          "time": 2700,
+          "power": 1260,
+          "resources": {
+            "food": 15750,
+            "lumber": 31500,
+            "stone": 31500,
+            "gold": 94500
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 9
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "gold_capacity"
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.05,
+          "time": 4050,
+          "power": 2640,
+          "resources": {
+            "food": 18900,
+            "lumber": 37800,
+            "stone": 37800,
+            "gold": 113400
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 9
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "food_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.1,
+          "time": 6210,
+          "power": 5760,
+          "resources": {
+            "food": 24500,
+            "lumber": 49000,
+            "stone": 49000,
+            "gold": 147000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 10
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "food_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.15,
+          "time": 9180,
+          "power": 9180,
+          "resources": {
+            "food": 29750,
+            "lumber": 59500,
+            "stone": 59500,
+            "gold": 178500
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 10
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "food_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.25,
+          "time": 13770,
+          "power": 13200,
+          "resources": {
+            "food": 40425,
+            "lumber": 80850,
+            "stone": 80850,
+            "gold": 242550
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 11
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "food_gathering_speed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "advanced_food_production",
+      "name": "Adv. Food Production",
+      "row": "food",
+      "category": "production",
+      "stat": "advanced_food_production",
+      "type": "buff",
+      "max_level": 10,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 0.02,
+          "time": 15840,
+          "power": 6600,
+          "resources": {
+            "food": 158400,
+            "lumber": 316800,
+            "stone": 316800,
+            "gold": 950400
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 22
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "resource_protect"
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.05,
+          "time": 31680,
+          "power": 14400,
+          "resources": {
+            "food": 221760,
+            "lumber": 443520,
+            "stone": 443520,
+            "gold": 1330560
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 22
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "advanced_food_production"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.1,
+          "time": 63360,
+          "power": 33100,
+          "resources": {
+            "food": 316800,
+            "lumber": 633600,
+            "stone": 633600,
+            "gold": 1900800
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 22
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "advanced_food_production"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.15,
+          "time": 126720,
+          "power": 55300,
+          "resources": {
+            "food": 447120,
+            "lumber": 894240,
+            "stone": 894240,
+            "gold": 2682720
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 23
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "advanced_food_production"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.2,
+          "time": 253440,
+          "power": 81600,
+          "resources": {
+            "food": 629280,
+            "lumber": 1258560,
+            "stone": 1258560,
+            "gold": 3775680
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 23
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "advanced_food_production"
+            }
+          ]
+        },
+        {
+          "level": 6,
+          "ability_value": 0.3,
+          "time": 506880,
+          "power": 113000,
+          "resources": {
+            "food": 894240,
+            "lumber": 1788480,
+            "stone": 1788480,
+            "gold": 5365440
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 23
+            },
+            {
+              "type": "research",
+              "level": 5,
+              "code": "advanced_food_production"
+            }
+          ]
+        },
+        {
+          "level": 7,
+          "ability_value": 0.4,
+          "time": 1013760,
+          "power": 169700,
+          "resources": {
+            "food": 1296000,
+            "lumber": 2592000,
+            "stone": 2592000,
+            "gold": 7776000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 24
+            },
+            {
+              "type": "research",
+              "level": 6,
+              "code": "advanced_food_production"
+            }
+          ]
+        },
+        {
+          "level": 8,
+          "ability_value": 0.5,
+          "time": 2027520,
+          "power": 236750,
+          "resources": {
+            "food": 1814400,
+            "lumber": 3628800,
+            "stone": 3628800,
+            "gold": 10886400
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 24
+            },
+            {
+              "type": "research",
+              "level": 7,
+              "code": "advanced_food_production"
+            }
+          ]
+        },
+        {
+          "level": 9,
+          "ability_value": 0.6,
+          "time": 4055040,
+          "power": 316250,
+          "resources": {
+            "food": 2557440,
+            "lumber": 5114880,
+            "stone": 5114880,
+            "gold": 15344640
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 24
+            },
+            {
+              "type": "research",
+              "level": 8,
+              "code": "advanced_food_production"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "ability_value": 0.8,
+          "time": 8110080,
+          "power": 412250,
+          "resources": {
+            "food": 3726000,
+            "lumber": 7452000,
+            "stone": 7452000,
+            "gold": 22356000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 25
+            },
+            {
+              "type": "research",
+              "level": 9,
+              "code": "advanced_food_production"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "advanced_food_capacity",
+      "name": "Adv. Food Capacity",
+      "row": "food",
+      "category": "production",
+      "stat": "advanced_food_capacity",
+      "type": "buff",
+      "max_level": 10,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 0.02,
+          "time": 20160,
+          "power": 8050,
+          "resources": {
+            "food": 235200,
+            "lumber": 470400,
+            "stone": 470400,
+            "gold": 1411200
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 24
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "advanced_gold_production"
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.05,
+          "time": 40320,
+          "power": 17550,
+          "resources": {
+            "food": 329280,
+            "lumber": 658560,
+            "stone": 658560,
+            "gold": 1975680
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 24
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "advanced_food_capacity"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.1,
+          "time": 80640,
+          "power": 40250,
+          "resources": {
+            "food": 470400,
+            "lumber": 940800,
+            "stone": 940800,
+            "gold": 2822400
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 24
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "advanced_food_capacity"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.15,
+          "time": 161280,
+          "power": 67250,
+          "resources": {
+            "food": 661500,
+            "lumber": 1323000,
+            "stone": 1323000,
+            "gold": 3969000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 25
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "advanced_food_capacity"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.2,
+          "time": 322560,
+          "power": 99250,
+          "resources": {
+            "food": 931000,
+            "lumber": 1862000,
+            "stone": 1862000,
+            "gold": 5586000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 25
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "advanced_food_capacity"
+            }
+          ]
+        },
+        {
+          "level": 6,
+          "ability_value": 0.3,
+          "time": 645120,
+          "power": 137350,
+          "resources": {
+            "food": 1323000,
+            "lumber": 2646000,
+            "stone": 2646000,
+            "gold": 7938000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 25
+            },
+            {
+              "type": "research",
+              "level": 5,
+              "code": "advanced_food_capacity"
+            }
+          ]
+        },
+        {
+          "level": 7,
+          "ability_value": 0.4,
+          "time": 1290240,
+          "power": 206050,
+          "resources": {
+            "food": 1911000,
+            "lumber": 3822000,
+            "stone": 3822000,
+            "gold": 11466000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 26
+            },
+            {
+              "type": "research",
+              "level": 6,
+              "code": "advanced_food_capacity"
+            }
+          ]
+        },
+        {
+          "level": 8,
+          "ability_value": 0.5,
+          "time": 2580480,
+          "power": 287350,
+          "resources": {
+            "food": 2675400,
+            "lumber": 5350800,
+            "stone": 5350800,
+            "gold": 16052400
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 26
+            },
+            {
+              "type": "research",
+              "level": 7,
+              "code": "advanced_food_capacity"
+            }
+          ]
+        },
+        {
+          "level": 9,
+          "ability_value": 0.6,
+          "time": 5160960,
+          "power": 383950,
+          "resources": {
+            "food": 3771040,
+            "lumber": 7542080,
+            "stone": 7542080,
+            "gold": 22626240
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 26
+            },
+            {
+              "type": "research",
+              "level": 8,
+              "code": "advanced_food_capacity"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "ability_value": 0.8,
+          "time": 10321920,
+          "power": 500350,
+          "resources": {
+            "food": 5477220,
+            "lumber": 10954440,
+            "stone": 10954440,
+            "gold": 32863320
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 27
+            },
+            {
+              "type": "research",
+              "level": 9,
+              "code": "advanced_food_capacity"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "advanced_food_gathering_speed",
+      "name": "Adv. Food Gathering Speed",
+      "row": "food",
+      "category": "production",
+      "stat": "advanced_food_gathering_speed",
+      "type": "buff",
+      "max_level": 10,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 0.02,
+          "time": 30240,
+          "power": 11150,
+          "resources": {
+            "food": 453600,
+            "lumber": 907200,
+            "stone": 907200,
+            "gold": 2721600
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 28
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "advanced_construction_speed"
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.05,
+          "time": 60480,
+          "power": 24350,
+          "resources": {
+            "food": 635040,
+            "lumber": 1270080,
+            "stone": 1270080,
+            "gold": 3810240
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 28
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "advanced_food_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.1,
+          "time": 120960,
+          "power": 55950,
+          "resources": {
+            "food": 907200,
+            "lumber": 1814400,
+            "stone": 1814400,
+            "gold": 5443200
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 28
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "advanced_food_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.15,
+          "time": 241920,
+          "power": 93350,
+          "resources": {
+            "food": 1268460,
+            "lumber": 2536920,
+            "stone": 2536920,
+            "gold": 7610760
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 29
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "advanced_food_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.2,
+          "time": 483840,
+          "power": 137650,
+          "resources": {
+            "food": 1785240,
+            "lumber": 3570480,
+            "stone": 3570480,
+            "gold": 10711440
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 29
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "advanced_food_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 6,
+          "ability_value": 0.3,
+          "time": 967680,
+          "power": 190450,
+          "resources": {
+            "food": 2536920,
+            "lumber": 5073840,
+            "stone": 5073840,
+            "gold": 15221520
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 29
+            },
+            {
+              "type": "research",
+              "level": 5,
+              "code": "advanced_food_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 7,
+          "ability_value": 0.4,
+          "time": 1935360,
+          "power": 285400,
+          "resources": {
+            "food": 3645000,
+            "lumber": 7290000,
+            "stone": 7290000,
+            "gold": 21870000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 30
+            },
+            {
+              "type": "research",
+              "level": 6,
+              "code": "advanced_food_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 8,
+          "ability_value": 0.5,
+          "time": 3870720,
+          "power": 397750,
+          "resources": {
+            "food": 5103000,
+            "lumber": 10206000,
+            "stone": 10206000,
+            "gold": 30618000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 30
+            },
+            {
+              "type": "research",
+              "level": 7,
+              "code": "advanced_food_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 9,
+          "ability_value": 0.6,
+          "time": 7741440,
+          "power": 531100,
+          "resources": {
+            "food": 7192800,
+            "lumber": 14385600,
+            "stone": 14385600,
+            "gold": 43156800
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 30
+            },
+            {
+              "type": "research",
+              "level": 8,
+              "code": "advanced_food_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "ability_value": 0.8,
+          "time": 15482880,
+          "power": 688900,
+          "resources": {
+            "food": 10060200,
+            "lumber": 20120400,
+            "stone": 20120400,
+            "gold": 60361200
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 30
+            },
+            {
+              "type": "research",
+              "level": 9,
+              "code": "advanced_food_gathering_speed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "wood_production",
+      "name": "Wood Production",
+      "row": "wood",
+      "category": "production",
+      "stat": "wood_production",
+      "type": "buff",
+      "max_level": 5,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 0.02,
+          "time": 3,
+          "power": 50,
+          "resources": {
+            "food": 500,
+            "lumber": 250,
+            "stone": 500,
+            "gold": 1500
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 1
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.05,
+          "time": 90,
+          "power": 110,
+          "resources": {
+            "food": 600,
+            "lumber": 300,
+            "stone": 600,
+            "gold": 1800
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 1
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "wood_production"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.1,
+          "time": 138,
+          "power": 290,
+          "resources": {
+            "food": 1400,
+            "lumber": 700,
+            "stone": 1400,
+            "gold": 4200
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 2
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "wood_production"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.15,
+          "time": 204,
+          "power": 490,
+          "resources": {
+            "food": 1700,
+            "lumber": 850,
+            "stone": 1700,
+            "gold": 5100
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 2
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "wood_production"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.25,
+          "time": 306,
+          "power": 1010,
+          "resources": {
+            "food": 3150,
+            "lumber": 1575,
+            "stone": 3150,
+            "gold": 9450
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 3
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "wood_production"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "wood_capacity",
+      "name": "Wood Capacity",
+      "row": "wood",
+      "category": "production",
+      "stat": "wood_capacity",
+      "type": "buff",
+      "max_level": 5,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 0.02,
+          "time": 900,
+          "power": 440,
+          "resources": {
+            "food": 9000,
+            "lumber": 4500,
+            "stone": 9000,
+            "gold": 27000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 5
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "gold_production"
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.05,
+          "time": 1350,
+          "power": 920,
+          "resources": {
+            "food": 10800,
+            "lumber": 5400,
+            "stone": 10800,
+            "gold": 32400
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 5
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "wood_capacity"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.1,
+          "time": 2070,
+          "power": 2080,
+          "resources": {
+            "food": 15120,
+            "lumber": 7560,
+            "stone": 15120,
+            "gold": 45360
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 6
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "wood_capacity"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.15,
+          "time": 3060,
+          "power": 3360,
+          "resources": {
+            "food": 18360,
+            "lumber": 9180,
+            "stone": 18360,
+            "gold": 55080
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 6
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "wood_capacity"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.25,
+          "time": 4590,
+          "power": 5640,
+          "resources": {
+            "food": 26460,
+            "lumber": 13230,
+            "stone": 26460,
+            "gold": 79380
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 7
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "wood_capacity"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "wood_gathering_speed",
+      "name": "Wood Gathering Speed",
+      "row": "wood",
+      "category": "production",
+      "stat": "wood_gathering_speed",
+      "type": "buff",
+      "max_level": 5,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 0.02,
+          "time": 2700,
+          "power": 1260,
+          "resources": {
+            "food": 31500,
+            "lumber": 15750,
+            "stone": 31500,
+            "gold": 94500
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 9
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "gold_capacity"
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.05,
+          "time": 4050,
+          "power": 2640,
+          "resources": {
+            "food": 37800,
+            "lumber": 18900,
+            "stone": 37800,
+            "gold": 113400
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 9
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "wood_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.1,
+          "time": 6210,
+          "power": 5760,
+          "resources": {
+            "food": 49000,
+            "lumber": 24500,
+            "stone": 49000,
+            "gold": 147000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 10
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "wood_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.15,
+          "time": 9180,
+          "power": 9180,
+          "resources": {
+            "food": 59500,
+            "lumber": 29750,
+            "stone": 59500,
+            "gold": 178500
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 10
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "wood_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.25,
+          "time": 13770,
+          "power": 13200,
+          "resources": {
+            "food": 80850,
+            "lumber": 40425,
+            "stone": 80850,
+            "gold": 242550
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 11
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "wood_gathering_speed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "advanced_wood_production",
+      "name": "Adv. Wood Production",
+      "row": "wood",
+      "category": "production",
+      "stat": "advanced_wood_production",
+      "type": "buff",
+      "max_level": 10,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 0.02,
+          "time": 15840,
+          "power": 6600,
+          "resources": {
+            "food": 316800,
+            "lumber": 158400,
+            "stone": 316800,
+            "gold": 950400
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 22
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "resource_protect"
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.05,
+          "time": 31680,
+          "power": 14400,
+          "resources": {
+            "food": 443520,
+            "lumber": 221760,
+            "stone": 443520,
+            "gold": 1330560
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 22
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "advanced_wood_production"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.1,
+          "time": 63360,
+          "power": 33100,
+          "resources": {
+            "food": 633600,
+            "lumber": 316800,
+            "stone": 633600,
+            "gold": 1900800
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 22
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "advanced_wood_production"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.15,
+          "time": 126720,
+          "power": 55300,
+          "resources": {
+            "food": 894240,
+            "lumber": 447120,
+            "stone": 894240,
+            "gold": 2682720
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 23
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "advanced_wood_production"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.2,
+          "time": 253440,
+          "power": 81600,
+          "resources": {
+            "food": 1258560,
+            "lumber": 629280,
+            "stone": 1258560,
+            "gold": 3775680
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 23
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "advanced_wood_production"
+            }
+          ]
+        },
+        {
+          "level": 6,
+          "ability_value": 0.3,
+          "time": 506880,
+          "power": 113000,
+          "resources": {
+            "food": 1788480,
+            "lumber": 894240,
+            "stone": 1788480,
+            "gold": 5365440
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 23
+            },
+            {
+              "type": "research",
+              "level": 5,
+              "code": "advanced_wood_production"
+            }
+          ]
+        },
+        {
+          "level": 7,
+          "ability_value": 0.4,
+          "time": 1013760,
+          "power": 169700,
+          "resources": {
+            "food": 2592000,
+            "lumber": 1296000,
+            "stone": 2592000,
+            "gold": 7776000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 24
+            },
+            {
+              "type": "research",
+              "level": 6,
+              "code": "advanced_wood_production"
+            }
+          ]
+        },
+        {
+          "level": 8,
+          "ability_value": 0.5,
+          "time": 2027520,
+          "power": 236750,
+          "resources": {
+            "food": 3628800,
+            "lumber": 1814400,
+            "stone": 3628800,
+            "gold": 10886400
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 24
+            },
+            {
+              "type": "research",
+              "level": 7,
+              "code": "advanced_wood_production"
+            }
+          ]
+        },
+        {
+          "level": 9,
+          "ability_value": 0.6,
+          "time": 4055040,
+          "power": 316250,
+          "resources": {
+            "food": 5114880,
+            "lumber": 2557440,
+            "stone": 5114880,
+            "gold": 15344640
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 24
+            },
+            {
+              "type": "research",
+              "level": 8,
+              "code": "advanced_wood_production"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "ability_value": 0.8,
+          "time": 8110080,
+          "power": 412250,
+          "resources": {
+            "food": 7452000,
+            "lumber": 3726000,
+            "stone": 7452000,
+            "gold": 22356000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 25
+            },
+            {
+              "type": "research",
+              "level": 9,
+              "code": "advanced_wood_production"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "advanced_wood_capacity",
+      "name": "Adv. Wood Capacity",
+      "row": "wood",
+      "category": "production",
+      "stat": "advanced_wood_capacity",
+      "type": "buff",
+      "max_level": 10,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 0.02,
+          "time": 20160,
+          "power": 8050,
+          "resources": {
+            "food": 470400,
+            "lumber": 235200,
+            "stone": 470400,
+            "gold": 1411200
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 24
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "advanced_gold_production"
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.05,
+          "time": 40320,
+          "power": 17550,
+          "resources": {
+            "food": 658560,
+            "lumber": 329280,
+            "stone": 658560,
+            "gold": 1975680
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 24
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "advanced_wood_capacity"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.1,
+          "time": 80640,
+          "power": 40250,
+          "resources": {
+            "food": 940800,
+            "lumber": 470400,
+            "stone": 940800,
+            "gold": 2822400
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 24
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "advanced_wood_capacity"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.15,
+          "time": 161280,
+          "power": 67250,
+          "resources": {
+            "food": 1323000,
+            "lumber": 661500,
+            "stone": 1323000,
+            "gold": 3969000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 25
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "advanced_wood_capacity"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.2,
+          "time": 322560,
+          "power": 99250,
+          "resources": {
+            "food": 1862000,
+            "lumber": 931000,
+            "stone": 1862000,
+            "gold": 5586000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 25
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "advanced_wood_capacity"
+            }
+          ]
+        },
+        {
+          "level": 6,
+          "ability_value": 0.3,
+          "time": 645120,
+          "power": 137350,
+          "resources": {
+            "food": 2646000,
+            "lumber": 1323000,
+            "stone": 2646000,
+            "gold": 7938000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 25
+            },
+            {
+              "type": "research",
+              "level": 5,
+              "code": "advanced_wood_capacity"
+            }
+          ]
+        },
+        {
+          "level": 7,
+          "ability_value": 0.4,
+          "time": 1290240,
+          "power": 206050,
+          "resources": {
+            "food": 3822000,
+            "lumber": 1911000,
+            "stone": 3822000,
+            "gold": 11466000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 26
+            },
+            {
+              "type": "research",
+              "level": 6,
+              "code": "advanced_wood_capacity"
+            }
+          ]
+        },
+        {
+          "level": 8,
+          "ability_value": 0.5,
+          "time": 2580480,
+          "power": 287350,
+          "resources": {
+            "food": 5350800,
+            "lumber": 2675400,
+            "stone": 5350800,
+            "gold": 16052400
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 26
+            },
+            {
+              "type": "research",
+              "level": 7,
+              "code": "advanced_wood_capacity"
+            }
+          ]
+        },
+        {
+          "level": 9,
+          "ability_value": 0.6,
+          "time": 5160960,
+          "power": 383950,
+          "resources": {
+            "food": 7542080,
+            "lumber": 3771040,
+            "stone": 7542080,
+            "gold": 22626240
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 26
+            },
+            {
+              "type": "research",
+              "level": 8,
+              "code": "advanced_wood_capacity"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "ability_value": 0.8,
+          "time": 10321920,
+          "power": 500350,
+          "resources": {
+            "food": 10954440,
+            "lumber": 5477220,
+            "stone": 10954440,
+            "gold": 32863320
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 27
+            },
+            {
+              "type": "research",
+              "level": 9,
+              "code": "advanced_wood_capacity"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "advanced_wood_gathering_speed",
+      "name": "Adv. Wood Gathering Speed",
+      "row": "wood",
+      "category": "production",
+      "stat": "advanced_wood_gathering_speed",
+      "type": "buff",
+      "max_level": 10,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 0.02,
+          "time": 30240,
+          "power": 11150,
+          "resources": {
+            "food": 907200,
+            "lumber": 453600,
+            "stone": 907200,
+            "gold": 2721600
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 28
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "advanced_construction_speed"
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.05,
+          "time": 60480,
+          "power": 24350,
+          "resources": {
+            "food": 1270080,
+            "lumber": 635040,
+            "stone": 1270080,
+            "gold": 3810240
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 28
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "advanced_wood_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.1,
+          "time": 120960,
+          "power": 55950,
+          "resources": {
+            "food": 1814400,
+            "lumber": 907200,
+            "stone": 1814400,
+            "gold": 5443200
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 28
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "advanced_wood_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.15,
+          "time": 241920,
+          "power": 93350,
+          "resources": {
+            "food": 2536920,
+            "lumber": 1268460,
+            "stone": 2536920,
+            "gold": 7610760
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 29
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "advanced_wood_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.2,
+          "time": 483840,
+          "power": 137650,
+          "resources": {
+            "food": 3570480,
+            "lumber": 1785240,
+            "stone": 3570480,
+            "gold": 10711440
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 29
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "advanced_wood_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 6,
+          "ability_value": 0.3,
+          "time": 967680,
+          "power": 190450,
+          "resources": {
+            "food": 5073840,
+            "lumber": 2536920,
+            "stone": 5073840,
+            "gold": 15221520
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 29
+            },
+            {
+              "type": "research",
+              "level": 5,
+              "code": "advanced_wood_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 7,
+          "ability_value": 0.4,
+          "time": 1935360,
+          "power": 285400,
+          "resources": {
+            "food": 7290000,
+            "lumber": 3645000,
+            "stone": 7290000,
+            "gold": 21870000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 30
+            },
+            {
+              "type": "research",
+              "level": 6,
+              "code": "advanced_wood_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 8,
+          "ability_value": 0.5,
+          "time": 3870720,
+          "power": 397750,
+          "resources": {
+            "food": 10206000,
+            "lumber": 5103000,
+            "stone": 10206000,
+            "gold": 30618000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 30
+            },
+            {
+              "type": "research",
+              "level": 7,
+              "code": "advanced_wood_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 9,
+          "ability_value": 0.6,
+          "time": 7741440,
+          "power": 531100,
+          "resources": {
+            "food": 14385600,
+            "lumber": 7192800,
+            "stone": 14385600,
+            "gold": 43156800
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 30
+            },
+            {
+              "type": "research",
+              "level": 8,
+              "code": "advanced_wood_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "ability_value": 0.8,
+          "time": 15482880,
+          "power": 688900,
+          "resources": {
+            "food": 20120400,
+            "lumber": 10060200,
+            "stone": 20120400,
+            "gold": 60361200
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 30
+            },
+            {
+              "type": "research",
+              "level": 9,
+              "code": "advanced_wood_gathering_speed"
+            }
+          ]
+        }
       ]
     },
     {
       "code": "stone_production",
       "name": "Stone Production",
+      "row": "stone",
       "category": "production",
       "stat": "stone_production",
       "type": "buff",
       "max_level": 5,
       "levels": [
-        {"level": 1, "ability_value": 0.02, "time": 60,    "power": 50,  "resources": {"food": 300,   "lumber": 200,   "stone": 400,   "gold": 1000},  "requirements": [{"type": "academy", "level": 1}]},
-        {"level": 2, "ability_value": 0.04, "time": 300,   "power": 100, "resources": {"food": 900,   "lumber": 600,   "stone": 1200,  "gold": 3000},  "requirements": [{"type": "academy", "level": 1}]},
-        {"level": 3, "ability_value": 0.06, "time": 1800,  "power": 150, "resources": {"food": 2700,  "lumber": 1800,  "stone": 3600,  "gold": 9000},  "requirements": [{"type": "academy", "level": 1}]},
-        {"level": 4, "ability_value": 0.08, "time": 7200,  "power": 200, "resources": {"food": 8100,  "lumber": 5400,  "stone": 10800, "gold": 27000}, "requirements": [{"type": "academy", "level": 1}]},
-        {"level": 5, "ability_value": 0.10, "time": 21600, "power": 250, "resources": {"food": 24300, "lumber": 16200, "stone": 32400, "gold": 81000}, "requirements": [{"type": "academy", "level": 1}]}
+        {
+          "level": 1,
+          "ability_value": 0.02,
+          "time": 3,
+          "power": 50,
+          "resources": {
+            "food": 500,
+            "lumber": 500,
+            "stone": 250,
+            "gold": 1500
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 1
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.05,
+          "time": 90,
+          "power": 110,
+          "resources": {
+            "food": 600,
+            "lumber": 600,
+            "stone": 300,
+            "gold": 1800
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 1
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "stone_production"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.1,
+          "time": 138,
+          "power": 290,
+          "resources": {
+            "food": 1400,
+            "lumber": 1400,
+            "stone": 700,
+            "gold": 4200
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 2
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "stone_production"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.15,
+          "time": 204,
+          "power": 490,
+          "resources": {
+            "food": 1700,
+            "lumber": 1700,
+            "stone": 850,
+            "gold": 5100
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 2
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "stone_production"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.25,
+          "time": 306,
+          "power": 1010,
+          "resources": {
+            "food": 3150,
+            "lumber": 3150,
+            "stone": 1575,
+            "gold": 9450
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 3
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "stone_production"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "stone_capacity",
+      "name": "Stone Capacity",
+      "row": "stone",
+      "category": "production",
+      "stat": "stone_capacity",
+      "type": "buff",
+      "max_level": 5,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 0.02,
+          "time": 900,
+          "power": 440,
+          "resources": {
+            "food": 9000,
+            "lumber": 9000,
+            "stone": 4500,
+            "gold": 27000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 5
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "gold_production"
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.05,
+          "time": 1350,
+          "power": 920,
+          "resources": {
+            "food": 10800,
+            "lumber": 10800,
+            "stone": 5400,
+            "gold": 32400
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 5
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "stone_capacity"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.1,
+          "time": 2070,
+          "power": 2080,
+          "resources": {
+            "food": 15120,
+            "lumber": 15120,
+            "stone": 7560,
+            "gold": 45360
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 6
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "stone_capacity"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.15,
+          "time": 3060,
+          "power": 3360,
+          "resources": {
+            "food": 18360,
+            "lumber": 18360,
+            "stone": 9180,
+            "gold": 55080
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 6
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "stone_capacity"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.25,
+          "time": 4590,
+          "power": 5640,
+          "resources": {
+            "food": 26460,
+            "lumber": 26460,
+            "stone": 13230,
+            "gold": 79380
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 7
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "stone_capacity"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "stone_gathering_speed",
+      "name": "Stone Gathering Speed",
+      "row": "stone",
+      "category": "production",
+      "stat": "stone_gathering_speed",
+      "type": "buff",
+      "max_level": 5,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 0.02,
+          "time": 2700,
+          "power": 1260,
+          "resources": {
+            "food": 31500,
+            "lumber": 31500,
+            "stone": 15750,
+            "gold": 94500
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 9
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "gold_capacity"
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.05,
+          "time": 4050,
+          "power": 2640,
+          "resources": {
+            "food": 37800,
+            "lumber": 37800,
+            "stone": 18900,
+            "gold": 113400
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 9
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "stone_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.1,
+          "time": 6210,
+          "power": 5760,
+          "resources": {
+            "food": 49000,
+            "lumber": 49000,
+            "stone": 24500,
+            "gold": 147000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 10
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "stone_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.15,
+          "time": 9180,
+          "power": 9180,
+          "resources": {
+            "food": 59500,
+            "lumber": 59500,
+            "stone": 29750,
+            "gold": 178500
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 10
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "stone_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.25,
+          "time": 13770,
+          "power": 13200,
+          "resources": {
+            "food": 80850,
+            "lumber": 80850,
+            "stone": 40425,
+            "gold": 242550
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 11
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "stone_gathering_speed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "advanced_stone_production",
+      "name": "Adv. Stone Production",
+      "row": "stone",
+      "category": "production",
+      "stat": "advanced_stone_production",
+      "type": "buff",
+      "max_level": 10,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 0.02,
+          "time": 15840,
+          "power": 6600,
+          "resources": {
+            "food": 316800,
+            "lumber": 316800,
+            "stone": 158400,
+            "gold": 950400
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 22
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "resource_protect"
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.05,
+          "time": 31680,
+          "power": 14400,
+          "resources": {
+            "food": 443520,
+            "lumber": 443520,
+            "stone": 221760,
+            "gold": 1330560
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 22
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "advanced_stone_production"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.1,
+          "time": 63360,
+          "power": 33100,
+          "resources": {
+            "food": 633600,
+            "lumber": 633600,
+            "stone": 316800,
+            "gold": 1900800
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 22
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "advanced_stone_production"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.15,
+          "time": 126720,
+          "power": 55300,
+          "resources": {
+            "food": 894240,
+            "lumber": 894240,
+            "stone": 447120,
+            "gold": 2682720
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 23
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "advanced_stone_production"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.2,
+          "time": 253440,
+          "power": 81600,
+          "resources": {
+            "food": 1258560,
+            "lumber": 1258560,
+            "stone": 629280,
+            "gold": 3775680
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 23
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "advanced_stone_production"
+            }
+          ]
+        },
+        {
+          "level": 6,
+          "ability_value": 0.3,
+          "time": 506880,
+          "power": 113000,
+          "resources": {
+            "food": 1788480,
+            "lumber": 1788480,
+            "stone": 894240,
+            "gold": 5365440
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 23
+            },
+            {
+              "type": "research",
+              "level": 5,
+              "code": "advanced_stone_production"
+            }
+          ]
+        },
+        {
+          "level": 7,
+          "ability_value": 0.4,
+          "time": 1013760,
+          "power": 169700,
+          "resources": {
+            "food": 2592000,
+            "lumber": 2592000,
+            "stone": 1296000,
+            "gold": 7776000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 24
+            },
+            {
+              "type": "research",
+              "level": 6,
+              "code": "advanced_stone_production"
+            }
+          ]
+        },
+        {
+          "level": 8,
+          "ability_value": 0.5,
+          "time": 2027520,
+          "power": 236750,
+          "resources": {
+            "food": 3628800,
+            "lumber": 3628800,
+            "stone": 1814400,
+            "gold": 10886400
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 24
+            },
+            {
+              "type": "research",
+              "level": 7,
+              "code": "advanced_stone_production"
+            }
+          ]
+        },
+        {
+          "level": 9,
+          "ability_value": 0.6,
+          "time": 4055040,
+          "power": 316250,
+          "resources": {
+            "food": 5114880,
+            "lumber": 5114880,
+            "stone": 2557440,
+            "gold": 15344640
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 24
+            },
+            {
+              "type": "research",
+              "level": 8,
+              "code": "advanced_stone_production"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "ability_value": 0.8,
+          "time": 8110080,
+          "power": 412250,
+          "resources": {
+            "food": 7452000,
+            "lumber": 7452000,
+            "stone": 3726000,
+            "gold": 22356000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 25
+            },
+            {
+              "type": "research",
+              "level": 9,
+              "code": "advanced_stone_production"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "advanced_stone_capacity",
+      "name": "Adv. Stone Capacity",
+      "row": "stone",
+      "category": "production",
+      "stat": "advanced_stone_capacity",
+      "type": "buff",
+      "max_level": 10,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 0.02,
+          "time": 20160,
+          "power": 8050,
+          "resources": {
+            "food": 470400,
+            "lumber": 470400,
+            "stone": 235200,
+            "gold": 1411200
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 24
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "advanced_gold_production"
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.05,
+          "time": 40320,
+          "power": 17550,
+          "resources": {
+            "food": 658560,
+            "lumber": 658560,
+            "stone": 329280,
+            "gold": 1975680
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 24
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "advanced_stone_capacity"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.1,
+          "time": 80640,
+          "power": 40250,
+          "resources": {
+            "food": 940800,
+            "lumber": 940800,
+            "stone": 470400,
+            "gold": 2822400
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 24
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "advanced_stone_capacity"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.15,
+          "time": 161280,
+          "power": 67250,
+          "resources": {
+            "food": 1323000,
+            "lumber": 1323000,
+            "stone": 661500,
+            "gold": 3969000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 25
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "advanced_stone_capacity"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.2,
+          "time": 322560,
+          "power": 99250,
+          "resources": {
+            "food": 1862000,
+            "lumber": 1862000,
+            "stone": 931000,
+            "gold": 5586000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 25
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "advanced_stone_capacity"
+            }
+          ]
+        },
+        {
+          "level": 6,
+          "ability_value": 0.3,
+          "time": 645120,
+          "power": 137350,
+          "resources": {
+            "food": 2646000,
+            "lumber": 2646000,
+            "stone": 1323000,
+            "gold": 7938000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 25
+            },
+            {
+              "type": "research",
+              "level": 5,
+              "code": "advanced_stone_capacity"
+            }
+          ]
+        },
+        {
+          "level": 7,
+          "ability_value": 0.4,
+          "time": 1290240,
+          "power": 206050,
+          "resources": {
+            "food": 3822000,
+            "lumber": 3822000,
+            "stone": 1911000,
+            "gold": 11466000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 26
+            },
+            {
+              "type": "research",
+              "level": 6,
+              "code": "advanced_stone_capacity"
+            }
+          ]
+        },
+        {
+          "level": 8,
+          "ability_value": 0.5,
+          "time": 2580480,
+          "power": 287350,
+          "resources": {
+            "food": 5350800,
+            "lumber": 5350800,
+            "stone": 2675400,
+            "gold": 16052400
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 26
+            },
+            {
+              "type": "research",
+              "level": 7,
+              "code": "advanced_stone_capacity"
+            }
+          ]
+        },
+        {
+          "level": 9,
+          "ability_value": 0.6,
+          "time": 5160960,
+          "power": 383950,
+          "resources": {
+            "food": 7542080,
+            "lumber": 7542080,
+            "stone": 3771040,
+            "gold": 22626240
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 26
+            },
+            {
+              "type": "research",
+              "level": 8,
+              "code": "advanced_stone_capacity"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "ability_value": 0.8,
+          "time": 10321920,
+          "power": 500350,
+          "resources": {
+            "food": 10954440,
+            "lumber": 10954440,
+            "stone": 5477220,
+            "gold": 32863320
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 27
+            },
+            {
+              "type": "research",
+              "level": 9,
+              "code": "advanced_stone_capacity"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "advanced_stone_gathering_speed",
+      "name": "Adv. Stone Gathering Speed",
+      "row": "stone",
+      "category": "production",
+      "stat": "advanced_stone_gathering_speed",
+      "type": "buff",
+      "max_level": 10,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 0.02,
+          "time": 30240,
+          "power": 11150,
+          "resources": {
+            "food": 907200,
+            "lumber": 907200,
+            "stone": 453600,
+            "gold": 2721600
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 28
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "advanced_construction_speed"
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.05,
+          "time": 60480,
+          "power": 24350,
+          "resources": {
+            "food": 1270080,
+            "lumber": 1270080,
+            "stone": 635040,
+            "gold": 3810240
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 28
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "advanced_stone_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.1,
+          "time": 120960,
+          "power": 55950,
+          "resources": {
+            "food": 1814400,
+            "lumber": 1814400,
+            "stone": 907200,
+            "gold": 5443200
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 28
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "advanced_stone_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.15,
+          "time": 241920,
+          "power": 93350,
+          "resources": {
+            "food": 2536920,
+            "lumber": 2536920,
+            "stone": 1268460,
+            "gold": 7610760
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 29
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "advanced_stone_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.2,
+          "time": 483840,
+          "power": 137650,
+          "resources": {
+            "food": 3570480,
+            "lumber": 3570480,
+            "stone": 1785240,
+            "gold": 10711440
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 29
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "advanced_stone_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 6,
+          "ability_value": 0.3,
+          "time": 967680,
+          "power": 190450,
+          "resources": {
+            "food": 5073840,
+            "lumber": 5073840,
+            "stone": 2536920,
+            "gold": 15221520
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 29
+            },
+            {
+              "type": "research",
+              "level": 5,
+              "code": "advanced_stone_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 7,
+          "ability_value": 0.4,
+          "time": 1935360,
+          "power": 285400,
+          "resources": {
+            "food": 7290000,
+            "lumber": 7290000,
+            "stone": 3645000,
+            "gold": 21870000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 30
+            },
+            {
+              "type": "research",
+              "level": 6,
+              "code": "advanced_stone_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 8,
+          "ability_value": 0.5,
+          "time": 3870720,
+          "power": 397750,
+          "resources": {
+            "food": 10206000,
+            "lumber": 10206000,
+            "stone": 5103000,
+            "gold": 30618000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 30
+            },
+            {
+              "type": "research",
+              "level": 7,
+              "code": "advanced_stone_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 9,
+          "ability_value": 0.6,
+          "time": 7741440,
+          "power": 531100,
+          "resources": {
+            "food": 14385600,
+            "lumber": 14385600,
+            "stone": 7192800,
+            "gold": 43156800
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 30
+            },
+            {
+              "type": "research",
+              "level": 8,
+              "code": "advanced_stone_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "ability_value": 0.8,
+          "time": 15482880,
+          "power": 688900,
+          "resources": {
+            "food": 20120400,
+            "lumber": 20120400,
+            "stone": 10060200,
+            "gold": 60361200
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 30
+            },
+            {
+              "type": "research",
+              "level": 9,
+              "code": "advanced_stone_gathering_speed"
+            }
+          ]
+        }
       ]
     },
     {
       "code": "gold_production",
       "name": "Gold Production",
+      "row": "general",
       "category": "production",
       "stat": "gold_production",
       "type": "buff",
       "max_level": 5,
       "levels": [
-        {"level": 1, "ability_value": 0.02, "time": 60,    "power": 50,  "resources": {"food": 300,   "lumber": 200,   "stone": 400,   "gold": 1000},  "requirements": [{"type": "academy", "level": 1}]},
-        {"level": 2, "ability_value": 0.04, "time": 300,   "power": 100, "resources": {"food": 900,   "lumber": 600,   "stone": 1200,  "gold": 3000},  "requirements": [{"type": "academy", "level": 1}]},
-        {"level": 3, "ability_value": 0.06, "time": 1800,  "power": 150, "resources": {"food": 2700,  "lumber": 1800,  "stone": 3600,  "gold": 9000},  "requirements": [{"type": "academy", "level": 1}]},
-        {"level": 4, "ability_value": 0.08, "time": 7200,  "power": 200, "resources": {"food": 8100,  "lumber": 5400,  "stone": 10800, "gold": 27000}, "requirements": [{"type": "academy", "level": 1}]},
-        {"level": 5, "ability_value": 0.10, "time": 21600, "power": 250, "resources": {"food": 24300, "lumber": 16200, "stone": 32400, "gold": 81000}, "requirements": [{"type": "academy", "level": 1}]}
+        {
+          "level": 1,
+          "ability_value": 0.02,
+          "time": 360,
+          "power": 240,
+          "resources": {
+            "food": 4500,
+            "lumber": 4500,
+            "stone": 4500,
+            "gold": 1500
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 3
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "food_production"
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "wood_production"
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "stone_production"
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.05,
+          "time": 540,
+          "power": 500,
+          "resources": {
+            "food": 5400,
+            "lumber": 5400,
+            "stone": 5400,
+            "gold": 1800
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 3
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "gold_production"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.1,
+          "time": 828,
+          "power": 1180,
+          "resources": {
+            "food": 8400,
+            "lumber": 8400,
+            "stone": 8400,
+            "gold": 2800
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 4
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "gold_production"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.15,
+          "time": 1224,
+          "power": 1900,
+          "resources": {
+            "food": 10200,
+            "lumber": 10200,
+            "stone": 10200,
+            "gold": 3400
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 4
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "gold_production"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.25,
+          "time": 1836,
+          "power": 2820,
+          "resources": {
+            "food": 15750,
+            "lumber": 15750,
+            "stone": 15750,
+            "gold": 5250
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 5
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "gold_production"
+            }
+          ]
+        }
       ]
     },
     {
-      "code": "hospital_capacity",
-      "name": "Hospital Capacity",
-      "category": "general",
-      "stat": "hospital_capacity",
+      "code": "gold_capacity",
+      "name": "Gold Capacity",
+      "row": "general",
+      "category": "production",
+      "stat": "gold_capacity",
       "type": "buff",
       "max_level": 5,
       "levels": [
-        {"level": 1, "ability_value": 500,  "time": 120,  "power": 50,  "resources": {"food": 500,  "lumber": 500,  "stone": 500,  "gold": 0}, "requirements": [{"type": "academy", "level": 1}]},
-        {"level": 2, "ability_value": 1000, "time": 300,  "power": 100, "resources": {"food": 1000, "lumber": 1000, "stone": 1000, "gold": 0}, "requirements": [{"type": "academy", "level": 1}]},
-        {"level": 3, "ability_value": 1500, "time": 600,  "power": 150, "resources": {"food": 2000, "lumber": 2000, "stone": 2000, "gold": 0}, "requirements": [{"type": "academy", "level": 1}]},
-        {"level": 4, "ability_value": 2000, "time": 1200, "power": 200, "resources": {"food": 4000, "lumber": 4000, "stone": 4000, "gold": 0}, "requirements": [{"type": "academy", "level": 2}]},
-        {"level": 5, "ability_value": 2500, "time": 2400, "power": 250, "resources": {"food": 8000, "lumber": 8000, "stone": 8000, "gold": 0}, "requirements": [{"type": "academy", "level": 2}]}
+        {
+          "level": 1,
+          "ability_value": 0.02,
+          "time": 1680,
+          "power": 870,
+          "resources": {
+            "food": 25200,
+            "lumber": 25200,
+            "stone": 25200,
+            "gold": 8400
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 7
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "food_capacity"
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "wood_capacity"
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "stone_capacity"
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.05,
+          "time": 2520,
+          "power": 1830,
+          "resources": {
+            "food": 30240,
+            "lumber": 30240,
+            "stone": 30240,
+            "gold": 10080
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 7
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "gold_capacity"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.1,
+          "time": 3864,
+          "power": 4050,
+          "resources": {
+            "food": 40320,
+            "lumber": 40320,
+            "stone": 40320,
+            "gold": 13440
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 8
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "gold_capacity"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.15,
+          "time": 5712,
+          "power": 6450,
+          "resources": {
+            "food": 48960,
+            "lumber": 48960,
+            "stone": 48960,
+            "gold": 16320
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 8
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "gold_capacity"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.25,
+          "time": 8568,
+          "power": 9330,
+          "resources": {
+            "food": 68040,
+            "lumber": 68040,
+            "stone": 68040,
+            "gold": 22680
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 9
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "gold_capacity"
+            }
+          ]
+        }
       ]
     },
     {
-      "code": "healing_speed",
-      "name": "Healing Speed",
-      "category": "general",
-      "stat": "healing_speed",
+      "code": "gold_gathering_speed",
+      "name": "Gold Gathering Speed",
+      "row": "general",
+      "category": "production",
+      "stat": "gold_gathering_speed",
       "type": "buff",
       "max_level": 5,
       "levels": [
-        {"level": 1, "ability_value": 0.05, "time": 600,   "power": 50,  "resources": {"food": 2000,  "lumber": 2000,  "stone": 2000,  "gold": 500},  "requirements": [{"type": "academy", "level": 2}]},
-        {"level": 2, "ability_value": 0.10, "time": 1800,  "power": 100, "resources": {"food": 6000,  "lumber": 6000,  "stone": 6000,  "gold": 1500}, "requirements": [{"type": "academy", "level": 2}]},
-        {"level": 3, "ability_value": 0.15, "time": 5400,  "power": 150, "resources": {"food": 18000, "lumber": 18000, "stone": 18000, "gold": 4500}, "requirements": [{"type": "academy", "level": 3}]},
-        {"level": 4, "ability_value": 0.20, "time": 16200, "power": 200, "resources": {"food": 54000, "lumber": 54000, "stone": 54000, "gold": 13500},"requirements": [{"type": "academy", "level": 3}]},
-        {"level": 5, "ability_value": 0.25, "time": 48600, "power": 250, "resources": {"food": 162000,"lumber": 162000,"stone": 162000,"gold": 40500},"requirements": [{"type": "academy", "level": 4}]}
+        {
+          "level": 1,
+          "ability_value": 0.02,
+          "time": 3960,
+          "power": 1440,
+          "resources": {
+            "food": 69300,
+            "lumber": 69300,
+            "stone": 69300,
+            "gold": 23100
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 11
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "food_gathering_speed"
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "wood_gathering_speed"
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "stone_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.05,
+          "time": 5940,
+          "power": 3030,
+          "resources": {
+            "food": 83160,
+            "lumber": 83160,
+            "stone": 83160,
+            "gold": 27720
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 11
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "gold_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.1,
+          "time": 9108,
+          "power": 6570,
+          "resources": {
+            "food": 105840,
+            "lumber": 105840,
+            "stone": 105840,
+            "gold": 35280
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 12
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "gold_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.15,
+          "time": 13464,
+          "power": 10470,
+          "resources": {
+            "food": 128520,
+            "lumber": 128520,
+            "stone": 128520,
+            "gold": 42840
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 12
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "gold_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.25,
+          "time": 20196,
+          "power": 16550,
+          "resources": {
+            "food": 171990,
+            "lumber": 171990,
+            "stone": 171990,
+            "gold": 57330
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 13
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "gold_gathering_speed"
+            }
+          ]
+        }
       ]
     },
     {
-      "code": "construction_speed",
-      "name": "Construction Speed",
-      "category": "general",
-      "stat": "construction_speed",
+      "code": "crystal_gathering_speed",
+      "name": "Crystal Gathering Speed",
+      "row": "general",
+      "category": "production",
+      "stat": "crystal_gathering_speed",
       "type": "buff",
       "max_level": 5,
       "levels": [
-        {"level": 1, "ability_value": 0.03, "time": 300,   "power": 50,  "resources": {"food": 0, "lumber": 1000,  "stone": 1000,  "gold": 500},   "requirements": [{"type": "academy", "level": 1}]},
-        {"level": 2, "ability_value": 0.06, "time": 900,   "power": 100, "resources": {"food": 0, "lumber": 3000,  "stone": 3000,  "gold": 1500},  "requirements": [{"type": "academy", "level": 1}]},
-        {"level": 3, "ability_value": 0.09, "time": 2700,  "power": 150, "resources": {"food": 0, "lumber": 9000,  "stone": 9000,  "gold": 4500},  "requirements": [{"type": "academy", "level": 2}]},
-        {"level": 4, "ability_value": 0.12, "time": 8100,  "power": 200, "resources": {"food": 0, "lumber": 27000, "stone": 27000, "gold": 13500}, "requirements": [{"type": "academy", "level": 3}]},
-        {"level": 5, "ability_value": 0.15, "time": 24300, "power": 250, "resources": {"food": 0, "lumber": 81000, "stone": 81000, "gold": 40500}, "requirements": [{"type": "academy", "level": 4}]}
+        {
+          "level": 1,
+          "ability_value": 0.02,
+          "time": 5460,
+          "power": 3040,
+          "resources": {
+            "food": 127400,
+            "lumber": 127400,
+            "stone": 127400,
+            "gold": 191100
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 13
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "gold_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.05,
+          "time": 8190,
+          "power": 6360,
+          "resources": {
+            "food": 152880,
+            "lumber": 152880,
+            "stone": 152880,
+            "gold": 229320
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 13
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "crystal_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.1,
+          "time": 12558,
+          "power": 13800,
+          "resources": {
+            "food": 192080,
+            "lumber": 192080,
+            "stone": 192080,
+            "gold": 288120
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 14
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "crystal_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.15,
+          "time": 18564,
+          "power": 21960,
+          "resources": {
+            "food": 233240,
+            "lumber": 233240,
+            "stone": 233240,
+            "gold": 349860
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 14
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "crystal_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.25,
+          "time": 27846,
+          "power": 31400,
+          "resources": {
+            "food": 308700,
+            "lumber": 308700,
+            "stone": 308700,
+            "gold": 463050
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 15
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "crystal_gathering_speed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "infantry_storage",
+      "name": "Infantry Storage",
+      "row": "general",
+      "category": "infantry",
+      "stat": "storage",
+      "type": "buff",
+      "max_level": 5,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 0.01,
+          "time": 7200,
+          "power": 3040,
+          "resources": {
+            "food": 96000,
+            "lumber": 48000,
+            "stone": 144000,
+            "gold": 288000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 15
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "crystal_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.03,
+          "time": 12240,
+          "power": 6520,
+          "resources": {
+            "food": 124800,
+            "lumber": 62400,
+            "stone": 187200,
+            "gold": 374400
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 15
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "infantry_storage"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.06,
+          "time": 20880,
+          "power": 14680,
+          "resources": {
+            "food": 174080,
+            "lumber": 87040,
+            "stone": 261120,
+            "gold": 522240
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 16
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "infantry_storage"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.1,
+          "time": 35280,
+          "power": 23960,
+          "resources": {
+            "food": 225280,
+            "lumber": 112640,
+            "stone": 337920,
+            "gold": 675840
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 16
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "infantry_storage"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.15,
+          "time": 60480,
+          "power": 35000,
+          "resources": {
+            "food": 315520,
+            "lumber": 157760,
+            "stone": 473280,
+            "gold": 946560
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 17
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "infantry_storage"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "ranged_storage",
+      "name": "Ranged Storage",
+      "row": "general",
+      "category": "ranged",
+      "stat": "storage",
+      "type": "buff",
+      "max_level": 5,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 0.01,
+          "time": 7200,
+          "power": 3040,
+          "resources": {
+            "food": 48000,
+            "lumber": 144000,
+            "stone": 96000,
+            "gold": 288000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 15
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "crystal_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.03,
+          "time": 12240,
+          "power": 6520,
+          "resources": {
+            "food": 62400,
+            "lumber": 187200,
+            "stone": 124800,
+            "gold": 374400
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 15
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "ranged_storage"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.06,
+          "time": 20880,
+          "power": 14680,
+          "resources": {
+            "food": 87040,
+            "lumber": 261120,
+            "stone": 174080,
+            "gold": 522240
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 16
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "ranged_storage"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.1,
+          "time": 35280,
+          "power": 23960,
+          "resources": {
+            "food": 112640,
+            "lumber": 337920,
+            "stone": 225280,
+            "gold": 675840
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 16
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "ranged_storage"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.15,
+          "time": 60480,
+          "power": 35000,
+          "resources": {
+            "food": 157760,
+            "lumber": 473280,
+            "stone": 315520,
+            "gold": 946560
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 17
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "ranged_storage"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "cavalry_storage",
+      "name": "Cavalry Storage",
+      "row": "general",
+      "category": "cavalry",
+      "stat": "storage",
+      "type": "buff",
+      "max_level": 5,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 0.01,
+          "time": 7200,
+          "power": 3040,
+          "resources": {
+            "food": 144000,
+            "lumber": 96000,
+            "stone": 48000,
+            "gold": 288000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 15
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "crystal_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.03,
+          "time": 12240,
+          "power": 6520,
+          "resources": {
+            "food": 187200,
+            "lumber": 124800,
+            "stone": 62400,
+            "gold": 374400
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 15
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "cavalry_storage"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.06,
+          "time": 20880,
+          "power": 14680,
+          "resources": {
+            "food": 261120,
+            "lumber": 174080,
+            "stone": 87040,
+            "gold": 522240
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 16
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "cavalry_storage"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.1,
+          "time": 35280,
+          "power": 23960,
+          "resources": {
+            "food": 337920,
+            "lumber": 225280,
+            "stone": 112640,
+            "gold": 675840
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 16
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "cavalry_storage"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.15,
+          "time": 60480,
+          "power": 35000,
+          "resources": {
+            "food": 473280,
+            "lumber": 315520,
+            "stone": 157760,
+            "gold": 946560
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 17
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "cavalry_storage"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "resource_protect",
+      "name": "Resource Protect",
+      "row": "general",
+      "category": "production",
+      "stat": "resource_protect",
+      "type": "buff",
+      "max_level": 5,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 0.01,
+          "time": 12540,
+          "power": 5000,
+          "resources": {
+            "food": 313500,
+            "lumber": 313500,
+            "stone": 313500,
+            "gold": 627000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 19
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "construction_speed"
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.03,
+          "time": 21318,
+          "power": 10720,
+          "resources": {
+            "food": 407550,
+            "lumber": 407550,
+            "stone": 407550,
+            "gold": 815100
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 19
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "resource_protect"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.06,
+          "time": 36366,
+          "power": 24080,
+          "resources": {
+            "food": 561000,
+            "lumber": 561000,
+            "stone": 561000,
+            "gold": 1122000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 20
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "resource_protect"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.1,
+          "time": 61446,
+          "power": 39360,
+          "resources": {
+            "food": 726000,
+            "lumber": 726000,
+            "stone": 726000,
+            "gold": 1452000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 20
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "resource_protect"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.15,
+          "time": 105336,
+          "power": 61760,
+          "resources": {
+            "food": 1004850,
+            "lumber": 1004850,
+            "stone": 1004850,
+            "gold": 2009700
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 21
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "resource_protect"
+            }
+          ]
+        }
       ]
     },
     {
       "code": "research_speed",
       "name": "Research Speed",
+      "row": "general",
       "category": "general",
       "stat": "research_speed",
       "type": "buff",
       "max_level": 5,
       "levels": [
-        {"level": 1, "ability_value": 0.03, "time": 600,   "power": 50,  "resources": {"food": 0, "lumber": 2000,  "stone": 2000,  "gold": 1000},  "requirements": [{"type": "academy", "level": 3}]},
-        {"level": 2, "ability_value": 0.06, "time": 1800,  "power": 100, "resources": {"food": 0, "lumber": 6000,  "stone": 6000,  "gold": 3000},  "requirements": [{"type": "academy", "level": 3}]},
-        {"level": 3, "ability_value": 0.09, "time": 5400,  "power": 150, "resources": {"food": 0, "lumber": 18000, "stone": 18000, "gold": 9000},  "requirements": [{"type": "academy", "level": 4}]},
-        {"level": 4, "ability_value": 0.12, "time": 16200, "power": 200, "resources": {"food": 0, "lumber": 54000, "stone": 54000, "gold": 27000}, "requirements": [{"type": "academy", "level": 5}]},
-        {"level": 5, "ability_value": 0.15, "time": 48600, "power": 250, "resources": {"food": 0, "lumber": 162000,"stone": 162000,"gold": 81000}, "requirements": [{"type": "academy", "level": 6}]}
+        {
+          "level": 1,
+          "ability_value": 0.01,
+          "time": 9180,
+          "power": 4280,
+          "resources": {
+            "food": 229500,
+            "lumber": 229500,
+            "stone": 229500,
+            "gold": 459000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 17
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "infantry_storage"
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "ranged_storage"
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "cavalry_storage"
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.03,
+          "time": 15606,
+          "power": 9160,
+          "resources": {
+            "food": 298350,
+            "lumber": 298350,
+            "stone": 298350,
+            "gold": 596700
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 17
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "research_speed"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.06,
+          "time": 26622,
+          "power": 20680,
+          "resources": {
+            "food": 413100,
+            "lumber": 413100,
+            "stone": 413100,
+            "gold": 826200
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 18
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "research_speed"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.1,
+          "time": 44982,
+          "power": 33720,
+          "resources": {
+            "food": 534600,
+            "lumber": 534600,
+            "stone": 534600,
+            "gold": 1069200
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 18
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "research_speed"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.15,
+          "time": 77112,
+          "power": 49160,
+          "resources": {
+            "food": 743850,
+            "lumber": 743850,
+            "stone": 743850,
+            "gold": 1487700
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 19
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "research_speed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "construction_speed",
+      "name": "Construction Speed",
+      "row": "general",
+      "category": "general",
+      "stat": "construction_speed",
+      "type": "buff",
+      "max_level": 5,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 0.01,
+          "time": 11400,
+          "power": 4760,
+          "resources": {
+            "food": 285000,
+            "lumber": 285000,
+            "stone": 285000,
+            "gold": 570000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 19
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "research_speed"
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.03,
+          "time": 19380,
+          "power": 10200,
+          "resources": {
+            "food": 370500,
+            "lumber": 370500,
+            "stone": 370500,
+            "gold": 741000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 19
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "construction_speed"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.06,
+          "time": 33060,
+          "power": 23000,
+          "resources": {
+            "food": 510000,
+            "lumber": 510000,
+            "stone": 510000,
+            "gold": 1020000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 20
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "construction_speed"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.1,
+          "time": 55860,
+          "power": 37560,
+          "resources": {
+            "food": 660000,
+            "lumber": 660000,
+            "stone": 660000,
+            "gold": 1320000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 20
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "construction_speed"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.15,
+          "time": 95760,
+          "power": 58960,
+          "resources": {
+            "food": 913500,
+            "lumber": 913500,
+            "stone": 913500,
+            "gold": 1827000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 21
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "construction_speed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "advanced_gold_production",
+      "name": "Adv. Gold Production",
+      "row": "general",
+      "category": "production",
+      "stat": "advanced_gold_production",
+      "type": "buff",
+      "max_level": 10,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 0.02,
+          "time": 17940,
+          "power": 6700,
+          "resources": {
+            "food": 538200,
+            "lumber": 538200,
+            "stone": 538200,
+            "gold": 179400
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 23
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "advanced_food_production"
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "advanced_wood_production"
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "advanced_stone_production"
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.05,
+          "time": 35880,
+          "power": 14600,
+          "resources": {
+            "food": 753480,
+            "lumber": 753480,
+            "stone": 753480,
+            "gold": 251160
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 23
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "advanced_gold_production"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.1,
+          "time": 71760,
+          "power": 33500,
+          "resources": {
+            "food": 1076400,
+            "lumber": 1076400,
+            "stone": 1076400,
+            "gold": 358800
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 23
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "advanced_gold_production"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.15,
+          "time": 143520,
+          "power": 56000,
+          "resources": {
+            "food": 1516320,
+            "lumber": 1516320,
+            "stone": 1516320,
+            "gold": 505440
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 24
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "advanced_gold_production"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.2,
+          "time": 287040,
+          "power": 82700,
+          "resources": {
+            "food": 2134080,
+            "lumber": 2134080,
+            "stone": 2134080,
+            "gold": 711360
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 24
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "advanced_gold_production"
+            }
+          ]
+        },
+        {
+          "level": 6,
+          "ability_value": 0.3,
+          "time": 574080,
+          "power": 114500,
+          "resources": {
+            "food": 3032640,
+            "lumber": 3032640,
+            "stone": 3032640,
+            "gold": 1010880
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 24
+            },
+            {
+              "type": "research",
+              "level": 5,
+              "code": "advanced_gold_production"
+            }
+          ]
+        },
+        {
+          "level": 7,
+          "ability_value": 0.4,
+          "time": 1148160,
+          "power": 171800,
+          "resources": {
+            "food": 4387500,
+            "lumber": 4387500,
+            "stone": 4387500,
+            "gold": 1462500
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 25
+            },
+            {
+              "type": "research",
+              "level": 6,
+              "code": "advanced_gold_production"
+            }
+          ]
+        },
+        {
+          "level": 8,
+          "ability_value": 0.5,
+          "time": 2296320,
+          "power": 239600,
+          "resources": {
+            "food": 6142500,
+            "lumber": 6142500,
+            "stone": 6142500,
+            "gold": 2047500
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 25
+            },
+            {
+              "type": "research",
+              "level": 7,
+              "code": "advanced_gold_production"
+            }
+          ]
+        },
+        {
+          "level": 9,
+          "ability_value": 0.6,
+          "time": 4592640,
+          "power": 320150,
+          "resources": {
+            "food": 8658000,
+            "lumber": 8658000,
+            "stone": 8658000,
+            "gold": 2886000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 25
+            },
+            {
+              "type": "research",
+              "level": 8,
+              "code": "advanced_gold_production"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "ability_value": 0.8,
+          "time": 9185280,
+          "power": 417350,
+          "resources": {
+            "food": 12593880,
+            "lumber": 12593880,
+            "stone": 12593880,
+            "gold": 4197960
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 26
+            },
+            {
+              "type": "research",
+              "level": 9,
+              "code": "advanced_gold_production"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "advanced_gold_capacity",
+      "name": "Adv. Gold Capacity",
+      "row": "general",
+      "category": "production",
+      "stat": "advanced_gold_capacity",
+      "type": "buff",
+      "max_level": 10,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 0.02,
+          "time": 22500,
+          "power": 8100,
+          "resources": {
+            "food": 787500,
+            "lumber": 787500,
+            "stone": 787500,
+            "gold": 262500
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 25
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "advanced_food_capacity"
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "advanced_wood_capacity"
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "advanced_stone_capacity"
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.05,
+          "time": 45000,
+          "power": 17700,
+          "resources": {
+            "food": 1102500,
+            "lumber": 1102500,
+            "stone": 1102500,
+            "gold": 367500
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 25
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "advanced_gold_capacity"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.1,
+          "time": 90000,
+          "power": 40600,
+          "resources": {
+            "food": 1575000,
+            "lumber": 1575000,
+            "stone": 1575000,
+            "gold": 525000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 25
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "advanced_gold_capacity"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.15,
+          "time": 180000,
+          "power": 67700,
+          "resources": {
+            "food": 2211300,
+            "lumber": 2211300,
+            "stone": 2211300,
+            "gold": 737100
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 26
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "advanced_gold_capacity"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.2,
+          "time": 360000,
+          "power": 99900,
+          "resources": {
+            "food": 3112200,
+            "lumber": 3112200,
+            "stone": 3112200,
+            "gold": 1037400
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 26
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "advanced_gold_capacity"
+            }
+          ]
+        },
+        {
+          "level": 6,
+          "ability_value": 0.3,
+          "time": 720000,
+          "power": 138300,
+          "resources": {
+            "food": 4422600,
+            "lumber": 4422600,
+            "stone": 4422600,
+            "gold": 1474200
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 26
+            },
+            {
+              "type": "research",
+              "level": 5,
+              "code": "advanced_gold_capacity"
+            }
+          ]
+        },
+        {
+          "level": 7,
+          "ability_value": 0.4,
+          "time": 1440000,
+          "power": 207450,
+          "resources": {
+            "food": 6378750,
+            "lumber": 6378750,
+            "stone": 6378750,
+            "gold": 2126250
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 27
+            },
+            {
+              "type": "research",
+              "level": 6,
+              "code": "advanced_gold_capacity"
+            }
+          ]
+        },
+        {
+          "level": 8,
+          "ability_value": 0.5,
+          "time": 2880000,
+          "power": 289350,
+          "resources": {
+            "food": 8930250,
+            "lumber": 8930250,
+            "stone": 8930250,
+            "gold": 2976750
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 27
+            },
+            {
+              "type": "research",
+              "level": 7,
+              "code": "advanced_gold_capacity"
+            }
+          ]
+        },
+        {
+          "level": 9,
+          "ability_value": 0.6,
+          "time": 5760000,
+          "power": 386550,
+          "resources": {
+            "food": 12587400,
+            "lumber": 12587400,
+            "stone": 12587400,
+            "gold": 4195800
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 27
+            },
+            {
+              "type": "research",
+              "level": 8,
+              "code": "advanced_gold_capacity"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "ability_value": 0.8,
+          "time": 11520000,
+          "power": 503550,
+          "resources": {
+            "food": 18257400,
+            "lumber": 18257400,
+            "stone": 18257400,
+            "gold": 6085800
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 28
+            },
+            {
+              "type": "research",
+              "level": 9,
+              "code": "advanced_gold_capacity"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "advanced_gold_gathering_speed",
+      "name": "Adv. Gold Gathering Speed",
+      "row": "general",
+      "category": "production",
+      "stat": "advanced_gold_gathering_speed",
+      "type": "buff",
+      "max_level": 10,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 0.02,
+          "time": 33060,
+          "power": 11150,
+          "resources": {
+            "food": 1487700,
+            "lumber": 1487700,
+            "stone": 1487700,
+            "gold": 495900
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 29
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "advanced_food_gathering_speed"
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "advanced_wood_gathering_speed"
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "advanced_stone_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.05,
+          "time": 66120,
+          "power": 24300,
+          "resources": {
+            "food": 2082780,
+            "lumber": 2082780,
+            "stone": 2082780,
+            "gold": 694260
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 29
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "advanced_gold_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.1,
+          "time": 132240,
+          "power": 55800,
+          "resources": {
+            "food": 2975400,
+            "lumber": 2975400,
+            "stone": 2975400,
+            "gold": 991800
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 29
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "advanced_gold_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.15,
+          "time": 264480,
+          "power": 93000,
+          "resources": {
+            "food": 4155300,
+            "lumber": 4155300,
+            "stone": 4155300,
+            "gold": 1385100
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 30
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "advanced_gold_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.2,
+          "time": 528960,
+          "power": 137200,
+          "resources": {
+            "food": 5848200,
+            "lumber": 5848200,
+            "stone": 5848200,
+            "gold": 1949400
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 30
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "advanced_gold_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 6,
+          "ability_value": 0.3,
+          "time": 1057920,
+          "power": 189800,
+          "resources": {
+            "food": 8310600,
+            "lumber": 8310600,
+            "stone": 8310600,
+            "gold": 2770200
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 30
+            },
+            {
+              "type": "research",
+              "level": 5,
+              "code": "advanced_gold_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 7,
+          "ability_value": 0.4,
+          "time": 2115840,
+          "power": 282800,
+          "resources": {
+            "food": 11542500,
+            "lumber": 11542500,
+            "stone": 11542500,
+            "gold": 3847500
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 30
+            },
+            {
+              "type": "research",
+              "level": 6,
+              "code": "advanced_gold_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 8,
+          "ability_value": 0.5,
+          "time": 4231680,
+          "power": 392900,
+          "resources": {
+            "food": 16159500,
+            "lumber": 16159500,
+            "stone": 16159500,
+            "gold": 5386500
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 30
+            },
+            {
+              "type": "research",
+              "level": 7,
+              "code": "advanced_gold_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 9,
+          "ability_value": 0.6,
+          "time": 8463360,
+          "power": 523550,
+          "resources": {
+            "food": 22777200,
+            "lumber": 22777200,
+            "stone": 22777200,
+            "gold": 7592400
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 30
+            },
+            {
+              "type": "research",
+              "level": 8,
+              "code": "advanced_gold_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "ability_value": 0.8,
+          "time": 16926720,
+          "power": 678050,
+          "resources": {
+            "food": 31857300,
+            "lumber": 31857300,
+            "stone": 31857300,
+            "gold": 10619100
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 30
+            },
+            {
+              "type": "research",
+              "level": 9,
+              "code": "advanced_gold_gathering_speed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "advanced_crystal_gathering_speed",
+      "name": "Adv. Crystal Gathering Speed",
+      "row": "general",
+      "category": "production",
+      "stat": "advanced_crystal_gathering_speed",
+      "type": "buff",
+      "max_level": 10,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 0.02,
+          "time": 36000,
+          "power": 14250,
+          "resources": {
+            "food": 1620000,
+            "lumber": 1620000,
+            "stone": 1620000,
+            "gold": 3240000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 30
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "advanced_gold_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.05,
+          "time": 72000,
+          "power": 31100,
+          "resources": {
+            "food": 2268000,
+            "lumber": 2268000,
+            "stone": 2268000,
+            "gold": 4536000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 30
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "advanced_crystal_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.1,
+          "time": 144000,
+          "power": 71300,
+          "resources": {
+            "food": 3240000,
+            "lumber": 3240000,
+            "stone": 3240000,
+            "gold": 6480000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 30
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "advanced_crystal_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.15,
+          "time": 288000,
+          "power": 118100,
+          "resources": {
+            "food": 4374000,
+            "lumber": 4374000,
+            "stone": 4374000,
+            "gold": 8748000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 30
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "advanced_crystal_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.2,
+          "time": 576000,
+          "power": 173600,
+          "resources": {
+            "food": 6156000,
+            "lumber": 6156000,
+            "stone": 6156000,
+            "gold": 12312000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 30
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "advanced_crystal_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 6,
+          "ability_value": 0.3,
+          "time": 1152000,
+          "power": 239700,
+          "resources": {
+            "food": 8748000,
+            "lumber": 8748000,
+            "stone": 8748000,
+            "gold": 17496000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 30
+            },
+            {
+              "type": "research",
+              "level": 5,
+              "code": "advanced_crystal_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 7,
+          "ability_value": 0.4,
+          "time": 2304000,
+          "power": 356550,
+          "resources": {
+            "food": 12150000,
+            "lumber": 12150000,
+            "stone": 12150000,
+            "gold": 24300000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 30
+            },
+            {
+              "type": "research",
+              "level": 6,
+              "code": "advanced_crystal_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 8,
+          "ability_value": 0.5,
+          "time": 4608000,
+          "power": 494850,
+          "resources": {
+            "food": 17010000,
+            "lumber": 17010000,
+            "stone": 17010000,
+            "gold": 34020000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 30
+            },
+            {
+              "type": "research",
+              "level": 7,
+              "code": "advanced_crystal_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 9,
+          "ability_value": 0.6,
+          "time": 9216000,
+          "power": 659100,
+          "resources": {
+            "food": 23976000,
+            "lumber": 23976000,
+            "stone": 23976000,
+            "gold": 47952000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 30
+            },
+            {
+              "type": "research",
+              "level": 8,
+              "code": "advanced_crystal_gathering_speed"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "ability_value": 0.8,
+          "time": 18432000,
+          "power": 853350,
+          "resources": {
+            "food": 33534000,
+            "lumber": 33534000,
+            "stone": 33534000,
+            "gold": 67068000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 30
+            },
+            {
+              "type": "research",
+              "level": 9,
+              "code": "advanced_crystal_gathering_speed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "advanced_research_speed",
+      "name": "Adv. Research Speed",
+      "row": "general",
+      "category": "general",
+      "stat": "advanced_research_speed",
+      "type": "buff",
+      "max_level": 10,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 0.01,
+          "time": 24960,
+          "power": 11150,
+          "resources": {
+            "food": 998400,
+            "lumber": 998400,
+            "stone": 998400,
+            "gold": 1996800
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 26
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "advanced_gold_capacity"
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.03,
+          "time": 49920,
+          "power": 24350,
+          "resources": {
+            "food": 1397760,
+            "lumber": 1397760,
+            "stone": 1397760,
+            "gold": 2795520
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 26
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "advanced_research_speed"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.06,
+          "time": 99840,
+          "power": 55950,
+          "resources": {
+            "food": 1996800,
+            "lumber": 1996800,
+            "stone": 1996800,
+            "gold": 3993600
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 26
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "advanced_research_speed"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.1,
+          "time": 199680,
+          "power": 93350,
+          "resources": {
+            "food": 2799360,
+            "lumber": 2799360,
+            "stone": 2799360,
+            "gold": 5598720
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 27
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "advanced_research_speed"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.15,
+          "time": 399360,
+          "power": 137750,
+          "resources": {
+            "food": 3939840,
+            "lumber": 3939840,
+            "stone": 3939840,
+            "gold": 7879680
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 27
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "advanced_research_speed"
+            }
+          ]
+        },
+        {
+          "level": 6,
+          "ability_value": 0.2,
+          "time": 798720,
+          "power": 190650,
+          "resources": {
+            "food": 5598720,
+            "lumber": 5598720,
+            "stone": 5598720,
+            "gold": 11197440
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 27
+            },
+            {
+              "type": "research",
+              "level": 5,
+              "code": "advanced_research_speed"
+            }
+          ]
+        },
+        {
+          "level": 7,
+          "ability_value": 0.25,
+          "time": 1597440,
+          "power": 285900,
+          "resources": {
+            "food": 8064000,
+            "lumber": 8064000,
+            "stone": 8064000,
+            "gold": 16128000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 28
+            },
+            {
+              "type": "research",
+              "level": 6,
+              "code": "advanced_research_speed"
+            }
+          ]
+        },
+        {
+          "level": 8,
+          "ability_value": 0.3,
+          "time": 3194880,
+          "power": 398550,
+          "resources": {
+            "food": 11289600,
+            "lumber": 11289600,
+            "stone": 11289600,
+            "gold": 22579200
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 28
+            },
+            {
+              "type": "research",
+              "level": 7,
+              "code": "advanced_research_speed"
+            }
+          ]
+        },
+        {
+          "level": 9,
+          "ability_value": 0.35,
+          "time": 6389760,
+          "power": 532350,
+          "resources": {
+            "food": 15912960,
+            "lumber": 15912960,
+            "stone": 15912960,
+            "gold": 31825920
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 28
+            },
+            {
+              "type": "research",
+              "level": 8,
+              "code": "advanced_research_speed"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "ability_value": 0.4,
+          "time": 12779520,
+          "power": 693450,
+          "resources": {
+            "food": 23051520,
+            "lumber": 23051520,
+            "stone": 23051520,
+            "gold": 46103040
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 29
+            },
+            {
+              "type": "research",
+              "level": 9,
+              "code": "advanced_research_speed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "advanced_construction_speed",
+      "name": "Adv. Construction Speed",
+      "row": "general",
+      "category": "general",
+      "stat": "advanced_construction_speed",
+      "type": "buff",
+      "max_level": 10,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 0.01,
+          "time": 27540,
+          "power": 11750,
+          "resources": {
+            "food": 1101600,
+            "lumber": 1101600,
+            "stone": 1101600,
+            "gold": 2203200
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 27
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "advanced_research_speed"
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "ability_value": 0.03,
+          "time": 55080,
+          "power": 25650,
+          "resources": {
+            "food": 1542240,
+            "lumber": 1542240,
+            "stone": 1542240,
+            "gold": 3084480
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 27
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "advanced_construction_speed"
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "ability_value": 0.06,
+          "time": 110160,
+          "power": 58850,
+          "resources": {
+            "food": 2203200,
+            "lumber": 2203200,
+            "stone": 2203200,
+            "gold": 4406400
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 27
+            },
+            {
+              "type": "research",
+              "level": 2,
+              "code": "advanced_construction_speed"
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "ability_value": 0.1,
+          "time": 220320,
+          "power": 98150,
+          "resources": {
+            "food": 3084480,
+            "lumber": 3084480,
+            "stone": 3084480,
+            "gold": 6168960
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 28
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "advanced_construction_speed"
+            }
+          ]
+        },
+        {
+          "level": 5,
+          "ability_value": 0.15,
+          "time": 440640,
+          "power": 144750,
+          "resources": {
+            "food": 4341120,
+            "lumber": 4341120,
+            "stone": 4341120,
+            "gold": 8682240
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 28
+            },
+            {
+              "type": "research",
+              "level": 4,
+              "code": "advanced_construction_speed"
+            }
+          ]
+        },
+        {
+          "level": 6,
+          "ability_value": 0.2,
+          "time": 881280,
+          "power": 200250,
+          "resources": {
+            "food": 6168960,
+            "lumber": 6168960,
+            "stone": 6168960,
+            "gold": 12337920
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 28
+            },
+            {
+              "type": "research",
+              "level": 5,
+              "code": "advanced_construction_speed"
+            }
+          ]
+        },
+        {
+          "level": 7,
+          "ability_value": 0.25,
+          "time": 1762560,
+          "power": 300150,
+          "resources": {
+            "food": 8874000,
+            "lumber": 8874000,
+            "stone": 8874000,
+            "gold": 17748000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 29
+            },
+            {
+              "type": "research",
+              "level": 6,
+              "code": "advanced_construction_speed"
+            }
+          ]
+        },
+        {
+          "level": 8,
+          "ability_value": 0.3,
+          "time": 3525120,
+          "power": 418350,
+          "resources": {
+            "food": 12423600,
+            "lumber": 12423600,
+            "stone": 12423600,
+            "gold": 24847200
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 29
+            },
+            {
+              "type": "research",
+              "level": 7,
+              "code": "advanced_construction_speed"
+            }
+          ]
+        },
+        {
+          "level": 9,
+          "ability_value": 0.35,
+          "time": 7050240,
+          "power": 558750,
+          "resources": {
+            "food": 17511360,
+            "lumber": 17511360,
+            "stone": 17511360,
+            "gold": 35022720
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 29
+            },
+            {
+              "type": "research",
+              "level": 8,
+              "code": "advanced_construction_speed"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "ability_value": 0.4,
+          "time": 14100480,
+          "power": 727650,
+          "resources": {
+            "food": 25336800,
+            "lumber": 25336800,
+            "stone": 25336800,
+            "gold": 50673600
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 30
+            },
+            {
+              "type": "research",
+              "level": 9,
+              "code": "advanced_construction_speed"
+            }
+          ]
+        }
       ]
     }
   ]

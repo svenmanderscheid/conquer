@@ -130,7 +130,8 @@ final class ResearchData
         }
 
         if ($category === 'production' || $category === 'counter'
-            || $category === 'castle_defense' || $category === 'composed' || $category === 'rally') {
+            || $category === 'castle_defense' || $category === 'composed' || $category === 'rally'
+            || $category === 'training' || $category === 'gathering') {
             // Stat is already fully qualified for these categories.
             return $stat;
         }
