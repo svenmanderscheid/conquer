@@ -555,6 +555,27 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
         </div>
     </div>
 
+    <!-- ANGREIFER PROFIL — direkt unter VS-Header -->
+    <?php if (!empty($playerStats)): ?>
+    <div style="background:var(--surface2);border-bottom:1px solid var(--border);padding:0.6rem 1.5rem;display:flex;flex-wrap:wrap;gap:1.5rem;align-items:center">
+        <div style="font-size:0.6rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);min-width:4rem">Angreifer</div>
+        <?php
+        $ppItems = [
+            'Spieler'       => htmlspecialchars($playerStats['username']  ?? ''),
+            'Stadt'         => htmlspecialchars($playerStats['city_name'] ?? ''),
+            'Schloss'       => 'Lv ' . (int)($playerStats['castle_level'] ?? 1),
+            'Macht'         => '<span style="color:var(--gold2)">' . $fmt($playerStats['power'] ?? 0) . '</span>',
+            'VIP'           => 'Lv ' . (int)($playerStats['vip_level'] ?? 0),
+        ];
+        foreach ($ppItems as $label => $val): ?>
+        <div style="display:flex;flex-direction:column;gap:0.1rem">
+            <div style="font-size:0.58rem;font-weight:800;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted)"><?= $label ?></div>
+            <div style="font-size:0.88rem;font-weight:700"><?= $val ?></div>
+        </div>
+        <?php endforeach ?>
+    </div>
+    <?php endif ?>
+
     <!-- TRUPPEN-VERLUSTE -->
     <div class="section-header">Truppen-Verluste</div>
     <div class="troops-lost">
@@ -757,32 +778,6 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
     </div>
     <?php endif ?>
 
-    <!-- ANGREIFER PROFIL -->
-    <?php if (!empty($playerStats)): ?>
-    <div class="section-header">Angreifer</div>
-    <div class="player-profile">
-        <div class="pp-field">
-            <div class="pp-label">Spieler</div>
-            <div class="pp-val"><?= htmlspecialchars($playerStats['username'] ?? '') ?></div>
-        </div>
-        <div class="pp-field">
-            <div class="pp-label">Stadt</div>
-            <div class="pp-val"><?= htmlspecialchars($playerStats['city_name'] ?? '') ?></div>
-        </div>
-        <div class="pp-field">
-            <div class="pp-label">Schlosslevel</div>
-            <div class="pp-val">Lv <?= (int)($playerStats['castle_level'] ?? 1) ?></div>
-        </div>
-        <div class="pp-field">
-            <div class="pp-label">Macht</div>
-            <div class="pp-val" style="color:var(--gold2)"><?= $fmt($playerStats['power'] ?? 0) ?></div>
-        </div>
-        <div class="pp-field">
-            <div class="pp-label">VIP</div>
-            <div class="pp-val">Lv <?= (int)($playerStats['vip_level'] ?? 0) ?></div>
-        </div>
-    </div>
-    <?php endif ?>
 
     <div style="height:2rem"></div>
 </div>
