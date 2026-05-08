@@ -163,7 +163,7 @@ for ($row = 0; $row < 2; $row++) {
 // ---------------------------------------------------------------------------
 
 $worldId    = 1;
-$perSector  = 15;
+$perSector  = 60;
 $minCityDist = 5;
 $minShrineDist = 20;
 $now        = gmdate('Y-m-d H:i:s');

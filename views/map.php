@@ -640,8 +640,17 @@ function mapApp() {
                 const r = await fetch('/api/march/list');
                 const j = await r.json();
                 if (j.ok) {
+                    const prev = this.marches;
                     this.marches = j.data.marches;
                     ConquerMap.setMarches(j.data.marches);
+
+                    // If any march just resolved (count dropped or state changed)
+                    // force entity re-fetch so killed monsters vanish immediately.
+                    const prevCount = prev.length;
+                    const nowCount  = j.data.marches.length;
+                    if (nowCount < prevCount || j.data.marches.some((m, i) => m.state !== (prev[i]?.state))) {
+                        ConquerMap.refreshEntities();
+                    }
                 }
             } catch {}
             setTimeout(() => this.pollMarches(), 5000);

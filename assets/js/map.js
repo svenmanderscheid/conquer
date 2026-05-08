@@ -348,11 +348,15 @@ const ConquerMap = (() => {
             const state = march.state;
             if (state !== 'marching' && state !== 'returning') continue;
 
-            // Origin = player city center, target = march destination center
+            // Origin = player city center
             const ox = myCity.x * s + s / 2 - camX;
             const oy = myCity.y * s + s / 2 - camY;
-            const tx = march.target_x * s + s / 2 - camX;
-            const ty = march.target_y * s + s / 2 - camY;
+            // Target = center of 2x2 monster block.
+            // Anchor = bottom-left tile (target_x, target_y).
+            // 4 tiles: x -> target_x..target_x+1, y -> target_y-1..target_y
+            // Center: x = target_x*s + s,  y = target_y*s - s/2
+            const tx = march.target_x * s + s     - camX;
+            const ty = march.target_y * s - s / 2 - camY;
 
             // Skip if both endpoints are far off screen
             const margin = s * 4;
@@ -372,10 +376,10 @@ const ConquerMap = (() => {
 
             // Dashed line
             ctx.beginPath();
-            ctx.setLineDash([Math.max(4, s * 0.15), Math.max(4, s * 0.15)]);
+            ctx.setLineDash([Math.max(6, s * 0.22), Math.max(5, s * 0.12)]);
             ctx.strokeStyle = lineColor;
-            ctx.lineWidth   = Math.max(1.5, s * 0.06);
-            ctx.globalAlpha = 0.75;
+            ctx.lineWidth   = Math.max(3, s * 0.11);
+            ctx.globalAlpha = 0.82;
             ctx.moveTo(ox, oy);
             ctx.lineTo(tx, ty);
             ctx.stroke();
@@ -400,20 +404,28 @@ const ConquerMap = (() => {
 
             const dotX = fromX + (toX - fromX) * progress;
             const dotY = fromY + (toY - fromY) * progress;
-            const r    = Math.max(4, s * 0.2);
+            const r    = Math.max(7, s * 0.32);
 
+            ctx.globalAlpha = 1;
+            // Glow ring
+            ctx.beginPath();
+            ctx.arc(dotX, dotY, r + 3, 0, Math.PI * 2);
+            ctx.fillStyle = lineColor;
+            ctx.globalAlpha = 0.25;
+            ctx.fill();
+            // Dot
             ctx.globalAlpha = 1;
             ctx.beginPath();
             ctx.arc(dotX, dotY, r, 0, Math.PI * 2);
             ctx.fillStyle   = dotColor;
             ctx.strokeStyle = lineColor;
-            ctx.lineWidth   = Math.max(1, s * 0.04);
+            ctx.lineWidth   = Math.max(2, s * 0.07);
             ctx.fill();
             ctx.stroke();
 
             // Arrowhead at destination
             const angle = Math.atan2(toY - fromY, toX - fromX);
-            const al    = Math.max(8, s * 0.3);
+            const al    = Math.max(14, s * 0.5);
             ctx.beginPath();
             ctx.moveTo(toX, toY);
             ctx.lineTo(toX - al * Math.cos(angle - 0.4), toY - al * Math.sin(angle - 0.4));
@@ -831,6 +843,7 @@ const ConquerMap = (() => {
     function zoomOut() { applyZoom(zoomIdx - 1, canvas.width / 2, canvas.height / 2); }
     function currentZoom() { return ZOOM_LEVELS[zoomIdx]; }
     function setMarches(marches) { activeMarches = marches || []; }
+    function refreshEntities() { lastVP = ''; scheduleFetch(); }
 
-    return { init, jumpToCity, zoomIn, zoomOut, currentZoom, setMarches };
+    return { init, jumpToCity, zoomIn, zoomOut, currentZoom, setMarches, refreshEntities };
 })();
