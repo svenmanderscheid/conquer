@@ -59,6 +59,30 @@ const ConquerMap = (() => {
     let terrainLoaded = [];
 
     // -------------------------------------------------------------------------
+    // Monster sprites — keyed by monster type ID (floor(code / 100))
+    // -------------------------------------------------------------------------
+
+    const MONSTER_SPRITE_SRCS = {
+        202001: '/assets/sprites/monsters/orc.png',
+        202002: '/assets/sprites/monsters/skeleton.png',
+        202003: '/assets/sprites/monsters/golem.png',
+    };
+
+    const monsterImgs   = {};   // typeId → HTMLImageElement
+    const monsterLoaded = {};   // typeId → bool
+
+    function loadMonsterImages() {
+        for (const [typeId, src] of Object.entries(MONSTER_SPRITE_SRCS)) {
+            const img       = new Image();
+            monsterLoaded[typeId] = false;
+            img.onload  = () => { monsterLoaded[typeId] = true; };
+            img.onerror = () => { console.warn('[monsters] failed to load: ' + src); };
+            img.src     = src;
+            monsterImgs[typeId] = img;
+        }
+    }
+
+    // -------------------------------------------------------------------------
     // Tile selection — position-stable hash, no biomes, no water
     //   plains_01/02/03 (idx 0-2) → 90%
     //   plains_04       (idx 3)   → 10%
@@ -140,6 +164,7 @@ const ConquerMap = (() => {
         mmCtx = minimap.getContext('2d');
 
         loadTerrainTiles();
+        loadMonsterImages();
         resizeMain();
         window.addEventListener('resize', resizeMain);
 
@@ -310,20 +335,37 @@ const ConquerMap = (() => {
                 ctx.fillText(String(e.level), px + s / 2, py + s / 2);
             }
         } else if (e.type === 'monster') {
-            const level = e.monster_code % 100;
-            ctx.beginPath();
-            ctx.arc(px + s/2, py + s/2, s/2 - pad, 0, Math.PI * 2);
-            ctx.fillStyle   = '#ef4444';
-            ctx.strokeStyle = '#991b1b';
-            ctx.lineWidth   = 1;
-            ctx.fill();
-            ctx.stroke();
-            if (s >= 16) {
+            const level  = e.monster_code % 100;
+            const typeId = Math.floor(e.monster_code / 100);
+            const img    = monsterImgs[typeId];
+
+            ctx.imageSmoothingEnabled = false;
+
+            if (img && monsterLoaded[typeId]) {
+                ctx.drawImage(img, Math.round(px), Math.round(py), s, s);
+            } else {
+                // Fallback: red circle while image loads
+                ctx.beginPath();
+                ctx.arc(px + s/2, py + s/2, s/2 - pad, 0, Math.PI * 2);
+                ctx.fillStyle   = '#ef4444';
+                ctx.strokeStyle = '#991b1b';
+                ctx.lineWidth   = 1;
+                ctx.fill();
+                ctx.stroke();
+            }
+
+            // Level badge — small pill at bottom-right of tile
+            if (s >= 24) {
+                const badgeSize = Math.max(10, Math.floor(s * 0.32));
+                const bx = Math.round(px + s - badgeSize - 1);
+                const by = Math.round(py + s - badgeSize - 1);
+                ctx.fillStyle = 'rgba(0,0,0,0.75)';
+                ctx.fillRect(bx, by, badgeSize, badgeSize);
                 ctx.fillStyle    = '#ffffff';
-                ctx.font         = `bold ${Math.max(7, Math.floor(s * 0.38))}px monospace`;
+                ctx.font         = `bold ${Math.max(7, Math.floor(badgeSize * 0.72))}px monospace`;
                 ctx.textAlign    = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText(String(level), px + s / 2, py + s / 2);
+                ctx.fillText(String(level), bx + badgeSize / 2, by + badgeSize / 2);
             }
         } else if (e.type === 'resource') {
             const cx = px + s/2, cy = py + s/2, r = s/2 - pad;
