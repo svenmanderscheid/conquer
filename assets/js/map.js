@@ -103,6 +103,9 @@ const ConquerMap = (() => {
     // Entity cache
     let entities = {}, fetchTimer = null, lastVP = '';
 
+    // Selected tile (shows border + keeps info panel open)
+    let selectedTile = null;
+
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
@@ -273,6 +276,19 @@ const ConquerMap = (() => {
             const py = e.y * s - camY;
             if (px < -s || py < -s || px > canvas.width + s || py > canvas.height + s) continue;
             drawEntity(e, px, py, s);
+        }
+
+        // Selected tile border
+        if (selectedTile !== null) {
+            const px = Math.round(selectedTile.x * s - camX);
+            const py = Math.round(selectedTile.y * s - camY);
+            ctx.save();
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth   = Math.max(2, s * 0.07);
+            ctx.shadowColor = '#ffffff';
+            ctx.shadowBlur  = 6;
+            ctx.strokeRect(px + 1, py + 1, s - 2, s - 2);
+            ctx.restore();
         }
     }
 
@@ -495,6 +511,9 @@ const ConquerMap = (() => {
         const { x, y } = screenToTile(sx, sy);
         if (x < 0 || y < 0 || x >= MAP_SIZE || y >= MAP_SIZE) return;
 
+        // Mark tile as selected immediately (shows border while loading)
+        selectedTile = { x, y };
+
         // Optimistically show coords while loading
         onTileInfo({ x, y, occupant: null });
 
@@ -502,7 +521,10 @@ const ConquerMap = (() => {
             const r = await fetch(`/api/map/tile/${x}/${y}`);
             const j = await r.json();
             if (j.ok) onTileInfo(j.data);
-        } catch { onTileInfo(null); }
+            // j.ok = false leaves the optimistic {x, y, occupant:null} in place
+        } catch {
+            // Network/parse error: keep whatever is shown, don't blank the panel
+        }
     }
 
     // ---- Minimap drag → scroll ----
