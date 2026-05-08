@@ -12,10 +12,13 @@ declare(strict_types=1);
 
 use Conquer\Game\City\BuildingData;
 use Conquer\Game\City\CityState;
+use Conquer\Game\City\TroopData;
 
-$city      = $state['city'];
-$buildings = $state['buildings'];
-$queue     = $state['build_queue'];
+$city       = $state['city'];
+$buildings  = $state['buildings'];
+$queue      = $state['build_queue'];
+$troops     = $state['troops']     ?? [];
+$troopQueue = $state['troop_queue'] ?? [];
 
 $building = $buildings[$buildingCode] ?? null;
 if ($building === null) {
@@ -342,6 +345,130 @@ $tile = $tileDefs[$buildingCode] ?? 0;
         }
         #toast.ok  { border-color: var(--green); color: var(--green); }
         #toast.err { border-color: var(--red);   color: var(--red);   }
+
+        /* ── Troop training section ── */
+        .troop-section {
+            margin-top: 2rem;
+        }
+
+        .troop-row {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.9rem 1rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .troop-row.locked {
+            opacity: 0.5;
+        }
+
+        .troop-header {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .troop-badge {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .troop-badge.cav { background: #8b5cf6; }
+        .troop-badge.rgd { background: #22c55e; }
+
+        .troop-name {
+            font-weight: 600;
+            font-size: 0.92rem;
+            flex: 1;
+        }
+
+        .troop-count {
+            font-size: 0.82rem;
+            color: var(--muted);
+        }
+
+        .troop-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.3rem;
+            font-size: 0.72rem;
+            color: var(--muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .troop-stat span { color: var(--text); font-weight: 600; }
+
+        .troop-cost {
+            display: flex;
+            gap: 0.5rem;
+            font-size: 0.72rem;
+            color: var(--muted);
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .troop-cost span { color: var(--text); }
+
+        .train-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .train-input {
+            width: 80px;
+            padding: 0.3rem 0.5rem;
+            border-radius: 5px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            font-size: 0.85rem;
+        }
+
+        .btn-train {
+            flex: 1;
+            padding: 0.35rem 0.8rem;
+            border-radius: 5px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .btn-train:hover:not(:disabled) { opacity: 0.85; }
+        .btn-train:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+
+        .lock-msg {
+            font-size: 0.75rem;
+            color: var(--muted);
+            font-style: italic;
+        }
+
+        .troop-queue-list {
+            margin-top: 1.2rem;
+        }
+
+        .queue-item {
+            background: rgba(245,158,11,0.08);
+            border: 1px solid var(--gold);
+            border-radius: 6px;
+            padding: 0.6rem 0.8rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.82rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .queue-item-cd { color: var(--gold); font-weight: 600; }
     </style>
 </head>
 <body>
@@ -443,6 +570,79 @@ $tile = $tileDefs[$buildingCode] ?? 0;
 
     </div>
 </div>
+
+<?php if ($buildingCode === 'barrack'):
+    $academyLevel = (int) ($buildings['academy']['level'] ?? 1);
+    $barrackLevel = (int) ($buildings['barrack']['level'] ?? 1);
+    $allTroops    = TroopData::all();
+    $typeName     = [1 => 'INF', 2 => 'RGD', 3 => 'CAV'];
+    $typeClass    = [1 => '', 2 => 'rgd', 3 => 'cav'];
+?>
+<div style="width:100%;max-width:480px;margin:1.5rem auto 0;padding:0 1rem">
+
+    <div class="section-title">Truppen ausbilden</div>
+
+    <?php foreach ($allTroops as $t):
+        $unlocked = TroopData::isUnlocked((int)$t['code'], $barrackLevel, $academyLevel);
+        $inCity   = (int) ($troops[(int)$t['code']] ?? 0);
+        $badge    = $typeClass[$t['type']] ?? '';
+    ?>
+    <div class="troop-row<?= $unlocked ? '' : ' locked' ?>">
+        <div class="troop-header">
+            <span class="troop-badge <?= $badge ?>"><?= $typeName[$t['type']] ?> T<?= (int)$t['tier'] ?></span>
+            <span class="troop-name"><?= htmlspecialchars($t['name']) ?></span>
+            <span class="troop-count">In Stadt: <?= number_format($inCity, 0, '.', ',') ?></span>
+        </div>
+
+        <div class="troop-stats">
+            <div>HP <span><?= (int)$t['hp'] ?></span></div>
+            <div>ATK <span><?= (int)$t['attack'] ?></span></div>
+            <div>DEF <span><?= (int)$t['defense'] ?></span></div>
+            <div>SPD <span><?= (int)$t['speed'] ?></span></div>
+        </div>
+
+        <div class="troop-cost">
+            <?php if ($t['need_food']   > 0): ?><span>🌾 <?= (int)$t['need_food'] ?></span><?php endif ?>
+            <?php if ($t['need_lumber'] > 0): ?><span>🪵 <?= (int)$t['need_lumber'] ?></span><?php endif ?>
+            <?php if ($t['need_stone']  > 0): ?><span>🪨 <?= (int)$t['need_stone'] ?></span><?php endif ?>
+            <?php if ($t['need_gold']   > 0): ?><span>💰 <?= (int)$t['need_gold'] ?></span><?php endif ?>
+            <span>⏱ <?= fmtTime((int)$t['time']) ?>/Einheit</span>
+        </div>
+
+        <?php if ($unlocked): ?>
+        <div class="train-row">
+            <input type="number" class="train-input" min="1" max="9999" value="100"
+                   id="count-<?= (int)$t['code'] ?>">
+            <button class="btn-train"
+                    data-code="<?= (int)$t['code'] ?>"
+                    data-name="<?= htmlspecialchars($t['name']) ?>">
+                Ausbilden
+            </button>
+        </div>
+        <?php else: ?>
+        <div class="lock-msg">🔒 Erfordert Academy Level <?= (int)$t['unlock_academy'] ?></div>
+        <?php endif ?>
+    </div>
+    <?php endforeach ?>
+
+    <?php if (!empty($troopQueue)): ?>
+    <div class="troop-queue-list">
+        <div class="section-title" style="margin-top:1.25rem">Trainings-Queue</div>
+        <?php foreach ($troopQueue as $qe):
+            $qTroop = TroopData::get((int)$qe['troop_code']);
+            $qName  = $qTroop['name'] ?? ('Code ' . $qe['troop_code']);
+        ?>
+        <div class="queue-item">
+            <div><?= (int)$qe['count'] ?>× <?= htmlspecialchars($qName) ?> (Slot <?= (int)$qe['barrack_slot'] ?>)</div>
+            <div class="queue-item-cd"
+                 data-finish="<?= strtotime($qe['finishes_at']) ?>">—</div>
+        </div>
+        <?php endforeach ?>
+    </div>
+    <?php endif ?>
+
+</div>
+<?php endif ?>
 
 <div id="toast"></div>
 
@@ -555,6 +755,76 @@ if (cdEl) {
     updateCountdown();
     setInterval(updateCountdown, 1000);
 }
+
+// ---------------------------------------------------------------------------
+// Troop training buttons
+// ---------------------------------------------------------------------------
+document.querySelectorAll('.btn-train').forEach(btn => {
+    btn.addEventListener('click', async () => {
+        const code  = parseInt(btn.dataset.code, 10);
+        const name  = btn.dataset.name;
+        const input = document.getElementById('count-' + code);
+        const count = parseInt(input?.value ?? '0', 10);
+
+        if (!count || count < 1) {
+            showToast('Ungültige Anzahl', 'err');
+            return;
+        }
+
+        btn.disabled = true;
+        const orig = btn.textContent;
+        btn.textContent = '…';
+
+        try {
+            const res  = await fetch('/api/troops/train', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': CSRF,
+                },
+                body: JSON.stringify({ troop_code: code, count }),
+            });
+            const json = await res.json();
+
+            if (json.ok) {
+                showToast('Training gestartet: ' + count + '× ' + name, 'ok');
+                setTimeout(() => window.location.reload(), 900);
+            } else {
+                showToast(json.error?.message ?? json.error ?? 'Fehler', 'err');
+                btn.disabled = false;
+                btn.textContent = orig;
+            }
+        } catch (e) {
+            showToast('Netzwerkfehler', 'err');
+            btn.disabled = false;
+            btn.textContent = orig;
+        }
+    });
+});
+
+// ---------------------------------------------------------------------------
+// Queue countdowns (training queue items)
+// ---------------------------------------------------------------------------
+function updateQueueCountdowns() {
+    document.querySelectorAll('.queue-item-cd').forEach(el => {
+        const finish = parseInt(el.dataset.finish, 10) * 1000;
+        const rem    = Math.max(0, Math.ceil((finish - Date.now()) / 1000));
+        if (rem === 0) {
+            el.textContent = 'fertig!';
+            setTimeout(() => window.location.reload(), 1200);
+            return;
+        }
+        const h = Math.floor(rem / 3600);
+        const m = Math.floor((rem % 3600) / 60);
+        const s = rem % 60;
+        if (h > 0) el.textContent = h + 'h ' + m + 'm ' + s + 's';
+        else if (m > 0) el.textContent = m + 'm ' + s + 's';
+        else el.textContent = s + 's';
+    });
+}
+
+updateQueueCountdowns();
+setInterval(updateQueueCountdowns, 1000);
 
 // ---------------------------------------------------------------------------
 // Toast helper

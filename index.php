@@ -35,6 +35,10 @@ if (str_starts_with($path, '/api/')) {
     $router->get('/api/city/state',              [\Conquer\Api\Handlers\CityHandler::class, 'state']);
     $router->post('/api/city/upgrade-building',  [\Conquer\Api\Handlers\CityHandler::class, 'upgradeBuilding']);
 
+    // Troops
+    $router->get('/api/troops/list',         [\Conquer\Api\Handlers\TroopHandler::class, 'list']);
+    $router->post('/api/troops/train',       [\Conquer\Api\Handlers\TroopHandler::class, 'train']);
+
     // Map
     $router->get('/api/map/info',            [\Conquer\Api\Handlers\MapHandler::class, 'info']);
     $router->get('/api/map/tiles',           [\Conquer\Api\Handlers\MapHandler::class, 'tiles']);

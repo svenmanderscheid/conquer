@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Conquer\Game\City;
 
 use Conquer\Db\Connection;
+use Conquer\Game\City\TroopTrainer;
 
 /**
  * Loads a player's city snapshot from the database.
@@ -87,18 +88,25 @@ final class CityState
         // Reload buildings in case upgrades were applied.
         $buildings = self::loadBuildings($db, $cityId);
 
+        // Credit any completed troop training.
+        TroopTrainer::processQueue($db, $cityId);
+
         // Apply lazy resource production (no DB write on read).
         $city = ResourceTick::apply($city, $buildings);
 
         // Recalculate power live so it's always correct on read.
         $city['power'] = BuildingData::calculateCityPower($buildings);
 
-        $queue = self::loadBuildQueue($db, $cityId);
+        $queue      = self::loadBuildQueue($db, $cityId);
+        $troops     = self::loadTroops($db, $cityId);
+        $troopQueue = self::loadTroopQueue($db, $cityId);
 
         return [
             'city'        => $city,
             'buildings'   => $buildings,
             'build_queue' => $queue,
+            'troops'      => $troops,
+            'troop_queue' => $troopQueue,
         ];
     }
 
@@ -203,11 +211,53 @@ final class CityState
      */
     private static function loadBuildQueue(Connection $db, int $cityId): array
     {
-        // building_queue may not exist yet — handle gracefully.
         try {
             return $db->query(
                 'SELECT id, building_code, level_to, started_at, finishes_at
                  FROM   building_queue
+                 WHERE  city_id = ? AND is_processed = 0
+                 ORDER  BY finishes_at ASC',
+                [$cityId],
+            )->fetchAll();
+        } catch (\PDOException) {
+            return [];
+        }
+    }
+
+    /**
+     * Returns troop counts for the city: {troop_code => count}.
+     *
+     * @return array<int, int>
+     */
+    private static function loadTroops(Connection $db, int $cityId): array
+    {
+        try {
+            $rows = $db->query(
+                'SELECT troop_code, count FROM city_troops WHERE city_id = ?',
+                [$cityId],
+            )->fetchAll();
+        } catch (\PDOException) {
+            return [];
+        }
+
+        $result = [];
+        foreach ($rows as $row) {
+            $result[(int) $row['troop_code']] = (int) $row['count'];
+        }
+        return $result;
+    }
+
+    /**
+     * Returns active training queue entries for the city.
+     *
+     * @return list<array<string, mixed>>
+     */
+    private static function loadTroopQueue(Connection $db, int $cityId): array
+    {
+        try {
+            return $db->query(
+                'SELECT id, troop_code, count, barrack_slot, started_at, finishes_at
+                 FROM   troop_queue
                  WHERE  city_id = ? AND is_processed = 0
                  ORDER  BY finishes_at ASC',
                 [$cityId],
