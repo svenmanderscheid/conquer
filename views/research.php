@@ -444,9 +444,13 @@ HTML;
             background: #0f172a;
             color: #e2e8f0;
             font-family: system-ui, -apple-system, sans-serif;
+            display: flex;
+            justify-content: center;
         }
 
         #game {
+            width: 100%;
+            max-width: 1280px;
             height: calc(100% - 72px);
             margin-top: 72px;
             display: flex;
