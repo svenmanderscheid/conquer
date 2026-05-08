@@ -119,6 +119,17 @@ if ($path === '/reports') {
     exit;
 }
 
+if (preg_match('#^/reports/(\d+)$#', $path, $m)) {
+    $session = \Conquer\Auth\Session::current();
+    if ($session === null) {
+        header('Location: /');
+        exit;
+    }
+    $reportId = (int) $m[1];
+    require ROOT_DIR . '/views/report_detail.php';
+    exit;
+}
+
 // ---------------------------------------------------------------------------
 // Map view (Sprint 2)
 // ---------------------------------------------------------------------------
