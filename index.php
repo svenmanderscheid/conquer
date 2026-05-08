@@ -32,8 +32,9 @@ if (str_starts_with($path, '/api/')) {
     $router->post('/api/auth/logout', [\Conquer\Api\Handlers\AuthHandler::class, 'logout']);
 
     // City
-    $router->get('/api/city/state',              [\Conquer\Api\Handlers\CityHandler::class, 'state']);
-    $router->post('/api/city/upgrade-building',  [\Conquer\Api\Handlers\CityHandler::class, 'upgradeBuilding']);
+    $router->get('/api/city/state',                         [\Conquer\Api\Handlers\CityHandler::class, 'state']);
+    $router->post('/api/city/upgrade-building',             [\Conquer\Api\Handlers\CityHandler::class, 'upgradeBuilding']);
+    $router->post('/api/city/instant-build/:queue_id',      [\Conquer\Api\Handlers\CityHandler::class, 'instantBuild']);
 
     // Troops
     $router->get('/api/troops/list',         [\Conquer\Api\Handlers\TroopHandler::class, 'list']);

@@ -20,6 +20,16 @@ $queue      = $state['build_queue'];
 $troops     = $state['troops']     ?? [];
 $troopQueue = $state['troop_queue'] ?? [];
 
+// Gem cost for instant-build: 1 gem per minute remaining (min 1)
+$instantGemCost = 0;
+if ($queueEntry !== null) {
+    $secsLeft       = max(0, strtotime($queueEntry['finishes_at']) - time());
+    $instantGemCost = max(1, (int) ceil($secsLeft / 60));
+}
+
+// Player gems (from session)
+$playerGems = (int) ($session['gems'] ?? 0);
+
 $building = $buildings[$buildingCode] ?? null;
 if ($building === null) {
     header('Location: /city');
@@ -515,6 +525,21 @@ $tile = $tileDefs[$buildingCode] ?? 0;
             <span id="countdown" data-finish="<?= strtotime($queueEntry['finishes_at']) ?>">—</span>
         </div>
 
+        <button
+            id="btn-instant"
+            class="btn-upgrade"
+            style="margin-top:0.75rem;background:#8b5cf6"
+            data-queue-id="<?= (int)$queueEntry['id'] ?>"
+            data-gem-cost="<?= $instantGemCost ?>"
+            <?= $playerGems < $instantGemCost ? 'disabled' : '' ?>
+        >
+            <?php if ($playerGems < $instantGemCost): ?>
+                💎 <?= number_format($instantGemCost) ?> Gems fehlen (du: <?= number_format($playerGems) ?>)
+            <?php else: ?>
+                💎 Sofort fertig (<?= number_format($instantGemCost) ?> Gems)
+            <?php endif ?>
+        </button>
+
         <?php else: ?>
         <!-- Upgrade-Infos -->
         <div class="section-title">Upgrade auf Level <?= $nextLevel ?></div>
@@ -754,6 +779,42 @@ function updateCountdown() {
 if (cdEl) {
     updateCountdown();
     setInterval(updateCountdown, 1000);
+}
+
+// ---------------------------------------------------------------------------
+// Instant build button
+// ---------------------------------------------------------------------------
+const btnInstant = document.getElementById('btn-instant');
+if (btnInstant) {
+    btnInstant.addEventListener('click', async () => {
+        const queueId = btnInstant.dataset.queueId;
+        const cost    = parseInt(btnInstant.dataset.gemCost, 10);
+
+        if (!confirm('💎 ' + cost.toLocaleString() + ' Gems verwenden um sofort fertig zu bauen?')) return;
+
+        btnInstant.disabled = true;
+        btnInstant.textContent = '…';
+
+        try {
+            const res  = await fetch('/api/city/instant-build/' + queueId, {
+                method: 'POST',
+                headers: { 'X-CSRF-Token': CSRF },
+            });
+            const json = await res.json();
+
+            if (json.ok) {
+                showToast('💎 Sofort fertiggestellt! ' + json.data.gems_spent + ' Gems verwendet.', 'ok');
+                setTimeout(() => window.location.reload(), 900);
+            } else {
+                showToast(json.error?.message ?? json.error ?? 'Fehler', 'err');
+                btnInstant.disabled = false;
+                btnInstant.textContent = '💎 Sofort fertig (' + cost.toLocaleString() + ' Gems)';
+            }
+        } catch (e) {
+            showToast('Netzwerkfehler', 'err');
+            btnInstant.disabled = false;
+        }
+    });
 }
 
 // ---------------------------------------------------------------------------
