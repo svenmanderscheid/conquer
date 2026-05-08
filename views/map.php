@@ -188,6 +188,70 @@ declare(strict_types=1);
         }
         .stat-cell .stat-val { font-size: 0.85rem; font-weight: 700; color: #e2e8f0; }
         .stat-cell .stat-lbl { font-size: 0.62rem; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        /* ── Attack button ── */
+        .btn-attack {
+            display: block; width: 100%; margin-top: 10px;
+            padding: 0.45rem; border-radius: 6px; border: none;
+            background: #ef4444; color: #fff; font-size: 0.82rem; font-weight: 700;
+            cursor: pointer;
+        }
+        .btn-attack:hover { opacity: 0.85; }
+
+        /* ── Attack modal ── */
+        #attack-modal {
+            position: fixed; inset: 0; z-index: 200;
+            background: rgba(0,0,0,0.7);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .modal-box {
+            background: #1e293b; border: 1px solid #334155;
+            border-radius: 12px; padding: 1.5rem;
+            width: 360px; max-width: 95vw; max-height: 90vh; overflow-y: auto;
+        }
+        .modal-title { font-size: 1rem; font-weight: 700; margin-bottom: 1rem; color: #ef4444; }
+        .modal-sub   { font-size: 0.7rem; color: #64748b; text-transform: uppercase;
+                       letter-spacing: 0.08em; margin: 0.75rem 0 0.4rem; }
+        .troop-pick  {
+            display: flex; align-items: center; gap: 0.5rem;
+            background: #0f172a; border: 1px solid #334155;
+            border-radius: 6px; padding: 0.5rem 0.6rem; margin-bottom: 0.4rem;
+        }
+        .troop-pick-name { flex: 1; font-size: 0.82rem; font-weight: 600; }
+        .troop-pick-avail { font-size: 0.72rem; color: #64748b; }
+        .troop-pick-input {
+            width: 72px; padding: 0.25rem 0.4rem; border-radius: 4px;
+            border: 1px solid #334155; background: #1e293b;
+            color: #e2e8f0; font-size: 0.82rem; text-align: right;
+        }
+        .modal-actions { display: flex; gap: 0.5rem; margin-top: 1rem; }
+        .modal-btn {
+            flex: 1; padding: 0.55rem; border-radius: 6px; border: none;
+            font-size: 0.85rem; font-weight: 700; cursor: pointer;
+        }
+        .modal-btn-cancel  { background: #334155; color: #94a3b8; }
+        .modal-btn-confirm { background: #ef4444; color: #fff; }
+        .modal-btn-confirm:disabled { background: #7f1d1d; color: #fca5a5; cursor: not-allowed; }
+
+        /* ── Toast ── */
+        #map-toast {
+            position: fixed; bottom: 1.2rem; left: 50%; transform: translateX(-50%);
+            background: #1e293b; border: 1px solid #334155; border-radius: 8px;
+            padding: 0.5rem 1.1rem; font-size: 0.82rem; z-index: 300;
+            white-space: nowrap; display: none;
+        }
+        #map-toast.ok  { border-color: #22c55e; color: #22c55e; }
+        #map-toast.err { border-color: #ef4444; color: #ef4444; }
+
+        /* ── Active march badge ── */
+        .march-badge {
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3);
+            border-radius: 6px; padding: 0.35rem 0.55rem; margin-bottom: 0.4rem;
+            font-size: 0.72rem;
+        }
+        .march-badge-label { color: #e2e8f0; font-weight: 600; }
+        .march-badge-state { color: #ef4444; }
     </style>
 </head>
 <body x-data="mapApp()" x-init="boot()">
@@ -321,6 +385,9 @@ declare(strict_types=1);
                                         </template>
                                     </div>
                                 </template>
+
+                                <!-- Attack button -->
+                                <button class="btn-attack" @click="openAttackModal()">⚔ Angriff starten</button>
                             </div>
                         </template>
 
@@ -384,67 +451,214 @@ declare(strict_types=1);
             </div>
         </div>
 
+        <!-- Active Marches -->
+        <div class="panel" x-show="marches.length > 0">
+            <div class="panel-title">Aktive Märsche</div>
+            <template x-for="m in marches" :key="m.id">
+                <div class="march-badge">
+                    <span class="march-badge-label">
+                        ⚔ Monster (<span x-text="m.target_x + ',' + m.target_y"></span>)
+                    </span>
+                    <span class="march-badge-state" x-text="m.state === 'marching' ? '→' : '←'"></span>
+                </div>
+            </template>
+        </div>
+
     </aside>
 </div><!-- #app -->
+
+<!-- Attack modal -->
+<div id="attack-modal" x-show="attackModal" @click.self="attackModal = false" style="display:none">
+    <div class="modal-box">
+        <div class="modal-title">⚔ Monster angreifen</div>
+
+        <div style="font-size:0.82rem;color:#94a3b8;margin-bottom:0.75rem"
+             x-text="attackTarget ? attackTarget.name + ' bei (' + attackTarget.x + ', ' + attackTarget.y + ')' : ''"></div>
+
+        <template x-if="attackLoading">
+            <div style="text-align:center;color:#475569;padding:1rem">Truppen laden…</div>
+        </template>
+
+        <template x-if="!attackLoading">
+            <div>
+                <div class="modal-sub">Truppen auswählen</div>
+
+                <template x-for="t in attackTroops" :key="t.code">
+                    <div class="troop-pick">
+                        <div>
+                            <div class="troop-pick-name" x-text="t.name"></div>
+                            <div class="troop-pick-avail" x-text="'Verfügbar: ' + t.available.toLocaleString()"></div>
+                        </div>
+                        <input type="number" class="troop-pick-input"
+                               min="0" :max="t.available"
+                               x-model.number="t.toSend"
+                               :disabled="t.available === 0">
+                    </div>
+                </template>
+
+                <div style="font-size:0.72rem;color:#64748b;margin-top:0.5rem"
+                     x-text="'Gesamt: ' + attackTroops.reduce((s,t) => s + (t.toSend||0), 0).toLocaleString() + ' Truppen'">
+                </div>
+            </div>
+        </template>
+
+        <div class="modal-actions">
+            <button class="modal-btn modal-btn-cancel" @click="attackModal = false">Abbrechen</button>
+            <button class="modal-btn modal-btn-confirm"
+                    :disabled="attackLoading || attackTroops.reduce((s,t)=>s+(t.toSend||0),0) === 0"
+                    @click="sendMarch()">
+                Marschieren
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="map-toast"></div>
 
 <script src="/assets/js/map.js?v=<?= filemtime(ROOT_DIR . '/assets/js/map.js') ?>"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <script>
-    function mapApp() {
-        return {
-            zoom:      4,
-            myCity:    null,
-            tileInfo:  null,
-            hoverTile: '',
+const CSRF = <?= json_encode($session['csrf_token']) ?>;
 
-            // Monster type lookup: floor(code / 100) → name
-            MONSTER_TYPES: {
-                202001: 'Orc',
-                202002: 'Skeleton',
-                202003: 'Golem',
-                202004: 'Treasure Goblin',
-                202005: 'Deathkar',
-                202006: 'Green Dragon',
-                202007: 'Red Dragon',
-                202008: 'Gold Dragon',
-                202009: 'Magdar',
-            },
+function mapApp() {
+    return {
+        zoom:         4,
+        myCity:       null,
+        tileInfo:     null,
+        hoverTile:    '',
+        marches:      [],
 
-            monsterLabel(code) {
-                const type  = Math.floor(code / 100);
-                const level = code % 100;
-                const name  = this.MONSTER_TYPES[type] ?? 'Unknown';
-                return `${name} Lv ${level}`;
-            },
+        // Attack modal state
+        attackModal:   false,
+        attackTarget:  null,
+        attackTroops:  [],
+        attackLoading: false,
 
-            shrineColor(tier) {
-                return { S: '#f59e0b', A: '#a78bfa', B: '#60a5fa', C: '#94a3b8' }[tier] ?? '#94a3b8';
-            },
+        MONSTER_TYPES: {
+            202001: 'Orc',        202002: 'Skeleton',   202003: 'Golem',
+            202004: 'Treasure Goblin', 202005: 'Deathkar',
+            202006: 'Green Dragon',    202007: 'Red Dragon',
+            202008: 'Gold Dragon',     202009: 'Magdar',
+        },
 
-            async boot() {
-                const r = await fetch('/api/map/info');
+        monsterLabel(code) {
+            const type  = Math.floor(code / 100);
+            const level = code % 100;
+            return (this.MONSTER_TYPES[type] ?? 'Unknown') + ' Lv ' + level;
+        },
+
+        shrineColor(tier) {
+            return { S: '#f59e0b', A: '#a78bfa', B: '#60a5fa', C: '#94a3b8' }[tier] ?? '#94a3b8';
+        },
+
+        async boot() {
+            const r = await fetch('/api/map/info');
+            const j = await r.json();
+            if (!j.ok) { window.location.href = '/'; return; }
+
+            this.myCity = j.data.my_city;
+
+            ConquerMap.init({
+                canvas:     document.getElementById('map-canvas'),
+                minimap:    document.getElementById('minimap-canvas'),
+                seed:       j.data.map_seed,
+                mapSize:    j.data.map_size,
+                cityCoords: j.data.my_city,
+                onTileInfo: (info) => { this.tileInfo = info; },
+                onHover:    (x, y) => { this.hoverTile = x !== null ? `${x}, ${y}` : ''; },
+            });
+            this.zoom = ConquerMap.currentZoom();
+            this.pollMarches();
+        },
+
+        doZoomIn()   { ConquerMap.zoomIn();     this.zoom = ConquerMap.currentZoom(); },
+        doZoomOut()  { ConquerMap.zoomOut();    this.zoom = ConquerMap.currentZoom(); },
+        jumpToCity() { ConquerMap.jumpToCity(); },
+
+        // ── Active march polling ──────────────────────────────────────────────
+        async pollMarches() {
+            try {
+                const r = await fetch('/api/march/list');
                 const j = await r.json();
-                if (!j.ok) { window.location.href = '/'; return; }
+                if (j.ok) this.marches = j.data.marches;
+            } catch {}
+            setTimeout(() => this.pollMarches(), 15000);
+        },
 
-                this.myCity = j.data.my_city;
+        // ── Attack modal ──────────────────────────────────────────────────────
+        async openAttackModal() {
+            if (!this.tileInfo?.occupant) return;
+            const occ = this.tileInfo.occupant;
 
-                ConquerMap.init({
-                    canvas:     document.getElementById('map-canvas'),
-                    minimap:    document.getElementById('minimap-canvas'),
-                    seed:       j.data.map_seed,
-                    mapSize:    j.data.map_size,
-                    cityCoords: j.data.my_city,
-                    onTileInfo: (info) => { this.tileInfo = info; },
-                    onHover:    (x, y) => { this.hoverTile = x !== null ? `${x}, ${y}` : ''; },
+            this.attackTarget  = {
+                x:    this.tileInfo.x,
+                y:    this.tileInfo.y,
+                name: occ.name + ' Lv ' + occ.level,
+            };
+            this.attackModal   = true;
+            this.attackLoading = true;
+            this.attackTroops  = [];
+
+            try {
+                const r = await fetch('/api/troops/list');
+                const j = await r.json();
+                if (j.ok) {
+                    this.attackTroops = j.data.definitions
+                        .filter(d => (j.data.troops[d.code] ?? 0) > 0)
+                        .map(d => ({
+                            code:      d.code,
+                            name:      d.name,
+                            tier:      d.tier,
+                            type:      d.type,
+                            available: j.data.troops[d.code] ?? 0,
+                            toSend:    0,
+                        }));
+                }
+            } catch {}
+
+            this.attackLoading = false;
+        },
+
+        async sendMarch() {
+            const troops = {};
+            let total = 0;
+            for (const t of this.attackTroops) {
+                if (t.toSend > 0) { troops[t.code] = t.toSend; total += t.toSend; }
+            }
+            if (total === 0) return;
+
+            this.attackLoading = true;
+            try {
+                const r = await fetch('/api/march/dispatch', {
+                    method:  'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': CSRF },
+                    body:    JSON.stringify({ target_x: this.attackTarget.x, target_y: this.attackTarget.y, troops }),
                 });
-                this.zoom = ConquerMap.currentZoom();
-            },
+                const j = await r.json();
 
-            doZoomIn()   { ConquerMap.zoomIn();     this.zoom = ConquerMap.currentZoom(); },
-            doZoomOut()  { ConquerMap.zoomOut();    this.zoom = ConquerMap.currentZoom(); },
-            jumpToCity() { ConquerMap.jumpToCity(); },
-        };
-    }
+                if (j.ok) {
+                    this.attackModal = false;
+                    this.showToast('⚔ Marsch gestartet! (ID ' + j.data.march_id + ')', 'ok');
+                    this.pollMarches();
+                } else {
+                    this.showToast(j.error?.message ?? j.error ?? 'Fehler', 'err');
+                }
+            } catch {
+                this.showToast('Netzwerkfehler', 'err');
+            }
+            this.attackLoading = false;
+        },
+
+        // ── Toast helper ──────────────────────────────────────────────────────
+        showToast(msg, type = 'ok') {
+            const el = document.getElementById('map-toast');
+            el.textContent  = msg;
+            el.className    = type;
+            el.style.display = 'block';
+            setTimeout(() => { el.style.display = 'none'; }, 4000);
+        },
+    };
+}
 </script>
 </body>
 </html>

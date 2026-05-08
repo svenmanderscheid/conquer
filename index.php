@@ -40,6 +40,14 @@ if (str_starts_with($path, '/api/')) {
     $router->get('/api/troops/list',         [\Conquer\Api\Handlers\TroopHandler::class, 'list']);
     $router->post('/api/troops/train',       [\Conquer\Api\Handlers\TroopHandler::class, 'train']);
 
+    // March
+    $router->post('/api/march/dispatch',     [\Conquer\Api\Handlers\MarchHandler::class, 'dispatch']);
+    $router->get('/api/march/list',          [\Conquer\Api\Handlers\MarchHandler::class, 'list']);
+
+    // Battle reports
+    $router->get('/api/battle/reports',      [\Conquer\Api\Handlers\BattleHandler::class, 'reports']);
+    $router->get('/api/battle/report/:id',   [\Conquer\Api\Handlers\BattleHandler::class, 'report']);
+
     // Map
     $router->get('/api/map/info',            [\Conquer\Api\Handlers\MapHandler::class, 'info']);
     $router->get('/api/map/tiles',           [\Conquer\Api\Handlers\MapHandler::class, 'tiles']);
