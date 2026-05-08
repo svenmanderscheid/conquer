@@ -238,10 +238,10 @@ declare(strict_types=1);
                                     Type: <strong style="color:#ef4444">Monster</strong>
                                 </div>
                                 <div class="tile-info-row">
-                                    Code: <strong x-text="tileInfo.occupant.monster_code"></strong>
+                                    Name: <strong x-text="monsterLabel(tileInfo.occupant.monster_code)"></strong>
                                 </div>
                                 <div class="tile-info-row">
-                                    HP: <strong x-text="tileInfo.occupant.hp_current"></strong>
+                                    HP: <strong x-text="tileInfo.occupant.hp_current.toLocaleString()"></strong>
                                 </div>
                             </div>
                         </template>
@@ -300,6 +300,26 @@ declare(strict_types=1);
             myCity:    null,
             tileInfo:  null,
             hoverTile: '',
+
+            // Monster type lookup: floor(code / 100) → name
+            MONSTER_TYPES: {
+                202001: 'Orc',
+                202002: 'Skeleton',
+                202003: 'Golem',
+                202004: 'Treasure Goblin',
+                202005: 'Deathkar',
+                202006: 'Green Dragon',
+                202007: 'Red Dragon',
+                202008: 'Gold Dragon',
+                202009: 'Magdar',
+            },
+
+            monsterLabel(code) {
+                const type  = Math.floor(code / 100);
+                const level = code % 100;
+                const name  = this.MONSTER_TYPES[type] ?? 'Unknown';
+                return `${name} Lv ${level}`;
+            },
 
             async boot() {
                 const r = await fetch('/api/map/info');

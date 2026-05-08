@@ -294,6 +294,7 @@ const ConquerMap = (() => {
                 ctx.fillText(String(e.level), px + s / 2, py + s / 2);
             }
         } else if (e.type === 'monster') {
+            const level = e.monster_code % 100;
             ctx.beginPath();
             ctx.arc(px + s/2, py + s/2, s/2 - pad, 0, Math.PI * 2);
             ctx.fillStyle   = '#ef4444';
@@ -301,6 +302,13 @@ const ConquerMap = (() => {
             ctx.lineWidth   = 1;
             ctx.fill();
             ctx.stroke();
+            if (s >= 16) {
+                ctx.fillStyle    = '#ffffff';
+                ctx.font         = `bold ${Math.max(7, Math.floor(s * 0.38))}px monospace`;
+                ctx.textAlign    = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(String(level), px + s / 2, py + s / 2);
+            }
         } else if (e.type === 'resource') {
             const cx = px + s/2, cy = py + s/2, r = s/2 - pad;
             ctx.beginPath();
