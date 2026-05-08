@@ -82,11 +82,15 @@ final class Router
      * Converts `:param` segments into named regex groups.
      * E.g. `/api/city/cancel-build/:queue_id` becomes
      *      `#^/api/city/cancel-build/(?P<queue_id>[^/]+)$#`
+     *
+     * NOTE: :param replacement must happen BEFORE preg_quote because
+     * PHP 7.3+ quotes ':' → '\:'. Quoting after replacement would corrupt
+     * the named-group syntax. Route patterns only contain slashes, letters,
+     * digits and hyphens (no regex special chars), so preg_quote is unnecessary.
      */
     private function patternToRegex(string $pattern): string
     {
-        $escaped = preg_quote($pattern, '#');
-        $regex   = preg_replace('#:([a-zA-Z_][a-zA-Z0-9_]*)#', '(?P<$1>[^/]+)', $escaped);
+        $regex = preg_replace('#:([a-zA-Z_][a-zA-Z0-9_]*)#', '(?P<$1>[^/]+)', $pattern);
 
         return '#^' . $regex . '$#';
     }
