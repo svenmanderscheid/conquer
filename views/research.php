@@ -117,48 +117,63 @@ $battleGrid = [
     'dragoon'                  => [22, 2],
 ];
 
+// Production flow — alle Verbindungen gehen strikt links → rechts:
+// col 0: food/wood/stone_production  →  col 1: gold_production (fan-in)
+// col 1 → col 2: food/wood/stone_capacity (fan-out)
+// col 2 → col 3: gold_capacity (fan-in)
+// col 3 → col 4: food/wood/stone_gathering_speed (fan-out)
+// col 4 → col 5: gold_gathering_speed (fan-in) → col 6: crystal
+// col 6 → col 7: infantry/ranged/cavalry_storage (fan-out)
+// col 7 → col 8: research_speed (fan-in) → col 9: construction_speed
+// col 9 → col 10: resource_protect → col 11: adv_food/wood/stone_production (fan-out)
+// col 11 → col 12: adv_gold_production (fan-in)
+// col 12 → col 13: adv_food/wood/stone_capacity (fan-out)
+// col 13 → col 14: adv_gold_capacity → col 15: adv_research_speed
+// col 15 → col 16: adv_construction_speed
+// col 16 → col 17: adv_food/wood/stone_gathering_speed (fan-out)
+// col 17 → col 18: adv_gold_gathering_speed (fan-in) → col 19: adv_crystal
 $productionGrid = [
     // Row 0 — Food
     'food_production'                  => [0,  0],
-    'food_capacity'                    => [1,  0],
-    'food_gathering_speed'             => [2,  0],
+    'food_capacity'                    => [2,  0],
+    'food_gathering_speed'             => [4,  0],
+    'infantry_storage'                 => [7,  0],
     'advanced_food_production'         => [11, 0],
-    'advanced_food_capacity'           => [12, 0],
-    'advanced_food_gathering_speed'    => [13, 0],
+    'advanced_food_capacity'           => [13, 0],
+    'advanced_food_gathering_speed'    => [17, 0],
 
     // Row 1 — Wood
     'wood_production'                  => [0,  1],
-    'wood_capacity'                    => [1,  1],
-    'wood_gathering_speed'             => [2,  1],
+    'wood_capacity'                    => [2,  1],
+    'wood_gathering_speed'             => [4,  1],
+    'ranged_storage'                   => [7,  1],
     'advanced_wood_production'         => [11, 1],
-    'advanced_wood_capacity'           => [12, 1],
-    'advanced_wood_gathering_speed'    => [13, 1],
+    'advanced_wood_capacity'           => [13, 1],
+    'advanced_wood_gathering_speed'    => [17, 1],
 
     // Row 2 — Stone
     'stone_production'                 => [0,  2],
-    'stone_capacity'                   => [1,  2],
-    'stone_gathering_speed'            => [2,  2],
+    'stone_capacity'                   => [2,  2],
+    'stone_gathering_speed'            => [4,  2],
+    'cavalry_storage'                  => [7,  2],
     'advanced_stone_production'        => [11, 2],
-    'advanced_stone_capacity'          => [12, 2],
-    'advanced_stone_gathering_speed'   => [13, 2],
+    'advanced_stone_capacity'          => [13, 2],
+    'advanced_stone_gathering_speed'   => [17, 2],
 
-    // Row 3 — General / shared
-    'gold_production'                  => [3,  3],
-    'gold_capacity'                    => [4,  3],
+    // Row 3 — Gold shared nodes (immer zwischen den Resource-Spalten)
+    'gold_production'                  => [1,  3],
+    'gold_capacity'                    => [3,  3],
     'gold_gathering_speed'             => [5,  3],
     'crystal_gathering_speed'          => [6,  3],
-    'infantry_storage'                 => [7,  1],
-    'ranged_storage'                   => [7,  2],
-    'cavalry_storage'                  => [7,  3],
     'research_speed'                   => [8,  3],
     'construction_speed'               => [9,  3],
     'resource_protect'                 => [10, 3],
-    'advanced_gold_production'         => [14, 3],
-    'advanced_gold_capacity'           => [15, 3],
-    'advanced_gold_gathering_speed'    => [16, 3],
-    'advanced_crystal_gathering_speed' => [17, 3],
-    'advanced_research_speed'          => [18, 3],
-    'advanced_construction_speed'      => [19, 3],
+    'advanced_gold_production'         => [12, 3],
+    'advanced_gold_capacity'           => [14, 3],
+    'advanced_research_speed'          => [15, 3],
+    'advanced_construction_speed'      => [16, 3],
+    'advanced_gold_gathering_speed'    => [18, 3],
+    'advanced_crystal_gathering_speed' => [19, 3],
 ];
 
 $advancedGrid = [
