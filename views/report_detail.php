@@ -6,6 +6,7 @@ declare(strict_types=1);
  */
 
 use Conquer\Db\Connection;
+use Conquer\Game\City\TroopData;
 
 $db       = Connection::getInstance();
 $playerId = (int) $session['player_id'];
@@ -28,6 +29,32 @@ if (!(int) $row['attacker_read']) {
 $data    = json_decode($row['data_json'], true) ?? [];
 $outcome = $row['outcome'];
 $troops  = $data['troops'] ?? [];
+
+// ── Player / city stats ───────────────────────────────────────────────────────
+$playerStats = $db->query(
+    'SELECT p.username, p.vip_level, c.castle_level, c.power, c.name AS city_name
+     FROM players p JOIN cities c ON c.player_id = p.id
+     WHERE p.id = ? LIMIT 1',
+    [$playerId],
+)->fetch() ?: [];
+
+// ── Attacker combat totals (calculated from troops sent) ──────────────────────
+$totalSent       = 0;
+$totalAtk        = 0;
+$totalHp         = 0;
+$totalDef        = 0;
+$totalAbsorption = 0;
+
+foreach ($troops as $t) {
+    $sent = (int) ($t['sent'] ?? 0);
+    $def  = TroopData::get((int) $t['code']);
+    if ($def === null || $sent <= 0) continue;
+    $totalSent       += $sent;
+    $totalAtk        += $sent * (float) $def['attack'];
+    $totalHp         += $sent * (float) $def['hp'];
+    $totalDef        += $sent * (float) $def['defense'];
+    $totalAbsorption += $sent * ((float) $def['hp'] + (float) $def['defense']);
+}
 
 $isWin  = $outcome === 'attacker_wins';
 $isDraw = $outcome === 'draw';
@@ -448,6 +475,63 @@ $fmt = fn(mixed $n): string => number_format((int)$n, 0, '.', ',');
             </table>
         </div>
         <?php endif ?>
+
+        <!-- Attacker stats -->
+        <div class="cards">
+
+            <!-- Combat power -->
+            <div class="card">
+                <div class="card-title">Kampfwerte der gesendeten Truppen</div>
+                <div class="combat-row">
+                    <span class="combat-label">Truppen gesamt</span>
+                    <span class="combat-val"><?= $fmt($totalSent) ?></span>
+                </div>
+                <div class="combat-row">
+                    <span class="combat-label">Gesamt-Angriff</span>
+                    <span class="combat-val" style="color:var(--red)"><?= $fmt($totalAtk) ?></span>
+                </div>
+                <div class="combat-row">
+                    <span class="combat-label">Gesamt-HP</span>
+                    <span class="combat-val"><?= $fmt($totalHp) ?></span>
+                </div>
+                <div class="combat-row">
+                    <span class="combat-label">Gesamt-Verteidigung</span>
+                    <span class="combat-val"><?= $fmt($totalDef) ?></span>
+                </div>
+                <div class="combat-row">
+                    <span class="combat-label">Absorption (HP + Def)</span>
+                    <span class="combat-val" style="color:var(--gold)"><?= $fmt($totalAbsorption) ?></span>
+                </div>
+            </div>
+
+            <!-- Player profile -->
+            <?php if (!empty($playerStats)): ?>
+            <div class="card">
+                <div class="card-title">Angreifer</div>
+                <div class="combat-row">
+                    <span class="combat-label">Spieler</span>
+                    <span class="combat-val"><?= htmlspecialchars($playerStats['username'] ?? '') ?></span>
+                </div>
+                <div class="combat-row">
+                    <span class="combat-label">Stadt</span>
+                    <span class="combat-val"><?= htmlspecialchars($playerStats['city_name'] ?? '') ?></span>
+                </div>
+                <div class="combat-row">
+                    <span class="combat-label">Schlosslevel</span>
+                    <span class="combat-val">Lv <?= (int)($playerStats['castle_level'] ?? 1) ?></span>
+                </div>
+                <div class="combat-row">
+                    <span class="combat-label">Macht</span>
+                    <span class="combat-val" style="color:var(--gold)"><?= $fmt($playerStats['power'] ?? 0) ?></span>
+                </div>
+                <div class="combat-row">
+                    <span class="combat-label">VIP</span>
+                    <span class="combat-val">Lv <?= (int)($playerStats['vip_level'] ?? 0) ?></span>
+                </div>
+            </div>
+            <?php endif ?>
+
+        </div>
 
     </div>
 </div>
