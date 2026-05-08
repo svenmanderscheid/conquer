@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 use Conquer\Db\Connection;
 use Conquer\Game\City\TroopData;
+use Conquer\Game\Research\BuffEngine;
 
 $db       = Connection::getInstance();
 $playerId = (int) $session['player_id'];
@@ -87,6 +88,11 @@ $monsterHpAfter  = (int) ($data['monster_hp_after']  ?? 0);
 $monsterKilled   = (bool) ($data['monster_killed']   ?? false);
 $monsterAtk      = (int) round((float) ($data['monster_atk_pool'] ?? 0));
 $monsterLossPct  = round(($data['monster_loss_ratio'] ?? 0) * 100, 1);
+
+$buffs = BuffEngine::getBuffs($playerId);
+
+// Troop type index → BuffEngine type name
+$troopTypeMap = [1 => 'infantry', 2 => 'ranged', 3 => 'cavalry'];
 
 $fmt = fn(mixed $n): string => number_format((int) $n, 0, '.', ',');
 $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
@@ -729,6 +735,9 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
                 <tr>
                     <th>Einheit</th>
                     <th>Tier</th>
+                    <th style="text-align:right">ATK/Einheit</th>
+                    <th style="text-align:right">HP/Einheit</th>
+                    <th style="text-align:right">DEF/Einheit</th>
                     <th style="text-align:right">Gesendet</th>
                     <th style="text-align:right">Verletzt</th>
                     <th style="text-align:right">Zurückgekehrt</th>
@@ -740,10 +749,18 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
                     $injured  = (int)($t['injured']  ?? $t['lost'] ?? 0);
                     $survived = (int)($t['survived'] ?? 0);
                     $sent     = (int)($t['sent']     ?? 0);
+                    $tDef     = TroopData::get((int)$t['code']);
+                    $tType    = $tDef ? ($troopTypeMap[$tDef['type'] ?? 1] ?? null) : null;
+                    $effAtk   = $tDef ? (int) round($tDef['attack']  * BuffEngine::effectiveMultiplier($buffs, $tType, 'atk')) : 0;
+                    $effHp    = $tDef ? (int) round($tDef['hp']       * BuffEngine::effectiveMultiplier($buffs, $tType, 'hp'))  : 0;
+                    $effDef   = $tDef ? (int) round($tDef['defense']  * BuffEngine::effectiveMultiplier($buffs, $tType, 'def')) : 0;
                 ?>
                 <tr>
                     <td><?= htmlspecialchars($t['name'] ?? '?') ?></td>
                     <td><span class="tier-badge">T<?= (int)($t['tier'] ?? 1) ?></span></td>
+                    <td style="text-align:right;color:var(--red2)"><?= $fmt($effAtk) ?></td>
+                    <td style="text-align:right"><?= $fmt($effHp) ?></td>
+                    <td style="text-align:right"><?= $fmt($effDef) ?></td>
                     <td style="text-align:right"><?= $fmt($sent) ?></td>
                     <td style="text-align:right">
                         <?php if ($injured > 0): ?>
@@ -760,7 +777,7 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="2" style="color:var(--muted);font-size:0.75rem">Gesamt</td>
+                    <td colspan="5" style="color:var(--muted);font-size:0.75rem">Gesamt</td>
                     <td style="text-align:right"><?= $fmt($totalSent) ?></td>
                     <td style="text-align:right">
                         <?php if ($totalInjured > 0): ?>
@@ -778,6 +795,53 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
     </div>
     <?php endif ?>
 
+
+    <!-- BOOST LIST -->
+    <div class="section-header">Boost List <span style="font-weight:400;opacity:.6;font-size:0.58rem;letter-spacing:0.04em">— Forschungs-Buffs zum Zeitpunkt des Angriffs</span></div>
+    <div style="background:var(--surface);padding:0.75rem 1.25rem 1rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:0.2rem 2rem">
+        <?php
+        $bPct = fn(string $key): string => '+' . round(($buffs[$key] ?? 0.0) * 100, 1) . '%';
+        $boostRows = [
+            // General
+            'Truppen HP'            => $bPct('troops_hp'),
+            'Truppen Angriff'       => $bPct('troops_atk'),
+            'Truppen Verteidigung'  => $bPct('troops_def'),
+            'Truppen Geschwindigkeit' => $bPct('troops_spd'),
+            // Infantry
+            'Infanterie HP'         => $bPct('infantry_hp'),
+            'Infanterie Angriff'    => $bPct('infantry_atk'),
+            'Infanterie Verteidigung' => $bPct('infantry_def'),
+            'Infanterie Geschwindigkeit' => $bPct('infantry_spd'),
+            // Ranged
+            'Fernkämpfer HP'        => $bPct('ranged_hp'),
+            'Fernkämpfer Angriff'   => $bPct('ranged_atk'),
+            'Fernkämpfer Verteidigung' => $bPct('ranged_def'),
+            'Fernkämpfer Geschwindigkeit' => $bPct('ranged_spd'),
+            // Cavalry
+            'Kavallerie HP'         => $bPct('cavalry_hp'),
+            'Kavallerie Angriff'    => $bPct('cavalry_atk'),
+            'Kavallerie Verteidigung' => $bPct('cavalry_def'),
+            'Kavallerie Geschwindigkeit' => $bPct('cavalry_spd'),
+            // Other
+            'Marschgröße (Bonus)'   => '+' . (int)($buffs['march_size'] ?? 0),
+            'Krankenhauskapazität'  => '+' . (int)($buffs['hospital_capacity'] ?? 0),
+            'Heilungsgeschwindigkeit' => $bPct('healing_speed'),
+            'Baugeschwindigkeit'    => $bPct('construction_speed'),
+        ];
+        foreach ($boostRows as $label => $val):
+            $isZero = $val === '+0%' || $val === '+0';
+        ?>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:0.22rem 0;border-bottom:1px solid rgba(255,255,255,0.03);font-size:0.77rem">
+            <span style="color:var(--muted)"><?= $label ?></span>
+            <span style="font-weight:700;color:<?= $isZero ? 'var(--muted)' : 'var(--green)' ?>"><?= $val ?></span>
+        </div>
+        <?php endforeach ?>
+        <?php if (empty(array_filter($buffs))): ?>
+        <div style="grid-column:1/-1;font-size:0.75rem;color:var(--muted);padding:0.5rem 0">
+            Noch keine Forschungen abgeschlossen. <a href="/research" style="color:var(--gold2)">Zur Akademie →</a>
+        </div>
+        <?php endif ?>
+    </div>
 
     <div style="height:2rem"></div>
 </div>

@@ -1,0 +1,126 @@
+{
+  "version": 1,
+  "tree": "production",
+  "nodes": [
+    {
+      "code": "food_production",
+      "name": "Food Production",
+      "category": "production",
+      "stat": "food_production",
+      "type": "buff",
+      "max_level": 5,
+      "levels": [
+        {"level": 1, "ability_value": 0.02, "time": 60,    "power": 50,  "resources": {"food": 300,   "lumber": 200,   "stone": 400,   "gold": 1000},  "requirements": [{"type": "academy", "level": 1}]},
+        {"level": 2, "ability_value": 0.04, "time": 300,   "power": 100, "resources": {"food": 900,   "lumber": 600,   "stone": 1200,  "gold": 3000},  "requirements": [{"type": "academy", "level": 1}]},
+        {"level": 3, "ability_value": 0.06, "time": 1800,  "power": 150, "resources": {"food": 2700,  "lumber": 1800,  "stone": 3600,  "gold": 9000},  "requirements": [{"type": "academy", "level": 1}]},
+        {"level": 4, "ability_value": 0.08, "time": 7200,  "power": 200, "resources": {"food": 8100,  "lumber": 5400,  "stone": 10800, "gold": 27000}, "requirements": [{"type": "academy", "level": 1}]},
+        {"level": 5, "ability_value": 0.10, "time": 21600, "power": 250, "resources": {"food": 24300, "lumber": 16200, "stone": 32400, "gold": 81000}, "requirements": [{"type": "academy", "level": 1}]}
+      ]
+    },
+    {
+      "code": "lumber_production",
+      "name": "Lumber Production",
+      "category": "production",
+      "stat": "lumber_production",
+      "type": "buff",
+      "max_level": 5,
+      "levels": [
+        {"level": 1, "ability_value": 0.02, "time": 60,    "power": 50,  "resources": {"food": 300,   "lumber": 200,   "stone": 400,   "gold": 1000},  "requirements": [{"type": "academy", "level": 1}]},
+        {"level": 2, "ability_value": 0.04, "time": 300,   "power": 100, "resources": {"food": 900,   "lumber": 600,   "stone": 1200,  "gold": 3000},  "requirements": [{"type": "academy", "level": 1}]},
+        {"level": 3, "ability_value": 0.06, "time": 1800,  "power": 150, "resources": {"food": 2700,  "lumber": 1800,  "stone": 3600,  "gold": 9000},  "requirements": [{"type": "academy", "level": 1}]},
+        {"level": 4, "ability_value": 0.08, "time": 7200,  "power": 200, "resources": {"food": 8100,  "lumber": 5400,  "stone": 10800, "gold": 27000}, "requirements": [{"type": "academy", "level": 1}]},
+        {"level": 5, "ability_value": 0.10, "time": 21600, "power": 250, "resources": {"food": 24300, "lumber": 16200, "stone": 32400, "gold": 81000}, "requirements": [{"type": "academy", "level": 1}]}
+      ]
+    },
+    {
+      "code": "stone_production",
+      "name": "Stone Production",
+      "category": "production",
+      "stat": "stone_production",
+      "type": "buff",
+      "max_level": 5,
+      "levels": [
+        {"level": 1, "ability_value": 0.02, "time": 60,    "power": 50,  "resources": {"food": 300,   "lumber": 200,   "stone": 400,   "gold": 1000},  "requirements": [{"type": "academy", "level": 1}]},
+        {"level": 2, "ability_value": 0.04, "time": 300,   "power": 100, "resources": {"food": 900,   "lumber": 600,   "stone": 1200,  "gold": 3000},  "requirements": [{"type": "academy", "level": 1}]},
+        {"level": 3, "ability_value": 0.06, "time": 1800,  "power": 150, "resources": {"food": 2700,  "lumber": 1800,  "stone": 3600,  "gold": 9000},  "requirements": [{"type": "academy", "level": 1}]},
+        {"level": 4, "ability_value": 0.08, "time": 7200,  "power": 200, "resources": {"food": 8100,  "lumber": 5400,  "stone": 10800, "gold": 27000}, "requirements": [{"type": "academy", "level": 1}]},
+        {"level": 5, "ability_value": 0.10, "time": 21600, "power": 250, "resources": {"food": 24300, "lumber": 16200, "stone": 32400, "gold": 81000}, "requirements": [{"type": "academy", "level": 1}]}
+      ]
+    },
+    {
+      "code": "gold_production",
+      "name": "Gold Production",
+      "category": "production",
+      "stat": "gold_production",
+      "type": "buff",
+      "max_level": 5,
+      "levels": [
+        {"level": 1, "ability_value": 0.02, "time": 60,    "power": 50,  "resources": {"food": 300,   "lumber": 200,   "stone": 400,   "gold": 1000},  "requirements": [{"type": "academy", "level": 1}]},
+        {"level": 2, "ability_value": 0.04, "time": 300,   "power": 100, "resources": {"food": 900,   "lumber": 600,   "stone": 1200,  "gold": 3000},  "requirements": [{"type": "academy", "level": 1}]},
+        {"level": 3, "ability_value": 0.06, "time": 1800,  "power": 150, "resources": {"food": 2700,  "lumber": 1800,  "stone": 3600,  "gold": 9000},  "requirements": [{"type": "academy", "level": 1}]},
+        {"level": 4, "ability_value": 0.08, "time": 7200,  "power": 200, "resources": {"food": 8100,  "lumber": 5400,  "stone": 10800, "gold": 27000}, "requirements": [{"type": "academy", "level": 1}]},
+        {"level": 5, "ability_value": 0.10, "time": 21600, "power": 250, "resources": {"food": 24300, "lumber": 16200, "stone": 32400, "gold": 81000}, "requirements": [{"type": "academy", "level": 1}]}
+      ]
+    },
+    {
+      "code": "hospital_capacity",
+      "name": "Hospital Capacity",
+      "category": "general",
+      "stat": "hospital_capacity",
+      "type": "buff",
+      "max_level": 5,
+      "levels": [
+        {"level": 1, "ability_value": 500,  "time": 120,  "power": 50,  "resources": {"food": 500,  "lumber": 500,  "stone": 500,  "gold": 0}, "requirements": [{"type": "academy", "level": 1}]},
+        {"level": 2, "ability_value": 1000, "time": 300,  "power": 100, "resources": {"food": 1000, "lumber": 1000, "stone": 1000, "gold": 0}, "requirements": [{"type": "academy", "level": 1}]},
+        {"level": 3, "ability_value": 1500, "time": 600,  "power": 150, "resources": {"food": 2000, "lumber": 2000, "stone": 2000, "gold": 0}, "requirements": [{"type": "academy", "level": 1}]},
+        {"level": 4, "ability_value": 2000, "time": 1200, "power": 200, "resources": {"food": 4000, "lumber": 4000, "stone": 4000, "gold": 0}, "requirements": [{"type": "academy", "level": 2}]},
+        {"level": 5, "ability_value": 2500, "time": 2400, "power": 250, "resources": {"food": 8000, "lumber": 8000, "stone": 8000, "gold": 0}, "requirements": [{"type": "academy", "level": 2}]}
+      ]
+    },
+    {
+      "code": "healing_speed",
+      "name": "Healing Speed",
+      "category": "general",
+      "stat": "healing_speed",
+      "type": "buff",
+      "max_level": 5,
+      "levels": [
+        {"level": 1, "ability_value": 0.05, "time": 600,   "power": 50,  "resources": {"food": 2000,  "lumber": 2000,  "stone": 2000,  "gold": 500},  "requirements": [{"type": "academy", "level": 2}]},
+        {"level": 2, "ability_value": 0.10, "time": 1800,  "power": 100, "resources": {"food": 6000,  "lumber": 6000,  "stone": 6000,  "gold": 1500}, "requirements": [{"type": "academy", "level": 2}]},
+        {"level": 3, "ability_value": 0.15, "time": 5400,  "power": 150, "resources": {"food": 18000, "lumber": 18000, "stone": 18000, "gold": 4500}, "requirements": [{"type": "academy", "level": 3}]},
+        {"level": 4, "ability_value": 0.20, "time": 16200, "power": 200, "resources": {"food": 54000, "lumber": 54000, "stone": 54000, "gold": 13500},"requirements": [{"type": "academy", "level": 3}]},
+        {"level": 5, "ability_value": 0.25, "time": 48600, "power": 250, "resources": {"food": 162000,"lumber": 162000,"stone": 162000,"gold": 40500},"requirements": [{"type": "academy", "level": 4}]}
+      ]
+    },
+    {
+      "code": "construction_speed",
+      "name": "Construction Speed",
+      "category": "general",
+      "stat": "construction_speed",
+      "type": "buff",
+      "max_level": 5,
+      "levels": [
+        {"level": 1, "ability_value": 0.03, "time": 300,   "power": 50,  "resources": {"food": 0, "lumber": 1000,  "stone": 1000,  "gold": 500},   "requirements": [{"type": "academy", "level": 1}]},
+        {"level": 2, "ability_value": 0.06, "time": 900,   "power": 100, "resources": {"food": 0, "lumber": 3000,  "stone": 3000,  "gold": 1500},  "requirements": [{"type": "academy", "level": 1}]},
+        {"level": 3, "ability_value": 0.09, "time": 2700,  "power": 150, "resources": {"food": 0, "lumber": 9000,  "stone": 9000,  "gold": 4500},  "requirements": [{"type": "academy", "level": 2}]},
+        {"level": 4, "ability_value": 0.12, "time": 8100,  "power": 200, "resources": {"food": 0, "lumber": 27000, "stone": 27000, "gold": 13500}, "requirements": [{"type": "academy", "level": 3}]},
+        {"level": 5, "ability_value": 0.15, "time": 24300, "power": 250, "resources": {"food": 0, "lumber": 81000, "stone": 81000, "gold": 40500}, "requirements": [{"type": "academy", "level": 4}]}
+      ]
+    },
+    {
+      "code": "research_speed",
+      "name": "Research Speed",
+      "category": "general",
+      "stat": "research_speed",
+      "type": "buff",
+      "max_level": 5,
+      "levels": [
+        {"level": 1, "ability_value": 0.03, "time": 600,   "power": 50,  "resources": {"food": 0, "lumber": 2000,  "stone": 2000,  "gold": 1000},  "requirements": [{"type": "academy", "level": 3}]},
+        {"level": 2, "ability_value": 0.06, "time": 1800,  "power": 100, "resources": {"food": 0, "lumber": 6000,  "stone": 6000,  "gold": 3000},  "requirements": [{"type": "academy", "level": 3}]},
+        {"level": 3, "ability_value": 0.09, "time": 5400,  "power": 150, "resources": {"food": 0, "lumber": 18000, "stone": 18000, "gold": 9000},  "requirements": [{"type": "academy", "level": 4}]},
+        {"level": 4, "ability_value": 0.12, "time": 16200, "power": 200, "resources": {"food": 0, "lumber": 54000, "stone": 54000, "gold": 27000}, "requirements": [{"type": "academy", "level": 5}]},
+        {"level": 5, "ability_value": 0.15, "time": 48600, "power": 250, "resources": {"food": 0, "lumber": 162000,"stone": 162000,"gold": 81000}, "requirements": [{"type": "academy", "level": 6}]}
+      ]
+    }
+  ]
+}

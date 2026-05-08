@@ -53,6 +53,11 @@ if (str_starts_with($path, '/api/')) {
     $router->get('/api/map/tiles',           [\Conquer\Api\Handlers\MapHandler::class, 'tiles']);
     $router->get('/api/map/tile/:x/:y',      [\Conquer\Api\Handlers\MapHandler::class, 'tile']);
 
+    // Research
+    $router->get('/api/research/state',      [\Conquer\Api\Handlers\ResearchHandler::class, 'state']);
+    $router->post('/api/research/start',     [\Conquer\Api\Handlers\ResearchHandler::class, 'start']);
+    $router->post('/api/research/instant',   [\Conquer\Api\Handlers\ResearchHandler::class, 'instant']);
+
     if (!$router->dispatch($method, $path)) {
         \Conquer\Api\Response::error(404, 'NOT_FOUND', 'API endpoint not found.');
     }
@@ -127,6 +132,20 @@ if (preg_match('#^/reports/(\d+)$#', $path, $m)) {
     }
     $reportId = (int) $m[1];
     require ROOT_DIR . '/views/report_detail.php';
+    exit;
+}
+
+// ---------------------------------------------------------------------------
+// Research view
+// ---------------------------------------------------------------------------
+
+if ($path === '/research') {
+    $session = \Conquer\Auth\Session::current();
+    if ($session === null) {
+        header('Location: /');
+        exit;
+    }
+    require ROOT_DIR . '/views/research.php';
     exit;
 }
 
