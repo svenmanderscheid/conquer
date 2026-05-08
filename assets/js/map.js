@@ -297,22 +297,31 @@ const ConquerMap = (() => {
 
         // Entities
         for (const e of Object.values(entities)) {
-            const px = e.x * s - camX;
-            const py = e.y * s - camY;
-            if (px < -s || py < -s || px > canvas.width + s || py > canvas.height + s) continue;
+            const px     = e.x * s - camX;
+            const py     = e.y * s - camY;
+            // Monsters draw 2×2 tiles (sprite extends one tile above anchor),
+            // so use a larger cull margin for them.
+            const margin = e.type === 'monster' ? s * 2 : s;
+            if (px < -margin || py < -margin || px > canvas.width + margin || py > canvas.height + margin) continue;
             drawEntity(e, px, py, s);
         }
 
         // Selected tile border
         if (selectedTile !== null) {
-            const px = Math.round(selectedTile.x * s - camX);
-            const py = Math.round(selectedTile.y * s - camY);
+            const px        = Math.round(selectedTile.x * s - camX);
+            const py        = Math.round(selectedTile.y * s - camY);
+            const isMonster = selectedTile.isMonster ?? false;
+            // Monsters occupy 2×2 tiles (anchor = bottom-left)
+            const bw = isMonster ? s * 2 : s;
+            const bh = isMonster ? s * 2 : s;
+            const bx = px;
+            const by = isMonster ? py - s : py;
             ctx.save();
             ctx.strokeStyle = '#ffffff';
             ctx.lineWidth   = Math.max(2, s * 0.07);
             ctx.shadowColor = '#ffffff';
             ctx.shadowBlur  = 6;
-            ctx.strokeRect(px + 1, py + 1, s - 2, s - 2);
+            ctx.strokeRect(bx + 1, by + 1, bw - 2, bh - 2);
             ctx.restore();
         }
     }
@@ -339,14 +348,21 @@ const ConquerMap = (() => {
             const typeId = Math.floor(e.monster_code / 100);
             const img    = monsterImgs[typeId];
 
+            // 2×2 tile footprint — anchor = bottom-left tile (e.x, e.y)
+            // Top-left of sprite is one tile above the anchor
+            const drawX = Math.round(px);
+            const drawY = Math.round(py - s);
+            const drawW = s * 2;
+            const drawH = s * 2;
+
             ctx.imageSmoothingEnabled = false;
 
             if (img && monsterLoaded[typeId]) {
-                ctx.drawImage(img, Math.round(px), Math.round(py), s, s);
+                ctx.drawImage(img, drawX, drawY, drawW, drawH);
             } else {
-                // Fallback: red circle while image loads
+                // Fallback: red circle centered on 2×2 block
                 ctx.beginPath();
-                ctx.arc(px + s/2, py + s/2, s/2 - pad, 0, Math.PI * 2);
+                ctx.arc(drawX + drawW / 2, drawY + drawH / 2, drawW / 2 - pad, 0, Math.PI * 2);
                 ctx.fillStyle   = '#ef4444';
                 ctx.strokeStyle = '#991b1b';
                 ctx.lineWidth   = 1;
@@ -354,11 +370,11 @@ const ConquerMap = (() => {
                 ctx.stroke();
             }
 
-            // Level badge — small pill at bottom-right of tile
-            if (s >= 24) {
-                const badgeSize = Math.max(10, Math.floor(s * 0.32));
-                const bx = Math.round(px + s - badgeSize - 1);
-                const by = Math.round(py + s - badgeSize - 1);
+            // Level badge — bottom-right corner of 2×2 block
+            if (s >= 16) {
+                const badgeSize = Math.max(10, Math.floor(s * 0.38));
+                const bx = Math.round(drawX + drawW - badgeSize - 2);
+                const by = Math.round(drawY + drawH - badgeSize - 2);
                 ctx.fillStyle = 'rgba(0,0,0,0.75)';
                 ctx.fillRect(bx, by, badgeSize, badgeSize);
                 ctx.fillStyle    = '#ffffff';
@@ -554,7 +570,9 @@ const ConquerMap = (() => {
         if (x < 0 || y < 0 || x >= MAP_SIZE || y >= MAP_SIZE) return;
 
         // Mark tile as selected immediately (shows border while loading)
-        selectedTile = { x, y };
+        // Check entity cache to know if it's a monster (2×2 border)
+        const cachedEntity = entities[`${x},${y}`];
+        selectedTile = { x, y, isMonster: cachedEntity?.type === 'monster' };
 
         // Optimistically show coords while loading
         onTileInfo({ x, y, occupant: null });
@@ -571,6 +589,10 @@ const ConquerMap = (() => {
             }
             if (j.ok) {
                 onTileInfo(j.data);
+                // Refine selection border once we know the real occupant type
+                if (selectedTile && selectedTile.x === x && selectedTile.y === y) {
+                    selectedTile = { x, y, isMonster: j.data.occupant?.type === 'monster' };
+                }
             } else {
                 console.warn('[map] tile API error:', j.error);
             }
