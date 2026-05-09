@@ -302,9 +302,9 @@ const ConquerMap = (() => {
         for (const e of Object.values(entities)) {
             const px     = e.x * s - camX;
             const py     = e.y * s - camY;
-            // Monsters draw 2×2 tiles (sprite extends one tile above anchor),
+            // Monsters and charms draw 2×2 tiles (anchor = bottom-left),
             // so use a larger cull margin for them.
-            const margin = e.type === 'monster' ? s * 2 : s;
+            const margin = (e.type === 'monster' || e.type === 'charm') ? s * 2 : s;
             if (px < -margin || py < -margin || px > canvas.width + margin || py > canvas.height + margin) continue;
             drawEntity(e, px, py, s);
         }
@@ -317,11 +317,13 @@ const ConquerMap = (() => {
             const px        = Math.round(selectedTile.x * s - camX);
             const py        = Math.round(selectedTile.y * s - camY);
             const isMonster = selectedTile.isMonster ?? false;
-            // Monsters occupy 2×2 tiles (anchor = bottom-left)
-            const bw = isMonster ? s * 2 : s;
-            const bh = isMonster ? s * 2 : s;
+            const isCharm   = selectedTile.isCharm   ?? false;
+            // Monsters and charms occupy 2×2 tiles (anchor = bottom-left)
+            const is2x2 = isMonster || isCharm;
+            const bw = is2x2 ? s * 2 : s;
+            const bh = is2x2 ? s * 2 : s;
             const bx = px;
-            const by = isMonster ? py - s : py;
+            const by = is2x2 ? py - s : py;
             ctx.save();
             ctx.strokeStyle = '#ffffff';
             ctx.lineWidth   = Math.max(2, s * 0.07);
@@ -511,13 +513,20 @@ const ConquerMap = (() => {
         } else if (e.type === 'charm') {
             const GRADE_COLOR = { normal: '#94a3b8', epic: '#a855f7', legendary: '#f59e0b' };
             const color = GRADE_COLOR[e.grade] ?? '#94a3b8';
-            const cx = px + s / 2, cy = py + s / 2;
-            const r  = s / 2 - pad;
+
+            // 2×2 footprint — anchor = bottom-left tile (e.x, e.y)
+            const drawX = Math.round(px);
+            const drawY = Math.round(py - s);   // one tile above anchor
+            const drawW = s * 2;
+            const drawH = s * 2;
+            const cx = drawX + drawW / 2;
+            const cy = drawY + drawH / 2;
+            const r  = drawW / 2 - pad * 2;
 
             // Glowing diamond shape
             ctx.save();
             ctx.shadowColor = color;
-            ctx.shadowBlur  = Math.max(4, s * 0.4);
+            ctx.shadowBlur  = Math.max(6, s * 0.5);
             ctx.beginPath();
             ctx.moveTo(cx,     cy - r);
             ctx.lineTo(cx + r, cy);
@@ -526,15 +535,15 @@ const ConquerMap = (() => {
             ctx.closePath();
             ctx.fillStyle   = color;
             ctx.strokeStyle = '#fff';
-            ctx.lineWidth   = 1;
+            ctx.lineWidth   = Math.max(1, s * 0.06);
             ctx.fill();
             ctx.stroke();
             ctx.restore();
 
             // Grade initial (N/E/L)
-            if (s >= 24) {
+            if (s >= 16) {
                 ctx.fillStyle    = '#0f172a';
-                ctx.font         = `bold ${Math.max(7, Math.floor(s * 0.36))}px monospace`;
+                ctx.font         = `bold ${Math.max(8, Math.floor(s * 0.5))}px monospace`;
                 ctx.textAlign    = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(e.grade[0].toUpperCase(), cx, cy);
@@ -715,10 +724,8 @@ const ConquerMap = (() => {
         const { x, y } = screenToTile(sx, sy);
         if (x < 0 || y < 0 || x >= MAP_SIZE || y >= MAP_SIZE) return;
 
-        // For 2×2 monsters (anchor = bottom-left tile), a click on any of the
-        // 4 occupied tiles should resolve to the anchor.
-        // Candidates: the clicked tile itself, and the 3 other possible anchor
-        // positions whose 2×2 block would cover (x, y).
+        // For 2×2 entities (monsters, charms — anchor = bottom-left tile),
+        // a click on any of the 4 occupied tiles resolves to the anchor.
         let tileX = x, tileY = y;
         const candidates = [
             [x,     y    ],  // bottom-left  (direct hit)
@@ -727,7 +734,8 @@ const ConquerMap = (() => {
             [x - 1, y + 1],  // top-right    → anchor is bottom-left
         ];
         for (const [ax, ay] of candidates) {
-            if (entities[`${ax},${ay}`]?.type === 'monster') {
+            const t = entities[`${ax},${ay}`]?.type;
+            if (t === 'monster' || t === 'charm') {
                 tileX = ax;
                 tileY = ay;
                 break;
