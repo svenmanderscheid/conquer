@@ -877,11 +877,18 @@ const ConquerMap = (() => {
         clampCamera(); lastVP = ''; scheduleFetch();
     }
 
+    function jumpTo(tx, ty) {
+        const s = tileSize();
+        camX = tx * s - canvas.width  / 2 + s / 2;
+        camY = ty * s - canvas.height / 2 + s / 2;
+        clampCamera(); lastVP = ''; scheduleFetch();
+    }
+
     function zoomIn()  { applyZoom(zoomIdx + 1, canvas.width / 2, canvas.height / 2); }
     function zoomOut() { applyZoom(zoomIdx - 1, canvas.width / 2, canvas.height / 2); }
     function currentZoom() { return ZOOM_LEVELS[zoomIdx]; }
     function setMarches(marches) { activeMarches = marches || []; }
     function refreshEntities() { lastVP = ''; scheduleFetch(); }
 
-    return { init, jumpToCity, zoomIn, zoomOut, currentZoom, setMarches, refreshEntities };
+    return { init, jumpToCity, jumpTo, zoomIn, zoomOut, currentZoom, setMarches, refreshEntities };
 })();

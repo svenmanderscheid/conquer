@@ -529,7 +529,10 @@ declare(strict_types=1);
             <div class="panel-title">Aktive Märsche</div>
             <template x-for="m in marches" :key="m.id">
                 <div class="march-badge"
-                     :class="m.state === 'returning' ? 'return' : (m.march_type == 5 || m.march_type == 6 ? 'monster' : 'pvp')">
+                     :class="m.state === 'returning' ? 'return' : (m.march_type == 5 || m.march_type == 6 ? 'monster' : 'pvp')"
+                     style="cursor:pointer"
+                     @click="jumpToMarch(m)"
+                     title="Auf Karte springen">
                     <span class="march-badge-label">
                         <template x-if="m.state === 'marching' && m.march_type == 5">
                             <span>⚔ Monster (<span x-text="m.target_x + ',' + m.target_y"></span>)</span>
@@ -700,6 +703,12 @@ function mapApp() {
         doZoomIn()   { ConquerMap.zoomIn();     this.zoom = ConquerMap.currentZoom(); },
         doZoomOut()  { ConquerMap.zoomOut();    this.zoom = ConquerMap.currentZoom(); },
         jumpToCity() { ConquerMap.jumpToCity(); },
+
+        jumpToMarch(m) {
+            const tx = m.state === 'returning' ? (this.myCity?.x ?? m.target_x) : m.target_x;
+            const ty = m.state === 'returning' ? (this.myCity?.y ?? m.target_y) : m.target_y;
+            ConquerMap.jumpTo(tx, ty);
+        },
 
         // ── Active march polling ──────────────────────────────────────────────
         async pollMarches() {
