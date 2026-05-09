@@ -287,6 +287,12 @@ foreach ($buildings as $code => $building) {
         <div class="res">💰 <?= $fmt($city['gold']) ?></div>
     </div>
 
+    <?php if (($state['vip']['level'] ?? 0) > 0): ?>
+    <div class="res" style="border-color:#f59e0b;color:#f59e0b;flex-shrink:0" title="VIP <?= (int)$state['vip']['level'] ?> — <?= (int)$state['vip']['points'] ?> pts">
+        ⭐ VIP <?= (int)$state['vip']['level'] ?>
+    </div>
+    <?php endif ?>
+
     <div class="topbar-actions">
         <a href="/map" class="btn">🗺 Map</a>
         <span style="font-size:.78rem;color:var(--muted)"><?= htmlspecialchars($session['username']) ?></span>

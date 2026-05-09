@@ -27,10 +27,11 @@ final class BuildingUpgrader
      * Start a building upgrade for the given city.
      *
      * @param  int                               $cityId
-     * @param  string                            $code       Building code to upgrade
-     * @param  array<string, mixed>              $city       City row from DB
-     * @param  array<string, array{level: int}>  $buildings  Current buildings map
-     * @param  int                               $vipLevel   Player VIP level
+     * @param  string                            $code        Building code to upgrade
+     * @param  array<string, mixed>              $city        City row from DB
+     * @param  array<string, array{level: int}>  $buildings   Current buildings map
+     * @param  int                               $vipLevel    Player VIP level
+     * @param  array<string, int>                $vipBonuses  VIP bonus array from VipService::bonuses()
      * @return array<string, mixed>  The new building_queue row
      * @throws \RuntimeException  On any validation failure (message is user-safe)
      */
@@ -39,7 +40,8 @@ final class BuildingUpgrader
         string $code,
         array  $city,
         array  $buildings,
-        int    $vipLevel = 1,
+        int    $vipLevel   = 0,
+        array  $vipBonuses = [],
     ): array {
         // 1. Valid building code?
         if (!in_array($code, CityState::BUILDING_CODES, true)) {
@@ -133,7 +135,7 @@ final class BuildingUpgrader
         }
 
         // All checks passed — deduct resources and insert queue entry.
-        $buildTime  = BuildingData::getBuildTime($code, $toLevel);
+        $buildTime  = BuildingData::getBuildTime($code, $toLevel, $vipBonuses);
         $startedAt  = gmdate('Y-m-d H:i:s');
         $finishesAt = gmdate('Y-m-d H:i:s', time() + $buildTime);
 

@@ -22,13 +22,18 @@ final class ResourceTick
     /**
      * Compute current resource values by applying production since last update.
      *
-     * @param  array<string, mixed>              $city      Row from cities table
-     * @param  array<string, array{level: int}>  $buildings Current buildings
+     * @param  array<string, mixed>              $city        Row from cities table
+     * @param  array<string, array{level: int}>  $buildings   Current buildings
      * @param  float                             $speedFactor World speed multiplier
+     * @param  array<string, int>                $vipBonuses  Optional VIP bonuses from VipService::bonuses()
      * @return array<string, mixed>              City array with updated resource values
      */
-    public static function apply(array $city, array $buildings, float $speedFactor = 1.0): array
-    {
+    public static function apply(
+        array $city,
+        array $buildings,
+        float $speedFactor = 1.0,
+        array $vipBonuses  = [],
+    ): array {
         $elapsed = time() - strtotime($city['last_resource_update']);
         if ($elapsed <= 0) {
             return $city;
@@ -42,8 +47,8 @@ final class ResourceTick
                 continue;
             }
 
-            $level = (int) ($buildings[$code]['level'] ?? 1);
-            $hourlyRate = BuildingData::getHourlyRate($code, $level) * $speedFactor;
+            $level      = (int) ($buildings[$code]['level'] ?? 1);
+            $hourlyRate = BuildingData::getHourlyRate($code, $level, $vipBonuses) * $speedFactor;
             $gained     = ($elapsed / 3600.0) * $hourlyRate;
 
             $city[$resource] = (int) min(
@@ -61,12 +66,18 @@ final class ResourceTick
      * Call this before any action that consumes resources (upgrades, training, etc.)
      * to ensure the accumulated production is not lost.
      *
-     * @param array<string, mixed>             $city      City row (after apply())
-     * @param array<string, array{level: int}> $buildings Current buildings
+     * @param array<string, mixed>             $city        City row (after apply())
+     * @param array<string, array{level: int}> $buildings   Current buildings
+     * @param float                            $speedFactor World speed multiplier
+     * @param array<string, int>               $vipBonuses  Optional VIP bonuses from VipService::bonuses()
      */
-    public static function persist(array $city, array $buildings, float $speedFactor = 1.0): void
-    {
-        $updated = self::apply($city, $buildings, $speedFactor);
+    public static function persist(
+        array $city,
+        array $buildings,
+        float $speedFactor = 1.0,
+        array $vipBonuses  = [],
+    ): void {
+        $updated = self::apply($city, $buildings, $speedFactor, $vipBonuses);
 
         Connection::getInstance()->execute(
             'UPDATE cities

@@ -43,15 +43,25 @@ final class BuildingData
 
     /**
      * Returns build time in seconds for upgrading to the given level.
+     *
+     * @param array<string, int> $vipBonuses Optional VIP bonus array from VipService::bonuses().
+     *                                        If provided, the construction_speed bonus (%) reduces build time.
      */
-    public static function getBuildTime(string $code, int $toLevel): int
+    public static function getBuildTime(string $code, int $toLevel, array $vipBonuses = []): int
     {
         if ($toLevel <= 1) {
             return 0;
         }
 
         // Exponential: L2=42s, L10≈9min, L20≈3.2h, L30≈2.8days
-        return max(10, (int) round(30 * pow(1.4, $toLevel - 1)));
+        $base = max(10, (int) round(30 * pow(1.4, $toLevel - 1)));
+
+        $speedBonus = (int) ($vipBonuses['construction_speed'] ?? 0);
+        if ($speedBonus > 0) {
+            $base = (int) round($base * (1 - $speedBonus / 100));
+        }
+
+        return max(1, $base);
     }
 
     // -------------------------------------------------------------------------
@@ -61,8 +71,11 @@ final class BuildingData
     /**
      * Returns the hourly production rate of a resource building at a given level.
      * Returns 0 for buildings that don't produce resources.
+     *
+     * @param array<string, int> $vipBonuses Optional VIP bonus array from VipService::bonuses().
+     *                                        If provided, the resource_production bonus (%) increases output.
      */
-    public static function getHourlyRate(string $code, int $level): float
+    public static function getHourlyRate(string $code, int $level, array $vipBonuses = []): float
     {
         $base = match ($code) {
             'farm'        => 300.0,   // food/hour at L1
@@ -77,7 +90,14 @@ final class BuildingData
         }
 
         // Scales: L1×1.0, L10×3.5, L20×16, L30×66
-        return $base * pow(1.15, $level - 1);
+        $rate = $base * pow(1.15, $level - 1);
+
+        $productionBonus = (int) ($vipBonuses['resource_production'] ?? 0);
+        if ($productionBonus > 0) {
+            $rate = $rate * (1 + $productionBonus / 100);
+        }
+
+        return $rate;
     }
 
     /**

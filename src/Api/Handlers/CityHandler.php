@@ -76,6 +76,8 @@ final class CityHandler
         $buildings = $state['buildings'];
         $cityId    = (int) $city['id'];
 
+        $vipBonuses = $state['vip']['bonuses'] ?? [];
+
         try {
             $entry = BuildingUpgrader::start(
                 $cityId,
@@ -83,6 +85,7 @@ final class CityHandler
                 $city,
                 $buildings,
                 (int) $session['vip_level'],
+                $vipBonuses,
             );
         } catch (\RuntimeException $e) {
             Response::error(422, 'UPGRADE_FAILED', $e->getMessage());

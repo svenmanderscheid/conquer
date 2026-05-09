@@ -5,6 +5,7 @@ namespace Conquer\Game\City;
 
 use Conquer\Db\Connection;
 use Conquer\Game\City\TroopTrainer;
+use Conquer\Game\Vip\VipService;
 
 /**
  * Loads a player's city snapshot from the database.
@@ -91,8 +92,12 @@ final class CityState
         // Credit any completed troop training.
         TroopTrainer::processQueue($db, $cityId);
 
+        // Load VIP status — used for production and build-time bonuses.
+        $vip        = VipService::status($playerId);
+        $vipBonuses = $vip['bonuses'];
+
         // Apply lazy resource production (no DB write on read).
-        $city = ResourceTick::apply($city, $buildings);
+        $city = ResourceTick::apply($city, $buildings, 1.0, $vipBonuses);
 
         // Recalculate power live so it's always correct on read.
         $city['power'] = BuildingData::calculateCityPower($buildings);
@@ -107,6 +112,7 @@ final class CityState
             'build_queue' => $queue,
             'troops'      => $troops,
             'troop_queue' => $troopQueue,
+            'vip'         => $vip,
         ];
     }
 

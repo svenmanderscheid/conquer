@@ -88,7 +88,12 @@ final class OAuth
         $raw         = $this->fetchUserInfo($p['userinfo_url'], $accessToken);
         $user        = $this->normalizeUser($provider, $raw);
 
-        return $this->findOrCreatePlayer($provider, $user);
+        $playerId = $this->findOrCreatePlayer($provider, $user);
+
+        // Award daily VIP login points (+10, max once per UTC day).
+        \Conquer\Game\Vip\VipService::dailyLogin($playerId);
+
+        return $playerId;
     }
 
     // -------------------------------------------------------------------------

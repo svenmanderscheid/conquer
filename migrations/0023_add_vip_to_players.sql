@@ -1,0 +1,2 @@
+ALTER TABLE players
+    ADD COLUMN last_vip_login DATE NULL DEFAULT NULL;
