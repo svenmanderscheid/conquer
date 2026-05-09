@@ -168,101 +168,94 @@ foreach ($buildings as $code => $building) {
             position: fixed;
             display: none;
             z-index: 200;
-            width: 172px;
-            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-            border: 2px solid #f59e0b;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.75), 0 0 0 1px rgba(245,158,11,0.2);
-        }
-        .bp-banner {
-            background: linear-gradient(180deg, #ea580c 0%, #9a3412 100%);
-            padding: 7px 10px 5px;
             text-align: center;
+            pointer-events: auto;
+        }
+        #bp-header {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(15,23,42,0.92);
+            border: 1px solid #f59e0b;
+            border-radius: 20px;
+            padding: 5px 16px;
+            margin-bottom: 8px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.6);
+        }
+        #bp-name {
+            font-size: 0.88rem;
             font-weight: 700;
+            color: #e2e8f0;
+            white-space: nowrap;
+        }
+        #bp-badge {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #f59e0b;
+            background: rgba(245,158,11,0.15);
+            border-radius: 10px;
+            padding: 1px 7px;
+            white-space: nowrap;
+        }
+        #bp-timer {
+            display: none;
+            background: rgba(15,23,42,0.92);
+            border: 1px solid #22c55e;
+            border-radius: 20px;
+            padding: 4px 16px;
             font-size: 0.82rem;
-            color: #fff;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-            border-bottom: 1px solid #7c2d12;
+            color: #22c55e;
+            font-family: monospace;
+            font-variant-numeric: tabular-nums;
+            margin-bottom: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
         }
-        .bp-level {
-            text-align: center;
-            font-size: 0.85rem;
-            color: #fbbf24;
-            padding: 5px 4px 2px;
-            font-weight: 600;
-            letter-spacing: 0.03em;
-        }
-        .bp-actions {
+        #bp-actions {
             display: flex;
+            gap: 10px;
             justify-content: center;
-            gap: 6px;
-            padding: 8px 10px 12px;
+            align-items: flex-end;
         }
-        .bp-btn {
+        /* Hex button */
+        .hex-wrap {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
-            text-decoration: none;
-            color: #e2e8f0;
-            flex: 1;
+            gap: 5px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
         }
-        .bp-btn-icon {
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            background: #1e3a5f;
-            border: 2px solid #3b82f6;
+        .hex-wrap:hover .hex-shape { filter: brightness(1.25) drop-shadow(0 0 6px rgba(245,158,11,0.5)); }
+        .hex-shape {
+            width: 58px;
+            height: 64px;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            background: linear-gradient(170deg, #a16207 0%, #78350f 100%);
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 1.05rem;
-            transition: border-color .15s, background .15s, transform .1s;
+            gap: 2px;
+            filter: drop-shadow(0 3px 4px rgba(0,0,0,0.6));
+            transition: filter 0.15s;
         }
-        .bp-btn:hover .bp-btn-icon {
-            border-color: #f59e0b;
-            background: #292d3e;
-            transform: scale(1.08);
+        .hex-wrap.hex-primary .hex-shape {
+            width: 68px;
+            height: 76px;
+            background: linear-gradient(170deg, #b45309 0%, #92400e 100%);
         }
-        .bp-btn-label {
-            font-size: 0.6rem;
-            color: #94a3b8;
-            text-align: center;
+        .hex-icon { font-size: 1.3rem; line-height: 1; }
+        .hex-wrap.hex-primary .hex-icon { font-size: 1.6rem; }
+        .hex-label {
+            font-size: 0.58rem;
+            color: #fde68a;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.7);
             white-space: nowrap;
-        }
-        /* Arrow pointing left toward building */
-        #building-popup::before {
-            content: '';
-            position: absolute;
-            left: -9px;
-            top: 50%;
-            transform: translateY(-50%);
-            border-top: 8px solid transparent;
-            border-bottom: 8px solid transparent;
-            border-right: 9px solid #f59e0b;
-        }
-        #building-popup::after {
-            content: '';
-            position: absolute;
-            left: -6px;
-            top: 50%;
-            transform: translateY(-50%);
-            border-top: 6px solid transparent;
-            border-bottom: 6px solid transparent;
-            border-right: 7px solid #1e293b;
-        }
-        #building-popup.popup-left::before {
-            left: auto; right: -9px;
-            border-right: none;
-            border-left: 9px solid #f59e0b;
-        }
-        #building-popup.popup-left::after {
-            left: auto; right: -6px;
-            border-right: none;
-            border-left: 7px solid #0f172a;
         }
 
         /* ── Building modal overlay ── */
@@ -313,9 +306,12 @@ foreach ($buildings as $code => $building) {
 
 <!-- Building action popup -->
 <div id="building-popup">
-    <div class="bp-banner" id="bp-name">—</div>
-    <div class="bp-level" id="bp-level">Lv.1</div>
-    <div class="bp-actions" id="bp-actions"></div>
+    <div id="bp-header">
+        <span id="bp-name">—</span>
+        <span id="bp-badge">Lv 1</span>
+    </div>
+    <div id="bp-timer">00:00:00</div>
+    <div id="bp-actions"></div>
 </div>
 
 </div><!-- #game -->
@@ -445,60 +441,87 @@ const BUILDING_FUNCS = {
 // ---------------------------------------------------------------------------
 const popup     = document.getElementById('building-popup');
 const bpName    = document.getElementById('bp-name');
-const bpLevel   = document.getElementById('bp-level');
+const bpBadge   = document.getElementById('bp-badge');
+const bpTimer   = document.getElementById('bp-timer');
 const bpActions = document.getElementById('bp-actions');
 
-function openPopup(building, clientX, clientY) {
-    const data  = BUILDINGS_DATA[building.code];
-    const level = data?.level ?? 1;
-    const lbl   = data?.inQueue ? `Lv.${level} → ${data.levelTo}` : `Lv.${level}`;
-    const name  = BUILDING_NAMES[building.code] ?? building.code.replace(/_/g, ' ');
-    const func  = BUILDING_FUNCS[building.code] ?? null;
+let popupTimer = null;
+
+function makeHexBtn(icon, label, onClick, primary = false) {
+    const wrap = document.createElement('button');
+    wrap.className = primary ? 'hex-wrap hex-primary' : 'hex-wrap';
+    wrap.innerHTML =
+        `<div class="hex-shape">
+            <span class="hex-icon">${icon}</span>
+         </div>
+         <span class="hex-label">${label}</span>`;
+    wrap.addEventListener('click', (e) => { e.stopPropagation(); onClick(); });
+    return wrap;
+}
+
+function openPopup(building) {
+    const data    = BUILDINGS_DATA[building.code];
+    const level   = data?.level ?? 1;
+    const inQueue = data?.inQueue ?? false;
+    const name    = BUILDING_NAMES[building.code] ?? building.code.replace(/_/g, ' ');
+    const func    = BUILDING_FUNCS[building.code] ?? null;
 
     bpName.textContent  = name;
-    bpLevel.textContent = lbl;
+    bpBadge.textContent = inQueue ? `Lv ${level} → ${data.levelTo}` : `Lv ${level}`;
 
-    // Build action buttons
-    const btn = (href, icon, label) =>
-        `<a class="bp-btn" href="${href}">
-            <div class="bp-btn-icon">${icon}</div>
-            <div class="bp-btn-label">${label}</div>
-         </a>`;
+    // Timer
+    clearInterval(popupTimer);
+    if (inQueue && data.finishesAt) {
+        bpTimer.style.display = 'block';
+        const tick = () => {
+            const left = Math.max(0, data.finishesAt * 1000 - Date.now());
+            const h = Math.floor(left / 3600000);
+            const m = Math.floor((left % 3600000) / 60000);
+            const s = Math.floor((left % 60000) / 1000);
+            bpTimer.textContent = `⏳ ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        };
+        tick();
+        popupTimer = setInterval(tick, 1000);
+    } else {
+        bpTimer.style.display = 'none';
+    }
 
-    const btnModal = (code, icon, label) =>
-        `<button class="bp-btn" onclick="openBuildingModal('${code}')" style="background:none;border:none;cursor:pointer">
-            <div class="bp-btn-icon">${icon}</div>
-            <div class="bp-btn-label">${label}</div>
-         </button>`;
+    // Action buttons
+    bpActions.innerHTML = '';
+    bpActions.appendChild(makeHexBtn('📋', 'Details', () => openBuildingModal(building.code)));
+    bpActions.appendChild(makeHexBtn(
+        inQueue ? '⚡' : '⬆',
+        inQueue ? 'Speedup' : 'Upgrade',
+        () => openBuildingModal(building.code),
+        true   // primary = larger center button
+    ));
+    if (func) {
+        bpActions.appendChild(makeHexBtn(func.icon, func.label, () => { window.location.href = func.url; }));
+    }
 
-    bpActions.innerHTML =
-        btnModal(building.code, '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#93c5fd" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>', 'Info') +
-        btnModal(building.code, '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>', 'Upgrade') +
-        (func ? btn(func.url, func.icon, func.label) : '');
-
-    // Position popup to the right of the click point (flip left if near edge)
+    // Position centered below the building sprite
     popup.style.display = 'block';
+    const rect   = canvas.getBoundingClientRect();
+    const scaleX = rect.width  / canvas.width;
+    const scaleY = rect.height / canvas.height;
+
+    const bCenterX = rect.left + (building.x + building.size / 2) * scaleX;
+    const bBottomY = rect.top  + (building.y + building.size)     * scaleY + 10;
+
     const pw = popup.offsetWidth;
-    const ph = popup.offsetHeight;
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const margin = 16;
+    let left = bCenterX - pw / 2;
+    let top  = bBottomY;
 
-    let left = clientX + margin;
-    let top  = clientY - ph / 2;
-
-    const flipLeft = left + pw > vw - 10;
-    popup.classList.toggle('popup-left', flipLeft);
-    if (flipLeft) left = clientX - pw - margin;
-
-    if (top < 80) top = 80;                  // stay below nav
-    if (top + ph > vh - 10) top = vh - ph - 10;
+    left = Math.max(8, Math.min(window.innerWidth  - pw - 8, left));
+    top  = Math.min(window.innerHeight - popup.offsetHeight - 8, top);
+    if (top < 80) top = 80;
 
     popup.style.left = left + 'px';
     popup.style.top  = top  + 'px';
 }
 
 function closePopup() {
+    clearInterval(popupTimer);
     popup.style.display = 'none';
 }
 
@@ -552,7 +575,7 @@ canvas.addEventListener('click', (e) => {
     const hit  = hitTest(mx, my);
     if (hit) {
         tooltip.style.display = 'none';
-        openPopup(hit, e.clientX, e.clientY);
+        openPopup(hit);
     } else {
         closePopup();
     }
