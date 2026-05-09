@@ -212,12 +212,11 @@ foreach ($buildings as $code => $building) {
         }
         #bp-actions {
             display: flex;
-            gap: 6px;
+            gap: 8px;
             justify-content: center;
-            align-items: flex-end;
-            padding-bottom: 4px;
+            align-items: center;
         }
-        /* Hex button */
+        /* Hex button — all same size, center distinguished by color */
         .hex-wrap {
             display: flex;
             flex-direction: column;
@@ -227,30 +226,28 @@ foreach ($buildings as $code => $building) {
             background: none;
             border: none;
             padding: 0;
-            transition: transform 0.12s;
         }
-        .hex-wrap:hover .hex-shape { transform: scale(1.1); }
         .hex-shape {
-            width: 46px;
-            height: 52px;
+            width: 48px;
+            height: 54px;
             clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-            background: linear-gradient(170deg, #a16207 0%, #6b2d0a 100%);
+            background: linear-gradient(160deg, #92400e 0%, #5c1d0a 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.65));
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.7));
             transition: filter 0.12s, transform 0.12s;
         }
-        .hex-wrap:hover .hex-shape { filter: drop-shadow(0 2px 8px rgba(245,158,11,0.55)) brightness(1.2); transform: scale(1.1); }
         .hex-wrap.hex-primary .hex-shape {
-            width: 54px;
-            height: 62px;
-            background: linear-gradient(170deg, #b45309 0%, #7c2d12 100%);
+            background: linear-gradient(160deg, #b45309 0%, #7c2d12 100%);
+        }
+        .hex-wrap:hover .hex-shape {
+            filter: drop-shadow(0 2px 10px rgba(245,158,11,0.6)) brightness(1.25);
+            transform: scale(1.1);
         }
         .hex-icon { font-size: 1rem; line-height: 1; }
-        .hex-wrap.hex-primary .hex-icon { font-size: 1.25rem; }
         .hex-label {
-            font-size: 0.6rem;
+            font-size: 0.62rem;
             color: #fff;
             font-weight: 700;
             text-transform: uppercase;
@@ -502,15 +499,17 @@ function openPopup(building) {
     }
     btns.forEach(b => bpActions.appendChild(b));
 
-    // Arc layout: center button lowest, side buttons curve upward
-    // Each step away from center gets translateY(-arcStep * distance²)
-    const arcStep = 14; // px per step
-    const mid = (btns.length - 1) / 2;
-    btns.forEach((b, i) => {
-        const dist = i - mid;              // distance from center (can be 0.5 for 2 btns)
-        const yUp  = -(dist * dist) * arcStep;
-        b.style.transform = `translateY(${yUp.toFixed(1)}px)`;
-    });
+    // Arc: center button drops down, side buttons stay at baseline
+    // Only meaningful with 3+ buttons
+    if (btns.length >= 3) {
+        const arcDrop = 18; // px the center button drops below the sides
+        const mid = (btns.length - 1) / 2;
+        btns.forEach((b, i) => {
+            const dist   = i - mid;
+            const factor = 1 - (dist / mid) ** 2; // 1 at center, 0 at sides
+            b.style.transform = `translateY(${(factor * arcDrop).toFixed(1)}px)`;
+        });
+    }
 
     // Position centered below the building sprite
     popup.style.display = 'block';
