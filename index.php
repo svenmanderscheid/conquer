@@ -59,6 +59,10 @@ if (str_starts_with($path, '/api/')) {
     $router->post('/api/research/start',     [\Conquer\Api\Handlers\ResearchHandler::class, 'start']);
     $router->post('/api/research/instant',   [\Conquer\Api\Handlers\ResearchHandler::class, 'instant']);
 
+    // Trading / Caravan
+    $router->get('/api/trading/caravan',      [\Conquer\Api\Handlers\TradingHandler::class, 'caravan']);
+    $router->post('/api/trading/caravan/buy', [\Conquer\Api\Handlers\TradingHandler::class, 'buy']);
+
     // Alliance
     $router->get('/api/alliance/my',      [\Conquer\Api\Handlers\AllianceHandler::class, 'my']);
     $router->post('/api/alliance/create', [\Conquer\Api\Handlers\AllianceHandler::class, 'create']);

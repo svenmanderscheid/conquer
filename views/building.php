@@ -655,6 +655,135 @@ $isModal = isset($_GET['modal']);
         }
 
         /* ────────────────────────────────────────
+           CARAVAN SECTION (below modal)
+        ──────────────────────────────────────── */
+        .caravan-section {
+            width: 100%;
+            max-width: min(960px, calc(100vw - 16px));
+            margin-top: 16px;
+            background: #111827;
+            border: 1px solid #2a3a55;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .caravan-header {
+            background: #0c1220;
+            border-bottom: 1px solid #2a3a55;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .caravan-header-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            color: #64748b;
+        }
+
+        .caravan-refresh-cd {
+            font-size: 0.72rem;
+            color: #fbbf24;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .caravan-inner {
+            padding: 12px 16px 16px;
+        }
+
+        .caravan-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 8px;
+        }
+
+        .caravan-slot {
+            background: #0f172a;
+            border: 1px solid #2a3a55;
+            border-radius: 7px;
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            transition: border-color .15s, opacity .2s;
+        }
+
+        .caravan-slot.bought {
+            opacity: 0.45;
+            border-color: #1e2d42;
+        }
+
+        .caravan-slot-top {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .caravan-discount {
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 3px;
+            background: #16a34a;
+            color: #fff;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .caravan-slot-label {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #e2e8f0;
+            line-height: 1.2;
+        }
+
+        .caravan-slot-price {
+            font-size: 0.76rem;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .caravan-slot-price strong {
+            color: #e2e8f0;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .btn-caravan-buy {
+            margin-top: auto;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            background: linear-gradient(180deg, #0ea5e9, #0369a1);
+            color: #fff;
+            transition: opacity .15s;
+            white-space: nowrap;
+        }
+
+        .btn-caravan-buy:hover:not(:disabled) { opacity: 0.85; }
+        .btn-caravan-buy:disabled {
+            background: #1e293b;
+            color: #475569;
+            cursor: not-allowed;
+        }
+
+        .caravan-loading {
+            font-size: 0.8rem;
+            color: #475569;
+            padding: 12px 0;
+            text-align: center;
+        }
+
+        /* ────────────────────────────────────────
            BARRACK SECTION (below modal)
         ──────────────────────────────────────── */
         .barrack-section {
@@ -1214,6 +1343,56 @@ $isModal = isset($_GET['modal']);
     </div>
     <?php endif ?>
 
+    <!-- ════════════════════════════════════════
+         CARAVAN SECTION (below modal) — Trading Post only
+    ════════════════════════════════════════ -->
+    <?php if ($buildingCode === 'trading_post'): ?>
+    <div class="caravan-section"
+         x-data="caravanApp()"
+         x-init="boot()">
+
+        <div class="caravan-header">
+            <div class="caravan-header-title">Caravan — Rotierender Markt</div>
+            <div class="caravan-refresh-cd">
+                Nächster Refresh: <span x-text="refreshLabel">…</span>
+            </div>
+        </div>
+
+        <div class="caravan-inner">
+            <template x-if="loading">
+                <div class="caravan-loading">Lade Caravan…</div>
+            </template>
+
+            <template x-if="!loading && error">
+                <div class="caravan-loading" style="color:#ef4444" x-text="error"></div>
+            </template>
+
+            <template x-if="!loading && !error">
+                <div class="caravan-grid">
+                    <template x-for="(slot, idx) in slots" :key="slot.idx">
+                        <div class="caravan-slot" :class="{ bought: slot.bought }">
+                            <div class="caravan-slot-top">
+                                <span class="caravan-discount" x-text="slot.discount + '%'"></span>
+                                <span class="caravan-slot-label" x-text="slot.label"></span>
+                            </div>
+                            <div class="caravan-slot-price">
+                                <span x-text="currencyIcon(slot.currency)"></span>
+                                <strong x-text="fmt(slot.price)"></strong>
+                                <span x-text="currencyLabel(slot.currency)"></span>
+                            </div>
+                            <button class="btn-caravan-buy"
+                                    :disabled="slot.bought || buying === slot.idx"
+                                    @click="buy(slot.idx)">
+                                <span x-text="slot.bought ? 'Gekauft' : (buying === slot.idx ? '…' : 'Kaufen')"></span>
+                            </button>
+                        </div>
+                    </template>
+                </div>
+            </template>
+        </div>
+    </div>
+    <?php endif ?>
+
 <?php if (!$isModal): ?>
 </div><!-- /page-wrap -->
 <?php endif ?>
@@ -1413,6 +1592,135 @@ function showToast(msg, type) {
 }
 })();
 </script>
+
+<?php if ($buildingCode === 'trading_post'): ?>
+<!-- Alpine.js CDN — only loaded for the Trading Post view -->
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<script>
+function caravanApp() {
+    return {
+        loading:      true,
+        error:        null,
+        slots:        [],
+        nextRefresh:  null,   // ISO-8601 string from server
+        refreshLabel: '…',
+        buying:       null,   // slot idx currently being purchased
+        _cdTimer:     null,
+
+        async boot() {
+            try {
+                const res  = await fetch('/api/trading/caravan');
+                const json = await res.json();
+
+                if (!json.ok) {
+                    this.error = json.error?.message ?? json.error?.code ?? 'Ladefehler';
+                    return;
+                }
+
+                this.slots       = json.data.slots;
+                this.nextRefresh = json.data.next_refresh_at;
+                this._startCountdown();
+            } catch (e) {
+                this.error = 'Netzwerkfehler beim Laden des Caravans.';
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async buy(slotIdx) {
+            if (this.buying !== null) return;
+            this.buying = slotIdx;
+
+            try {
+                const res  = await fetch('/api/trading/caravan/buy', {
+                    method:  'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-Token': <?= json_encode($session['csrf_token']) ?>,
+                    },
+                    body: JSON.stringify({ slot_idx: slotIdx }),
+                });
+                const json = await res.json();
+
+                if (json.ok) {
+                    // Mark the slot as bought locally — avoids a full reload.
+                    const idx = this.slots.findIndex(s => s.idx === slotIdx);
+                    if (idx !== -1) this.slots[idx].bought = true;
+                    this._toast(json.data.slot.label + ' gekauft!', 'ok');
+                } else {
+                    this._toast(json.error?.message ?? json.error?.code ?? 'Kauf fehlgeschlagen', 'err');
+                }
+            } catch (e) {
+                this._toast('Netzwerkfehler', 'err');
+            } finally {
+                this.buying = null;
+            }
+        },
+
+        // ---- helpers --------------------------------------------------------
+
+        fmt(n) {
+            return Number(n).toLocaleString('de-DE');
+        },
+
+        currencyIcon(cur) {
+            const map = { gems: '💎', food: '🌾', lumber: '🪵', stone: '🪨', gold: '💰' };
+            return map[cur] ?? cur;
+        },
+
+        currencyLabel(cur) {
+            const map = { gems: 'Gems', food: 'Nahrung', lumber: 'Holz', stone: 'Stein', gold: 'Gold' };
+            return map[cur] ?? cur;
+        },
+
+        _startCountdown() {
+            if (this._cdTimer) clearInterval(this._cdTimer);
+
+            const tick = () => {
+                if (!this.nextRefresh) return;
+
+                const target = new Date(this.nextRefresh.replace(' ', 'T') + 'Z').getTime();
+                const rem    = Math.max(0, Math.ceil((target - Date.now()) / 1000));
+
+                if (rem === 0) {
+                    this.refreshLabel = 'jetzt!';
+                    clearInterval(this._cdTimer);
+                    // Auto-reload caravan after a brief pause.
+                    setTimeout(() => {
+                        this.loading = true;
+                        this.error   = null;
+                        this.boot();
+                    }, 1500);
+                    return;
+                }
+
+                const h = Math.floor(rem / 3600);
+                const m = Math.floor((rem % 3600) / 60);
+                const s = rem % 60;
+                const pad = n => String(n).padStart(2, '0');
+
+                if (h > 0) this.refreshLabel = h + 'h ' + pad(m) + 'm ' + pad(s) + 's';
+                else if (m > 0) this.refreshLabel = m + 'm ' + pad(s) + 's';
+                else this.refreshLabel = s + 's';
+            };
+
+            tick();
+            this._cdTimer = setInterval(tick, 1000);
+        },
+
+        _toast(msg, type) {
+            const t = document.getElementById('bm-toast');
+            if (!t) return;
+            t.textContent    = msg;
+            t.className      = type;
+            t.style.display  = 'block';
+            setTimeout(() => { t.style.display = 'none'; }, 3200);
+        },
+    };
+}
+</script>
+<?php endif ?>
+
 <?php if (!$isModal): ?>
 </body>
 </html>
