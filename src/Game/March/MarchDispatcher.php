@@ -18,6 +18,7 @@ final class MarchDispatcher
     private const MAX_SLOTS     = 2;
     private const MAX_CAP       = 50_000;
     private const MARCH_MONSTER = 5;
+    private const MARCH_CHARM   = 6;
 
     private function __construct() {}
 
@@ -161,6 +162,130 @@ final class MarchDispatcher
                     ':tx'     => $targetX,
                     ':ty'     => $targetY,
                     ':mid'    => $monsterId,
+                    ':troops' => $troopsJson,
+                    ':dur'    => $marchSecs,
+                ],
+            );
+
+            $marchId = (int) $db->lastInsertId();
+        });
+
+        return $marchId;
+    }
+
+    /**
+     * Dispatch a charm-collection march (march_type = 6).
+     * Requires at least 1 troop. Speed = slowest troop.
+     *
+     * @throws \RuntimeException on validation failure
+     */
+    public static function dispatchCharm(
+        int   $playerId,
+        int   $cityId,
+        int   $originX,
+        int   $originY,
+        int   $targetX,
+        int   $targetY,
+        int   $charmId,
+        array $selectedTroops,
+    ): int {
+        if (empty($selectedTroops)) {
+            throw new \RuntimeException('Mindestens 1 Truppe muss zum Einsammeln mitgeschickt werden.');
+        }
+
+        $db = Connection::getInstance();
+
+        // Check march slots
+        $active = (int) $db->query(
+            "SELECT COUNT(*) FROM marches WHERE player_id = ? AND state IN ('marching','resolving','returning')",
+            [$playerId],
+        )->fetchColumn();
+
+        if ($active >= self::MAX_SLOTS) {
+            throw new \RuntimeException('Alle ' . self::MAX_SLOTS . ' Marsch-Slots belegt.');
+        }
+
+        // Validate troops
+        $total = 0;
+        $cleanTroops = [];
+        foreach ($selectedTroops as $code => $count) {
+            $count = (int) $count;
+            if ($count <= 0) continue;
+            if (TroopData::get((int) $code) === null) {
+                throw new \RuntimeException('Unbekannter Truppen-Code: ' . $code);
+            }
+            $cleanTroops[(int) $code] = $count;
+            $total += $count;
+        }
+        if ($total <= 0) throw new \RuntimeException('Mindestens 1 Truppe muss ausgewählt werden.');
+        if ($total > self::MAX_CAP) throw new \RuntimeException('Zu viele Truppen.');
+
+        // Verify available
+        $availableRows = $db->query(
+            'SELECT troop_code, count FROM city_troops WHERE city_id = ?',
+            [$cityId],
+        )->fetchAll();
+        $available = [];
+        foreach ($availableRows as $r) $available[(int)$r['troop_code']] = (int)$r['count'];
+
+        foreach ($cleanTroops as $code => $count) {
+            if (($available[$code] ?? 0) < $count) {
+                $name = TroopData::get($code)['name'] ?? ('Code ' . $code);
+                throw new \RuntimeException('Nicht genug ' . $name . '.');
+            }
+        }
+
+        // Validate charm exists and is collectible
+        $charm = $db->query(
+            'SELECT id FROM map_charms WHERE id = ? AND world_id = 1 AND collected_by IS NULL AND expires_at > UTC_TIMESTAMP()',
+            [$charmId],
+        )->fetch();
+        if ($charm === false) {
+            throw new \RuntimeException('Charm nicht mehr verfügbar (abgelaufen oder bereits eingesammelt).');
+        }
+
+        // March speed = slowest troop
+        $minSpeed = PHP_INT_MAX;
+        foreach ($cleanTroops as $code => $_) {
+            $speed = (int) (TroopData::get($code)['speed'] ?? 65);
+            if ($speed < $minSpeed) $minSpeed = $speed;
+        }
+        $distance  = sqrt(($targetX - $originX) ** 2 + ($targetY - $originY) ** 2);
+        $marchSecs = max(5, (int) floor($distance * 100 / $minSpeed));
+
+        $marchId    = 0;
+        $troopsJson = json_encode($cleanTroops);
+
+        $db->transaction(function () use (
+            $db, $cityId, $playerId, $targetX, $targetY,
+            $charmId, $troopsJson, $marchSecs, $cleanTroops, &$marchId,
+        ): void {
+            foreach ($cleanTroops as $code => $count) {
+                $db->execute(
+                    'UPDATE city_troops SET count = count - ? WHERE city_id = ? AND troop_code = ?',
+                    [$count, $cityId, $code],
+                );
+            }
+
+            $db->execute(
+                'INSERT INTO marches
+                    (player_id, world_id, march_type, origin_city_id,
+                     target_x, target_y, target_type, target_id,
+                     troops_json, departure_time, arrival_time, state)
+                 VALUES
+                    (:pid, 1, :type, :city,
+                     :tx, :ty, 4, :cid,
+                     :troops,
+                     UTC_TIMESTAMP(),
+                     DATE_ADD(UTC_TIMESTAMP(), INTERVAL :dur SECOND),
+                     "marching")',
+                [
+                    ':pid'    => $playerId,
+                    ':type'   => self::MARCH_CHARM,
+                    ':city'   => $cityId,
+                    ':tx'     => $targetX,
+                    ':ty'     => $targetY,
+                    ':cid'    => $charmId,
                     ':troops' => $troopsJson,
                     ':dur'    => $marchSecs,
                 ],

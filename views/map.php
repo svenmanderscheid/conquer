@@ -443,6 +443,57 @@ declare(strict_types=1);
                             </div>
                         </template>
 
+                        <!-- Charm -->
+                        <template x-if="tileInfo.occupant?.type === 'charm'">
+                            <div>
+                                <div class="tile-info-name" :style="'color:' + charmGradeColor(tileInfo.occupant.grade)">
+                                    ✨ <span x-text="charmGradeLabel(tileInfo.occupant.grade) + ' Charm'"></span>
+                                </div>
+                                <div class="tile-info-row">
+                                    <span class="lbl">Kategorie</span>
+                                    <span class="val" x-text="charmCatLabel(tileInfo.occupant.stat_category)"></span>
+                                </div>
+                                <div class="tile-info-row">
+                                    <span class="lbl">Bonus</span>
+                                    <span class="val" :style="'color:' + charmGradeColor(tileInfo.occupant.grade)"
+                                          x-text="'+' + tileInfo.occupant.bonus_pct + '%'"></span>
+                                </div>
+                                <div class="tile-info-row">
+                                    <span class="lbl">Verfällt in</span>
+                                    <span class="val" x-text="charmTimeLeft(tileInfo.occupant.expires_at, tick)"></span>
+                                </div>
+
+                                <!-- Troop selection for collect -->
+                                <div style="margin-top:8px">
+                                    <div style="font-size:.7rem;color:#64748b;margin-bottom:4px">Truppen auswählen:</div>
+                                    <template x-if="charmTroopsLoading">
+                                        <div style="font-size:.7rem;color:#475569;padding:4px 0">Laden…</div>
+                                    </template>
+                                    <template x-if="!charmTroopsLoading && charmTroops.length === 0">
+                                        <div style="font-size:.7rem;color:#ef4444">Keine Truppen verfügbar</div>
+                                    </template>
+                                    <template x-for="t in charmTroops" :key="t.code">
+                                        <label style="display:flex;align-items:center;gap:6px;font-size:.72rem;color:#cbd5e1;margin-bottom:3px">
+                                            <input type="number" :id="'charm-t-' + t.code"
+                                                   min="0" :max="t.count"
+                                                   x-model.number="t.toSend"
+                                                   style="width:52px;padding:2px 4px;border-radius:3px;border:1px solid #334155;background:#1e293b;color:#e2e8f0">
+                                            <span x-text="t.name + ' (' + t.count + ')'"></span>
+                                        </label>
+                                    </template>
+                                </div>
+
+                                <button
+                                    style="margin-top:8px;width:100%;padding:6px;border:none;border-radius:5px;
+                                           background:linear-gradient(180deg,#a855f7,#7e22ce);color:#fff;
+                                           font-weight:700;font-size:.8rem;cursor:pointer"
+                                    :disabled="charmCollecting || charmTroops.reduce((s,t)=>s+(t.toSend||0),0)===0"
+                                    @click="collectCharm(tileInfo.occupant.id, tileInfo.x, tileInfo.y)"
+                                    x-text="charmCollecting ? '…' : '✨ Einsammeln'">
+                                </button>
+                            </div>
+                        </template>
+
                     </div>
                 </template>
             </div>
@@ -478,12 +529,15 @@ declare(strict_types=1);
             <div class="panel-title">Aktive Märsche</div>
             <template x-for="m in marches" :key="m.id">
                 <div class="march-badge"
-                     :class="m.state === 'returning' ? 'return' : (m.march_type == 5 ? 'monster' : 'pvp')">
+                     :class="m.state === 'returning' ? 'return' : (m.march_type == 5 || m.march_type == 6 ? 'monster' : 'pvp')">
                     <span class="march-badge-label">
                         <template x-if="m.state === 'marching' && m.march_type == 5">
                             <span>⚔ Monster (<span x-text="m.target_x + ',' + m.target_y"></span>)</span>
                         </template>
-                        <template x-if="m.state === 'marching' && m.march_type != 5">
+                        <template x-if="m.state === 'marching' && m.march_type == 6">
+                            <span>✨ Charm (<span x-text="m.target_x + ',' + m.target_y"></span>)</span>
+                        </template>
+                        <template x-if="m.state === 'marching' && m.march_type != 5 && m.march_type != 6">
                             <span>⚔ Dorf (<span x-text="m.target_x + ',' + m.target_y"></span>)</span>
                         </template>
                         <template x-if="m.state === 'returning'">
@@ -577,6 +631,11 @@ function mapApp() {
         attackTroops:  [],
         attackLoading: false,
 
+        // Charm collect state
+        charmTroops:        [],
+        charmTroopsLoading: false,
+        charmCollecting:    false,
+
         MONSTER_TYPES: {
             202001: 'Orc',        202002: 'Skeleton',   202003: 'Golem',
             202004: 'Treasure Goblin', 202005: 'Deathkar',
@@ -622,7 +681,15 @@ function mapApp() {
                 seed:       j.data.map_seed,
                 mapSize:    j.data.map_size,
                 cityCoords: j.data.my_city,
-                onTileInfo: (info) => { this.tileInfo = info; },
+                onTileInfo: (info) => {
+                    this.tileInfo = info;
+                    // Load troop list when a charm tile is selected
+                    if (info?.occupant?.type === 'charm') {
+                        this.loadCharmTroops();
+                    } else {
+                        this.charmTroops = [];
+                    }
+                },
                 onHover:    (x, y) => { this.hoverTile = x !== null ? `${x}, ${y}` : ''; },
             });
             this.zoom = ConquerMap.currentZoom();
@@ -718,6 +785,77 @@ function mapApp() {
                 this.showToast('Netzwerkfehler', 'err');
             }
             this.attackLoading = false;
+        },
+
+        // ── Charm helpers ─────────────────────────────────────────────────────
+        charmGradeColor(grade) {
+            return { normal: '#94a3b8', epic: '#a855f7', legendary: '#f59e0b' }[grade] ?? '#94a3b8';
+        },
+        charmGradeLabel(grade) {
+            return { normal: 'Normal', epic: 'Epic', legendary: 'Legendary' }[grade] ?? grade;
+        },
+        charmCatLabel(cat) {
+            return {
+                construction: 'Bauzeitbonus', research: 'Forschungsbonus',
+                troops_hp: 'Truppen HP', troops_attack: 'Truppenangriff',
+                troops_defense: 'Truppenschutz', carry: 'Traglast',
+                march_speed: 'Marschgeschwindigkeit', gathering: 'Sammelgeschwindigkeit',
+            }[cat] ?? cat;
+        },
+        charmTimeLeft(expiresAt, _tick) {
+            const timeLeft = Math.max(0, Math.round((new Date(expiresAt.replace(' ', 'T') + 'Z') - Date.now()) / 1000));
+            const mins = Math.floor(timeLeft / 60);
+            const secs = timeLeft % 60;
+            return `${mins}m ${secs}s`;
+        },
+
+        async loadCharmTroops() {
+            this.charmTroopsLoading = true;
+            this.charmTroops = [];
+            try {
+                const r = await fetch('/api/troops/list');
+                const j = await r.json();
+                if (j.ok) {
+                    this.charmTroops = j.data.definitions
+                        .filter(d => (j.data.troops[d.code] ?? 0) > 0)
+                        .map(d => ({
+                            code:   d.code,
+                            name:   d.name,
+                            count:  j.data.troops[d.code] ?? 0,
+                            toSend: 1,
+                        }));
+                }
+            } catch {}
+            this.charmTroopsLoading = false;
+        },
+
+        async collectCharm(charmId, tx, ty) {
+            const troops = {};
+            let total = 0;
+            for (const t of this.charmTroops) {
+                if ((t.toSend || 0) > 0) { troops[t.code] = t.toSend; total += t.toSend; }
+            }
+            if (total === 0) { alert('Mindestens 1 Truppe muss ausgewählt werden.'); return; }
+
+            this.charmCollecting = true;
+            try {
+                const r = await fetch('/api/march/dispatch-charm', {
+                    method:  'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': CSRF },
+                    body:    JSON.stringify({ charm_id: charmId, target_x: tx, target_y: ty, troops }),
+                });
+                const j = await r.json();
+                if (j.ok) {
+                    this.showToast('✨ Charm-Marsch gestartet! (ID ' + j.data.march_id + ')', 'ok');
+                    ConquerMap.refreshEntities?.();
+                    this.pollMarches();
+                } else {
+                    this.showToast(j.message ?? j.error ?? 'Fehler beim Einsammeln', 'err');
+                }
+            } catch {
+                this.showToast('Netzwerkfehler', 'err');
+            }
+            this.charmCollecting = false;
         },
 
         // ── Toast helper ──────────────────────────────────────────────────────

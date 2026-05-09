@@ -72,6 +72,59 @@ final class MarchHandler
     }
 
     /**
+     * POST /api/march/dispatch-charm
+     *
+     * Body: { charm_id: int, target_x: int, target_y: int, troops: {code: count} }
+     */
+    public static function dispatchCharm(array $params): void
+    {
+        $session = Session::current();
+        if ($session === null) {
+            Response::error(401, 'UNAUTHENTICATED', 'Not logged in.');
+        }
+
+        $csrf = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+        if ($csrf === '' || !hash_equals($session['csrf_token'], $csrf)) {
+            Response::error(403, 'CSRF_INVALID', 'CSRF token missing or invalid.');
+        }
+
+        $body    = json_decode((string) file_get_contents('php://input'), true) ?? [];
+        $charmId = (int) ($body['charm_id'] ?? 0);
+        $targetX = (int) ($body['target_x'] ?? -1);
+        $targetY = (int) ($body['target_y'] ?? -1);
+        $troops  = (array) ($body['troops']  ?? []);
+
+        if ($charmId <= 0 || $targetX < 0 || $targetY < 0) {
+            Response::error(400, 'INVALID_INPUT', 'charm_id, target_x und target_y sind erforderlich.');
+        }
+
+        $state = CityState::loadForPlayer((int) $session['player_id']);
+        if ($state === null) {
+            Response::error(404, 'NO_CITY', 'Keine Stadt gefunden.');
+        }
+
+        $city   = $state['city'];
+        $cityId = (int) $city['id'];
+
+        try {
+            $marchId = \Conquer\Game\March\MarchDispatcher::dispatchCharm(
+                playerId:       (int) $session['player_id'],
+                cityId:         $cityId,
+                originX:        (int) $city['coord_x'],
+                originY:        (int) $city['coord_y'],
+                targetX:        $targetX,
+                targetY:        $targetY,
+                charmId:        $charmId,
+                selectedTroops: $troops,
+            );
+        } catch (\RuntimeException $e) {
+            Response::error(400, 'DISPATCH_FAILED', $e->getMessage());
+        }
+
+        Response::ok(['march_id' => $marchId]);
+    }
+
+    /**
      * GET /api/march/list
      *
      * Returns all active marches (marching + returning) for the player.

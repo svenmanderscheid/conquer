@@ -159,6 +159,30 @@ final class MapHandler
             ];
         }
 
+        // Uncollected charms
+        $rows = $db->query('
+            SELECT id, coord_x, coord_y, stat_category, grade, charm_code, expires_at
+            FROM map_charms
+            WHERE world_id = 1
+              AND collected_by IS NULL
+              AND expires_at > UTC_TIMESTAMP()
+              AND coord_x BETWEEN :x1 AND :x2
+              AND coord_y BETWEEN :y1 AND :y2
+        ', [':x1' => $xMin, ':x2' => $xMax, ':y1' => $yMin, ':y2' => $yMax])->fetchAll();
+
+        foreach ($rows as $row) {
+            $entities[] = [
+                'type'          => 'charm',
+                'id'            => (int) $row['id'],
+                'x'             => (int) $row['coord_x'],
+                'y'             => (int) $row['coord_y'],
+                'stat_category' => $row['stat_category'],
+                'grade'         => $row['grade'],
+                'charm_code'    => (int) $row['charm_code'],
+                'expires_at'    => $row['expires_at'],
+            ];
+        }
+
         Response::ok([
             'entities' => $entities,
             'viewport' => ['x_min' => $xMin, 'y_min' => $yMin, 'x_max' => $xMax, 'y_max' => $yMax],
@@ -276,6 +300,33 @@ final class MapHandler
                     'shrine_code'       => $shrine['shrine_code'],
                     'tier'              => $shrine['tier'],
                     'owner_alliance_id' => $shrine['owner_alliance_id'],
+                ];
+            }
+        }
+
+        if ($occ === null) {
+            $charm = $db->query(
+                'SELECT id, stat_category, grade, charm_code, expires_at
+                 FROM map_charms
+                 WHERE world_id = 1 AND coord_x = ? AND coord_y = ?
+                   AND collected_by IS NULL AND expires_at > UTC_TIMESTAMP()',
+                [$x, $y],
+            )->fetch();
+
+            if ($charm !== false) {
+                $bonusPct = match($charm['grade']) {
+                    'epic'      => 5.0,
+                    'legendary' => 10.0,
+                    default     => 3.0,
+                };
+                $occ = [
+                    'type'          => 'charm',
+                    'id'            => (int) $charm['id'],
+                    'stat_category' => $charm['stat_category'],
+                    'grade'         => $charm['grade'],
+                    'charm_code'    => (int) $charm['charm_code'],
+                    'bonus_pct'     => $bonusPct,
+                    'expires_at'    => $charm['expires_at'],
                 ];
             }
         }

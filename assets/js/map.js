@@ -508,6 +508,37 @@ const ConquerMap = (() => {
             ctx.lineWidth   = 1;
             ctx.fill();
             ctx.stroke();
+        } else if (e.type === 'charm') {
+            const GRADE_COLOR = { normal: '#94a3b8', epic: '#a855f7', legendary: '#f59e0b' };
+            const color = GRADE_COLOR[e.grade] ?? '#94a3b8';
+            const cx = px + s / 2, cy = py + s / 2;
+            const r  = s / 2 - pad;
+
+            // Glowing diamond shape
+            ctx.save();
+            ctx.shadowColor = color;
+            ctx.shadowBlur  = Math.max(4, s * 0.4);
+            ctx.beginPath();
+            ctx.moveTo(cx,     cy - r);
+            ctx.lineTo(cx + r, cy);
+            ctx.lineTo(cx,     cy + r);
+            ctx.lineTo(cx - r, cy);
+            ctx.closePath();
+            ctx.fillStyle   = color;
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth   = 1;
+            ctx.fill();
+            ctx.stroke();
+            ctx.restore();
+
+            // Grade initial (N/E/L)
+            if (s >= 24) {
+                ctx.fillStyle    = '#0f172a';
+                ctx.font         = `bold ${Math.max(7, Math.floor(s * 0.36))}px monospace`;
+                ctx.textAlign    = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(e.grade[0].toUpperCase(), cx, cy);
+            }
         } else if (e.type === 'shrine') {
             const TIER_COLOR = { S: '#f59e0b', A: '#a78bfa', B: '#60a5fa', C: '#94a3b8' };
             const cx = px + s/2, cy = py + s/2, r = s/2 - pad;
@@ -557,6 +588,7 @@ const ConquerMap = (() => {
             else if (e.type === 'monster')  mmCtx.fillStyle = '#ef4444';
             else if (e.type === 'resource') mmCtx.fillStyle = '#22c55e';
             else if (e.type === 'shrine')   mmCtx.fillStyle = '#a78bfa';
+            else if (e.type === 'charm')    mmCtx.fillStyle = '#a855f7';
             else continue;
             mmCtx.fillRect(mx - 1, my - 1, 3, 3);
         }
@@ -702,8 +734,10 @@ const ConquerMap = (() => {
             }
         }
 
-        const isMonster = entities[`${tileX},${tileY}`]?.type === 'monster';
-        selectedTile    = { x: tileX, y: tileY, isMonster };
+        const tileEntity = entities[`${tileX},${tileY}`];
+        const isMonster  = tileEntity?.type === 'monster';
+        const isCharm    = tileEntity?.type === 'charm';
+        selectedTile     = { x: tileX, y: tileY, isMonster, isCharm };
 
         // Optimistically show coords while loading
         onTileInfo({ x: tileX, y: tileY, occupant: null });
@@ -721,7 +755,11 @@ const ConquerMap = (() => {
             if (j.ok) {
                 onTileInfo(j.data);
                 if (selectedTile && selectedTile.x === tileX && selectedTile.y === tileY) {
-                    selectedTile = { x: tileX, y: tileY, isMonster: j.data.occupant?.type === 'monster' };
+                    selectedTile = {
+                        x: tileX, y: tileY,
+                        isMonster: j.data.occupant?.type === 'monster',
+                        isCharm:   j.data.occupant?.type === 'charm',
+                    };
                 }
             } else {
                 console.warn('[map] tile API error:', j.error);

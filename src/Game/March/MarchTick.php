@@ -56,6 +56,8 @@ final class MarchTick
             if ($marchType === 5) {
                 self::resolveMonster($db, $log, $marchId, $playerId, $cityId,
                     $targetX, $targetY, $monsterId, $intTroops);
+            } elseif ($marchType === 6) {
+                self::resolveCharmCollect($db, $log, $marchId, $playerId, $cityId, $targetX, $targetY, (int)$march['target_id']);
             } else {
                 // Unsupported type — return immediately
                 $db->execute(
@@ -144,6 +146,8 @@ final class MarchTick
         ): void {
             if ($result['monster_killed']) {
                 $db->execute('DELETE FROM field_monsters WHERE id = ?', [$monsterId]);
+                // Spawn charm at monster's tile
+                \Conquer\Game\Charm\CharmSpawner::spawn(1, $targetX, $targetY, (int)$monster['monster_code']);
             } else {
                 $db->execute(
                     'UPDATE field_monsters SET hp_current = ? WHERE id = ?',
@@ -217,6 +221,88 @@ final class MarchTick
                 ':id'   => $marchId,
             ],
         );
+    }
+
+    private static function resolveCharmCollect(
+        Connection $db,
+        Logger     $log,
+        int        $marchId,
+        int        $playerId,
+        int        $cityId,
+        int        $targetX,
+        int        $targetY,
+        int        $charmId,
+    ): void {
+        // Optimistic lock
+        $db->execute(
+            "UPDATE marches SET state = 'resolving' WHERE id = ? AND state = 'marching'",
+            [$marchId],
+        );
+
+        // Check charm still exists and is collectible
+        $charm = $db->query(
+            'SELECT * FROM map_charms
+             WHERE id = ? AND world_id = 1 AND collected_by IS NULL AND expires_at > UTC_TIMESTAMP()',
+            [$charmId],
+        )->fetch();
+
+        if ($charm === false) {
+            // Charm expired or already taken — march just returns
+            $db->execute(
+                "UPDATE marches
+                 SET state = 'returning', return_time = UTC_TIMESTAMP()
+                 WHERE id = ?",
+                [$marchId],
+            );
+            $log->info('[MarchTick] March ' . $marchId . ' — charm ' . $charmId . ' already gone');
+            return;
+        }
+
+        $grade    = $charm['grade'];
+        $category = $charm['stat_category'];
+        $code     = (int) $charm['charm_code'];
+        $bonus    = \Conquer\Game\Charm\CharmSpawner::bonusPct($grade);
+        $durSecs  = \Conquer\Game\Charm\CharmSpawner::durationSecs($grade);
+
+        $db->transaction(function () use (
+            $db, $marchId, $playerId, $charmId, $grade, $category, $code, $bonus, $durSecs,
+        ): void {
+            // Mark charm as collected
+            $db->execute(
+                'UPDATE map_charms SET collected_by = ?, collected_at = UTC_TIMESTAMP() WHERE id = ?',
+                [$playerId, $charmId],
+            );
+
+            // Activate buff (overwrite same category if exists)
+            $db->execute(
+                'INSERT INTO player_charms_active
+                    (player_id, stat_category, grade, charm_code, bonus_pct, activated_at, expires_at)
+                 VALUES (?, ?, ?, ?, ?, UTC_TIMESTAMP(), DATE_ADD(UTC_TIMESTAMP(), INTERVAL ? SECOND))
+                 ON DUPLICATE KEY UPDATE
+                    grade        = VALUES(grade),
+                    charm_code   = VALUES(charm_code),
+                    bonus_pct    = VALUES(bonus_pct),
+                    activated_at = UTC_TIMESTAMP(),
+                    expires_at   = DATE_ADD(UTC_TIMESTAMP(), INTERVAL ? SECOND)',
+                [$playerId, $category, $grade, $code, $bonus, $durSecs, $durSecs],
+            );
+
+            // Return march
+            $db->execute(
+                "UPDATE marches
+                 SET state       = 'returning',
+                     return_time = DATE_ADD(UTC_TIMESTAMP(),
+                                   INTERVAL TIMESTAMPDIFF(SECOND, departure_time, arrival_time) SECOND),
+                     haul_json   = '{}'
+                 WHERE id = ?",
+                [$marchId],
+            );
+        });
+
+        $log->info(sprintf(
+            '[MarchTick] March %d — charm %d collected (%s %s +%.0f%%)',
+            $marchId, $charmId, $grade, $category, $bonus,
+        ));
     }
 
     /** Load monster definition from data files (cached per request). */

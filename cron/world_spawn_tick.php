@@ -171,6 +171,12 @@ foreach ($byDespawn as $hours => $codes) {
     // The above deletes; count is approximate from logging
 }
 
+// Delete expired uncollected charms
+$db->execute(
+    'DELETE FROM map_charms WHERE expires_at < UTC_TIMESTAMP() AND collected_by IS NULL',
+    [],
+);
+
 // Also delete any monster code not in despawn map (orphan cleanup)
 // Skipping for now — only add if needed.
 
@@ -190,13 +196,25 @@ $totalSpawned = 0;
 
 foreach ($sectors as $sIdx => $sector) {
     // Current solo monster count in this sector
-    $currentCount = (int) $db->query(
+    $monsterCount = (int) $db->query(
         'SELECT COUNT(*) FROM field_monsters
          WHERE world_id = ?
            AND coord_x BETWEEN ? AND ?
            AND coord_y BETWEEN ? AND ?',
         [$worldId, $sector['x_min'], $sector['x_max'], $sector['y_min'], $sector['y_max']]
     )->fetchColumn();
+
+    $charmCount = (int) $db->query(
+        'SELECT COUNT(*) FROM map_charms
+         WHERE world_id = ?
+           AND collected_by IS NULL
+           AND expires_at > UTC_TIMESTAMP()
+           AND coord_x BETWEEN ? AND ?
+           AND coord_y BETWEEN ? AND ?',
+        [$worldId, $sector['x_min'], $sector['x_max'], $sector['y_min'], $sector['y_max']]
+    )->fetchColumn();
+
+    $currentCount = $monsterCount + $charmCount;
 
     $cap       = (int) $sectorCaps['solo_monsters_combined'];
     $available = max(0, $cap - $currentCount);
