@@ -138,16 +138,17 @@ final class MarchTick
         }
 
         $monsterDef = self::loadMonsterDef((int) $monster['monster_code']);
-        $result     = BattleEngine::resolveMonster($troops, $monster, $monsterDef);
+        $monsterCode = (int) $monster['monster_code'];
+        $result      = BattleEngine::resolveMonster($troops, $monster, $monsterDef);
 
         $db->transaction(function () use (
             $db, $marchId, $playerId, $cityId, $monsterId,
-            $targetX, $targetY, $result,
+            $targetX, $targetY, $monsterCode, $result,
         ): void {
             if ($result['monster_killed']) {
                 $db->execute('DELETE FROM field_monsters WHERE id = ?', [$monsterId]);
                 // Spawn charm at monster's tile
-                \Conquer\Game\Charm\CharmSpawner::spawn(1, $targetX, $targetY, (int)$monster['monster_code']);
+                \Conquer\Game\Charm\CharmSpawner::spawn(1, $targetX, $targetY, $monsterCode);
             } else {
                 $db->execute(
                     'UPDATE field_monsters SET hp_current = ? WHERE id = ?',
