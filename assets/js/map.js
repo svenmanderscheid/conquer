@@ -515,13 +515,12 @@ const ConquerMap = (() => {
             const color = GRADE_COLOR[e.grade] ?? '#94a3b8';
 
             // 2×2 footprint — anchor = bottom-left tile (e.x, e.y)
+            // Diamond is drawn at 1×1 size, centered in the 2×2 block
             const drawX = Math.round(px);
             const drawY = Math.round(py - s);   // one tile above anchor
-            const drawW = s * 2;
-            const drawH = s * 2;
-            const cx = drawX + drawW / 2;
-            const cy = drawY + drawH / 2;
-            const r  = drawW / 2 - pad * 2;
+            const cx = drawX + s;               // center of 2×2 block
+            const cy = drawY + s;
+            const r  = s / 2 - pad;
 
             // Glowing diamond shape
             ctx.save();
