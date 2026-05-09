@@ -1144,6 +1144,76 @@ $isModal = isset($_GET['modal']);
     </div><!-- /barrack-section -->
     <?php endif ?>
 
+    <!-- ════════════════════════════════════════
+         HALL OF ALLIANCE SECTION (below modal)
+    ════════════════════════════════════════ -->
+    <?php if ($buildingCode === 'hall_of_alliance'):
+        // Load membership status for this player
+        $__db          = \Conquer\Db\Connection::getInstance();
+        $__playerId    = (int) $session['player_id'];
+        $__member      = $__db->query(
+            'SELECT am.role, a.name, a.tag
+             FROM   alliance_members am
+             JOIN   alliances a ON a.id = am.alliance_id
+             WHERE  am.player_id = ?',
+            [$__playerId],
+        )->fetch() ?: null;
+    ?>
+    <div class="barrack-section">
+        <div class="barrack-section-header">Allianz</div>
+        <div class="barrack-inner">
+            <?php if ($__member === null): ?>
+            <div style="text-align:center;padding:20px 0">
+                <p style="font-size:.85rem;color:#94a3b8;margin-bottom:14px">
+                    Du bist derzeit in keiner Allianz. Tritt einer Allianz bei oder gründe deine eigene,
+                    um von gemeinsamen Buffs und koordiniertem Spiel zu profitieren.
+                </p>
+                <a href="/alliance"
+                   style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;
+                          border-radius:6px;background:linear-gradient(180deg,#2563eb,#1e3a8a);
+                          color:#fff;font-size:.82rem;font-weight:700;text-decoration:none">
+                    ⚔ Allianz beitreten oder gründen
+                </a>
+            </div>
+            <?php else:
+                $__roleLabelMap = [
+                    'leader'      => 'Leader',
+                    'vice_leader' => 'Vize-Leader',
+                    'officer'     => 'Offizier',
+                    'veteran'     => 'Veteran',
+                    'member'      => 'Mitglied',
+                ];
+                $__roleLabel = $__roleLabelMap[$__member['role']] ?? $__member['role'];
+            ?>
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
+                <div style="flex-shrink:0;width:52px;height:52px;border-radius:7px;background:#0f172a;
+                            border:2px solid #fbbf24;display:flex;align-items:center;justify-content:center;
+                            font-size:.78rem;font-weight:900;color:#fbbf24;letter-spacing:.04em">
+                    [<?= htmlspecialchars((string)$__member['tag']) ?>]
+                </div>
+                <div>
+                    <div style="font-size:1.05rem;font-weight:800;color:#e2e8f0">
+                        <?= htmlspecialchars((string)$__member['name']) ?>
+                    </div>
+                    <div style="font-size:.75rem;color:#64748b;margin-top:2px">
+                        Deine Rolle: <strong style="color:#fbbf24"><?= htmlspecialchars($__roleLabel) ?></strong>
+                    </div>
+                </div>
+            </div>
+            <a href="/alliance"
+               style="display:inline-flex;align-items:center;gap:6px;padding:7px 16px;
+                      border-radius:6px;background:#1e293b;border:1px solid #334155;
+                      color:#e2e8f0;font-size:.8rem;font-weight:600;text-decoration:none;
+                      transition:background .15s"
+               onmouseover="this.style.background='#293548'"
+               onmouseout="this.style.background='#1e293b'">
+                ⚔ Zur Allianz-Übersicht
+            </a>
+            <?php endif ?>
+        </div>
+    </div>
+    <?php endif ?>
+
 <?php if (!$isModal): ?>
 </div><!-- /page-wrap -->
 <?php endif ?>

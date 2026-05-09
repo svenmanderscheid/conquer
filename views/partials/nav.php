@@ -147,7 +147,7 @@ $_fmt  = fn(mixed $n): string => number_format((int) $n, 0, '.', ',');
             <div class="cnav-spacer"></div>
 
             <div class="cnav-right">
-                <a href="#" class="nav-item nav-dim">
+                <a href="/alliance" class="nav-item<?= $_isActive('/alliance') ?>">
                     <span class="nav-icon">⚜</span> Allianz
                 </a>
                 <a href="#" class="nav-item nav-dim">

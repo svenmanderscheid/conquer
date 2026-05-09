@@ -59,6 +59,16 @@ if (str_starts_with($path, '/api/')) {
     $router->post('/api/research/start',     [\Conquer\Api\Handlers\ResearchHandler::class, 'start']);
     $router->post('/api/research/instant',   [\Conquer\Api\Handlers\ResearchHandler::class, 'instant']);
 
+    // Alliance
+    $router->get('/api/alliance/my',      [\Conquer\Api\Handlers\AllianceHandler::class, 'my']);
+    $router->post('/api/alliance/create', [\Conquer\Api\Handlers\AllianceHandler::class, 'create']);
+    $router->post('/api/alliance/join',   [\Conquer\Api\Handlers\AllianceHandler::class, 'join']);
+    $router->post('/api/alliance/leave',  [\Conquer\Api\Handlers\AllianceHandler::class, 'leave']);
+    $router->get('/api/alliance/search',  [\Conquer\Api\Handlers\AllianceHandler::class, 'search']);
+    $router->get('/api/alliance/members', [\Conquer\Api\Handlers\AllianceHandler::class, 'members']);
+    $router->get('/api/alliance/chat',    [\Conquer\Api\Handlers\AllianceHandler::class, 'chat']);
+    $router->post('/api/alliance/chat',   [\Conquer\Api\Handlers\AllianceHandler::class, 'sendChat']);
+
     if (!$router->dispatch($method, $path)) {
         \Conquer\Api\Response::error(404, 'NOT_FOUND', 'API endpoint not found.');
     }
@@ -133,6 +143,17 @@ if (preg_match('#^/reports/(\d+)$#', $path, $m)) {
     }
     $reportId = (int) $m[1];
     require ROOT_DIR . '/views/report_detail.php';
+    exit;
+}
+
+// ---------------------------------------------------------------------------
+// Alliance view
+// ---------------------------------------------------------------------------
+
+if ($path === '/alliance') {
+    $session = \Conquer\Auth\Session::current();
+    if ($session === null) { header('Location: /'); exit; }
+    require ROOT_DIR . '/views/alliance.php';
     exit;
 }
 
