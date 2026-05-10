@@ -312,7 +312,7 @@ const ConquerMap = (() => {
             const py     = e.y * s - camY;
             // Monsters and charms draw 2×2 tiles (anchor = bottom-left),
             // so use a larger cull margin for them.
-            const margin = (e.type === 'monster' || e.type === 'charm') ? s * 2 : s;
+            const margin = (e.type === 'monster' || e.type === 'charm') ? s * 2 : (e.type === 'city' ? s * 3 : s);
             if (px < -margin || py < -margin || px > canvas.width + margin || py > canvas.height + margin) continue;
             drawEntity(e, px, py, s);
         }
@@ -326,10 +326,11 @@ const ConquerMap = (() => {
             const py        = Math.round(selectedTile.y * s - camY);
             const isMonster = selectedTile.isMonster ?? false;
             const isCharm   = selectedTile.isCharm   ?? false;
-            // Monsters and charms occupy 2×2 tiles (anchor = bottom-left)
+            const isCity    = selectedTile.isCity    ?? false;
+            // Monsters/charms: 2×2 (anchor = bottom-left); cities: 4×4 (anchor = top-left)
             const is2x2 = isMonster || isCharm;
-            const bw = is2x2 ? s * 2 : s;
-            const bh = is2x2 ? s * 2 : s;
+            const bw = isCity ? s * 3 : (is2x2 ? s * 2 : s);
+            const bh = isCity ? s * 3 : (is2x2 ? s * 2 : s);
             const bx = px;
             const by = is2x2 ? py - s : py;
             ctx.save();
@@ -348,7 +349,7 @@ const ConquerMap = (() => {
     }
 
     function drawMarches(s) {
-        if (!myCity || activeMarches.length === 0) return;
+        if (activeMarches.length === 0) return;
         const now = Date.now();
 
         ctx.save();
@@ -358,15 +359,16 @@ const ConquerMap = (() => {
             const state = march.state;
             if (state !== 'marching' && state !== 'returning') continue;
 
-            // Origin = player city center
-            const ox = myCity.x * s + s / 2 - camX;
-            const oy = myCity.y * s + s / 2 - camY;
-            // Target = center of 2x2 monster block.
-            // Anchor = bottom-left tile (target_x, target_y).
-            // 4 tiles: x -> target_x..target_x+1, y -> target_y-1..target_y
-            // Center: x = target_x*s + s,  y = target_y*s - s/2
-            const tx = march.target_x * s + s     - camX;
-            const ty = march.target_y * s - s / 2 - camY;
+            // Origin: use per-march coords if available (from /api/map/marches),
+            // otherwise fall back to myCity for backward compatibility.
+            const originX = march.origin_x != null ? parseInt(march.origin_x, 10) : myCity?.x;
+            const originY = march.origin_y != null ? parseInt(march.origin_y, 10) : myCity?.y;
+            if (originX == null || originY == null) continue;
+
+            const ox = originX * s + s * 1.5 - camX;
+            const oy = originY * s + s * 1.5 - camY;
+            const tx = march.target_x * s + s * 1.5 - camX;
+            const ty = march.target_y * s + s * 1.5 - camY;
 
             // Skip if both endpoints are far off screen
             const margin = s * 4;
@@ -456,21 +458,22 @@ const ConquerMap = (() => {
 
         if (e.type === 'city') {
             const isOwn = myPlayerId !== null && e.player_id == myPlayerId;
+            const cs    = s * 3; // 3×3 tile footprint
             ctx.fillStyle   = isOwn ? '#22c55e' : '#f59e0b';
             ctx.strokeStyle = isOwn ? '#15803d' : '#92400e';
-            ctx.lineWidth   = 1;
-            ctx.fillRect(  px + pad, py + pad, s - pad*2, s - pad*2);
-            ctx.strokeRect(px + pad + 0.5, py + pad + 0.5, s - pad*2 - 1, s - pad*2 - 1);
-            if (s >= 16) {
+            ctx.lineWidth   = Math.max(1, s * 0.08);
+            ctx.fillRect(  px + pad, py + pad, cs - pad*2, cs - pad*2);
+            ctx.strokeRect(px + pad + 0.5, py + pad + 0.5, cs - pad*2 - 1, cs - pad*2 - 1);
+            if (s >= 4) {
                 ctx.fillStyle    = '#1c1917';
-                ctx.font         = `bold ${Math.max(7, Math.floor(s * 0.38))}px monospace`;
+                ctx.font         = `bold ${Math.max(8, Math.floor(cs * 0.18))}px monospace`;
                 ctx.textAlign    = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText(String(e.level), px + s / 2, py + s / 2);
+                ctx.fillText(String(e.level), px + cs / 2, py + cs / 2);
             }
-            // Player name + alliance tag label below tile
-            if (s >= 32) {
-                const fontSize = Math.max(9, Math.floor(s * 0.28));
+            // Player name + alliance tag label below 4×4 footprint
+            if (s >= 8) {
+                const fontSize = Math.max(9, Math.floor(s * 0.35));
                 ctx.font         = `${fontSize}px sans-serif`;
                 ctx.textAlign    = 'center';
                 ctx.textBaseline = 'top';
@@ -478,31 +481,19 @@ const ConquerMap = (() => {
                 const tag        = e.alliance_tag ? ` [${e.alliance_tag}]` : '';
                 const label      = playerName + tag;
                 if (label) {
-                    // Shadow for readability
                     ctx.fillStyle = 'rgba(0,0,0,0.7)';
-                    ctx.fillText(label, px + s / 2 + 1, py + s + 3);
+                    ctx.fillText(label, px + cs / 2 + 1, py + cs + 3);
                     ctx.fillStyle = isOwn ? '#86efac' : '#fde68a';
-                    ctx.fillText(label, px + s / 2, py + s + 2);
-                }
-            } else if (s >= 16) {
-                const pName = e.player_name ?? e.player ?? '';
-                if (pName) {
-                    ctx.font         = `${Math.max(7, Math.floor(s * 0.3))}px sans-serif`;
-                    ctx.textAlign    = 'center';
-                    ctx.textBaseline = 'top';
-                    ctx.fillStyle    = 'rgba(0,0,0,0.65)';
-                    ctx.fillText(pName, px + s / 2 + 1, py + s + 2);
-                    ctx.fillStyle    = isOwn ? '#86efac' : '#fde68a';
-                    ctx.fillText(pName, px + s / 2, py + s + 1);
+                    ctx.fillText(label, px + cs / 2, py + cs + 2);
                 }
             }
-            // Emoji above tile (5-second window, entity.emoji_code set only if not expired)
-            if (e.emoji_code && s >= 16) {
-                ctx.font         = `${Math.max(16, s)}px sans-serif`;
+            // Emoji above 4×4 footprint
+            if (e.emoji_code && s >= 4) {
+                ctx.font         = `${Math.max(16, cs * 0.35)}px sans-serif`;
                 ctx.textAlign    = 'center';
                 ctx.textBaseline = 'bottom';
                 ctx.globalAlpha  = 1;
-                ctx.fillText(e.emoji_code, px + s / 2, py - 2);
+                ctx.fillText(e.emoji_code, px + cs / 2, py - 2);
             }
         } else if (e.type === 'monster') {
             const level  = e.monster_code % 100;
@@ -798,12 +789,13 @@ const ConquerMap = (() => {
 
         // For 2×2 entities (monsters, charms — anchor = bottom-left tile),
         // a click on any of the 4 occupied tiles resolves to the anchor.
+        // For 4×4 cities (anchor = top-left tile), check up to 3 tiles left/above.
         let tileX = x, tileY = y;
         const candidates = [
-            [x,     y    ],  // bottom-left  (direct hit)
-            [x - 1, y    ],  // bottom-right → anchor one tile left
-            [x,     y + 1],  // top-left     → anchor one tile below
-            [x - 1, y + 1],  // top-right    → anchor is bottom-left
+            [x,     y    ],
+            [x - 1, y    ],
+            [x,     y + 1],
+            [x - 1, y + 1],
         ];
         for (const [ax, ay] of candidates) {
             const t = entities[`${ax},${ay}`]?.type;
@@ -813,18 +805,32 @@ const ConquerMap = (() => {
                 break;
             }
         }
+        // 3×3 city check (anchor = top-left): clicked tile may be up to 2 tiles
+        // right/below the anchor, so subtract offsets to find the anchor.
+        citySearch:
+        for (let ox = 0; ox <= 2; ox++) {
+            for (let oy = 0; oy <= 2; oy++) {
+                if (entities[`${x - ox},${y - oy}`]?.type === 'city') {
+                    tileX = x - ox;
+                    tileY = y - oy;
+                    break citySearch;
+                }
+            }
+        }
 
         const tileEntity = entities[`${tileX},${tileY}`];
         const isMonster  = tileEntity?.type === 'monster';
         const isCharm    = tileEntity?.type === 'charm';
         const isCity     = tileEntity?.type === 'city';
-        selectedTile     = { x: tileX, y: tileY, isMonster, isCharm };
+        selectedTile     = { x: tileX, y: tileY, isMonster, isCharm, isCity };
 
         // City click → hex popup (no tile info fetch needed)
         if (isCity) {
+            const s      = tileSize();
             const rect   = canvas.getBoundingClientRect();
-            const screenX = Math.round(rect.left + tileX * s + s / 2 - camX);
-            const screenY = Math.round(rect.top  + tileY * s + s / 2 - camY);
+            // screenX = horizontal center of 3×3; screenY = bottom edge of 3×3
+            const screenX = Math.round(rect.left + tileX * s + s * 1.5 - camX);
+            const screenY = Math.round(rect.top  + tileY * s + s * 3   - camY);
             onCityClick(tileEntity, screenX, screenY);
             return;
         }
@@ -983,7 +989,7 @@ const ConquerMap = (() => {
     function zoomIn()  { applyZoom(zoomIdx + 1, canvas.width / 2, canvas.height / 2); }
     function zoomOut() { applyZoom(zoomIdx - 1, canvas.width / 2, canvas.height / 2); }
     function currentZoom() { return ZOOM_LEVELS[zoomIdx]; }
-    function setMarches(marches) { activeMarches = marches || []; }
+    function setMarches(marches) { activeMarches = marches || []; requestAnimationFrame(renderMain); }
     function refreshEntities() { lastVP = ''; scheduleFetch(); }
     function setMyPlayerId(id)   { myPlayerId   = id; }
     function setMyAllianceId(id) { myAllianceId = id; }

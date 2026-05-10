@@ -316,15 +316,10 @@ final class MarchDispatcher
         int   $cityId,
         int   $originX,
         int   $originY,
-        int   $targetPlayerId,
         int   $targetX,
         int   $targetY,
         array $selectedTroops,
     ): int {
-        if ($playerId === $targetPlayerId) {
-            throw new \RuntimeException('Du kannst dich nicht selbst angreifen.');
-        }
-
         if (empty($selectedTroops)) {
             throw new \RuntimeException('Keine Truppen ausgewählt.');
         }
@@ -388,12 +383,16 @@ final class MarchDispatcher
 
         // ── Verify target city exists at coords ──────────────────────────────
         $targetCity = $db->query(
-            'SELECT id FROM cities WHERE world_id = 1 AND coord_x = ? AND coord_y = ? AND is_hidden = 0',
+            'SELECT id, player_id FROM cities WHERE world_id = 1 AND coord_x = ? AND coord_y = ? AND is_hidden = 0',
             [$targetX, $targetY],
         )->fetch();
 
         if ($targetCity === false) {
             throw new \RuntimeException('Keine Stadt auf diesem Tile (' . $targetX . ',' . $targetY . ').');
+        }
+
+        if ((int) $targetCity['player_id'] === $playerId) {
+            throw new \RuntimeException('Du kannst dich nicht selbst angreifen.');
         }
 
         $targetCityId = (int) $targetCity['id'];
@@ -546,13 +545,42 @@ final class MarchDispatcher
 
         try {
             return $db->query(
-                "SELECT id, march_type, origin_city_id,
-                        target_x, target_y, target_type, target_id,
-                        troops_json, departure_time, arrival_time, return_time, state
-                 FROM   marches
-                 WHERE  player_id = ? AND state IN ('marching','resolving','returning')
-                 ORDER  BY arrival_time ASC",
+                "SELECT m.id, m.march_type, m.origin_city_id,
+                        c.coord_x AS origin_x, c.coord_y AS origin_y,
+                        m.target_x, m.target_y, m.target_type, m.target_id,
+                        m.troops_json, m.departure_time, m.arrival_time, m.return_time, m.state
+                 FROM   marches m
+                 JOIN   cities c ON c.id = m.origin_city_id
+                 WHERE  m.player_id = ? AND m.state IN ('marching','resolving','returning')
+                 ORDER  BY m.arrival_time ASC",
                 [$playerId],
+            )->fetchAll();
+        } catch (\PDOException) {
+            return [];
+        }
+    }
+
+    /**
+     * Returns all active marches from all players (for public map overlay).
+     * Only includes PvP attacks (type 7) and monster marches (type 5).
+     *
+     * @return list<array<string,mixed>>
+     */
+    public static function listAllActive(): array
+    {
+        $db = Connection::getInstance();
+
+        try {
+            return $db->query(
+                "SELECT m.id, m.march_type, m.player_id,
+                        c.coord_x AS origin_x, c.coord_y AS origin_y,
+                        m.target_x, m.target_y,
+                        m.departure_time, m.arrival_time, m.return_time, m.state
+                 FROM   marches m
+                 JOIN   cities c ON c.id = m.origin_city_id
+                 WHERE  m.state IN ('marching','resolving','returning')
+                   AND  m.march_type IN (5, 7)
+                 ORDER  BY m.arrival_time ASC",
             )->fetchAll();
         } catch (\PDOException) {
             return [];

@@ -225,6 +225,12 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             flex-direction: column;
         }
 
+        /* When rendered inside the city overlay, fill the bldg-wrap height */
+        .modal-card.is-overlay {
+            flex: 1;
+            min-height: 0;
+        }
+
         /* ── Two-panel body ── */
         .modal-body {
             display: flex;
@@ -961,6 +967,226 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
         .queue-item-cd { color: #fbbf24; font-weight: 600; font-variant-numeric: tabular-nums; }
 
         /* ────────────────────────────────────────
+           BARRACK — LoK-Style Troop UI
+        ──────────────────────────────────────── */
+
+        /* Type sub-tabs (INFANTERIE | FERNKAMPF | KAVALLERIE) */
+        .brk-type-tabs {
+            display: flex;
+            background: #0a1220;
+            border-bottom: 1px solid #2a3a55;
+        }
+
+        .brk-type-tab {
+            flex: 1;
+            padding: 9px 4px;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: #475569;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            transition: color 0.15s, border-color 0.15s;
+            margin-bottom: -1px;
+        }
+
+        .brk-type-tab:hover     { color: #94a3b8; }
+        .brk-type-tab.active    { color: #f0d080; border-bottom-color: #d4a017; }
+
+        /* Tier card row */
+        .brk-tier-row {
+            display: flex;
+            gap: 6px;
+            padding: 10px 12px;
+            overflow-x: auto;
+            background: #0d1525;
+            border-bottom: 1px solid #2a3a55;
+            scrollbar-width: thin;
+            scrollbar-color: #334155 transparent;
+        }
+
+        .brk-tier-card {
+            flex: 0 0 72px;
+            height: 88px;
+            border-radius: 8px;
+            border: 2px solid #2a3a55;
+            background: #111827;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 6px 4px 5px;
+            gap: 4px;
+            position: relative;
+            transition: border-color 0.15s, box-shadow 0.15s;
+            flex-shrink: 0;
+        }
+
+        .brk-tier-card:hover:not(.locked) {
+            border-color: #475569;
+        }
+
+        .brk-tier-card.selected {
+            border-color: var(--brk-color, #0ea5e9);
+            box-shadow: 0 0 10px var(--brk-color, #0ea5e9);
+        }
+
+        .brk-tier-card.locked {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .brk-tier-badge {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            font-size: 0.6rem;
+            font-weight: 900;
+            padding: 1px 5px;
+            border-radius: 3px;
+            color: #fff;
+            line-height: 1.5;
+        }
+
+        .brk-tier-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            margin-top: 4px;
+        }
+
+        .brk-tier-count {
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: #e2e8f0;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Detail panel */
+        .brk-detail {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        .brk-detail-name {
+            padding: 8px 14px;
+            font-size: 0.92rem;
+            font-weight: 800;
+            color: #f0d080;
+            background: linear-gradient(90deg, #1a1000, #0d1525);
+            border-bottom: 1px solid #2a3a55;
+            letter-spacing: 0.03em;
+        }
+
+        .brk-stats-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 6px 0;
+        }
+
+        .brk-stat-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            font-size: 0.8rem;
+        }
+
+        .brk-stat-icon { flex: 0 0 18px; text-align: center; font-size: 0.9rem; }
+        .brk-stat-label { flex: 1; color: #64748b; }
+        .brk-stat-val { font-weight: 700; color: #e2e8f0; font-variant-numeric: tabular-nums; }
+
+        /* Train section */
+        .brk-train-section {
+            display: flex;
+            gap: 8px;
+            padding: 10px 14px;
+            border-top: 1px solid #2a3a55;
+            background: #0a1220;
+            flex-shrink: 0;
+        }
+
+        .brk-train-input {
+            width: 80px;
+            padding: 7px 10px;
+            border-radius: 6px;
+            border: 1px solid #2a3a55;
+            background: #111827;
+            color: #e2e8f0;
+            font-size: 0.88rem;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .brk-train-btn {
+            flex: 1;
+            padding: 8px;
+            border-radius: 6px;
+            border: none;
+            background: linear-gradient(180deg, #3b82f6, #1d4ed8);
+            color: #fff;
+            font-size: 0.82rem;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            cursor: pointer;
+            transition: opacity 0.15s;
+        }
+
+        .brk-train-btn:hover:not(:disabled) { opacity: 0.88; }
+        .brk-train-btn:disabled { background: #1e293b; color: #475569; cursor: not-allowed; }
+
+        /* Queue bar */
+        .brk-queue-bar {
+            background: rgba(251,191,36,0.05);
+            border-top: 1px solid #2a3a55;
+            padding: 8px 14px;
+            flex-shrink: 0;
+        }
+
+        .brk-queue-title {
+            font-size: 0.62rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            color: #d4a017;
+            margin-bottom: 6px;
+        }
+
+        .brk-queue-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 8px;
+            background: rgba(251,191,36,0.06);
+            border: 1px solid rgba(212,160,23,0.3);
+            border-radius: 5px;
+            margin-bottom: 4px;
+            font-size: 0.78rem;
+        }
+
+        .brk-queue-icon { font-size: 1rem; flex-shrink: 0; }
+        .brk-queue-info { flex: 1; color: #e2e8f0; }
+        .brk-queue-cd   { color: #fbbf24; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+        /* #tab-truppen must fill the right panel height */
+        #tab-truppen {
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        /* ────────────────────────────────────────
            TOAST
         ──────────────────────────────────────── */
         #bm-toast {
@@ -1012,7 +1238,7 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
 <?php $hudCurrentView = 'city'; require __DIR__ . '/partials/hud.php'; ?>
 <div class="page-wrap">
 <?php endif ?>
-    <div class="modal-card">
+    <div class="modal-card<?= $isModal ? ' is-overlay' : '' ?>">
 
         <!-- ── Modal body: two panels ── -->
         <div class="modal-body">
@@ -1229,70 +1455,56 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
                     $academyLevel = (int) ($buildings['academy']['level'] ?? 1);
                     $barrackLevel = (int) ($buildings['barrack']['level'] ?? 1);
                     $allTroops    = TroopData::all();
-                    $typeName     = [1 => 'INF', 2 => 'RGD', 3 => 'CAV'];
-                    $typeClass    = [1 => '', 2 => 'rgd', 3 => 'cav'];
+                    $troopsData   = array_values(array_map(function($t) use ($barrackLevel, $academyLevel, $troops) {
+                        return [
+                            'code'          => (int)$t['code'],
+                            'name'          => $t['name'],
+                            'type'          => (int)$t['type'],
+                            'tier'          => (int)$t['tier'],
+                            'hp'            => (int)$t['hp'],
+                            'attack'        => (int)$t['attack'],
+                            'defense'       => (int)$t['defense'],
+                            'speed'         => (int)$t['speed'],
+                            'need_food'     => (int)$t['need_food'],
+                            'need_lumber'   => (int)$t['need_lumber'],
+                            'need_stone'    => (int)$t['need_stone'],
+                            'need_gold'     => (int)$t['need_gold'],
+                            'time'          => (int)$t['time'],
+                            'unlock_academy'=> (int)$t['unlock_academy'],
+                            'unlocked'      => TroopData::isUnlocked((int)$t['code'], $barrackLevel, $academyLevel),
+                            'in_city'       => (int)($troops[(int)$t['code']] ?? 0),
+                        ];
+                    }, $allTroops));
+                    $queueData = array_map(function($qe) {
+                        $qt = TroopData::get((int)$qe['troop_code']);
+                        return [
+                            'slot'        => (int)$qe['barrack_slot'],
+                            'name'        => $qt['name'] ?? 'Einheit',
+                            'count'       => (int)$qe['count'],
+                            'finishes_at' => strtotime($qe['finishes_at']),
+                        ];
+                    }, $troopQueue);
                 ?>
-                <div id="tab-truppen" class="tab-pane tab-scroll"<?= $activeTab !== 'truppen' ? ' style="display:none"' : '' ?>>
-                    <div style="padding:12px 16px 16px">
-                        <?php foreach ($allTroops as $t):
-                            $unlocked = TroopData::isUnlocked((int)$t['code'], $barrackLevel, $academyLevel);
-                            $inCity   = (int) ($troops[(int)$t['code']] ?? 0);
-                            $badge    = $typeClass[$t['type']] ?? '';
-                        ?>
-                        <div class="troop-row<?= $unlocked ? '' : ' locked' ?>">
-                            <div class="troop-header">
-                                <span class="troop-badge <?= $badge ?>"><?= $typeName[$t['type']] ?> T<?= (int)$t['tier'] ?></span>
-                                <span class="troop-name"><?= htmlspecialchars($t['name']) ?></span>
-                                <span class="troop-count">In Stadt: <?= number_format($inCity, 0, '.', ',') ?></span>
-                            </div>
-
-                            <div class="troop-stats">
-                                <div>HP <span><?= (int)$t['hp'] ?></span></div>
-                                <div>ATK <span><?= (int)$t['attack'] ?></span></div>
-                                <div>DEF <span><?= (int)$t['defense'] ?></span></div>
-                                <div>SPD <span><?= (int)$t['speed'] ?></span></div>
-                            </div>
-
-                            <div class="troop-cost">
-                                <?php if ($t['need_food']   > 0): ?><span>🌾 <?= (int)$t['need_food'] ?></span><?php endif ?>
-                                <?php if ($t['need_lumber'] > 0): ?><span>🪵 <?= (int)$t['need_lumber'] ?></span><?php endif ?>
-                                <?php if ($t['need_stone']  > 0): ?><span>🪨 <?= (int)$t['need_stone'] ?></span><?php endif ?>
-                                <?php if ($t['need_gold']   > 0): ?><span>💰 <?= (int)$t['need_gold'] ?></span><?php endif ?>
-                                <span>⏱ <?= fmtTime((int)$t['time']) ?>/Einheit</span>
-                            </div>
-
-                            <?php if ($unlocked): ?>
-                            <div class="train-row">
-                                <input type="number" class="train-input" min="1" max="9999" value="100"
-                                       id="count-<?= (int)$t['code'] ?>">
-                                <button class="btn-train"
-                                        data-code="<?= (int)$t['code'] ?>"
-                                        data-name="<?= htmlspecialchars($t['name']) ?>">
-                                    Ausbilden
-                                </button>
-                            </div>
-                            <?php else: ?>
-                            <div class="lock-msg">🔒 Erfordert Academy Level <?= (int)$t['unlock_academy'] ?></div>
-                            <?php endif ?>
-                        </div>
-                        <?php endforeach ?>
-
-                        <?php if (!empty($troopQueue)): ?>
-                        <div class="troop-queue-list">
-                            <div class="troop-queue-title">Trainings-Queue</div>
-                            <?php foreach ($troopQueue as $qe):
-                                $qTroop = TroopData::get((int)$qe['troop_code']);
-                                $qName  = $qTroop['name'] ?? ('Code ' . $qe['troop_code']);
-                            ?>
-                            <div class="queue-item">
-                                <div><?= (int)$qe['count'] ?>× <?= htmlspecialchars($qName) ?> (Slot <?= (int)$qe['barrack_slot'] ?>)</div>
-                                <div class="queue-item-cd"
-                                     data-finish="<?= strtotime($qe['finishes_at']) ?>">—</div>
-                            </div>
-                            <?php endforeach ?>
-                        </div>
-                        <?php endif ?>
+                <div id="tab-truppen" class="tab-pane"<?= $activeTab !== 'truppen' ? ' style="display:none"' : '' ?>>
+                    <!-- Type sub-tabs -->
+                    <div class="brk-type-tabs">
+                        <button class="brk-type-tab active" data-btype="1">INFANTERIE</button>
+                        <button class="brk-type-tab" data-btype="2">FERNKAMPF</button>
+                        <button class="brk-type-tab" data-btype="3">KAVALLERIE</button>
                     </div>
+                    <!-- Tier card row (filled by JS) -->
+                    <div class="brk-tier-row" id="brk-tier-row"></div>
+                    <!-- Detail + train panel -->
+                    <div class="brk-detail" id="brk-detail" style="display:none">
+                        <div class="brk-detail-name" id="brk-detail-name"></div>
+                        <div class="brk-stats-list" id="brk-stats-list"></div>
+                        <div class="brk-train-section">
+                            <input type="number" id="brk-count" class="brk-train-input" value="100" min="1" max="9999">
+                            <button id="brk-train-btn" class="brk-train-btn">AUSBILDEN</button>
+                        </div>
+                    </div>
+                    <!-- Queue bar (filled by JS) -->
+                    <div class="brk-queue-bar" id="brk-queue-bar" style="display:none"></div>
                 </div><!-- /tab-truppen -->
                 <?php endif ?>
 
@@ -1556,50 +1768,208 @@ if (btnInstant) {
 }
 
 // ---------------------------------------------------------------------------
-// Troop training buttons
+// Barrack LoK-style UI
 // ---------------------------------------------------------------------------
-document.querySelectorAll('.btn-train').forEach(btn => {
-    btn.addEventListener('click', async () => {
-        const code  = parseInt(btn.dataset.code, 10);
-        const name  = btn.dataset.name;
-        const input = document.getElementById('count-' + code);
-        const count = parseInt(input?.value ?? '0', 10);
+<?php if ($buildingCode === 'barrack'): ?>
+(function () {
+    const BRK_TROOPS = <?= json_encode($troopsData) ?>;
+    const BRK_QUEUE  = <?= json_encode($queueData) ?>;
+    const ROMAN      = ['', 'I', 'II', 'III', 'IV', 'V'];
+    const TYPE_COLOR = { 1: '#0ea5e9', 2: '#22c55e', 3: '#8b5cf6' };
+    const STAT_ICONS = { hp: '❤️', attack: '⚔️', defense: '🛡️', speed: '⚡' };
+    const STAT_LABELS= { hp: 'HP', attack: 'Angriff', defense: 'Verteidigung', speed: 'Geschw.' };
+    const RES_ICONS  = { need_food: '🌾', need_lumber: '🪵', need_stone: '🪨', need_gold: '💰' };
+    const RES_LABELS = { need_food: 'Nahrung', need_lumber: 'Holz', need_stone: 'Stein', need_gold: 'Gold' };
 
-        if (!count || count < 1) {
-            showToast('Ungültige Anzahl', 'err');
-            return;
-        }
+    let brkCurrentType = 1;
+    let brkSelectedCode = null;
 
-        btn.disabled = true;
-        const orig = btn.textContent;
-        btn.textContent = '…';
+    function fmtNum(n) {
+        return Number(n).toLocaleString('de-DE');
+    }
+    function fmtTimeSec(s) {
+        if (s < 60)  return s + 's';
+        if (s < 3600) return Math.floor(s/60) + 'm ' + (s%60) + 's';
+        return Math.floor(s/3600) + 'h ' + Math.floor((s%3600)/60) + 'm';
+    }
 
-        try {
-            const res  = await fetch('/api/troops/train', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-Token': CSRF,
-                },
-                body: JSON.stringify({ troop_code: code, count }),
-            });
-            const json = await res.json();
+    function brkRenderCards() {
+        const row = document.getElementById('brk-tier-row');
+        if (!row) return;
+        const filtered = BRK_TROOPS.filter(t => t.type === brkCurrentType);
+        row.innerHTML = '';
+        filtered.forEach(t => {
+            const color  = TYPE_COLOR[t.type] || '#0ea5e9';
+            const roman  = ROMAN[t.tier] || t.tier;
+            const locked = !t.unlocked;
+            const sel    = t.code === brkSelectedCode;
 
-            if (json.ok) {
-                showToast('Training gestartet: ' + count + '× ' + name, 'ok');
-                setTimeout(() => window.location.reload(), 900);
-            } else {
-                showToast(json.error?.message ?? json.error ?? 'Fehler', 'err');
-                btn.disabled = false;
-                btn.textContent = orig;
+            const card = document.createElement('div');
+            card.className = 'brk-tier-card' + (locked ? ' locked' : '') + (sel ? ' selected' : '');
+            card.style.setProperty('--brk-color', color);
+            card.innerHTML =
+                '<div class="brk-tier-badge" style="background:' + color + '">' + roman + '</div>' +
+                '<div class="brk-tier-icon">' + (locked ? '🔒' : '⚔') + '</div>' +
+                '<div class="brk-tier-count">' + fmtNum(t.in_city) + '</div>';
+
+            if (!locked) {
+                card.addEventListener('click', () => {
+                    brkSelectedCode = t.code;
+                    brkRenderCards();
+                    brkShowDetail(t);
+                });
             }
-        } catch (e) {
-            showToast('Netzwerkfehler', 'err');
-            btn.disabled = false;
-            btn.textContent = orig;
+            row.appendChild(card);
+        });
+
+        // If nothing selected yet, auto-select first unlocked
+        if (brkSelectedCode === null) {
+            const first = filtered.find(t => t.unlocked);
+            if (first) {
+                brkSelectedCode = first.code;
+                brkRenderCards();
+                brkShowDetail(first);
+                return;
+            }
         }
+        // Re-show detail for currently selected
+        const sel = filtered.find(t => t.code === brkSelectedCode);
+        if (sel) brkShowDetail(sel);
+    }
+
+    function brkShowDetail(t) {
+        const detail = document.getElementById('brk-detail');
+        const nameEl = document.getElementById('brk-detail-name');
+        const statsEl= document.getElementById('brk-stats-list');
+        if (!detail || !nameEl || !statsEl) return;
+
+        detail.style.display = '';
+        nameEl.textContent = t.name + ' (Tier ' + (ROMAN[t.tier] || t.tier) + ')';
+
+        let html = '';
+        ['hp','attack','defense','speed'].forEach(k => {
+            html += '<div class="brk-stat-row">' +
+                '<span class="brk-stat-icon">' + (STAT_ICONS[k]||'') + '</span>' +
+                '<span class="brk-stat-label">' + (STAT_LABELS[k]||k) + '</span>' +
+                '<span class="brk-stat-val">' + fmtNum(t[k]) + '</span>' +
+                '</div>';
+        });
+        // Cost rows
+        html += '<div class="brk-stat-row" style="margin-top:6px;border-top:1px solid #1e2d42;padding-top:6px">' +
+            '<span class="brk-stat-icon">⏱</span>' +
+            '<span class="brk-stat-label">Zeit/Einheit</span>' +
+            '<span class="brk-stat-val">' + fmtTimeSec(t.time) + '</span>' +
+            '</div>';
+        ['need_food','need_lumber','need_stone','need_gold'].forEach(k => {
+            if (!t[k]) return;
+            html += '<div class="brk-stat-row">' +
+                '<span class="brk-stat-icon">' + (RES_ICONS[k]||'') + '</span>' +
+                '<span class="brk-stat-label">' + (RES_LABELS[k]||k) + '</span>' +
+                '<span class="brk-stat-val">' + fmtNum(t[k]) + '</span>' +
+                '</div>';
+        });
+        // In city count
+        html += '<div class="brk-stat-row" style="border-top:1px solid #1e2d42;padding-top:6px;margin-top:6px">' +
+            '<span class="brk-stat-icon">🏰</span>' +
+            '<span class="brk-stat-label">In Stadt</span>' +
+            '<span class="brk-stat-val">' + fmtNum(t.in_city) + '</span>' +
+            '</div>';
+        statsEl.innerHTML = html;
+
+        // Update train button
+        const trainBtn = document.getElementById('brk-train-btn');
+        if (trainBtn) {
+            trainBtn.dataset.code = t.code;
+            trainBtn.dataset.name = t.name;
+            if (!t.unlocked) {
+                trainBtn.disabled = true;
+                trainBtn.textContent = '🔒 Academy Lv.' + t.unlock_academy;
+            } else {
+                trainBtn.disabled = false;
+                trainBtn.textContent = 'AUSBILDEN';
+            }
+        }
+    }
+
+    function brkRenderQueue() {
+        const bar = document.getElementById('brk-queue-bar');
+        if (!bar) return;
+        if (!BRK_QUEUE.length) { bar.style.display = 'none'; return; }
+        bar.style.display = '';
+        let html = '<div class="brk-queue-title">Trainings-Queue</div>';
+        BRK_QUEUE.forEach(q => {
+            html += '<div class="brk-queue-item">' +
+                '<div class="brk-queue-icon">⚔</div>' +
+                '<div class="brk-queue-info"><span>' + q.count + '× ' + q.name + '</span></div>' +
+                '<div class="brk-queue-cd" data-finish="' + q.finishes_at + '">—</div>' +
+                '</div>';
+        });
+        bar.innerHTML = html;
+    }
+
+    // Type tab clicks
+    document.querySelectorAll('.brk-type-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.brk-type-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            brkCurrentType = parseInt(btn.dataset.btype, 10);
+            brkSelectedCode = null;
+            brkRenderCards();
+        });
     });
-});
+
+    // Train button
+    const brkTrainBtn = document.getElementById('brk-train-btn');
+    if (brkTrainBtn) {
+        brkTrainBtn.addEventListener('click', async () => {
+            const code  = parseInt(brkTrainBtn.dataset.code, 10);
+            const name  = brkTrainBtn.dataset.name;
+            const count = parseInt(document.getElementById('brk-count')?.value ?? '0', 10);
+            if (!count || count < 1) { showToast('Ungültige Anzahl', 'err'); return; }
+
+            brkTrainBtn.disabled = true;
+            brkTrainBtn.textContent = '…';
+
+            try {
+                const res  = await fetch('/api/troops/train', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': CSRF },
+                    body: JSON.stringify({ troop_code: code, count }),
+                });
+                const json = await res.json();
+                if (json.ok) {
+                    showToast('Training gestartet: ' + count + '× ' + name, 'ok');
+                    setTimeout(() => window.location.reload(), 900);
+                } else {
+                    showToast(json.error?.message ?? json.error ?? 'Fehler', 'err');
+                    brkTrainBtn.disabled = false;
+                    brkTrainBtn.textContent = 'AUSBILDEN';
+                }
+            } catch (e) {
+                showToast('Netzwerkfehler', 'err');
+                brkTrainBtn.disabled = false;
+                brkTrainBtn.textContent = 'AUSBILDEN';
+            }
+        });
+    }
+
+    // Queue countdowns (reuse existing updateQueueCountdowns via .brk-queue-cd)
+    function updateBrkQueueCd() {
+        document.querySelectorAll('.brk-queue-cd').forEach(el => {
+            const finish = parseInt(el.dataset.finish, 10) * 1000;
+            const rem    = Math.max(0, Math.ceil((finish - Date.now()) / 1000));
+            if (rem === 0) { el.textContent = 'fertig!'; return; }
+            el.textContent = fmtTimeSec(rem);
+        });
+    }
+    setInterval(updateBrkQueueCd, 1000);
+
+    // Init
+    brkRenderCards();
+    brkRenderQueue();
+    updateBrkQueueCd();
+})();
+<?php endif ?>
 
 // ---------------------------------------------------------------------------
 // Queue countdowns (training queue)

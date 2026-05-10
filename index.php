@@ -46,6 +46,7 @@ if (str_starts_with($path, '/api/')) {
     $router->post('/api/march/dispatch-player', [\Conquer\Api\Handlers\MarchHandler::class, 'dispatchPlayer']);
     $router->post('/api/march/dispatch-scout',  [\Conquer\Api\Handlers\MarchHandler::class, 'dispatchScout']);
     $router->get('/api/march/list',             [\Conquer\Api\Handlers\MarchHandler::class, 'list']);
+    $router->get('/api/map/marches',            [\Conquer\Api\Handlers\MarchHandler::class, 'listAll']);
 
     // Battle reports
     $router->get('/api/battle/reports',      [\Conquer\Api\Handlers\BattleHandler::class, 'reports']);

@@ -442,6 +442,9 @@ foreach ($troopQueue as $tq) {
         #bldg-wrap {
             width: 100%;
             max-width: 960px;
+            display: flex;
+            flex-direction: column;
+            max-height: calc(100vh - 100px); /* overlay padding: 60px top + 20px bottom + margin */
         }
     </style>
 </head>

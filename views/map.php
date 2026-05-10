@@ -243,29 +243,212 @@ declare(strict_types=1);
         .modal-btn-purple:hover { opacity: 0.9; }
         .modal-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
+        /* ── LoK Attack Overlay ── */
+        .atk-overlay {
+            position: fixed; inset: 0; z-index: 300;
+            background: rgba(0,0,0,0.88);
+            display: flex; align-items: stretch;
+        }
+        .atk-back {
+            position: absolute; top: 10px; left: 10px; z-index: 10;
+            width: 48px; height: 34px;
+            background: #1d4ed8; border: 2px solid #3b82f6; border-radius: 6px;
+            color: #fff; font-size: 1.2rem; font-weight: 900; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .atk-back:hover { background: #2563eb; }
+        /* Left target panel */
+        .atk-left {
+            flex: 0 0 32%; display: flex; align-items: center; justify-content: center;
+            padding: 56px 16px 16px;
+        }
+        .atk-target-panel {
+            display: flex; flex-direction: column; align-items: center;
+            width: 100%; gap: 10px;
+        }
+        .atk-banner {
+            width: 100%; padding: 8px 16px; border-radius: 4px;
+            background: linear-gradient(180deg,#c8730a,#7a3d00);
+            border: 2px solid #f59e0b;
+            font-size: 1rem; font-weight: 900; text-transform: uppercase;
+            color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.5); text-align: center;
+        }
+        .atk-banner-red {
+            background: linear-gradient(180deg,#7f1d1d,#450a0a);
+            border-color: #ef4444;
+        }
+        .atk-coords { font-size: 0.75rem; color: #94a3b8; }
+        .atk-city-img { font-size: 4.5rem; line-height: 1; filter: drop-shadow(0 4px 8px rgba(0,0,0,.5)); }
+        .atk-name-row {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 0.85rem; color: #e2e8f0; font-weight: 700;
+        }
+        .atk-lvl-hex {
+            background: #0f172a; border: 2px solid #ef4444; border-radius: 6px;
+            padding: 2px 8px; font-weight: 900; color: #ef4444; font-size: 1rem;
+        }
+        .atk-monster-lv {
+            font-size: 1.4rem; font-weight: 900; color: #e2e8f0;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .atk-skull { font-size: 1.8rem; color: #ef4444; }
+        .atk-hp-track {
+            width: 100%; height: 12px; background: #1e293b;
+            border: 1px solid #334155; border-radius: 6px; overflow: hidden;
+        }
+        .atk-hp-fill { height: 100%; background: #ef4444; border-radius: 6px; }
+        .atk-reward {
+            width: 100%; background: #0f172a; border: 2px solid #0ea5e9; border-radius: 8px;
+            padding: 8px;
+        }
+        .atk-reward-hdr {
+            font-size: 0.68rem; font-weight: 900; color: #38bdf8;
+            text-transform: uppercase; text-align: center; letter-spacing: .07em;
+            margin-bottom: 6px;
+        }
+        .atk-reward-body { font-size: 0.72rem; color: #94a3b8; text-align: center; }
+        /* Right panel */
+        .atk-right {
+            flex: 1; display: flex; flex-direction: column;
+            background: #0e1a2e; border-left: 1px solid #1e3a5f;
+            margin: 16px 16px 16px 0; border-radius: 12px; overflow: hidden;
+        }
+        /* Tabs */
+        .atk-tabs {
+            display: flex; align-items: stretch;
+            background: #0c1628; border-bottom: 2px solid #1e3a5f;
+            flex-shrink: 0;
+        }
+        .atk-tab-title {
+            flex: 1; padding: 11px 18px;
+            font-size: 0.9rem; font-weight: 900; color: #fff;
+            text-transform: uppercase; letter-spacing: .05em;
+        }
+        .atk-tab {
+            padding: 11px 18px;
+            font-size: 0.8rem; font-weight: 700; color: #94a3b8;
+            text-transform: uppercase; letter-spacing: .05em; cursor: pointer;
+            border-left: 1px solid #1e3a5f;
+        }
+        .atk-tab-active { color: #fff; background: rgba(59,130,246,.18); }
+        .atk-tab-dim { color: #475569; cursor: not-allowed; }
+        /* Body */
+        .atk-body { flex: 1; display: flex; overflow: hidden; min-height: 0; }
+        /* Troop list */
+        .atk-list {
+            flex: 0 0 56%; border-right: 1px solid #1e3a5f;
+            overflow-y: auto; padding: 6px 8px;
+            display: flex; flex-direction: column; gap: 2px;
+        }
+        .atk-loading { color: #475569; text-align: center; padding: 2rem; font-size: 0.85rem; }
+        .atk-row { display: flex; align-items: center; gap: 7px; padding: 5px 2px; }
+        .atk-icon {
+            flex: 0 0 46px; height: 46px; border-radius: 6px; position: relative;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; font-weight: 900; color: #fff;
+        }
+        .atk-t1 { background: #334155; border: 2px solid #475569; }
+        .atk-t2 { background: #1d4ed8; border: 2px solid #3b82f6; }
+        .atk-t3 { background: #92400e; border: 2px solid #f59e0b; }
+        .atk-t4 { background: #5b21b6; border: 2px solid #8b5cf6; }
+        .atk-t5 { background: #991b1b; border: 2px solid #ef4444; }
+        .atk-tbadge {
+            position: absolute; top: -5px; right: -5px;
+            font-size: 0.5rem; font-weight: 900; padding: 1px 3px; border-radius: 3px;
+            background: #7f1d1d; border: 1px solid #ef4444; color: #fca5a5; line-height: 1.2;
+        }
+        .atk-t2 .atk-tbadge { background: #1e3a8a; border-color: #3b82f6; color: #93c5fd; }
+        .atk-t3 .atk-tbadge { background: #78350f; border-color: #f59e0b; color: #fde68a; }
+        .atk-t4 .atk-tbadge { background: #3b0764; border-color: #8b5cf6; color: #c4b5fd; }
+        .atk-t5 .atk-tbadge { background: #7f1d1d; border-color: #ef4444; color: #fca5a5; }
+        .atk-mid { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+        .atk-cnt { font-size: 0.88rem; font-weight: 700; color: #e2e8f0; }
+        .atk-srow { display: flex; align-items: center; gap: 4px; }
+        .atk-sl { flex: 1; accent-color: #38bdf8; height: 6px; cursor: pointer; }
+        .atk-sl:disabled { opacity: .3; cursor: not-allowed; }
+        .atk-arr {
+            flex: 0 0 30px; height: 22px; font-size: 0.62rem;
+            background: linear-gradient(180deg,#16a34a,#15803d); border: 1px solid #166534;
+            border-radius: 4px; color: #fff; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .atk-arr:hover { background: linear-gradient(180deg,#22c55e,#16a34a); }
+        .atk-arr:disabled { opacity: .3; cursor: not-allowed; }
+        .atk-num {
+            flex: 0 0 60px; padding: 3px 5px;
+            background: #0f172a; border: 1px solid #334155; border-radius: 4px;
+            color: #e2e8f0; font-size: 0.82rem; text-align: right;
+        }
+        /* Formation panel */
+        .atk-form {
+            flex: 1; overflow-y: auto; padding: 8px 6px;
+            display: flex; flex-direction: column; gap: 6px; min-width: 0;
+        }
+        .atk-presets { display: flex; gap: 5px; }
+        .atk-preset {
+            flex: 1; height: 27px; border-radius: 14px;
+            background: #1e293b; border: 1px solid #334155;
+            color: #94a3b8; font-size: 0.82rem; font-weight: 700; cursor: pointer;
+            transition: all .15s;
+        }
+        .atk-preset:hover { background: #273548; color: #e2e8f0; }
+        .atk-preset.is-active { background: #3b82f6; border-color: #60a5fa; color: #fff; }
+        .atk-cap-row {
+            display: flex; align-items: center; gap: 6px; font-size: 0.75rem;
+            color: #94a3b8; font-weight: 600;
+            background: #0f172a; border: 1px solid #1e293b; border-radius: 5px;
+            padding: 4px 8px;
+        }
+        .atk-grid {
+            display: grid; grid-template-columns: repeat(3,1fr); gap: 4px; flex: 1; overflow-y: auto;
+        }
+        .atk-card {
+            display: flex; flex-direction: column; align-items: center;
+            background: #1e293b; border: 2px solid #334155; border-radius: 6px;
+            padding: 3px; gap: 2px; transition: border-color .15s;
+        }
+        .atk-card.is-sel { border-color: #ef4444; }
+        .atk-card-icon { width: 100%; aspect-ratio: 1; }
+        .atk-card-cnt { font-size: 0.68rem; font-weight: 700; color: #e2e8f0; text-align: center; }
+        /* Info bar */
+        .atk-info {
+            display: flex; padding: 5px 12px; gap: 16px; flex-shrink: 0;
+            background: #0c1628; border-top: 1px solid #1e3a5f;
+        }
+        .atk-info-item { flex: 1; }
+        .atk-info-lbl { display: block; font-size: 0.62rem; color: #64748b; text-transform: uppercase; letter-spacing: .05em; }
+        .atk-info-val { display: block; font-size: 0.82rem; font-weight: 700; color: #e2e8f0; }
+        /* Buttons row */
+        .atk-foot { display: flex; height: 52px; flex-shrink: 0; }
+        .atk-empty {
+            flex: 0 0 28%; background: #f59e0b; border: none; border-radius: 0 0 0 12px;
+            color: #1c1917; font-size: 0.95rem; font-weight: 900;
+            text-transform: uppercase; letter-spacing: .05em; cursor: pointer;
+        }
+        .atk-empty:hover { background: #d97706; }
+        .atk-go {
+            flex: 1; border: none; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 0; border-radius: 0 0 12px 0; transition: opacity .15s;
+        }
+        .atk-go:hover:not(:disabled) { opacity: .88; }
+        .atk-go:disabled { opacity: .4; cursor: not-allowed; }
+        .atk-go-blue { background: #1d4ed8; }
+        .atk-go-red  { background: #b91c1c; }
+        .atk-go-time { font-size: 0.72rem; color: rgba(255,255,255,.7); line-height: 1; }
+        .atk-go-lbl  { font-size: 0.95rem; font-weight: 900; color: #fff; text-transform: uppercase; line-height: 1.3; }
+
         /* ── Hex Popup ── */
         #hex-popup {
             position: fixed;
             z-index: 160;
             pointer-events: auto;
-            transform: translate(-50%, -50%);
+            transform: translateX(-50%);
         }
         [x-cloak] { display: none !important; }
-        .hex-card {
-            background: rgba(10,14,26,0.96);
-            border: 1px solid #334155;
-            border-radius: 14px;
-            padding: 10px;
-            min-width: 180px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.7);
-        }
-        .hex-card-title {
-            font-size: 0.78rem; font-weight: 700; color: #e2e8f0;
-            text-align: center; margin-bottom: 8px;
-            padding-bottom: 7px; border-bottom: 1px solid #1e293b;
-        }
         .hex-btn-grid {
-            display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
+            display: flex; flex-wrap: nowrap; gap: 6px; justify-content: center;
+            align-items: flex-end;
         }
         .hex-btn {
             width: 52px; height: 52px;
@@ -292,13 +475,6 @@ declare(strict_types=1);
         .hex-btn.hex-purple:hover:not(:disabled) { border-color: #8b5cf6; background: rgba(139,92,246,0.12); }
         .hex-btn.hex-green  { border-color: rgba(34,197,94,0.5); color: #86efac; }
         .hex-btn.hex-green:hover:not(:disabled) { border-color: #22c55e; background: rgba(34,197,94,0.12); }
-        .hex-popup-close {
-            display: block; width: 100%; margin-top: 7px;
-            padding: 3px 0; border-radius: 5px; border: 1px solid #334155;
-            background: transparent; color: #475569; font-size: 0.7rem; cursor: pointer;
-            text-align: center;
-        }
-        .hex-popup-close:hover { background: #1e293b; color: #94a3b8; }
 
         /* Formation presets */
         .formation-bar {
@@ -644,142 +820,190 @@ declare(strict_types=1);
 <div id="hex-popup" x-show="hexPopup" x-cloak
      :style="`left:${hexPopupX}px;top:${hexPopupY}px`"
      @mousedown.stop>
-    <div class="hex-card">
-        <!-- Title -->
-        <div class="hex-card-title" x-text="hexPopupTitle"></div>
-
-        <!-- Own city buttons (4) -->
+    <div class="hex-btn-grid">
         <template x-if="hexPopup === 'own'">
-            <div class="hex-btn-grid">
-                <button class="hex-btn hex-purple" @click="openEmojiPicker(); hexPopup=null">
+            <div style="display:contents">
+                <button class="hex-btn hex-purple" style="transform:translateY(0px)" @click="openEmojiPicker(); hexPopup=null">
                     <span class="hex-btn-icon">😀</span>Emoji
                 </button>
-                <button class="hex-btn hex-orange" @click="openOwnProfile(); hexPopup=null">
+                <button class="hex-btn hex-orange" style="transform:translateY(16px)" @click="openOwnProfile(); hexPopup=null">
                     <span class="hex-btn-icon">👤</span>Profil
                 </button>
-                <button class="hex-btn hex-green" @click="hexPopup=null; window.location.href='/city'">
+                <button class="hex-btn hex-green" style="transform:translateY(16px)" @click="hexPopup=null; window.location.href='/city'">
                     <span class="hex-btn-icon">🏰</span>Stadt
                 </button>
-                <button class="hex-btn" @click="openSkinModal(); hexPopup=null">
+                <button class="hex-btn" style="transform:translateY(0px)" @click="openSkinModal(); hexPopup=null">
                     <span class="hex-btn-icon">👕</span>Skin
                 </button>
             </div>
         </template>
-
-        <!-- Enemy city buttons (5) -->
         <template x-if="hexPopup === 'enemy'">
-            <div class="hex-btn-grid">
-                <button class="hex-btn hex-orange" @click="openEnemyProfile(hexPopupEntity); hexPopup=null">
+            <div style="display:contents">
+                <button class="hex-btn hex-orange" style="transform:translateY(0px)" @click="openEnemyProfile(hexPopupEntity); hexPopup=null">
                     <span class="hex-btn-icon">ℹ️</span>Info
                 </button>
-                <button class="hex-btn hex-red" @click="openPlayerAttack(hexPopupEntity); hexPopup=null">
+                <button class="hex-btn hex-red" style="transform:translateY(13.5px)" @click="openPlayerAttack(hexPopupEntity); hexPopup=null">
                     <span class="hex-btn-icon">⚔️</span>Angriff
                 </button>
-                <button class="hex-btn hex-orange" @click="openRally(hexPopupEntity); hexPopup=null">
+                <button class="hex-btn hex-orange" style="transform:translateY(18px)" @click="openRally(hexPopupEntity); hexPopup=null">
                     <span class="hex-btn-icon">🏳️</span>Rally
                 </button>
-                <button class="hex-btn hex-purple" @click="sendScout(hexPopupEntity); hexPopup=null">
+                <button class="hex-btn hex-purple" style="transform:translateY(13.5px)" @click="sendScout(hexPopupEntity); hexPopup=null">
                     <span class="hex-btn-icon">🔭</span>Scout
                 </button>
-                <button class="hex-btn" disabled title="Kommt bald">
+                <button class="hex-btn" style="transform:translateY(0px)" disabled title="Kommt bald">
                     <span class="hex-btn-icon">💊</span>Debuff
                 </button>
             </div>
         </template>
-
-        <button class="hex-popup-close" @click="hexPopup=null">Schließen</button>
     </div>
 </div>
 
-<!-- ── Monster Attack Modal (existing) ── -->
-<div class="modal-overlay" x-show="attackModal" @click.self="attackModal=false" style="display:none">
-    <div class="modal-box">
-        <div class="modal-title" style="color:#ef4444">⚔ Monster angreifen</div>
-        <div style="font-size:0.82rem;color:#94a3b8;margin-bottom:0.75rem"
-             x-text="attackTarget ? attackTarget.name + ' bei (' + attackTarget.x + ', ' + attackTarget.y + ')' : ''"></div>
+<!-- ── LoK-style Attack Modal (Monster + Player combined) ── -->
+<div class="atk-overlay" x-show="attackModal || playerAttackModal" x-cloak style="display:none">
+    <button class="atk-back" @click="attackModal=false; playerAttackModal=false">&#8592;</button>
 
-        <template x-if="attackLoading"><div style="text-align:center;color:#475569;padding:1rem">Truppen laden…</div></template>
-
-        <template x-if="!attackLoading">
-            <div>
-                <div class="modal-sub">Truppen auswählen</div>
-                <template x-for="t in attackTroops" :key="t.code">
-                    <div class="troop-pick">
-                        <div class="troop-pick-header">
-                            <span class="troop-pick-name" x-text="t.name"></span>
-                            <span class="troop-pick-avail" x-text="(t.toSend||0).toLocaleString() + ' / ' + t.available.toLocaleString()"></span>
-                        </div>
-                        <div class="troop-pick-controls">
-                            <input type="range" class="troop-pick-slider" min="0" :max="t.available" step="1" x-model.number="t.toSend" :disabled="t.available===0">
-                            <input type="number" class="troop-pick-input" min="0" :max="t.available" x-model.number="t.toSend" :disabled="t.available===0">
-                            <button class="troop-pick-max" :disabled="t.available===0" @click="t.toSend=t.available">Max</button>
-                        </div>
-                    </div>
-                </template>
-                <div style="font-size:0.72rem;color:#64748b;margin-top:0.5rem"
-                     x-text="'Gesamt: ' + attackTroops.reduce((s,t)=>s+(t.toSend||0),0).toLocaleString() + ' Truppen'"></div>
+    <!-- Left: target info -->
+    <div class="atk-left">
+        <!-- Player target -->
+        <div x-show="playerAttackModal" class="atk-target-panel">
+            <div class="atk-banner"
+                 x-text="playerAttackTarget?.player_name ?? playerAttackTarget?.player ?? '?'"></div>
+            <div class="atk-coords"
+                 x-text="playerAttackTarget ? `X:${playerAttackTarget.x} Y:${playerAttackTarget.y}` : ''"></div>
+            <div class="atk-city-img">🏰</div>
+            <div class="atk-name-row">
+                <span class="atk-lvl-hex" x-text="playerAttackTarget?.level ?? 1"></span>
+                <span x-text="playerAttackTarget?.player_name ?? playerAttackTarget?.player ?? '?'"></span>
             </div>
-        </template>
-
-        <div class="modal-actions">
-            <button class="modal-btn modal-btn-cancel" @click="attackModal=false">Abbrechen</button>
-            <button class="modal-btn modal-btn-red"
-                    :disabled="attackLoading || attackTroops.reduce((s,t)=>s+(t.toSend||0),0)===0"
-                    @click="sendMarch()">Marschieren</button>
+        </div>
+        <!-- Monster target -->
+        <div x-show="attackModal" class="atk-target-panel">
+            <div class="atk-banner atk-banner-red" x-text="attackTarget?.name ?? ''"></div>
+            <div class="atk-coords"
+                 x-text="attackTarget ? `X:${attackTarget.x} Y:${attackTarget.y}` : ''"></div>
+            <div class="atk-city-img" style="font-size:3.5rem">👾</div>
+            <div class="atk-monster-lv">
+                <span class="atk-skull">☠</span>
+                Lv.&nbsp;<strong x-text="attackTarget?.name?.match(/\d+/)?.[0] ?? '?'"></strong>
+            </div>
+            <div class="atk-hp-track"><div class="atk-hp-fill" style="width:100%"></div></div>
+            <div class="atk-reward">
+                <div class="atk-reward-hdr">POTENTIAL REWARD</div>
+                <div class="atk-reward-body">EXP: —</div>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- ── Player Attack Modal (PvP) ── -->
-<div class="modal-overlay" x-show="playerAttackModal" @click.self="playerAttackModal=false" style="display:none">
-    <div class="modal-box">
-        <div class="modal-title" style="color:#ef4444">⚔ Spieler angreifen</div>
-        <div style="font-size:0.82rem;color:#94a3b8;margin-bottom:0.5rem"
-             x-text="playerAttackTarget ? (playerAttackTarget.player_name ?? playerAttackTarget.player) + ' bei (' + playerAttackTarget.x + ', ' + playerAttackTarget.y + ')' : ''"></div>
-
-        <!-- Formation presets -->
-        <div class="modal-sub">Formation laden</div>
-        <div class="formation-bar">
-            <template x-for="i in [0,1,2,3]" :key="i">
-                <div class="formation-slot" :class="selectedFormation===i ? 'active' : ''"
-                     @click="applyFormation(i)"
-                     x-text="formations[i] ? 'F' + (i+1) : '— Leer'"></div>
-            </template>
-        </div>
-        <div style="text-align:right;margin-bottom:0.5rem">
-            <span style="font-size:0.65rem;color:#475569">Aktuelle Auswahl speichern als: </span>
-            <template x-for="i in [0,1,2,3]" :key="i">
-                <button class="formation-save-btn" @click="saveFormation(i, playerAttackTroops)" x-text="'F'+(i+1)"></button>
-            </template>
+    <!-- Right: troop selection -->
+    <div class="atk-right">
+        <!-- Tabs -->
+        <div class="atk-tabs">
+            <div class="atk-tab-title" x-text="attackModal ? 'MONSTER ATTACK' : 'ATTACK'"></div>
+            <div class="atk-tab atk-tab-active">MARCH</div>
+            <div class="atk-tab atk-tab-dim">DRAGO</div>
         </div>
 
-        <template x-if="playerAttackLoading"><div style="text-align:center;color:#475569;padding:1rem">Truppen laden…</div></template>
-        <template x-if="!playerAttackLoading">
-            <div>
-                <div class="modal-sub">Truppen auswählen</div>
-                <template x-for="t in playerAttackTroops" :key="t.code">
-                    <div class="troop-pick">
-                        <div class="troop-pick-header">
-                            <span class="troop-pick-name" x-text="t.name"></span>
-                            <span class="troop-pick-avail" x-text="(t.toSend||0).toLocaleString() + ' / ' + t.available.toLocaleString()"></span>
+        <!-- Body: troop list + formation -->
+        <div class="atk-body">
+            <!-- Troop list -->
+            <div class="atk-list">
+                <div x-show="(attackModal && attackLoading)||(playerAttackModal && playerAttackLoading)"
+                     class="atk-loading">Truppen laden…</div>
+                <template x-for="t in (attackModal ? attackTroops : playerAttackTroops)" :key="t.code">
+                    <div class="atk-row">
+                        <div class="atk-icon" :class="'atk-t'+(t.tier??1)">
+                            <span x-text="(t.name??'?').charAt(0)"></span>
+                            <div class="atk-tbadge"
+                                 x-text="['','I','II','III','IV','V'][t.tier??1]??''"></div>
                         </div>
-                        <div class="troop-pick-controls">
-                            <input type="range" class="troop-pick-slider" style="accent-color:#ef4444" min="0" :max="t.available" step="1" x-model.number="t.toSend" :disabled="t.available===0">
-                            <input type="number" class="troop-pick-input" min="0" :max="t.available" x-model.number="t.toSend" :disabled="t.available===0">
-                            <button class="troop-pick-max" :disabled="t.available===0" @click="t.toSend=t.available">Max</button>
+                        <div class="atk-mid">
+                            <div class="atk-cnt" x-text="(t.toSend||0).toLocaleString()"></div>
+                            <div class="atk-srow">
+                                <input type="range" class="atk-sl" min="0"
+                                       :max="t.available" step="1"
+                                       x-model.number="t.toSend"
+                                       :disabled="t.available===0">
+                                <button class="atk-arr"
+                                        @click="t.toSend = t.toSend===t.available ? 0 : t.available"
+                                        :disabled="t.available===0">&#9668;&#9658;</button>
+                            </div>
                         </div>
+                        <input type="number" class="atk-num" min="0"
+                               :max="t.available" x-model.number="t.toSend"
+                               :disabled="t.available===0">
                     </div>
                 </template>
-                <div style="font-size:0.72rem;color:#64748b;margin-top:0.5rem"
-                     x-text="'Gesamt: ' + playerAttackTroops.reduce((s,t)=>s+(t.toSend||0),0).toLocaleString() + ' Truppen'"></div>
             </div>
-        </template>
 
-        <div class="modal-actions">
-            <button class="modal-btn modal-btn-cancel" @click="playerAttackModal=false">Abbrechen</button>
-            <button class="modal-btn modal-btn-red"
-                    :disabled="playerAttackLoading || playerAttackTroops.reduce((s,t)=>s+(t.toSend||0),0)===0"
-                    @click="sendPlayerMarch()">⚔ Angreifen</button>
+            <!-- Formation grid -->
+            <div class="atk-form">
+                <div class="atk-presets">
+                    <template x-for="i in [0,1,2,3]" :key="i">
+                        <button class="atk-preset"
+                                :class="selectedFormation===i ? 'is-active' : ''"
+                                @click="applyFormation(i)"
+                                x-text="i+1"></button>
+                    </template>
+                </div>
+                <div class="atk-cap-row">
+                    <span>⚔</span>
+                    <span x-text="
+                        (attackModal?attackTroops:playerAttackTroops)
+                            .reduce((s,t)=>s+(t.toSend||0),0).toLocaleString()
+                        +' / '+
+                        (attackModal?attackTroops:playerAttackTroops)
+                            .reduce((s,t)=>s+t.available,0).toLocaleString()
+                    "></span>
+                </div>
+                <div class="atk-grid">
+                    <template x-for="t in (attackModal?attackTroops:playerAttackTroops).filter(t=>t.available>0)"
+                              :key="t.code">
+                        <div class="atk-card" :class="(t.toSend||0)>0 ? 'is-sel' : ''">
+                            <div class="atk-card-icon atk-icon" :class="'atk-t'+(t.tier??1)">
+                                <span x-text="(t.name??'?').charAt(0)"></span>
+                                <div class="atk-tbadge"
+                                     x-text="['','I','II','III','IV','V'][t.tier??1]??''"></div>
+                            </div>
+                            <div class="atk-card-cnt" x-text="(t.toSend||0).toLocaleString()"></div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info bar -->
+        <div class="atk-info">
+            <div class="atk-info-item">
+                <span class="atk-info-lbl">Troop Dispatch Queue</span>
+                <span class="atk-info-val">1 / 8</span>
+            </div>
+            <div class="atk-info-item" x-show="playerAttackModal">
+                <span class="atk-info-lbl">Troops Load</span>
+                <span class="atk-info-val"
+                      x-text="playerAttackTroops.reduce((s,t)=>s+(t.toSend||0),0).toLocaleString()"></span>
+            </div>
+            <div class="atk-info-item" x-show="attackModal">
+                <span class="atk-info-lbl">Action Point</span>
+                <span class="atk-info-val">10 / 4,422</span>
+            </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="atk-foot">
+            <button class="atk-empty"
+                    @click="(attackModal?attackTroops:playerAttackTroops).forEach(t=>t.toSend=0)">
+                EMPTY
+            </button>
+            <button class="atk-go"
+                    :class="attackModal ? 'atk-go-red' : 'atk-go-blue'"
+                    :disabled="(attackModal?attackLoading:playerAttackLoading)
+                        || (attackModal?attackTroops:playerAttackTroops)
+                               .reduce((s,t)=>s+(t.toSend||0),0)===0"
+                    @click="attackModal ? sendMarch() : sendPlayerMarch()">
+                <div class="atk-go-time">⏱ 00:00:00</div>
+                <div class="atk-go-lbl" x-text="attackModal ? 'ATTACK' : 'MARCH'"></div>
+            </button>
         </div>
     </div>
 </div>
@@ -889,63 +1113,68 @@ declare(strict_types=1);
 
 <!-- ── Own Profile Modal ── -->
 <div class="modal-overlay" x-show="ownProfileModal" @click.self="ownProfileModal=false" style="display:none">
-    <div class="modal-box" style="width:440px">
-        <div class="modal-title" style="color:#f0d080">👑 Mein Profil</div>
+    <div class="modal-box" style="width:380px;padding:0;overflow:hidden">
 
-        <template x-if="ownProfile">
-            <div>
-                <div class="profile-header">
-                    <div class="profile-avatar">⚔</div>
-                    <div class="profile-info">
-                        <div class="profile-name" x-text="ownProfile.username"></div>
-                        <div class="profile-tag" x-text="ownProfile.alliance_tag ? '[' + ownProfile.alliance_tag + '] ' + (ownProfile.alliance_name ?? '') : 'Keine Allianz'"></div>
-                    </div>
-                </div>
-                <div class="profile-stats-grid">
-                    <div class="pstat">
-                        <div class="pstat-val" x-text="(ownProfile.power ?? 0).toLocaleString()"></div>
-                        <div class="pstat-lbl">Macht</div>
-                    </div>
-                    <div class="pstat">
-                        <div class="pstat-val" x-text="ownProfile.castle_level ?? '?'"></div>
-                        <div class="pstat-lbl">Castle Lv</div>
-                    </div>
-                    <div class="pstat">
-                        <div class="pstat-val" x-text="(ownProfile.kill_count ?? 0).toLocaleString()"></div>
-                        <div class="pstat-lbl">Kills</div>
-                    </div>
-                </div>
-                <!-- Lord Level + AP bar -->
-                <div style="margin-top:12px;background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:10px">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px">
-                        <span style="font-size:0.78rem;font-weight:700;color:#f0d080">Lord Lv <span x-text="ownProfile.lord_level ?? 0"></span></span>
-                        <span style="font-size:0.65rem;color:#64748b">XP: <span x-text="(ownProfile.lord_xp ?? 0).toLocaleString()"></span></span>
-                    </div>
-                    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
-                        <span style="font-size:0.7rem;color:#64748b;white-space:nowrap">⚡ AP</span>
-                        <div style="flex:1;height:8px;background:#1e293b;border-radius:4px;overflow:hidden">
-                            <div style="height:100%;background:#f59e0b;border-radius:4px;transition:width 0.3s"
-                                 :style="'width:' + Math.min(100, Math.round((ownProfile.action_points ?? 0) / 200 * 100)) + '%'"></div>
-                        </div>
-                        <span style="font-size:0.7rem;color:#fbbf24;white-space:nowrap" x-text="(ownProfile.action_points ?? 0) + ' / 200'"></span>
-                    </div>
-                </div>
+        <!-- Header mit Avatar + Basis-Info -->
+        <div style="background:linear-gradient(135deg,#1a0500,#3d0a00);padding:16px;display:flex;gap:14px;align-items:center;border-bottom:1px solid #5c1d0a">
+            <div style="width:64px;height:64px;border-radius:8px;background:linear-gradient(135deg,#7c1e0e,#4a0d05);border:2px solid #d4a017;display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0">⚔</div>
+            <div style="flex:1;min-width:0">
+                <div style="font-size:1rem;font-weight:800;color:#f0d080;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" x-text="ownProfile?.username ?? ''"></div>
+                <div style="font-size:0.72rem;color:#94a3b8;margin-top:2px" x-text="ownProfile?.alliance_tag ? '[' + ownProfile.alliance_tag + '] ' + (ownProfile.alliance_name ?? '') : 'Keine Allianz'"></div>
             </div>
-        </template>
-
-        <!-- Tabs (placeholder content) -->
-        <div class="profile-tabs" style="margin-top:0.75rem">
-            <template x-for="tab in ['Verlauf','Truppen','Meisterschaft','Schatz','Ranking']" :key="tab">
-                <button class="profile-tab-btn"
-                        :class="ownProfileTab === tab ? 'active' : ''"
-                        @click="ownProfileTab = tab"
-                        x-text="tab"></button>
-            </template>
         </div>
-        <div class="profile-tab-placeholder">Kommt bald — <span x-text="ownProfileTab"></span></div>
 
-        <div class="modal-actions" style="margin-top:0.75rem">
-            <button class="modal-btn modal-btn-cancel" @click="ownProfileModal=false">Schließen</button>
+        <!-- Stats -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#1e293b">
+            <div style="background:#0f172a;padding:10px;text-align:center">
+                <div style="font-size:0.9rem;font-weight:700;color:#e2e8f0" x-text="(ownProfile?.power ?? 0).toLocaleString()"></div>
+                <div style="font-size:0.6rem;color:#475569;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Macht</div>
+            </div>
+            <div style="background:#0f172a;padding:10px;text-align:center">
+                <div style="font-size:0.9rem;font-weight:700;color:#e2e8f0" x-text="ownProfile?.castle_level ?? '?'"></div>
+                <div style="font-size:0.6rem;color:#475569;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Castle Lv</div>
+            </div>
+            <div style="background:#0f172a;padding:10px;text-align:center">
+                <div style="font-size:0.9rem;font-weight:700;color:#e2e8f0" x-text="(ownProfile?.kill_count ?? 0).toLocaleString()"></div>
+                <div style="font-size:0.6rem;color:#475569;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Kills</div>
+            </div>
+        </div>
+
+        <!-- Lord Level + AP -->
+        <div style="padding:12px 16px;border-bottom:1px solid #1e293b">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px">
+                <span style="font-size:0.78rem;font-weight:700;color:#f0d080">Lord Lv <span x-text="ownProfile?.lord_level ?? 0"></span></span>
+                <span style="font-size:0.65rem;color:#64748b">XP: <span x-text="(ownProfile?.lord_xp ?? 0).toLocaleString()"></span></span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+                <span style="font-size:0.7rem;color:#64748b;white-space:nowrap">⚡ AP</span>
+                <div style="flex:1;height:8px;background:#1e293b;border-radius:4px;overflow:hidden">
+                    <div style="height:100%;background:#f59e0b;border-radius:4px;transition:width 0.3s"
+                         :style="'width:' + Math.min(100, Math.round((ownProfile?.action_points ?? 0) / 200 * 100)) + '%'"></div>
+                </div>
+                <span style="font-size:0.7rem;color:#fbbf24;white-space:nowrap" x-text="(ownProfile?.action_points ?? 0) + ' / 200'"></span>
+            </div>
+        </div>
+
+        <!-- Nav Buttons -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#1e293b">
+            <a href="#" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 6px;background:#0f172a;color:#94a3b8;text-decoration:none;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;transition:background 0.15s" onmouseover="this.style.background='#1a2535'" onmouseout="this.style.background='#0f172a'">
+                <span style="font-size:1.2rem">📜</span>VERLAUF
+            </a>
+            <a href="/alliance" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 6px;background:#0f172a;color:#94a3b8;text-decoration:none;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;transition:background 0.15s" onmouseover="this.style.background='#1a2535'" onmouseout="this.style.background='#0f172a'">
+                <span style="font-size:1.2rem">⚔</span>ALLIANZ
+            </a>
+            <a href="#" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 6px;background:#0f172a;color:#94a3b8;text-decoration:none;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;transition:background 0.15s" onmouseover="this.style.background='#1a2535'" onmouseout="this.style.background='#0f172a'">
+                <span style="font-size:1.2rem">📖</span>MEISTER
+            </a>
+            <a href="#" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 6px;background:#0f172a;color:#94a3b8;text-decoration:none;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;transition:background 0.15s" onmouseover="this.style.background='#1a2535'" onmouseout="this.style.background='#0f172a'">
+                <span style="font-size:1.2rem">💎</span>SCHATZ
+            </a>
+        </div>
+
+        <!-- Schließen Button -->
+        <div style="padding:10px 16px">
+            <button class="modal-btn modal-btn-cancel" style="width:100%" @click="ownProfileModal=false">Schließen</button>
         </div>
     </div>
 </div>
@@ -1050,7 +1279,6 @@ function mapApp() {
         // Own profile modal
         ownProfileModal: false,
         ownProfile:      null,
-        ownProfileTab:   'Verlauf',
 
         // Emoji picker
         emojiModal:   false,
@@ -1142,10 +1370,11 @@ function mapApp() {
                     const tag   = entity.alliance_tag ? ` [${entity.alliance_tag}]` : '';
                     this.hexPopupTitle = pName + tag + (entity.level ? ` · Lv ${entity.level}` : '');
 
-                    // Clamp popup within viewport
-                    const pw = 200, ph = 180;
+                    // Popup appears below the city — clamp so it stays within viewport.
+                    // With transform:translateX(-50%) the X is the center of the popup.
+                    const pw = 300, ph = 80;
                     this.hexPopupX = Math.min(Math.max(screenX, pw / 2 + 4), window.innerWidth  - pw / 2 - 4);
-                    this.hexPopupY = Math.min(Math.max(screenY, ph / 2 + 4), window.innerHeight - ph / 2 - 4);
+                    this.hexPopupY = Math.min(screenY + 8, window.innerHeight - ph - 4);
                 },
 
                 onMonsterClick: (entity) => {
@@ -1187,18 +1416,25 @@ function mapApp() {
         // ── March polling ─────────────────────────────────────────────────────
         async pollMarches() {
             try {
+                // Own marches → sidebar list
                 const r = await fetch('/api/march/list');
                 const j = await r.json();
                 if (j.ok) {
                     const prev = this.marches;
                     this.marches = j.data.marches;
-                    ConquerMap.setMarches(j.data.marches);
-                    const prevCount = prev.length;
-                    if (j.data.marches.length < prevCount || j.data.marches.some((m, i) => m.state !== (prev[i]?.state))) {
+                    if (j.data.marches.length < prev.length || j.data.marches.some((m, i) => m.state !== (prev[i]?.state))) {
                         ConquerMap.refreshEntities();
                     }
                 }
             } catch {}
+
+            try {
+                // All public marches (types 5+7) → map overlay
+                const r2 = await fetch('/api/map/marches');
+                const j2 = await r2.json();
+                if (j2.ok) ConquerMap.setMarches(j2.data.marches);
+            } catch {}
+
             setTimeout(() => this.pollMarches(), 5000);
         },
 
@@ -1218,6 +1454,7 @@ function mapApp() {
                         .map(d => ({
                             code:      d.code,
                             name:      d.name,
+                            tier:      d.tier ?? 1,
                             available: j.data.troops[d.code] ?? 0,
                             toSend:    0,
                         }));
@@ -1409,7 +1646,8 @@ function mapApp() {
             const f = this.formations[slotIdx];
             if (!f) return;
             this.selectedFormation = slotIdx;
-            for (const t of this.playerAttackTroops) {
+            const troops = this.attackModal ? this.attackTroops : this.playerAttackTroops;
+            for (const t of troops) {
                 t.toSend = f[t.code] ?? 0;
                 if (t.toSend > t.available) t.toSend = t.available;
             }

@@ -369,7 +369,8 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
     z-index: 9000;
     display: flex;
     gap: 8px;
-    align-items: flex-end;
+    align-items: center;
+    width: max-content;
 }
 
 .hud-nav-btn {

@@ -225,6 +225,23 @@ final class MarchHandler
     }
 
     /**
+     * GET /api/map/marches
+     *
+     * Returns all publicly visible active marches (all players, types 5+7).
+     * Used for the map overlay — includes origin_x/origin_y per march.
+     */
+    public static function listAll(array $params): void
+    {
+        $session = Session::current();
+        if ($session === null) {
+            Response::error(401, 'UNAUTHENTICATED', 'Not logged in.');
+        }
+
+        $marches = MarchDispatcher::listAllActive();
+        Response::ok(['marches' => $marches]);
+    }
+
+    /**
      * GET /api/march/list
      *
      * Returns all active marches (marching + returning) for the player.
