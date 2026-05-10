@@ -38,6 +38,7 @@ $csrf = $session['csrf_token'];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conquer — Allianz</title>
+    <link rel="stylesheet" href="/assets/css/main.css">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -555,7 +556,7 @@ $csrf = $session['csrf_token'];
                     <span class="alliance-list-name" x-text="a.name"></span>
                     <span class="alliance-list-count" x-text="a.member_count+'/'+a.max_members+' Mitglieder'"></span>
                     <button
-                        class="btn btn-success btn-sm"
+                        class="btn-game btn-game-green btn-game-sm"
                         :disabled="a.member_count >= a.max_members || joining"
                         @click="join(a.id, a.name)"
                         x-text="a.member_count >= a.max_members ? 'Voll' : 'Beitreten'"
@@ -585,7 +586,7 @@ $csrf = $session['csrf_token'];
                 <label class="form-label">Beschreibung (optional)</label>
                 <textarea class="form-textarea" x-model="createDesc" placeholder="Kurze Beschreibung..." maxlength="500"></textarea>
             </div>
-            <button class="btn btn-primary" :disabled="creating" @click="create()">
+            <button class="btn-game btn-game-blue" :disabled="creating" @click="create()">
                 <span x-text="creating ? 'Wird erstellt...' : 'Allianz gründen'"></span>
             </button>
         </div>
@@ -619,7 +620,7 @@ $csrf = $session['csrf_token'];
 
             <!-- Leave button -->
             <div style="margin-top:14px;text-align:right">
-                <button class="btn btn-danger btn-sm" @click="confirmLeave = true">
+                <button class="btn-game btn-game-red btn-game-sm" @click="confirmLeave = true">
                     Allianz verlassen
                 </button>
             </div>
@@ -692,7 +693,7 @@ $csrf = $session['csrf_token'];
                     maxlength="200"
                     @keydown.enter.prevent="sendMsg()"
                 >
-                <button class="btn btn-primary btn-sm" :disabled="sending || chatInput.trim() === ''" @click="sendMsg()">
+                <button class="btn-game btn-game-blue btn-game-sm" :disabled="sending || chatInput.trim() === ''" @click="sendMsg()">
                     Senden
                 </button>
             </div>
@@ -715,10 +716,10 @@ $csrf = $session['csrf_token'];
                 <?php endif ?>
             </p>
             <div class="confirm-btns">
-                <button class="btn btn-danger" :disabled="leaving" @click="leave()">
+                <button class="btn-game btn-game-red" :disabled="leaving" @click="leave()">
                     <span x-text="leaving ? 'Verlasse...' : 'Ja, verlassen'"></span>
                 </button>
-                <button class="btn btn-primary" @click="confirmLeave = false">Abbrechen</button>
+                <button class="btn-game btn-game-blue" @click="confirmLeave = false">Abbrechen</button>
             </div>
         </div>
     </div>

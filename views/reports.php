@@ -59,6 +59,7 @@ $outcomeLabel = [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conquer — Kampfberichte</title>
+    <link rel="stylesheet" href="/assets/css/main.css">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -132,16 +133,21 @@ $outcomeLabel = [
         .btn-detail {
             padding: 0.2rem 0.65rem;
             border-radius: 5px;
-            font-size: 0.75rem;
-            background: linear-gradient(180deg, #1a2744 0%, #0f1729 100%);
-            border: 1px solid var(--border);
-            color: var(--muted2);
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: linear-gradient(180deg, #c8870a 0%, #9a6508 100%);
+            border: none;
+            border-bottom: 2px solid #6b4306;
+            color: #fff8e0;
             text-decoration: none;
             cursor: pointer;
-            transition: border-color 0.15s, color 0.15s;
+            transition: filter 0.15s;
             display: inline-block;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
         }
-        .btn-detail:hover { border-color: var(--border-h); color: var(--gold-l); }
+        .btn-detail:hover { filter: brightness(1.15); color: #fff8e0; }
 
         .pagination {
             display: flex;
@@ -156,12 +162,19 @@ $outcomeLabel = [
             border: 1px solid var(--border);
             color: var(--muted2);
             font-size: 0.78rem;
+            font-weight: 600;
             text-decoration: none;
-            transition: border-color 0.15s, color 0.15s;
+            transition: border-color 0.15s, color 0.15s, background 0.15s;
             display: inline-block;
         }
-        .page-btn.active { border-color: var(--gold); color: var(--gold-l); font-weight: 700; }
-        .page-btn:hover  { border-color: var(--border-h); color: var(--gold-l); }
+        .page-btn.active {
+            background: linear-gradient(180deg, #c8870a 0%, #9a6508 100%);
+            border-color: #6b4306;
+            color: #fff8e0;
+            font-weight: 700;
+            border-bottom-width: 2px;
+        }
+        .page-btn:hover:not(.active) { border-color: var(--border-h); color: var(--gold-l); }
 
         .empty { padding: 3rem; text-align: center; color: var(--muted); font-size: 0.9rem; }
     </style>
@@ -170,15 +183,18 @@ $outcomeLabel = [
 <?php $hudCurrentView = 'reports'; require __DIR__ . '/partials/hud.php'; ?>
 <div id="game">
 
-    <header style="flex:0 0 40px;background:linear-gradient(180deg,#1a2744 0%,#0f1729 100%);border-bottom:1px solid var(--border);padding:0 1.25rem;display:flex;align-items:center;gap:0.75rem;box-shadow:0 2px 8px rgba(0,0,0,0.4)">
-        <span style="font-size:0.95rem;font-weight:700;color:var(--gold)">&#x1F4DC; Kampfberichte</span>
-        <span style="color:var(--muted);font-size:0.8rem"><?= $total ?> Berichte gesamt</span>
+    <header style="flex:0 0 44px;background:linear-gradient(180deg,#1a2744 0%,#0f1729 100%);border-bottom:2px solid rgba(212,160,23,0.4);padding:0 1.25rem;display:flex;align-items:center;gap:0.75rem;box-shadow:0 2px 12px rgba(0,0,0,0.5)">
+        <span style="font-size:0.95rem;font-weight:800;color:var(--gold-l);text-transform:uppercase;letter-spacing:0.05em">&#x1F4DC; Kampfberichte</span>
+        <span style="color:var(--muted);font-size:0.78rem;font-weight:600"><?= $total ?> Berichte</span>
     </header>
 
     <div class="content">
         <?php if (empty($reports)): ?>
-            <div class="empty">Noch keine Kampfberichte vorhanden.</div>
+            <div class="empty" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--muted);padding:3rem;text-align:center">
+                Noch keine Kampfberichte vorhanden.
+            </div>
         <?php else: ?>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
         <table>
             <thead>
                 <tr>
@@ -195,10 +211,10 @@ $outcomeLabel = [
                     $lbl = $r['monster_name'] ?? ('Tile ' . $r['target_x'] . ',' . $r['target_y']);
                 ?>
                 <tr class="<?= $r['attacker_read'] ? '' : 'unread' ?>">
-                    <td style="color:var(--muted)"><?= htmlspecialchars($r['created_at']) ?> UTC</td>
-                    <td>⚔ <?= htmlspecialchars($lbl) ?> (<?= (int)$r['target_x'] ?>,<?= (int)$r['target_y'] ?>)</td>
+                    <td style="color:var(--muted);font-family:monospace;font-size:0.78rem"><?= htmlspecialchars($r['created_at']) ?> UTC</td>
+                    <td style="font-weight:600">⚔ <?= htmlspecialchars($lbl) ?> <span style="color:var(--muted);font-size:0.78rem">(<?= (int)$r['target_x'] ?>,<?= (int)$r['target_y'] ?>)</span></td>
                     <td>
-                        <span class="outcome-badge" style="color:<?= $oc['color'] ?>">
+                        <span class="outcome-badge" style="color:<?= $oc['color'] ?>;border-color:<?= $oc['color'] ?>33">
                             <?= $oc['label'] ?>
                         </span>
                     </td>
@@ -209,6 +225,7 @@ $outcomeLabel = [
             <?php endforeach ?>
             </tbody>
         </table>
+        </div>
 
         <?php if ($pages > 1): ?>
         <div class="pagination">

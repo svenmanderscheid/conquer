@@ -436,6 +436,7 @@ $isEmbed = isset($_GET['embed']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conquer — Forschung</title>
+    <link rel="stylesheet" href="/assets/css/main.css">
     <?php if ($isEmbed): ?>
     <style>
         html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #0f172a; color: #e2e8f0; font-family: system-ui, -apple-system, sans-serif; }
@@ -487,20 +488,22 @@ $isEmbed = isset($_GET['embed']);
         .qb-name { color: #fbbf24; font-weight: 800; letter-spacing: 0.02em; }
         .qb-eta  { color: #64748b; margin-left: auto; font-family: monospace; }
         .btn-instant-banner {
-            padding: 0.25rem 0.75rem;
+            padding: 0.28rem 0.9rem;
             border-radius: 5px;
-            border: 1px solid rgba(139,92,246,0.5);
-            background: rgba(139,92,246,0.12);
-            color: #c4b5fd;
+            border: none;
+            border-bottom: 2px solid #4c1d95;
+            background: linear-gradient(180deg, #7c3aed 0%, #6d28d9 100%);
+            color: #fff;
             font-size: 0.72rem;
             font-weight: 800;
             cursor: pointer;
-            transition: background 0.15s;
+            transition: filter 0.15s;
             font-family: inherit;
             text-transform: uppercase;
             letter-spacing: 0.04em;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
         }
-        .btn-instant-banner:hover { background: rgba(139,92,246,0.28); }
+        .btn-instant-banner:hover { filter: brightness(1.15); }
 
         /* ── Tab bar ── */
         .tab-bar {

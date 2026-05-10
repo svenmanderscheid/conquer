@@ -73,6 +73,7 @@ foreach ($troopQueue as $tq) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Conquer — <?= htmlspecialchars($city['name']) ?></title>
+    <link rel="stylesheet" href="/assets/css/main.css">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -498,7 +499,7 @@ foreach ($troopQueue as $tq) {
     <div style="background:linear-gradient(180deg,rgba(15,23,42,0.97),rgba(8,12,24,0.97));border:1px solid rgba(239,68,68,0.35);border-radius:10px;padding:10px 12px;backdrop-filter:blur(8px);box-shadow:0 2px 12px rgba(0,0,0,0.7)">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
             <div style="font-size:0.68rem;font-weight:800;color:#f87171;text-transform:uppercase;letter-spacing:0.06em">🏥 Hospital</div>
-            <button style="font-size:0.62rem;padding:2px 7px;border-radius:4px;background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.4);color:#f87171;cursor:pointer;font-weight:700"
+            <button style="font-size:0.62rem;padding:3px 9px;border-radius:5px;background:linear-gradient(180deg,#dc2626,#b91c1c);border:none;border-bottom:2px solid #991b1b;color:#fff;cursor:pointer;font-weight:800;letter-spacing:0.04em;text-transform:uppercase;box-shadow:0 2px 6px rgba(0,0,0,0.4)"
                     @click="instantHeal()">
                 Sofort (50💎)
             </button>

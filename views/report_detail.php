@@ -104,6 +104,7 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conquer — Kampfbericht #<?= $reportId ?></title>
+    <link rel="stylesheet" href="/assets/css/main.css">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -155,16 +156,23 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
             box-shadow: 0 2px 8px rgba(0,0,0,0.4);
         }
         .topbar-back {
-            padding: 0.25rem 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 0.28rem 0.8rem;
             border-radius: 5px;
-            background: rgba(0,0,0,0.3);
+            font-size: 0.73rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            background: linear-gradient(180deg, #1a2744 0%, #0f1729 100%);
             border: 1px solid var(--border);
-            color: var(--muted);
+            border-bottom: 2px solid rgba(184,134,11,0.2);
+            color: var(--muted2, #94a3b8);
             text-decoration: none;
-            font-size: 0.78rem;
-            transition: border-color 0.15s, color 0.15s;
+            transition: filter 0.15s, color 0.15s;
         }
-        .topbar-back:hover { border-color: var(--border2); color: var(--gold2); }
+        .topbar-back:hover { filter: brightness(1.15); color: var(--gold2); }
         .topbar-id { font-size: 0.82rem; color: var(--gold2); font-weight: 700; letter-spacing: 0.04em; }
         .topbar-date { font-size: 0.75rem; color: var(--muted); margin-left: auto; }
 
@@ -454,6 +462,7 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
             font-size: 1rem;
             font-weight: 800;
             font-variant-numeric: tabular-nums;
+            color: var(--text);
         }
 
         /* ── Player profile ── */
@@ -485,19 +494,20 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
         .troop-table th {
             text-align: left;
             padding: 0.5rem 1.25rem;
-            color: var(--muted);
+            color: var(--gold2);
             font-size: 0.62rem;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.08em;
             border-bottom: 1px solid var(--border);
-            background: var(--surface2);
+            background: linear-gradient(180deg, #1a2744 0%, #0f1729 100%);
         }
         .troop-table td {
             padding: 0.55rem 1.25rem;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
+            border-bottom: 1px solid rgba(184,134,11,0.1);
         }
         .troop-table tr:last-child td { border-bottom: none; }
+        .troop-table tr:hover td { background: rgba(212,160,23,0.03); }
         .troop-table tfoot td {
             border-top: 1px solid var(--border);
             padding-top: 0.6rem;
@@ -509,9 +519,9 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
             border-radius: 3px;
             font-size: 0.62rem;
             font-weight: 800;
-            background: rgba(37,99,168,0.3);
+            background: rgba(184,134,11,0.2);
             color: var(--gold2);
-            border: 1px solid rgba(37,99,168,0.5);
+            border: 1px solid rgba(212,160,23,0.4);
         }
         .val-green { color: var(--green); font-weight: 700; }
         .val-red   { color: var(--red2);  font-weight: 700; }
