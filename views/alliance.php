@@ -53,8 +53,8 @@ $csrf = $session['csrf_token'];
             width: 100%;
             max-width: 960px;
             margin: 0 auto;
-            margin-top: 90px;
-            margin-bottom: 32px;
+            margin-top: 70px;
+            margin-bottom: 90px;
             padding: 0 12px;
         }
 
@@ -436,7 +436,7 @@ $csrf = $session['csrf_token'];
     </style>
 </head>
 <body>
-<?php require __DIR__ . '/partials/nav.php'; ?>
+<?php $hudCurrentView = 'alliance'; require __DIR__ . '/partials/hud.php'; ?>
 
 <div class="page-wrap">
 

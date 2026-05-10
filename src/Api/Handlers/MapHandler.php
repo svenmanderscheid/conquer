@@ -57,7 +57,7 @@ final class MapHandler
     /**
      * GET /api/map/tiles?x_min=&y_min=&x_max=&y_max=
      *
-     * Returns all dynamic entities (cities, monsters, resource nodes) in the
+     * Returns all dynamic entities (cities, monsters, resource nodes, rallies) in the
      * requested tile region. Viewport is clamped to 100×100 tiles to prevent
      * abuse. Terrain is generated client-side from the world seed.
      */
@@ -79,11 +79,17 @@ final class MapHandler
         $db       = Connection::getInstance();
         $entities = [];
 
-        // Player cities (2×2 footprint — anchor tile represents the city)
+        // Player cities — includes alliance tag + active emoji
         $rows = $db->query('
-            SELECT c.coord_x, c.coord_y, c.name, c.castle_level, p.username
+            SELECT c.coord_x, c.coord_y, c.name, c.castle_level,
+                   p.id AS player_id, p.username,
+                   am.alliance_id, a.tag AS alliance_tag,
+                   CASE WHEN pe.expires_at > UTC_TIMESTAMP() THEN pe.emoji_code ELSE NULL END AS emoji_code
             FROM cities c
             JOIN players p ON c.player_id = p.id
+            LEFT JOIN alliance_members am ON am.player_id = p.id
+            LEFT JOIN alliances a ON a.id = am.alliance_id
+            LEFT JOIN player_emojis pe ON pe.player_id = p.id
             WHERE c.world_id = 1
               AND c.coord_x BETWEEN :x1 AND :x2
               AND c.coord_y BETWEEN :y1 AND :y2
@@ -92,12 +98,16 @@ final class MapHandler
 
         foreach ($rows as $row) {
             $entities[] = [
-                'type'   => 'city',
-                'x'      => (int) $row['coord_x'],
-                'y'      => (int) $row['coord_y'],
-                'name'   => $row['name'],
-                'level'  => (int) $row['castle_level'],
-                'player' => $row['username'],
+                'type'         => 'city',
+                'x'            => (int) $row['coord_x'],
+                'y'            => (int) $row['coord_y'],
+                'name'         => $row['name'],
+                'level'        => (int) $row['castle_level'],
+                'player'       => $row['username'],
+                'player_id'    => (int) $row['player_id'],
+                'alliance_id'  => $row['alliance_id'] ? (int) $row['alliance_id'] : null,
+                'alliance_tag' => $row['alliance_tag'],
+                'emoji_code'   => $row['emoji_code'],
             ];
         }
 
@@ -187,6 +197,36 @@ final class MapHandler
             // map_charms table not yet migrated — skip charms silently
         }
 
+        // Active rallies — visible to all as a map entity (table may not exist yet)
+        try {
+            $rows = $db->query('
+                SELECT r.id, r.target_x, r.target_y, r.leader_player_id, r.launch_at,
+                       p.username AS leader_name,
+                       (SELECT COUNT(*) FROM rally_participants rp WHERE rp.rally_id = r.id) AS participant_count
+                FROM rallies r
+                JOIN players p ON p.id = r.leader_player_id
+                WHERE r.world_id = 1 AND r.status = "gathering"
+                  AND r.launch_at > UTC_TIMESTAMP()
+                  AND r.target_x BETWEEN :x1 AND :x2
+                  AND r.target_y BETWEEN :y1 AND :y2
+            ', [':x1' => $xMin, ':x2' => $xMax, ':y1' => $yMin, ':y2' => $yMax])->fetchAll();
+
+            foreach ($rows as $row) {
+                $entities[] = [
+                    'type'              => 'rally',
+                    'x'                 => (int) $row['target_x'],
+                    'y'                 => (int) $row['target_y'],
+                    'rally_id'          => (int) $row['id'],
+                    'leader_player_id'  => (int) $row['leader_player_id'],
+                    'leader_name'       => $row['leader_name'],
+                    'launch_at'         => $row['launch_at'],
+                    'participant_count' => (int) $row['participant_count'],
+                ];
+            }
+        } catch (\PDOException) {
+            // rallies table not yet migrated — skip silently
+        }
+
         Response::ok([
             'entities' => $entities,
             'viewport' => ['x_min' => $xMin, 'y_min' => $yMin, 'x_max' => $xMax, 'y_max' => $yMax],
@@ -213,19 +253,32 @@ final class MapHandler
         $occ = null;
 
         $city = $db->query('
-            SELECT c.name, c.castle_level, c.power, p.username
+            SELECT c.name, c.castle_level, c.power,
+                   p.id AS player_id, p.username, p.lord_level, p.kill_count,
+                   am.alliance_id, a.tag AS alliance_tag, a.name AS alliance_name,
+                   CASE WHEN pe.expires_at > UTC_TIMESTAMP() THEN pe.emoji_code ELSE NULL END AS emoji_code
             FROM cities c
             JOIN players p ON c.player_id = p.id
+            LEFT JOIN alliance_members am ON am.player_id = p.id
+            LEFT JOIN alliances a ON a.id = am.alliance_id
+            LEFT JOIN player_emojis pe ON pe.player_id = p.id
             WHERE c.world_id = 1 AND c.coord_x = ? AND c.coord_y = ? AND c.is_hidden = 0
         ', [$x, $y])->fetch();
 
         if ($city !== false) {
             $occ = [
-                'type'   => 'city',
-                'name'   => $city['name'],
-                'player' => $city['username'],
-                'level'  => (int) $city['castle_level'],
-                'power'  => (int) $city['power'],
+                'type'          => 'city',
+                'name'          => $city['name'],
+                'player'        => $city['username'],
+                'player_id'     => (int) $city['player_id'],
+                'level'         => (int) $city['castle_level'],
+                'power'         => (int) $city['power'],
+                'lord_level'    => (int) $city['lord_level'],
+                'kill_count'    => (int) $city['kill_count'],
+                'alliance_id'   => $city['alliance_id'] ? (int) $city['alliance_id'] : null,
+                'alliance_tag'  => $city['alliance_tag'],
+                'alliance_name' => $city['alliance_name'],
+                'emoji_code'    => $city['emoji_code'],
             ];
         }
 

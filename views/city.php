@@ -31,10 +31,39 @@ $buildingsForCanvas = [];
 foreach ($buildings as $code => $building) {
     $queued = $inQueue[$code] ?? null;
     $buildingsForCanvas[$code] = [
-        'level'   => (int) $building['level'],
-        'inQueue' => $queued !== null,
-        'levelTo' => $queued ? (int) $queued['level_to'] : null,
+        'level'      => (int) $building['level'],
+        'inQueue'    => $queued !== null,
+        'levelTo'    => $queued ? (int) $queued['level_to'] : null,
         'finishesAt' => $queued ? strtotime($queued['finishes_at']) : null,
+    ];
+}
+
+// Research queue
+$researchQueue = [];
+try {
+    $rq = \Conquer\Db\Connection::getInstance()->query(
+        'SELECT research_code, level_to, finishes_at FROM research_queue
+         WHERE player_id = ? AND is_processed = 0 AND finishes_at > UTC_TIMESTAMP()
+         ORDER BY finishes_at ASC LIMIT 1',
+        [(int)$session['player_id']]
+    )->fetch();
+    if ($rq) {
+        $researchQueue = [
+            'code'       => $rq['research_code'],
+            'levelTo'    => (int)$rq['level_to'],
+            'finishesAt' => strtotime($rq['finishes_at']),
+        ];
+    }
+} catch (\Throwable) {}
+
+// Troop queue
+$troopQueueForJs = [];
+$troopQueue = $state['troop_queue'] ?? [];
+foreach ($troopQueue as $tq) {
+    $troopQueueForJs[] = [
+        'code'       => $tq['troop_code'],
+        'count'      => (int)$tq['count'],
+        'finishesAt' => strtotime($tq['finishes_at']),
     ];
 }
 ?>
@@ -72,8 +101,9 @@ foreach ($buildings as $code => $building) {
         #game {
             width: 100%;
             max-width: 1280px;
-            height: calc(100% - 72px);
-            margin-top: 72px;
+            height: calc(100% - 52px);
+            margin-top: 52px;
+            padding-bottom: 70px;
             display: flex;
             flex-direction: column;
             background: var(--bg);
@@ -140,6 +170,7 @@ foreach ($buildings as $code => $building) {
             flex: 1;
             overflow: auto;
             background: var(--bg);
+            position: relative;
         }
 
         #city-canvas {
@@ -163,13 +194,22 @@ foreach ($buildings as $code => $building) {
             white-space: nowrap;
         }
 
-        /* ── Building Popup ── */
+        /* ── Building Popup (three-part: above / spacer / below) ── */
         #building-popup {
             position: fixed;
             display: none;
             z-index: 200;
             text-align: center;
+            pointer-events: none; /* children re-enable where needed */
+        }
+
+        /* Name + level banner — floats ABOVE the building */
+        #bp-above {
             pointer-events: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
         }
         #bp-header {
             display: inline-flex;
@@ -179,7 +219,6 @@ foreach ($buildings as $code => $building) {
             border: 1px solid #f59e0b;
             border-radius: 20px;
             padding: 5px 16px;
-            margin-bottom: 8px;
             box-shadow: 0 2px 12px rgba(0,0,0,0.6);
         }
         #bp-name {
@@ -197,18 +236,16 @@ foreach ($buildings as $code => $building) {
             padding: 1px 7px;
             white-space: nowrap;
         }
-        #bp-timer {
-            display: none;
-            background: rgba(15,23,42,0.92);
-            border: 1px solid #22c55e;
-            border-radius: 20px;
-            padding: 4px 16px;
-            font-size: 0.82rem;
-            color: #22c55e;
-            font-family: monospace;
-            font-variant-numeric: tabular-nums;
-            margin-bottom: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+
+        /* Transparent spacer — height set by JS to match building height */
+        #bp-spacer {
+            width: 1px;
+            height: 96px; /* default, overridden by JS */
+        }
+
+        /* Buttons row — appears BELOW the building */
+        #bp-below {
+            pointer-events: auto;
         }
         #bp-actions {
             display: flex;
@@ -216,6 +253,7 @@ foreach ($buildings as $code => $building) {
             justify-content: center;
             align-items: center;
         }
+
         /* Hex button — all same size, center distinguished by color */
         .hex-wrap {
             display: flex;
@@ -256,16 +294,150 @@ foreach ($buildings as $code => $building) {
             white-space: nowrap;
         }
 
+        /* ── Activity badges over buildings (DOM overlay) ── */
+        #city-badges {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .city-badge {
+            position: absolute;
+            transform: translate(-50%, -100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            pointer-events: none;
+        }
+
+        .city-badge-inner {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(10,18,35,0.88);
+            border: 1px solid rgba(34,197,94,0.6);
+            border-radius: 12px;
+            padding: 3px 8px 3px 6px;
+            box-shadow: 0 0 8px rgba(34,197,94,0.3), 0 2px 6px rgba(0,0,0,0.6);
+            animation: badge-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes badge-pulse {
+            0%, 100% { box-shadow: 0 0 6px rgba(34,197,94,0.2), 0 2px 6px rgba(0,0,0,0.6); }
+            50%       { box-shadow: 0 0 14px rgba(34,197,94,0.55), 0 2px 8px rgba(0,0,0,0.7); }
+        }
+
+        .city-badge-icon {
+            font-size: 0.75rem;
+            line-height: 1;
+        }
+
+        .city-badge-timer {
+            font-size: 0.68rem;
+            font-family: monospace;
+            font-variant-numeric: tabular-nums;
+            color: #86efac;
+            white-space: nowrap;
+            letter-spacing: 0.02em;
+        }
+
+        /* Research badge uses purple tint */
+        .city-badge.badge-research .city-badge-inner {
+            border-color: rgba(167,139,250,0.6);
+            box-shadow: 0 0 8px rgba(167,139,250,0.3), 0 2px 6px rgba(0,0,0,0.6);
+            animation: badge-pulse-purple 2s ease-in-out infinite;
+        }
+        .city-badge.badge-research .city-badge-timer { color: #c4b5fd; }
+
+        @keyframes badge-pulse-purple {
+            0%, 100% { box-shadow: 0 0 6px rgba(167,139,250,0.2), 0 2px 6px rgba(0,0,0,0.6); }
+            50%       { box-shadow: 0 0 14px rgba(167,139,250,0.55), 0 2px 8px rgba(0,0,0,0.7); }
+        }
+
+        /* ── Left side activity panel ── */
+        #city-activity-panel {
+            position: fixed;
+            left: 12px;
+            bottom: 80px;
+            z-index: 150;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            pointer-events: none;
+        }
+
+        .cap-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(15,23,42,0.88);
+            border: 1px solid rgba(51,65,85,0.8);
+            border-radius: 10px;
+            padding: 5px 10px 5px 6px;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+            min-width: 170px;
+        }
+
+        .cap-icon-wrap {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .cap-icon-wrap.cap-build    { background: rgba(245,158,11,0.2); border: 1px solid rgba(245,158,11,0.4); }
+        .cap-icon-wrap.cap-research { background: rgba(167,139,250,0.2); border: 1px solid rgba(167,139,250,0.4); }
+        .cap-icon-wrap.cap-troop    { background: rgba(34,197,94,0.2); border: 1px solid rgba(34,197,94,0.4); }
+
+        .cap-text {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            overflow: hidden;
+        }
+
+        .cap-name {
+            font-size: 0.68rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .cap-timer {
+            font-size: 0.66rem;
+            font-family: monospace;
+            font-variant-numeric: tabular-nums;
+            color: #64748b;
+            white-space: nowrap;
+        }
+
+        .cap-timer.cap-timer-build    { color: #fbbf24; }
+        .cap-timer.cap-timer-research { color: #a78bfa; }
+        .cap-timer.cap-timer-troop    { color: #4ade80; }
+
         /* ── Building modal overlay ── */
         #bldg-overlay {
             position: fixed;
             inset: 0;
             background: rgba(0,0,0,.72);
             z-index: 4000;
-            align-items: flex-start;
+            align-items: center;
             justify-content: center;
             overflow-y: auto;
-            padding: 20px 8px;
+            padding: 60px 8px 20px;
         }
         #bldg-wrap {
             width: 100%;
@@ -274,49 +446,33 @@ foreach ($buildings as $code => $building) {
     </style>
 </head>
 <body>
-<?php require __DIR__ . '/partials/nav.php'; ?>
+<?php $hudCurrentView = 'city'; require __DIR__ . '/partials/hud.php'; ?>
 <div id="game">
-
-<header class="topbar">
-    <a href="/city" class="topbar-title">⚔ <?= htmlspecialchars($city['name']) ?></a>
-
-    <div class="resources">
-        <div class="res">🌾 <?= $fmt($city['food']) ?></div>
-        <div class="res">🪵 <?= $fmt($city['lumber']) ?></div>
-        <div class="res">🪨 <?= $fmt($city['stone']) ?></div>
-        <div class="res">💰 <?= $fmt($city['gold']) ?></div>
-    </div>
-
-    <?php if (($state['vip']['level'] ?? 0) > 0): ?>
-    <div class="res" style="border-color:#f59e0b;color:#f59e0b;flex-shrink:0" title="VIP <?= (int)$state['vip']['level'] ?> — <?= (int)$state['vip']['points'] ?> pts">
-        ⭐ VIP <?= (int)$state['vip']['level'] ?>
-    </div>
-    <?php endif ?>
-
-    <div class="topbar-actions">
-        <a href="/map" class="btn">🗺 Map</a>
-        <span style="font-size:.78rem;color:var(--muted)"><?= htmlspecialchars($session['username']) ?></span>
-        <form method="post" action="/auth/logout" style="display:inline">
-            <button type="submit" class="btn">Logout</button>
-        </form>
-    </div>
-</header>
 
 <div id="city-wrap">
     <canvas id="city-canvas"></canvas>
+    <!-- Activity badges overlay (positioned over canvas) -->
+    <div id="city-badges"></div>
 </div>
 
 <div id="city-tooltip"></div>
 
-<!-- Building action popup -->
+<!-- Building action popup (three-part layout) -->
 <div id="building-popup">
-    <div id="bp-header">
-        <span id="bp-name">—</span>
-        <span id="bp-badge">Lv 1</span>
+    <div id="bp-above">
+        <div id="bp-header">
+            <span id="bp-name">—</span>
+            <span id="bp-badge">Lv 1</span>
+        </div>
     </div>
-    <div id="bp-timer">00:00:00</div>
-    <div id="bp-actions"></div>
+    <div id="bp-spacer"></div>
+    <div id="bp-below">
+        <div id="bp-actions"></div>
+    </div>
 </div>
+
+<!-- Left side activity panel -->
+<div id="city-activity-panel"></div>
 
 </div><!-- #game -->
 
@@ -377,6 +533,10 @@ const GRASS_TILES = [0, 1, 2];
 // Building data from PHP (levels, queue status)
 const BUILDINGS_DATA = <?= json_encode($buildingsForCanvas) ?>;
 
+// Queue data from PHP
+const RESEARCH_QUEUE = <?= json_encode($researchQueue) ?>;
+const TROOP_QUEUE    = <?= json_encode($troopQueueForJs) ?>;
+
 // ---------------------------------------------------------------------------
 // Canvas setup
 // ---------------------------------------------------------------------------
@@ -391,7 +551,10 @@ function resizeCanvas() {
     canvas.height = Math.max(CANVAS_H, wrap.clientHeight);
 }
 resizeCanvas();
-window.addEventListener('resize', () => { resizeCanvas(); });
+window.addEventListener('resize', () => {
+    resizeCanvas();
+    renderBadges();
+});
 
 // ---------------------------------------------------------------------------
 // Atlas load (grass background only)
@@ -433,20 +596,36 @@ const BUILDING_NAMES = {
 
 // Buildings with a dedicated "function" button (3rd icon).
 const BUILDING_FUNCS = {
-    academy:          { icon: '🔬', label: 'Research', url: '/research' },
-    barrack:          { icon: '⚔️',  label: 'Training', url: '/city/building/barrack' },
-    hospital:         { icon: '💊', label: 'Heal',     url: '/city/building/hospital' },
-    trading_post:     { icon: '📦', label: 'Trade',    url: '/city/building/trading_post' },
-    hall_of_alliance: { icon: '🤝', label: 'Alliance', url: '/city/building/hall_of_alliance' },
+    academy:          { icon: '🔬', label: 'Research', tab: 'forschung' },
+    barrack:          { icon: '⚔️',  label: 'Training', tab: 'truppen' },
+    hospital:         { icon: '💊', label: 'Heal',     tab: 'heilen' },
+    trading_post:     { icon: '📦', label: 'Trade',    tab: 'caravan' },
+    hall_of_alliance: { icon: '🤝', label: 'Alliance', tab: 'allianz' },
 };
+
+// ---------------------------------------------------------------------------
+// Shared countdown formatter
+// ---------------------------------------------------------------------------
+function fmtCountdown(ms) {
+    if (ms <= 0) return '00:00:00';
+    const totalSec = Math.floor(ms / 1000);
+    const d = Math.floor(totalSec / 86400);
+    const h = Math.floor((totalSec % 86400) / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    const s = totalSec % 60;
+    const hms = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    return d > 0 ? `${d}d ${hms}` : hms;
+}
 
 // ---------------------------------------------------------------------------
 // Popup helpers
 // ---------------------------------------------------------------------------
 const popup     = document.getElementById('building-popup');
+const bpAbove   = document.getElementById('bp-above');
+const bpSpacer  = document.getElementById('bp-spacer');
+const bpBelow   = document.getElementById('bp-below');
 const bpName    = document.getElementById('bp-name');
 const bpBadge   = document.getElementById('bp-badge');
-const bpTimer   = document.getElementById('bp-timer');
 const bpActions = document.getElementById('bp-actions');
 
 let popupTimer = null;
@@ -470,25 +649,11 @@ function openPopup(building) {
     const name    = BUILDING_NAMES[building.code] ?? building.code.replace(/_/g, ' ');
     const func    = BUILDING_FUNCS[building.code] ?? null;
 
-    bpName.textContent  = name;
+    bpName.textContent  = name.toUpperCase();
     bpBadge.textContent = inQueue ? `Lv ${level} → ${data.levelTo}` : `Lv ${level}`;
 
-    // Timer
+    // Clear any old popup timer (timer is now in the activity panel, not popup)
     clearInterval(popupTimer);
-    if (inQueue && data.finishesAt) {
-        bpTimer.style.display = 'block';
-        const tick = () => {
-            const left = Math.max(0, data.finishesAt * 1000 - Date.now());
-            const h = Math.floor(left / 3600000);
-            const m = Math.floor((left % 3600000) / 60000);
-            const s = Math.floor((left % 60000) / 1000);
-            bpTimer.textContent = `⏳ ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-        };
-        tick();
-        popupTimer = setInterval(tick, 1000);
-    } else {
-        bpTimer.style.display = 'none';
-    }
 
     // Action buttons
     bpActions.innerHTML = '';
@@ -501,39 +666,50 @@ function openPopup(building) {
         true   // primary = larger center button
     ));
     if (func) {
-        btns.push(makeHexBtn(func.icon, func.label, () => { window.location.href = func.url; }));
+        if (func.tab) {
+            btns.push(makeHexBtn(func.icon, func.label, () => openBuildingModal(building.code, func.tab)));
+        } else {
+            btns.push(makeHexBtn(func.icon, func.label, () => { window.location.href = func.url; }));
+        }
     }
     btns.forEach(b => bpActions.appendChild(b));
 
     // Arc: center button drops down, side buttons stay at baseline
-    // Only meaningful with 3+ buttons
     if (btns.length >= 3) {
-        const arcDrop = 18; // px the center button drops below the sides
+        const arcDrop = 18;
         const mid = (btns.length - 1) / 2;
         btns.forEach((b, i) => {
             const dist   = i - mid;
-            const factor = 1 - (dist / mid) ** 2; // 1 at center, 0 at sides
+            const factor = 1 - (dist / mid) ** 2;
             b.style.transform = `translateY(${(factor * arcDrop).toFixed(1)}px)`;
         });
     }
 
-    // Position centered below the building sprite
+    // Position: top of popup = top of building (bTopY).
+    // #bp-above floats above, #bp-spacer covers the building, #bp-below holds buttons.
     popup.style.display = 'block';
+
     const rect   = canvas.getBoundingClientRect();
     const scaleX = rect.width  / canvas.width;
     const scaleY = rect.height / canvas.height;
 
-    const bCenterX = rect.left + (building.x + building.size / 2) * scaleX;
-    const bBottomY = rect.top  + (building.y + building.size)     * scaleY + 10;
+    const bCenterX   = rect.left + (building.x + building.size / 2) * scaleX;
+    const bTopY      = rect.top  + building.y * scaleY;
+    const buildingPx = building.size * scaleY;
 
+    // Set spacer height to match building height on screen
+    bpSpacer.style.height = Math.round(buildingPx) + 'px';
+
+    // Measure popup width after display
     const pw = popup.offsetWidth;
     let left = bCenterX - pw / 2;
-    let top  = bBottomY;
+    left = Math.max(8, Math.min(window.innerWidth - pw - 8, left));
 
-    left = Math.max(8, Math.min(window.innerWidth  - pw - 8, left));
-    top  = Math.min(window.innerHeight - popup.offsetHeight - 8, top);
-    if (top < 80) top = 80;
+    // Top anchor = building top; clamp so #bp-above doesn't go off-screen
+    let top = bTopY - bpAbove.offsetHeight - 4;
+    if (top < 56) top = 56; // below fixed topbar
 
+    // Recompute: popup top = where bp-above starts
     popup.style.left = left + 'px';
     popup.style.top  = top  + 'px';
 }
@@ -549,6 +725,188 @@ document.addEventListener('click', (e) => {
         closePopup();
     }
 });
+
+// ---------------------------------------------------------------------------
+// Activity badges — DOM overlay above the canvas
+// ---------------------------------------------------------------------------
+const badgesContainer = document.getElementById('city-badges');
+
+function renderBadges() {
+    // Collect all active queues to show badges for
+    const badgeItems = [];
+
+    // Building queues
+    for (const b of BUILDING_DEFS) {
+        const data = BUILDINGS_DATA[b.code];
+        if (data?.inQueue && data.finishesAt) {
+            badgeItems.push({
+                type:       'build',
+                code:       b.code,
+                icon:       '🔨',
+                finishesAt: data.finishesAt,
+                building:   b,
+            });
+        }
+    }
+
+    // Research queue — show on academy building
+    if (RESEARCH_QUEUE && RESEARCH_QUEUE.finishesAt) {
+        const academy = BUILDING_DEFS.find(b => b.code === 'academy');
+        if (academy) {
+            badgeItems.push({
+                type:       'research',
+                code:       'academy_research',
+                icon:       '🔬',
+                finishesAt: RESEARCH_QUEUE.finishesAt,
+                building:   academy,
+            });
+        }
+    }
+
+    // Troop queue — show on barracks building
+    if (TROOP_QUEUE && TROOP_QUEUE.length > 0) {
+        const barrack = BUILDING_DEFS.find(b => b.code === 'barrack');
+        if (barrack) {
+            // Use the nearest finish time
+            const nearest = TROOP_QUEUE.reduce((a, b) => a.finishesAt < b.finishesAt ? a : b);
+            badgeItems.push({
+                type:       'troop',
+                code:       'barrack_troop',
+                icon:       '⚔',
+                finishesAt: nearest.finishesAt,
+                building:   barrack,
+            });
+        }
+    }
+
+    // Clear and rebuild badge DOM
+    badgesContainer.innerHTML = '';
+
+    const rect   = canvas.getBoundingClientRect();
+    const scaleX = rect.width  / canvas.width;
+    const scaleY = rect.height / canvas.height;
+
+    for (const item of badgeItems) {
+        const b = item.building;
+
+        // Position: center-bottom of building in canvas-relative % coords
+        const centerX = (b.x + b.size / 2) * scaleX;
+        const bottomY = (b.y + b.size - 8) * scaleY; // slightly above bottom edge
+
+        const badge = document.createElement('div');
+        badge.className = 'city-badge' + (item.type === 'research' ? ' badge-research' : '');
+        badge.dataset.code = item.code;
+        badge.style.left = centerX + 'px';
+        badge.style.top  = bottomY + 'px';
+
+        const timerText = fmtCountdown(item.finishesAt * 1000 - Date.now());
+
+        badge.innerHTML =
+            `<div class="city-badge-inner">
+                <span class="city-badge-icon">${item.icon}</span>
+                <span class="city-badge-timer" data-finishes="${item.finishesAt}">${timerText}</span>
+             </div>`;
+
+        badgesContainer.appendChild(badge);
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Activity panel — left sidebar
+// ---------------------------------------------------------------------------
+const activityPanel = document.getElementById('city-activity-panel');
+
+const TROOP_NAMES = {};  // populated on demand — troop codes shown as-is for now
+
+function renderActivityPanel() {
+    const rows = [];
+
+    // Building queues
+    for (const b of BUILDING_DEFS) {
+        const data = BUILDINGS_DATA[b.code];
+        if (data?.inQueue && data.finishesAt) {
+            const name = BUILDING_NAMES[b.code] ?? b.code;
+            rows.push({
+                type:       'build',
+                icon:       '🔨',
+                name:       name + ' → Lv ' + data.levelTo,
+                finishesAt: data.finishesAt,
+            });
+        }
+    }
+
+    // Research queue
+    if (RESEARCH_QUEUE && RESEARCH_QUEUE.finishesAt) {
+        const resName = RESEARCH_QUEUE.code.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        rows.push({
+            type:       'research',
+            icon:       '🔬',
+            name:       resName + ' Lv ' + RESEARCH_QUEUE.levelTo,
+            finishesAt: RESEARCH_QUEUE.finishesAt,
+        });
+    }
+
+    // Troop queue (one row per batch)
+    if (TROOP_QUEUE && TROOP_QUEUE.length > 0) {
+        TROOP_QUEUE.forEach(tq => {
+            const troopName = tq.code.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+            rows.push({
+                type:       'troop',
+                icon:       '⚔',
+                name:       tq.count + '× ' + troopName,
+                finishesAt: tq.finishesAt,
+            });
+        });
+    }
+
+    // Rebuild DOM if row count changed; otherwise just update timers
+    const existing = activityPanel.querySelectorAll('.cap-row');
+    if (existing.length !== rows.length) {
+        activityPanel.innerHTML = '';
+        for (const row of rows) {
+            const div = document.createElement('div');
+            div.className = 'cap-row';
+            div.innerHTML =
+                `<div class="cap-icon-wrap cap-${row.type}">${row.icon}</div>
+                 <div class="cap-text">
+                     <span class="cap-name">${row.name}</span>
+                     <span class="cap-timer cap-timer-${row.type}" data-finishes="${row.finishesAt}">
+                         ${fmtCountdown(row.finishesAt * 1000 - Date.now())}
+                     </span>
+                 </div>`;
+            activityPanel.appendChild(div);
+        }
+    } else {
+        // Just update timer text
+        existing.forEach((row, i) => {
+            const timerEl = row.querySelector('.cap-timer');
+            if (timerEl && rows[i]) {
+                timerEl.textContent = fmtCountdown(rows[i].finishesAt * 1000 - Date.now());
+            }
+        });
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Live countdown tick (badges + panel, every second)
+// ---------------------------------------------------------------------------
+function tickCountdowns() {
+    // Update badge timers in-place
+    badgesContainer.querySelectorAll('.city-badge-timer').forEach(el => {
+        const finishesAt = parseInt(el.dataset.finishes, 10);
+        if (finishesAt) {
+            el.textContent = fmtCountdown(finishesAt * 1000 - Date.now());
+        }
+    });
+
+    // Update panel timers in-place (or rebuild if structure changed)
+    renderActivityPanel();
+}
+
+// Initial render + start interval
+renderBadges();
+renderActivityPanel();
+setInterval(tickCountdowns, 1000);
 
 // ---------------------------------------------------------------------------
 // Interaction state
@@ -723,14 +1081,14 @@ setTimeout(() => window.location.reload(), 30_000);
 // ---------------------------------------------------------------------------
 // Building modal overlay
 // ---------------------------------------------------------------------------
-async function openBuildingModal(code) {
+async function openBuildingModal(code, tab = 'upgrade') {
     closePopup();
     const overlay = document.getElementById('bldg-overlay');
     const wrap    = document.getElementById('bldg-wrap');
     wrap.innerHTML = '<p style="color:#64748b;text-align:center;padding:60px 0;font-family:system-ui">Laden…</p>';
     overlay.style.display = 'flex';
 
-    const r    = await fetch(`/city/building/${code}?modal=1`);
+    const r    = await fetch(`/city/building/${code}?modal=1&tab=${encodeURIComponent(tab)}`);
     const html = await r.text();
 
     const parser = new DOMParser();
@@ -765,7 +1123,7 @@ function closeBldgModal(e) {
     document.getElementById('bldg-overlay').style.display = 'none';
     document.getElementById('bldg-wrap').innerHTML = '';
 }
-window.closeBldgModal   = closeBldgModal;
+window.closeBldgModal    = closeBldgModal;
 window.openBuildingModal = openBuildingModal;
 </script>
 

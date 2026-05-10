@@ -58,6 +58,10 @@ final class MarchTick
                     $targetX, $targetY, $monsterId, $intTroops);
             } elseif ($marchType === 6) {
                 self::resolveCharmCollect($db, $log, $marchId, $playerId, $cityId, $targetX, $targetY, (int)$march['target_id']);
+            } elseif ($marchType === 7) {
+                self::resolvePlayerAttack($db, $log, $marchId, $playerId, $cityId, $targetX, $targetY, (int)$march['target_id'], $intTroops);
+            } elseif ($marchType === 8) {
+                self::resolveScout($db, $log, $marchId, $playerId, $cityId, $targetX, $targetY, (int)$march['target_id']);
             } else {
                 // Unsupported type — return immediately
                 $db->execute(
@@ -85,8 +89,11 @@ final class MarchTick
         foreach ($returning as $march) {
             $marchId   = (int) $march['id'];
             $cityId    = (int) $march['origin_city_id'];
-            $survivors = json_decode((string) ($march['haul_json'] ?? '{}'), true)['survivors'] ?? [];
+            $haul      = json_decode((string) ($march['haul_json'] ?? '{}'), true) ?? [];
+            $survivors = $haul['survivors'] ?? [];
+            $loot      = $haul['loot']      ?? [];
 
+            // Return surviving troops to city
             foreach ($survivors as $code => $count) {
                 $count = (int) $count;
                 if ($count <= 0) continue;
@@ -95,6 +102,25 @@ final class MarchTick
                      VALUES (?, ?, ?)
                      ON DUPLICATE KEY UPDATE count = count + ?',
                     [$cityId, (int) $code, $count, $count],
+                );
+            }
+
+            // Add looted resources to origin city
+            if (!empty($loot)) {
+                $db->execute(
+                    'UPDATE cities
+                     SET food  = food  + :f,
+                         wood  = wood  + :w,
+                         stone = stone + :s,
+                         gold  = gold  + :g
+                     WHERE id = :id',
+                    [
+                        ':f'  => (int) ($loot['food']  ?? 0),
+                        ':w'  => (int) ($loot['wood']  ?? 0),
+                        ':s'  => (int) ($loot['stone'] ?? 0),
+                        ':g'  => (int) ($loot['gold']  ?? 0),
+                        ':id' => $cityId,
+                    ],
                 );
             }
 
@@ -137,7 +163,7 @@ final class MarchTick
             return;
         }
 
-        $monsterDef = self::loadMonsterDef((int) $monster['monster_code']);
+        $monsterDef  = self::loadMonsterDef((int) $monster['monster_code']);
         $monsterCode = (int) $monster['monster_code'];
         $result      = BattleEngine::resolveMonster($troops, $monster, $monsterDef);
 
@@ -190,6 +216,21 @@ final class MarchTick
                 ],
             );
         });
+
+        // Award Lord XP for monster kill
+        if ($result['monster_killed']) {
+            $level = (int) ($monsterDef['level'] ?? 1);
+            $xp    = $level * 10; // Level 1 = 10 XP, Level 2 = 20 XP, etc.
+
+            // Deathkar bosses award double XP
+            $name = strtolower($monsterDef['name'] ?? '');
+            if (str_contains($name, 'deathkar')) {
+                $xp = $level * 20;
+            }
+
+            \Conquer\Game\Player\LordLevel::addXp($playerId, $xp);
+            $db->execute('UPDATE players SET kill_count = kill_count + 1 WHERE id = ?', [$playerId]);
+        }
 
         $log->info(sprintf(
             '[MarchTick] March %d resolved — %s, monster %s',
@@ -304,6 +345,231 @@ final class MarchTick
             '[MarchTick] March %d — charm %d collected (%s %s +%.0f%%)',
             $marchId, $charmId, $grade, $category, $bonus,
         ));
+    }
+
+    private static function resolvePlayerAttack(
+        Connection $db,
+        Logger     $log,
+        int        $marchId,
+        int        $playerId,
+        int        $cityId,
+        int        $targetX,
+        int        $targetY,
+        int        $targetCityId,
+        array      $attackerTroops,
+    ): void {
+        // Optimistic lock
+        $db->execute("UPDATE marches SET state='resolving' WHERE id=? AND state='marching'", [$marchId]);
+
+        // Load defender troops
+        $defRows   = $db->query('SELECT troop_code, count FROM city_troops WHERE city_id = ?', [$targetCityId])->fetchAll();
+        $defTroops = [];
+        foreach ($defRows as $r) $defTroops[(int)$r['troop_code']] = (int)$r['count'];
+
+        // Load attacker + defender city stats
+        $atkCity = $db->query('SELECT power, player_id FROM cities WHERE id = ?', [$cityId])->fetch();
+        $defCity = $db->query('SELECT power, player_id FROM cities WHERE id = ?', [$targetCityId])->fetch();
+
+        $defPlayerId = (int)($defCity['player_id'] ?? 0);
+
+        // Simple battle: compare total power — slight defender advantage (must exceed 40%)
+        $atkPower   = (int)($atkCity['power'] ?? 1);
+        $defPower   = (int)($defCity['power'] ?? 1);
+        $totalPower = $atkPower + $defPower;
+
+        $attackerWins = $atkPower > ($totalPower * 0.4);
+        $outcome      = $attackerWins ? 'attacker_wins' : 'defender_wins';
+
+        // Calculate losses (loser loses 30%, winner loses 10%)
+        $attackerLosses = [];
+        $defenderLosses = [];
+
+        foreach ($attackerTroops as $code => $count) {
+            $lossRate               = $attackerWins ? 0.10 : 0.30;
+            $attackerLosses[$code]  = (int)ceil($count * $lossRate);
+        }
+        foreach ($defTroops as $code => $count) {
+            if ($count <= 0) continue;
+            $lossRate               = $attackerWins ? 0.30 : 0.10;
+            $defenderLosses[$code]  = (int)ceil($count * $lossRate);
+        }
+
+        // Loot: 20% of defender resources if attacker wins
+        $loot = [];
+        if ($attackerWins) {
+            $res = $db->query('SELECT food, wood, stone, gold FROM cities WHERE id = ?', [$targetCityId])->fetch();
+            if ($res !== false) {
+                $loot = [
+                    'food'  => (int)floor((float)$res['food']  * 0.20),
+                    'wood'  => (int)floor((float)$res['wood']  * 0.20),
+                    'stone' => (int)floor((float)$res['stone'] * 0.20),
+                    'gold'  => (int)floor((float)$res['gold']  * 0.20),
+                ];
+            }
+        }
+
+        $survivors = [];
+        foreach ($attackerTroops as $code => $count) {
+            $survivors[$code] = max(0, $count - ($attackerLosses[$code] ?? 0));
+        }
+
+        $db->transaction(function () use (
+            $db, $marchId, $playerId, $cityId, $defPlayerId, $targetCityId,
+            $targetX, $targetY, $attackerTroops, $defTroops, $defenderLosses,
+            $attackerLosses, $survivors, $loot, $outcome, $attackerWins,
+        ): void {
+            // Apply defender losses
+            foreach ($defenderLosses as $code => $loss) {
+                if ($loss <= 0) continue;
+                $db->execute(
+                    'UPDATE city_troops SET count = GREATEST(0, count - ?) WHERE city_id = ? AND troop_code = ?',
+                    [$loss, $targetCityId, $code],
+                );
+            }
+
+            // Transfer loot from defender city
+            if ($attackerWins && !empty($loot)) {
+                $db->execute(
+                    'UPDATE cities SET food=GREATEST(0,food-:f), wood=GREATEST(0,wood-:w), stone=GREATEST(0,stone-:s), gold=GREATEST(0,gold-:g) WHERE id=:id',
+                    [':f'=>$loot['food'],':w'=>$loot['wood'],':s'=>$loot['stone'],':g'=>$loot['gold'],':id'=>$targetCityId],
+                );
+            }
+
+            // Increment attacker kill count on victory
+            if ($attackerWins) {
+                $db->execute('UPDATE players SET kill_count = kill_count + 1 WHERE id = ?', [$playerId]);
+            }
+
+            // Battle report (attacker side)
+            $reportData = [
+                'attacker_troops'    => $attackerTroops,
+                'defender_troops'    => $defTroops,
+                'attacker_losses'    => $attackerLosses,
+                'defender_losses'    => $defenderLosses,
+                'attacker_survivors' => $survivors,
+                'loot'               => $loot,
+                'outcome'            => $outcome,
+            ];
+            $db->execute(
+                'INSERT INTO battle_reports
+                    (world_id, march_id, attacker_id, attacker_city_id,
+                     target_type, target_id, target_x, target_y,
+                     outcome, data_json, attacker_read, created_at)
+                 VALUES (1,:mid,:pid,:cid, 2,:tid,:tx,:ty, :out,:data, 0, UTC_TIMESTAMP())',
+                [':mid'=>$marchId,':pid'=>$playerId,':cid'=>$cityId,
+                 ':tid'=>$targetCityId,':tx'=>$targetX,':ty'=>$targetY,
+                 ':out'=>$outcome,':data'=>json_encode($reportData)],
+            );
+
+            // Battle report (defender side) — unread notification
+            if ($defPlayerId > 0) {
+                $db->execute(
+                    'INSERT INTO battle_reports
+                        (world_id, march_id, attacker_id, attacker_city_id,
+                         target_type, target_id, target_x, target_y,
+                         outcome, data_json, attacker_read, created_at)
+                     VALUES (1,:mid,:pid,:cid, 2,:tid,:tx,:ty, :out,:data, 0, UTC_TIMESTAMP())',
+                    [':mid'=>$marchId,':pid'=>$defPlayerId,':cid'=>$targetCityId,
+                     ':tid'=>$cityId,':tx'=>$targetX,':ty'=>$targetY,
+                     ':out'=>($outcome === 'attacker_wins' ? 'defender_loses' : 'attacker_loses'),
+                     ':data'=>json_encode($reportData)],
+                );
+            }
+
+            // Set march returning with survivors + loot in haul
+            $db->execute(
+                "UPDATE marches SET state='returning',
+                 return_time=DATE_ADD(UTC_TIMESTAMP(), INTERVAL TIMESTAMPDIFF(SECOND,departure_time,arrival_time) SECOND),
+                 haul_json=:haul WHERE id=:id",
+                [':haul'=>json_encode(['survivors'=>$survivors,'loot'=>$loot]), ':id'=>$marchId],
+            );
+        });
+
+        $log->info(sprintf('[MarchTick] Player attack march %d resolved — %s', $marchId, $outcome));
+    }
+
+    private static function resolveScout(
+        Connection $db,
+        Logger     $log,
+        int        $marchId,
+        int        $playerId,
+        int        $cityId,
+        int        $targetX,
+        int        $targetY,
+        int        $targetCityId,
+    ): void {
+        $db->execute("UPDATE marches SET state='resolving' WHERE id=? AND state='marching'", [$marchId]);
+
+        // Gather target city info
+        $targetCity = $db->query(
+            'SELECT c.food, c.wood, c.stone, c.gold, c.power, c.castle_level,
+                    p.username, p.lord_level, p.kill_count
+             FROM cities c JOIN players p ON p.id = c.player_id
+             WHERE c.id = ?',
+            [$targetCityId],
+        )->fetch();
+
+        $troops = [];
+        if ($targetCity !== false) {
+            $troopRows = $db->query(
+                'SELECT troop_code, count FROM city_troops WHERE city_id = ? AND count > 0',
+                [$targetCityId],
+            )->fetchAll();
+            foreach ($troopRows as $r) {
+                $troops[(int)$r['troop_code']] = (int)$r['count'];
+            }
+        }
+
+        // Placeholder wall stats — real wall system not yet implemented
+        $wallDurability = 27000;
+        $wallAtk        = 42.0;
+        $wallDef        = 42.0;
+
+        $scoutData = [
+            'type'         => 'scout',
+            'target_name'  => $targetCity['username']    ?? 'Unknown',
+            'target_power' => (int)($targetCity['power'] ?? 0),
+            'castle_level' => (int)($targetCity['castle_level'] ?? 1),
+            'lord_level'   => (int)($targetCity['lord_level']   ?? 0),
+            'wall'         => [
+                'durability'     => $wallDurability,
+                'durability_max' => $wallDurability,
+                'attack_buff'    => $wallAtk,
+                'defense_buff'   => $wallDef,
+            ],
+            'resources' => [
+                'food'  => (int)($targetCity['food']  ?? 0),
+                'wood'  => (int)($targetCity['wood']  ?? 0),
+                'stone' => (int)($targetCity['stone'] ?? 0),
+                'gold'  => (int)($targetCity['gold']  ?? 0),
+            ],
+            'troops'    => $troops,
+            'mastery'   => null,   // placeholder — not yet implemented
+            'treasures' => null,   // placeholder — not yet implemented
+        ];
+
+        $db->transaction(function () use (
+            $db, $marchId, $playerId, $cityId, $targetCityId, $targetX, $targetY, $scoutData,
+        ): void {
+            $db->execute(
+                'INSERT INTO battle_reports
+                    (world_id, march_id, attacker_id, attacker_city_id,
+                     target_type, target_id, target_x, target_y,
+                     outcome, data_json, attacker_read, created_at)
+                 VALUES (1,:mid,:pid,:cid, 2,:tid,:tx,:ty,"scouted",:data, 0, UTC_TIMESTAMP())',
+                [':mid'=>$marchId,':pid'=>$playerId,':cid'=>$cityId,
+                 ':tid'=>$targetCityId,':tx'=>$targetX,':ty'=>$targetY,
+                 ':data'=>json_encode($scoutData)],
+            );
+            $db->execute(
+                "UPDATE marches SET state='returning',
+                 return_time=DATE_ADD(UTC_TIMESTAMP(), INTERVAL TIMESTAMPDIFF(SECOND,departure_time,arrival_time) SECOND),
+                 haul_json='{}' WHERE id=?",
+                [$marchId],
+            );
+        });
+
+        $log->info(sprintf('[MarchTick] Scout march %d resolved — scouted city %d', $marchId, $targetCityId));
     }
 
     /** Load monster definition from data files (cached per request). */

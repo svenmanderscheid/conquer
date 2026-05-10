@@ -428,6 +428,7 @@ HTML;
     }
     return $html;
 }
+$isEmbed = isset($_GET['embed']);
 ?>
 <!DOCTYPE html>
 <html lang="de">
@@ -435,6 +436,12 @@ HTML;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conquer — Forschung</title>
+    <?php if ($isEmbed): ?>
+    <style>
+        html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #0f172a; color: #e2e8f0; font-family: system-ui, -apple-system, sans-serif; }
+        #game { width: 100%; height: 100%; display: flex; flex-direction: column; margin-top: 0; }
+    </style>
+    <?php endif ?>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -451,8 +458,8 @@ HTML;
         #game {
             width: 100%;
             max-width: 1280px;
-            height: calc(100% - 72px);
-            margin-top: 72px;
+            height: calc(100% - 52px);
+            margin-top: 52px;
             display: flex;
             flex-direction: column;
         }
@@ -977,16 +984,9 @@ HTML;
     </style>
 </head>
 <body>
-<?php require __DIR__ . '/partials/nav.php'; ?>
+<?php if (!$isEmbed): $hudCurrentView = 'research'; require __DIR__ . '/partials/hud.php'; endif ?>
 
 <div id="game">
-
-    <!-- Top bar -->
-    <div class="topbar">
-        <a href="/city" class="topbar-back">&larr; Stadt</a>
-        <span class="topbar-title">&#x1F52C; Akademie &mdash; Forschung</span>
-        <div class="topbar-acad">Akademie Lv <strong><?= $academyLevel ?></strong></div>
-    </div>
 
     <!-- Queue banner (hidden when no queue) -->
     <div class="queue-banner" id="queue-banner" style="<?= $queueRow ? '' : 'display:none' ?>">

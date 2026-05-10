@@ -27,6 +27,7 @@ if (!(int) $row['attacker_read']) {
     $db->execute('UPDATE battle_reports SET attacker_read = 1 WHERE id = ?', [$reportId]);
 }
 
+$isEmbed = isset($_GET['embed']);
 $data    = json_decode($row['data_json'], true) ?? [];
 $outcome = $row['outcome'];
 $troops  = $data['troops'] ?? [];
@@ -135,8 +136,8 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
         #game {
             width: 100%;
             max-width: 960px;
-            min-height: calc(100vh - 72px);
-            margin-top: 72px;
+            min-height: calc(100vh - 52px);
+            margin-top: <?= $isEmbed ? '0' : '52px' ?>;
             display: flex;
             flex-direction: column;
             gap: 0;
@@ -520,15 +521,16 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
     </style>
 </head>
 <body>
-<?php require __DIR__ . '/partials/nav.php'; ?>
+<?php if (!$isEmbed): $hudCurrentView = 'reports'; require __DIR__ . '/partials/hud.php'; endif ?>
 <div id="game">
-
+<?php if (!$isEmbed): ?>
     <!-- Back bar -->
     <div class="topbar">
         <a href="/reports" class="topbar-back">← Alle Berichte</a>
         <span class="topbar-id">📜 Kampfbericht #<?= $reportId ?></span>
         <span class="topbar-date"><?= htmlspecialchars($row['created_at']) ?> UTC</span>
     </div>
+<?php endif ?>
 
     <!-- VS Header -->
     <div class="vs-header">
@@ -798,49 +800,108 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
 
     <!-- BOOST LIST -->
     <div class="section-header">Boost List <span style="font-weight:400;opacity:.6;font-size:0.58rem;letter-spacing:0.04em">— Forschungs-Buffs zum Zeitpunkt des Angriffs</span></div>
-    <div style="background:var(--surface);padding:0.75rem 1.25rem 1rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:0.2rem 2rem">
-        <?php
-        $bPct = fn(string $key): string => '+' . round(($buffs[$key] ?? 0.0) * 100, 1) . '%';
-        $boostRows = [
-            // General
-            'Truppen HP'            => $bPct('troops_hp'),
-            'Truppen Angriff'       => $bPct('troops_atk'),
-            'Truppen Verteidigung'  => $bPct('troops_def'),
-            'Truppen Geschwindigkeit' => $bPct('troops_spd'),
-            // Infantry
-            'Infanterie HP'         => $bPct('infantry_hp'),
-            'Infanterie Angriff'    => $bPct('infantry_atk'),
-            'Infanterie Verteidigung' => $bPct('infantry_def'),
-            'Infanterie Geschwindigkeit' => $bPct('infantry_spd'),
-            // Ranged
-            'Fernkämpfer HP'        => $bPct('ranged_hp'),
-            'Fernkämpfer Angriff'   => $bPct('ranged_atk'),
-            'Fernkämpfer Verteidigung' => $bPct('ranged_def'),
-            'Fernkämpfer Geschwindigkeit' => $bPct('ranged_spd'),
-            // Cavalry
-            'Kavallerie HP'         => $bPct('cavalry_hp'),
-            'Kavallerie Angriff'    => $bPct('cavalry_atk'),
-            'Kavallerie Verteidigung' => $bPct('cavalry_def'),
-            'Kavallerie Geschwindigkeit' => $bPct('cavalry_spd'),
-            // Other
-            'Marschgröße (Bonus)'   => '+' . (int)($buffs['march_size'] ?? 0),
-            'Krankenhauskapazität'  => '+' . (int)($buffs['hospital_capacity'] ?? 0),
-            'Heilungsgeschwindigkeit' => $bPct('healing_speed'),
-            'Baugeschwindigkeit'    => $bPct('construction_speed'),
-        ];
-        foreach ($boostRows as $label => $val):
-            $isZero = $val === '+0%' || $val === '+0';
-        ?>
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:0.22rem 0;border-bottom:1px solid rgba(255,255,255,0.03);font-size:0.77rem">
-            <span style="color:var(--muted)"><?= $label ?></span>
-            <span style="font-weight:700;color:<?= $isZero ? 'var(--muted)' : 'var(--green)' ?>"><?= $val ?></span>
+    <?php
+    // Defender buffs: for PvP load via target_id; monsters have no research buffs
+    $isMonster    = ((int)$row['target_type']) === 3;
+    $defenderBuffs = (!$isMonster && $row['target_id'])
+        ? (BuffEngine::getBuffs((int)$row['target_id']) ?: [])
+        : [];
+
+    $bPctFor = fn(array $b, string $key): string => '+' . round(($b[$key] ?? 0.0) * 100, 1) . '%';
+    $bIntFor  = fn(array $b, string $key): string => '+' . (int)($b[$key] ?? 0);
+
+    // Same stat list for both sides
+    $boostStats = [
+        'Truppen HP'                  => ['troops_hp',          'pct'],
+        'Truppen Angriff'             => ['troops_atk',         'pct'],
+        'Truppen Verteidigung'        => ['troops_def',         'pct'],
+        'Truppen Geschwindigkeit'     => ['troops_spd',         'pct'],
+        'Infanterie HP'               => ['infantry_hp',        'pct'],
+        'Infanterie Angriff'          => ['infantry_atk',       'pct'],
+        'Infanterie Verteidigung'     => ['infantry_def',       'pct'],
+        'Infanterie Geschwindigkeit'  => ['infantry_spd',       'pct'],
+        'Fernkämpfer HP'              => ['ranged_hp',          'pct'],
+        'Fernkämpfer Angriff'         => ['ranged_atk',         'pct'],
+        'Fernkämpfer Verteidigung'    => ['ranged_def',         'pct'],
+        'Fernkämpfer Geschwindigkeit' => ['ranged_spd',         'pct'],
+        'Kavallerie HP'               => ['cavalry_hp',         'pct'],
+        'Kavallerie Angriff'          => ['cavalry_atk',        'pct'],
+        'Kavallerie Verteidigung'     => ['cavalry_def',        'pct'],
+        'Kavallerie Geschwindigkeit'  => ['cavalry_spd',        'pct'],
+        'Marschgröße (Bonus)'         => ['march_size',         'int'],
+        'Krankenhauskapazität'        => ['hospital_capacity',  'int'],
+        'Heilungsgeschwindigkeit'     => ['healing_speed',      'pct'],
+        'Baugeschwindigkeit'          => ['construction_speed', 'pct'],
+    ];
+
+    $resolveVal = function(array $b, string $key, string $type) use ($bPctFor, $bIntFor): string {
+        if (empty($b)) return '—';
+        return $type === 'int' ? $bIntFor($b, $key) : $bPctFor($b, $key);
+    };
+
+    $boostRow = fn(string $label, string $atkVal, string $defVal): string =>
+        '<div style="display:grid;grid-template-columns:1fr auto;align-items:center;padding:0.22rem 0;border-bottom:1px solid rgba(255,255,255,0.03);font-size:0.77rem;gap:8px">'
+        . '<span style="color:var(--muted)">' . htmlspecialchars($label) . '</span>'
+        . '<span style="font-weight:700;color:' . (($atkVal === '+0%' || $atkVal === '+0') ? 'var(--muted)' : 'var(--green)') . ';white-space:nowrap">' . htmlspecialchars($atkVal) . '</span>'
+        . '</div>';
+
+    $boostRowDef = fn(string $label, string $defVal): string =>
+        '<div style="display:grid;grid-template-columns:1fr auto;align-items:center;padding:0.22rem 0;border-bottom:1px solid rgba(255,255,255,0.03);font-size:0.77rem;gap:8px">'
+        . '<span style="color:var(--muted)">' . htmlspecialchars($label) . '</span>'
+        . '<span style="font-weight:700;color:' . (($defVal === '—' || $defVal === '+0%' || $defVal === '+0') ? 'var(--muted)' : 'var(--green)') . ';white-space:nowrap">' . htmlspecialchars($defVal) . '</span>'
+        . '</div>';
+
+    $atkName = htmlspecialchars($playerStats['username'] ?? 'Angreifer');
+    $defName = $isMonster ? htmlspecialchars($monsterName) : htmlspecialchars($data['defender_name'] ?? 'Verteidiger');
+    ?>
+    <div style="background:var(--surface);display:grid;grid-template-columns:1fr 1px 1fr">
+        <div style="padding:0.75rem 1.25rem 1rem">
+            <div style="font-size:0.6rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:0.5rem"><?= $atkName ?></div>
+            <?php foreach ($boostStats as $label => [$key, $type]):
+                $val = $resolveVal($buffs, $key, $type); ?>
+                <div style="display:grid;grid-template-columns:1fr auto;align-items:center;padding:0.22rem 0;border-bottom:1px solid rgba(255,255,255,0.03);font-size:0.77rem;gap:8px">
+                    <span style="color:var(--muted)"><?= htmlspecialchars($label) ?></span>
+                    <span style="font-weight:700;color:<?= ($val === '+0%' || $val === '+0') ? 'var(--muted)' : 'var(--green)' ?>;white-space:nowrap"><?= htmlspecialchars($val) ?></span>
+                </div>
+            <?php endforeach ?>
         </div>
-        <?php endforeach ?>
-        <?php if (empty(array_filter($buffs))): ?>
-        <div style="grid-column:1/-1;font-size:0.75rem;color:var(--muted);padding:0.5rem 0">
-            Noch keine Forschungen abgeschlossen. <a href="/research" style="color:var(--gold2)">Zur Akademie →</a>
+        <div style="background:var(--border)"></div>
+        <div style="padding:0.75rem 1.25rem 1rem">
+            <div style="font-size:0.6rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:0.5rem"><?= $defName ?></div>
+            <?php if ($isMonster): ?>
+                <?php
+                $monsterRows = [
+                    'HP vor Kampf'      => $fmt($monsterHpBefore),
+                    'HP verbleibend'    => $monsterKilled ? '0' : $fmt($monsterHpAfter),
+                    'Angriffskraft'     => $fmt($monsterAtk),
+                    'Schaden erhalten'  => $fmt((int)($data['attacker_damage'] ?? 0)),
+                    'HP zerstört'       => $monsterLossPct . '%',
+                    'Status'            => $monsterKilled ? 'Besiegt' : 'Überlebt',
+                ];
+                foreach ($monsterRows as $mLabel => $mVal):
+                    $mColor = match($mLabel) {
+                        'Status'          => $monsterKilled ? 'var(--green)' : 'var(--red2)',
+                        'HP verbleibend'  => $monsterKilled ? 'var(--muted)' : 'var(--red2)',
+                        'Schaden erhalten'=> 'var(--red2)',
+                        'HP zerstört'     => $monsterLossPct >= 100 ? 'var(--green)' : 'var(--red2)',
+                        default           => 'var(--text)',
+                    };
+                ?>
+                <div style="display:grid;grid-template-columns:1fr auto;align-items:center;padding:0.22rem 0;border-bottom:1px solid rgba(255,255,255,0.03);font-size:0.77rem;gap:8px">
+                    <span style="color:var(--muted)"><?= htmlspecialchars($mLabel) ?></span>
+                    <span style="font-weight:700;color:<?= $mColor ?>;white-space:nowrap"><?= htmlspecialchars($mVal) ?></span>
+                </div>
+                <?php endforeach ?>
+            <?php else: ?>
+                <?php foreach ($boostStats as $label => [$key, $type]):
+                    $val = $resolveVal($defenderBuffs, $key, $type); ?>
+                    <div style="display:grid;grid-template-columns:1fr auto;align-items:center;padding:0.22rem 0;border-bottom:1px solid rgba(255,255,255,0.03);font-size:0.77rem;gap:8px">
+                        <span style="color:var(--muted)"><?= htmlspecialchars($label) ?></span>
+                        <span style="font-weight:700;color:<?= ($val === '—' || $val === '+0%' || $val === '+0') ? 'var(--muted)' : 'var(--green)' ?>;white-space:nowrap"><?= htmlspecialchars($val) ?></span>
+                    </div>
+                <?php endforeach ?>
+            <?php endif ?>
         </div>
-        <?php endif ?>
     </div>
 
     <div style="height:2rem"></div>

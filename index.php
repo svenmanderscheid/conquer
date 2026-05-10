@@ -41,9 +41,11 @@ if (str_starts_with($path, '/api/')) {
     $router->post('/api/troops/train',       [\Conquer\Api\Handlers\TroopHandler::class, 'train']);
 
     // March
-    $router->post('/api/march/dispatch',       [\Conquer\Api\Handlers\MarchHandler::class, 'dispatch']);
-    $router->post('/api/march/dispatch-charm', [\Conquer\Api\Handlers\MarchHandler::class, 'dispatchCharm']);
-    $router->get('/api/march/list',            [\Conquer\Api\Handlers\MarchHandler::class, 'list']);
+    $router->post('/api/march/dispatch',        [\Conquer\Api\Handlers\MarchHandler::class, 'dispatch']);
+    $router->post('/api/march/dispatch-charm',  [\Conquer\Api\Handlers\MarchHandler::class, 'dispatchCharm']);
+    $router->post('/api/march/dispatch-player', [\Conquer\Api\Handlers\MarchHandler::class, 'dispatchPlayer']);
+    $router->post('/api/march/dispatch-scout',  [\Conquer\Api\Handlers\MarchHandler::class, 'dispatchScout']);
+    $router->get('/api/march/list',             [\Conquer\Api\Handlers\MarchHandler::class, 'list']);
 
     // Battle reports
     $router->get('/api/battle/reports',      [\Conquer\Api\Handlers\BattleHandler::class, 'reports']);
@@ -72,6 +74,21 @@ if (str_starts_with($path, '/api/')) {
     $router->get('/api/alliance/members', [\Conquer\Api\Handlers\AllianceHandler::class, 'members']);
     $router->get('/api/alliance/chat',    [\Conquer\Api\Handlers\AllianceHandler::class, 'chat']);
     $router->post('/api/alliance/chat',   [\Conquer\Api\Handlers\AllianceHandler::class, 'sendChat']);
+
+    // Player
+    $router->get('/api/player/me',                    [\Conquer\Api\Handlers\PlayerHandler::class, 'me']);
+    $router->get('/api/player/profile/:id',           [\Conquer\Api\Handlers\PlayerHandler::class, 'profile']);
+    $router->get('/api/player/formations',            [\Conquer\Api\Handlers\PlayerHandler::class, 'formations']);
+    $router->post('/api/player/formations/:slot',     [\Conquer\Api\Handlers\PlayerHandler::class, 'saveFormation']);
+    $router->post('/api/player/emoji',                [\Conquer\Api\Handlers\PlayerHandler::class, 'setEmoji']);
+    $router->get('/api/player/skins',                 [\Conquer\Api\Handlers\PlayerHandler::class, 'skins']);
+    $router->post('/api/player/skin/equip',           [\Conquer\Api\Handlers\PlayerHandler::class, 'equipSkin']);
+
+    // Rally
+    $router->post('/api/rally/start',  [\Conquer\Api\Handlers\RallyHandler::class, 'start']);
+    $router->post('/api/rally/join',   [\Conquer\Api\Handlers\RallyHandler::class, 'join']);
+    $router->get('/api/rally/list',    [\Conquer\Api\Handlers\RallyHandler::class, 'list']);
+    $router->get('/api/rally/:id',     [\Conquer\Api\Handlers\RallyHandler::class, 'detail']);
 
     if (!$router->dispatch($method, $path)) {
         \Conquer\Api\Response::error(404, 'NOT_FOUND', 'API endpoint not found.');
@@ -158,6 +175,13 @@ if ($path === '/alliance') {
     $session = \Conquer\Auth\Session::current();
     if ($session === null) { header('Location: /'); exit; }
     require ROOT_DIR . '/views/alliance.php';
+    exit;
+}
+
+if ($path === '/alliance/battle') {
+    $session = \Conquer\Auth\Session::current();
+    if ($session === null) { header('Location: /'); exit; }
+    require ROOT_DIR . '/views/alliance_battle.php';
     exit;
 }
 

@@ -83,23 +83,12 @@ $outcomeLabel = [
         #game {
             width: 100%;
             max-width: 1280px;
-            min-height: calc(100vh - 72px);
-            margin-top: 72px;
+            min-height: calc(100vh - 52px);
+            margin-top: 52px;
             display: flex;
             flex-direction: column;
             background: var(--bg);
         }
-
-        .topbar {
-            flex: 0 0 48px;
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            padding: 0 1.25rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        .topbar-title { font-size: 0.95rem; font-weight: 700; color: var(--gold); }
 
         .content { padding: 1.5rem; flex: 1; }
 
@@ -168,11 +157,11 @@ $outcomeLabel = [
     </style>
 </head>
 <body>
-<?php require __DIR__ . '/partials/nav.php'; ?>
+<?php $hudCurrentView = 'reports'; require __DIR__ . '/partials/hud.php'; ?>
 <div id="game">
 
-    <header class="topbar">
-        <span class="topbar-title">📜 Kampfberichte</span>
+    <header style="flex:0 0 40px;background:var(--surface);border-bottom:1px solid var(--border);padding:0 1.25rem;display:flex;align-items:center;gap:0.75rem">
+        <span style="font-size:0.95rem;font-weight:700;color:var(--gold)">&#x1F4DC; Kampfberichte</span>
         <span style="color:var(--muted);font-size:0.8rem"><?= $total ?> Berichte gesamt</span>
     </header>
 

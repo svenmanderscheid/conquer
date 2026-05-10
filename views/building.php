@@ -45,8 +45,6 @@ if ($queueEntry !== null) {
     $instantGemCost = max(1, (int) ceil($secsLeft / 60));
 }
 
-// Player gems (from session)
-$playerGems = (int) ($session['gems'] ?? 0);
 
 $name     = CityState::BUILDING_NAMES[$buildingCode] ?? ucwords(str_replace('_', ' ', $buildingCode));
 $cost     = BuildingData::getCost($buildingCode, $nextLevel);
@@ -170,6 +168,17 @@ if ($queueEntry !== null) {
 }
 
 $isModal = isset($_GET['modal']);
+
+// ── Tab detection ──────────────────────────────────────────────────────────
+$tabs = ['upgrade' => 'Level Up'];
+if ($buildingCode === 'barrack')          $tabs['truppen']   = 'Truppen';
+if ($buildingCode === 'trading_post')     $tabs['caravan']   = 'Caravan';
+if ($buildingCode === 'hall_of_alliance') $tabs['allianz']   = 'Allianz';
+if ($buildingCode === 'academy')          $tabs['forschung'] = 'Forschung';
+if ($buildingCode === 'hospital')         $tabs['heilen']    = 'Heilen';
+
+$activeTab = $_GET['tab'] ?? 'upgrade';
+if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
 ?>
 <?php if (!$isModal): ?>
 <!DOCTYPE html>
@@ -381,12 +390,35 @@ $isModal = isset($_GET['modal']);
             font-weight: 700;
             letter-spacing: .08em;
             text-transform: uppercase;
-            color: #fbbf24;
-            border-bottom: 2px solid #fbbf24;
+            color: #475569;
+            border-bottom: 2px solid transparent;
+            border-top: none; border-left: none; border-right: none;
+            background: none;
+            cursor: pointer;
             white-space: nowrap;
+            transition: color .15s;
         }
 
+        .tab-item.tab-active {
+            color: #fbbf24;
+            border-bottom-color: #fbbf24;
+        }
+
+        .tab-item:hover:not(.tab-active) { color: #94a3b8; }
+
         .tab-spacer { flex: 1; }
+
+        /* Tab pane container */
+        .tab-pane {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .tab-pane.tab-scroll {
+            overflow-y: auto;
+        }
 
         .tab-close {
             display: inline-flex;
@@ -977,7 +1009,7 @@ $isModal = isset($_GET['modal']);
 <?php if (!$isModal): ?>
 </head>
 <body>
-<?php require __DIR__ . '/partials/nav.php'; ?>
+<?php $hudCurrentView = 'city'; require __DIR__ . '/partials/hud.php'; ?>
 <div class="page-wrap">
 <?php endif ?>
     <div class="modal-card">
@@ -1041,9 +1073,12 @@ $isModal = isset($_GET['modal']);
 
                 <!-- Tab bar -->
                 <div class="tab-bar">
-                    <div class="tab-item">
-                        <?= $queueEntry !== null ? 'UPGRADE LÄUFT' : 'LEVEL UP' ?>
-                    </div>
+                    <?php foreach ($tabs as $tabId => $tabLabel): ?>
+                    <button class="tab-item<?= $activeTab === $tabId ? ' tab-active' : '' ?>"
+                            data-tab="<?= htmlspecialchars($tabId) ?>">
+                        <?php if ($tabId === 'upgrade' && $queueEntry !== null): ?>UPGRADE LÄUFT<?php else: ?><?= htmlspecialchars(strtoupper($tabLabel)) ?><?php endif ?>
+                    </button>
+                    <?php endforeach ?>
                     <div class="tab-spacer"></div>
                     <?php if ($isModal): ?>
                     <button class="tab-close" onclick="window.closeBldgModal?.()" title="Schließen" style="background:none;border:none;cursor:pointer">✕</button>
@@ -1052,6 +1087,8 @@ $isModal = isset($_GET['modal']);
                     <?php endif ?>
                 </div>
 
+                <!-- ── Tab pane: upgrade ── -->
+                <div id="tab-upgrade" class="tab-pane"<?= $activeTab !== 'upgrade' ? ' style="display:none"' : '' ?>>
                 <!-- Content: two sub-columns -->
                 <div class="right-content">
 
@@ -1146,19 +1183,15 @@ $isModal = isset($_GET['modal']);
 
                 <!-- ── Bottom action bar ── -->
                 <div class="action-bar">
-                    <?php
-                    // Instant button: enabled only when this building is in queue AND player has gems
-                    $instantEnabled = ($queueEntry !== null) && ($playerGems >= $instantGemCost);
-                    ?>
                     <button
                         id="btn-instant"
                         class="action-btn btn-instant"
-                        <?= !$instantEnabled ? 'disabled' : '' ?>
+                        <?= $queueEntry === null ? 'disabled' : '' ?>
                         data-queue-id="<?= $queueEntry !== null ? (int)$queueEntry['id'] : '' ?>"
                         data-gem-cost="<?= $instantGemCost ?>"
                     >
                         <span class="action-btn-top">
-                            💎 <?= number_format($instantGemCost) ?> Gems
+                            💎 <?= $queueEntry !== null ? number_format($instantGemCost) : '—' ?> Gems
                         </span>
                         <span class="action-btn-label">SOFORT UPGRADEN</span>
                     </button>
@@ -1189,6 +1222,212 @@ $isModal = isset($_GET['modal']);
                         <span class="action-btn-label"><?= htmlspecialchars($upgradeLabel) ?></span>
                     </button>
                 </div><!-- /action-bar -->
+                </div><!-- /tab-upgrade -->
+
+                <!-- ── Tab pane: truppen (barrack only) ── -->
+                <?php if ($buildingCode === 'barrack'):
+                    $academyLevel = (int) ($buildings['academy']['level'] ?? 1);
+                    $barrackLevel = (int) ($buildings['barrack']['level'] ?? 1);
+                    $allTroops    = TroopData::all();
+                    $typeName     = [1 => 'INF', 2 => 'RGD', 3 => 'CAV'];
+                    $typeClass    = [1 => '', 2 => 'rgd', 3 => 'cav'];
+                ?>
+                <div id="tab-truppen" class="tab-pane tab-scroll"<?= $activeTab !== 'truppen' ? ' style="display:none"' : '' ?>>
+                    <div style="padding:12px 16px 16px">
+                        <?php foreach ($allTroops as $t):
+                            $unlocked = TroopData::isUnlocked((int)$t['code'], $barrackLevel, $academyLevel);
+                            $inCity   = (int) ($troops[(int)$t['code']] ?? 0);
+                            $badge    = $typeClass[$t['type']] ?? '';
+                        ?>
+                        <div class="troop-row<?= $unlocked ? '' : ' locked' ?>">
+                            <div class="troop-header">
+                                <span class="troop-badge <?= $badge ?>"><?= $typeName[$t['type']] ?> T<?= (int)$t['tier'] ?></span>
+                                <span class="troop-name"><?= htmlspecialchars($t['name']) ?></span>
+                                <span class="troop-count">In Stadt: <?= number_format($inCity, 0, '.', ',') ?></span>
+                            </div>
+
+                            <div class="troop-stats">
+                                <div>HP <span><?= (int)$t['hp'] ?></span></div>
+                                <div>ATK <span><?= (int)$t['attack'] ?></span></div>
+                                <div>DEF <span><?= (int)$t['defense'] ?></span></div>
+                                <div>SPD <span><?= (int)$t['speed'] ?></span></div>
+                            </div>
+
+                            <div class="troop-cost">
+                                <?php if ($t['need_food']   > 0): ?><span>🌾 <?= (int)$t['need_food'] ?></span><?php endif ?>
+                                <?php if ($t['need_lumber'] > 0): ?><span>🪵 <?= (int)$t['need_lumber'] ?></span><?php endif ?>
+                                <?php if ($t['need_stone']  > 0): ?><span>🪨 <?= (int)$t['need_stone'] ?></span><?php endif ?>
+                                <?php if ($t['need_gold']   > 0): ?><span>💰 <?= (int)$t['need_gold'] ?></span><?php endif ?>
+                                <span>⏱ <?= fmtTime((int)$t['time']) ?>/Einheit</span>
+                            </div>
+
+                            <?php if ($unlocked): ?>
+                            <div class="train-row">
+                                <input type="number" class="train-input" min="1" max="9999" value="100"
+                                       id="count-<?= (int)$t['code'] ?>">
+                                <button class="btn-train"
+                                        data-code="<?= (int)$t['code'] ?>"
+                                        data-name="<?= htmlspecialchars($t['name']) ?>">
+                                    Ausbilden
+                                </button>
+                            </div>
+                            <?php else: ?>
+                            <div class="lock-msg">🔒 Erfordert Academy Level <?= (int)$t['unlock_academy'] ?></div>
+                            <?php endif ?>
+                        </div>
+                        <?php endforeach ?>
+
+                        <?php if (!empty($troopQueue)): ?>
+                        <div class="troop-queue-list">
+                            <div class="troop-queue-title">Trainings-Queue</div>
+                            <?php foreach ($troopQueue as $qe):
+                                $qTroop = TroopData::get((int)$qe['troop_code']);
+                                $qName  = $qTroop['name'] ?? ('Code ' . $qe['troop_code']);
+                            ?>
+                            <div class="queue-item">
+                                <div><?= (int)$qe['count'] ?>× <?= htmlspecialchars($qName) ?> (Slot <?= (int)$qe['barrack_slot'] ?>)</div>
+                                <div class="queue-item-cd"
+                                     data-finish="<?= strtotime($qe['finishes_at']) ?>">—</div>
+                            </div>
+                            <?php endforeach ?>
+                        </div>
+                        <?php endif ?>
+                    </div>
+                </div><!-- /tab-truppen -->
+                <?php endif ?>
+
+                <!-- ── Tab pane: caravan (trading_post only) ── -->
+                <?php if ($buildingCode === 'trading_post'): ?>
+                <div id="tab-caravan" class="tab-pane tab-scroll"<?= $activeTab !== 'caravan' ? ' style="display:none"' : '' ?>
+                     x-data="caravanApp()" x-init="boot()">
+                    <div style="padding:10px 16px;border-bottom:1px solid #2a3a55;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
+                        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#64748b">Caravan — Rotierender Markt</div>
+                        <div style="font-size:.72rem;color:#fbbf24;font-variant-numeric:tabular-nums">
+                            Nächster Refresh: <span x-text="refreshLabel">…</span>
+                        </div>
+                    </div>
+                    <div style="padding:12px 16px 16px">
+                        <template x-if="loading">
+                            <div class="caravan-loading">Lade Caravan…</div>
+                        </template>
+                        <template x-if="!loading && error">
+                            <div class="caravan-loading" style="color:#ef4444" x-text="error"></div>
+                        </template>
+                        <template x-if="!loading && !error">
+                            <div class="caravan-grid">
+                                <template x-for="(slot, idx) in slots" :key="slot.idx">
+                                    <div class="caravan-slot" :class="{ bought: slot.bought }">
+                                        <div class="caravan-slot-top">
+                                            <span class="caravan-discount" x-text="slot.discount + '%'"></span>
+                                            <span class="caravan-slot-label" x-text="slot.label"></span>
+                                        </div>
+                                        <div class="caravan-slot-price">
+                                            <span x-text="currencyIcon(slot.currency)"></span>
+                                            <strong x-text="fmt(slot.price)"></strong>
+                                            <span x-text="currencyLabel(slot.currency)"></span>
+                                        </div>
+                                        <button class="btn-caravan-buy"
+                                                :disabled="slot.bought || buying === slot.idx"
+                                                @click="buy(slot.idx)">
+                                            <span x-text="slot.bought ? 'Gekauft' : (buying === slot.idx ? '…' : 'Kaufen')"></span>
+                                        </button>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                </div><!-- /tab-caravan -->
+                <?php endif ?>
+
+                <!-- ── Tab pane: allianz (hall_of_alliance only) ── -->
+                <?php if ($buildingCode === 'hall_of_alliance'):
+                    $__db          = \Conquer\Db\Connection::getInstance();
+                    $__playerId    = (int) $session['player_id'];
+                    $__member      = $__db->query(
+                        'SELECT am.role, a.name, a.tag
+                         FROM   alliance_members am
+                         JOIN   alliances a ON a.id = am.alliance_id
+                         WHERE  am.player_id = ?',
+                        [$__playerId],
+                    )->fetch() ?: null;
+                ?>
+                <div id="tab-allianz" class="tab-pane tab-scroll"<?= $activeTab !== 'allianz' ? ' style="display:none"' : '' ?>>
+                    <div style="padding:20px 16px">
+                    <?php if ($__member === null): ?>
+                        <div style="text-align:center;padding:20px 0">
+                            <p style="font-size:.85rem;color:#94a3b8;margin-bottom:14px">
+                                Du bist derzeit in keiner Allianz. Tritt einer Allianz bei oder gründe deine eigene,
+                                um von gemeinsamen Buffs und koordiniertem Spiel zu profitieren.
+                            </p>
+                            <a href="/alliance"
+                               style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;
+                                      border-radius:6px;background:linear-gradient(180deg,#2563eb,#1e3a8a);
+                                      color:#fff;font-size:.82rem;font-weight:700;text-decoration:none">
+                                ⚔ Allianz beitreten oder gründen
+                            </a>
+                        </div>
+                    <?php else:
+                        $__roleLabelMap = [
+                            'leader'      => 'Leader',
+                            'vice_leader' => 'Vize-Leader',
+                            'officer'     => 'Offizier',
+                            'veteran'     => 'Veteran',
+                            'member'      => 'Mitglied',
+                        ];
+                        $__roleLabel = $__roleLabelMap[$__member['role']] ?? $__member['role'];
+                    ?>
+                        <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
+                            <div style="flex-shrink:0;width:52px;height:52px;border-radius:7px;background:#0f172a;
+                                        border:2px solid #fbbf24;display:flex;align-items:center;justify-content:center;
+                                        font-size:.78rem;font-weight:900;color:#fbbf24;letter-spacing:.04em">
+                                [<?= htmlspecialchars((string)$__member['tag']) ?>]
+                            </div>
+                            <div>
+                                <div style="font-size:1.05rem;font-weight:800;color:#e2e8f0">
+                                    <?= htmlspecialchars((string)$__member['name']) ?>
+                                </div>
+                                <div style="font-size:.75rem;color:#64748b;margin-top:2px">
+                                    Deine Rolle: <strong style="color:#fbbf24"><?= htmlspecialchars($__roleLabel) ?></strong>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="/alliance"
+                           style="display:inline-flex;align-items:center;gap:6px;padding:7px 16px;
+                                  border-radius:6px;background:#1e293b;border:1px solid #334155;
+                                  color:#e2e8f0;font-size:.8rem;font-weight:600;text-decoration:none;
+                                  transition:background .15s"
+                           onmouseover="this.style.background='#293548'"
+                           onmouseout="this.style.background='#1e293b'">
+                            ⚔ Zur Allianz-Übersicht
+                        </a>
+                    <?php endif ?>
+                    </div>
+                </div><!-- /tab-allianz -->
+                <?php endif ?>
+
+                <!-- ── Tab pane: forschung (academy only) ── -->
+                <?php if ($buildingCode === 'academy'): ?>
+                <div id="tab-forschung" class="tab-pane"<?= $activeTab !== 'forschung' ? ' style="display:none"' : '' ?>>
+                    <iframe id="research-iframe"
+                            src="<?= $activeTab === 'forschung' ? '/research?embed=1' : '' ?>"
+                            style="border:none;width:100%;flex:1;min-height:0;display:block"
+                            data-src="/research?embed=1">
+                    </iframe>
+                </div><!-- /tab-forschung -->
+                <?php endif ?>
+
+                <!-- ── Tab pane: heilen (hospital only) ── -->
+                <?php if ($buildingCode === 'hospital'): ?>
+                <div id="tab-heilen" class="tab-pane tab-scroll"<?= $activeTab !== 'heilen' ? ' style="display:none"' : '' ?>>
+                    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:40px;text-align:center;gap:12px">
+                        <div style="font-size:3rem">🏥</div>
+                        <div style="font-size:.95rem;font-weight:700;color:#e2e8f0">Heilung — Demnächst</div>
+                        <div style="font-size:.8rem;color:#64748b;max-width:300px;line-height:1.6">
+                            Verwundete Truppen werden automatisch geheilt. Das Heilungs-System wird in einem kommenden Sprint implementiert.
+                        </div>
+                    </div>
+                </div><!-- /tab-heilen -->
+                <?php endif ?>
 
             </div><!-- /right-panel -->
 
@@ -1196,202 +1435,8 @@ $isModal = isset($_GET['modal']);
 
     </div><!-- /modal-card -->
 
-    <!-- ════════════════════════════════════════
-         BARRACK SECTION (below modal)
-    ════════════════════════════════════════ -->
-    <?php if ($buildingCode === 'barrack'):
-        $academyLevel = (int) ($buildings['academy']['level'] ?? 1);
-        $barrackLevel = (int) ($buildings['barrack']['level'] ?? 1);
-        $allTroops    = TroopData::all();
-        $typeName     = [1 => 'INF', 2 => 'RGD', 3 => 'CAV'];
-        $typeClass    = [1 => '', 2 => 'rgd', 3 => 'cav'];
-    ?>
-    <div class="barrack-section">
-        <div class="barrack-section-header">Truppen ausbilden</div>
-        <div class="barrack-inner">
 
-            <?php foreach ($allTroops as $t):
-                $unlocked = TroopData::isUnlocked((int)$t['code'], $barrackLevel, $academyLevel);
-                $inCity   = (int) ($troops[(int)$t['code']] ?? 0);
-                $badge    = $typeClass[$t['type']] ?? '';
-            ?>
-            <div class="troop-row<?= $unlocked ? '' : ' locked' ?>">
-                <div class="troop-header">
-                    <span class="troop-badge <?= $badge ?>"><?= $typeName[$t['type']] ?> T<?= (int)$t['tier'] ?></span>
-                    <span class="troop-name"><?= htmlspecialchars($t['name']) ?></span>
-                    <span class="troop-count">In Stadt: <?= number_format($inCity, 0, '.', ',') ?></span>
-                </div>
 
-                <div class="troop-stats">
-                    <div>HP <span><?= (int)$t['hp'] ?></span></div>
-                    <div>ATK <span><?= (int)$t['attack'] ?></span></div>
-                    <div>DEF <span><?= (int)$t['defense'] ?></span></div>
-                    <div>SPD <span><?= (int)$t['speed'] ?></span></div>
-                </div>
-
-                <div class="troop-cost">
-                    <?php if ($t['need_food']   > 0): ?><span>🌾 <?= (int)$t['need_food'] ?></span><?php endif ?>
-                    <?php if ($t['need_lumber'] > 0): ?><span>🪵 <?= (int)$t['need_lumber'] ?></span><?php endif ?>
-                    <?php if ($t['need_stone']  > 0): ?><span>🪨 <?= (int)$t['need_stone'] ?></span><?php endif ?>
-                    <?php if ($t['need_gold']   > 0): ?><span>💰 <?= (int)$t['need_gold'] ?></span><?php endif ?>
-                    <span>⏱ <?= fmtTime((int)$t['time']) ?>/Einheit</span>
-                </div>
-
-                <?php if ($unlocked): ?>
-                <div class="train-row">
-                    <input type="number" class="train-input" min="1" max="9999" value="100"
-                           id="count-<?= (int)$t['code'] ?>">
-                    <button class="btn-train"
-                            data-code="<?= (int)$t['code'] ?>"
-                            data-name="<?= htmlspecialchars($t['name']) ?>">
-                        Ausbilden
-                    </button>
-                </div>
-                <?php else: ?>
-                <div class="lock-msg">🔒 Erfordert Academy Level <?= (int)$t['unlock_academy'] ?></div>
-                <?php endif ?>
-            </div>
-            <?php endforeach ?>
-
-            <?php if (!empty($troopQueue)): ?>
-            <div class="troop-queue-list">
-                <div class="troop-queue-title">Trainings-Queue</div>
-                <?php foreach ($troopQueue as $qe):
-                    $qTroop = TroopData::get((int)$qe['troop_code']);
-                    $qName  = $qTroop['name'] ?? ('Code ' . $qe['troop_code']);
-                ?>
-                <div class="queue-item">
-                    <div><?= (int)$qe['count'] ?>× <?= htmlspecialchars($qName) ?> (Slot <?= (int)$qe['barrack_slot'] ?>)</div>
-                    <div class="queue-item-cd"
-                         data-finish="<?= strtotime($qe['finishes_at']) ?>">—</div>
-                </div>
-                <?php endforeach ?>
-            </div>
-            <?php endif ?>
-
-        </div><!-- /barrack-inner -->
-    </div><!-- /barrack-section -->
-    <?php endif ?>
-
-    <!-- ════════════════════════════════════════
-         HALL OF ALLIANCE SECTION (below modal)
-    ════════════════════════════════════════ -->
-    <?php if ($buildingCode === 'hall_of_alliance'):
-        // Load membership status for this player
-        $__db          = \Conquer\Db\Connection::getInstance();
-        $__playerId    = (int) $session['player_id'];
-        $__member      = $__db->query(
-            'SELECT am.role, a.name, a.tag
-             FROM   alliance_members am
-             JOIN   alliances a ON a.id = am.alliance_id
-             WHERE  am.player_id = ?',
-            [$__playerId],
-        )->fetch() ?: null;
-    ?>
-    <div class="barrack-section">
-        <div class="barrack-section-header">Allianz</div>
-        <div class="barrack-inner">
-            <?php if ($__member === null): ?>
-            <div style="text-align:center;padding:20px 0">
-                <p style="font-size:.85rem;color:#94a3b8;margin-bottom:14px">
-                    Du bist derzeit in keiner Allianz. Tritt einer Allianz bei oder gründe deine eigene,
-                    um von gemeinsamen Buffs und koordiniertem Spiel zu profitieren.
-                </p>
-                <a href="/alliance"
-                   style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;
-                          border-radius:6px;background:linear-gradient(180deg,#2563eb,#1e3a8a);
-                          color:#fff;font-size:.82rem;font-weight:700;text-decoration:none">
-                    ⚔ Allianz beitreten oder gründen
-                </a>
-            </div>
-            <?php else:
-                $__roleLabelMap = [
-                    'leader'      => 'Leader',
-                    'vice_leader' => 'Vize-Leader',
-                    'officer'     => 'Offizier',
-                    'veteran'     => 'Veteran',
-                    'member'      => 'Mitglied',
-                ];
-                $__roleLabel = $__roleLabelMap[$__member['role']] ?? $__member['role'];
-            ?>
-            <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
-                <div style="flex-shrink:0;width:52px;height:52px;border-radius:7px;background:#0f172a;
-                            border:2px solid #fbbf24;display:flex;align-items:center;justify-content:center;
-                            font-size:.78rem;font-weight:900;color:#fbbf24;letter-spacing:.04em">
-                    [<?= htmlspecialchars((string)$__member['tag']) ?>]
-                </div>
-                <div>
-                    <div style="font-size:1.05rem;font-weight:800;color:#e2e8f0">
-                        <?= htmlspecialchars((string)$__member['name']) ?>
-                    </div>
-                    <div style="font-size:.75rem;color:#64748b;margin-top:2px">
-                        Deine Rolle: <strong style="color:#fbbf24"><?= htmlspecialchars($__roleLabel) ?></strong>
-                    </div>
-                </div>
-            </div>
-            <a href="/alliance"
-               style="display:inline-flex;align-items:center;gap:6px;padding:7px 16px;
-                      border-radius:6px;background:#1e293b;border:1px solid #334155;
-                      color:#e2e8f0;font-size:.8rem;font-weight:600;text-decoration:none;
-                      transition:background .15s"
-               onmouseover="this.style.background='#293548'"
-               onmouseout="this.style.background='#1e293b'">
-                ⚔ Zur Allianz-Übersicht
-            </a>
-            <?php endif ?>
-        </div>
-    </div>
-    <?php endif ?>
-
-    <!-- ════════════════════════════════════════
-         CARAVAN SECTION (below modal) — Trading Post only
-    ════════════════════════════════════════ -->
-    <?php if ($buildingCode === 'trading_post'): ?>
-    <div class="caravan-section"
-         x-data="caravanApp()"
-         x-init="boot()">
-
-        <div class="caravan-header">
-            <div class="caravan-header-title">Caravan — Rotierender Markt</div>
-            <div class="caravan-refresh-cd">
-                Nächster Refresh: <span x-text="refreshLabel">…</span>
-            </div>
-        </div>
-
-        <div class="caravan-inner">
-            <template x-if="loading">
-                <div class="caravan-loading">Lade Caravan…</div>
-            </template>
-
-            <template x-if="!loading && error">
-                <div class="caravan-loading" style="color:#ef4444" x-text="error"></div>
-            </template>
-
-            <template x-if="!loading && !error">
-                <div class="caravan-grid">
-                    <template x-for="(slot, idx) in slots" :key="slot.idx">
-                        <div class="caravan-slot" :class="{ bought: slot.bought }">
-                            <div class="caravan-slot-top">
-                                <span class="caravan-discount" x-text="slot.discount + '%'"></span>
-                                <span class="caravan-slot-label" x-text="slot.label"></span>
-                            </div>
-                            <div class="caravan-slot-price">
-                                <span x-text="currencyIcon(slot.currency)"></span>
-                                <strong x-text="fmt(slot.price)"></strong>
-                                <span x-text="currencyLabel(slot.currency)"></span>
-                            </div>
-                            <button class="btn-caravan-buy"
-                                    :disabled="slot.bought || buying === slot.idx"
-                                    @click="buy(slot.idx)">
-                                <span x-text="slot.bought ? 'Gekauft' : (buying === slot.idx ? '…' : 'Kaufen')"></span>
-                            </button>
-                        </div>
-                    </template>
-                </div>
-            </template>
-        </div>
-    </div>
-    <?php endif ?>
 
 <?php if (!$isModal): ?>
 </div><!-- /page-wrap -->
@@ -1579,6 +1624,28 @@ function updateQueueCountdowns() {
 
 updateQueueCountdowns();
 setInterval(updateQueueCountdowns, 1000);
+
+// ---------------------------------------------------------------------------
+// Tab switching
+// ---------------------------------------------------------------------------
+document.querySelectorAll('.tab-item[data-tab]').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const target = btn.dataset.tab;
+        document.querySelectorAll('.tab-pane').forEach(p => { p.style.display = 'none'; });
+        document.querySelectorAll('.tab-item').forEach(b => b.classList.remove('tab-active'));
+        const pane = document.getElementById('tab-' + target);
+        if (pane) pane.style.display = '';
+        btn.classList.add('tab-active');
+
+        // Lazy-load iframe tabs (e.g. research)
+        if (pane) {
+            const iframe = pane.querySelector('iframe[data-src]');
+            if (iframe && !iframe.src.includes(iframe.dataset.src.split('?')[0])) {
+                iframe.src = iframe.dataset.src;
+            }
+        }
+    });
+});
 
 // ---------------------------------------------------------------------------
 // Toast helper

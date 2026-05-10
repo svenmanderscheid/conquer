@@ -132,6 +132,10 @@ const ConquerMap = (() => {
 
     // Active marches for line overlay
     let activeMarches = [];
+    let myPlayerId    = null;
+    let myAllianceId  = null;
+    let onCityClick    = () => {};
+    let onMonsterClick = () => {};
 
     // -------------------------------------------------------------------------
     // Helpers
@@ -162,6 +166,10 @@ const ConquerMap = (() => {
         myCity     = opts.cityCoords;
         onTileInfo = opts.onTileInfo ?? (() => {});
         onHover    = opts.onHover   ?? (() => {});
+        myPlayerId    = opts.myPlayerId    ?? null;
+        myAllianceId  = opts.myAllianceId  ?? null;
+        onCityClick   = opts.onCityClick   ?? (() => {});
+        onMonsterClick = opts.onMonsterClick ?? (() => {});
 
         ctx   = canvas.getContext('2d');
         mmCtx = minimap.getContext('2d');
@@ -447,8 +455,9 @@ const ConquerMap = (() => {
         ctx.save();
 
         if (e.type === 'city') {
-            ctx.fillStyle   = '#f59e0b';
-            ctx.strokeStyle = '#92400e';
+            const isOwn = myPlayerId !== null && e.player_id == myPlayerId;
+            ctx.fillStyle   = isOwn ? '#22c55e' : '#f59e0b';
+            ctx.strokeStyle = isOwn ? '#15803d' : '#92400e';
             ctx.lineWidth   = 1;
             ctx.fillRect(  px + pad, py + pad, s - pad*2, s - pad*2);
             ctx.strokeRect(px + pad + 0.5, py + pad + 0.5, s - pad*2 - 1, s - pad*2 - 1);
@@ -458,6 +467,42 @@ const ConquerMap = (() => {
                 ctx.textAlign    = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(String(e.level), px + s / 2, py + s / 2);
+            }
+            // Player name + alliance tag label below tile
+            if (s >= 32) {
+                const fontSize = Math.max(9, Math.floor(s * 0.28));
+                ctx.font         = `${fontSize}px sans-serif`;
+                ctx.textAlign    = 'center';
+                ctx.textBaseline = 'top';
+                const playerName = e.player_name ?? e.player ?? '';
+                const tag        = e.alliance_tag ? ` [${e.alliance_tag}]` : '';
+                const label      = playerName + tag;
+                if (label) {
+                    // Shadow for readability
+                    ctx.fillStyle = 'rgba(0,0,0,0.7)';
+                    ctx.fillText(label, px + s / 2 + 1, py + s + 3);
+                    ctx.fillStyle = isOwn ? '#86efac' : '#fde68a';
+                    ctx.fillText(label, px + s / 2, py + s + 2);
+                }
+            } else if (s >= 16) {
+                const pName = e.player_name ?? e.player ?? '';
+                if (pName) {
+                    ctx.font         = `${Math.max(7, Math.floor(s * 0.3))}px sans-serif`;
+                    ctx.textAlign    = 'center';
+                    ctx.textBaseline = 'top';
+                    ctx.fillStyle    = 'rgba(0,0,0,0.65)';
+                    ctx.fillText(pName, px + s / 2 + 1, py + s + 2);
+                    ctx.fillStyle    = isOwn ? '#86efac' : '#fde68a';
+                    ctx.fillText(pName, px + s / 2, py + s + 1);
+                }
+            }
+            // Emoji above tile (5-second window, entity.emoji_code set only if not expired)
+            if (e.emoji_code && s >= 16) {
+                ctx.font         = `${Math.max(16, s)}px sans-serif`;
+                ctx.textAlign    = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.globalAlpha  = 1;
+                ctx.fillText(e.emoji_code, px + s / 2, py - 2);
             }
         } else if (e.type === 'monster') {
             const level  = e.monster_code % 100;
@@ -570,6 +615,33 @@ const ConquerMap = (() => {
                 ctx.textBaseline = 'middle';
                 ctx.fillText(e.tier, cx, cy);
             }
+        } else if (e.type === 'rally') {
+            // Pulsing reticle for active rally gathering point
+            const cx = px + s/2, cy = py + s/2, r = s/2 - pad;
+            const phase = (Date.now() % 1200) / 1200;
+            const alpha = 0.5 + 0.5 * Math.sin(phase * Math.PI * 2);
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.strokeStyle = '#ef4444';
+            ctx.lineWidth   = Math.max(2, s * 0.09);
+            ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+            const cr = r * 0.35;
+            ctx.beginPath();
+            ctx.moveTo(cx - r, cy); ctx.lineTo(cx - cr, cy);
+            ctx.moveTo(cx + cr, cy); ctx.lineTo(cx + r, cy);
+            ctx.moveTo(cx, cy - r); ctx.lineTo(cx, cy - cr);
+            ctx.moveTo(cx, cy + cr); ctx.lineTo(cx, cy + r);
+            ctx.stroke();
+            ctx.globalAlpha = 1;
+            // Rally icon (swords ⚔ or R label)
+            if (s >= 24) {
+                ctx.fillStyle    = '#ef4444';
+                ctx.font         = `bold ${Math.max(8, Math.floor(s * 0.32))}px monospace`;
+                ctx.textAlign    = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('R', cx, cy);
+            }
+            ctx.restore();
         }
 
         ctx.restore();
@@ -597,6 +669,7 @@ const ConquerMap = (() => {
             else if (e.type === 'resource') mmCtx.fillStyle = '#22c55e';
             else if (e.type === 'shrine')   mmCtx.fillStyle = '#a78bfa';
             else if (e.type === 'charm')    mmCtx.fillStyle = '#a855f7';
+            else if (e.type === 'rally')    mmCtx.fillStyle = '#ef4444';
             else continue;
             mmCtx.fillRect(mx - 1, my - 1, 3, 3);
         }
@@ -744,7 +817,23 @@ const ConquerMap = (() => {
         const tileEntity = entities[`${tileX},${tileY}`];
         const isMonster  = tileEntity?.type === 'monster';
         const isCharm    = tileEntity?.type === 'charm';
+        const isCity     = tileEntity?.type === 'city';
         selectedTile     = { x: tileX, y: tileY, isMonster, isCharm };
+
+        // City click → hex popup (no tile info fetch needed)
+        if (isCity) {
+            const rect   = canvas.getBoundingClientRect();
+            const screenX = Math.round(rect.left + tileX * s + s / 2 - camX);
+            const screenY = Math.round(rect.top  + tileY * s + s / 2 - camY);
+            onCityClick(tileEntity, screenX, screenY);
+            return;
+        }
+
+        // Monster click → directly open attack modal
+        if (isMonster) {
+            onMonsterClick(tileEntity);
+            return;
+        }
 
         // Optimistically show coords while loading
         onTileInfo({ x: tileX, y: tileY, occupant: null });
@@ -896,6 +985,8 @@ const ConquerMap = (() => {
     function currentZoom() { return ZOOM_LEVELS[zoomIdx]; }
     function setMarches(marches) { activeMarches = marches || []; }
     function refreshEntities() { lastVP = ''; scheduleFetch(); }
+    function setMyPlayerId(id)   { myPlayerId   = id; }
+    function setMyAllianceId(id) { myAllianceId = id; }
 
-    return { init, jumpToCity, jumpTo, zoomIn, zoomOut, currentZoom, setMarches, refreshEntities };
+    return { init, jumpToCity, jumpTo, zoomIn, zoomOut, currentZoom, setMarches, refreshEntities, setMyPlayerId, setMyAllianceId };
 })();
