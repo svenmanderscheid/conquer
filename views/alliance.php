@@ -58,10 +58,10 @@ $csrf = $session['csrf_token'];
             padding: 0 12px;
         }
 
-        /* ── Section card ── */
+        /* ── Section card — extends game-panel from main.css ── */
         .card {
-            background: #0f1729;
-            border: 1px solid rgba(184,134,11,0.3);
+            background: var(--c-panel, #0f1729);
+            border: 1px solid var(--c-border, rgba(184,134,11,0.3));
             border-radius: 12px;
             overflow: hidden;
             margin-bottom: 16px;
@@ -76,7 +76,7 @@ $csrf = $session['csrf_token'];
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            color: #d4a017;
+            color: var(--c-gold, #d4a017);
             display: flex;
             align-items: center;
             gap: 8px;
@@ -295,7 +295,7 @@ $csrf = $session['csrf_token'];
         .chat-input:focus { border-color: rgba(212,160,23,0.6); }
         .chat-input::placeholder { color: #475569; }
 
-        /* ── Buttons ── */
+        /* ── Buttons — use btn-game from main.css; local aliases for compat ── */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -313,7 +313,7 @@ $csrf = $session['csrf_token'];
             letter-spacing: 0.04em;
         }
 
-        .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+        .btn:disabled { filter: grayscale(0.5) opacity(0.5); cursor: not-allowed; }
         .btn:hover:not(:disabled) { filter: brightness(1.12); }
         .btn:active:not(:disabled) { transform: translateY(1px); }
 

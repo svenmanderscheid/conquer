@@ -108,20 +108,20 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-            --bg:      #0a0e1a;
-            --surface: #111827;
-            --surface2: #1a2235;
-            --border:  #1e3a5f;
-            --border2: #2a4a7f;
-            --text:    #d1dce8;
-            --muted:   #6b82a0;
+            --bg:      #080c18;
+            --surface: #0f1729;
+            --surface2: #1a2744;
+            --border:  rgba(184,134,11,0.3);
+            --border2: rgba(212,160,23,0.5);
+            --text:    #e2e8f0;
+            --muted:   #64748b;
             --gold:    #d4a017;
-            --gold2:   #f0c040;
+            --gold2:   #f0d080;
             --green:   #22c55e;
             --red:     #dc2626;
             --red2:    #ef4444;
-            --blue:    #1e4080;
-            --blue2:   #2563a8;
+            --blue:    #1a2744;
+            --blue2:   #1d4ed8;
         }
 
         html, body {
@@ -145,30 +145,32 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
 
         /* ── Top back bar ── */
         .topbar {
-            background: var(--surface);
+            background: linear-gradient(180deg, #1a2744 0%, #0f1729 100%);
             border-bottom: 1px solid var(--border);
             padding: 0.5rem 1.25rem;
             display: flex;
             align-items: center;
             gap: 0.75rem;
             flex-wrap: wrap;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
         }
         .topbar-back {
             padding: 0.25rem 0.75rem;
             border-radius: 5px;
-            background: var(--bg);
+            background: rgba(0,0,0,0.3);
             border: 1px solid var(--border);
             color: var(--muted);
             text-decoration: none;
             font-size: 0.78rem;
+            transition: border-color 0.15s, color 0.15s;
         }
-        .topbar-back:hover { border-color: var(--gold); color: var(--gold); }
-        .topbar-id { font-size: 0.82rem; color: var(--gold); font-weight: 700; }
+        .topbar-back:hover { border-color: var(--border2); color: var(--gold2); }
+        .topbar-id { font-size: 0.82rem; color: var(--gold2); font-weight: 700; letter-spacing: 0.04em; }
         .topbar-date { font-size: 0.75rem; color: var(--muted); margin-left: auto; }
 
         /* ── VS Header ── */
         .vs-header {
-            background: linear-gradient(180deg, #0d1e3a 0%, #0a1628 100%);
+            background: linear-gradient(180deg, #1a2744 0%, #0d1322 100%);
             border-bottom: 2px solid var(--border2);
             padding: 1.25rem 1.5rem 1rem;
             display: grid;
@@ -242,14 +244,14 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
 
         /* ── Section header ── */
         .section-header {
-            background: linear-gradient(90deg, var(--blue) 0%, transparent 100%);
+            background: linear-gradient(90deg, rgba(184,134,11,0.18) 0%, rgba(184,134,11,0.04) 60%, transparent 100%);
             padding: 0.35rem 1.25rem;
             font-size: 0.65rem;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.12em;
-            color: #7ab4e0;
-            border-top: 1px solid var(--border2);
+            color: var(--gold2);
+            border-top: 1px solid var(--border);
             border-bottom: 1px solid var(--border);
         }
 
@@ -258,6 +260,7 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
             display: grid;
             grid-template-columns: 1fr 1px 1fr;
             background: var(--surface);
+            border-bottom: 1px solid var(--border);
         }
         .troops-lost-col {
             padding: 1rem 1.5rem;
@@ -270,7 +273,7 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            color: var(--muted);
+            color: var(--gold2);
             margin-bottom: 0.75rem;
             padding-bottom: 0.4rem;
             border-bottom: 1px solid var(--border);
@@ -305,6 +308,7 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
             padding: 1rem 1.25rem;
             background: var(--surface2);
             align-items: flex-end;
+            border-bottom: 1px solid var(--border);
         }
         .troop-chip {
             display: flex;
@@ -323,18 +327,19 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
             justify-content: center;
             font-size: 1.3rem;
             position: relative;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
         }
         .troop-chip-tier {
             position: absolute;
             bottom: -2px;
             right: -2px;
-            background: var(--blue);
+            background: #1a2744;
             color: var(--gold2);
             font-size: 0.55rem;
             font-weight: 800;
             padding: 0.05rem 0.25rem;
             border-radius: 3px;
-            border: 1px solid var(--border2);
+            border: 1px solid rgba(212,160,23,0.5);
         }
         .troop-chip-count {
             font-size: 0.75rem;
@@ -380,6 +385,7 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
             flex-wrap: wrap;
             gap: 0;
             background: var(--surface);
+            border-bottom: 1px solid var(--border);
         }
         .mstat {
             flex: 1 1 150px;

@@ -63,17 +63,21 @@ $outcomeLabel = [
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-            --bg:      #0f172a;
-            --surface: #1e293b;
-            --border:  #334155;
+            --bg:      #080c18;
+            --surface: #0f1729;
+            --surface2: #1a2744;
+            --border:  rgba(184,134,11,0.3);
+            --border-h: rgba(212,160,23,0.7);
             --text:    #e2e8f0;
-            --muted:   #94a3b8;
-            --gold:    #f59e0b;
+            --muted:   #64748b;
+            --muted2:  #94a3b8;
+            --gold:    #d4a017;
+            --gold-l:  #f0d080;
         }
 
         html, body {
             min-height: 100%;
-            background: #000;
+            background: var(--bg);
             color: var(--text);
             font-family: system-ui, -apple-system, sans-serif;
             display: flex;
@@ -101,18 +105,19 @@ $outcomeLabel = [
             text-align: left;
             padding: 0.5rem 0.75rem;
             border-bottom: 2px solid var(--border);
-            color: var(--muted);
-            font-weight: 600;
+            color: var(--muted2);
+            font-weight: 700;
             text-transform: uppercase;
-            font-size: 0.7rem;
-            letter-spacing: 0.06em;
+            font-size: 0.68rem;
+            letter-spacing: 0.08em;
+            background: linear-gradient(180deg, #1a2744 0%, #0f1729 100%);
         }
         td {
             padding: 0.55rem 0.75rem;
-            border-bottom: 1px solid #1e293b;
+            border-bottom: 1px solid rgba(184,134,11,0.12);
         }
-        tr:hover td { background: rgba(255,255,255,0.03); }
-        tr.unread td { background: rgba(245,158,11,0.06); }
+        tr:hover td { background: rgba(212,160,23,0.04); }
+        tr.unread td { background: rgba(212,160,23,0.07); }
 
         .outcome-badge {
             display: inline-block;
@@ -120,20 +125,23 @@ $outcomeLabel = [
             border-radius: 999px;
             font-size: 0.72rem;
             font-weight: 700;
-            background: rgba(0,0,0,0.3);
+            background: rgba(0,0,0,0.35);
+            border: 1px solid rgba(255,255,255,0.06);
         }
 
         .btn-detail {
             padding: 0.2rem 0.65rem;
             border-radius: 5px;
             font-size: 0.75rem;
-            background: var(--surface);
+            background: linear-gradient(180deg, #1a2744 0%, #0f1729 100%);
             border: 1px solid var(--border);
-            color: var(--text);
+            color: var(--muted2);
             text-decoration: none;
             cursor: pointer;
+            transition: border-color 0.15s, color 0.15s;
+            display: inline-block;
         }
-        .btn-detail:hover { border-color: var(--gold); color: var(--gold); }
+        .btn-detail:hover { border-color: var(--border-h); color: var(--gold-l); }
 
         .pagination {
             display: flex;
@@ -144,14 +152,16 @@ $outcomeLabel = [
         .page-btn {
             padding: 0.25rem 0.65rem;
             border-radius: 5px;
-            background: var(--surface);
+            background: linear-gradient(180deg, #1a2744 0%, #0f1729 100%);
             border: 1px solid var(--border);
-            color: var(--text);
+            color: var(--muted2);
             font-size: 0.78rem;
             text-decoration: none;
+            transition: border-color 0.15s, color 0.15s;
+            display: inline-block;
         }
-        .page-btn.active { border-color: var(--gold); color: var(--gold); font-weight: 700; }
-        .page-btn:hover  { border-color: var(--gold); }
+        .page-btn.active { border-color: var(--gold); color: var(--gold-l); font-weight: 700; }
+        .page-btn:hover  { border-color: var(--border-h); color: var(--gold-l); }
 
         .empty { padding: 3rem; text-align: center; color: var(--muted); font-size: 0.9rem; }
     </style>
@@ -160,7 +170,7 @@ $outcomeLabel = [
 <?php $hudCurrentView = 'reports'; require __DIR__ . '/partials/hud.php'; ?>
 <div id="game">
 
-    <header style="flex:0 0 40px;background:var(--surface);border-bottom:1px solid var(--border);padding:0 1.25rem;display:flex;align-items:center;gap:0.75rem">
+    <header style="flex:0 0 40px;background:linear-gradient(180deg,#1a2744 0%,#0f1729 100%);border-bottom:1px solid var(--border);padding:0 1.25rem;display:flex;align-items:center;gap:0.75rem;box-shadow:0 2px 8px rgba(0,0,0,0.4)">
         <span style="font-size:0.95rem;font-weight:700;color:var(--gold)">&#x1F4DC; Kampfberichte</span>
         <span style="color:var(--muted);font-size:0.8rem"><?= $total ?> Berichte gesamt</span>
     </header>
