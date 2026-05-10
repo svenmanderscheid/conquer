@@ -57,11 +57,12 @@ declare(strict_types=1);
         #coord-bar {
             position: absolute;
             bottom: 10px; left: 50%; transform: translateX(-50%);
-            background: rgba(15,23,42,0.85);
-            border: 1px solid #334155; border-radius: 6px;
+            background: rgba(8,12,24,0.88);
+            border: 1px solid rgba(184,134,11,0.3); border-radius: 6px;
             padding: 3px 12px;
             font-size: 0.75rem; color: #64748b; white-space: nowrap;
             pointer-events: none;
+            backdrop-filter: blur(4px);
         }
         #coord-bar strong { color: #94a3b8; }
 
