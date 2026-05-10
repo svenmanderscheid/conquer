@@ -93,6 +93,24 @@ final class OAuth
         // Award daily VIP login points (+10, max once per UTC day).
         \Conquer\Game\Vip\VipService::dailyLogin($playerId);
 
+        // Initialize tutorial progress (INSERT IGNORE — safe to call every login).
+        try {
+            \Conquer\Game\Tutorial\TutorialService::ensureInitialized($playerId);
+        } catch (\Throwable) {}
+
+        // Ensure daily quests exist for today (idempotent).
+        try {
+            \Conquer\Game\Quest\DailyQuestService::ensureDailyQuests($playerId);
+        } catch (\Throwable) {}
+
+        // Update last_active_at
+        try {
+            \Conquer\Db\Connection::getInstance()->execute(
+                'UPDATE players SET last_active_at = UTC_TIMESTAMP() WHERE id = ?',
+                [$playerId],
+            );
+        } catch (\Throwable) {}
+
         return $playerId;
     }
 

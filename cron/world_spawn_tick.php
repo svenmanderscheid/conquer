@@ -272,4 +272,26 @@ foreach ($sectors as $sIdx => $sector) {
 }
 
 $log->info("world_spawn_tick: despawn cleanup done, {$totalSpawned} monsters spawned across 8 sectors.");
+
+// ---------------------------------------------------------------------------
+// Step 3: Shrine maintenance — mark contested shrines as secured if timer elapsed
+// ---------------------------------------------------------------------------
+try {
+    \Conquer\Game\Shrine\ShrineService::checkSecured();
+    $log->info('world_spawn_tick: shrine checkSecured done.');
+} catch (\Throwable $e) {
+    $log->error('world_spawn_tick: shrine checkSecured failed: ' . $e->getMessage());
+}
+
+// ---------------------------------------------------------------------------
+// Step 4: Field object maintenance — clean expired objects + spawn new ones
+// ---------------------------------------------------------------------------
+try {
+    \Conquer\Game\Map\FieldObjectService::cleanExpired();
+    \Conquer\Game\Map\FieldObjectService::spawnObjects(1);
+    $log->info('world_spawn_tick: field object maintenance done.');
+} catch (\Throwable $e) {
+    $log->error('world_spawn_tick: field object maintenance failed: ' . $e->getMessage());
+}
+
 echo "Tick complete. {$totalSpawned} monsters spawned.\n";

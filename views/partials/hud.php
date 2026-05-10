@@ -361,16 +361,25 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
     flex-shrink: 0;
 }
 
-/* ── BOTTOM NAV (bottom-right) ───────────────────────────────────────────── */
+/* ── BOTTOM NAV ──────────────────────────────────────────────────────────── */
 #hud-bottom {
     position: fixed;
-    bottom: 12px;
-    right: 12px;
+    bottom: 0;
+    left: 0;
+    right: 0;
     z-index: 9000;
+    pointer-events: none;
+}
+
+#hud-bottom-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 12px 12px;
     display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
     gap: 8px;
-    align-items: center;
-    width: max-content;
+    pointer-events: all;
 }
 
 .hud-nav-btn {
@@ -379,9 +388,9 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
     align-items: center;
     justify-content: center;
     gap: 3px;
-    min-width: 52px;
-    min-height: 52px;
-    padding: 6px 8px;
+    width: 58px;
+    height: 58px;
+    padding: 6px 4px;
     background: rgba(15,7,0,0.9);
     border: 1px solid rgba(184,134,11,0.35);
     border-radius: 10px;
@@ -719,16 +728,15 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
 
 /* Mobile adjustments */
 @media (max-width: 600px) {
-    #hud-bottom {
-        bottom: 8px;
-        right: 8px;
+    #hud-bottom-inner {
+        padding: 0 8px 8px;
         gap: 6px;
     }
 
     .hud-nav-btn {
-        min-width: 48px;
-        min-height: 48px;
-        padding: 5px 6px;
+        width: 52px;
+        height: 52px;
+        padding: 5px 4px;
     }
 
     .hud-reports-layout {
@@ -832,6 +840,7 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
 
 <!-- ── BOTTOM NAV ─────────────────────────────────────────────────────────── -->
 <div id="hud-bottom">
+<div id="hud-bottom-inner">
     <button onclick="hudOpenInventory()" class="hud-nav-btn" title="Inventory">
         <span class="hud-nav-icon">&#x1F4E6;</span>
         <span>Inventory</span>
@@ -851,6 +860,7 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
         <span class="hud-nav-icon"><?= $_hud_toggle_icon ?></span>
         <span><?= htmlspecialchars($_hud_toggle_label) ?></span>
     </a>
+</div>
 </div>
 
 <!-- ── MESSAGES MODAL ─────────────────────────────────────────────────────── -->

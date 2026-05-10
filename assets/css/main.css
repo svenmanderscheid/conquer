@@ -1,0 +1,437 @@
+/* ==========================================================================
+   Conquer — Global Game Theme
+   Dark fantasy strategy MMO — inspired by League of Kingdoms aesthetic
+   ========================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* --------------------------------------------------------------------------
+   CSS Custom Properties — Design Tokens
+   -------------------------------------------------------------------------- */
+:root {
+    --c-bg:        #080c18;
+    --c-panel:     #0f1729;
+    --c-panel2:    #1a2744;
+    --c-border:    rgba(184,134,11,0.3);
+    --c-border-h:  rgba(212,160,23,0.7);
+    --c-gold:      #d4a017;
+    --c-gold-l:    #f0d080;
+    --c-gold-xl:   #ffd700;
+    --c-text:      #e2e8f0;
+    --c-muted:     #64748b;
+    --c-muted2:    #94a3b8;
+    --c-epic:      #8b5cf6;
+    --c-legendary: #0ea5e9;
+    --c-danger:    #ef4444;
+    --c-success:   #22c55e;
+    --c-warning:   #f59e0b;
+    --c-amber:     #fbbf24;
+}
+
+html, body {
+    background: var(--c-bg);
+    color: var(--c-text);
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* --------------------------------------------------------------------------
+   Game Buttons
+   -------------------------------------------------------------------------- */
+.btn-game {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    border: none;
+    background: linear-gradient(180deg, #c8870a 0%, #9a6508 100%);
+    color: #fff8e0;
+    border-bottom: 2px solid #6b4306;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,220,100,0.2);
+    transition: filter 0.15s, transform 0.1s;
+    text-decoration: none;
+    font-family: inherit;
+    line-height: 1.3;
+}
+.btn-game:hover { filter: brightness(1.15); color: #fff8e0; }
+.btn-game:active { transform: translateY(1px); border-bottom-width: 1px; }
+
+.btn-game-blue {
+    background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
+    border-bottom-color: #1e3a8a;
+    color: #fff;
+}
+.btn-game-green {
+    background: linear-gradient(180deg, #16a34a 0%, #15803d 100%);
+    border-bottom-color: #166534;
+    color: #fff;
+}
+.btn-game-red {
+    background: linear-gradient(180deg, #dc2626 0%, #b91c1c 100%);
+    border-bottom-color: #991b1b;
+    color: #fff;
+}
+.btn-game-purple {
+    background: linear-gradient(180deg, #7c3aed 0%, #6d28d9 100%);
+    border-bottom-color: #4c1d95;
+    color: #fff;
+}
+.btn-game-sm { padding: 5px 12px; font-size: 0.72rem; }
+.btn-game-lg { padding: 11px 24px; font-size: 0.9rem; }
+.btn-game:disabled { filter: grayscale(0.6) opacity(0.5); cursor: not-allowed; transform: none; }
+
+/* --------------------------------------------------------------------------
+   Game Panels / Cards
+   -------------------------------------------------------------------------- */
+.game-panel {
+    background: var(--c-panel);
+    border: 1px solid var(--c-border);
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+.game-panel-header {
+    background: linear-gradient(180deg, #1a2744 0%, #0f1729 100%);
+    border-bottom: 1px solid var(--c-border);
+    border-radius: 10px 10px 0 0;
+    padding: 10px 16px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--c-gold-l);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.game-panel-body {
+    padding: 16px;
+}
+
+/* --------------------------------------------------------------------------
+   Progress Bars
+   -------------------------------------------------------------------------- */
+.progress-bar-wrap {
+    background: rgba(0,0,0,0.4);
+    border-radius: 999px;
+    height: 8px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.progress-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #b8860b 0%, #ffd700 50%, #f0c040 100%);
+    box-shadow: 0 0 6px rgba(255,215,0,0.4);
+    transition: width 0.3s ease;
+}
+
+.progress-bar-fill.blue {
+    background: linear-gradient(90deg, #1d4ed8 0%, #60a5fa 100%);
+    box-shadow: 0 0 6px rgba(96,165,250,0.4);
+}
+
+.progress-bar-fill.green {
+    background: linear-gradient(90deg, #166534 0%, #4ade80 100%);
+    box-shadow: 0 0 6px rgba(74,222,128,0.4);
+}
+
+.progress-bar-fill.red {
+    background: linear-gradient(90deg, #991b1b 0%, #f87171 100%);
+}
+
+.progress-bar-fill.purple {
+    background: linear-gradient(90deg, #5b21b6 0%, #c4b5fd 100%);
+    box-shadow: 0 0 6px rgba(196,181,253,0.4);
+}
+
+/* --------------------------------------------------------------------------
+   Resource Chips
+   -------------------------------------------------------------------------- */
+.res-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 5px;
+    padding: 3px 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--c-gold-l);
+}
+
+.res-chip.ok  { border-color: rgba(34,197,94,0.35); color: #86efac; }
+.res-chip.bad { border-color: rgba(239,68,68,0.35); color: #fca5a5; }
+
+/* --------------------------------------------------------------------------
+   Grade / Rarity Colors
+   -------------------------------------------------------------------------- */
+.grade-normal    { color: #94a3b8; border-color: #334155; }
+.grade-rare      { color: #60a5fa; border-color: rgba(96,165,250,0.4); }
+.grade-epic      { color: #c4b5fd; border-color: rgba(139,92,246,0.5); }
+.grade-legendary { color: #fbbf24; border-color: rgba(251,191,36,0.5); }
+.grade-mythic    { color: #2dd4bf; border-color: rgba(45,212,191,0.5); }
+
+/* --------------------------------------------------------------------------
+   Countdown / Monospace Badges
+   -------------------------------------------------------------------------- */
+.countdown-badge {
+    font-family: monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 4px;
+    padding: 2px 6px;
+    color: #94a3b8;
+}
+
+/* --------------------------------------------------------------------------
+   Section / Title Labels
+   -------------------------------------------------------------------------- */
+.section-label {
+    font-size: 0.62rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--c-gold);
+    margin-bottom: 8px;
+}
+
+/* --------------------------------------------------------------------------
+   Tab Bars — Global Style
+   -------------------------------------------------------------------------- */
+.game-tab-bar {
+    display: flex;
+    background: var(--c-panel);
+    border-bottom: 1px solid var(--c-border);
+}
+
+.game-tab-btn {
+    padding: 10px 20px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--c-muted);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+    margin-bottom: -1px;
+    font-family: inherit;
+}
+
+.game-tab-btn:hover { color: var(--c-text); }
+.game-tab-btn.active {
+    color: var(--c-gold-l);
+    border-bottom-color: var(--c-gold);
+}
+
+/* --------------------------------------------------------------------------
+   Form Elements
+   -------------------------------------------------------------------------- */
+.game-input {
+    width: 100%;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--c-border);
+    border-radius: 6px;
+    color: var(--c-text);
+    font-size: 0.85rem;
+    padding: 8px 12px;
+    outline: none;
+    transition: border-color 0.15s;
+    font-family: inherit;
+}
+
+.game-input:focus {
+    border-color: var(--c-border-h);
+}
+
+.game-label {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--c-muted);
+    margin-bottom: 5px;
+}
+
+/* --------------------------------------------------------------------------
+   Utility — Dividers, Gaps, etc.
+   -------------------------------------------------------------------------- */
+.game-divider {
+    border: none;
+    border-top: 1px solid var(--c-border);
+    margin: 8px 0;
+}
+
+.text-gold  { color: var(--c-gold-l); }
+.text-muted { color: var(--c-muted); }
+.text-good  { color: var(--c-success); }
+.text-bad   { color: var(--c-danger); }
+.text-warn  { color: var(--c-warning); }
+.text-epic  { color: var(--c-epic); }
+
+/* --------------------------------------------------------------------------
+   Scrollbars — Dark Themed
+   -------------------------------------------------------------------------- */
+.game-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(184,134,11,0.3) rgba(0,0,0,0.2);
+    overflow-y: auto;
+}
+
+.game-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+.game-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+.game-scroll::-webkit-scrollbar-thumb {
+    background: rgba(184,134,11,0.3);
+    border-radius: 3px;
+}
+.game-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(212,160,23,0.5);
+}
+
+/* --------------------------------------------------------------------------
+   Toast Notifications
+   -------------------------------------------------------------------------- */
+.game-toast {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    padding: 8px 16px;
+    border-radius: 7px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    z-index: 9000;
+    pointer-events: none;
+    display: none;
+    backdrop-filter: blur(4px);
+}
+
+.game-toast.ok  {
+    background: rgba(34,197,94,0.12);
+    border: 1px solid rgba(34,197,94,0.4);
+    color: #22c55e;
+}
+
+.game-toast.err {
+    background: rgba(239,68,68,0.12);
+    border: 1px solid rgba(239,68,68,0.4);
+    color: #ef4444;
+}
+
+/* --------------------------------------------------------------------------
+   Overlay / Modal Base
+   -------------------------------------------------------------------------- */
+.game-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 4000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.game-modal {
+    background: var(--c-panel);
+    border: 1px solid var(--c-border);
+    border-radius: 12px;
+    box-shadow: 0 16px 64px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.04);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 80px);
+}
+
+.game-modal-header {
+    background: linear-gradient(180deg, #1c1400 0%, #130e00 100%);
+    border-bottom: 1px solid var(--c-border);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.game-modal-title {
+    font-size: 0.92rem;
+    font-weight: 800;
+    color: var(--c-gold-l);
+    letter-spacing: 0.04em;
+}
+
+.game-modal-close {
+    background: rgba(239,68,68,0.1);
+    border: 1px solid rgba(239,68,68,0.3);
+    border-radius: 5px;
+    color: #f87171;
+    font-size: 0.9rem;
+    padding: 3px 10px;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-family: inherit;
+    line-height: 1.5;
+}
+
+.game-modal-close:hover { background: rgba(239,68,68,0.25); }
+
+/* --------------------------------------------------------------------------
+   Member / Role Badges
+   -------------------------------------------------------------------------- */
+.role-badge {
+    font-size: 0.62rem;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    display: inline-block;
+}
+
+.role-leader      { background: #d97706; color: #fff; }
+.role-vice_leader { background: #7c3aed; color: #fff; }
+.role-officer     { background: #0369a1; color: #fff; }
+.role-veteran     { background: #166534; color: #fff; }
+.role-member      { background: rgba(51,65,85,0.8); color: #94a3b8; border: 1px solid #334155; }
+
+/* --------------------------------------------------------------------------
+   Animations
+   -------------------------------------------------------------------------- */
+@keyframes pulse-gold {
+    0%, 100% { box-shadow: 0 0 6px rgba(212,160,23,0.2); }
+    50%       { box-shadow: 0 0 16px rgba(212,160,23,0.6); }
+}
+
+@keyframes pulse-green {
+    0%, 100% { box-shadow: 0 0 6px rgba(34,197,94,0.2); }
+    50%       { box-shadow: 0 0 14px rgba(34,197,94,0.55); }
+}
+
+@keyframes pulse-blue {
+    0%, 100% { box-shadow: 0 0 6px rgba(96,165,250,0.2); }
+    50%       { box-shadow: 0 0 14px rgba(96,165,250,0.55); }
+}
+
+@keyframes pulse-purple {
+    0%, 100% { box-shadow: 0 0 6px rgba(167,139,250,0.2); }
+    50%       { box-shadow: 0 0 14px rgba(167,139,250,0.55); }
+}
+
+.pulse-gold   { animation: pulse-gold   2s ease-in-out infinite; }
+.pulse-green  { animation: pulse-green  2s ease-in-out infinite; }
+.pulse-blue   { animation: pulse-blue   2s ease-in-out infinite; }
+.pulse-purple { animation: pulse-purple 2s ease-in-out infinite; }

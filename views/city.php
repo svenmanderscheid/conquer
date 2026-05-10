@@ -77,20 +77,20 @@ foreach ($troopQueue as $tq) {
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-            --bg:      #0f172a;
-            --surface: #1e293b;
-            --border:  #334155;
+            --bg:      #080c18;
+            --surface: #0f1729;
+            --border:  rgba(184,134,11,0.3);
             --text:    #e2e8f0;
             --muted:   #94a3b8;
-            --accent:  #0ea5e9;
-            --gold:    #f59e0b;
+            --accent:  #d4a017;
+            --gold:    #f0d080;
             --green:   #22c55e;
             --red:     #ef4444;
         }
 
         html, body {
             height: 100%;
-            background: #000;
+            background: var(--bg);
             color: var(--text);
             font-family: system-ui, -apple-system, sans-serif;
             overflow: hidden;
@@ -113,8 +113,8 @@ foreach ($troopQueue as $tq) {
         .topbar {
             flex: 0 0 48px;
             height: 48px;
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
+            background: linear-gradient(180deg, #1a0d00 0%, #0f0700 100%);
+            border-bottom: 1px solid rgba(184,134,11,0.4);
             padding: 0 1rem;
             display: flex;
             align-items: center;
@@ -123,10 +123,11 @@ foreach ($troopQueue as $tq) {
 
         .topbar-title {
             font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--accent);
+            font-weight: 700;
+            color: #f0d080;
             white-space: nowrap;
             text-decoration: none;
+            letter-spacing: 0.03em;
         }
 
         .resources {
@@ -140,11 +141,13 @@ foreach ($troopQueue as $tq) {
             display: flex;
             align-items: center;
             gap: 0.25rem;
-            background: var(--bg);
-            border: 1px solid var(--border);
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(184,134,11,0.2);
             border-radius: 5px;
             padding: 0.2rem 0.5rem;
-            font-size: 0.78rem;
+            font-size: 0.75rem;
+            color: #f0d080;
+            font-weight: 600;
         }
 
         .topbar-actions {
@@ -158,18 +161,19 @@ foreach ($troopQueue as $tq) {
             border-radius: 5px;
             font-size: 0.78rem;
             cursor: pointer;
-            border: 1px solid var(--border);
-            background: var(--bg);
-            color: var(--muted);
+            border: 1px solid rgba(184,134,11,0.3);
+            background: rgba(0,0,0,0.3);
+            color: #94a3b8;
             text-decoration: none;
+            transition: border-color 0.15s, color 0.15s;
         }
-        .btn:hover { border-color: var(--accent); color: var(--accent); }
+        .btn:hover { border-color: #d4a017; color: #f0d080; }
 
         /* ── Canvas wrapper ── */
         #city-wrap {
             flex: 1;
             overflow: auto;
-            background: var(--bg);
+            background: #050810;
             position: relative;
         }
 
@@ -182,16 +186,18 @@ foreach ($troopQueue as $tq) {
         /* ── Tooltip ── */
         #city-tooltip {
             position: fixed;
-            background: var(--surface);
-            border: 1px solid var(--gold);
+            background: linear-gradient(180deg, #1a2744 0%, #0f1729 100%);
+            border: 1px solid rgba(212,160,23,0.6);
             border-radius: 6px;
-            padding: 0.4rem 0.8rem;
-            font-size: 0.8rem;
-            color: var(--text);
+            padding: 0.4rem 0.9rem;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #f0d080;
             pointer-events: none;
             display: none;
             z-index: 30;
             white-space: nowrap;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.6);
         }
 
         /* ── Building Popup (three-part: above / spacer / below) ── */
@@ -215,25 +221,28 @@ foreach ($troopQueue as $tq) {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: rgba(15,23,42,0.92);
-            border: 1px solid #f59e0b;
+            background: linear-gradient(180deg, rgba(26,39,68,0.97) 0%, rgba(8,12,24,0.97) 100%);
+            border: 1px solid rgba(212,160,23,0.7);
             border-radius: 20px;
-            padding: 5px 16px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.6);
+            padding: 6px 18px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.8), 0 0 12px rgba(212,160,23,0.15);
         }
         #bp-name {
-            font-size: 0.88rem;
-            font-weight: 700;
-            color: #e2e8f0;
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: #f0d080;
             white-space: nowrap;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
         #bp-badge {
-            font-size: 0.72rem;
-            font-weight: 700;
-            color: #f59e0b;
-            background: rgba(245,158,11,0.15);
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: #d4a017;
+            background: rgba(212,160,23,0.15);
+            border: 1px solid rgba(212,160,23,0.3);
             border-radius: 10px;
-            padding: 1px 7px;
+            padding: 1px 8px;
             white-space: nowrap;
         }
 
@@ -266,31 +275,32 @@ foreach ($troopQueue as $tq) {
             padding: 0;
         }
         .hex-shape {
-            width: 48px;
-            height: 54px;
+            width: 52px;
+            height: 58px;
             clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-            background: linear-gradient(160deg, #92400e 0%, #5c1d0a 100%);
+            background: linear-gradient(160deg, #7c3008 0%, #4a1a04 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.7));
+            filter: drop-shadow(0 3px 6px rgba(0,0,0,0.8));
             transition: filter 0.12s, transform 0.12s;
         }
         .hex-wrap.hex-primary .hex-shape {
-            background: linear-gradient(160deg, #b45309 0%, #7c2d12 100%);
+            background: linear-gradient(160deg, #c8870a 0%, #9a6508 100%);
+            filter: drop-shadow(0 3px 8px rgba(200,135,10,0.5));
         }
         .hex-wrap:hover .hex-shape {
-            filter: drop-shadow(0 2px 10px rgba(245,158,11,0.6)) brightness(1.25);
-            transform: scale(1.1);
+            filter: drop-shadow(0 3px 14px rgba(212,160,23,0.7)) brightness(1.2);
+            transform: scale(1.08);
         }
-        .hex-icon { font-size: 1rem; line-height: 1; }
+        .hex-icon { font-size: 1.05rem; line-height: 1; }
         .hex-label {
-            font-size: 0.62rem;
-            color: #fff;
-            font-weight: 700;
+            font-size: 0.6rem;
+            color: #f0d080;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.04em;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+            letter-spacing: 0.05em;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.95);
             white-space: nowrap;
         }
 
@@ -375,13 +385,13 @@ foreach ($troopQueue as $tq) {
             display: flex;
             align-items: center;
             gap: 8px;
-            background: rgba(15,23,42,0.88);
-            border: 1px solid rgba(51,65,85,0.8);
+            background: linear-gradient(180deg, rgba(15,23,42,0.95) 0%, rgba(8,12,24,0.95) 100%);
+            border: 1px solid rgba(184,134,11,0.25);
             border-radius: 10px;
             padding: 5px 10px 5px 6px;
-            backdrop-filter: blur(4px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
-            min-width: 170px;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.03);
+            min-width: 175px;
         }
 
         .cap-icon-wrap {
@@ -409,15 +419,15 @@ foreach ($troopQueue as $tq) {
 
         .cap-name {
             font-size: 0.68rem;
-            font-weight: 600;
-            color: #cbd5e1;
+            font-weight: 700;
+            color: #e2e8f0;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
         .cap-timer {
-            font-size: 0.66rem;
+            font-size: 0.64rem;
             font-family: monospace;
             font-variant-numeric: tabular-nums;
             color: #64748b;
@@ -425,26 +435,29 @@ foreach ($troopQueue as $tq) {
         }
 
         .cap-timer.cap-timer-build    { color: #fbbf24; }
-        .cap-timer.cap-timer-research { color: #a78bfa; }
+        .cap-timer.cap-timer-research { color: #c4b5fd; }
         .cap-timer.cap-timer-troop    { color: #4ade80; }
 
         /* ── Building modal overlay ── */
         #bldg-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,.72);
+            background: rgba(0,0,0,0.82);
             z-index: 4000;
             align-items: center;
             justify-content: center;
             overflow-y: auto;
             padding: 60px 8px 20px;
+            backdrop-filter: blur(2px);
         }
         #bldg-wrap {
             width: 100%;
             max-width: 960px;
             display: flex;
             flex-direction: column;
-            max-height: calc(100vh - 100px); /* overlay padding: 60px top + 20px bottom + margin */
+            max-height: calc(100vh - 100px);
+            border-radius: 12px;
+            box-shadow: 0 24px 80px rgba(0,0,0,0.9), 0 0 0 1px rgba(184,134,11,0.15);
         }
     </style>
 </head>
@@ -476,6 +489,28 @@ foreach ($troopQueue as $tq) {
 
 <!-- Left side activity panel -->
 <div id="city-activity-panel"></div>
+
+<!-- Hospital wounded panel (Alpine.js, only visible when wounded > 0) -->
+<div id="hospital-panel"
+     x-data="hospitalApp()" x-init="loadHospital()"
+     x-show="hospitalWounded.length > 0" x-cloak
+     style="position:fixed;right:12px;bottom:80px;z-index:150;width:220px">
+    <div style="background:linear-gradient(180deg,rgba(15,23,42,0.97),rgba(8,12,24,0.97));border:1px solid rgba(239,68,68,0.35);border-radius:10px;padding:10px 12px;backdrop-filter:blur(8px);box-shadow:0 2px 12px rgba(0,0,0,0.7)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <div style="font-size:0.68rem;font-weight:800;color:#f87171;text-transform:uppercase;letter-spacing:0.06em">🏥 Hospital</div>
+            <button style="font-size:0.62rem;padding:2px 7px;border-radius:4px;background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.4);color:#f87171;cursor:pointer;font-weight:700"
+                    @click="instantHeal()">
+                Sofort (50💎)
+            </button>
+        </div>
+        <template x-for="w in hospitalWounded" :key="w.troop_code">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:0.72rem">
+                <span style="color:#e2e8f0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px" x-text="w.troop_name ?? w.troop_code"></span>
+                <span style="color:#f87171;font-weight:700;white-space:nowrap;margin-left:6px" x-text="Number(w.count).toLocaleString()"></span>
+            </div>
+        </template>
+    </div>
+</div>
 
 </div><!-- #game -->
 
@@ -852,7 +887,7 @@ function renderActivityPanel() {
     // Troop queue (one row per batch)
     if (TROOP_QUEUE && TROOP_QUEUE.length > 0) {
         TROOP_QUEUE.forEach(tq => {
-            const troopName = tq.code.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+            const troopName = String(tq.code).replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
             rows.push({
                 type:       'troop',
                 icon:       '⚔',
@@ -1133,5 +1168,39 @@ window.openBuildingModal = openBuildingModal;
 <div id="bldg-overlay" style="display:none" onclick="closeBldgModal(event)">
     <div id="bldg-wrap"></div>
 </div>
+
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<script>
+function hospitalApp() {
+    return {
+        hospitalWounded: [],
+
+        async loadHospital() {
+            try {
+                const r = await fetch('/api/hospital/status');
+                const j = await r.json();
+                if (j.ok) this.hospitalWounded = j.data.wounded ?? [];
+            } catch {}
+        },
+
+        async instantHeal() {
+            if (!confirm('50 Gems für Sofort-Heilung ausgeben?')) return;
+            try {
+                const r = await fetch('/api/hospital/instant-heal', {
+                    method:  'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body:    JSON.stringify({ csrf_token: <?= json_encode($session['csrf_token'] ?? '') ?> }),
+                });
+                const j = await r.json();
+                if (j.ok) {
+                    this.hospitalWounded = [];
+                } else {
+                    alert(j.message || j.error || 'Fehler');
+                }
+            } catch { alert('Netzwerkfehler'); }
+        },
+    };
+}
+</script>
 </body>
 </html>

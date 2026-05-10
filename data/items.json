@@ -1,0 +1,366 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "code": 10103001,
+      "name": "Speed Up 5m",
+      "category": "speedup",
+      "subcategory": "generic",
+      "duration_seconds": 300,
+      "description": "Reduces any timer by 5 minutes."
+    },
+    {
+      "code": 10103002,
+      "name": "Speed Up 15m",
+      "category": "speedup",
+      "subcategory": "generic",
+      "duration_seconds": 900,
+      "description": "Reduces any timer by 15 minutes."
+    },
+    {
+      "code": 10103003,
+      "name": "Speed Up 1h",
+      "category": "speedup",
+      "subcategory": "generic",
+      "duration_seconds": 3600,
+      "description": "Reduces any timer by 1 hour."
+    },
+    {
+      "code": 10103004,
+      "name": "Speed Up 3h",
+      "category": "speedup",
+      "subcategory": "generic",
+      "duration_seconds": 10800,
+      "description": "Reduces any timer by 3 hours."
+    },
+    {
+      "code": 10103005,
+      "name": "Speed Up 8h",
+      "category": "speedup",
+      "subcategory": "generic",
+      "duration_seconds": 28800,
+      "description": "Reduces any timer by 8 hours."
+    },
+    {
+      "code": 10103006,
+      "name": "Speed Up 24h",
+      "category": "speedup",
+      "subcategory": "generic",
+      "duration_seconds": 86400,
+      "description": "Reduces any timer by 24 hours."
+    },
+    {
+      "code": 10103011,
+      "name": "Building Speed Up 1h",
+      "category": "speedup",
+      "subcategory": "building",
+      "duration_seconds": 3600,
+      "description": "Reduces a building construction or upgrade timer by 1 hour."
+    },
+    {
+      "code": 10103012,
+      "name": "Building Speed Up 3h",
+      "category": "speedup",
+      "subcategory": "building",
+      "duration_seconds": 10800,
+      "description": "Reduces a building construction or upgrade timer by 3 hours."
+    },
+    {
+      "code": 10103013,
+      "name": "Building Speed Up 8h",
+      "category": "speedup",
+      "subcategory": "building",
+      "duration_seconds": 28800,
+      "description": "Reduces a building construction or upgrade timer by 8 hours."
+    },
+    {
+      "code": 10103021,
+      "name": "Research Speed Up 1h",
+      "category": "speedup",
+      "subcategory": "research",
+      "duration_seconds": 3600,
+      "description": "Reduces a research timer by 1 hour."
+    },
+    {
+      "code": 10103022,
+      "name": "Research Speed Up 3h",
+      "category": "speedup",
+      "subcategory": "research",
+      "duration_seconds": 10800,
+      "description": "Reduces a research timer by 3 hours."
+    },
+    {
+      "code": 10103023,
+      "name": "Research Speed Up 8h",
+      "category": "speedup",
+      "subcategory": "research",
+      "duration_seconds": 28800,
+      "description": "Reduces a research timer by 8 hours."
+    },
+    {
+      "code": 10103031,
+      "name": "Training Speed Up 1h",
+      "category": "speedup",
+      "subcategory": "training",
+      "duration_seconds": 3600,
+      "description": "Reduces a troop training timer by 1 hour."
+    },
+    {
+      "code": 10103032,
+      "name": "Training Speed Up 3h",
+      "category": "speedup",
+      "subcategory": "training",
+      "duration_seconds": 10800,
+      "description": "Reduces a troop training timer by 3 hours."
+    },
+    {
+      "code": 10103041,
+      "name": "Healing Speed Up 1h",
+      "category": "speedup",
+      "subcategory": "healing",
+      "duration_seconds": 3600,
+      "description": "Reduces a hospital healing timer by 1 hour."
+    },
+    {
+      "code": 10102001,
+      "name": "Resource Production Boost 8h",
+      "category": "boost",
+      "subcategory": "resource_production",
+      "boost_type": "resource_production",
+      "bonus_pct": 25,
+      "duration_seconds": 28800,
+      "description": "Increases all resource production by 25% for 8 hours."
+    },
+    {
+      "code": 10102002,
+      "name": "Resource Production Boost 24h",
+      "category": "boost",
+      "subcategory": "resource_production",
+      "boost_type": "resource_production",
+      "bonus_pct": 25,
+      "duration_seconds": 86400,
+      "description": "Increases all resource production by 25% for 24 hours."
+    },
+    {
+      "code": 10102011,
+      "name": "Gathering Speed Boost 8h",
+      "category": "boost",
+      "subcategory": "gathering_speed",
+      "boost_type": "gathering_speed",
+      "bonus_pct": 50,
+      "duration_seconds": 28800,
+      "description": "Increases gathering speed by 50% for 8 hours."
+    },
+    {
+      "code": 10102021,
+      "name": "Construction Boost 8h",
+      "category": "boost",
+      "subcategory": "construction",
+      "boost_type": "construction_speed",
+      "bonus_pct": 25,
+      "duration_seconds": 28800,
+      "description": "Increases construction speed by 25% for 8 hours."
+    },
+    {
+      "code": 10102031,
+      "name": "Research Boost 8h",
+      "category": "boost",
+      "subcategory": "research",
+      "boost_type": "research_speed",
+      "bonus_pct": 25,
+      "duration_seconds": 28800,
+      "description": "Increases research speed by 25% for 8 hours."
+    },
+    {
+      "code": 10102041,
+      "name": "Training Boost 8h",
+      "category": "boost",
+      "subcategory": "training",
+      "boost_type": "training_speed",
+      "bonus_pct": 25,
+      "duration_seconds": 28800,
+      "description": "Increases troop training speed by 25% for 8 hours."
+    },
+    {
+      "code": 10102051,
+      "name": "Anti-Reconnaissance 8h",
+      "category": "boost",
+      "subcategory": "anti_spy",
+      "boost_type": "anti_spy",
+      "duration_seconds": 28800,
+      "description": "Prevents enemy scouts from viewing your city details for 8 hours."
+    },
+    {
+      "code": 10101001,
+      "name": "Small Food Pack",
+      "category": "resource_pack",
+      "subcategory": "food",
+      "resource": "food",
+      "amount": 50000,
+      "description": "Instantly adds 50,000 Food to your stockpile."
+    },
+    {
+      "code": 10101002,
+      "name": "Medium Food Pack",
+      "category": "resource_pack",
+      "subcategory": "food",
+      "resource": "food",
+      "amount": 200000,
+      "description": "Instantly adds 200,000 Food to your stockpile."
+    },
+    {
+      "code": 10101003,
+      "name": "Large Food Pack",
+      "category": "resource_pack",
+      "subcategory": "food",
+      "resource": "food",
+      "amount": 500000,
+      "description": "Instantly adds 500,000 Food to your stockpile."
+    },
+    {
+      "code": 10101011,
+      "name": "Small Lumber Pack",
+      "category": "resource_pack",
+      "subcategory": "lumber",
+      "resource": "lumber",
+      "amount": 50000,
+      "description": "Instantly adds 50,000 Lumber to your stockpile."
+    },
+    {
+      "code": 10101012,
+      "name": "Medium Lumber Pack",
+      "category": "resource_pack",
+      "subcategory": "lumber",
+      "resource": "lumber",
+      "amount": 200000,
+      "description": "Instantly adds 200,000 Lumber to your stockpile."
+    },
+    {
+      "code": 10101021,
+      "name": "Small Stone Pack",
+      "category": "resource_pack",
+      "subcategory": "stone",
+      "resource": "stone",
+      "amount": 50000,
+      "description": "Instantly adds 50,000 Stone to your stockpile."
+    },
+    {
+      "code": 10101022,
+      "name": "Medium Stone Pack",
+      "category": "resource_pack",
+      "subcategory": "stone",
+      "resource": "stone",
+      "amount": 200000,
+      "description": "Instantly adds 200,000 Stone to your stockpile."
+    },
+    {
+      "code": 10101031,
+      "name": "Small Gold Pack",
+      "category": "resource_pack",
+      "subcategory": "gold",
+      "resource": "gold",
+      "amount": 25000,
+      "description": "Instantly adds 25,000 Gold to your stockpile."
+    },
+    {
+      "code": 10101032,
+      "name": "Medium Gold Pack",
+      "category": "resource_pack",
+      "subcategory": "gold",
+      "resource": "gold",
+      "amount": 100000,
+      "description": "Instantly adds 100,000 Gold to your stockpile."
+    },
+    {
+      "code": 10101041,
+      "name": "Small GEMS Pack",
+      "category": "resource_pack",
+      "subcategory": "gems",
+      "resource": "gems",
+      "amount": 50,
+      "description": "Instantly adds 50 Gems to your account."
+    },
+    {
+      "code": 10101042,
+      "name": "Medium GEMS Pack",
+      "category": "resource_pack",
+      "subcategory": "gems",
+      "resource": "gems",
+      "amount": 150,
+      "description": "Instantly adds 150 Gems to your account."
+    },
+    {
+      "code": 10101043,
+      "name": "Large GEMS Pack",
+      "category": "resource_pack",
+      "subcategory": "gems",
+      "resource": "gems",
+      "amount": 500,
+      "description": "Instantly adds 500 Gems to your account."
+    },
+    {
+      "code": 10104001,
+      "name": "AP Refill Small",
+      "category": "ap_refill",
+      "subcategory": "small",
+      "ap_amount": 50,
+      "description": "Restores 50 Action Points immediately."
+    },
+    {
+      "code": 10104002,
+      "name": "AP Refill Full",
+      "category": "ap_refill",
+      "subcategory": "full",
+      "ap_amount": 200,
+      "description": "Fully restores all Action Points immediately."
+    },
+    {
+      "code": 10105001,
+      "name": "Silver Chest",
+      "category": "chest",
+      "subcategory": "silver",
+      "chest_type": "silver",
+      "description": "A silver chest containing a selection of useful items."
+    },
+    {
+      "code": 10105002,
+      "name": "Gold Chest",
+      "category": "chest",
+      "subcategory": "gold",
+      "chest_type": "gold",
+      "description": "A gold chest containing valuable items and rare treasure fragments."
+    },
+    {
+      "code": 10105003,
+      "name": "Platinum Chest",
+      "category": "chest",
+      "subcategory": "platinum",
+      "chest_type": "platinum",
+      "description": "A platinum chest containing the finest items, including legendary and mythic fragments."
+    },
+    {
+      "code": 10106001,
+      "name": "VIP Points Pack S",
+      "category": "vip_point",
+      "subcategory": "small",
+      "vip_points": 100,
+      "description": "Grants 100 VIP Points, progressing your VIP level."
+    },
+    {
+      "code": 10106002,
+      "name": "VIP Points Pack M",
+      "category": "vip_point",
+      "subcategory": "medium",
+      "vip_points": 500,
+      "description": "Grants 500 VIP Points, progressing your VIP level."
+    },
+    {
+      "code": 10106003,
+      "name": "VIP Points Pack L",
+      "category": "vip_point",
+      "subcategory": "large",
+      "vip_points": 2000,
+      "description": "Grants 2,000 VIP Points, significantly advancing your VIP level."
+    }
+  ]
+}

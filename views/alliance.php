@@ -44,7 +44,7 @@ $csrf = $session['csrf_token'];
 
         html, body {
             min-height: 100vh;
-            background: #0f172a;
+            background: #080c18;
             color: #e2e8f0;
             font-family: system-ui, -apple-system, sans-serif;
         }
@@ -60,22 +60,23 @@ $csrf = $session['csrf_token'];
 
         /* ── Section card ── */
         .card {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 10px;
+            background: #0f1729;
+            border: 1px solid rgba(184,134,11,0.3);
+            border-radius: 12px;
             overflow: hidden;
             margin-bottom: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.03);
         }
 
         .card-header {
-            background: #0f172a;
-            border-bottom: 1px solid #334155;
+            background: linear-gradient(180deg, #1a2744 0%, #0f1729 100%);
+            border-bottom: 1px solid rgba(184,134,11,0.25);
             padding: 10px 16px;
             font-size: 0.7rem;
-            font-weight: 700;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: .1em;
-            color: #64748b;
+            letter-spacing: 0.1em;
+            color: #d4a017;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -88,72 +89,84 @@ $csrf = $session['csrf_token'];
         /* ── Tabs ── */
         .tab-bar {
             display: flex;
-            border-bottom: 1px solid #334155;
-            background: #0f172a;
+            border-bottom: 1px solid rgba(184,134,11,0.25);
+            background: #080c18;
         }
 
         .tab-btn {
             padding: 10px 20px;
             font-size: 0.78rem;
-            font-weight: 700;
-            letter-spacing: .07em;
+            font-weight: 800;
+            letter-spacing: 0.07em;
             text-transform: uppercase;
             color: #64748b;
             background: none;
             border: none;
             border-bottom: 2px solid transparent;
             cursor: pointer;
-            transition: color .15s, border-color .15s;
+            transition: color 0.15s, border-color 0.15s;
+            margin-bottom: -1px;
+            font-family: inherit;
         }
 
-        .tab-btn:hover          { color: #94a3b8; }
-        .tab-btn.tab-active     { color: #fbbf24; border-bottom-color: #fbbf24; }
+        .tab-btn:hover          { color: #e2e8f0; }
+        .tab-btn.tab-active     { color: #f0d080; border-bottom-color: #d4a017; }
 
         /* ── Alliance info panel ── */
         .alliance-banner {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 18px;
             margin-bottom: 16px;
+            padding: 16px;
+            background: linear-gradient(135deg, rgba(26,39,68,0.6) 0%, rgba(8,12,24,0.6) 100%);
+            border-radius: 10px;
+            border: 1px solid rgba(184,134,11,0.2);
         }
 
         .alliance-tag-badge {
             flex-shrink: 0;
-            width: 64px;
-            height: 64px;
-            border-radius: 8px;
-            background: #0f172a;
-            border: 2px solid #fbbf24;
+            width: 68px;
+            height: 68px;
+            border-radius: 10px;
+            background: linear-gradient(180deg, #1a1200 0%, #0d0900 100%);
+            border: 2px solid rgba(212,160,23,0.6);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             font-weight: 900;
-            color: #fbbf24;
-            letter-spacing: .05em;
+            color: #f0d080;
+            letter-spacing: 0.04em;
+            box-shadow: 0 0 16px rgba(212,160,23,0.15);
         }
 
         .alliance-title {
             font-size: 1.3rem;
             font-weight: 900;
-            color: #e2e8f0;
+            color: #f0d080;
+            text-shadow: 0 0 20px rgba(212,160,23,0.3);
         }
 
         .alliance-meta {
             font-size: 0.78rem;
             color: #64748b;
-            margin-top: 2px;
+            margin-top: 4px;
+            line-height: 1.5;
         }
+
+        .alliance-meta strong { color: #d4a017; }
 
         .alliance-desc {
             font-size: 0.82rem;
             color: #94a3b8;
-            line-height: 1.5;
-            margin-top: 10px;
-            padding: 10px;
-            background: #0f172a;
-            border-radius: 6px;
-            border: 1px solid #334155;
+            line-height: 1.6;
+            margin-top: 12px;
+            padding: 10px 14px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            border: 1px solid rgba(184,134,11,0.15);
+            border-left: 3px solid rgba(212,160,23,0.4);
         }
 
         /* ── Member list ── */
@@ -161,63 +174,92 @@ $csrf = $session['csrf_token'];
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 8px 10px;
-            border-radius: 6px;
-            border: 1px solid #334155;
-            background: #0f172a;
+            padding: 9px 12px;
+            border-radius: 7px;
+            border: 1px solid rgba(45,64,96,0.6);
+            background: rgba(0,0,0,0.25);
             margin-bottom: 6px;
             font-size: 0.82rem;
+            transition: border-color 0.15s, background 0.15s;
+        }
+
+        .member-row:hover {
+            border-color: rgba(184,134,11,0.25);
+            background: rgba(255,255,255,0.02);
+        }
+
+        .member-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #7c1e0e, #4a0d05);
+            border: 1px solid rgba(212,160,23,0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
         }
 
         .member-username {
             flex: 1;
-            font-weight: 600;
+            font-weight: 700;
             color: #e2e8f0;
         }
 
         .role-badge {
-            font-size: 0.65rem;
-            font-weight: 700;
+            font-size: 0.62rem;
+            font-weight: 800;
             padding: 2px 7px;
             border-radius: 3px;
             text-transform: uppercase;
-            letter-spacing: .06em;
+            letter-spacing: 0.06em;
         }
 
         .role-leader       { background: #d97706; color: #fff; }
         .role-vice_leader  { background: #7c3aed; color: #fff; }
         .role-officer      { background: #0369a1; color: #fff; }
         .role-veteran      { background: #166534; color: #fff; }
-        .role-member       { background: #334155; color: #94a3b8; }
+        .role-member       { background: rgba(51,65,85,0.6); color: #94a3b8; border: 1px solid #334155; }
 
         .member-joined {
-            font-size: 0.7rem;
+            font-size: 0.68rem;
             color: #475569;
+            font-family: monospace;
         }
 
         /* ── Chat panel ── */
         .chat-messages {
             height: 340px;
             overflow-y: auto;
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 6px;
-            padding: 10px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(45,64,96,0.6);
+            border-radius: 8px;
+            padding: 10px 12px;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 7px;
             margin-bottom: 10px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(184,134,11,0.2) transparent;
         }
+
+        .chat-messages::-webkit-scrollbar { width: 5px; }
+        .chat-messages::-webkit-scrollbar-thumb { background: rgba(184,134,11,0.2); border-radius: 3px; }
 
         .chat-msg {
             font-size: 0.8rem;
             line-height: 1.4;
+            padding: 3px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
         }
 
+        .chat-msg:last-child { border-bottom: none; }
+
         .chat-msg-name {
-            font-weight: 700;
-            color: #fbbf24;
-            margin-right: 5px;
+            font-weight: 800;
+            color: #f0d080;
+            margin-right: 6px;
         }
 
         .chat-msg-text {
@@ -226,9 +268,10 @@ $csrf = $session['csrf_token'];
         }
 
         .chat-msg-time {
-            font-size: 0.65rem;
+            font-size: 0.62rem;
             color: #475569;
-            margin-left: 5px;
+            margin-left: 6px;
+            font-family: monospace;
         }
 
         .chat-input-row {
@@ -238,17 +281,19 @@ $csrf = $session['csrf_token'];
 
         .chat-input {
             flex: 1;
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 6px;
+            background: rgba(0,0,0,0.35);
+            border: 1px solid rgba(184,134,11,0.25);
+            border-radius: 7px;
             color: #e2e8f0;
             font-size: 0.85rem;
-            padding: 8px 12px;
+            padding: 9px 12px;
             outline: none;
-            transition: border-color .15s;
+            transition: border-color 0.15s;
+            font-family: inherit;
         }
 
-        .chat-input:focus { border-color: #475569; }
+        .chat-input:focus { border-color: rgba(212,160,23,0.6); }
+        .chat-input::placeholder { color: #475569; }
 
         /* ── Buttons ── */
         .btn {
@@ -259,19 +304,38 @@ $csrf = $session['csrf_token'];
             padding: 8px 16px;
             border-radius: 6px;
             font-size: 0.82rem;
-            font-weight: 700;
+            font-weight: 800;
             cursor: pointer;
             border: none;
-            transition: opacity .15s, filter .15s;
+            transition: filter 0.15s, transform 0.1s;
+            font-family: inherit;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
         }
 
         .btn:disabled { opacity: 0.45; cursor: not-allowed; }
-        .btn:hover:not(:disabled) { filter: brightness(1.1); }
+        .btn:hover:not(:disabled) { filter: brightness(1.12); }
+        .btn:active:not(:disabled) { transform: translateY(1px); }
 
-        .btn-primary { background: linear-gradient(180deg, #2563eb, #1e3a8a); color: #fff; }
-        .btn-success { background: linear-gradient(180deg, #16a34a, #14532d); color: #fff; }
-        .btn-danger  { background: linear-gradient(180deg, #dc2626, #7f1d1d); color: #fff; }
-        .btn-sm      { padding: 5px 12px; font-size: 0.76rem; }
+        .btn-primary {
+            background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
+            color: #fff;
+            border-bottom: 2px solid #1e3a8a;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+        .btn-success {
+            background: linear-gradient(180deg, #16a34a 0%, #15803d 100%);
+            color: #fff;
+            border-bottom: 2px solid #166534;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+        .btn-danger {
+            background: linear-gradient(180deg, #dc2626 0%, #b91c1c 100%);
+            color: #fff;
+            border-bottom: 2px solid #991b1b;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+        .btn-sm { padding: 5px 12px; font-size: 0.72rem; }
 
         /* ── Search / join panel ── */
         .search-row {
@@ -282,82 +346,91 @@ $csrf = $session['csrf_token'];
 
         .search-input {
             flex: 1;
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 6px;
+            background: rgba(0,0,0,0.35);
+            border: 1px solid rgba(184,134,11,0.25);
+            border-radius: 7px;
             color: #e2e8f0;
             font-size: 0.85rem;
             padding: 8px 12px;
             outline: none;
-            transition: border-color .15s;
+            transition: border-color 0.15s;
+            font-family: inherit;
         }
 
-        .search-input:focus { border-color: #475569; }
+        .search-input:focus { border-color: rgba(212,160,23,0.6); }
+        .search-input::placeholder { color: #475569; }
 
         .alliance-list-row {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 10px 12px;
-            border-radius: 6px;
-            border: 1px solid #334155;
-            background: #0f172a;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(45,64,96,0.5);
+            background: rgba(0,0,0,0.25);
             margin-bottom: 6px;
             font-size: 0.82rem;
+            transition: border-color 0.15s, background 0.15s;
+        }
+
+        .alliance-list-row:hover {
+            border-color: rgba(184,134,11,0.3);
+            background: rgba(255,255,255,0.02);
         }
 
         .alliance-list-tag {
             flex-shrink: 0;
-            padding: 2px 8px;
-            border-radius: 4px;
-            background: #1e293b;
-            border: 1px solid #fbbf24;
-            color: #fbbf24;
+            padding: 3px 9px;
+            border-radius: 5px;
+            background: rgba(212,160,23,0.1);
+            border: 1px solid rgba(212,160,23,0.5);
+            color: #f0d080;
             font-size: 0.7rem;
             font-weight: 900;
-            letter-spacing: .05em;
+            letter-spacing: 0.06em;
         }
 
         .alliance-list-name {
             flex: 1;
-            font-weight: 600;
+            font-weight: 700;
             color: #e2e8f0;
         }
 
         .alliance-list-count {
-            font-size: 0.75rem;
+            font-size: 0.74rem;
             color: #64748b;
         }
 
         /* ── Create form ── */
         .form-row {
-            margin-bottom: 12px;
+            margin-bottom: 14px;
         }
 
         .form-label {
             display: block;
-            font-size: 0.72rem;
-            font-weight: 700;
+            font-size: 0.68rem;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: .07em;
+            letter-spacing: 0.08em;
             color: #64748b;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
         }
 
         .form-input, .form-textarea {
             width: 100%;
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 6px;
+            background: rgba(0,0,0,0.35);
+            border: 1px solid rgba(184,134,11,0.25);
+            border-radius: 7px;
             color: #e2e8f0;
             font-size: 0.85rem;
-            padding: 8px 12px;
+            padding: 9px 12px;
             outline: none;
-            transition: border-color .15s;
+            transition: border-color 0.15s;
             font-family: inherit;
         }
 
-        .form-input:focus, .form-textarea:focus { border-color: #475569; }
+        .form-input:focus, .form-textarea:focus { border-color: rgba(212,160,23,0.6); }
+        .form-input::placeholder, .form-textarea::placeholder { color: #475569; }
 
         .form-textarea {
             min-height: 80px;
@@ -365,9 +438,9 @@ $csrf = $session['csrf_token'];
         }
 
         .hint {
-            font-size: 0.7rem;
+            font-size: 0.68rem;
             color: #475569;
-            margin-top: 3px;
+            margin-top: 4px;
         }
 
         /* ── Toast ── */
@@ -376,52 +449,60 @@ $csrf = $session['csrf_token'];
             bottom: 1.5rem;
             left: 50%;
             transform: translateX(-50%);
-            background: #1e293b;
-            border: 1px solid #334155;
+            background: #0f1729;
+            border: 1px solid rgba(184,134,11,0.3);
             border-radius: 8px;
-            padding: 7px 16px;
+            padding: 8px 18px;
             font-size: 0.85rem;
+            font-weight: 700;
             display: none;
             z-index: 9000;
             white-space: nowrap;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
         }
 
-        #al-toast.ok  { border-color: #22c55e; color: #22c55e; }
-        #al-toast.err { border-color: #ef4444; color: #ef4444; }
+        #al-toast.ok  { border-color: rgba(34,197,94,0.5); color: #22c55e; }
+        #al-toast.err { border-color: rgba(239,68,68,0.5); color: #ef4444; }
 
         /* ── Leave modal confirmation ── */
         .confirm-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.65);
+            background: rgba(0,0,0,0.78);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 8000;
+            backdrop-filter: blur(3px);
         }
 
         .confirm-box {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 10px;
-            padding: 24px;
-            max-width: 340px;
+            background: #0f1729;
+            border: 1px solid rgba(239,68,68,0.4);
+            border-radius: 12px;
+            padding: 28px;
+            max-width: 360px;
             width: 100%;
             text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.85);
         }
 
         .confirm-box h3 {
-            font-size: 1rem;
+            font-size: 1.05rem;
+            font-weight: 800;
             margin-bottom: 10px;
-            color: #e2e8f0;
+            color: #f0d080;
         }
 
         .confirm-box p {
             font-size: 0.82rem;
             color: #94a3b8;
-            margin-bottom: 20px;
-            line-height: 1.5;
+            margin-bottom: 22px;
+            line-height: 1.6;
         }
+
+        .confirm-box strong { color: #e2e8f0; }
 
         .confirm-btns {
             display: flex;

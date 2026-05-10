@@ -448,7 +448,7 @@ $isEmbed = isset($_GET['embed']);
         html, body {
             height: 100%;
             overflow: hidden;
-            background: #0f172a;
+            background: #080c18;
             color: #e2e8f0;
             font-family: system-ui, -apple-system, sans-serif;
             display: flex;
@@ -464,86 +464,68 @@ $isEmbed = isset($_GET['embed']);
             flex-direction: column;
         }
 
-        /* ── Top bar ── */
-        .topbar {
-            flex-shrink: 0;
-            background: #1e293b;
-            border-bottom: 1px solid #334155;
-            padding: 0 1rem;
-            height: 44px;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        .topbar-back {
-            padding: 0.2rem 0.6rem;
-            border-radius: 4px;
-            background: rgba(255,255,255,.05);
-            border: 1px solid #334155;
-            color: #64748b;
-            text-decoration: none;
-            font-size: 0.75rem;
-        }
-        .topbar-back:hover { color: #f0c040; border-color: #d4a017; }
-        .topbar-title { font-weight: 700; color: #fbbf24; font-size: 0.88rem; }
-        .topbar-acad  { margin-left: auto; font-size: 0.73rem; color: #64748b; }
-        .topbar-acad strong { color: #e2e8f0; }
-
         /* ── Queue banner ── */
         .queue-banner {
             flex-shrink: 0;
-            height: 38px;
-            background: linear-gradient(90deg, #0d2a4f 0%, #0a1e38 100%);
-            border-bottom: 1px solid #1e4a8f;
+            height: 40px;
+            background: linear-gradient(90deg, #0a1a3a 0%, #060e24 100%);
+            border-bottom: 1px solid rgba(59,130,246,0.35);
             padding: 0 1rem;
             display: flex;
             align-items: center;
             gap: 0.75rem;
             font-size: 0.78rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
         }
         .qb-dot {
             width: 8px; height: 8px; border-radius: 50%;
             background: #3b82f6;
+            box-shadow: 0 0 8px rgba(59,130,246,0.6);
             animation: pulse-dot 1.5s infinite;
         }
         @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.35} }
-        .qb-name { color: #fbbf24; font-weight: 700; }
-        .qb-eta  { color: #64748b; margin-left: auto; }
+        .qb-name { color: #fbbf24; font-weight: 800; letter-spacing: 0.02em; }
+        .qb-eta  { color: #64748b; margin-left: auto; font-family: monospace; }
         .btn-instant-banner {
-            padding: 0.2rem 0.6rem;
-            border-radius: 4px;
-            border: 1px solid rgba(139,92,246,.5);
-            background: rgba(139,92,246,.1);
+            padding: 0.25rem 0.75rem;
+            border-radius: 5px;
+            border: 1px solid rgba(139,92,246,0.5);
+            background: rgba(139,92,246,0.12);
             color: #c4b5fd;
             font-size: 0.72rem;
-            font-weight: 700;
+            font-weight: 800;
             cursor: pointer;
+            transition: background 0.15s;
+            font-family: inherit;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
         }
-        .btn-instant-banner:hover { background: rgba(139,92,246,.25); }
+        .btn-instant-banner:hover { background: rgba(139,92,246,0.28); }
 
         /* ── Tab bar ── */
         .tab-bar {
             flex-shrink: 0;
             display: flex;
-            background: #1e293b;
-            border-bottom: 2px solid #334155;
+            background: #0f1729;
+            border-bottom: 1px solid rgba(184,134,11,0.3);
         }
         .tab-btn {
-            padding: 10px 24px;
-            font-size: 0.85rem;
-            font-weight: 600;
+            padding: 11px 24px;
+            font-size: 0.8rem;
+            font-weight: 700;
             color: #64748b;
             border: none;
             background: none;
             cursor: pointer;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.06em;
             border-bottom: 2px solid transparent;
-            margin-bottom: -2px;
-            transition: color .15s;
+            margin-bottom: -1px;
+            transition: color 0.15s, border-color 0.15s;
+            font-family: inherit;
         }
         .tab-btn:hover { color: #e2e8f0; }
-        .tab-btn.active { color: #e2e8f0; border-bottom-color: #0ea5e9; }
+        .tab-btn.active { color: #f0d080; border-bottom-color: #d4a017; }
 
         /* ── Tree scroll area ── */
         .tree-wrap {
@@ -559,19 +541,17 @@ $isEmbed = isset($_GET['embed']);
             overflow-y: auto;
             padding: 24px;
             scrollbar-width: thin;
-            scrollbar-color: #334155 #0f172a;
+            scrollbar-color: rgba(184,134,11,0.3) #080c18;
+            background: #080c18;
         }
-        .tree-scroll::-webkit-scrollbar { height: 8px; width: 8px; }
-        .tree-scroll::-webkit-scrollbar-track { background: #0f172a; }
-        .tree-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        .tree-scroll::-webkit-scrollbar { height: 6px; width: 6px; }
+        .tree-scroll::-webkit-scrollbar-track { background: #080c18; }
+        .tree-scroll::-webkit-scrollbar-thumb { background: rgba(184,134,11,0.3); border-radius: 3px; }
 
-        .tree-canvas {
-            position: relative;
-        }
+        .tree-canvas { position: relative; }
         .tree-svg {
             position: absolute;
-            top: 0;
-            left: 0;
+            top: 0; left: 0;
             pointer-events: none;
             z-index: 0;
         }
@@ -581,8 +561,8 @@ $isEmbed = isset($_GET['embed']);
             position: absolute;
             width: 190px;
             height: 70px;
-            background: #1a2740;
-            border: 2px solid #2d4060;
+            background: #0f1729;
+            border: 1px solid rgba(45,64,96,0.8);
             border-radius: 8px;
             display: flex;
             align-items: center;
@@ -590,18 +570,19 @@ $isEmbed = isset($_GET['embed']);
             padding: 6px 8px;
             cursor: pointer;
             z-index: 1;
-            transition: border-color .15s, box-shadow .15s;
+            transition: border-color 0.15s, box-shadow 0.15s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
         }
         .node-card:hover {
-            border-color: #f59e0b;
-            box-shadow: 0 0 8px rgba(245,158,11,.3);
+            border-color: rgba(212,160,23,0.7);
+            box-shadow: 0 0 12px rgba(212,160,23,0.2), 0 2px 8px rgba(0,0,0,0.5);
         }
         .node-card.selected {
-            border-color: #f59e0b !important;
-            box-shadow: 0 0 12px rgba(245,158,11,.4);
+            border-color: #d4a017 !important;
+            box-shadow: 0 0 16px rgba(212,160,23,0.35), 0 2px 8px rgba(0,0,0,0.5) !important;
         }
-        .node-card.locked { opacity: .42; }
-        .node-card.locked:hover { border-color: #2d4060; box-shadow: none; cursor: default; }
+        .node-card.locked { opacity: 0.38; }
+        .node-card.locked:hover { border-color: rgba(45,64,96,0.8); box-shadow: none; cursor: default; }
         .node-card.maxed .nc-bar-text { color: #fbbf24; }
 
         .nc-icon {
@@ -619,13 +600,13 @@ $isEmbed = isset($_GET['embed']);
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 5px;
             min-width: 0;
         }
         .nc-name {
-            font-size: 0.65rem;
+            font-size: 0.64rem;
             color: #e2e8f0;
-            font-weight: 600;
+            font-weight: 700;
             line-height: 1.2;
             overflow: hidden;
             display: -webkit-box;
@@ -634,10 +615,10 @@ $isEmbed = isset($_GET['embed']);
         }
         .nc-bar {
             position: relative;
-            height: 16px;
-            background: #0f1e30;
+            height: 14px;
+            background: rgba(0,0,0,0.4);
             border-radius: 3px;
-            border: 1px solid #2d4060;
+            border: 1px solid rgba(45,64,96,0.6);
             overflow: hidden;
             display: flex;
             align-items: center;
@@ -646,18 +627,20 @@ $isEmbed = isset($_GET['embed']);
         .nc-fill {
             position: absolute;
             left: 0; top: 0; bottom: 0;
-            background: #3b82f6;
+            background: linear-gradient(90deg, #1d4ed8 0%, #60a5fa 100%);
             border-radius: 2px;
-            transition: width .3s;
+            transition: width 0.3s;
         }
         .nc-fill.maxed {
-            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+            background: linear-gradient(90deg, #b8860b, #fbbf24);
+            box-shadow: 0 0 6px rgba(251,191,36,0.3);
         }
         .nc-bar-text {
             position: relative;
-            font-size: 0.6rem;
+            font-size: 0.58rem;
             color: #94a3b8;
             z-index: 1;
+            font-weight: 700;
         }
         .nc-active-dot {
             position: absolute;
@@ -665,6 +648,7 @@ $isEmbed = isset($_GET['embed']);
             width: 8px; height: 8px;
             background: #22c55e;
             border-radius: 50%;
+            box-shadow: 0 0 6px rgba(34,197,94,0.6);
             animation: pulse-dot 1s infinite;
         }
 
@@ -672,51 +656,57 @@ $isEmbed = isset($_GET['embed']);
         .rm-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,.65);
+            background: rgba(0,0,0,0.75);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 5000;
+            backdrop-filter: blur(2px);
         }
         .rm-card {
-            background: #0f172a;
-            border: 2px solid #d4a017;
-            border-radius: 10px;
-            width: 400px;
+            background: #0f1729;
+            border: 1px solid rgba(184,134,11,0.4);
+            border-radius: 12px;
+            width: 420px;
             max-width: calc(100vw - 24px);
-            box-shadow: 0 12px 48px rgba(0,0,0,.85);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.03);
             display: flex;
             flex-direction: column;
             overflow: hidden;
         }
         .rm-header {
-            background: linear-gradient(90deg, #1c1400 0%, #2a1f00 100%);
-            border-bottom: 1px solid #6b4e00;
-            padding: 10px 14px;
+            background: linear-gradient(180deg, #1c1400 0%, #130e00 100%);
+            border-bottom: 1px solid rgba(184,134,11,0.35);
+            padding: 12px 14px;
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
         .rm-title {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: #fbbf24;
+            font-size: 0.92rem;
+            font-weight: 800;
+            color: #f0d080;
+            letter-spacing: 0.03em;
         }
         .rm-close {
-            background: none;
-            border: none;
-            color: #64748b;
+            background: rgba(239,68,68,0.1);
+            border: 1px solid rgba(239,68,68,0.3);
+            border-radius: 5px;
+            color: #f87171;
             cursor: pointer;
-            font-size: 1rem;
-            padding: 2px 6px;
-            border-radius: 4px;
+            font-size: 0.9rem;
+            padding: 3px 10px;
+            transition: background 0.15s;
+            font-family: inherit;
+            line-height: 1.5;
         }
-        .rm-close:hover { color: #ef4444; background: rgba(239,68,68,.1); }
+        .rm-close:hover { color: #ef4444; background: rgba(239,68,68,0.2); }
         .rm-body {
             padding: 14px;
             display: flex;
             flex-direction: column;
             gap: 10px;
+            background: #0f1729;
         }
         .rm-top {
             display: flex;
@@ -727,37 +717,39 @@ $isEmbed = isset($_GET['embed']);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
             flex-shrink: 0;
         }
         .rm-icon {
             width: 80px;
             height: 80px;
-            background: #1a1200;
-            border: 2px solid #d4a017;
-            border-radius: 8px;
+            background: linear-gradient(180deg, #1a1200 0%, #0d0900 100%);
+            border: 2px solid rgba(212,160,23,0.5);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 2rem;
+            box-shadow: 0 0 16px rgba(212,160,23,0.1);
         }
         .rm-bar-wrap {
             width: 80px;
-            height: 7px;
-            background: #1e293b;
-            border-radius: 4px;
-            border: 1px solid #334155;
+            height: 6px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.05);
             overflow: hidden;
         }
         .rm-bar-fill {
             height: 100%;
-            background: linear-gradient(90deg, #d4a017, #fbbf24);
-            border-radius: 4px;
-            transition: width .3s;
+            background: linear-gradient(90deg, #b8860b, #fbbf24);
+            border-radius: 999px;
+            transition: width 0.3s;
         }
         .rm-bar-text {
             font-size: 0.65rem;
             color: #94a3b8;
+            font-weight: 600;
         }
         .rm-right {
             flex: 1;
@@ -771,11 +763,11 @@ $isEmbed = isset($_GET['embed']);
             align-items: center;
             gap: 8px;
             font-size: 0.95rem;
-            font-weight: 700;
+            font-weight: 800;
         }
-        .rm-lv-cur  { color: #94a3b8; }
-        .rm-lv-arr  { color: #f59e0b; font-size: 1.1rem; }
-        .rm-lv-next { color: #fbbf24; }
+        .rm-lv-cur  { color: #64748b; }
+        .rm-lv-arr  { color: #d4a017; font-size: 1.1rem; }
+        .rm-lv-next { color: #f0d080; }
         .rm-stats {
             display: flex;
             flex-direction: column;
@@ -785,16 +777,16 @@ $isEmbed = isset($_GET['embed']);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(34,197,94,.07);
-            border: 1px solid rgba(34,197,94,.2);
-            border-radius: 4px;
-            padding: 4px 8px;
+            background: rgba(34,197,94,0.06);
+            border: 1px solid rgba(34,197,94,0.18);
+            border-radius: 5px;
+            padding: 5px 9px;
             font-size: 0.78rem;
             color: #94a3b8;
         }
         .rm-stat-val {
             font-weight: 700;
-            color: #22c55e;
+            color: #4ade80;
         }
         .rm-time-row {
             font-size: 0.72rem;
@@ -804,13 +796,13 @@ $isEmbed = isset($_GET['embed']);
             gap: 4px;
         }
         .rm-section-heading {
-            font-size: 0.62rem;
+            font-size: 0.6rem;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: .07em;
-            color: #475569;
-            padding-bottom: 4px;
-            border-bottom: 1px solid #1e293b;
+            letter-spacing: 0.1em;
+            color: rgba(184,134,11,0.6);
+            padding-bottom: 5px;
+            border-bottom: 1px solid rgba(184,134,11,0.15);
         }
         .rm-resources {
             display: grid;
@@ -822,42 +814,42 @@ $isEmbed = isset($_GET['embed']);
             align-items: center;
             gap: 6px;
             font-size: 0.73rem;
-            padding: 5px 8px;
-            background: #0f1e30;
-            border-radius: 4px;
-            border: 1px solid #1e3a5f;
+            padding: 5px 9px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 5px;
+            border: 1px solid rgba(45,64,96,0.6);
         }
-        .rm-res-row.ok  { border-color: rgba(34,197,94,.35); }
-        .rm-res-row.nok { border-color: rgba(239,68,68,.35); color: #fca5a5; }
+        .rm-res-row.ok  { border-color: rgba(34,197,94,0.35); background: rgba(34,197,94,0.04); }
+        .rm-res-row.nok { border-color: rgba(239,68,68,0.35); color: #fca5a5; background: rgba(239,68,68,0.04); }
         .rm-res-amount { margin-left: auto; font-weight: 700; }
         .rm-res-check  { font-size: 0.8rem; margin-left: 4px; }
         .rm-academy {
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 7px 10px;
-            background: #0f1e30;
+            padding: 8px 10px;
+            background: rgba(0,0,0,0.3);
             border-radius: 6px;
-            border: 1px solid #1e3a5f;
+            border: 1px solid rgba(45,64,96,0.6);
             font-size: 0.78rem;
             cursor: pointer;
-            transition: background .12s;
+            transition: background 0.12s;
         }
-        .rm-academy:hover { background: #162032; }
-        .rm-academy.nok { border-color: rgba(239,68,68,.4); }
-        .rm-academy.ok  { border-color: rgba(34,197,94,.35); }
+        .rm-academy:hover { background: rgba(255,255,255,0.04); }
+        .rm-academy.nok { border-color: rgba(239,68,68,0.4); }
+        .rm-academy.ok  { border-color: rgba(34,197,94,0.35); }
         .rm-acad-icon { font-size: 1.4rem; line-height: 1; }
         .rm-acad-text { flex: 1; color: #94a3b8; }
         .rm-acad-badge {
-            font-size: 0.72rem;
-            font-weight: 700;
+            font-size: 0.7rem;
+            font-weight: 800;
             padding: 2px 8px;
             border-radius: 10px;
-            background: #1e293b;
+            background: rgba(0,0,0,0.3);
             color: #64748b;
         }
-        .rm-acad-badge.nok { background: rgba(239,68,68,.15); color: #ef4444; }
-        .rm-acad-badge.ok  { background: rgba(34,197,94,.15); color: #22c55e; }
+        .rm-acad-badge.nok { background: rgba(239,68,68,0.15); color: #ef4444; }
+        .rm-acad-badge.ok  { background: rgba(34,197,94,0.15); color: #22c55e; }
         .rm-req-list {
             display: flex;
             flex-direction: column;
@@ -868,74 +860,86 @@ $isEmbed = isset($_GET['embed']);
             align-items: center;
             gap: 10px;
             padding: 6px 10px;
-            background: #0f1e30;
+            background: rgba(0,0,0,0.3);
             border-radius: 5px;
-            border: 1px solid #1e3a5f;
+            border: 1px solid rgba(45,64,96,0.6);
             font-size: 0.76rem;
             cursor: pointer;
-            transition: background .12s;
+            transition: background 0.12s;
         }
-        .rm-req-row:hover { background: #162032; }
-        .rm-req-row.ok  { border-color: rgba(34,197,94,.35); }
-        .rm-req-row.nok { border-color: rgba(239,68,68,.35); }
+        .rm-req-row:hover { background: rgba(255,255,255,0.04); }
+        .rm-req-row.ok  { border-color: rgba(34,197,94,0.35); }
+        .rm-req-row.nok { border-color: rgba(239,68,68,0.35); }
         .rm-req-icon { font-size: 1rem; line-height: 1; }
         .rm-req-name { flex: 1; color: #94a3b8; }
         .rm-req-badge {
             font-size: 0.7rem;
-            font-weight: 700;
+            font-weight: 800;
             padding: 2px 7px;
             border-radius: 10px;
         }
-        .rm-req-badge.ok  { background: rgba(34,197,94,.15); color: #22c55e; }
-        .rm-req-badge.nok { background: rgba(239,68,68,.15); color: #ef4444; }
+        .rm-req-badge.ok  { background: rgba(34,197,94,0.15); color: #22c55e; }
+        .rm-req-badge.nok { background: rgba(239,68,68,0.15); color: #ef4444; }
         .rm-lock-msg {
             font-size: 0.74rem;
             color: #fca5a5;
-            padding: 6px 10px;
-            background: rgba(239,68,68,.07);
-            border-radius: 5px;
-            border: 1px solid rgba(239,68,68,.2);
+            padding: 7px 10px;
+            background: rgba(239,68,68,0.06);
+            border-radius: 6px;
+            border: 1px solid rgba(239,68,68,0.2);
         }
         .rm-actions {
             display: flex;
             gap: 8px;
             padding: 12px 14px;
-            border-top: 1px solid #1e293b;
+            border-top: 1px solid rgba(184,134,11,0.15);
+            background: rgba(0,0,0,0.2);
         }
         .rm-btn-start {
             flex: 1;
             padding: 10px;
-            background: #0ea5e9;
+            background: linear-gradient(180deg, #0ea5e9 0%, #0369a1 100%);
             border: none;
-            border-radius: 6px;
+            border-bottom: 2px solid #075985;
+            border-radius: 7px;
             color: #fff;
-            font-weight: 700;
+            font-weight: 800;
             cursor: pointer;
             font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            font-family: inherit;
+            transition: filter 0.15s;
         }
-        .rm-btn-start:hover:not(:disabled) { background: #0284c7; }
-        .rm-btn-start:disabled { background: #1e3a4f; color: #64748b; cursor: default; }
+        .rm-btn-start:hover:not(:disabled) { filter: brightness(1.12); }
+        .rm-btn-start:disabled { background: rgba(30,58,79,0.5); color: #475569; cursor: default; border-bottom-color: transparent; }
         .rm-btn-instant {
             flex: 1;
             padding: 10px;
-            background: #7c3aed;
+            background: linear-gradient(180deg, #7c3aed 0%, #5b21b6 100%);
             border: none;
-            border-radius: 6px;
+            border-bottom: 2px solid #3b0764;
+            border-radius: 7px;
             color: #fff;
-            font-weight: 700;
+            font-weight: 800;
             cursor: pointer;
             font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            font-family: inherit;
+            transition: filter 0.15s;
         }
-        .rm-btn-instant:hover:not(:disabled) { background: #6d28d9; }
-        .rm-btn-instant:disabled { background: #2d1b69; color: #64748b; cursor: default; }
+        .rm-btn-instant:hover:not(:disabled) { filter: brightness(1.12); }
+        .rm-btn-instant:disabled { background: rgba(45,27,105,0.4); color: #475569; cursor: default; border-bottom-color: transparent; }
         .rm-maxed-bar {
             text-align: center;
             padding: 12px;
             font-size: 0.88rem;
-            font-weight: 700;
+            font-weight: 800;
             color: #fbbf24;
-            background: rgba(251,191,36,.06);
-            border-top: 1px solid rgba(251,191,36,.2);
+            background: rgba(251,191,36,0.06);
+            border-top: 1px solid rgba(251,191,36,0.2);
+            letter-spacing: 0.04em;
         }
 
         /* ── Buffs tab ── */
@@ -944,7 +948,8 @@ $isEmbed = isset($_GET['embed']);
             overflow-y: auto;
             padding: 1.25rem;
             scrollbar-width: thin;
-            scrollbar-color: #334155 #0f172a;
+            scrollbar-color: rgba(184,134,11,0.3) #080c18;
+            background: #080c18;
         }
         .buffs-grid {
             display: grid;
@@ -952,19 +957,21 @@ $isEmbed = isset($_GET['embed']);
             gap: 1.25rem;
         }
         .buff-group-title {
-            font-size: 0.62rem;
+            font-size: 0.6rem;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: .08em;
+            letter-spacing: 0.1em;
             color: #d4a017;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.6rem;
+            padding-bottom: 4px;
+            border-bottom: 1px solid rgba(184,134,11,0.2);
         }
         .buff-row {
             display: flex;
             justify-content: space-between;
             font-size: 0.73rem;
-            padding: 0.2rem 0;
-            border-bottom: 1px solid rgba(255,255,255,.04);
+            padding: 0.25rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
         }
         .buff-row:last-child { border-bottom: none; }
         .buff-label { color: #64748b; }
@@ -973,14 +980,15 @@ $isEmbed = isset($_GET['embed']);
         .toast {
             position: fixed;
             bottom: 1.5rem; right: 1.5rem;
-            padding: 0.55rem 1.1rem;
+            padding: 8px 16px;
             border-radius: 7px;
-            font-size: 0.8rem; font-weight: 600;
+            font-size: 0.8rem; font-weight: 700;
             z-index: 9000; pointer-events: none;
             display: none;
+            backdrop-filter: blur(4px);
         }
-        .toast.ok  { background: rgba(34,197,94,.12); border:1px solid rgba(34,197,94,.4); color:#22c55e; }
-        .toast.err { background: rgba(239,68,68,.12);  border:1px solid rgba(239,68,68,.4);  color:#ef4444; }
+        .toast.ok  { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.4); color: #22c55e; }
+        .toast.err { background: rgba(239,68,68,0.12);  border: 1px solid rgba(239,68,68,0.4);  color: #ef4444; }
     </style>
 </head>
 <body>

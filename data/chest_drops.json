@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "chests": {
+    "silver": {
+      "rolls": 3,
+      "drop_table": [
+        { "weight": 40, "item_code": 10103002, "quantity": 1 },
+        { "weight": 30, "item_code": 10103003, "quantity": 1 },
+        { "weight": 15, "item_code": 10101001, "quantity": 1 },
+        { "weight": 10, "item_code": 10103011, "quantity": 1 },
+        { "weight": 4, "fragment_grade": "normal", "quantity": 5 },
+        { "weight": 1, "fragment_grade": "rare", "quantity": 3 }
+      ]
+    },
+    "gold": {
+      "rolls": 4,
+      "drop_table": [
+        { "weight": 30, "item_code": 10103003, "quantity": 1 },
+        { "weight": 25, "item_code": 10103004, "quantity": 1 },
+        { "weight": 15, "item_code": 10102001, "quantity": 1 },
+        { "weight": 15, "fragment_grade": "rare", "quantity": 5 },
+        { "weight": 10, "fragment_grade": "epic", "quantity": 3 },
+        { "weight": 5, "item_code": 10101042, "quantity": 1 }
+      ]
+    },
+    "platinum": {
+      "rolls": 5,
+      "drop_table": [
+        { "weight": 25, "item_code": 10103005, "quantity": 1 },
+        { "weight": 20, "item_code": 10103006, "quantity": 1 },
+        { "weight": 20, "fragment_grade": "epic", "quantity": 5 },
+        { "weight": 15, "fragment_grade": "legendary", "quantity": 3 },
+        { "weight": 12, "item_code": 10102001, "quantity": 2 },
+        { "weight": 7, "item_code": 10101043, "quantity": 1 },
+        { "weight": 1, "fragment_grade": "mythic", "quantity": 1 }
+      ]
+    }
+  }
+}

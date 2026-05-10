@@ -17,6 +17,50 @@ require_once ROOT_DIR . '/src/Bootstrap.php';
 \Conquer\Bootstrap::init(ROOT_DIR);
 
 // ---------------------------------------------------------------------------
+// Admin Panel — separate session, separate auth, no game session needed
+// ---------------------------------------------------------------------------
+
+if (str_starts_with((string) ($_SERVER['REQUEST_URI'] ?? '/'), '/admin')) {
+    session_name('conquer_admin');
+    session_start();
+
+    $adminUri = parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
+    $adminUri = '/' . ltrim((string) $adminUri, '/');
+
+    $m = [];
+    match (true) {
+        $adminUri === '/admin/login' && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET'
+            => \Conquer\Admin\AdminController::loginPage(),
+        $adminUri === '/admin/login' && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST'
+            => \Conquer\Admin\AdminController::loginPost(),
+        $adminUri === '/admin/logout'
+            => \Conquer\Admin\AdminController::logout(),
+        $adminUri === '/admin' || $adminUri === '/admin/'
+            => \Conquer\Admin\AdminController::dashboard(),
+        $adminUri === '/admin/players'
+            => \Conquer\Admin\AdminController::players(),
+        (bool) preg_match('#^/admin/players/(\d+)$#', $adminUri, $m)
+            => \Conquer\Admin\AdminController::playerDetail((int) $m[1]),
+        $adminUri === '/admin/alliances'
+            => \Conquer\Admin\AdminController::alliances(),
+        $adminUri === '/admin/world'
+            => \Conquer\Admin\AdminController::world(),
+        $adminUri === '/admin/chat'
+            => \Conquer\Admin\AdminController::chat(),
+        $adminUri === '/admin/audit'
+            => \Conquer\Admin\AdminController::auditLog(),
+        str_starts_with($adminUri, '/admin/action')
+            => \Conquer\Admin\AdminController::handleAction(),
+        default => (static function (): void {
+            http_response_code(404);
+            echo '<!DOCTYPE html><html lang="de"><body style="background:#0f172a;color:#f87171;font-family:system-ui;padding:40px;">'
+                . '<h2>404 &mdash; Admin-Seite nicht gefunden</h2></body></html>';
+        })(),
+    };
+    exit;
+}
+
+// ---------------------------------------------------------------------------
 // Router
 // ---------------------------------------------------------------------------
 
@@ -25,7 +69,8 @@ $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
 // JSON API — all /api/* requests are handled here.
 if (str_starts_with($path, '/api/')) {
-    $router = new \Conquer\Router();
+    $router  = new \Conquer\Router();
+    $session = \Conquer\Auth\Session::current() ?? [];
 
     // Auth
     $router->get('/api/auth/me',      [\Conquer\Api\Handlers\AuthHandler::class, 'me']);
@@ -41,21 +86,24 @@ if (str_starts_with($path, '/api/')) {
     $router->post('/api/troops/train',       [\Conquer\Api\Handlers\TroopHandler::class, 'train']);
 
     // March
-    $router->post('/api/march/dispatch',        [\Conquer\Api\Handlers\MarchHandler::class, 'dispatch']);
-    $router->post('/api/march/dispatch-charm',  [\Conquer\Api\Handlers\MarchHandler::class, 'dispatchCharm']);
-    $router->post('/api/march/dispatch-player', [\Conquer\Api\Handlers\MarchHandler::class, 'dispatchPlayer']);
-    $router->post('/api/march/dispatch-scout',  [\Conquer\Api\Handlers\MarchHandler::class, 'dispatchScout']);
-    $router->get('/api/march/list',             [\Conquer\Api\Handlers\MarchHandler::class, 'list']);
-    $router->get('/api/map/marches',            [\Conquer\Api\Handlers\MarchHandler::class, 'listAll']);
+    $router->post('/api/march/dispatch',         [\Conquer\Api\Handlers\MarchHandler::class, 'dispatch']);
+    $router->post('/api/march/dispatch-charm',   [\Conquer\Api\Handlers\MarchHandler::class, 'dispatchCharm']);
+    $router->post('/api/march/dispatch-player',  [\Conquer\Api\Handlers\MarchHandler::class, 'dispatchPlayer']);
+    $router->post('/api/march/dispatch-scout',   [\Conquer\Api\Handlers\MarchHandler::class, 'dispatchScout']);
+    $router->post('/api/march/dispatch-gather',  fn() => \Conquer\Api\Handlers\MarchHandler::dispatchGather($session));
+    $router->post('/api/march/recall',           fn() => \Conquer\Api\Handlers\MarchHandler::recall($session));
+    $router->get('/api/march/list',              [\Conquer\Api\Handlers\MarchHandler::class, 'list']);
+    $router->get('/api/map/marches',             [\Conquer\Api\Handlers\MarchHandler::class, 'listAll']);
 
     // Battle reports
     $router->get('/api/battle/reports',      [\Conquer\Api\Handlers\BattleHandler::class, 'reports']);
     $router->get('/api/battle/report/:id',   [\Conquer\Api\Handlers\BattleHandler::class, 'report']);
 
     // Map
-    $router->get('/api/map/info',            [\Conquer\Api\Handlers\MapHandler::class, 'info']);
-    $router->get('/api/map/tiles',           [\Conquer\Api\Handlers\MapHandler::class, 'tiles']);
-    $router->get('/api/map/tile/:x/:y',      [\Conquer\Api\Handlers\MapHandler::class, 'tile']);
+    $router->get('/api/map/info',              [\Conquer\Api\Handlers\MapHandler::class, 'info']);
+    $router->get('/api/map/tiles',             [\Conquer\Api\Handlers\MapHandler::class, 'tiles']);
+    $router->get('/api/map/tile/:x/:y',        [\Conquer\Api\Handlers\MapHandler::class, 'tile']);
+    $router->get('/api/map/field-object/:id',  fn($p) => \Conquer\Api\Handlers\MapHandler::fieldObject($session, (int) $p['id']));
 
     // Research
     $router->get('/api/research/state',      [\Conquer\Api\Handlers\ResearchHandler::class, 'state']);
@@ -67,14 +115,22 @@ if (str_starts_with($path, '/api/')) {
     $router->post('/api/trading/caravan/buy', [\Conquer\Api\Handlers\TradingHandler::class, 'buy']);
 
     // Alliance
-    $router->get('/api/alliance/my',      [\Conquer\Api\Handlers\AllianceHandler::class, 'my']);
-    $router->post('/api/alliance/create', [\Conquer\Api\Handlers\AllianceHandler::class, 'create']);
-    $router->post('/api/alliance/join',   [\Conquer\Api\Handlers\AllianceHandler::class, 'join']);
-    $router->post('/api/alliance/leave',  [\Conquer\Api\Handlers\AllianceHandler::class, 'leave']);
-    $router->get('/api/alliance/search',  [\Conquer\Api\Handlers\AllianceHandler::class, 'search']);
-    $router->get('/api/alliance/members', [\Conquer\Api\Handlers\AllianceHandler::class, 'members']);
-    $router->get('/api/alliance/chat',    [\Conquer\Api\Handlers\AllianceHandler::class, 'chat']);
-    $router->post('/api/alliance/chat',   [\Conquer\Api\Handlers\AllianceHandler::class, 'sendChat']);
+    $router->get('/api/alliance/my',            [\Conquer\Api\Handlers\AllianceHandler::class, 'my']);
+    $router->post('/api/alliance/create',        [\Conquer\Api\Handlers\AllianceHandler::class, 'create']);
+    $router->post('/api/alliance/join',          [\Conquer\Api\Handlers\AllianceHandler::class, 'join']);
+    $router->post('/api/alliance/leave',         [\Conquer\Api\Handlers\AllianceHandler::class, 'leave']);
+    $router->get('/api/alliance/search',         [\Conquer\Api\Handlers\AllianceHandler::class, 'search']);
+    $router->get('/api/alliance/members',        [\Conquer\Api\Handlers\AllianceHandler::class, 'members']);
+    $router->get('/api/alliance/chat',           [\Conquer\Api\Handlers\AllianceHandler::class, 'chat']);
+    $router->post('/api/alliance/chat',          [\Conquer\Api\Handlers\AllianceHandler::class, 'sendChat']);
+    $router->get('/api/alliance/help-requests',  fn() => \Conquer\Api\Handlers\AllianceHandler::helpRequests($session));
+    $router->post('/api/alliance/help',          fn() => \Conquer\Api\Handlers\AllianceHandler::help($session));
+    $router->get('/api/alliance/treasury',       fn() => \Conquer\Api\Handlers\AllianceHandler::treasury($session));
+    $router->post('/api/alliance/donate',        fn() => \Conquer\Api\Handlers\AllianceHandler::donate($session));
+
+    // World Chat
+    $router->get('/api/world-chat',              fn() => \Conquer\Api\Handlers\AllianceHandler::worldChat($session));
+    $router->post('/api/world-chat/send',        fn() => \Conquer\Api\Handlers\AllianceHandler::sendWorldChat($session));
 
     // Player
     $router->get('/api/player/me',                    [\Conquer\Api\Handlers\PlayerHandler::class, 'me']);
@@ -90,6 +146,39 @@ if (str_starts_with($path, '/api/')) {
     $router->post('/api/rally/join',   [\Conquer\Api\Handlers\RallyHandler::class, 'join']);
     $router->get('/api/rally/list',    [\Conquer\Api\Handlers\RallyHandler::class, 'list']);
     $router->get('/api/rally/:id',     [\Conquer\Api\Handlers\RallyHandler::class, 'detail']);
+
+    // Shrine System
+    $router->get('/api/shrines',                  fn() => \Conquer\Api\Handlers\ShrineHandler::list($session));
+    $router->get('/api/shrines/:id',              fn($p) => \Conquer\Api\Handlers\ShrineHandler::detail($session, (int) $p['id']));
+    $router->post('/api/shrines/:id/garrison',    fn($p) => \Conquer\Api\Handlers\ShrineHandler::garrison($session, (int) $p['id']));
+    $router->post('/api/shrines/:id/recall',      fn($p) => \Conquer\Api\Handlers\ShrineHandler::recall($session, (int) $p['id']));
+
+    // Conquest Event
+    $router->get('/api/conquest/event',           fn() => \Conquer\Api\Handlers\ConquestHandler::current($session));
+    $router->get('/api/conquest/leaderboard',     fn() => \Conquer\Api\Handlers\ConquestHandler::leaderboard($session));
+
+    // Hospital
+    $router->get('/api/hospital/status',        [\Conquer\Api\Handlers\HospitalHandler::class, 'status']);
+    $router->post('/api/hospital/instant-heal', [\Conquer\Api\Handlers\HospitalHandler::class, 'instantHeal']);
+
+    // Inventory
+    $router->get('/api/inventory',      [\Conquer\Api\Handlers\InventoryHandler::class, 'list']);
+    $router->post('/api/inventory/use', [\Conquer\Api\Handlers\InventoryHandler::class, 'use']);
+
+    // Treasure
+    $router->get('/api/treasure/list',         [\Conquer\Api\Handlers\TreasureHandler::class, 'list']);
+    $router->post('/api/treasure/equip',       [\Conquer\Api\Handlers\TreasureHandler::class, 'equip']);
+    $router->post('/api/treasure/unequip',     [\Conquer\Api\Handlers\TreasureHandler::class, 'unequip']);
+    $router->get('/api/treasure/chest-status', [\Conquer\Api\Handlers\TreasureHandler::class, 'chestStatus']);
+    $router->post('/api/treasure/open-chest',  [\Conquer\Api\Handlers\TreasureHandler::class, 'openChest']);
+
+    // Daily quests
+    $router->get('/api/quests/daily',  [\Conquer\Api\Handlers\QuestHandler::class, 'list']);
+    $router->post('/api/quests/claim', [\Conquer\Api\Handlers\QuestHandler::class, 'claim']);
+
+    // Notifications / poll
+    $router->get('/api/notifications/poll',  [\Conquer\Api\Handlers\NotificationHandler::class, 'poll']);
+    $router->post('/api/notifications/read', [\Conquer\Api\Handlers\NotificationHandler::class, 'markRead']);
 
     if (!$router->dispatch($method, $path)) {
         \Conquer\Api\Response::error(404, 'NOT_FOUND', 'API endpoint not found.');

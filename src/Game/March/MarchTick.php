@@ -5,6 +5,11 @@ namespace Conquer\Game\March;
 
 use Conquer\Db\Connection;
 use Conquer\Logger;
+use Conquer\Game\Hospital\HospitalService;
+use Conquer\Game\Quest\DailyQuestService;
+
+/** Fraction of losses that go to hospital instead of dying permanently. */
+const MORTALITY_RATE = 0.3; // 30% of losses are wounded, 70% die
 
 /**
  * Lazy march tick — called from MarchHandler::list() so marches resolve
@@ -23,6 +28,20 @@ final class MarchTick
     {
         $db  = Connection::getInstance();
         $log = Logger::getInstance();
+
+        // ── Step 0: recovery — reset marches stuck in 'resolving' > 2 min ──────
+        try {
+            $db->execute(
+                "UPDATE marches
+                 SET state = 'marching'
+                 WHERE player_id = ?
+                   AND state = 'resolving'
+                   AND arrival_time <= DATE_SUB(UTC_TIMESTAMP(), INTERVAL 2 MINUTE)",
+                [$playerId],
+            );
+        } catch (\PDOException $e) {
+            $log->error('[MarchTick] resolving recovery failed: ' . $e->getMessage());
+        }
 
         // ── Step 1: arrived ─────────────────────────────────────────────────
         try {
@@ -62,6 +81,8 @@ final class MarchTick
                 self::resolvePlayerAttack($db, $log, $marchId, $playerId, $cityId, $targetX, $targetY, (int)$march['target_id'], $intTroops);
             } elseif ($marchType === 8) {
                 self::resolveScout($db, $log, $marchId, $playerId, $cityId, $targetX, $targetY, (int)$march['target_id']);
+            } elseif ($marchType === 9) {
+                GatherService::resolveGather($db, $log, $marchId, $playerId, $cityId, $targetX, $targetY, (int)$march['target_id']);
             } else {
                 // Unsupported type — return immediately
                 $db->execute(
@@ -217,7 +238,7 @@ final class MarchTick
             );
         });
 
-        // Award Lord XP for monster kill
+        // Award Lord XP for monster kill + daily quest tracking
         if ($result['monster_killed']) {
             $level = (int) ($monsterDef['level'] ?? 1);
             $xp    = $level * 10; // Level 1 = 10 XP, Level 2 = 20 XP, etc.
@@ -230,6 +251,11 @@ final class MarchTick
 
             \Conquer\Game\Player\LordLevel::addXp($playerId, $xp);
             $db->execute('UPDATE players SET kill_count = kill_count + 1 WHERE id = ?', [$playerId]);
+
+            // Track daily quests for monster kills
+            try {
+                DailyQuestService::trackProgress($playerId, 'attack_monster');
+            } catch (\Throwable) {}
         }
 
         $log->info(sprintf(
@@ -381,17 +407,26 @@ final class MarchTick
         $outcome      = $attackerWins ? 'attacker_wins' : 'defender_wins';
 
         // Calculate losses (loser loses 30%, winner loses 10%)
-        $attackerLosses = [];
-        $defenderLosses = [];
+        // Of those losses, MORTALITY_RATE die permanently; the rest go to hospital.
+        $attackerLosses  = [];
+        $attackerWounded = []; // go to hospital
+        $defenderLosses  = [];
+        $defenderWounded = [];
 
         foreach ($attackerTroops as $code => $count) {
-            $lossRate               = $attackerWins ? 0.10 : 0.30;
-            $attackerLosses[$code]  = (int)ceil($count * $lossRate);
+            $lossRate                = $attackerWins ? 0.10 : 0.30;
+            $totalLoss               = (int)ceil($count * $lossRate);
+            $dead                    = (int)ceil($totalLoss * (1.0 - MORTALITY_RATE));
+            $attackerLosses[$code]   = $dead;
+            $attackerWounded[$code]  = $totalLoss - $dead;
         }
         foreach ($defTroops as $code => $count) {
             if ($count <= 0) continue;
-            $lossRate               = $attackerWins ? 0.30 : 0.10;
-            $defenderLosses[$code]  = (int)ceil($count * $lossRate);
+            $lossRate                = $attackerWins ? 0.30 : 0.10;
+            $totalLoss               = (int)ceil($count * $lossRate);
+            $dead                    = (int)ceil($totalLoss * (1.0 - MORTALITY_RATE));
+            $defenderLosses[$code]   = $dead;
+            $defenderWounded[$code]  = $totalLoss - $dead;
         }
 
         // Loot: 20% of defender resources if attacker wins
@@ -410,20 +445,29 @@ final class MarchTick
 
         $survivors = [];
         foreach ($attackerTroops as $code => $count) {
-            $survivors[$code] = max(0, $count - ($attackerLosses[$code] ?? 0));
+            $survivors[$code] = max(0, $count - ($attackerLosses[$code] ?? 0) - ($attackerWounded[$code] ?? 0));
         }
 
         $db->transaction(function () use (
             $db, $marchId, $playerId, $cityId, $defPlayerId, $targetCityId,
             $targetX, $targetY, $attackerTroops, $defTroops, $defenderLosses,
-            $attackerLosses, $survivors, $loot, $outcome, $attackerWins,
+            $defenderWounded, $attackerLosses, $attackerWounded, $survivors,
+            $loot, $outcome, $attackerWins,
         ): void {
-            // Apply defender losses
+            // Apply defender permanent losses
             foreach ($defenderLosses as $code => $loss) {
                 if ($loss <= 0) continue;
                 $db->execute(
                     'UPDATE city_troops SET count = GREATEST(0, count - ?) WHERE city_id = ? AND troop_code = ?',
                     [$loss, $targetCityId, $code],
+                );
+            }
+            // Apply defender wounded (also remove from active troops, hospital handles healing)
+            foreach ($defenderWounded as $code => $count) {
+                if ($count <= 0) continue;
+                $db->execute(
+                    'UPDATE city_troops SET count = GREATEST(0, count - ?) WHERE city_id = ? AND troop_code = ?',
+                    [$count, $targetCityId, $code],
                 );
             }
 
@@ -484,6 +528,29 @@ final class MarchTick
                 [':haul'=>json_encode(['survivors'=>$survivors,'loot'=>$loot]), ':id'=>$marchId],
             );
         });
+
+        // Send wounded to hospital (outside transaction — non-critical)
+        $filteredAttackerWounded = array_filter($attackerWounded, fn($c) => $c > 0);
+        if (!empty($filteredAttackerWounded)) {
+            HospitalService::addWounded($cityId, $filteredAttackerWounded);
+        }
+        if ($defPlayerId > 0) {
+            $filteredDefenderWounded = array_filter($defenderWounded, fn($c) => $c > 0);
+            if (!empty($filteredDefenderWounded)) {
+                HospitalService::addWounded($targetCityId, $filteredDefenderWounded);
+            }
+        }
+
+        // Track daily quest progress
+        try {
+            DailyQuestService::trackProgress($playerId, 'attack_player');
+        } catch (\Throwable) {}
+
+        // Award Lord XP for player attack
+        $xpGain = $attackerWins ? 25 : 5;
+        try {
+            \Conquer\Game\Player\LordLevel::addXp($playerId, $xpGain);
+        } catch (\Throwable) {}
 
         $log->info(sprintf('[MarchTick] Player attack march %d resolved — %s', $marchId, $outcome));
     }

@@ -1,0 +1,316 @@
+{
+  "version": 1,
+  "treasures": [
+    {
+      "code": 60100001,
+      "name": "Manure",
+      "grade": "normal",
+      "slot_type": "any",
+      "description": "An ancient fertilizer with magical properties.",
+      "stats": [
+        { "type": "food_production", "base_value": 2.0, "per_level": 0.5 }
+      ],
+      "max_level": 10,
+      "fragments_per_level": 10
+    },
+    {
+      "code": 60100002,
+      "name": "Woodcutter's Charm",
+      "grade": "normal",
+      "slot_type": "any",
+      "description": "A charm carved from ancient oak, humming with forest energy.",
+      "stats": [
+        { "type": "lumber_production", "base_value": 2.0, "per_level": 0.5 }
+      ],
+      "max_level": 10,
+      "fragments_per_level": 10
+    },
+    {
+      "code": 60100003,
+      "name": "Stone Amulet",
+      "grade": "normal",
+      "slot_type": "any",
+      "description": "A rough amulet chiseled from mountain granite.",
+      "stats": [
+        { "type": "stone_production", "base_value": 2.0, "per_level": 0.5 }
+      ],
+      "max_level": 10,
+      "fragments_per_level": 10
+    },
+    {
+      "code": 60100004,
+      "name": "Coin Purse",
+      "grade": "normal",
+      "slot_type": "any",
+      "description": "A worn leather purse that always jingles a little louder than it should.",
+      "stats": [
+        { "type": "gold_production", "base_value": 2.0, "per_level": 0.5 }
+      ],
+      "max_level": 10,
+      "fragments_per_level": 10
+    },
+    {
+      "code": 60100005,
+      "name": "Leather Strap",
+      "grade": "normal",
+      "slot_type": "any",
+      "description": "Hardened leather reinforced with simple runes of protection.",
+      "stats": [
+        { "type": "infantry_defense", "base_value": 1.5, "per_level": 0.4 }
+      ],
+      "max_level": 10,
+      "fragments_per_level": 10
+    },
+    {
+      "code": 60100006,
+      "name": "Feathered Cap",
+      "grade": "normal",
+      "slot_type": "any",
+      "description": "A light cap adorned with eagle feathers that sharpens a marksman's eye.",
+      "stats": [
+        { "type": "ranged_attack", "base_value": 1.5, "per_level": 0.4 }
+      ],
+      "max_level": 10,
+      "fragments_per_level": 10
+    },
+    {
+      "code": 60200001,
+      "name": "Iron Shield",
+      "grade": "rare",
+      "slot_type": "any",
+      "description": "A sturdy iron shield etched with protective sigils.",
+      "stats": [
+        { "type": "infantry_defense", "base_value": 3.0, "per_level": 0.8 },
+        { "type": "all_hp", "base_value": 1.0, "per_level": 0.3 }
+      ],
+      "max_level": 10,
+      "fragments_per_level": 20
+    },
+    {
+      "code": 60200002,
+      "name": "Hunter's Bow",
+      "grade": "rare",
+      "slot_type": "any",
+      "description": "A finely crafted bow that makes every arrow fly true and fast.",
+      "stats": [
+        { "type": "ranged_attack", "base_value": 3.0, "per_level": 0.8 },
+        { "type": "march_speed", "base_value": 1.0, "per_level": 0.3 }
+      ],
+      "max_level": 10,
+      "fragments_per_level": 20
+    },
+    {
+      "code": 60200003,
+      "name": "Cavalry Spurs",
+      "grade": "rare",
+      "slot_type": "any",
+      "description": "Enchanted spurs that drive horses to unnatural speeds.",
+      "stats": [
+        { "type": "cavalry_attack", "base_value": 3.0, "per_level": 0.8 },
+        { "type": "march_speed", "base_value": 2.0, "per_level": 0.5 }
+      ],
+      "max_level": 10,
+      "fragments_per_level": 20
+    },
+    {
+      "code": 60200004,
+      "name": "Builder's Hammer",
+      "grade": "rare",
+      "slot_type": "any",
+      "description": "A magical hammer that drives nails faster than the eye can follow.",
+      "stats": [
+        { "type": "construction_speed", "base_value": 4.0, "per_level": 1.0 }
+      ],
+      "max_level": 10,
+      "fragments_per_level": 20
+    },
+    {
+      "code": 60200005,
+      "name": "Scholar's Tome",
+      "grade": "rare",
+      "slot_type": "any",
+      "description": "An ancient tome that whispers forgotten knowledge to its holder.",
+      "stats": [
+        { "type": "research_speed", "base_value": 4.0, "per_level": 1.0 }
+      ],
+      "max_level": 10,
+      "fragments_per_level": 20
+    },
+    {
+      "code": 60200006,
+      "name": "Drillmaster's Horn",
+      "grade": "rare",
+      "slot_type": "any",
+      "description": "A commanding horn whose call motivates soldiers to train harder and faster.",
+      "stats": [
+        { "type": "training_speed", "base_value": 4.0, "per_level": 1.0 }
+      ],
+      "max_level": 10,
+      "fragments_per_level": 20
+    },
+    {
+      "code": 60300001,
+      "name": "Dragon Scale Shield",
+      "grade": "epic",
+      "slot_type": "any",
+      "description": "A shield crafted from the scales of a slain dragon, nearly impenetrable.",
+      "stats": [
+        { "type": "all_defense", "base_value": 5.0, "per_level": 1.2 },
+        { "type": "infantry_hp", "base_value": 3.0, "per_level": 0.8 }
+      ],
+      "max_level": 10,
+      "fragments_per_level": 40
+    },
+    {
+      "code": 60300002,
+      "name": "Phoenix Feather Bow",
+      "grade": "epic",
+      "slot_type": "any",
+      "description": "A bow strung with phoenix feathers, its arrows burn through monster hides.",
+      "stats": [
+        { "type": "ranged_attack", "base_value": 5.0, "per_level": 1.2 },
+        { "type": "vs_monster_attack", "base_value": 3.0, "per_level": 0.8 }
+      ],
+      "max_level": 10,
+      "fragments_per_level": 40
+    },
+    {
+      "code": 60300003,
+      "name": "Shadow Blade",
+      "grade": "epic",
+      "slot_type": "any",
+      "description": "A blade forged in shadow-fire, swift and deadly in every hand.",
+      "stats": [
+        { "type": "all_attack", "base_value": 4.0, "per_level": 1.0 },
+        { "type": "march_speed", "base_value": 3.0, "per_level": 0.8 }
+      ],
+      "max_level": 10,
+      "fragments_per_level": 40
+    },
+    {
+      "code": 60300004,
+      "name": "Archmage's Staff",
+      "grade": "epic",
+      "slot_type": "any",
+      "description": "A staff crackling with arcane energy that accelerates all learning and building.",
+      "stats": [
+        { "type": "research_speed", "base_value": 6.0, "per_level": 1.5 },
+        { "type": "construction_speed", "base_value": 2.0, "per_level": 0.5 }
+      ],
+      "max_level": 10,
+      "fragments_per_level": 40
+    },
+    {
+      "code": 60300005,
+      "name": "Warlord's Banner",
+      "grade": "epic",
+      "slot_type": "any",
+      "description": "A banner that rallies troops, fitting more soldiers into every march.",
+      "stats": [
+        { "type": "march_capacity", "base_value": 500, "per_level": 200 },
+        { "type": "all_attack", "base_value": 2.0, "per_level": 0.5 }
+      ],
+      "max_level": 10,
+      "fragments_per_level": 40
+    },
+    {
+      "code": 60300006,
+      "name": "Harvest Idol",
+      "grade": "epic",
+      "slot_type": "any",
+      "description": "A fertility idol that blesses fields and gathering parties alike.",
+      "stats": [
+        { "type": "food_production", "base_value": 6.0, "per_level": 1.5 },
+        { "type": "gathering_speed", "base_value": 4.0, "per_level": 1.0 }
+      ],
+      "max_level": 10,
+      "fragments_per_level": 40
+    },
+    {
+      "code": 60400001,
+      "name": "Titan's Gauntlet",
+      "grade": "legendary",
+      "slot_type": "any",
+      "description": "A gauntlet forged by titans, granting overwhelming power to all who wear it.",
+      "stats": [
+        { "type": "all_attack", "base_value": 8.0, "per_level": 2.0 },
+        { "type": "all_defense", "base_value": 5.0, "per_level": 1.5 },
+        { "type": "infantry_hp", "base_value": 4.0, "per_level": 1.0 }
+      ],
+      "max_level": 10,
+      "fragments_per_level": 80
+    },
+    {
+      "code": 60400002,
+      "name": "Celestial Compass",
+      "grade": "legendary",
+      "slot_type": "any",
+      "description": "A compass blessed by celestial spirits that guides armies with unmatched precision.",
+      "stats": [
+        { "type": "march_speed", "base_value": 8.0, "per_level": 2.0 },
+        { "type": "march_capacity", "base_value": 1000, "per_level": 300 },
+        { "type": "gathering_speed", "base_value": 6.0, "per_level": 1.5 }
+      ],
+      "max_level": 10,
+      "fragments_per_level": 80
+    },
+    {
+      "code": 60400003,
+      "name": "Oracle's Eye",
+      "grade": "legendary",
+      "slot_type": "any",
+      "description": "A crystalline eye of an oracle that accelerates all scholarly and civic works.",
+      "stats": [
+        { "type": "research_speed", "base_value": 10.0, "per_level": 2.5 },
+        { "type": "construction_speed", "base_value": 6.0, "per_level": 1.5 },
+        { "type": "training_speed", "base_value": 4.0, "per_level": 1.0 }
+      ],
+      "max_level": 10,
+      "fragments_per_level": 80
+    },
+    {
+      "code": 60400004,
+      "name": "Blood Moon Totem",
+      "grade": "legendary",
+      "slot_type": "any",
+      "description": "A totem of terrible power, awakened under a blood moon to destroy all enemies.",
+      "stats": [
+        { "type": "all_attack", "base_value": 10.0, "per_level": 2.5 },
+        { "type": "vs_monster_attack", "base_value": 8.0, "per_level": 2.0 },
+        { "type": "all_hp", "base_value": 5.0, "per_level": 1.5 }
+      ],
+      "max_level": 10,
+      "fragments_per_level": 80
+    },
+    {
+      "code": 60500001,
+      "name": "Eternal Flame Crown",
+      "grade": "mythic",
+      "slot_type": "any",
+      "description": "A crown wreathed in undying flame, forged at the dawn of creation for the mightiest of rulers.",
+      "stats": [
+        { "type": "all_attack", "base_value": 15.0, "per_level": 3.0 },
+        { "type": "all_defense", "base_value": 10.0, "per_level": 2.5 },
+        { "type": "all_hp", "base_value": 8.0, "per_level": 2.0 },
+        { "type": "march_capacity", "base_value": 2000, "per_level": 500 }
+      ],
+      "max_level": 10,
+      "fragments_per_level": 150
+    },
+    {
+      "code": 60500002,
+      "name": "World Serpent Scale",
+      "grade": "mythic",
+      "slot_type": "any",
+      "description": "A scale shed by the world serpent itself, radiating an aura of protection and abundance.",
+      "stats": [
+        { "type": "resource_protection", "base_value": 20.0, "per_level": 3.0 },
+        { "type": "food_production", "base_value": 10.0, "per_level": 2.0 },
+        { "type": "lumber_production", "base_value": 10.0, "per_level": 2.0 },
+        { "type": "hospital_capacity", "base_value": 2000, "per_level": 500 }
+      ],
+      "max_level": 10,
+      "fragments_per_level": 150
+    }
+  ]
+}

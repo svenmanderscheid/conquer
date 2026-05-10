@@ -246,21 +246,29 @@ declare(strict_types=1);
         /* ── LoK Attack Overlay ── */
         .atk-overlay {
             position: fixed; inset: 0; z-index: 300;
-            background: rgba(0,0,0,0.88);
-            display: flex; align-items: stretch;
+            background: rgba(0,0,0,0.75);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .atk-dialog {
+            display: flex; width: 90vw; max-width: 900px;
+            height: 80vh; max-height: 620px;
+            border-radius: 12px; overflow: hidden;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.7);
+            position: relative;
         }
         .atk-back {
             position: absolute; top: 10px; left: 10px; z-index: 10;
-            width: 48px; height: 34px;
+            width: 36px; height: 28px;
             background: #1d4ed8; border: 2px solid #3b82f6; border-radius: 6px;
-            color: #fff; font-size: 1.2rem; font-weight: 900; cursor: pointer;
+            color: #fff; font-size: 1rem; font-weight: 900; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
         }
         .atk-back:hover { background: #2563eb; }
         /* Left target panel */
         .atk-left {
-            flex: 0 0 32%; display: flex; align-items: center; justify-content: center;
-            padding: 56px 16px 16px;
+            flex: 0 0 30%; display: flex; align-items: center; justify-content: center;
+            padding: 48px 14px 14px;
+            background: #0a1220;
         }
         .atk-target-panel {
             display: flex; flex-direction: column; align-items: center;
@@ -311,27 +319,25 @@ declare(strict_types=1);
         .atk-right {
             flex: 1; display: flex; flex-direction: column;
             background: #0e1a2e; border-left: 1px solid #1e3a5f;
-            margin: 16px 16px 16px 0; border-radius: 12px; overflow: hidden;
+            overflow: hidden;
         }
         /* Tabs */
         .atk-tabs {
-            display: flex; align-items: stretch;
+            display: flex; align-items: center; gap: 10px;
             background: #0c1628; border-bottom: 2px solid #1e3a5f;
-            flex-shrink: 0;
+            flex-shrink: 0; padding: 0 14px;
         }
         .atk-tab-title {
-            flex: 1; padding: 11px 18px;
+            flex: 1; padding: 11px 0;
             font-size: 0.9rem; font-weight: 900; color: #fff;
             text-transform: uppercase; letter-spacing: .05em;
         }
-        .atk-tab {
-            padding: 11px 18px;
-            font-size: 0.8rem; font-weight: 700; color: #94a3b8;
-            text-transform: uppercase; letter-spacing: .05em; cursor: pointer;
-            border-left: 1px solid #1e3a5f;
+        .atk-tab-march {
+            padding: 4px 12px; border-radius: 4px;
+            background: rgba(59,130,246,.2); border: 1px solid #3b82f6;
+            font-size: 0.72rem; font-weight: 700; color: #93c5fd;
+            text-transform: uppercase; letter-spacing: .06em;
         }
-        .atk-tab-active { color: #fff; background: rgba(59,130,246,.18); }
-        .atk-tab-dim { color: #475569; cursor: not-allowed; }
         /* Body */
         .atk-body { flex: 1; display: flex; overflow: hidden; min-height: 0; }
         /* Troop list */
@@ -421,7 +427,7 @@ declare(strict_types=1);
         /* Buttons row */
         .atk-foot { display: flex; height: 52px; flex-shrink: 0; }
         .atk-empty {
-            flex: 0 0 28%; background: #f59e0b; border: none; border-radius: 0 0 0 12px;
+            flex: 0 0 28%; background: #f59e0b; border: none; border-radius: 0;
             color: #1c1917; font-size: 0.95rem; font-weight: 900;
             text-transform: uppercase; letter-spacing: .05em; cursor: pointer;
         }
@@ -434,7 +440,7 @@ declare(strict_types=1);
         .atk-go:hover:not(:disabled) { opacity: .88; }
         .atk-go:disabled { opacity: .4; cursor: not-allowed; }
         .atk-go-blue { background: #1d4ed8; }
-        .atk-go-red  { background: #b91c1c; }
+        .atk-go-red  { background: #b91c1c; border-radius: 0; }
         .atk-go-time { font-size: 0.72rem; color: rgba(255,255,255,.7); line-height: 1; }
         .atk-go-lbl  { font-size: 0.95rem; font-weight: 900; color: #fff; text-transform: uppercase; line-height: 1.3; }
 
@@ -754,8 +760,36 @@ declare(strict_types=1);
             </div>
         </div>
 
+        <!-- Field object (gather) panel -->
+        <div class="panel" x-show="tileInfo && tileInfo.type === 'field_object'" x-cloak>
+            <div class="panel-title">Ressourcenfeld</div>
+            <div style="font-size:0.85rem;font-weight:800;color:#f0d080;margin-bottom:6px">
+                🌾 <span x-text="fieldObjectName(tileInfo?.object_name)"></span>
+                <span x-show="tileInfo?.level"> Lv.<span x-text="tileInfo?.level"></span></span>
+            </div>
+            <div style="font-size:0.75rem;color:#94a3b8;margin-bottom:6px">
+                Ressourcen:
+                <span style="color:#ffd700;font-weight:700" x-text="(tileInfo?.resource_amount ?? 0).toLocaleString()"></span>
+                /
+                <span x-text="(tileInfo?.resource_max ?? 0).toLocaleString()"></span>
+            </div>
+            <div x-show="tileInfo?.is_occupied" style="font-size:0.72rem;color:#f87171;margin-bottom:6px">
+                Wird bereits gesammelt
+            </div>
+            <!-- Resource progress bar -->
+            <div style="height:6px;background:#1e293b;border-radius:3px;overflow:hidden;margin-bottom:12px">
+                <div style="height:100%;background:#22c55e;border-radius:3px;transition:width 0.3s"
+                     :style="`width:${tileInfo && tileInfo.resource_max > 0 ? Math.round((tileInfo.resource_amount/tileInfo.resource_max)*100) : 0}%`"></div>
+            </div>
+            <button style="width:100%;padding:7px;border:none;border-radius:6px;background:linear-gradient(180deg,#16a34a,#15803d);color:#fff;font-size:0.82rem;font-weight:700;cursor:pointer"
+                    @click="dispatchGather()"
+                    :disabled="tileInfo?.is_occupied">
+                🚶 Sammeln
+            </button>
+        </div>
+
         <!-- Default "click on map" hint when no special tile selected -->
-        <div class="panel" x-show="!tileInfo || ['city','monster'].includes(tileInfo.occupant?.type)">
+        <div class="panel" x-show="!tileInfo || ['city','monster','field_object'].includes(tileInfo.occupant?.type ?? tileInfo?.type)">
             <div class="tile-info-empty" style="padding:4px 0">Klicke auf ein Tile um Details zu sehen</div>
         </div>
 
@@ -860,7 +894,9 @@ declare(strict_types=1);
 </div>
 
 <!-- ── LoK-style Attack Modal (Monster + Player combined) ── -->
-<div class="atk-overlay" x-show="attackModal || playerAttackModal" x-cloak style="display:none">
+<div class="atk-overlay" x-show="attackModal || playerAttackModal" x-cloak
+     style="display:none" @click.self="attackModal=false; playerAttackModal=false">
+    <div class="atk-dialog">
     <button class="atk-back" @click="attackModal=false; playerAttackModal=false">&#8592;</button>
 
     <!-- Left: target info -->
@@ -897,11 +933,10 @@ declare(strict_types=1);
 
     <!-- Right: troop selection -->
     <div class="atk-right">
-        <!-- Tabs -->
+        <!-- Header -->
         <div class="atk-tabs">
             <div class="atk-tab-title" x-text="attackModal ? 'MONSTER ATTACK' : 'ATTACK'"></div>
-            <div class="atk-tab atk-tab-active">MARCH</div>
-            <div class="atk-tab atk-tab-dim">DRAGO</div>
+            <div class="atk-tab-march">MARCH</div>
         </div>
 
         <!-- Body: troop list + formation -->
@@ -1005,7 +1040,8 @@ declare(strict_types=1);
                 <div class="atk-go-lbl" x-text="attackModal ? 'ATTACK' : 'MARCH'"></div>
             </button>
         </div>
-    </div>
+    </div><!-- atk-right -->
+    </div><!-- atk-dialog -->
 </div>
 
 <!-- ── Rally Modal ── -->
@@ -1791,6 +1827,33 @@ function mapApp() {
                 }
             } catch { this.showToast('Netzwerkfehler', 'err'); }
             this.charmCollecting = false;
+        },
+
+        // ── Field object (gather march) ───────────────────────────────────────
+        fieldObjectName(name) {
+            return { farm: 'Bauernhof', lumber: 'Holzfäller', quarry: 'Steinbruch', gold_mine: 'Goldmine', gem_node: 'Edelsteinader' }[name] || name || '—';
+        },
+        async dispatchGather() {
+            if (!this.tileInfo) return;
+            try {
+                const r = await fetch('/api/march/dispatch-gather', {
+                    method:  'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': CSRF },
+                    body:    JSON.stringify({
+                        target_x:    this.tileInfo.x,
+                        target_y:    this.tileInfo.y,
+                        troop_count: 1000,
+                    }),
+                });
+                const j = await r.json();
+                if (j.ok) {
+                    this.showToast('Marsch gestartet!', 'ok');
+                    this.tileInfo = null;
+                    this.pollMarches();
+                } else {
+                    this.showToast(j.message ?? j.error ?? 'Fehler', 'err');
+                }
+            } catch { this.showToast('Netzwerkfehler', 'err'); }
         },
 
         // ── Toast ─────────────────────────────────────────────────────────────

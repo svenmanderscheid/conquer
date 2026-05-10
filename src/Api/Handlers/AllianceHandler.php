@@ -430,6 +430,291 @@ final class AllianceHandler
     }
 
     // -------------------------------------------------------------------------
+    // POST /api/alliance/help
+    // -------------------------------------------------------------------------
+
+    /**
+     * Helps with a build/research request from an alliance member.
+     * Body: { "request_id": int }
+     */
+    public static function help(array $session): void
+    {
+        $session = \Conquer\Auth\Session::current();
+        if ($session === null) {
+            Response::error(401, 'UNAUTHENTICATED', 'Not logged in.');
+        }
+
+        $supplied = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+        if ($supplied === '' || !hash_equals($session['csrf_token'], $supplied)) {
+            Response::error(403, 'CSRF_INVALID', 'CSRF token missing or invalid.');
+        }
+
+        $body      = json_decode(file_get_contents('php://input') ?: '', true) ?? [];
+        $requestId = (int) ($body['request_id'] ?? 0);
+
+        if ($requestId <= 0) {
+            Response::error(400, 'MISSING_FIELD', 'request_id is required.');
+        }
+
+        try {
+            $result = \Conquer\Game\Alliance\AllianceHelpService::help($requestId, (int) $session['player_id']);
+        } catch (\RuntimeException $e) {
+            Response::error(400, 'HELP_FAILED', $e->getMessage());
+        }
+
+        Response::ok(['helped' => true]);
+    }
+
+    // -------------------------------------------------------------------------
+    // GET /api/alliance/help-requests
+    // -------------------------------------------------------------------------
+
+    /**
+     * Returns open help requests for the player's alliance.
+     */
+    public static function helpRequests(array $session): void
+    {
+        $session = \Conquer\Auth\Session::current();
+        if ($session === null) {
+            Response::error(401, 'UNAUTHENTICATED', 'Not logged in.');
+        }
+
+        $db       = Connection::getInstance();
+        $playerId = (int) $session['player_id'];
+
+        $member = $db->query(
+            'SELECT alliance_id FROM alliance_members WHERE player_id = ?',
+            [$playerId],
+        )->fetch();
+
+        if ($member === false) {
+            Response::error(403, 'NOT_MEMBER', 'You are not in an alliance.');
+        }
+
+        $allianceId = (int) $member['alliance_id'];
+
+        try {
+            $requests = \Conquer\Game\Alliance\AllianceHelpService::getHelpRequests($allianceId);
+        } catch (\Throwable) {
+            $requests = [];
+        }
+
+        Response::ok(['requests' => $requests]);
+    }
+
+    // -------------------------------------------------------------------------
+    // GET /api/alliance/treasury
+    // -------------------------------------------------------------------------
+
+    /**
+     * Returns the current treasury balance of the player's alliance.
+     */
+    public static function treasury(array $session): void
+    {
+        $session = \Conquer\Auth\Session::current();
+        if ($session === null) {
+            Response::error(401, 'UNAUTHENTICATED', 'Not logged in.');
+        }
+
+        $db       = Connection::getInstance();
+        $playerId = (int) $session['player_id'];
+
+        $member = $db->query(
+            'SELECT alliance_id FROM alliance_members WHERE player_id = ?',
+            [$playerId],
+        )->fetch();
+
+        if ($member === false) {
+            Response::error(403, 'NOT_MEMBER', 'You are not in an alliance.');
+        }
+
+        $allianceId = (int) $member['alliance_id'];
+
+        try {
+            $balance = \Conquer\Game\Alliance\TreasuryService::getBalance($allianceId);
+        } catch (\Throwable) {
+            Response::error(500, 'DB_ERROR', 'Treasury konnte nicht geladen werden.');
+        }
+
+        Response::ok(['treasury' => $balance]);
+    }
+
+    // -------------------------------------------------------------------------
+    // POST /api/alliance/donate
+    // -------------------------------------------------------------------------
+
+    /**
+     * Donates resources to the alliance treasury.
+     * Body: { "food": int, "lumber": int, "stone": int, "gold": int }
+     */
+    public static function donate(array $session): void
+    {
+        $session = \Conquer\Auth\Session::current();
+        if ($session === null) {
+            Response::error(401, 'UNAUTHENTICATED', 'Not logged in.');
+        }
+
+        $supplied = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+        if ($supplied === '' || !hash_equals($session['csrf_token'], $supplied)) {
+            Response::error(403, 'CSRF_INVALID', 'CSRF token missing or invalid.');
+        }
+
+        $body   = json_decode(file_get_contents('php://input') ?: '', true) ?? [];
+        $food   = max(0, (int) ($body['food']   ?? 0));
+        $lumber = max(0, (int) ($body['lumber'] ?? 0));
+        $stone  = max(0, (int) ($body['stone']  ?? 0));
+        $gold   = max(0, (int) ($body['gold']   ?? 0));
+
+        if ($food + $lumber + $stone + $gold <= 0) {
+            Response::error(400, 'NOTHING_TO_DONATE', 'Mindestens eine Ressource muss gespendet werden.');
+        }
+
+        $db       = Connection::getInstance();
+        $playerId = (int) $session['player_id'];
+
+        $member = $db->query(
+            'SELECT alliance_id FROM alliance_members WHERE player_id = ?',
+            [$playerId],
+        )->fetch();
+
+        if ($member === false) {
+            Response::error(403, 'NOT_MEMBER', 'You are not in an alliance.');
+        }
+
+        $allianceId = (int) $member['alliance_id'];
+
+        try {
+            \Conquer\Game\Alliance\TreasuryService::donate($allianceId, $playerId, $food, $lumber, $stone, $gold);
+        } catch (\RuntimeException $e) {
+            Response::error(400, 'DONATE_FAILED', $e->getMessage());
+        }
+
+        Response::ok(['donated' => true]);
+    }
+
+    // -------------------------------------------------------------------------
+    // GET /api/world-chat
+    // -------------------------------------------------------------------------
+
+    /**
+     * Returns the last 50 world chat messages in chronological order.
+     */
+    public static function worldChat(array $session): void
+    {
+        $session = \Conquer\Auth\Session::current();
+        if ($session === null) {
+            Response::error(401, 'UNAUTHENTICATED', 'Not logged in.');
+        }
+
+        $db = Connection::getInstance();
+
+        try {
+            $messages = $db->query(
+                'SELECT id, player_id, username, alliance_tag, message, created_at
+                 FROM world_chat
+                 WHERE world_id = 1
+                 ORDER BY created_at DESC
+                 LIMIT 50',
+            )->fetchAll();
+        } catch (\PDOException) {
+            $messages = [];
+        }
+
+        // Return in chronological order (oldest first)
+        $messages = array_reverse($messages);
+
+        Response::ok(['messages' => $messages]);
+    }
+
+    // -------------------------------------------------------------------------
+    // POST /api/world-chat/send
+    // -------------------------------------------------------------------------
+
+    /**
+     * Sends a message to the world chat.
+     * Body: { "message": "..." }
+     * Rate limit: 1 message per 2 seconds per player.
+     */
+    public static function sendWorldChat(array $session): void
+    {
+        $session = \Conquer\Auth\Session::current();
+        if ($session === null) {
+            Response::error(401, 'UNAUTHENTICATED', 'Not logged in.');
+        }
+
+        $supplied = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+        if ($supplied === '' || !hash_equals($session['csrf_token'], $supplied)) {
+            Response::error(403, 'CSRF_INVALID', 'CSRF token missing or invalid.');
+        }
+
+        $body    = json_decode(file_get_contents('php://input') ?: '', true) ?? [];
+        $message = strip_tags(trim((string) ($body['message'] ?? '')));
+
+        if ($message === '') {
+            Response::error(400, 'MISSING_FIELD', 'message is required.');
+        }
+
+        if (mb_strlen($message) > 200) {
+            Response::error(400, 'MESSAGE_TOO_LONG', 'Message must not exceed 200 characters.');
+        }
+
+        $db       = Connection::getInstance();
+        $playerId = (int) $session['player_id'];
+        $username = (string) $session['username'];
+
+        // Load alliance tag for display
+        $allianceTag = null;
+        try {
+            $member = $db->query(
+                'SELECT a.tag FROM alliance_members am JOIN alliances a ON a.id = am.alliance_id WHERE am.player_id = ?',
+                [$playerId],
+            )->fetch();
+            if ($member !== false) {
+                $allianceTag = $member['tag'];
+            }
+        } catch (\PDOException) {}
+
+        // Rate limit: 1 message per 2 seconds
+        try {
+            $lastMsg = $db->query(
+                'SELECT created_at FROM world_chat WHERE world_id = 1 AND player_id = ? ORDER BY id DESC LIMIT 1',
+                [$playerId],
+            )->fetch();
+
+            if ($lastMsg !== false) {
+                $elapsed = time() - strtotime($lastMsg['created_at']);
+                if ($elapsed < 2) {
+                    $wait = 2 - $elapsed;
+                    Response::error(429, 'CHAT_COOLDOWN', "Bitte warte {$wait}s vor der nächsten Nachricht.");
+                }
+            }
+        } catch (\PDOException) {}
+
+        // Insert message
+        try {
+            $db->execute(
+                'INSERT INTO world_chat (world_id, player_id, username, alliance_tag, message)
+                 VALUES (1, ?, ?, ?, ?)',
+                [$playerId, $username, $allianceTag, $message],
+            );
+            $newId = $db->lastInsertId();
+        } catch (\PDOException $e) {
+            Response::error(500, 'DB_ERROR', 'Nachricht konnte nicht gespeichert werden.');
+        }
+
+        // 1% chance: cleanup old messages (older than 7 days)
+        if (random_int(1, 100) === 1) {
+            try {
+                $db->execute(
+                    "DELETE FROM world_chat WHERE world_id = 1 AND created_at < DATE_SUB(UTC_TIMESTAMP(), INTERVAL 7 DAY)",
+                );
+            } catch (\PDOException) {}
+        }
+
+        Response::ok(['id' => $newId ?? 0, 'created_at' => gmdate('Y-m-d H:i:s')]);
+    }
+
+    // -------------------------------------------------------------------------
     // POST /api/alliance/chat
     // -------------------------------------------------------------------------
 

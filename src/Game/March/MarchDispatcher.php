@@ -26,6 +26,8 @@ final class MarchDispatcher
     private const MARCH_CHARM         = 6;
     private const MARCH_ATTACK_PLAYER = 7;
     private const MARCH_SCOUT         = 8;
+    public const  MARCH_GATHER        = 9;
+    public const  MARCH_SUPPORT       = 10;
 
     private function __construct() {}
 
@@ -532,6 +534,23 @@ final class MarchDispatcher
         });
 
         return $marchId;
+    }
+
+    /**
+     * Dispatch a gather march to a field object (march_type = 9).
+     * Delegates to GatherService for full validation and insertion.
+     *
+     * @throws \RuntimeException on validation failure
+     */
+    public static function dispatchGather(
+        int $playerId,
+        int $cityId,
+        int $targetX,
+        int $targetY,
+        int $troopCount,
+    ): int {
+        // Delegate to GatherService
+        return \Conquer\Game\March\GatherService::dispatch($playerId, $cityId, $targetX, $targetY, $troopCount);
     }
 
     /**

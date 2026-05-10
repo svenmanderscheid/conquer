@@ -1,0 +1,93 @@
+{
+  "version": 1,
+  "quests": [
+    {
+      "code": "attack_monster_1",
+      "title": "Monster Jäger",
+      "description": "Greife 1 Monster an",
+      "type": "attack_monster",
+      "target": 1,
+      "rewards": [
+        { "item_code": 10103002, "quantity": 2 },
+        { "gems": 10 }
+      ]
+    },
+    {
+      "code": "attack_monster_3",
+      "title": "Monster Vernichter",
+      "description": "Greife 3 Monster an",
+      "type": "attack_monster",
+      "target": 3,
+      "rewards": [
+        { "item_code": 10103003, "quantity": 1 },
+        { "gems": 20 }
+      ]
+    },
+    {
+      "code": "upgrade_building_1",
+      "title": "Baumeister",
+      "description": "Upgrade 1 Gebäude",
+      "type": "upgrade_building",
+      "target": 1,
+      "rewards": [
+        { "item_code": 10103011, "quantity": 1 },
+        { "gems": 15 }
+      ]
+    },
+    {
+      "code": "train_troops_100",
+      "title": "Rekrutenausbilder",
+      "description": "Trainiere 100 Truppen",
+      "type": "train_troops",
+      "target": 100,
+      "rewards": [
+        { "item_code": 10103031, "quantity": 1 },
+        { "gems": 15 }
+      ]
+    },
+    {
+      "code": "research_complete_1",
+      "title": "Wissensdurst",
+      "description": "Schliesse 1 Forschung ab",
+      "type": "research_complete",
+      "target": 1,
+      "rewards": [
+        { "item_code": 10103021, "quantity": 1 },
+        { "gems": 20 }
+      ]
+    },
+    {
+      "code": "collect_resources",
+      "title": "Sammler",
+      "description": "Sammle 50.000 Ressourcen (Gather March)",
+      "type": "gather_resources",
+      "target": 50000,
+      "rewards": [
+        { "item_code": 10102001, "quantity": 1 },
+        { "gems": 10 }
+      ]
+    },
+    {
+      "code": "login_daily",
+      "title": "Täglicher Besucher",
+      "description": "Logge dich ein",
+      "type": "daily_login",
+      "target": 1,
+      "auto_complete_on_login": true,
+      "rewards": [
+        { "item_code": 10103001, "quantity": 1 },
+        { "gems": 5 }
+      ]
+    },
+    {
+      "code": "open_chest_1",
+      "title": "Schatzsucher",
+      "description": "Öffne 1 Schatzkiste",
+      "type": "open_chest",
+      "target": 1,
+      "rewards": [
+        { "gems": 50 }
+      ]
+    }
+  ]
+}

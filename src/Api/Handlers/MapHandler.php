@@ -131,22 +131,32 @@ final class MapHandler
         }
 
         // Field objects (resource nodes)
-        $rows = $db->query('
-            SELECT coord_x, coord_y, object_code, remaining
-            FROM field_objects
-            WHERE world_id = 1
-              AND coord_x BETWEEN :x1 AND :x2
-              AND coord_y BETWEEN :y1 AND :y2
-        ', [':x1' => $xMin, ':x2' => $xMax, ':y1' => $yMin, ':y2' => $yMax])->fetchAll();
+        try {
+            $rows = $db->query('
+                SELECT id, coord_x, coord_y, object_type, level, resource_amount, resource_max, gatherer_march_id
+                FROM field_objects
+                WHERE world_id = 1 AND expires_at > UTC_TIMESTAMP()
+                  AND coord_x BETWEEN :x1 AND :x2
+                  AND coord_y BETWEEN :y1 AND :y2
+            ', [':x1' => $xMin, ':x2' => $xMax, ':y1' => $yMin, ':y2' => $yMax])->fetchAll();
 
-        foreach ($rows as $row) {
-            $entities[] = [
-                'type'        => 'resource',
-                'x'           => (int) $row['coord_x'],
-                'y'           => (int) $row['coord_y'],
-                'object_code' => (int) $row['object_code'],
-                'remaining'   => (int) $row['remaining'],
-            ];
+            $typeNames = [1 => 'farm', 2 => 'lumber', 3 => 'quarry', 4 => 'gold_mine', 5 => 'gem_node'];
+            foreach ($rows as $row) {
+                $entities[] = [
+                    'type'            => 'field_object',
+                    'x'               => (int) $row['coord_x'],
+                    'y'               => (int) $row['coord_y'],
+                    'id'              => (int) $row['id'],
+                    'object_type'     => (int) $row['object_type'],
+                    'object_name'     => $typeNames[(int) $row['object_type']] ?? 'unknown',
+                    'level'           => (int) $row['level'],
+                    'resource_amount' => (int) $row['resource_amount'],
+                    'resource_max'    => (int) $row['resource_max'],
+                    'is_occupied'     => $row['gatherer_march_id'] !== null,
+                ];
+            }
+        } catch (\PDOException) {
+            // field_objects table schema may not match — skip silently
         }
 
         // Shrines
@@ -393,6 +403,53 @@ final class MapHandler
         }
 
         Response::ok(['x' => $x, 'y' => $y, 'occupant' => $occ]);
+    }
+
+    /**
+     * GET /api/map/field-object/:id
+     *
+     * Returns detailed information about a single field object.
+     */
+    public static function fieldObject(array $session, int $id): void
+    {
+        if ($id <= 0) {
+            Response::error(400, 'INVALID_INPUT', 'Ungültige Field Object ID.');
+        }
+
+        $db = Connection::getInstance();
+
+        try {
+            $fo = $db->query(
+                'SELECT id, coord_x, coord_y, object_type, level, resource_amount, resource_max,
+                        gatherer_march_id, expires_at
+                 FROM field_objects
+                 WHERE id = ? AND world_id = 1 AND expires_at > UTC_TIMESTAMP()',
+                [$id],
+            )->fetch();
+        } catch (\PDOException) {
+            Response::error(500, 'DB_ERROR', 'Datenbankfehler.');
+        }
+
+        if ($fo === false) {
+            Response::error(404, 'NOT_FOUND', 'Field Object nicht gefunden oder abgelaufen.');
+        }
+
+        $typeNames = [1 => 'farm', 2 => 'lumber', 3 => 'quarry', 4 => 'gold_mine', 5 => 'gem_node'];
+        $objectType = (int) $fo['object_type'];
+
+        Response::ok([
+            'id'              => (int) $fo['id'],
+            'x'               => (int) $fo['coord_x'],
+            'y'               => (int) $fo['coord_y'],
+            'object_type'     => $objectType,
+            'object_name'     => $typeNames[$objectType] ?? 'unknown',
+            'resource_type'   => \Conquer\Game\Map\FieldObjectService::RESOURCE_BY_TYPE[$objectType] ?? null,
+            'level'           => (int) $fo['level'],
+            'resource_amount' => (int) $fo['resource_amount'],
+            'resource_max'    => (int) $fo['resource_max'],
+            'is_occupied'     => $fo['gatherer_march_id'] !== null,
+            'expires_at'      => $fo['expires_at'],
+        ]);
     }
 
     /**

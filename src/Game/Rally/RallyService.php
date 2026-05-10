@@ -383,6 +383,193 @@ final class RallyService
         });
     }
 
+    /**
+     * Returns all open (status = 'gathering') rallies for an alliance with
+     * participant counts. Alias kept for API handler compatibility — this
+     * wraps listForAlliance which already filters by 'gathering'.
+     *
+     * @return list<array<string,mixed>>
+     */
+    public static function getOpenRallies(int $allianceId): array
+    {
+        return self::listForAlliance($allianceId);
+    }
+
+    /**
+     * Manually launches a rally before its auto-launch timer fires.
+     *
+     * Delegates to tryLaunch after verifying the caller is the captain (leader).
+     * Only the leader may force-launch early.
+     *
+     * @return array{launched: bool, rally_id: int}
+     * @throws \RuntimeException if the caller is not the captain or the rally
+     *         is not in 'gathering' state
+     */
+    public static function launch(int $rallyId, int $captainId): array
+    {
+        $db = Connection::getInstance();
+
+        $rally = $db->query(
+            'SELECT id, leader_player_id, status, launch_at FROM rallies WHERE id = ?',
+            [$rallyId],
+        )->fetch();
+
+        if ($rally === false) {
+            throw new \RuntimeException('Rally #' . $rallyId . ' nicht gefunden.');
+        }
+
+        if ((int) $rally['leader_player_id'] !== $captainId) {
+            throw new \RuntimeException('Nur der Rally-Leader kann die Rally starten.');
+        }
+
+        if ($rally['status'] !== 'gathering') {
+            throw new \RuntimeException(
+                'Rally #' . $rallyId . ' kann nicht gestartet werden (Status: ' . $rally['status'] . ').'
+            );
+        }
+
+        // Allow early launch — tryLaunch enforces launch_at, so we temporarily
+        // set it to UTC_TIMESTAMP() if needed.
+        $launchAt = new \DateTimeImmutable($rally['launch_at'], new \DateTimeZone('UTC'));
+        $now      = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+
+        if ($now < $launchAt) {
+            // Force launch_at to now so tryLaunch accepts it
+            $db->execute(
+                'UPDATE rallies SET launch_at = UTC_TIMESTAMP() WHERE id = ?',
+                [$rallyId],
+            );
+        }
+
+        self::tryLaunch($rallyId);
+
+        return ['launched' => true, 'rally_id' => $rallyId];
+    }
+
+    /**
+     * Cancels a rally and returns all troops to their respective cities.
+     *
+     * Only the captain (leader) may cancel. Participants' troops are also
+     * returned. The rally status is set to 'cancelled'.
+     *
+     * @throws \RuntimeException if the caller is not the captain or the rally
+     *         is already past 'gathering' state
+     */
+    public static function cancel(int $rallyId, int $captainId): void
+    {
+        $db = Connection::getInstance();
+
+        $rally = $db->query(
+            'SELECT id, leader_player_id, leader_city_id, troops_json, status
+             FROM   rallies
+             WHERE  id = ?',
+            [$rallyId],
+        )->fetch();
+
+        if ($rally === false) {
+            throw new \RuntimeException('Rally #' . $rallyId . ' nicht gefunden.');
+        }
+
+        if ((int) $rally['leader_player_id'] !== $captainId) {
+            throw new \RuntimeException('Nur der Rally-Leader kann die Rally abbrechen.');
+        }
+
+        if ($rally['status'] !== 'gathering') {
+            throw new \RuntimeException(
+                'Rally #' . $rallyId . ' kann nicht mehr abgebrochen werden (Status: ' . $rally['status'] . ').'
+            );
+        }
+
+        $db->transaction(function (Connection $db) use ($rallyId, $rally): void {
+            // Return leader troops
+            $leaderTroops = json_decode($rally['troops_json'] ?? '{}', true) ?: [];
+            $leaderCityId = (int) $rally['leader_city_id'];
+
+            foreach ($leaderTroops as $code => $count) {
+                if ((int) $count <= 0) {
+                    continue;
+                }
+
+                $db->execute(
+                    "INSERT INTO city_troops (city_id, troop_code, count)
+                     VALUES (?, ?, ?)
+                     ON DUPLICATE KEY UPDATE count = count + VALUES(count)",
+                    [$leaderCityId, (int) $code, (int) $count],
+                );
+            }
+
+            // Return participant troops
+            $participants = $db->query(
+                'SELECT player_id, city_id, troops_json FROM rally_participants WHERE rally_id = ?',
+                [$rallyId],
+            )->fetchAll();
+
+            foreach ($participants as $p) {
+                $pTroops = json_decode($p['troops_json'] ?? '{}', true) ?: [];
+                $pCityId = (int) $p['city_id'];
+
+                foreach ($pTroops as $code => $count) {
+                    if ((int) $count <= 0) {
+                        continue;
+                    }
+
+                    $db->execute(
+                        "INSERT INTO city_troops (city_id, troop_code, count)
+                         VALUES (?, ?, ?)
+                         ON DUPLICATE KEY UPDATE count = count + VALUES(count)",
+                        [$pCityId, (int) $code, (int) $count],
+                    );
+                }
+            }
+
+            // Update rally status
+            $db->execute(
+                "UPDATE rallies SET status = 'cancelled' WHERE id = ?",
+                [$rallyId],
+            );
+
+            // Mark participants cancelled
+            $db->execute(
+                "UPDATE rally_participants SET status = 'cancelled' WHERE rally_id = ?",
+                [$rallyId],
+            );
+        });
+    }
+
+    /**
+     * Returns all participants for a rally with their troop compositions.
+     *
+     * @return list<array<string,mixed>>
+     */
+    public static function getParticipants(int $rallyId): array
+    {
+        $db = Connection::getInstance();
+
+        $rows = $db->query(
+            "SELECT
+                 rp.id,
+                 rp.player_id,
+                 rp.city_id,
+                 rp.troops_json,
+                 rp.joined_at,
+                 rp.status,
+                 p.username
+             FROM   rally_participants rp
+             JOIN   players             p ON p.id = rp.player_id
+             WHERE  rp.rally_id = ?
+             ORDER  BY rp.joined_at ASC",
+            [$rallyId],
+        )->fetchAll();
+
+        foreach ($rows as &$row) {
+            $row['troops'] = json_decode((string) ($row['troops_json'] ?? '{}'), true) ?: [];
+            unset($row['troops_json']);
+        }
+        unset($row);
+
+        return $rows;
+    }
+
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------
