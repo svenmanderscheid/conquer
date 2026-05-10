@@ -788,4 +788,144 @@ final class AllianceHandler
 
         Response::ok(['id' => $newId, 'sent_at' => gmdate('Y-m-d H:i:s')]);
     }
+
+    // -------------------------------------------------------------------------
+    // GET /api/alliance/diplomacy
+    // -------------------------------------------------------------------------
+
+    /**
+     * Returns all diplomatic relations for the current player's alliance.
+     */
+    public static function getDiplomacy(array $session): void
+    {
+        $db       = Connection::getInstance();
+        $playerId = (int) $session['player_id'];
+
+        $member = $db->query(
+            'SELECT alliance_id FROM alliance_members WHERE player_id = ?',
+            [$playerId],
+        )->fetch();
+
+        if ($member === false) {
+            Response::error(403, 'NOT_MEMBER', 'Du bist kein Mitglied einer Allianz.');
+        }
+
+        $allianceId = (int) $member['alliance_id'];
+        $diplomacy  = \Conquer\Game\Alliance\DiplomacyService::getDiplomacy($allianceId);
+
+        Response::ok(['diplomacy' => $diplomacy]);
+    }
+
+    // -------------------------------------------------------------------------
+    // POST /api/alliance/diplomacy
+    // -------------------------------------------------------------------------
+
+    /**
+     * Sets a diplomatic relation with another alliance.
+     * Body: { "target_alliance_id": int, "relation": "ally"|"nap"|"war" }
+     * Only leaders and vice_leaders may change diplomacy.
+     */
+    public static function setDiplomacy(array $session): void
+    {
+        $supplied = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+        if ($supplied === '' || !hash_equals($session['csrf_token'], $supplied)) {
+            Response::error(403, 'CSRF_INVALID', 'CSRF token missing or invalid.');
+        }
+
+        $body           = json_decode(file_get_contents('php://input') ?: '', true) ?? [];
+        $targetAllianceId = (int) ($body['target_alliance_id'] ?? 0);
+        $relation       = trim((string) ($body['relation'] ?? ''));
+
+        if ($targetAllianceId <= 0) {
+            Response::error(400, 'MISSING_FIELD', 'target_alliance_id ist erforderlich.');
+        }
+
+        if (!in_array($relation, ['ally', 'nap', 'war'], true)) {
+            Response::error(400, 'INVALID_RELATION', 'relation muss ally, nap oder war sein.');
+        }
+
+        $db       = Connection::getInstance();
+        $playerId = (int) $session['player_id'];
+
+        $member = $db->query(
+            'SELECT alliance_id, role FROM alliance_members WHERE player_id = ?',
+            [$playerId],
+        )->fetch();
+
+        if ($member === false) {
+            Response::error(403, 'NOT_MEMBER', 'Du bist kein Mitglied einer Allianz.');
+        }
+
+        if (!in_array($member['role'], ['leader', 'vice_leader'], true)) {
+            Response::error(403, 'FORBIDDEN', 'Nur Anführer und Vize-Anführer können Diplomatie ändern.');
+        }
+
+        $allianceId = (int) $member['alliance_id'];
+
+        try {
+            \Conquer\Game\Alliance\DiplomacyService::setRelation(
+                $allianceId,
+                $targetAllianceId,
+                $relation,
+                $playerId,
+            );
+        } catch (\RuntimeException | \InvalidArgumentException $e) {
+            Response::error(400, 'DIPLOMACY_FAILED', $e->getMessage());
+        }
+
+        Response::ok(['set' => true, 'relation' => $relation]);
+    }
+
+    // -------------------------------------------------------------------------
+    // DELETE /api/alliance/diplomacy/:id
+    // -------------------------------------------------------------------------
+
+    /**
+     * Removes a diplomacy row by its ID.
+     * Only affects rows that belong to the current player's alliance.
+     * Only leaders and vice_leaders may remove diplomacy.
+     */
+    public static function removeDiplomacy(array $session, int $diplomacyId): void
+    {
+        $supplied = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+        if ($supplied === '' || !hash_equals($session['csrf_token'], $supplied)) {
+            Response::error(403, 'CSRF_INVALID', 'CSRF token missing or invalid.');
+        }
+
+        if ($diplomacyId <= 0) {
+            Response::error(400, 'INVALID_INPUT', 'Ungültige diplomacy id.');
+        }
+
+        $db       = Connection::getInstance();
+        $playerId = (int) $session['player_id'];
+
+        $member = $db->query(
+            'SELECT alliance_id, role FROM alliance_members WHERE player_id = ?',
+            [$playerId],
+        )->fetch();
+
+        if ($member === false) {
+            Response::error(403, 'NOT_MEMBER', 'Du bist kein Mitglied einer Allianz.');
+        }
+
+        if (!in_array($member['role'], ['leader', 'vice_leader'], true)) {
+            Response::error(403, 'FORBIDDEN', 'Nur Anführer und Vize-Anführer können Diplomatie entfernen.');
+        }
+
+        $allianceId = (int) $member['alliance_id'];
+
+        // Verify the row belongs to this alliance before deleting
+        $row = $db->query(
+            'SELECT id, target_id FROM alliance_diplomacy WHERE id = ? AND alliance_id = ?',
+            [$diplomacyId, $allianceId],
+        )->fetch();
+
+        if ($row === false) {
+            Response::error(404, 'NOT_FOUND', 'Diplomatie-Eintrag nicht gefunden.');
+        }
+
+        \Conquer\Game\Alliance\DiplomacyService::removeRelation($allianceId, (int) $row['target_id']);
+
+        Response::ok(['removed' => true]);
+    }
 }

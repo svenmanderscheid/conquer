@@ -80,6 +80,7 @@ if (str_starts_with($path, '/api/')) {
     $router->get('/api/city/state',                         [\Conquer\Api\Handlers\CityHandler::class, 'state']);
     $router->post('/api/city/upgrade-building',             [\Conquer\Api\Handlers\CityHandler::class, 'upgradeBuilding']);
     $router->post('/api/city/instant-build/:queue_id',      [\Conquer\Api\Handlers\CityHandler::class, 'instantBuild']);
+    $router->post('/api/city/wall-repair',                  fn() => \Conquer\Api\Handlers\CityHandler::repairWall($session));
 
     // Troops
     $router->get('/api/troops/list',         [\Conquer\Api\Handlers\TroopHandler::class, 'list']);
@@ -127,6 +128,9 @@ if (str_starts_with($path, '/api/')) {
     $router->post('/api/alliance/help',          fn() => \Conquer\Api\Handlers\AllianceHandler::help($session));
     $router->get('/api/alliance/treasury',       fn() => \Conquer\Api\Handlers\AllianceHandler::treasury($session));
     $router->post('/api/alliance/donate',        fn() => \Conquer\Api\Handlers\AllianceHandler::donate($session));
+    $router->get('/api/alliance/diplomacy',      fn() => \Conquer\Api\Handlers\AllianceHandler::getDiplomacy($session));
+    $router->post('/api/alliance/diplomacy',     fn() => \Conquer\Api\Handlers\AllianceHandler::setDiplomacy($session));
+    $router->delete('/api/alliance/diplomacy/:id', fn($p) => \Conquer\Api\Handlers\AllianceHandler::removeDiplomacy($session, (int) $p['id']));
 
     // World Chat
     $router->get('/api/world-chat',              fn() => \Conquer\Api\Handlers\AllianceHandler::worldChat($session));

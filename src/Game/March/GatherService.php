@@ -76,19 +76,8 @@ final class GatherService
         }
 
         // ── Check march slots ────────────────────────────────────────────────
-        $active = (int) $db->query(
-            "SELECT COUNT(*) FROM marches
-             WHERE  player_id = ? AND state IN ('marching','resolving','returning')",
-            [$playerId],
-        )->fetchColumn();
-
-        // Gather marches share the 2-slot cap with other march types
-        $maxSlots = 2;
-        if ($active >= $maxSlots) {
-            throw new \RuntimeException(
-                'Alle ' . $maxSlots . ' Marsch-Slots belegt. Warte bis ein Marsch zurückkehrt.'
-            );
-        }
+        // Gather marches share the 3-slot cap with all other march types.
+        MarchDispatcher::assertSlotAvailable($playerId);
 
         // ── Get origin city coords for distance calculation ───────────────────
         $originCity = $db->query(

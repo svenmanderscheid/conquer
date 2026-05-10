@@ -33,6 +33,11 @@ final class Router
         $this->add('POST', $pattern, $handler);
     }
 
+    public function delete(string $pattern, callable $handler): void
+    {
+        $this->add('DELETE', $pattern, $handler);
+    }
+
     /**
      * Attempt to match the current request to a registered route.
      *

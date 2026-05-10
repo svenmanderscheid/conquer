@@ -66,6 +66,9 @@ final class MarchHandler
                 selectedTroops: $troops,
             );
         } catch (\RuntimeException $e) {
+            if ($e->getMessage() === 'MARCH_SLOT_FULL') {
+                Response::error(400, 'march_slot_full', 'Alle Marsch-Slots belegt. Warte auf eine Rückkehr.');
+            }
             Response::error(400, 'DISPATCH_FAILED', $e->getMessage());
         }
 
@@ -119,6 +122,9 @@ final class MarchHandler
                 selectedTroops: $troops,
             );
         } catch (\RuntimeException $e) {
+            if ($e->getMessage() === 'MARCH_SLOT_FULL') {
+                Response::error(400, 'march_slot_full', 'Alle Marsch-Slots belegt. Warte auf eine Rückkehr.');
+            }
             Response::error(400, 'DISPATCH_FAILED', $e->getMessage());
         }
 
@@ -170,6 +176,9 @@ final class MarchHandler
                 selectedTroops: $troops,
             );
         } catch (\RuntimeException $e) {
+            if ($e->getMessage() === 'MARCH_SLOT_FULL') {
+                Response::error(400, 'march_slot_full', 'Alle Marsch-Slots belegt. Warte auf eine Rückkehr.');
+            }
             Response::error(400, 'DISPATCH_FAILED', $e->getMessage());
         }
 
@@ -219,6 +228,9 @@ final class MarchHandler
                 targetY:  $targetY,
             );
         } catch (\RuntimeException $e) {
+            if ($e->getMessage() === 'MARCH_SLOT_FULL') {
+                Response::error(400, 'march_slot_full', 'Alle Marsch-Slots belegt. Warte auf eine Rückkehr.');
+            }
             Response::error(400, 'DISPATCH_FAILED', $e->getMessage());
         }
 
@@ -262,6 +274,9 @@ final class MarchHandler
                 troopCount: $troopCount,
             );
         } catch (\RuntimeException $e) {
+            if ($e->getMessage() === 'MARCH_SLOT_FULL') {
+                Response::error(400, 'march_slot_full', 'Alle Marsch-Slots belegt. Warte auf eine Rückkehr.');
+            }
             Response::error(400, 'DISPATCH_FAILED', $e->getMessage());
         }
 

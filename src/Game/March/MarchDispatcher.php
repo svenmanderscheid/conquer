@@ -15,12 +15,12 @@ use Conquer\Game\City\TroopData;
  *   7 = MARCH_ATTACK_PLAYER  — attack another player's city
  *   8 = MARCH_SCOUT          — scout another player's city (no troops needed)
  *
- * March slots: max 2 (base, no research unlock yet).
+ * March slots: max 3 (base, no research unlock yet).
  * March cap: 50 000 troops per march.
  */
 final class MarchDispatcher
 {
-    private const MAX_SLOTS           = 2;
+    private const MAX_SLOTS           = 3;
     private const MAX_CAP             = 50_000;
     private const MARCH_MONSTER       = 5;
     private const MARCH_CHARM         = 6;
@@ -30,6 +30,27 @@ final class MarchDispatcher
     public const  MARCH_SUPPORT       = 10;
 
     private function __construct() {}
+
+    /**
+     * Throws RuntimeException('MARCH_SLOT_FULL') when the player has no free march slots.
+     * Called internally and from GatherService which shares the same slot cap.
+     *
+     * @throws \RuntimeException
+     */
+    public static function assertSlotAvailable(int $playerId): void
+    {
+        $db = Connection::getInstance();
+
+        $active = (int) $db->query(
+            "SELECT COUNT(*) FROM marches
+             WHERE player_id = ? AND state IN ('marching','resolving','returning')",
+            [$playerId],
+        )->fetchColumn();
+
+        if ($active >= self::MAX_SLOTS) {
+            throw new \RuntimeException('MARCH_SLOT_FULL');
+        }
+    }
 
     /**
      * Dispatch a monster attack march.
@@ -51,20 +72,9 @@ final class MarchDispatcher
             throw new \RuntimeException('Keine Truppen ausgewählt.');
         }
 
+        self::assertSlotAvailable($playerId);
+
         $db = Connection::getInstance();
-
-        // ── Check march slots ────────────────────────────────────────────────
-        $active = (int) $db->query(
-            "SELECT COUNT(*) FROM marches
-             WHERE player_id = ? AND state IN ('marching','resolving','returning')",
-            [$playerId],
-        )->fetchColumn();
-
-        if ($active >= self::MAX_SLOTS) {
-            throw new \RuntimeException(
-                'Alle ' . self::MAX_SLOTS . ' Marsch-Slots belegt. Warte bis ein Marsch zurückkehrt.'
-            );
-        }
 
         // ── Validate + count troops ──────────────────────────────────────────
         $total = 0;
@@ -202,17 +212,9 @@ final class MarchDispatcher
             throw new \RuntimeException('Mindestens 1 Truppe muss zum Einsammeln mitgeschickt werden.');
         }
 
+        self::assertSlotAvailable($playerId);
+
         $db = Connection::getInstance();
-
-        // Check march slots
-        $active = (int) $db->query(
-            "SELECT COUNT(*) FROM marches WHERE player_id = ? AND state IN ('marching','resolving','returning')",
-            [$playerId],
-        )->fetchColumn();
-
-        if ($active >= self::MAX_SLOTS) {
-            throw new \RuntimeException('Alle ' . self::MAX_SLOTS . ' Marsch-Slots belegt.');
-        }
 
         // Validate troops
         $total = 0;
@@ -326,20 +328,9 @@ final class MarchDispatcher
             throw new \RuntimeException('Keine Truppen ausgewählt.');
         }
 
+        self::assertSlotAvailable($playerId);
+
         $db = Connection::getInstance();
-
-        // ── Check march slots ────────────────────────────────────────────────
-        $active = (int) $db->query(
-            "SELECT COUNT(*) FROM marches
-             WHERE player_id = ? AND state IN ('marching','resolving','returning')",
-            [$playerId],
-        )->fetchColumn();
-
-        if ($active >= self::MAX_SLOTS) {
-            throw new \RuntimeException(
-                'Alle ' . self::MAX_SLOTS . ' Marsch-Slots belegt. Warte bis ein Marsch zurückkehrt.'
-            );
-        }
 
         // ── Validate + count troops ──────────────────────────────────────────
         $total       = 0;
@@ -469,20 +460,9 @@ final class MarchDispatcher
         int $targetX,
         int $targetY,
     ): int {
+        self::assertSlotAvailable($playerId);
+
         $db = Connection::getInstance();
-
-        // ── Check march slots ────────────────────────────────────────────────
-        $active = (int) $db->query(
-            "SELECT COUNT(*) FROM marches
-             WHERE player_id = ? AND state IN ('marching','resolving','returning')",
-            [$playerId],
-        )->fetchColumn();
-
-        if ($active >= self::MAX_SLOTS) {
-            throw new \RuntimeException(
-                'Alle ' . self::MAX_SLOTS . ' Marsch-Slots belegt. Warte bis ein Marsch zurückkehrt.'
-            );
-        }
 
         // ── Verify target city exists ─────────────────────────────────────────
         $targetCity = $db->query(

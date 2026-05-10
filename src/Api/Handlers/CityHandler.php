@@ -95,6 +95,104 @@ final class CityHandler
     }
 
     /**
+     * POST /api/city/wall-repair
+     *
+     * Repairs wall HP at a cost of 100 stone + 50 wood per 1 000 HP repaired.
+     * The requested HP amount is rounded to the nearest 1 000.
+     * Repair is capped at wall_hp_max.
+     *
+     * Body: { "hp_amount": int }  — HP to repair (will be rounded to nearest 1 000)
+     */
+    public static function repairWall(array $session): void
+    {
+        $supplied = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+        if ($supplied === '' || !hash_equals($session['csrf_token'], $supplied)) {
+            Response::error(403, 'CSRF_INVALID', 'CSRF token missing or invalid.');
+        }
+
+        $body     = json_decode(file_get_contents('php://input') ?: '', true) ?? [];
+        $hpRaw    = (int) ($body['hp_amount'] ?? 0);
+
+        if ($hpRaw <= 0) {
+            Response::error(400, 'MISSING_FIELD', 'hp_amount muss größer als 0 sein.');
+        }
+
+        // Round to nearest 1 000
+        $hpAmount = (int) round($hpRaw / 1000) * 1000;
+        if ($hpAmount <= 0) {
+            $hpAmount = 1000; // minimum 1 chunk
+        }
+
+        $db       = Connection::getInstance();
+        $playerId = (int) $session['player_id'];
+
+        // Load city — verify ownership
+        $city = $db->query(
+            'SELECT id, stone, wood, wall_hp_current, wall_hp_max
+             FROM   cities
+             WHERE  player_id = ?
+             LIMIT 1',
+            [$playerId],
+        )->fetch();
+
+        if ($city === false) {
+            Response::error(404, 'NO_CITY', 'Keine Stadt gefunden.');
+        }
+
+        $cityId        = (int) $city['id'];
+        $hpCurrent     = (int) $city['wall_hp_current'];
+        $hpMax         = (int) $city['wall_hp_max'];
+        $stoneAvail    = (int) $city['stone'];
+        $woodAvail     = (int) $city['wood'];
+
+        $missing = $hpMax - $hpCurrent;
+        if ($missing <= 0) {
+            Response::error(400, 'WALL_FULL', 'Die Mauer ist bereits vollständig repariert.');
+        }
+
+        // Cap repair to what is actually missing
+        $hpToRepair = min($hpAmount, $missing);
+
+        // Round hpToRepair up to nearest 1 000 for cost calculation, but never exceed missing
+        $chunks     = (int) ceil($hpToRepair / 1000);
+        $stoneCost  = $chunks * 100;
+        $woodCost   = $chunks * 50;
+
+        if ($stoneAvail < $stoneCost) {
+            Response::error(400, 'NOT_ENOUGH_STONE',
+                'Nicht genug Stein. Benötigt: ' . $stoneCost . ', vorhanden: ' . $stoneAvail . '.');
+        }
+
+        if ($woodAvail < $woodCost) {
+            Response::error(400, 'NOT_ENOUGH_WOOD',
+                'Nicht genug Holz. Benötigt: ' . $woodCost . ', vorhanden: ' . $woodAvail . '.');
+        }
+
+        $db->execute(
+            'UPDATE cities
+             SET    stone            = stone - ?,
+                    wood             = wood - ?,
+                    wall_hp_current  = LEAST(wall_hp_max, wall_hp_current + ?)
+             WHERE  id = ?',
+            [$stoneCost, $woodCost, $hpToRepair, $cityId],
+        );
+
+        // Re-read final HP for the response
+        $newHp = (int) $db->query(
+            'SELECT wall_hp_current FROM cities WHERE id = ?',
+            [$cityId],
+        )->fetchColumn();
+
+        Response::ok([
+            'hp_repaired'       => $hpToRepair,
+            'stone_spent'       => $stoneCost,
+            'wood_spent'        => $woodCost,
+            'wall_hp_current'   => $newHp,
+            'wall_hp_max'       => $hpMax,
+        ]);
+    }
+
+    /**
      * POST /api/city/instant-build/:queue_id
      *
      * Instantly completes a building upgrade using GEMS.
