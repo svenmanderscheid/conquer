@@ -301,7 +301,7 @@ declare(strict_types=1);
             font-size: 0.85rem; color: #e2e8f0; font-weight: 700;
         }
         .atk-lvl-hex {
-            background: #0f172a; border: 2px solid #ef4444; border-radius: 6px;
+            background: rgba(0,0,0,0.4); border: 2px solid #ef4444; border-radius: 6px;
             padding: 2px 8px; font-weight: 900; color: #ef4444; font-size: 1rem;
         }
         .atk-monster-lv {
@@ -310,8 +310,8 @@ declare(strict_types=1);
         }
         .atk-skull { font-size: 1.8rem; color: #ef4444; }
         .atk-hp-track {
-            width: 100%; height: 12px; background: #1e293b;
-            border: 1px solid #334155; border-radius: 6px; overflow: hidden;
+            width: 100%; height: 12px; background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(184,134,11,0.2); border-radius: 6px; overflow: hidden;
         }
         .atk-hp-fill { height: 100%; background: #ef4444; border-radius: 6px; }
         .atk-reward {
@@ -351,7 +351,7 @@ declare(strict_types=1);
         .atk-body { flex: 1; display: flex; overflow: hidden; min-height: 0; }
         /* Troop list */
         .atk-list {
-            flex: 0 0 56%; border-right: 1px solid #1e3a5f;
+            flex: 0 0 56%; border-right: 1px solid rgba(184,134,11,0.25);
             overflow-y: auto; padding: 6px 8px;
             display: flex; flex-direction: column; gap: 2px;
         }
@@ -470,8 +470,8 @@ declare(strict_types=1);
         .hex-btn {
             width: 52px; height: 52px;
             border-radius: 50%;
-            border: 2px solid #334155;
-            background: #1e293b;
+            border: 2px solid rgba(184,134,11,0.3);
+            background: rgba(8,12,24,0.88);
             cursor: pointer;
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
@@ -480,8 +480,9 @@ declare(strict_types=1);
             color: #94a3b8;
             transition: background 0.15s, border-color 0.15s, color 0.15s;
             gap: 2px;
+            backdrop-filter: blur(4px);
         }
-        .hex-btn:hover:not(:disabled) { background: #273548; color: #e2e8f0; }
+        .hex-btn:hover:not(:disabled) { background: rgba(26,39,68,0.9); color: #e2e8f0; border-color: rgba(212,160,23,0.5); }
         .hex-btn:disabled { opacity: 0.4; cursor: not-allowed; }
         .hex-btn .hex-btn-icon { font-size: 1.3rem; line-height: 1; }
         .hex-btn.hex-red   { border-color: rgba(239,68,68,0.5); color: #f87171; }
@@ -754,7 +755,7 @@ declare(strict_types=1);
                                             <input type="number" :id="'charm-t-' + t.code"
                                                    min="0" :max="t.count"
                                                    x-model.number="t.toSend"
-                                                   style="width:52px;padding:2px 4px;border-radius:3px;border:1px solid #334155;background:#1e293b;color:#e2e8f0">
+                                                   style="width:52px;padding:2px 4px;border-radius:3px;border:1px solid rgba(184,134,11,0.3);background:rgba(0,0,0,0.4);color:#e2e8f0">
                                             <span x-text="t.name + ' (' + t.count + ')'"></span>
                                         </label>
                                     </template>
@@ -792,7 +793,7 @@ declare(strict_types=1);
                 Wird bereits gesammelt
             </div>
             <!-- Resource progress bar -->
-            <div style="height:6px;background:#1e293b;border-radius:3px;overflow:hidden;margin-bottom:12px">
+            <div style="height:6px;background:rgba(0,0,0,0.4);border:1px solid rgba(184,134,11,0.15);border-radius:3px;overflow:hidden;margin-bottom:12px">
                 <div style="height:100%;background:#22c55e;border-radius:3px;transition:width 0.3s"
                      :style="`width:${tileInfo && tileInfo.resource_max > 0 ? Math.round((tileInfo.resource_amount/tileInfo.resource_max)*100) : 0}%`"></div>
             </div>
@@ -1068,7 +1069,7 @@ declare(strict_types=1);
 
         <div class="modal-sub">Rally-Timer</div>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:0.75rem">
-            <div style="flex:1;background:#0f172a;border:1px solid #334155;border-radius:6px;padding:8px 12px;font-size:0.85rem;font-weight:700;color:#fbbf24;text-align:center"
+            <div style="flex:1;background:rgba(0,0,0,0.35);border:1px solid rgba(184,134,11,0.3);border-radius:6px;padding:8px 12px;font-size:0.85rem;font-weight:700;color:#f0d080;text-align:center"
                  x-text="rallyMinutes + ' Minuten'"></div>
             <button class="modal-btn modal-btn-orange" style="flex:0 0 auto;padding:8px 14px"
                     @click="rallyTimePicker=true">Ändern</button>
@@ -1176,31 +1177,31 @@ declare(strict_types=1);
         </div>
 
         <!-- Stats -->
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#1e293b">
-            <div style="background:#0f172a;padding:10px;text-align:center">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(184,134,11,0.15)">
+            <div style="background:#080c18;padding:10px;text-align:center">
                 <div style="font-size:0.9rem;font-weight:700;color:#e2e8f0" x-text="(ownProfile?.power ?? 0).toLocaleString()"></div>
-                <div style="font-size:0.6rem;color:#475569;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Macht</div>
+                <div style="font-size:0.6rem;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Macht</div>
             </div>
-            <div style="background:#0f172a;padding:10px;text-align:center">
+            <div style="background:#080c18;padding:10px;text-align:center">
                 <div style="font-size:0.9rem;font-weight:700;color:#e2e8f0" x-text="ownProfile?.castle_level ?? '?'"></div>
-                <div style="font-size:0.6rem;color:#475569;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Castle Lv</div>
+                <div style="font-size:0.6rem;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Castle Lv</div>
             </div>
-            <div style="background:#0f172a;padding:10px;text-align:center">
+            <div style="background:#080c18;padding:10px;text-align:center">
                 <div style="font-size:0.9rem;font-weight:700;color:#e2e8f0" x-text="(ownProfile?.kill_count ?? 0).toLocaleString()"></div>
-                <div style="font-size:0.6rem;color:#475569;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Kills</div>
+                <div style="font-size:0.6rem;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Kills</div>
             </div>
         </div>
 
         <!-- Lord Level + AP -->
-        <div style="padding:12px 16px;border-bottom:1px solid #1e293b">
+        <div style="padding:12px 16px;border-bottom:1px solid rgba(184,134,11,0.2)">
             <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px">
                 <span style="font-size:0.78rem;font-weight:700;color:#f0d080">Lord Lv <span x-text="ownProfile?.lord_level ?? 0"></span></span>
                 <span style="font-size:0.65rem;color:#64748b">XP: <span x-text="(ownProfile?.lord_xp ?? 0).toLocaleString()"></span></span>
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
                 <span style="font-size:0.7rem;color:#64748b;white-space:nowrap">⚡ AP</span>
-                <div style="flex:1;height:8px;background:#1e293b;border-radius:4px;overflow:hidden">
-                    <div style="height:100%;background:#f59e0b;border-radius:4px;transition:width 0.3s"
+                <div style="flex:1;height:8px;background:rgba(0,0,0,0.4);border:1px solid rgba(184,134,11,0.15);border-radius:4px;overflow:hidden">
+                    <div style="height:100%;background:linear-gradient(90deg,#b8860b,#ffd700);border-radius:4px;transition:width 0.3s"
                          :style="'width:' + Math.min(100, Math.round((ownProfile?.action_points ?? 0) / 200 * 100)) + '%'"></div>
                 </div>
                 <span style="font-size:0.7rem;color:#fbbf24;white-space:nowrap" x-text="(ownProfile?.action_points ?? 0) + ' / 200'"></span>
@@ -1208,17 +1209,17 @@ declare(strict_types=1);
         </div>
 
         <!-- Nav Buttons -->
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#1e293b">
-            <a href="#" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 6px;background:#0f172a;color:#94a3b8;text-decoration:none;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;transition:background 0.15s" onmouseover="this.style.background='#1a2535'" onmouseout="this.style.background='#0f172a'">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(184,134,11,0.15)">
+            <a href="#" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 6px;background:#080c18;color:#94a3b8;text-decoration:none;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;transition:color 0.15s" onmouseover="this.style.color='#f0d080'" onmouseout="this.style.color='#94a3b8'">
                 <span style="font-size:1.2rem">📜</span>VERLAUF
             </a>
-            <a href="/alliance" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 6px;background:#0f172a;color:#94a3b8;text-decoration:none;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;transition:background 0.15s" onmouseover="this.style.background='#1a2535'" onmouseout="this.style.background='#0f172a'">
+            <a href="/alliance" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 6px;background:#080c18;color:#94a3b8;text-decoration:none;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;transition:color 0.15s" onmouseover="this.style.color='#f0d080'" onmouseout="this.style.color='#94a3b8'">
                 <span style="font-size:1.2rem">⚔</span>ALLIANZ
             </a>
-            <a href="#" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 6px;background:#0f172a;color:#94a3b8;text-decoration:none;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;transition:background 0.15s" onmouseover="this.style.background='#1a2535'" onmouseout="this.style.background='#0f172a'">
+            <a href="#" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 6px;background:#080c18;color:#94a3b8;text-decoration:none;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;transition:color 0.15s" onmouseover="this.style.color='#f0d080'" onmouseout="this.style.color='#94a3b8'">
                 <span style="font-size:1.2rem">📖</span>MEISTER
             </a>
-            <a href="#" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 6px;background:#0f172a;color:#94a3b8;text-decoration:none;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;transition:background 0.15s" onmouseover="this.style.background='#1a2535'" onmouseout="this.style.background='#0f172a'">
+            <a href="#" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 6px;background:#080c18;color:#94a3b8;text-decoration:none;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;transition:color 0.15s" onmouseover="this.style.color='#f0d080'" onmouseout="this.style.color='#94a3b8'">
                 <span style="font-size:1.2rem">💎</span>SCHATZ
             </a>
         </div>
