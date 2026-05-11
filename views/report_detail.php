@@ -13,18 +13,22 @@ $db       = Connection::getInstance();
 $playerId = (int) $session['player_id'];
 
 $row = $db->query(
-    'SELECT * FROM battle_reports WHERE id = ? AND attacker_id = ?',
-    [$reportId, $playerId],
+    'SELECT * FROM battle_reports WHERE id = ? AND (attacker_id = ? OR defender_id = ?)',
+    [$reportId, $playerId, $playerId],
 )->fetch();
 
 if ($row === false) {
-    header('Location: /reports');
+    header('Location: ' . APP_BASE . '/reports');
     exit;
 }
 
-// Mark as read
-if (!(int) $row['attacker_read']) {
+$isAttacker = (int)$row['attacker_id'] === $playerId;
+
+// Mark as read for the correct role
+if ($isAttacker && !(int)$row['attacker_read']) {
     $db->execute('UPDATE battle_reports SET attacker_read = 1 WHERE id = ?', [$reportId]);
+} elseif (!$isAttacker && !(int)$row['defender_read']) {
+    $db->execute('UPDATE battle_reports SET defender_read = 1 WHERE id = ?', [$reportId]);
 }
 
 $isEmbed = isset($_GET['embed']);

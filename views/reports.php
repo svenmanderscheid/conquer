@@ -15,30 +15,36 @@ $offset   = ($page - 1) * $perPage;
 $db = Connection::getInstance();
 
 try {
+    // Fetch reports where this player was attacker OR scouted defender
     $reports = $db->query(
-        'SELECT id, target_type, target_x, target_y, outcome,
-                attacker_read, created_at,
-                JSON_UNQUOTE(JSON_EXTRACT(data_json, "$.monster_name")) AS monster_name
+        'SELECT id, attacker_id, defender_id, target_type, target_x, target_y, outcome,
+                attacker_read, defender_read, created_at,
+                JSON_UNQUOTE(JSON_EXTRACT(data_json, "$.monster_name"))  AS monster_name,
+                JSON_UNQUOTE(JSON_EXTRACT(data_json, "$.attacker_name")) AS attacker_name_json,
+                JSON_UNQUOTE(JSON_EXTRACT(data_json, "$.target_name"))   AS target_name_json,
+                (attacker_id = ?) AS is_attacker
          FROM   battle_reports
-         WHERE  attacker_id = ?
+         WHERE  attacker_id = ? OR defender_id = ?
          ORDER  BY created_at DESC
          LIMIT  ? OFFSET ?',
-        [$playerId, $perPage, $offset],
+        [$playerId, $playerId, $playerId, $perPage, $offset],
     )->fetchAll();
 
     $total = (int) $db->query(
-        'SELECT COUNT(*) FROM battle_reports WHERE attacker_id = ?',
-        [$playerId],
+        'SELECT COUNT(*) FROM battle_reports WHERE attacker_id = ? OR defender_id = ?',
+        [$playerId, $playerId],
     )->fetchColumn();
 
-    // Mark all on this page as read
-    $ids = array_column($reports, 'id');
-    if ($ids) {
-        $placeholders = implode(',', array_fill(0, count($ids), '?'));
-        $db->execute(
-            "UPDATE battle_reports SET attacker_read = 1 WHERE id IN ($placeholders)",
-            $ids,
-        );
+    // Mark visible reports as read (attacker_read or defender_read depending on role)
+    $attackerIds = array_column(array_filter($reports, fn($r) => (int)$r['is_attacker'] === 1), 'id');
+    $defenderIds = array_column(array_filter($reports, fn($r) => (int)$r['is_attacker'] === 0), 'id');
+    if ($attackerIds) {
+        $ph = implode(',', array_fill(0, count($attackerIds), '?'));
+        $db->execute("UPDATE battle_reports SET attacker_read = 1 WHERE id IN ($ph)", $attackerIds);
+    }
+    if ($defenderIds) {
+        $ph = implode(',', array_fill(0, count($defenderIds), '?'));
+        $db->execute("UPDATE battle_reports SET defender_read = 1 WHERE id IN ($ph)", $defenderIds);
     }
 } catch (\Throwable) {
     $reports = [];
@@ -48,9 +54,10 @@ try {
 $pages = max(1, (int) ceil($total / $perPage));
 
 $outcomeLabel = [
-    'attacker_wins'  => ['label' => 'Sieg',       'color' => '#22c55e'],
-    'defender_wins'  => ['label' => 'Niederlage', 'color' => '#ef4444'],
-    'draw'           => ['label' => 'Unentschieden', 'color' => '#f59e0b'],
+    'attacker_wins'  => ['label' => 'Sieg',            'color' => 'var(--c-success)'],
+    'defender_wins'  => ['label' => 'Niederlage',       'color' => 'var(--c-danger)'],
+    'draw'           => ['label' => 'Unentschieden',    'color' => 'var(--c-warning)'],
+    'scouted'        => ['label' => 'Ausgespäht',       'color' => 'var(--c-info)'],
 ];
 ?>
 <!DOCTYPE html>
@@ -209,19 +216,34 @@ $outcomeLabel = [
             <tbody>
             <?php foreach ($reports as $r): ?>
                 <?php
-                    $oc  = $outcomeLabel[$r['outcome']] ?? ['label' => $r['outcome'], 'color' => '#94a3b8'];
-                    $lbl = $r['monster_name'] ?? ('Tile ' . $r['target_x'] . ',' . $r['target_y']);
+                    $oc         = $outcomeLabel[$r['outcome']] ?? ['label' => $r['outcome'], 'color' => 'var(--c-muted)'];
+                    $isAttacker = (int)$r['is_attacker'] === 1;
+                    $isRead     = $isAttacker ? $r['attacker_read'] : $r['defender_read'];
+
+                    if ($r['outcome'] === 'scouted' && !$isAttacker) {
+                        // Defender view: "You were scouted by X"
+                        $icon = '&#128065;';
+                        $lbl  = 'Ausgespäht von ' . htmlspecialchars($r['attacker_name_json'] ?? 'Unknown');
+                    } elseif ($r['outcome'] === 'scouted') {
+                        // Attacker view: "You scouted X"
+                        $icon = '&#128065;';
+                        $lbl  = 'Ausgespäht: ' . htmlspecialchars($r['target_name_json'] ?? ('Tile ' . $r['target_x'] . ',' . $r['target_y']));
+                    } else {
+                        $icon = '&#9876;';
+                        $lbl  = $r['monster_name'] ?? ('Tile ' . $r['target_x'] . ',' . $r['target_y']);
+                        $lbl  = htmlspecialchars((string) $lbl);
+                    }
                 ?>
-                <tr class="<?= $r['attacker_read'] ? '' : 'unread' ?>">
+                <tr class="<?= $isRead ? '' : 'unread' ?>">
                     <td style="color:var(--c-muted,#8b6f47);font-family:monospace;font-size:0.78rem"><?= htmlspecialchars($r['created_at']) ?> UTC</td>
-                    <td style="font-weight:600">⚔ <?= htmlspecialchars($lbl) ?> <span style="color:var(--c-muted,#8b6f47);font-size:0.78rem">(<?= (int)$r['target_x'] ?>,<?= (int)$r['target_y'] ?>)</span></td>
+                    <td style="font-weight:600"><?= $icon ?> <?= $lbl ?> <span style="color:var(--c-muted,#8b6f47);font-size:0.78rem">(<?= (int)$r['target_x'] ?>,<?= (int)$r['target_y'] ?>)</span></td>
                     <td>
                         <span class="outcome-badge" style="color:<?= $oc['color'] ?>;border-color:<?= $oc['color'] ?>33">
                             <?= $oc['label'] ?>
                         </span>
                     </td>
                     <td>
-                        <a href="/reports/<?= (int)$r['id'] ?>" class="btn-detail">Detail</a>
+                        <a href="<?= APP_BASE ?>/reports/<?= (int)$r['id'] ?>" class="btn-detail">Detail</a>
                     </td>
                 </tr>
             <?php endforeach ?>

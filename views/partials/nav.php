@@ -20,8 +20,10 @@ try {
     $__db = Connection::getInstance();
 
     $_unread = (int) $__db->query(
-        'SELECT COUNT(*) FROM battle_reports WHERE attacker_id = ? AND attacker_read = 0',
-        [(int) $session['player_id']],
+        'SELECT COUNT(*) FROM battle_reports
+          WHERE (attacker_id = ? AND attacker_read = 0)
+             OR (defender_id = ? AND defender_read = 0)',
+        [(int) $session['player_id'], (int) $session['player_id']],
     )->fetchColumn();
 
     $_res = $__db->query(

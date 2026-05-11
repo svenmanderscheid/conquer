@@ -581,7 +581,7 @@ final class MarchTick
         // Gather target city info
         $targetCity = $db->query(
             'SELECT c.food, c.lumber, c.stone, c.gold, c.power, c.castle_level,
-                    p.username, p.lord_level, p.kill_count
+                    p.id AS player_id, p.username, p.lord_level, p.kill_count
              FROM cities c JOIN players p ON p.id = c.player_id
              WHERE c.id = ?',
             [$targetCityId],
@@ -626,17 +626,21 @@ final class MarchTick
             'treasures' => null,   // placeholder — not yet implemented
         ];
 
+        $defenderPlayerId = (int)($targetCity['player_id'] ?? 0);
+
         $db->transaction(function () use (
-            $db, $marchId, $playerId, $cityId, $targetCityId, $targetX, $targetY, $scoutData,
+            $db, $marchId, $playerId, $cityId, $targetCityId, $targetX, $targetY,
+            $scoutData, $defenderPlayerId,
         ): void {
             $db->execute(
                 'INSERT INTO battle_reports
-                    (world_id, march_id, attacker_id, attacker_city_id,
+                    (world_id, march_id, attacker_id, attacker_city_id, defender_id,
                      target_type, target_id, target_x, target_y,
-                     outcome, data_json, attacker_read, created_at)
-                 VALUES (1,:mid,:pid,:cid, 2,:tid,:tx,:ty,"scouted",:data, 0, UTC_TIMESTAMP())',
-                [':mid'=>$marchId,':pid'=>$playerId,':cid'=>$cityId,
-                 ':tid'=>$targetCityId,':tx'=>$targetX,':ty'=>$targetY,
+                     outcome, data_json, attacker_read, defender_read, created_at)
+                 VALUES (1,:mid,:pid,:cid,:did, 2,:tid,:tx,:ty,"scouted",:data, 0, 0, UTC_TIMESTAMP())',
+                [':mid'=>$marchId, ':pid'=>$playerId, ':cid'=>$cityId,
+                 ':did'=>($defenderPlayerId > 0 ? $defenderPlayerId : null),
+                 ':tid'=>$targetCityId, ':tx'=>$targetX, ':ty'=>$targetY,
                  ':data'=>json_encode($scoutData)],
             );
             $db->execute(
@@ -647,7 +651,28 @@ final class MarchTick
             );
         });
 
+        // Notify the scouted player
+        if ($defenderPlayerId > 0) {
+            $attackerName = self::getPlayerName($db, $playerId);
+            \Conquer\Game\Notification\NotificationService::push(
+                $defenderPlayerId,
+                'scouted',
+                ['attacker_name' => $attackerName, 'x' => $targetX, 'y' => $targetY],
+            );
+        }
+
         $log->info(sprintf('[MarchTick] Scout march %d resolved — scouted city %d', $marchId, $targetCityId));
+    }
+
+    /** Returns the username for a player id (used for notifications). */
+    private static function getPlayerName(Connection $db, int $playerId): string
+    {
+        try {
+            $row = $db->query('SELECT username FROM players WHERE id = ? LIMIT 1', [$playerId])->fetch();
+            return $row['username'] ?? 'Unknown';
+        } catch (\Throwable) {
+            return 'Unknown';
+        }
     }
 
     /** Load monster definition from data files (cached per request). */

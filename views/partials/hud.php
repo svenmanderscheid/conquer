@@ -37,10 +37,12 @@ try {
         [(int) $session['player_id']]
     )->fetchAll() ?: [];
 
-    // Unread battle reports count
+    // Unread battle reports count (as attacker OR as scouted defender)
     $_hud_unread = (int) $_hud_db->query(
-        'SELECT COUNT(*) FROM battle_reports WHERE attacker_id = ? AND attacker_read = 0',
-        [(int) $session['player_id']]
+        'SELECT COUNT(*) FROM battle_reports
+          WHERE (attacker_id = ? AND attacker_read = 0)
+             OR (defender_id = ? AND defender_read = 0)',
+        [(int) $session['player_id'], (int) $session['player_id']]
     )->fetchColumn();
 } catch (\Throwable) {}
 
