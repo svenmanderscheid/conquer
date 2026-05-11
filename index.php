@@ -17,15 +17,27 @@ require_once ROOT_DIR . '/src/Bootstrap.php';
 \Conquer\Bootstrap::init(ROOT_DIR);
 
 // ---------------------------------------------------------------------------
+// Normalize request path — strip app sub-directory prefix (e.g. /conquer/)
+// This ensures routing works both on localhost/conquer/ and on production root.
+// ---------------------------------------------------------------------------
+
+$_rawPath   = parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH) ?? '/';
+$_scriptDir = rtrim(dirname((string) ($_SERVER['SCRIPT_NAME'] ?? '/')), '/\\');
+// Strip the base directory (e.g. /conquer) from the path when running in a sub-folder
+if ($_scriptDir !== '' && $_scriptDir !== '/' && str_starts_with($_rawPath, $_scriptDir)) {
+    $_rawPath = substr($_rawPath, strlen($_scriptDir));
+}
+$_normalizedPath = '/' . ltrim($_rawPath, '/');
+
+// ---------------------------------------------------------------------------
 // Admin Panel — separate session, separate auth, no game session needed
 // ---------------------------------------------------------------------------
 
-if (str_starts_with((string) ($_SERVER['REQUEST_URI'] ?? '/'), '/admin')) {
+if (str_starts_with($_normalizedPath, '/admin')) {
     session_name('conquer_admin');
     session_start();
 
-    $adminUri = parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
-    $adminUri = '/' . ltrim((string) $adminUri, '/');
+    $adminUri = $_normalizedPath;
 
     $m = [];
     match (true) {
@@ -64,7 +76,7 @@ if (str_starts_with((string) ($_SERVER['REQUEST_URI'] ?? '/'), '/admin')) {
 // Router
 // ---------------------------------------------------------------------------
 
-$path   = '/' . ltrim((string) (parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH)), '/');
+$path   = $_normalizedPath;
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
 // JSON API — all /api/* requests are handled here.
