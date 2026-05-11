@@ -7,6 +7,9 @@ use Conquer\Db\Connection;
 use Conquer\Logger;
 use Conquer\Game\Hospital\HospitalService;
 use Conquer\Game\Quest\DailyQuestService;
+use Conquer\Game\Notification\NotificationService;
+use Conquer\Game\Inventory\InventoryService;
+use Conquer\Game\Alliance\AllianceGiftService;
 
 /** Fraction of losses that go to hospital instead of dying permanently. */
 const MORTALITY_RATE = 0.3; // 30% of losses are wounded, 70% die
@@ -189,6 +192,31 @@ final class MarchTick
             [$monsterId],
         )->fetch();
 
+        // Block solo march on rally-type monsters
+        if ($monster !== false && ($monster['monster_type'] ?? 'solo') === 'rally') {
+            // Is this march part of a rally (leader)? Check rallies table.
+            $isRallyLeader = $db->query(
+                "SELECT id FROM rallies WHERE lead_march_id = ? AND state IN ('forming','marching') LIMIT 1",
+                [$marchId],
+            )->fetch();
+
+            if ($isRallyLeader === false) {
+                // Solo attack on rally monster — block and return march
+                $db->execute(
+                    "UPDATE marches SET state = 'returning', return_time = UTC_TIMESTAMP()
+                     WHERE id = ?",
+                    [$marchId],
+                );
+                NotificationService::push($playerId, 'rally_required', [
+                    'monster_id' => $monsterId,
+                    'x'          => $targetX,
+                    'y'          => $targetY,
+                ]);
+                $log->info("[MarchTick] March {$marchId} blocked — rally-only monster {$monsterId}");
+                return;
+            }
+        }
+
         if ($monster === false || (int) $monster['hp_current'] <= 0) {
             self::finalizeMarch($db, $marchId, $troops, [], 'defender_wins');
             $log->info('[MarchTick] March ' . $marchId . ' — monster already dead');
@@ -266,6 +294,16 @@ final class MarchTick
             // Track daily quests for monster kills
             try {
                 DailyQuestService::trackProgress($playerId, 'attack_monster');
+            } catch (\Throwable) {}
+
+            // Treasure Goblin guaranteed drops (codes 20200401–20200405)
+            if ($monsterCode >= 20200401 && $monsterCode <= 20200405) {
+                self::grantTreasureGoblinDrops($playerId, $monsterCode);
+            }
+
+            // Alliance gift trigger — 20% chance for alliance members
+            try {
+                AllianceGiftService::triggerMonsterKill($playerId, $monsterCode);
             } catch (\Throwable) {}
         }
 
@@ -540,6 +578,11 @@ final class MarchTick
             );
         });
 
+        // Wall destruction check — teleport defender city if wall drops to 0
+        if ($attackerWins && $defPlayerId > 0) {
+            self::checkWallDestroyed($db, $targetCityId, $defPlayerId);
+        }
+
         // Send wounded to hospital (outside transaction — non-critical)
         $filteredAttackerWounded = array_filter($attackerWounded, fn($c) => $c > 0);
         if (!empty($filteredAttackerWounded)) {
@@ -672,6 +715,117 @@ final class MarchTick
             return $row['username'] ?? 'Unknown';
         } catch (\Throwable) {
             return 'Unknown';
+        }
+    }
+
+    /**
+     * Checks whether the defender's wall HP has reached zero after the attack.
+     * If so: teleport the city to a random free coordinate and notify the defender.
+     */
+    private static function checkWallDestroyed(Connection $db, int $targetCityId, int $defPlayerId): void
+    {
+        try {
+            $wallRow = $db->query(
+                'SELECT wall_hp_current, wall_hp_max FROM cities WHERE id = ?',
+                [$targetCityId],
+            )->fetch();
+
+            if ($wallRow === false) {
+                return;
+            }
+
+            $wallHp    = (int) $wallRow['wall_hp_current'];
+            $wallHpMax = (int) $wallRow['wall_hp_max'];
+
+            // Wall damage from battle: attacker_wins → defender loses 30% troops
+            // Simplified wall damage: 10% of max HP per player victory
+            $wallDamage = (int) ceil($wallHpMax * 0.10);
+
+            if (($wallHp - $wallDamage) > 0) {
+                // Wall survives — just reduce HP
+                $db->execute(
+                    'UPDATE cities SET wall_hp_current = GREATEST(0, wall_hp_current - ?), wall_last_update = UTC_TIMESTAMP() WHERE id = ?',
+                    [$wallDamage, $targetCityId],
+                );
+                return;
+            }
+
+            // Wall destroyed — teleport city to random free coordinates
+            [$nx, $ny] = self::findFreeTeleportCoord($db);
+
+            $db->execute(
+                'UPDATE cities
+                 SET coord_x        = ?,
+                     coord_y        = ?,
+                     wall_hp_current = wall_hp_max,
+                     wall_last_update = UTC_TIMESTAMP()
+                 WHERE id = ?',
+                [$nx, $ny, $targetCityId],
+            );
+
+            NotificationService::push($defPlayerId, 'wall_destroyed', [
+                'new_x' => $nx,
+                'new_y' => $ny,
+            ]);
+        } catch (\Throwable $e) {
+            Logger::getInstance()->error('[MarchTick] checkWallDestroyed failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Finds a random free coordinate for city teleportation.
+     * Stays within the safe zone (200-tile edge buffer on a 1024×1024 map).
+     *
+     * @return array{int, int}  [x, y]
+     */
+    private static function findFreeTeleportCoord(Connection $db): array
+    {
+        $min = 200;
+        $max = 823; // 1024 - 200 - 1
+
+        for ($attempt = 0; $attempt < 50; $attempt++) {
+            $nx = random_int($min, $max);
+            $ny = random_int($min, $max);
+
+            $taken = $db->query(
+                'SELECT 1 FROM cities WHERE world_id = 1 AND coord_x = ? AND coord_y = ? LIMIT 1',
+                [$nx, $ny],
+            )->fetch();
+
+            if ($taken === false) {
+                return [$nx, $ny];
+            }
+        }
+
+        // Fallback: use coordinates that are very likely free (random large offset)
+        return [random_int($min, $max), random_int($min, $max)];
+    }
+
+    /**
+     * Grants guaranteed Treasure Goblin item drops.
+     *
+     * Drops: guaranteed 30-minute speedup (building OR research, 50/50),
+     * plus 50% chance for 30–75 GEMS.
+     *
+     * Goblin levels 1–5 map to codes 20200401–20200405.
+     */
+    private static function grantTreasureGoblinDrops(int $playerId, int $monsterCode): void
+    {
+        try {
+            // Guaranteed: 30-minute speedup (building=10103011 or research=10103023, 50/50)
+            $speedupCode = (random_int(0, 1) === 0) ? 10103011 : 10103023;
+            InventoryService::addItems($playerId, $speedupCode, 1);
+
+            // 50% chance: 30–75 GEMS
+            if (random_int(1, 100) <= 50) {
+                $gems = random_int(30, 75);
+                Connection::getInstance()->execute(
+                    'UPDATE players SET gems = gems + ? WHERE id = ?',
+                    [$gems, $playerId],
+                );
+            }
+        } catch (\Throwable $e) {
+            Logger::getInstance()->error('[MarchTick] grantTreasureGoblinDrops failed: ' . $e->getMessage());
         }
     }
 

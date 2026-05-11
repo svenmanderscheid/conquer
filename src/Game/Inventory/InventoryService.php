@@ -6,6 +6,7 @@ namespace Conquer\Game\Inventory;
 use Conquer\Db\Connection;
 use Conquer\Game\Hospital\HospitalService;
 use Conquer\Game\Vip\VipService;
+use Conquer\Game\Buff\ActiveBuffService;
 
 /**
  * Player item inventory — add, remove, and use consumable items.
@@ -418,6 +419,8 @@ final class InventoryService
 
     /**
      * Activates a timed boost by inserting into player_charms_active.
+     * Additionally records production/research/training boosts in active_buffs
+     * so ActiveBuffService can apply multiplicative stacking.
      *
      * @param array<string, mixed> $def
      * @return array{ok: bool, effect: string}
@@ -469,6 +472,25 @@ final class InventoryService
                 ':dur2' => $durationSeconds,
             ],
         );
+
+        // Mirror production/research/training boosts into active_buffs for
+        // multiplicative stacking via ActiveBuffService::getMultiplier().
+        $activeBuffType = match ($boostType) {
+            'resource_production' => 'production_boost',
+            'research_speed'      => 'research_boost',
+            'training_speed'      => 'training_boost',
+            default               => null,
+        };
+
+        if ($activeBuffType !== null && $bonusPct > 0.0) {
+            $multiplier = 1.0 + ($bonusPct / 100.0);
+            $hours      = (int) ceil($durationSeconds / 3600.0);
+            try {
+                ActiveBuffService::apply($playerId, $activeBuffType, $multiplier, $hours);
+            } catch (\Throwable) {
+                // non-critical
+            }
+        }
 
         $hours   = number_format($durationSeconds / 3600.0, 1);
         $pctText = $bonusPct > 0 ? '+' . $bonusPct . '%' : '';

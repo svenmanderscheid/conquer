@@ -181,10 +181,13 @@ $db->execute(
 // Skipping for now — only add if needed.
 
 // ---------------------------------------------------------------------------
-// Step 2: Spawn solo monsters per sector
+// Step 2: Spawn solo monsters per sector (Orc / Skeleton / Golem + Treasure Goblin)
 // ---------------------------------------------------------------------------
 
-// Filter to solo monster types only (Orc / Skeleton / Golem)
+// Caps per sector for special monster types
+$goblinCaps = [1 => 6, 2 => 4, 3 => 2, 4 => 1, 5 => 1]; // level → max per sector
+
+// Filter solo types (Orc / Skeleton / Golem)
 $soloTypes = ['Orc', 'Skeleton', 'Golem'];
 
 $spawnMonsters = array_filter(
@@ -271,7 +274,238 @@ foreach ($sectors as $sIdx => $sector) {
     }
 }
 
-$log->info("world_spawn_tick: despawn cleanup done, {$totalSpawned} monsters spawned across 8 sectors.");
+$log->info("world_spawn_tick: despawn cleanup done, {$totalSpawned} solo/goblin monsters spawned across 8 sectors.");
+
+// ---------------------------------------------------------------------------
+// Step 2b: Spawn Treasure Goblins (codes 20200401–20200405)
+// 30-minute despawn timer, separate per-sector caps
+// ---------------------------------------------------------------------------
+
+$goblinDefs = array_filter(
+    $spawnCfg['monsters'],
+    static fn($m) => $m['monster'] === 'Treasure Goblin'
+);
+
+$goblinSpawned = 0;
+
+foreach ($sectors as $sIdx => $sector) {
+    foreach ($goblinDefs as $goblinDef) {
+        $code  = (int) $goblinDef['code'];
+        $level = $code % 100; // last 2 digits = level
+        $cap   = $goblinCaps[$level] ?? 1;
+
+        // Current goblin count of this level in this sector
+        $existing = (int) $db->query(
+            'SELECT COUNT(*) FROM field_monsters
+             WHERE world_id = ? AND monster_code = ?
+               AND coord_x BETWEEN ? AND ?
+               AND coord_y BETWEEN ? AND ?',
+            [$worldId, $code, $sector['x_min'], $sector['x_max'], $sector['y_min'], $sector['y_max']]
+        )->fetchColumn();
+
+        $toSpawn = max(0, $cap - $existing);
+        if ($toSpawn <= 0) continue;
+
+        $hp = resolveHp($code, $hpByNameLevel);
+
+        for ($i = 0; $i < $toSpawn; $i++) {
+            $placed   = false;
+            $attempts = 0;
+
+            while (!$placed && $attempts < 30) {
+                $attempts++;
+                $x = mt_rand($sector['x_min'], $sector['x_max']);
+                $y = mt_rand($sector['y_min'], $sector['y_max']);
+
+                if (isTileBlocked($x, $y, $cities, $shrines, $minCityDist, $minShrineDist)) {
+                    continue;
+                }
+
+                $occupied = (bool) $db->query(
+                    'SELECT id FROM field_monsters WHERE world_id = ? AND coord_x = ? AND coord_y = ? LIMIT 1',
+                    [$worldId, $x, $y]
+                )->fetch();
+
+                if ($occupied) continue;
+
+                // Treasure Goblin despawns after 30 minutes — set spawned_at offset
+                // so the 0.5h despawn window is used by the cleanup loop
+                $db->execute(
+                    'INSERT INTO field_monsters (world_id, monster_code, coord_x, coord_y, hp_current, monster_type, spawned_at)
+                     VALUES (?, ?, ?, ?, ?, \'solo\', ?)',
+                    [$worldId, $code, $x, $y, $hp, $now]
+                );
+                $placed = true;
+                $goblinSpawned++;
+            }
+        }
+    }
+}
+
+$log->info("world_spawn_tick: {$goblinSpawned} Treasure Goblins spawned.");
+
+// ---------------------------------------------------------------------------
+// Step 2c: Spawn Rally-type monsters (Deathkar, Dragons, Magdar)
+// These use monster_type='rally' — solo marches are blocked by MarchTick.
+// ---------------------------------------------------------------------------
+
+// Deathkar codes: 20200501–20200510
+$deathkarDefs = array_filter(
+    $spawnCfg['monsters'],
+    static fn($m) => $m['monster'] === 'Deathkar'
+);
+
+$rallySpawned = 0;
+
+foreach ($sectors as $sIdx => $sector) {
+    foreach ($deathkarDefs as $def) {
+        $code = (int) $def['code'];
+
+        $existing = (int) $db->query(
+            'SELECT COUNT(*) FROM field_monsters
+             WHERE world_id = ? AND monster_code = ?
+               AND coord_x BETWEEN ? AND ?
+               AND coord_y BETWEEN ? AND ?',
+            [$worldId, $code, $sector['x_min'], $sector['x_max'], $sector['y_min'], $sector['y_max']]
+        )->fetchColumn();
+
+        // Max 2 Deathkar of any level per sector
+        if ($existing >= 2) continue;
+
+        // Only spawn if random roll succeeds (50% chance per tick per code per sector)
+        if (mt_rand(0, 1) === 0) continue;
+
+        $hp = resolveHp($code, $hpByNameLevel);
+
+        $placed   = false;
+        $attempts = 0;
+        while (!$placed && $attempts < 30) {
+            $attempts++;
+            $x = mt_rand($sector['x_min'], $sector['x_max']);
+            $y = mt_rand($sector['y_min'], $sector['y_max']);
+
+            if (isTileBlocked($x, $y, $cities, $shrines, $minCityDist, $minShrineDist)) continue;
+
+            $occupied = (bool) $db->query(
+                'SELECT id FROM field_monsters WHERE world_id = ? AND coord_x = ? AND coord_y = ? LIMIT 1',
+                [$worldId, $x, $y]
+            )->fetch();
+
+            if ($occupied) continue;
+
+            $db->execute(
+                'INSERT INTO field_monsters (world_id, monster_code, coord_x, coord_y, hp_current, monster_type, spawned_at)
+                 VALUES (?, ?, ?, ?, ?, \'rally\', ?)',
+                [$worldId, $code, $x, $y, $hp, $now]
+            );
+            $placed = true;
+            $rallySpawned++;
+        }
+    }
+}
+
+// Dragons: codes 20200601–20200803 — 1-2 per sector (very rare, 20% chance)
+$dragonDefs = array_filter(
+    $spawnCfg['monsters'],
+    static fn($m) => str_contains(strtolower($m['monster']), 'dragon')
+);
+
+foreach ($sectors as $sIdx => $sector) {
+    foreach ($dragonDefs as $def) {
+        $code = (int) $def['code'];
+
+        // Very rare: 20% chance per tick
+        if (mt_rand(1, 100) > 20) continue;
+
+        $existing = (int) $db->query(
+            'SELECT COUNT(*) FROM field_monsters
+             WHERE world_id = ? AND monster_code = ?
+               AND coord_x BETWEEN ? AND ?
+               AND coord_y BETWEEN ? AND ?',
+            [$worldId, $code, $sector['x_min'], $sector['x_max'], $sector['y_min'], $sector['y_max']]
+        )->fetchColumn();
+
+        // Cap: max 2 of any dragon type per sector
+        if ($existing >= 2) continue;
+
+        $hp       = resolveHp($code, $hpByNameLevel);
+        $placed   = false;
+        $attempts = 0;
+
+        while (!$placed && $attempts < 30) {
+            $attempts++;
+            $x = mt_rand($sector['x_min'], $sector['x_max']);
+            $y = mt_rand($sector['y_min'], $sector['y_max']);
+
+            if (isTileBlocked($x, $y, $cities, $shrines, $minCityDist, $minShrineDist)) continue;
+
+            $occupied = (bool) $db->query(
+                'SELECT id FROM field_monsters WHERE world_id = ? AND coord_x = ? AND coord_y = ? LIMIT 1',
+                [$worldId, $x, $y]
+            )->fetch();
+
+            if ($occupied) continue;
+
+            $db->execute(
+                'INSERT INTO field_monsters (world_id, monster_code, coord_x, coord_y, hp_current, monster_type, spawned_at)
+                 VALUES (?, ?, ?, ?, ?, \'rally\', ?)',
+                [$worldId, $code, $x, $y, $hp, $now]
+            );
+            $placed = true;
+            $rallySpawned++;
+        }
+    }
+}
+
+// Magdar: codes 20200901–20200903 — 1 per entire world (extremely rare, 5% chance)
+$magdarDefs = array_filter(
+    $spawnCfg['monsters'],
+    static fn($m) => $m['monster'] === 'Magdar'
+);
+
+foreach ($magdarDefs as $def) {
+    $code = (int) $def['code'];
+
+    // Only 5% chance
+    if (mt_rand(1, 100) > 5) continue;
+
+    // Max 1 Magdar of this type across the entire world
+    $existingWorld = (int) $db->query(
+        'SELECT COUNT(*) FROM field_monsters WHERE world_id = ? AND monster_code = ?',
+        [$worldId, $code]
+    )->fetchColumn();
+
+    if ($existingWorld >= 1) continue;
+
+    $hp       = resolveHp($code, $hpByNameLevel);
+    $placed   = false;
+    $attempts = 0;
+
+    while (!$placed && $attempts < 50) {
+        $attempts++;
+        $x = mt_rand(200, 823);
+        $y = mt_rand(200, 823);
+
+        if (isTileBlocked($x, $y, $cities, $shrines, $minCityDist, $minShrineDist)) continue;
+
+        $occupied = (bool) $db->query(
+            'SELECT id FROM field_monsters WHERE world_id = ? AND coord_x = ? AND coord_y = ? LIMIT 1',
+            [$worldId, $x, $y]
+        )->fetch();
+
+        if ($occupied) continue;
+
+        $db->execute(
+            'INSERT INTO field_monsters (world_id, monster_code, coord_x, coord_y, hp_current, monster_type, spawned_at)
+             VALUES (?, ?, ?, ?, ?, \'rally\', ?)',
+            [$worldId, $code, $x, $y, $hp, $now]
+        );
+        $placed = true;
+        $rallySpawned++;
+    }
+}
+
+$log->info("world_spawn_tick: {$rallySpawned} rally-type monsters (Deathkar/Dragon/Magdar) spawned.");
 
 // ---------------------------------------------------------------------------
 // Step 3: Shrine maintenance — mark contested shrines as secured if timer elapsed

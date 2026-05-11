@@ -93,6 +93,11 @@ final class OAuth
         // Award daily VIP login points (+10, max once per UTC day).
         \Conquer\Game\Vip\VipService::dailyLogin($playerId);
 
+        // Inactivity system: restore hidden city on login.
+        try {
+            $this->restoreHiddenCityOnLogin($playerId);
+        } catch (\Throwable) {}
+
         // Initialize tutorial progress (INSERT IGNORE — safe to call every login).
         try {
             \Conquer\Game\Tutorial\TutorialService::ensureInitialized($playerId);
@@ -393,6 +398,58 @@ final class OAuth
         }
 
         return $candidate;
+    }
+
+    // -------------------------------------------------------------------------
+    // Inactivity system
+    // -------------------------------------------------------------------------
+
+    /**
+     * When a player was hidden (>30 days inactive), show their city again on login.
+     * If the city was hidden, also assign new random coordinates so they don't
+     * return to a spot that may be contested.
+     */
+    private function restoreHiddenCityOnLogin(int $playerId): void
+    {
+        $db = Connection::getInstance();
+
+        // Check if the player is currently hidden
+        $player = $db->query(
+            'SELECT is_hidden FROM players WHERE id = ?',
+            [$playerId],
+        )->fetch();
+
+        if ($player === false || (int) $player['is_hidden'] === 0) {
+            return; // Not hidden — nothing to do
+        }
+
+        // Player was hidden — mark them visible again
+        $db->execute(
+            'UPDATE players SET is_hidden = 0 WHERE id = ?',
+            [$playerId],
+        );
+
+        // Assign new random coordinates for the city (fresh start)
+        try {
+            $coord = self::randomCoord($db);
+            $db->execute(
+                'UPDATE cities
+                 SET coord_x = ?, coord_y = ?, is_hidden = 0
+                 WHERE player_id = ? AND world_id = 1',
+                [$coord['x'], $coord['y'], $playerId],
+            );
+        } catch (\Throwable) {
+            // If coord assignment fails, just un-hide without moving
+            $db->execute(
+                'UPDATE cities SET is_hidden = 0 WHERE player_id = ? AND world_id = 1',
+                [$playerId],
+            );
+        }
+
+        // Send welcome-back notification
+        \Conquer\Game\Notification\NotificationService::push($playerId, 'welcome_back', []);
+
+        Logger::getInstance()->info("Inactivity: player {$playerId} restored from hidden state.");
     }
 
     // -------------------------------------------------------------------------
