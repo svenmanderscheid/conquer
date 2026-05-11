@@ -72,23 +72,34 @@ final class MarchTick
                 $intTroops[(int) $code] = (int) $count;
             }
 
-            if ($marchType === 5) {
-                self::resolveMonster($db, $log, $marchId, $playerId, $cityId,
-                    $targetX, $targetY, $monsterId, $intTroops);
-            } elseif ($marchType === 6) {
-                self::resolveCharmCollect($db, $log, $marchId, $playerId, $cityId, $targetX, $targetY, (int)$march['target_id']);
-            } elseif ($marchType === 7) {
-                self::resolvePlayerAttack($db, $log, $marchId, $playerId, $cityId, $targetX, $targetY, (int)$march['target_id'], $intTroops);
-            } elseif ($marchType === 8) {
-                self::resolveScout($db, $log, $marchId, $playerId, $cityId, $targetX, $targetY, (int)$march['target_id']);
-            } elseif ($marchType === 9) {
-                GatherService::resolveGather($db, $log, $marchId, $playerId, $cityId, $targetX, $targetY, (int)$march['target_id']);
-            } else {
-                // Unsupported type — return immediately
-                $db->execute(
-                    "UPDATE marches SET state = 'returning', return_time = UTC_TIMESTAMP() WHERE id = ?",
-                    [$marchId],
-                );
+            try {
+                if ($marchType === 5) {
+                    self::resolveMonster($db, $log, $marchId, $playerId, $cityId,
+                        $targetX, $targetY, $monsterId, $intTroops);
+                } elseif ($marchType === 6) {
+                    self::resolveCharmCollect($db, $log, $marchId, $playerId, $cityId, $targetX, $targetY, (int)$march['target_id']);
+                } elseif ($marchType === 7) {
+                    self::resolvePlayerAttack($db, $log, $marchId, $playerId, $cityId, $targetX, $targetY, (int)$march['target_id'], $intTroops);
+                } elseif ($marchType === 8) {
+                    self::resolveScout($db, $log, $marchId, $playerId, $cityId, $targetX, $targetY, (int)$march['target_id']);
+                } elseif ($marchType === 9) {
+                    GatherService::resolveGather($db, $log, $marchId, $playerId, $cityId, $targetX, $targetY, (int)$march['target_id']);
+                } else {
+                    // Unsupported type — return immediately
+                    $db->execute(
+                        "UPDATE marches SET state = 'returning', return_time = UTC_TIMESTAMP() WHERE id = ?",
+                        [$marchId],
+                    );
+                }
+            } catch (\Throwable $e) {
+                $log->error(sprintf('[MarchTick] Unhandled error in march %d (type %d): %s', $marchId, $marchType, $e->getMessage()));
+                // Safety net: put back to returning so the march doesn't block forever
+                try {
+                    $db->execute(
+                        "UPDATE marches SET state='returning', return_time=UTC_TIMESTAMP() WHERE id=? AND state='resolving'",
+                        [$marchId],
+                    );
+                } catch (\Throwable) {}
             }
         }
 
@@ -569,7 +580,7 @@ final class MarchTick
 
         // Gather target city info
         $targetCity = $db->query(
-            'SELECT c.food, c.wood, c.stone, c.gold, c.power, c.castle_level,
+            'SELECT c.food, c.lumber, c.stone, c.gold, c.power, c.castle_level,
                     p.username, p.lord_level, p.kill_count
              FROM cities c JOIN players p ON p.id = c.player_id
              WHERE c.id = ?',
@@ -605,10 +616,10 @@ final class MarchTick
                 'defense_buff'   => $wallDef,
             ],
             'resources' => [
-                'food'  => (int)($targetCity['food']  ?? 0),
-                'wood'  => (int)($targetCity['wood']  ?? 0),
-                'stone' => (int)($targetCity['stone'] ?? 0),
-                'gold'  => (int)($targetCity['gold']  ?? 0),
+                'food'   => (int)($targetCity['food']   ?? 0),
+                'lumber' => (int)($targetCity['lumber'] ?? 0),
+                'stone'  => (int)($targetCity['stone']  ?? 0),
+                'gold'   => (int)($targetCity['gold']   ?? 0),
             ],
             'troops'    => $troops,
             'mastery'   => null,   // placeholder — not yet implemented
