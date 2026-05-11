@@ -1122,6 +1122,51 @@ declare(strict_types=1);
     </div>
 </div>
 
+<!-- ── Rally Join Modal ── -->
+<div class="modal-overlay" x-show="rallyJoinModal" @click.self="rallyJoinModal=false" style="display:none">
+    <div class="modal-box">
+        <div class="modal-title" style="color:#f59e0b">⚔ Rally beitreten</div>
+
+        <template x-if="rallyJoinLoading">
+            <div style="text-align:center;color:#8b6f47;padding:2rem">Laden…</div>
+        </template>
+
+        <template x-if="!rallyJoinLoading && rallyJoinData">
+            <div>
+                <div style="font-size:.82rem;color:#8b6f47;margin-bottom:10px">
+                    Ziel: <strong x-text="rallyJoinData.target_player_name ?? ('(' + rallyJoinData.rally.target_x + ',' + rallyJoinData.rally.target_y + ')')"></strong>
+                    &bull; Starter: <strong x-text="rallyJoinData.rally.starter_name ?? 'Unbekannt'"></strong>
+                </div>
+                <div style="font-size:.78rem;color:#8b6f47;margin-bottom:14px">
+                    Startet um: <span x-text="fmtDateTime(rallyJoinData.rally.launches_at)"></span>
+                    &bull; <span x-text="(rallyJoinData.participants ?? []).length"></span> Teilnehmer
+                </div>
+
+                <!-- Troop selector (same pattern as monster attack) -->
+                <template x-if="rallyJoinTroops.length === 0">
+                    <div style="color:#8b6f47;font-size:.8rem;text-align:center;padding:.5rem">Keine Truppen vorhanden.</div>
+                </template>
+                <template x-for="t in rallyJoinTroops" :key="t.code">
+                    <div class="troop-row">
+                        <span class="troop-name" x-text="t.name"></span>
+                        <span class="troop-avail" x-text="'/' + t.available.toLocaleString()"></span>
+                        <input class="troop-input" type="number" min="0" :max="t.available" x-model.number="t.toSend" @input="t.toSend=Math.min(t.available,Math.max(0,t.toSend||0))">
+                    </div>
+                </template>
+                <div style="font-size:.72rem;color:#8b6f47;margin:.5rem 0"
+                     x-text="'Gesamt: ' + rallyJoinTroops.reduce((s,t)=>s+(t.toSend||0),0).toLocaleString() + ' Truppen'"></div>
+            </div>
+        </template>
+
+        <div class="modal-actions">
+            <button class="modal-btn modal-btn-cancel" @click="rallyJoinModal=false">Abbrechen</button>
+            <button class="modal-btn modal-btn-confirm" style="background:linear-gradient(180deg,#f59e0b,#b45309)"
+                    :disabled="rallyJoinLoading || rallyJoinTroops.reduce((s,t)=>s+(t.toSend||0),0)===0"
+                    @click="joinRally()">⚔ Beitreten</button>
+        </div>
+    </div>
+</div>
+
 <!-- ── Enemy Profile Modal ── -->
 <div class="modal-overlay" x-show="enemyProfileModal" @click.self="enemyProfileModal=false" style="display:none">
     <div class="modal-box">
@@ -1323,6 +1368,11 @@ function mapApp() {
         rallyMinutes:    30,
         rallyLoading:    false,
         rallyTimePicker: false,
+        // Rally join modal
+        rallyJoinModal:   false,
+        rallyJoinData:    null,
+        rallyJoinTroops:  [],
+        rallyJoinLoading: false,
 
         // Enemy profile modal
         enemyProfileModal:   false,
@@ -1657,6 +1707,68 @@ function mapApp() {
                 }
             } catch { this.showToast('Netzwerkfehler', 'err'); }
             this.rallyLoading = false;
+        },
+
+        // ── Rally Join ───────────────────────────────────────────────────────
+        async openRallyJoin(rallyId) {
+            this.rallyJoinModal   = true;
+            this.rallyJoinData    = null;
+            this.rallyJoinTroops  = [];
+            this.rallyJoinLoading = true;
+
+            try {
+                // Load rally details + player troops in parallel
+                const [rallyRes, troopsRes] = await Promise.all([
+                    fetch('/api/rally/' + rallyId),
+                    fetch('/api/troops/list'),
+                ]);
+                const [rallyJ, troopsJ] = await Promise.all([rallyRes.json(), troopsRes.json()]);
+
+                if (rallyJ.ok)  this.rallyJoinData  = rallyJ.data;
+                if (troopsJ.ok) {
+                    this.rallyJoinTroops = (troopsJ.data.definitions ?? [])
+                        .filter(t => (t.available ?? 0) > 0)
+                        .map(t => ({ ...t, toSend: 0 }));
+                }
+            } catch { this.showToast('Netzwerkfehler', 'err'); }
+
+            this.rallyJoinLoading = false;
+        },
+
+        async joinRally() {
+            if (!this.rallyJoinData) return;
+            const rallyId = this.rallyJoinData.rally?.id ?? this.rallyJoinData.id;
+            const troops = {};
+            let total = 0;
+            for (const t of this.rallyJoinTroops) {
+                if ((t.toSend ?? 0) > 0) { troops[t.code] = t.toSend; total += t.toSend; }
+            }
+            if (total === 0 || !rallyId) return;
+
+            this.rallyJoinLoading = true;
+            try {
+                const r = await fetch('/api/rally/join', {
+                    method:  'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': CSRF },
+                    body:    JSON.stringify({ rally_id: rallyId, troops }),
+                });
+                const j = await r.json();
+                if (j.ok) {
+                    this.rallyJoinModal = false;
+                    this.showToast('⚔ Rally beigetreten!', 'ok');
+                    ConquerMap.refreshEntities();
+                } else {
+                    this.showToast(j.message ?? j.error ?? 'Fehler', 'err');
+                }
+            } catch { this.showToast('Netzwerkfehler', 'err'); }
+            this.rallyJoinLoading = false;
+        },
+
+        fmtDateTime(dt) {
+            if (!dt) return '—';
+            return new Date(dt.replace(' ', 'T') + 'Z').toLocaleString('de-DE', {
+                hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit',
+            });
         },
 
         // ── Formations ────────────────────────────────────────────────────────

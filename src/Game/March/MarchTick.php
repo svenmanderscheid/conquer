@@ -84,6 +84,8 @@ final class MarchTick
                     self::resolveScout($db, $log, $marchId, $playerId, $cityId, $targetX, $targetY, (int)$march['target_id']);
                 } elseif ($marchType === 9) {
                     GatherService::resolveGather($db, $log, $marchId, $playerId, $cityId, $targetX, $targetY, (int)$march['target_id']);
+                } elseif ($marchType === 10) {
+                    self::resolveReinforce($db, $log, $marchId, $playerId, $cityId, (int)$march['target_id'], $intTroops);
                 } else {
                     // Unsupported type — return immediately
                     $db->execute(
@@ -398,10 +400,26 @@ final class MarchTick
         // Optimistic lock
         $db->execute("UPDATE marches SET state='resolving' WHERE id=? AND state='marching'", [$marchId]);
 
-        // Load defender troops
+        // Load defender troops (own city troops)
         $defRows   = $db->query('SELECT troop_code, count FROM city_troops WHERE city_id = ?', [$targetCityId])->fetchAll();
         $defTroops = [];
         foreach ($defRows as $r) $defTroops[(int)$r['troop_code']] = (int)$r['count'];
+
+        // Add reinforcement troops to defender (active reinforcements at this city)
+        try {
+            $reinforceRows = $db->query(
+                "SELECT troops_json FROM reinforcements WHERE target_city_id = ? AND state = 'active'",
+                [$targetCityId],
+            )->fetchAll();
+            foreach ($reinforceRows as $rr) {
+                $rTroops = json_decode((string) $rr['troops_json'], true) ?? [];
+                foreach ($rTroops as $code => $count) {
+                    $defTroops[(int) $code] = ($defTroops[(int) $code] ?? 0) + (int) $count;
+                }
+            }
+        } catch (\PDOException) {
+            // reinforcements table may not exist — non-fatal
+        }
 
         // Load attacker + defender city stats
         $atkCity = $db->query('SELECT power, player_id FROM cities WHERE id = ?', [$cityId])->fetch();
@@ -673,6 +691,67 @@ final class MarchTick
         } catch (\Throwable) {
             return 'Unknown';
         }
+    }
+
+    /**
+     * Resolves a reinforcement march (type 10).
+     * Inserts an entry into the reinforcements table and marks the march as 'arrived'
+     * (troops stay at destination until recalled).
+     */
+    private static function resolveReinforce(
+        Connection $db,
+        Logger     $log,
+        int        $marchId,
+        int        $playerId,
+        int        $originCityId,
+        int        $targetCityId,
+        array      $troops,
+    ): void {
+        $db->execute(
+            "UPDATE marches SET state = 'resolving' WHERE id = ? AND state = 'marching'",
+            [$marchId],
+        );
+
+        // Check if target city still exists
+        $targetCity = $db->query(
+            'SELECT player_id FROM cities WHERE id = ?',
+            [$targetCityId],
+        )->fetch();
+
+        if ($targetCity === false) {
+            // Target city gone — return troops
+            $db->execute(
+                "UPDATE marches SET state='returning', return_time=UTC_TIMESTAMP(),
+                 haul_json=:haul WHERE id=:id",
+                [':haul' => json_encode(['survivors' => $troops]), ':id' => $marchId],
+            );
+            return;
+        }
+
+        $targetPlayerId = (int) $targetCity['player_id'];
+
+        $db->transaction(function (Connection $db) use (
+            $marchId, $playerId, $originCityId, $targetCityId, $targetPlayerId, $troops,
+        ): void {
+            // Insert reinforcement record
+            $db->execute(
+                "INSERT INTO reinforcements
+                    (march_id, sender_id, sender_city_id, target_player_id, target_city_id, troops_json, state)
+                 VALUES (?, ?, ?, ?, ?, ?, 'active')",
+                [$marchId, $playerId, $originCityId, $targetPlayerId, $targetCityId, json_encode($troops)],
+            );
+
+            // March state = 'arrived' — stays until recalled
+            $db->execute(
+                "UPDATE marches SET state = 'arrived' WHERE id = ?",
+                [$marchId],
+            );
+        });
+
+        $log->info(sprintf(
+            '[MarchTick] Reinforce march %d arrived at city %d — %d troop types',
+            $marchId, $targetCityId, count($troops),
+        ));
     }
 
     /** Load monster definition from data files (cached per request). */

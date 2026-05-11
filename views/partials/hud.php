@@ -865,6 +865,345 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
 </div>
 </div>
 
+<!-- ── BOTTOM CHAT WIDGET ─────────────────────────────────────────────────── -->
+<?php
+$_hud_in_alliance = false;
+try {
+    $__chatMember = Connection::getInstance()->query(
+        'SELECT am.alliance_id FROM alliance_members am WHERE am.player_id = ?',
+        [(int) $session['player_id']]
+    )->fetch();
+    $_hud_in_alliance = ($__chatMember !== false);
+} catch (\Throwable) {}
+?>
+<style>
+/* ── Bottom Chat ────────────────────────────────────────────────────────── */
+#hud-chat-widget {
+    position: fixed;
+    bottom: 0;
+    left: 12px;
+    width: 320px;
+    z-index: 100;
+    font-family: system-ui, -apple-system, sans-serif;
+    pointer-events: all;
+}
+
+#hud-chat-header {
+    background: var(--c-panel3, #e8d8b0);
+    border: 1px solid var(--c-border, rgba(139,90,43,0.35));
+    border-bottom: none;
+    border-radius: 10px 10px 0 0;
+    padding: 5px 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+#hud-chat-header-title {
+    flex: 1;
+    font-size: 0.68rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--c-wood-dark, #8b5a2b);
+}
+
+#hud-chat-chevron {
+    font-size: 0.75rem;
+    color: var(--c-muted, #8b6f47);
+    transition: transform 0.2s;
+}
+
+#hud-chat-body {
+    background: var(--c-panel, #f4e4c1);
+    border: 1px solid var(--c-border, rgba(139,90,43,0.35));
+    border-top: none;
+    display: flex;
+    flex-direction: column;
+    height: 380px;
+    overflow: hidden;
+}
+
+.hud-chat-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--c-border, rgba(139,90,43,0.35));
+    background: var(--c-panel2, #ede0c4);
+    flex-shrink: 0;
+}
+
+.hud-chat-tab-btn {
+    flex: 1;
+    padding: 5px 8px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--c-muted, #8b6f47);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: color 0.15s;
+    margin-bottom: -1px;
+    font-family: inherit;
+}
+
+.hud-chat-tab-btn:hover { color: var(--c-text, #4a3520); }
+.hud-chat-tab-btn.hud-chat-tab-active {
+    color: var(--c-wood-dark, #8b5a2b);
+    border-bottom-color: var(--c-gold, #c08858);
+}
+
+.hud-chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 7px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--c-border, rgba(139,90,43,0.35)) transparent;
+}
+
+.hud-chat-messages::-webkit-scrollbar { width: 4px; }
+.hud-chat-messages::-webkit-scrollbar-thumb { background: var(--c-border, rgba(139,90,43,0.35)); border-radius: 2px; }
+
+.hud-chat-msg {
+    font-size: 0.78rem;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.hud-chat-msg-user {
+    font-weight: 800;
+    color: var(--c-gold, #c08858);
+    margin-right: 4px;
+}
+
+.hud-chat-msg-text {
+    color: var(--c-text, #4a3520);
+}
+
+.hud-chat-msg-time {
+    font-size: 0.62rem;
+    color: var(--c-muted, #8b6f47);
+    margin-left: 4px;
+    font-family: monospace;
+}
+
+.hud-chat-input-row {
+    flex-shrink: 0;
+    display: flex;
+    gap: 6px;
+    padding: 7px 8px;
+    border-top: 1px solid var(--c-border, rgba(139,90,43,0.35));
+    background: var(--c-panel2, #ede0c4);
+}
+
+.hud-chat-input {
+    flex: 1;
+    background: #fdf6e8;
+    border: 1px solid var(--c-border, rgba(139,90,43,0.35));
+    border-radius: 5px;
+    color: var(--c-text, #4a3520);
+    font-size: 0.78rem;
+    padding: 5px 8px;
+    outline: none;
+    transition: border-color 0.15s;
+    font-family: inherit;
+    min-width: 0;
+}
+
+.hud-chat-input:focus { border-color: var(--c-gold, #c08858); }
+.hud-chat-input::placeholder { color: var(--c-muted, #8b6f47); font-size: 0.72rem; }
+
+.hud-chat-send-btn {
+    flex-shrink: 0;
+    background: linear-gradient(180deg, #c9925a, #9a6535);
+    border: none;
+    border-bottom: 2px solid #6b4120;
+    border-radius: 5px;
+    color: #fff8ec;
+    font-size: 0.68rem;
+    font-weight: 800;
+    padding: 4px 10px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: filter 0.15s;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.hud-chat-send-btn:hover { filter: brightness(1.1); }
+.hud-chat-send-btn:disabled { filter: grayscale(0.5) opacity(0.6); cursor: not-allowed; }
+
+@media (max-width: 480px) {
+    #hud-chat-widget { display: none; }
+}
+</style>
+
+<div id="hud-chat-widget">
+    <div id="hud-chat-header" onclick="hudChatToggle()">
+        <span id="hud-chat-header-title">&#x1F4AC; Chat</span>
+        <span id="hud-chat-chevron">&#x25B2;</span>
+    </div>
+    <div id="hud-chat-body">
+        <div class="hud-chat-tabs">
+            <button class="hud-chat-tab-btn hud-chat-tab-active" id="hud-chat-tab-world" onclick="hudChatSwitchTab('world')">&#x1F30D; Welt</button>
+            <?php if ($_hud_in_alliance): ?>
+            <button class="hud-chat-tab-btn" id="hud-chat-tab-alliance" onclick="hudChatSwitchTab('alliance')">&#x2694; Allianz</button>
+            <?php endif ?>
+        </div>
+        <div class="hud-chat-messages" id="hud-chat-msgs"></div>
+        <div class="hud-chat-input-row">
+            <input type="text" class="hud-chat-input" id="hud-chat-input" placeholder="Nachricht..." maxlength="200"
+                   onkeydown="if(event.key==='Enter')hudChatSend()">
+            <button class="hud-chat-send-btn" id="hud-chat-send" onclick="hudChatSend()">Senden</button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+'use strict';
+
+const HUD_CHAT_CSRF      = <?= json_encode((string) ($session['csrf_token'] ?? '')) ?>;
+const HUD_IN_ALLIANCE    = <?= $_hud_in_alliance ? 'true' : 'false' ?>;
+
+let hudChatOpen    = true;
+let hudChatTab     = 'world';
+let hudChatLastId  = 0;
+let hudChatAliLastId = 0;
+let hudChatPollTimer = null;
+let hudChatSending = false;
+
+const widgetEl  = document.getElementById('hud-chat-widget');
+const bodyEl    = document.getElementById('hud-chat-body');
+const chevronEl = document.getElementById('hud-chat-chevron');
+const msgsEl    = document.getElementById('hud-chat-msgs');
+const inputEl   = document.getElementById('hud-chat-input');
+const sendBtn   = document.getElementById('hud-chat-send');
+
+// ── Toggle open/closed ─────────────────────────────────────────────────────
+window.hudChatToggle = function () {
+    hudChatOpen = !hudChatOpen;
+    bodyEl.style.display    = hudChatOpen ? 'flex' : 'none';
+    chevronEl.textContent   = hudChatOpen ? '▲' : '▼';
+};
+
+// ── Tab switch ─────────────────────────────────────────────────────────────
+window.hudChatSwitchTab = function (tab) {
+    hudChatTab = tab;
+    document.querySelectorAll('.hud-chat-tab-btn').forEach(function (b) {
+        b.classList.toggle('hud-chat-tab-active', b.id === 'hud-chat-tab-' + tab);
+    });
+    msgsEl.innerHTML = '';
+    hudChatLastId    = 0;
+    hudChatAliLastId = 0;
+    hudChatLoad(false);
+};
+
+// ── Load / poll messages ───────────────────────────────────────────────────
+async function hudChatLoad(poll) {
+    let url;
+    if (hudChatTab === 'world') {
+        const sid = poll && hudChatLastId > 0 ? '?since_id=' + hudChatLastId : '';
+        url = '/api/chat/world' + sid;
+    } else {
+        const sid = poll && hudChatAliLastId > 0 ? '?since_id=' + hudChatAliLastId : '';
+        url = '/api/chat/alliance' + sid;
+    }
+
+    try {
+        const res  = await fetch(url);
+        const json = await res.json();
+        if (!json.ok) return;
+
+        const msgs = json.data.messages ?? [];
+        if (msgs.length === 0 && poll) return;
+
+        if (!poll) {
+            msgsEl.innerHTML = '';
+        }
+
+        msgs.forEach(function (m) {
+            const tag    = m.alliance_tag ? '[' + hudChatEsc(m.alliance_tag) + '] ' : '';
+            const time   = (m.created_at ?? m.sent_at ?? '').substring(11, 16);
+            const div    = document.createElement('div');
+            div.className = 'hud-chat-msg';
+            div.innerHTML  =
+                '<span class="hud-chat-msg-user">' + tag + hudChatEsc(m.username) + '</span>' +
+                '<span class="hud-chat-msg-text">' + hudChatEsc(m.message) + '</span>' +
+                '<span class="hud-chat-msg-time">' + hudChatEsc(time) + '</span>';
+            msgsEl.appendChild(div);
+        });
+
+        if (msgs.length > 0) {
+            const lastMsg = msgs[msgs.length - 1];
+            if (hudChatTab === 'world') {
+                hudChatLastId = lastMsg.id ?? hudChatLastId;
+            } else {
+                hudChatAliLastId = lastMsg.id ?? hudChatAliLastId;
+            }
+            msgsEl.scrollTop = msgsEl.scrollHeight;
+        }
+    } catch { /* silent on poll */ }
+}
+
+// ── Send message ───────────────────────────────────────────────────────────
+window.hudChatSend = async function () {
+    const msg = (inputEl.value ?? '').trim();
+    if (!msg || hudChatSending) return;
+
+    hudChatSending  = true;
+    sendBtn.disabled = true;
+
+    const url = hudChatTab === 'world' ? '/api/chat/world' : '/api/chat/alliance';
+
+    try {
+        const res  = await fetch(url, {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': HUD_CHAT_CSRF },
+            body:    JSON.stringify({ message: msg }),
+        });
+        const json = await res.json();
+        if (json.ok) {
+            inputEl.value = '';
+            await hudChatLoad(true);
+        }
+        // Silently ignore cooldown / errors in HUD chat
+    } catch { /* silent */ }
+
+    hudChatSending   = false;
+    sendBtn.disabled = false;
+};
+
+// ── Auto-poll ──────────────────────────────────────────────────────────────
+function hudChatStartPoll() {
+    if (hudChatPollTimer) clearInterval(hudChatPollTimer);
+    hudChatPollTimer = setInterval(function () {
+        if (hudChatOpen) hudChatLoad(true);
+    }, 8000);
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────
+hudChatLoad(false);
+hudChatStartPoll();
+
+function hudChatEsc(str) {
+    return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+})();
+</script>
+
 <!-- ── MESSAGES MODAL ─────────────────────────────────────────────────────── -->
 <div id="hud-messages-modal" class="hud-modal" style="display:none">
     <div class="hud-modal-inner">

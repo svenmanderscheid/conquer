@@ -634,6 +634,106 @@ $csrf = $session['csrf_token'];
             <button class="tab-btn" :class="tab==='info' && 'tab-active'" @click="tab='info'">Info</button>
             <button class="tab-btn" :class="tab==='members' && 'tab-active'" @click="tab='members'; loadMembers()">Mitglieder</button>
             <button class="tab-btn" :class="tab==='chat' && 'tab-active'" @click="tab='chat'; startChat()">Chat</button>
+            <button class="tab-btn" :class="tab==='research' && 'tab-active'" @click="tab='research'; loadResearch()">&#x1F52C; Forschung</button>
+            <button class="tab-btn" :class="tab==='rallies' && 'tab-active'" @click="tab='rallies'; loadRallies()">&#x2694; Rallies</button>
+        </div>
+
+        <!-- ── Research tab ── -->
+        <div class="card-body" x-show="tab === 'research'" style="padding-bottom:8px">
+
+            <!-- Active queue banner -->
+            <template x-if="researchActiveCode">
+                <div style="background:var(--c-panel3,#e8d8b0);border:1px solid var(--c-gold,#c08858);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:.8rem;display:flex;align-items:center;gap:10px">
+                    <span style="font-size:1.1rem">&#x231B;</span>
+                    <div>
+                        <strong style="color:var(--c-wood-dark,#8b5a2b)" x-text="researchNodeName(researchActiveCode)"></strong>
+                        wird erforscht
+                        <span style="color:var(--c-muted,#8b6f47)">— fertig: <span x-text="fmtDate(researchFinishesAt)"></span></span>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Node cards per tree -->
+            <template x-for="tree in ['battle','production','special']" :key="tree">
+                <div style="margin-bottom:16px">
+                    <div style="font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--c-wood-dark,#8b5a2b);margin-bottom:8px" x-text="treeLabel(tree)"></div>
+                    <template x-for="node in researchNodesForTree(tree)" :key="node.code">
+                        <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;border:1px solid var(--c-border,rgba(139,90,43,.35));background:var(--c-panel2,#ede0c4);margin-bottom:6px">
+                            <!-- Level pips -->
+                            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;min-width:36px">
+                                <span style="font-size:0.65rem;font-weight:800;color:var(--c-muted,#8b6f47);text-transform:uppercase">Level</span>
+                                <span style="font-size:1rem;font-weight:900;color:var(--c-wood-dark,#8b5a2b)" x-text="node.level + '/10'"></span>
+                            </div>
+
+                            <!-- Info -->
+                            <div style="flex:1;min-width:0">
+                                <div style="font-size:.82rem;font-weight:800;color:var(--c-text,#4a3520)" x-text="node.name"></div>
+                                <div style="font-size:.7rem;color:var(--c-muted,#8b6f47)" x-text="bonusText(node)"></div>
+                                <template x-if="node.cost_next">
+                                    <div style="font-size:.68rem;color:var(--c-muted,#8b6f47);margin-top:2px">
+                                        Kosten: &#x1FAB5; <span x-text="node.cost_next.lumber"></span>
+                                        / &#x1FAA8; <span x-text="node.cost_next.stone"></span>
+                                        / &#x1FA99; <span x-text="node.cost_next.gold"></span>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <!-- Action -->
+                            <div style="flex-shrink:0">
+                                <template x-if="node.level >= 10">
+                                    <span style="font-size:.7rem;font-weight:700;color:var(--c-success,#7fb069)">&#x2714; Max</span>
+                                </template>
+                                <template x-if="node.in_queue">
+                                    <span style="font-size:.7rem;color:var(--c-muted,#8b6f47)">&#x231B; Aktiv</span>
+                                </template>
+                                <template x-if="node.level < 10 && !node.in_queue && canStartResearch">
+                                    <button
+                                        class="btn-game btn-game-blue btn-game-sm"
+                                        :disabled="researchStarting || researchActiveCode !== null"
+                                        @click="startResearch(node.code)"
+                                        x-text="researchStarting ? 'Starte...' : ('→ L' + (node.level + 1))"
+                                    ></button>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </template>
+
+            <template x-if="researchNodes.length === 0">
+                <div style="color:var(--c-muted,#8b6f47);font-size:.82rem;text-align:center;padding:20px 0">Lade Forschungs-Daten...</div>
+            </template>
+        </div>
+
+        <!-- ── Rallies tab ── -->
+        <div class="card-body" x-show="tab === 'rallies'">
+
+            <template x-if="ralliesLoading">
+                <div style="color:var(--c-muted,#8b6f47);font-size:.82rem;text-align:center;padding:16px 0">Lade Rallies...</div>
+            </template>
+
+            <template x-if="!ralliesLoading && ralliesList.length === 0">
+                <div style="color:var(--c-muted,#8b6f47);font-size:.82rem;text-align:center;padding:20px 0">Keine aktiven Rallies.</div>
+            </template>
+
+            <template x-for="r in ralliesList" :key="r.id">
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;border:1px solid var(--c-border,rgba(139,90,43,.35));background:var(--c-panel2,#ede0c4);margin-bottom:8px;font-size:.82rem">
+                    <div style="flex:1;min-width:0">
+                        <div style="font-weight:800;color:var(--c-wood-dark,#8b5a2b)">&#x2694; Rally</div>
+                        <div style="font-size:.74rem;color:var(--c-muted,#8b6f47)">
+                            Starter: <span x-text="r.starter_name ?? 'Unbekannt'"></span>
+                            &bull; Ziel: (<span x-text="r.target_x"></span>, <span x-text="r.target_y"></span>)
+                            &bull; <span x-text="(r.participant_count ?? 0)"></span> Teilnehmer
+                        </div>
+                        <div style="font-size:.68rem;color:var(--c-muted,#8b6f47);margin-top:2px">
+                            Start: <span x-text="fmtRallyDate(r.launches_at)"></span>
+                        </div>
+                    </div>
+                    <a :href="'/map?rally=' + r.id" class="btn-game btn-game-blue btn-game-sm">
+                        Karte
+                    </a>
+                </div>
+            </template>
         </div>
 
         <!-- ── Info tab ── -->
@@ -641,11 +741,11 @@ $csrf = $session['csrf_token'];
             <p style="font-size:.85rem;color:var(--c-text,#4a3520);line-height:1.6">
                 Willkommen in der Allianz
                 <strong style="color:var(--c-wood-dark,#8b5a2b)"><?= htmlspecialchars((string)$myAlliance['name']) ?></strong>.
-                Nutze den Chat-Tab um mit deinen Mitstreitern zu kommunizieren, und den Mitglieder-Tab
-                um die Zusammensetzung deiner Allianz zu sehen.
+                Nutze den Chat-Tab um mit deinen Mitstreitern zu kommunizieren, den Mitglieder-Tab
+                um die Zusammensetzung deiner Allianz zu sehen, und den Forschungs-Tab um Allianz-Buffs freizuschalten.
             </p>
             <p style="font-size:.75rem;color:var(--c-muted,#8b6f47);margin-top:10px">
-                Weitere Allianz-Features (Territorien, Alliance-Buffs, War-Declare) folgen in späteren Sprints.
+                Weitere Allianz-Features (Territorien, War-Declare) folgen in späteren Sprints.
             </p>
         </div>
 
@@ -841,16 +941,23 @@ function allianceBrowse() {
 // ---------------------------------------------------------------------------
 function allianceMember() {
     return {
-        tab:          'info',
-        memberList:   [],
-        membersLoading: false,
-        messages:     [],
-        lastMsgId:    0,
-        chatInput:    '',
-        sending:      false,
-        pollTimer:    null,
-        confirmLeave: false,
-        leaving:      false,
+        tab:                'info',
+        memberList:         [],
+        membersLoading:     false,
+        messages:           [],
+        lastMsgId:          0,
+        chatInput:          '',
+        sending:            false,
+        pollTimer:          null,
+        confirmLeave:       false,
+        leaving:            false,
+        researchNodes:      [],
+        researchActiveCode: null,
+        researchFinishesAt: null,
+        researchStarting:   false,
+        canStartResearch:   <?= json_encode(in_array($myMember['role'], ['leader', 'vice_leader', 'officer'])) ?>,
+        ralliesList:        [],
+        ralliesLoading:     false,
 
         async init() {
             // nothing on load — tabs trigger their own loads
@@ -937,6 +1044,95 @@ function allianceMember() {
                 alToast('Netzwerkfehler', 'err');
             } finally {
                 this.sending = false;
+            }
+        },
+
+        async loadRallies() {
+            this.ralliesLoading = true;
+            try {
+                const res  = await fetch('/api/rally/list');
+                const json = await res.json();
+                if (json.ok) this.ralliesList = json.data.rallies ?? [];
+            } catch (e) {
+                alToast('Rallies konnten nicht geladen werden.', 'err');
+            } finally {
+                this.ralliesLoading = false;
+            }
+        },
+
+        fmtRallyDate(dt) {
+            if (!dt) return '—';
+            try {
+                return new Date(dt.replace(' ', 'T') + 'Z').toLocaleString('de-DE', {
+                    hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit',
+                });
+            } catch { return dt; }
+        },
+
+        async loadResearch() {
+            if (this.researchNodes.length > 0) return;
+            try {
+                const res  = await fetch('/api/alliance/research/state');
+                const json = await res.json();
+                if (!json.ok) return;
+                const nodes = Object.values(json.data.nodes);
+                this.researchNodes      = nodes;
+                this.researchActiveCode = json.data.active_code  ?? null;
+                this.researchFinishesAt = json.data.finishes_at  ?? null;
+            } catch (e) {
+                alToast('Forschungs-Daten konnten nicht geladen werden.', 'err');
+            }
+        },
+
+        researchNodesForTree(tree) {
+            return this.researchNodes.filter(n => n.tree === tree);
+        },
+
+        researchNodeName(code) {
+            const node = this.researchNodes.find(n => n.code === code);
+            return node ? node.name : code;
+        },
+
+        treeLabel(tree) {
+            const labels = { battle: '⚔ Kampf', production: '🌾 Produktion', special: '✨ Spezial' };
+            return labels[tree] ?? tree;
+        },
+
+        bonusText(node) {
+            const total = node.level * (node.bonus_per_level ?? 0);
+            let label = (node.bonus_label ?? '').replace('{n}', total.toFixed(total % 1 === 0 ? 0 : 1));
+            if (node.level > 0) return label + ' (Stufe ' + node.level + ')';
+            return node.description ?? '';
+        },
+
+        fmtDate(dt) {
+            if (!dt) return '—';
+            return new Date(dt.replace(' ', 'T') + 'Z').toLocaleString('de-DE', {
+                hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit',
+            });
+        },
+
+        async startResearch(code) {
+            if (this.researchStarting || this.researchActiveCode !== null) return;
+            this.researchStarting = true;
+            try {
+                const res  = await fetch('/api/alliance/research/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': CSRF },
+                    body: JSON.stringify({ research_code: code }),
+                });
+                const json = await res.json();
+                if (json.ok) {
+                    alToast('Forschung gestartet!', 'ok');
+                    this.researchNodes = []; // force reload
+                    await this.loadResearch();
+                } else {
+                    alToast(json.error?.message ?? json.error?.code ?? 'Fehler', 'err');
+                }
+            } catch (e) {
+                alToast('Netzwerkfehler', 'err');
+            } finally {
+                this.researchStarting = false;
             }
         },
 

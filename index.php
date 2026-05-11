@@ -108,7 +108,10 @@ if (str_starts_with($path, '/api/')) {
     $router->post('/api/march/dispatch-player',  [\Conquer\Api\Handlers\MarchHandler::class, 'dispatchPlayer']);
     $router->post('/api/march/dispatch-scout',   [\Conquer\Api\Handlers\MarchHandler::class, 'dispatchScout']);
     $router->post('/api/march/dispatch-gather',  fn() => \Conquer\Api\Handlers\MarchHandler::dispatchGather($session));
-    $router->post('/api/march/recall',           fn() => \Conquer\Api\Handlers\MarchHandler::recall($session));
+    $router->post('/api/march/recall',            fn() => \Conquer\Api\Handlers\MarchHandler::recall($session));
+    $router->post('/api/march/reinforce',         fn() => \Conquer\Api\Handlers\MarchHandler::dispatchReinforce($session));
+    $router->post('/api/march/recall-reinforce',  fn() => \Conquer\Api\Handlers\MarchHandler::recallReinforcement($session));
+    $router->get('/api/march/reinforcements',     fn() => \Conquer\Api\Handlers\MarchHandler::listReinforcements($session));
     $router->get('/api/march/list',              [\Conquer\Api\Handlers\MarchHandler::class, 'list']);
     $router->get('/api/map/marches',             [\Conquer\Api\Handlers\MarchHandler::class, 'listAll']);
 
@@ -148,9 +151,20 @@ if (str_starts_with($path, '/api/')) {
     $router->post('/api/alliance/diplomacy',     fn() => \Conquer\Api\Handlers\AllianceHandler::setDiplomacy($session));
     $router->delete('/api/alliance/diplomacy/:id', fn($p) => \Conquer\Api\Handlers\AllianceHandler::removeDiplomacy($session, (int) $p['id']));
 
-    // World Chat
+    // Alliance Research
+    $router->get('/api/alliance/research/data',  fn() => \Conquer\Api\Handlers\AllianceHandler::researchData($session));
+    $router->get('/api/alliance/research/state', fn() => \Conquer\Api\Handlers\AllianceHandler::researchState($session));
+    $router->post('/api/alliance/research/start', fn() => \Conquer\Api\Handlers\AllianceHandler::researchStart($session));
+
+    // World Chat (legacy routes — kept for backward compat)
     $router->get('/api/world-chat',              fn() => \Conquer\Api\Handlers\AllianceHandler::worldChat($session));
     $router->post('/api/world-chat/send',        fn() => \Conquer\Api\Handlers\AllianceHandler::sendWorldChat($session));
+
+    // Chat (new unified routes used by HUD chat widget)
+    $router->get('/api/chat/world',     fn() => \Conquer\Api\Handlers\ChatHandler::worldChat($session));
+    $router->post('/api/chat/world',    fn() => \Conquer\Api\Handlers\ChatHandler::sendWorldChat($session));
+    $router->get('/api/chat/alliance',  fn() => \Conquer\Api\Handlers\ChatHandler::allianceChat($session));
+    $router->post('/api/chat/alliance', fn() => \Conquer\Api\Handlers\ChatHandler::sendAllianceChat($session));
 
     // Player
     $router->get('/api/player/me',                    [\Conquer\Api\Handlers\PlayerHandler::class, 'me']);

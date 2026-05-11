@@ -534,6 +534,106 @@ final class MarchDispatcher
     }
 
     /**
+     * Dispatch a reinforcement march (march_type = 10 = MARCH_SUPPORT).
+     * Troops travel to a friendly city. On arrival the march_tick inserts
+     * them into the reinforcements table and deducts from origin city.
+     *
+     * @param array<int,int> $selectedTroops  troop_code → count
+     * @throws \RuntimeException on slot full or validation failure
+     */
+    public static function dispatchReinforce(
+        int   $playerId,
+        int   $cityId,
+        int   $originX,
+        int   $originY,
+        int   $targetX,
+        int   $targetY,
+        int   $targetCityId,
+        int   $targetPlayerId,
+        array $selectedTroops,
+    ): int {
+        self::assertSlotAvailable($playerId);
+
+        if (empty($selectedTroops)) {
+            throw new \RuntimeException('Mindestens eine Truppenart muss ausgewählt werden.');
+        }
+
+        $db         = Connection::getInstance();
+        $total      = 0;
+        $cleanTroops = [];
+
+        foreach ($selectedTroops as $code => $count) {
+            $count = (int) $count;
+            if ($count <= 0) continue;
+            if (TroopData::get((int) $code) === null) {
+                throw new \RuntimeException('Unbekannter Truppen-Code: ' . $code);
+            }
+            $cleanTroops[(int) $code] = $count;
+            $total += $count;
+        }
+
+        if ($total <= 0) {
+            throw new \RuntimeException('Mindestens 1 Truppe muss ausgewählt werden.');
+        }
+        if ($total > self::MAX_CAP) {
+            throw new \RuntimeException('Maximal ' . number_format(self::MAX_CAP) . ' Truppen pro Marsch.');
+        }
+
+        // Calculate speed based on slowest troop
+        $minSpeed = PHP_INT_MAX;
+        foreach ($cleanTroops as $code => $_) {
+            $def   = TroopData::get($code);
+            $speed = (int) ($def['speed'] ?? 65);
+            if ($speed < $minSpeed) $minSpeed = $speed;
+        }
+
+        $distance   = sqrt(($targetX - $originX) ** 2 + ($targetY - $originY) ** 2);
+        $marchSecs  = max(5, (int) floor($distance * 100 / $minSpeed));
+        $troopsJson = json_encode($cleanTroops);
+
+        $marchId = 0;
+        $db->transaction(function () use (
+            $db, $playerId, $cityId, $targetX, $targetY, $targetCityId, $targetPlayerId,
+            $cleanTroops, $troopsJson, $marchSecs, &$marchId,
+        ): void {
+            // Deduct troops from sender city
+            foreach ($cleanTroops as $code => $count) {
+                $db->execute(
+                    'UPDATE city_troops SET count = GREATEST(0, count - ?) WHERE city_id = ? AND troop_code = ?',
+                    [$count, $cityId, $code],
+                );
+            }
+
+            // Insert march — target_id = target city id
+            $db->execute(
+                'INSERT INTO marches
+                    (player_id, world_id, march_type, origin_city_id,
+                     target_x, target_y, target_type, target_id,
+                     troops_json, departure_time, arrival_time, state)
+                 VALUES (:pid, 1, :type, :city,
+                     :tx, :ty, 2, :tcid,
+                     :troops, UTC_TIMESTAMP(),
+                     DATE_ADD(UTC_TIMESTAMP(), INTERVAL :dur SECOND),
+                     "marching")',
+                [
+                    ':pid'   => $playerId,
+                    ':type'  => self::MARCH_SUPPORT,
+                    ':city'  => $cityId,
+                    ':tx'    => $targetX,
+                    ':ty'    => $targetY,
+                    ':tcid'  => $targetCityId,
+                    ':troops'=> $troopsJson,
+                    ':dur'   => $marchSecs,
+                ],
+            );
+
+            $marchId = (int) $db->lastInsertId();
+        });
+
+        return $marchId;
+    }
+
+    /**
      * Returns all active marches for a player (for the map overlay + city UI).
      *
      * @return list<array<string,mixed>>

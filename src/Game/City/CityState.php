@@ -6,6 +6,7 @@ namespace Conquer\Game\City;
 use Conquer\Db\Connection;
 use Conquer\Game\City\TroopTrainer;
 use Conquer\Game\Vip\VipService;
+use Conquer\Game\Alliance\AllianceResearchService;
 
 /**
  * Loads a player's city snapshot from the database.
@@ -95,6 +96,28 @@ final class CityState
         // Load VIP status — used for production and build-time bonuses.
         $vip        = VipService::status($playerId);
         $vipBonuses = $vip['bonuses'];
+
+        // Load Alliance Research production bonuses (if player is in an alliance).
+        $allianceResearchBonuses = ['food_pct' => 0.0, 'lumber_pct' => 0.0, 'stone_pct' => 0.0, 'gold_pct' => 0.0];
+        try {
+            $memberRow = $db->query(
+                'SELECT alliance_id FROM alliance_members WHERE player_id = ?',
+                [$playerId],
+            )->fetch();
+            if ($memberRow !== false) {
+                $allianceResearchBonuses = AllianceResearchService::getProductionBonuses((int) $memberRow['alliance_id']);
+            }
+        } catch (\Throwable) {
+            // Non-fatal — no alliance bonuses applied
+        }
+
+        // Merge alliance research bonuses into vipBonuses for ResourceTick
+        if (!empty($allianceResearchBonuses)) {
+            $vipBonuses['food_prod_pct']   = ($vipBonuses['food_prod_pct']   ?? 0.0) + $allianceResearchBonuses['food_pct'];
+            $vipBonuses['lumber_prod_pct'] = ($vipBonuses['lumber_prod_pct'] ?? 0.0) + $allianceResearchBonuses['lumber_pct'];
+            $vipBonuses['stone_prod_pct']  = ($vipBonuses['stone_prod_pct']  ?? 0.0) + $allianceResearchBonuses['stone_pct'];
+            $vipBonuses['gold_prod_pct']   = ($vipBonuses['gold_prod_pct']   ?? 0.0) + $allianceResearchBonuses['gold_pct'];
+        }
 
         // Apply lazy resource production (no DB write on read).
         $city = ResourceTick::apply($city, $buildings, 1.0, $vipBonuses);
