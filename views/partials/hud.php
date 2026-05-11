@@ -120,9 +120,9 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
     top: 0; left: 0; right: 0;
     height: 52px;
     z-index: 9000;
-    background: linear-gradient(180deg, #1a0d00 0%, #0f0700 100%);
-    border-bottom: 1px solid #b8860b;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    background: var(--c-panel2);
+    border-bottom: 2px solid var(--c-border);
+    box-shadow: 0 2px 8px var(--c-shadow);
 }
 
 #hud-top-inner {
@@ -146,8 +146,8 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
     width: 36px;
     height: 36px;
     border-radius: 6px;
-    background: linear-gradient(135deg, #7c1e0e, #4a0d05);
-    border: 2px solid #d4a017;
+    background: linear-gradient(135deg, var(--c-gold), var(--c-wood-dark));
+    border: 2px solid var(--c-gold);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -165,7 +165,7 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
 .hud-username {
     font-size: 0.75rem;
     font-weight: 700;
-    color: #f0d080;
+    color: var(--c-text);
     white-space: nowrap;
     max-width: 90px;
     overflow: hidden;
@@ -174,16 +174,16 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
 
 .hud-power {
     font-size: 0.62rem;
-    color: #94a3b8;
+    color: var(--c-muted);
     white-space: nowrap;
 }
 
 .hud-vip {
     font-size: 0.62rem;
     font-weight: 700;
-    color: #fbbf24;
-    background: rgba(251,191,36,0.1);
-    border: 1px solid rgba(251,191,36,0.3);
+    color: var(--c-wood-dark);
+    background: #e8d0a8;
+    border: 1px solid var(--c-border);
     border-radius: 4px;
     padding: 2px 5px;
     white-space: nowrap;
@@ -192,10 +192,10 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
 }
 
 .hud-charm-btn {
-    background: rgba(139,92,246,0.15);
-    border: 1px solid rgba(139,92,246,0.4);
+    background: rgba(139,90,43,0.12);
+    border: 1px solid var(--c-border);
     border-radius: 5px;
-    color: #c4b5fd;
+    color: var(--c-wood-dark);
     font-size: 0.68rem;
     font-weight: 700;
     padding: 3px 7px;
@@ -207,7 +207,7 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
 }
 
 .hud-charm-btn:hover {
-    background: rgba(139,92,246,0.3);
+    background: rgba(139,90,43,0.22);
 }
 
 .hud-logout {
@@ -217,10 +217,10 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
 }
 
 .hud-logout-btn {
-    background: rgba(239,68,68,0.1);
-    border: 1px solid rgba(239,68,68,0.3);
+    background: rgba(192,96,77,0.1);
+    border: 1px solid rgba(192,96,77,0.35);
     border-radius: 5px;
-    color: #f87171;
+    color: var(--c-danger);
     font-size: 0.75rem;
     padding: 3px 7px;
     cursor: pointer;
@@ -229,13 +229,13 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
 }
 
 .hud-logout-btn:hover {
-    background: rgba(239,68,68,0.25);
+    background: rgba(192,96,77,0.22);
 }
 
 .hud-sep {
     width: 1px;
     height: 28px;
-    background: rgba(184,134,11,0.25);
+    background: var(--c-border);
     flex-shrink: 0;
     margin: 0 2px;
 }
@@ -264,7 +264,7 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
     gap: 3px;
     font-size: 0.7rem;
     font-weight: 600;
-    color: #f0d080;
+    color: var(--c-muted);
     white-space: nowrap;
     flex-shrink: 0;
 }
@@ -275,12 +275,12 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
 }
 
 .hud-res-val {
-    color: #ffd700;
+    color: var(--c-text);
     font-variant-numeric: tabular-nums;
 }
 
 .hud-gems .hud-res-val {
-    color: #c4b5fd;
+    color: var(--c-wood-dark);
 }
 
 /* ── CHARM POPUP ─────────────────────────────────────────────────────────── */
@@ -289,11 +289,11 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
     top: 60px;
     left: 8px;
     width: 240px;
-    background: linear-gradient(180deg, #1a0d00 0%, #0f0700 100%);
-    border: 1px solid #8b5cf6;
-    border-radius: 8px;
+    background: var(--c-panel);
+    border: 1px solid var(--c-border);
+    border-radius: 10px;
     z-index: 9100;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.7);
+    box-shadow: 0 4px 20px var(--c-shadow);
     overflow: hidden;
 }
 
@@ -302,15 +302,15 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: #8b5cf6;
+    color: var(--c-wood-dark);
     padding: 8px 12px 6px;
-    border-bottom: 1px solid rgba(139,92,246,0.3);
+    border-bottom: 1px solid var(--c-border);
 }
 
 .hud-charm-empty {
     padding: 12px;
     font-size: 0.75rem;
-    color: #64748b;
+    color: var(--c-muted);
     text-align: center;
 }
 
@@ -319,7 +319,7 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
     align-items: center;
     gap: 8px;
     padding: 7px 12px;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    border-bottom: 1px solid var(--c-border);
 }
 
 .hud-charm-item:last-child {
@@ -341,7 +341,7 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
 .hud-charm-name {
     font-size: 0.7rem;
     font-weight: 600;
-    color: #e2e8f0;
+    color: var(--c-text);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -349,14 +349,14 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
 
 .hud-charm-meta {
     font-size: 0.62rem;
-    color: #64748b;
+    color: var(--c-muted);
 }
 
 .hud-charm-timer {
     font-size: 0.62rem;
     font-family: monospace;
     font-weight: 700;
-    color: #94a3b8;
+    color: var(--c-muted);
     white-space: nowrap;
     flex-shrink: 0;
 }
@@ -391,27 +391,27 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
     width: 58px;
     height: 58px;
     padding: 6px 4px;
-    background: rgba(15,7,0,0.9);
-    border: 1px solid rgba(184,134,11,0.35);
+    background: linear-gradient(180deg, #c9925a, #9a6535);
+    border: none;
+    border-bottom: 3px solid #6b4120;
     border-radius: 10px;
-    color: #f0d080;
+    color: #fff8ec;
     font-size: 0.58rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
     cursor: pointer;
     text-decoration: none;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.6);
-    transition: border-color 0.15s, background 0.15s;
+    box-shadow: 0 2px 10px var(--c-shadow);
+    transition: filter 0.15s, background 0.15s;
     position: relative;
     -webkit-tap-highlight-color: transparent;
 }
 
 .hud-nav-btn:hover {
-    border-color: #d4a017;
-    background: rgba(30,15,0,0.95);
+    filter: brightness(1.1);
     text-decoration: none;
-    color: #ffd700;
+    color: #fff8ec;
 }
 
 .hud-nav-btn .hud-nav-icon {
@@ -420,12 +420,12 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
 }
 
 .hud-nav-primary {
-    border-color: rgba(245,158,11,0.6);
-    background: rgba(30,15,0,0.95);
+    background: linear-gradient(180deg, #d4a070, #a06830);
+    border-bottom: 3px solid #6b4120;
 }
 
 .hud-nav-primary:hover {
-    border-color: #f59e0b;
+    filter: brightness(1.1);
 }
 
 .hud-nav-badge {
@@ -448,7 +448,7 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
     position: fixed;
     inset: 0;
     z-index: 9500;
-    background: rgba(0,0,0,0.75);
+    background: rgba(74,53,32,0.6);
     display: flex;
     align-items: stretch;
     justify-content: center;
@@ -457,7 +457,7 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
 .hud-modal-inner {
     width: 100%;
     max-width: 1280px;
-    background: #0a0e1a;
+    background: var(--c-panel);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -466,8 +466,8 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
 .hud-modal-topbar {
     flex-shrink: 0;
     height: 48px;
-    background: linear-gradient(180deg, #1a0d00 0%, #0f0700 100%);
-    border-bottom: 1px solid #b8860b;
+    background: var(--c-panel3);
+    border-bottom: 1px solid var(--c-border);
     display: flex;
     align-items: center;
     padding: 0 12px;
@@ -478,14 +478,14 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
     flex: 1;
     font-size: 0.85rem;
     font-weight: 700;
-    color: #f0d080;
+    color: var(--c-wood-dark);
 }
 
 .hud-modal-close {
-    background: rgba(239,68,68,0.12);
-    border: 1px solid rgba(239,68,68,0.3);
+    background: rgba(192,96,77,0.12);
+    border: 1px solid rgba(192,96,77,0.35);
     border-radius: 5px;
-    color: #f87171;
+    color: var(--c-danger);
     font-size: 0.9rem;
     padding: 3px 10px;
     cursor: pointer;
@@ -494,15 +494,15 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
 }
 
 .hud-modal-close:hover {
-    background: rgba(239,68,68,0.25);
+    background: rgba(192,96,77,0.25);
 }
 
 /* Modal tab bar */
 .hud-tab-bar {
     flex-shrink: 0;
     display: flex;
-    background: #0f0700;
-    border-bottom: 1px solid rgba(184,134,11,0.3);
+    background: var(--c-panel2);
+    border-bottom: 1px solid var(--c-border);
     overflow-x: auto;
     scrollbar-width: none;
 }
@@ -515,7 +515,7 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #64748b;
+    color: var(--c-muted);
     background: none;
     border: none;
     border-bottom: 2px solid transparent;
@@ -526,12 +526,12 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
 }
 
 .hud-tab-btn:hover {
-    color: #94a3b8;
+    color: var(--c-text);
 }
 
 .hud-tab-btn.hud-tab-active {
-    color: #f0d080;
-    border-bottom-color: #d4a017;
+    color: var(--c-wood-dark);
+    border-bottom-color: var(--c-gold);
 }
 
 .hud-tab-content {
@@ -553,7 +553,7 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
     justify-content: center;
     flex-direction: column;
     gap: 8px;
-    color: #334155;
+    color: var(--c-muted);
     font-size: 0.85rem;
     font-style: italic;
 }
@@ -569,8 +569,8 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
     width: 260px;
     flex-shrink: 0;
     overflow-y: auto;
-    border-right: 1px solid #1e293b;
-    background: #070d1a;
+    border-right: 1px solid var(--c-border);
+    background: var(--c-panel2);
 }
 
 .hud-report-item {
@@ -578,18 +578,18 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
     align-items: center;
     gap: 8px;
     padding: 10px 12px;
-    border-bottom: 1px solid #0f172a;
+    border-bottom: 1px solid var(--c-border);
     cursor: pointer;
     transition: background 0.1s;
 }
 
 .hud-report-item:hover {
-    background: rgba(255,255,255,0.04);
+    background: rgba(139,90,43,0.08);
 }
 
 .hud-report-item.hud-report-active {
-    background: rgba(245,158,11,0.08);
-    border-left: 2px solid #f59e0b;
+    background: rgba(139,90,43,0.14);
+    border-left: 2px solid var(--c-gold);
     padding-left: 10px;
 }
 
@@ -601,7 +601,7 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
 .hud-report-name {
     font-size: 0.75rem;
     font-weight: 600;
-    color: #e2e8f0;
+    color: var(--c-text);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -609,14 +609,14 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
 
 .hud-report-date {
     font-size: 0.62rem;
-    color: #475569;
+    color: var(--c-muted);
     white-space: nowrap;
 }
 
 .hud-report-list-empty {
     padding: 20px 12px;
     font-size: 0.75rem;
-    color: #334155;
+    color: var(--c-muted);
     text-align: center;
     font-style: italic;
 }
@@ -624,7 +624,7 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
 .hud-report-detail-panel {
     flex: 1;
     overflow: hidden;
-    background: #0a0e1a;
+    background: var(--c-panel);
     display: flex;
     flex-direction: column;
 }
@@ -634,7 +634,7 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
     align-items: center;
     justify-content: center;
     height: 100%;
-    color: #334155;
+    color: var(--c-muted);
     font-size: 0.82rem;
     font-style: italic;
 }
@@ -645,8 +645,8 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
     grid-template-columns: 1fr auto 1fr;
     gap: 0.75rem;
     padding: 1rem;
-    background: linear-gradient(180deg, #0d1e3a 0%, #0a0e1a 100%);
-    border-bottom: 1px solid #1e3a5f;
+    background: var(--c-panel2);
+    border-bottom: 1px solid var(--c-border);
     align-items: center;
 }
 
@@ -664,18 +664,18 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
 .hud-vs-name {
     font-size: 0.95rem;
     font-weight: 800;
-    color: #f0c040;
+    color: var(--c-wood-dark);
 }
 
 .hud-vs-name-enemy {
     font-size: 0.95rem;
     font-weight: 800;
-    color: #ef4444;
+    color: var(--c-danger);
 }
 
 .hud-vs-sub {
     font-size: 0.7rem;
-    color: #64748b;
+    color: var(--c-muted);
 }
 
 .hud-vs-center-col {
@@ -690,7 +690,7 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
     font-size: 0.6rem;
     font-weight: 800;
     letter-spacing: 0.1em;
-    color: #475569;
+    color: var(--c-muted);
     text-transform: uppercase;
 }
 
@@ -717,13 +717,13 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
     align-items: center;
     font-size: 0.78rem;
     padding: 6px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-    color: #94a3b8;
+    border-bottom: 1px solid var(--c-border);
+    color: var(--c-muted);
 }
 
 .hud-report-stat-row span:last-child {
     font-weight: 700;
-    color: #e2e8f0;
+    color: var(--c-text);
 }
 
 /* Mobile adjustments */
@@ -747,7 +747,7 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
         width: 100%;
         height: 180px;
         border-right: none;
-        border-bottom: 1px solid #1e293b;
+        border-bottom: 1px solid var(--c-border);
     }
 
     .hud-report-vs {

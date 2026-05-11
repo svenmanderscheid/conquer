@@ -109,26 +109,26 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-            --bg:      #080c18;
-            --surface: #0f1729;
-            --surface2: #1a2744;
-            --border:  rgba(184,134,11,0.3);
-            --border2: rgba(212,160,23,0.5);
-            --text:    #e2e8f0;
-            --muted:   #64748b;
-            --gold:    #d4a017;
-            --gold2:   #f0d080;
-            --green:   #22c55e;
-            --red:     #dc2626;
-            --red2:    #ef4444;
-            --blue:    #1a2744;
-            --blue2:   #1d4ed8;
+            --bg:      var(--c-bg, #f0e8d0);
+            --surface: var(--c-panel, #f4e4c1);
+            --surface2: var(--c-panel2, #ede0c4);
+            --border:  var(--c-border, rgba(139,90,43,0.35));
+            --border2: var(--c-gold, #c08858);
+            --text:    var(--c-text, #4a3520);
+            --muted:   var(--c-muted, #8b6f47);
+            --gold:    var(--c-gold, #c08858);
+            --gold2:   var(--c-wood-dark, #8b5a2b);
+            --green:   var(--c-success, #7fb069);
+            --red:     var(--c-danger, #c0604d);
+            --red2:    var(--c-danger, #c0604d);
+            --blue:    var(--c-panel2, #ede0c4);
+            --blue2:   var(--c-info, #5f9ea0);
         }
 
         html, body {
             min-height: 100%;
-            background: var(--bg);
-            color: var(--text);
+            background: var(--c-bg, #f0e8d0);
+            color: var(--c-text, #4a3520);
             font-family: system-ui, -apple-system, sans-serif;
             display: flex;
             justify-content: center;
@@ -146,14 +146,14 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
 
         /* ── Top back bar ── */
         .topbar {
-            background: linear-gradient(180deg, #1a2744 0%, #0f1729 100%);
-            border-bottom: 1px solid var(--border);
+            background: var(--c-panel2, #ede0c4);
+            border-bottom: 1px solid var(--c-border, rgba(139,90,43,0.35));
             padding: 0.5rem 1.25rem;
             display: flex;
             align-items: center;
             gap: 0.75rem;
             flex-wrap: wrap;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            box-shadow: 0 2px 8px var(--c-shadow, rgba(139,90,43,0.18));
         }
         .topbar-back {
             display: inline-flex;
@@ -165,21 +165,21 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.04em;
-            background: linear-gradient(180deg, #1a2744 0%, #0f1729 100%);
-            border: 1px solid var(--border);
-            border-bottom: 2px solid rgba(184,134,11,0.2);
-            color: var(--muted2, #94a3b8);
+            background: linear-gradient(180deg, #c9925a 0%, #9a6535 100%);
+            border: none;
+            border-bottom: 2px solid #6b4120;
+            color: #fff8ec;
             text-decoration: none;
-            transition: filter 0.15s, color 0.15s;
+            transition: filter 0.15s;
         }
-        .topbar-back:hover { filter: brightness(1.15); color: var(--gold2); }
-        .topbar-id { font-size: 0.82rem; color: var(--gold2); font-weight: 700; letter-spacing: 0.04em; }
-        .topbar-date { font-size: 0.75rem; color: var(--muted); margin-left: auto; }
+        .topbar-back:hover { filter: brightness(1.12); color: #fff8ec; }
+        .topbar-id { font-size: 0.82rem; color: var(--c-wood-dark, #8b5a2b); font-weight: 700; letter-spacing: 0.04em; }
+        .topbar-date { font-size: 0.75rem; color: var(--c-muted, #8b6f47); margin-left: auto; }
 
         /* ── VS Header ── */
         .vs-header {
-            background: linear-gradient(180deg, #1a2744 0%, #0d1322 100%);
-            border-bottom: 2px solid var(--border2);
+            background: var(--c-panel2, #ede0c4);
+            border-bottom: 2px solid var(--c-border, rgba(139,90,43,0.35));
             padding: 1.25rem 1.5rem 1rem;
             display: grid;
             grid-template-columns: 1fr auto 1fr;
@@ -193,14 +193,14 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
         .vs-player-name {
             font-size: 1.2rem;
             font-weight: 800;
-            color: var(--gold2);
+            color: var(--c-wood-dark, #8b5a2b);
             letter-spacing: 0.02em;
         }
         .vs-power {
             font-size: 0.82rem;
-            color: var(--muted);
+            color: var(--c-muted, #8b6f47);
         }
-        .vs-power strong { color: var(--text); }
+        .vs-power strong { color: var(--c-text, #4a3520); }
 
         .vs-badge {
             display: inline-flex;
@@ -236,39 +236,40 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
         }
         .vs-coords {
             font-size: 0.7rem;
-            color: var(--muted);
-            background: var(--surface);
+            color: var(--c-muted, #8b6f47);
+            background: var(--c-panel3, #e8d8b0);
             padding: 0.15rem 0.5rem;
             border-radius: 999px;
-            border: 1px solid var(--border);
+            border: 1px solid var(--c-border, rgba(139,90,43,0.35));
         }
 
         .vs-monster-name {
             font-size: 1.2rem;
             font-weight: 800;
-            color: var(--red2);
+            color: var(--c-danger, #c0604d);
             letter-spacing: 0.02em;
         }
 
         /* ── Section header ── */
         .section-header {
-            background: linear-gradient(90deg, rgba(184,134,11,0.18) 0%, rgba(184,134,11,0.04) 60%, transparent 100%);
+            background: var(--c-panel3, #e8d8b0);
             padding: 0.35rem 1.25rem;
             font-size: 0.65rem;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.12em;
-            color: var(--gold2);
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
+            color: var(--c-wood-dark, #8b5a2b);
+            border-left: 3px solid var(--c-gold, #c08858);
+            border-top: 1px solid var(--c-border, rgba(139,90,43,0.35));
+            border-bottom: 1px solid var(--c-border, rgba(139,90,43,0.35));
         }
 
         /* ── Troops Lost comparison ── */
         .troops-lost {
             display: grid;
             grid-template-columns: 1fr 1px 1fr;
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
+            background: var(--c-panel, #f4e4c1);
+            border-bottom: 1px solid var(--c-border, rgba(139,90,43,0.35));
         }
         .troops-lost-col {
             padding: 1rem 1.5rem;
@@ -281,10 +282,10 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            color: var(--gold2);
+            color: var(--c-wood-dark, #8b5a2b);
             margin-bottom: 0.75rem;
             padding-bottom: 0.4rem;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid var(--c-border, rgba(139,90,43,0.35));
         }
         .tl-row {
             display: flex;
@@ -292,7 +293,7 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
             align-items: center;
             padding: 0.3rem 0;
             font-size: 0.82rem;
-            border-bottom: 1px solid rgba(255,255,255,0.03);
+            border-bottom: 1px solid rgba(139,90,43,0.08);
         }
         .tl-row:last-child { border-bottom: none; }
         .tl-label {
@@ -300,13 +301,13 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.06em;
-            color: var(--muted);
+            color: var(--c-muted, #8b6f47);
         }
-        .tl-val { font-weight: 700; font-variant-numeric: tabular-nums; }
-        .tl-val.green { color: var(--green); }
-        .tl-val.red   { color: var(--red2); }
-        .tl-val.gold  { color: var(--gold2); }
-        .tl-val.muted { color: var(--muted); }
+        .tl-val { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--c-text, #4a3520); }
+        .tl-val.green { color: var(--c-success, #7fb069); }
+        .tl-val.red   { color: var(--c-danger, #c0604d); }
+        .tl-val.gold  { color: var(--c-wood-dark, #8b5a2b); }
+        .tl-val.muted { color: var(--c-muted, #8b6f47); }
 
         /* ── Troops Info grid ── */
         .troops-info {
@@ -314,9 +315,9 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
             flex-wrap: wrap;
             gap: 0.75rem;
             padding: 1rem 1.25rem;
-            background: var(--surface2);
+            background: var(--c-panel2, #ede0c4);
             align-items: flex-end;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid var(--c-border, rgba(139,90,43,0.35));
         }
         .troop-chip {
             display: flex;
@@ -328,41 +329,41 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
             width: 52px;
             height: 52px;
             border-radius: 6px;
-            border: 2px solid var(--border2);
-            background: var(--surface);
+            border: 1px solid var(--c-border, rgba(139,90,43,0.35));
+            background: var(--c-panel, #f4e4c1);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.3rem;
             position: relative;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            box-shadow: 0 2px 8px var(--c-shadow, rgba(139,90,43,0.18));
         }
         .troop-chip-tier {
             position: absolute;
             bottom: -2px;
             right: -2px;
-            background: #1a2744;
-            color: var(--gold2);
+            background: var(--c-panel3, #e8d8b0);
+            color: var(--c-wood-dark, #8b5a2b);
             font-size: 0.55rem;
             font-weight: 800;
             padding: 0.05rem 0.25rem;
             border-radius: 3px;
-            border: 1px solid rgba(212,160,23,0.5);
+            border: 1px solid var(--c-border, rgba(139,90,43,0.35));
         }
         .troop-chip-count {
             font-size: 0.75rem;
             font-weight: 700;
-            color: var(--text);
+            color: var(--c-text, #4a3520);
             font-variant-numeric: tabular-nums;
         }
         .troop-chip-injured {
             font-size: 0.65rem;
-            color: var(--red2);
+            color: var(--c-danger, #c0604d);
             font-weight: 700;
         }
         .troop-chip-name {
             font-size: 0.6rem;
-            color: var(--muted);
+            color: var(--c-muted, #8b6f47);
             text-align: center;
             max-width: 56px;
             overflow: hidden;
@@ -376,14 +377,14 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
         }
         .troops-info-total-label {
             font-size: 0.6rem;
-            color: var(--muted);
+            color: var(--c-muted, #8b6f47);
             text-transform: uppercase;
             letter-spacing: 0.08em;
         }
         .troops-info-total-val {
             font-size: 1.2rem;
             font-weight: 800;
-            color: var(--gold2);
+            color: var(--c-wood-dark, #8b5a2b);
             font-variant-numeric: tabular-nums;
         }
 
@@ -392,14 +393,14 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
             display: flex;
             flex-wrap: wrap;
             gap: 0;
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
+            background: var(--c-panel, #f4e4c1);
+            border-bottom: 1px solid var(--c-border, rgba(139,90,43,0.35));
         }
         .mstat {
             flex: 1 1 150px;
             padding: 0.85rem 1.25rem;
-            border-right: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
+            border-right: 1px solid var(--c-border, rgba(139,90,43,0.35));
+            border-bottom: 1px solid var(--c-border, rgba(139,90,43,0.35));
         }
         .mstat:last-child { border-right: none; }
         .mstat-label {
@@ -407,13 +408,14 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            color: var(--muted);
+            color: var(--c-muted, #8b6f47);
             margin-bottom: 0.25rem;
         }
         .mstat-val {
             font-size: 1rem;
             font-weight: 800;
             font-variant-numeric: tabular-nums;
+            color: var(--c-text, #4a3520);
         }
 
         /* ── HP bar ── */
@@ -422,32 +424,32 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
             display: flex;
             justify-content: space-between;
             font-size: 0.65rem;
-            color: var(--muted);
+            color: var(--c-muted, #8b6f47);
             margin-bottom: 0.2rem;
         }
         .hp-bar-track {
             height: 6px;
-            background: rgba(255,255,255,0.08);
+            background: rgba(139,90,43,0.12);
             border-radius: 3px;
             overflow: hidden;
         }
         .hp-bar-fill {
             height: 100%;
             border-radius: 3px;
-            background: var(--red2);
+            background: var(--c-danger, #c0604d);
         }
 
         /* ── Combat totals ── */
         .combat-totals {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            background: var(--surface2);
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
+            background: var(--c-panel2, #ede0c4);
+            border-top: 1px solid var(--c-border, rgba(139,90,43,0.35));
+            border-bottom: 1px solid var(--c-border, rgba(139,90,43,0.35));
         }
         .ctotal {
             padding: 0.85rem 1.25rem;
-            border-right: 1px solid var(--border);
+            border-right: 1px solid var(--c-border, rgba(139,90,43,0.35));
         }
         .ctotal:last-child { border-right: none; }
         .ctotal-label {
@@ -455,19 +457,19 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            color: var(--muted);
+            color: var(--c-muted, #8b6f47);
             margin-bottom: 0.25rem;
         }
         .ctotal-val {
             font-size: 1rem;
             font-weight: 800;
             font-variant-numeric: tabular-nums;
-            color: var(--text);
+            color: var(--c-text, #4a3520);
         }
 
         /* ── Player profile ── */
         .player-profile {
-            background: var(--surface);
+            background: var(--c-panel, #f4e4c1);
             padding: 1rem 1.5rem;
             display: flex;
             flex-wrap: wrap;
@@ -480,12 +482,12 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            color: var(--muted);
+            color: var(--c-muted, #8b6f47);
         }
-        .pp-val { font-size: 0.92rem; font-weight: 700; }
+        .pp-val { font-size: 0.92rem; font-weight: 700; color: var(--c-text, #4a3520); }
 
         /* ── Troops detail table ── */
-        .section-body { background: var(--surface); }
+        .section-body { background: var(--c-panel, #f4e4c1); }
         .troop-table {
             width: 100%;
             border-collapse: collapse;
@@ -494,22 +496,23 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
         .troop-table th {
             text-align: left;
             padding: 0.5rem 1.25rem;
-            color: var(--gold2);
+            color: var(--c-wood-dark, #8b5a2b);
             font-size: 0.62rem;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            border-bottom: 1px solid var(--border);
-            background: linear-gradient(180deg, #1a2744 0%, #0f1729 100%);
+            border-bottom: 1px solid var(--c-border, rgba(139,90,43,0.35));
+            background: var(--c-panel3, #e8d8b0);
         }
         .troop-table td {
             padding: 0.55rem 1.25rem;
-            border-bottom: 1px solid rgba(184,134,11,0.1);
+            border-bottom: 1px solid rgba(139,90,43,0.1);
+            color: var(--c-text, #4a3520);
         }
         .troop-table tr:last-child td { border-bottom: none; }
-        .troop-table tr:hover td { background: rgba(212,160,23,0.03); }
+        .troop-table tr:hover td { background: rgba(192,136,88,0.06); }
         .troop-table tfoot td {
-            border-top: 1px solid var(--border);
+            border-top: 1px solid var(--c-border, rgba(139,90,43,0.35));
             padding-top: 0.6rem;
             font-weight: 700;
         }
@@ -519,13 +522,13 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
             border-radius: 3px;
             font-size: 0.62rem;
             font-weight: 800;
-            background: rgba(184,134,11,0.2);
-            color: var(--gold2);
-            border: 1px solid rgba(212,160,23,0.4);
+            background: var(--c-panel3, #e8d8b0);
+            color: var(--c-wood-dark, #8b5a2b);
+            border: 1px solid var(--c-border, rgba(139,90,43,0.35));
         }
-        .val-green { color: var(--green); font-weight: 700; }
-        .val-red   { color: var(--red2);  font-weight: 700; }
-        .val-muted { color: var(--muted); }
+        .val-green { color: var(--c-success, #7fb069); font-weight: 700; }
+        .val-red   { color: var(--c-danger, #c0604d);  font-weight: 700; }
+        .val-muted { color: var(--c-muted, #8b6f47); }
 
         @media (max-width: 640px) {
             .vs-header { grid-template-columns: 1fr auto 1fr; gap: 0.5rem; }
@@ -581,20 +584,20 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
 
     <!-- ANGREIFER PROFIL — direkt unter VS-Header -->
     <?php if (!empty($playerStats)): ?>
-    <div style="background:var(--surface2);border-bottom:1px solid var(--border);padding:0.6rem 1.5rem;display:flex;flex-wrap:wrap;gap:1.5rem;align-items:center">
-        <div style="font-size:0.6rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);min-width:4rem">Angreifer</div>
+    <div style="background:var(--c-panel2,#ede0c4);border-bottom:1px solid var(--c-border,rgba(139,90,43,0.35));padding:0.6rem 1.5rem;display:flex;flex-wrap:wrap;gap:1.5rem;align-items:center">
+        <div style="font-size:0.6rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--c-muted,#8b6f47);min-width:4rem">Angreifer</div>
         <?php
         $ppItems = [
             'Spieler'       => htmlspecialchars($playerStats['username']  ?? ''),
             'Stadt'         => htmlspecialchars($playerStats['city_name'] ?? ''),
             'Schloss'       => 'Lv ' . (int)($playerStats['castle_level'] ?? 1),
-            'Macht'         => '<span style="color:var(--gold2)">' . $fmt($playerStats['power'] ?? 0) . '</span>',
+            'Macht'         => '<span style="color:var(--c-wood-dark,#8b5a2b)">' . $fmt($playerStats['power'] ?? 0) . '</span>',
             'VIP'           => 'Lv ' . (int)($playerStats['vip_level'] ?? 0),
         ];
         foreach ($ppItems as $label => $val): ?>
         <div style="display:flex;flex-direction:column;gap:0.1rem">
-            <div style="font-size:0.58rem;font-weight:800;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted)"><?= $label ?></div>
-            <div style="font-size:0.88rem;font-weight:700"><?= $val ?></div>
+            <div style="font-size:0.58rem;font-weight:800;text-transform:uppercase;letter-spacing:0.07em;color:var(--c-muted,#8b6f47)"><?= $label ?></div>
+            <div style="font-size:0.88rem;font-weight:700;color:var(--c-text,#4a3520)"><?= $val ?></div>
         </div>
         <?php endforeach ?>
     </div>
@@ -666,7 +669,7 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
 
     <!-- HP-Bar Monster -->
     <?php if ($monsterHpBefore > 0): ?>
-    <div style="background:var(--surface);padding:0 1.5rem 1rem;border-bottom:1px solid var(--border)">
+    <div style="background:var(--c-panel,#f4e4c1);padding:0 1.5rem 1rem;border-bottom:1px solid var(--c-border,rgba(139,90,43,0.35))">
         <div class="hp-bar-wrap">
             <div class="hp-bar-labels">
                 <span><?= $fmt($monsterHpAfter) ?> HP verbleibend</span>
@@ -721,7 +724,7 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
     <div class="combat-totals">
         <div class="ctotal">
             <div class="ctotal-label">Angriff gesamt</div>
-            <div class="ctotal-val" style="color:var(--red2)"><?= $fmtF($totalAtk) ?></div>
+            <div class="ctotal-val" style="color:var(--c-danger,#c0604d)"><?= $fmtF($totalAtk) ?></div>
         </div>
         <div class="ctotal">
             <div class="ctotal-label">HP gesamt</div>
@@ -733,12 +736,12 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
         </div>
         <div class="ctotal">
             <div class="ctotal-label">Absorption (HP+Def)</div>
-            <div class="ctotal-val" style="color:var(--gold2)"><?= $fmtF($totalAbsorption) ?></div>
+            <div class="ctotal-val" style="color:var(--c-wood-dark,#8b5a2b)"><?= $fmtF($totalAbsorption) ?></div>
         </div>
         <div class="ctotal">
             <div class="ctotal-label">Verwundungsrate</div>
             <?php $injPct = round(($data['attacker_injury_ratio'] ?? 0) * 100, 1); ?>
-            <div class="ctotal-val" style="color:<?= $injPct > 0 ? 'var(--red2)' : 'var(--green)' ?>">
+            <div class="ctotal-val" style="color:<?= $injPct > 0 ? 'var(--c-danger,#c0604d)' : 'var(--c-success,#7fb069)' ?>">
                 <?= $injPct ?>%
             </div>
         </div>
@@ -776,7 +779,7 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
                 <tr>
                     <td><?= htmlspecialchars($t['name'] ?? '?') ?></td>
                     <td><span class="tier-badge">T<?= (int)($t['tier'] ?? 1) ?></span></td>
-                    <td style="text-align:right;color:var(--red2)"><?= $fmt($effAtk) ?></td>
+                    <td style="text-align:right;color:var(--c-danger,#c0604d)"><?= $fmt($effAtk) ?></td>
                     <td style="text-align:right"><?= $fmt($effHp) ?></td>
                     <td style="text-align:right"><?= $fmt($effDef) ?></td>
                     <td style="text-align:right"><?= $fmt($sent) ?></td>
@@ -795,7 +798,7 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="5" style="color:var(--muted);font-size:0.75rem">Gesamt</td>
+                    <td colspan="5" style="color:var(--c-muted,#8b6f47);font-size:0.75rem">Gesamt</td>
                     <td style="text-align:right"><?= $fmt($totalSent) ?></td>
                     <td style="text-align:right">
                         <?php if ($totalInjured > 0): ?>
@@ -856,34 +859,34 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
     };
 
     $boostRow = fn(string $label, string $atkVal, string $defVal): string =>
-        '<div style="display:grid;grid-template-columns:1fr auto;align-items:center;padding:0.22rem 0;border-bottom:1px solid rgba(255,255,255,0.03);font-size:0.77rem;gap:8px">'
-        . '<span style="color:var(--muted)">' . htmlspecialchars($label) . '</span>'
-        . '<span style="font-weight:700;color:' . (($atkVal === '+0%' || $atkVal === '+0') ? 'var(--muted)' : 'var(--green)') . ';white-space:nowrap">' . htmlspecialchars($atkVal) . '</span>'
+        '<div style="display:grid;grid-template-columns:1fr auto;align-items:center;padding:0.22rem 0;border-bottom:1px solid rgba(139,90,43,0.08);font-size:0.77rem;gap:8px">'
+        . '<span style="color:var(--c-muted,#8b6f47)">' . htmlspecialchars($label) . '</span>'
+        . '<span style="font-weight:700;color:' . (($atkVal === '+0%' || $atkVal === '+0') ? 'var(--c-muted,#8b6f47)' : 'var(--c-success,#7fb069)') . ';white-space:nowrap">' . htmlspecialchars($atkVal) . '</span>'
         . '</div>';
 
     $boostRowDef = fn(string $label, string $defVal): string =>
-        '<div style="display:grid;grid-template-columns:1fr auto;align-items:center;padding:0.22rem 0;border-bottom:1px solid rgba(255,255,255,0.03);font-size:0.77rem;gap:8px">'
-        . '<span style="color:var(--muted)">' . htmlspecialchars($label) . '</span>'
-        . '<span style="font-weight:700;color:' . (($defVal === '—' || $defVal === '+0%' || $defVal === '+0') ? 'var(--muted)' : 'var(--green)') . ';white-space:nowrap">' . htmlspecialchars($defVal) . '</span>'
+        '<div style="display:grid;grid-template-columns:1fr auto;align-items:center;padding:0.22rem 0;border-bottom:1px solid rgba(139,90,43,0.08);font-size:0.77rem;gap:8px">'
+        . '<span style="color:var(--c-muted,#8b6f47)">' . htmlspecialchars($label) . '</span>'
+        . '<span style="font-weight:700;color:' . (($defVal === '—' || $defVal === '+0%' || $defVal === '+0') ? 'var(--c-muted,#8b6f47)' : 'var(--c-success,#7fb069)') . ';white-space:nowrap">' . htmlspecialchars($defVal) . '</span>'
         . '</div>';
 
     $atkName = htmlspecialchars($playerStats['username'] ?? 'Angreifer');
     $defName = $isMonster ? htmlspecialchars($monsterName) : htmlspecialchars($data['defender_name'] ?? 'Verteidiger');
     ?>
-    <div style="background:var(--surface);display:grid;grid-template-columns:1fr 1px 1fr">
+    <div style="background:var(--c-panel,#f4e4c1);display:grid;grid-template-columns:1fr 1px 1fr">
         <div style="padding:0.75rem 1.25rem 1rem">
-            <div style="font-size:0.6rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:0.5rem"><?= $atkName ?></div>
+            <div style="font-size:0.6rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--c-muted,#8b6f47);margin-bottom:0.5rem"><?= $atkName ?></div>
             <?php foreach ($boostStats as $label => [$key, $type]):
                 $val = $resolveVal($buffs, $key, $type); ?>
-                <div style="display:grid;grid-template-columns:1fr auto;align-items:center;padding:0.22rem 0;border-bottom:1px solid rgba(255,255,255,0.03);font-size:0.77rem;gap:8px">
-                    <span style="color:var(--muted)"><?= htmlspecialchars($label) ?></span>
-                    <span style="font-weight:700;color:<?= ($val === '+0%' || $val === '+0') ? 'var(--muted)' : 'var(--green)' ?>;white-space:nowrap"><?= htmlspecialchars($val) ?></span>
+                <div style="display:grid;grid-template-columns:1fr auto;align-items:center;padding:0.22rem 0;border-bottom:1px solid rgba(139,90,43,0.08);font-size:0.77rem;gap:8px">
+                    <span style="color:var(--c-muted,#8b6f47)"><?= htmlspecialchars($label) ?></span>
+                    <span style="font-weight:700;color:<?= ($val === '+0%' || $val === '+0') ? 'var(--c-muted,#8b6f47)' : 'var(--c-success,#7fb069)' ?>;white-space:nowrap"><?= htmlspecialchars($val) ?></span>
                 </div>
             <?php endforeach ?>
         </div>
-        <div style="background:var(--border)"></div>
+        <div style="background:var(--c-border,rgba(139,90,43,0.35))"></div>
         <div style="padding:0.75rem 1.25rem 1rem">
-            <div style="font-size:0.6rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:0.5rem"><?= $defName ?></div>
+            <div style="font-size:0.6rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--c-muted,#8b6f47);margin-bottom:0.5rem"><?= $defName ?></div>
             <?php if ($isMonster): ?>
                 <?php
                 $monsterRows = [
@@ -896,24 +899,24 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
                 ];
                 foreach ($monsterRows as $mLabel => $mVal):
                     $mColor = match($mLabel) {
-                        'Status'          => $monsterKilled ? 'var(--green)' : 'var(--red2)',
-                        'HP verbleibend'  => $monsterKilled ? 'var(--muted)' : 'var(--red2)',
-                        'Schaden erhalten'=> 'var(--red2)',
-                        'HP zerstört'     => $monsterLossPct >= 100 ? 'var(--green)' : 'var(--red2)',
-                        default           => 'var(--text)',
+                        'Status'          => $monsterKilled ? 'var(--c-success,#7fb069)' : 'var(--c-danger,#c0604d)',
+                        'HP verbleibend'  => $monsterKilled ? 'var(--c-muted,#8b6f47)' : 'var(--c-danger,#c0604d)',
+                        'Schaden erhalten'=> 'var(--c-danger,#c0604d)',
+                        'HP zerstört'     => $monsterLossPct >= 100 ? 'var(--c-success,#7fb069)' : 'var(--c-danger,#c0604d)',
+                        default           => 'var(--c-text,#4a3520)',
                     };
                 ?>
-                <div style="display:grid;grid-template-columns:1fr auto;align-items:center;padding:0.22rem 0;border-bottom:1px solid rgba(255,255,255,0.03);font-size:0.77rem;gap:8px">
-                    <span style="color:var(--muted)"><?= htmlspecialchars($mLabel) ?></span>
+                <div style="display:grid;grid-template-columns:1fr auto;align-items:center;padding:0.22rem 0;border-bottom:1px solid rgba(139,90,43,0.08);font-size:0.77rem;gap:8px">
+                    <span style="color:var(--c-muted,#8b6f47)"><?= htmlspecialchars($mLabel) ?></span>
                     <span style="font-weight:700;color:<?= $mColor ?>;white-space:nowrap"><?= htmlspecialchars($mVal) ?></span>
                 </div>
                 <?php endforeach ?>
             <?php else: ?>
                 <?php foreach ($boostStats as $label => [$key, $type]):
                     $val = $resolveVal($defenderBuffs, $key, $type); ?>
-                    <div style="display:grid;grid-template-columns:1fr auto;align-items:center;padding:0.22rem 0;border-bottom:1px solid rgba(255,255,255,0.03);font-size:0.77rem;gap:8px">
-                        <span style="color:var(--muted)"><?= htmlspecialchars($label) ?></span>
-                        <span style="font-weight:700;color:<?= ($val === '—' || $val === '+0%' || $val === '+0') ? 'var(--muted)' : 'var(--green)' ?>;white-space:nowrap"><?= htmlspecialchars($val) ?></span>
+                    <div style="display:grid;grid-template-columns:1fr auto;align-items:center;padding:0.22rem 0;border-bottom:1px solid rgba(139,90,43,0.08);font-size:0.77rem;gap:8px">
+                        <span style="color:var(--c-muted,#8b6f47)"><?= htmlspecialchars($label) ?></span>
+                        <span style="font-weight:700;color:<?= ($val === '—' || $val === '+0%' || $val === '+0') ? 'var(--c-muted,#8b6f47)' : 'var(--c-success,#7fb069)' ?>;white-space:nowrap"><?= htmlspecialchars($val) ?></span>
                     </div>
                 <?php endforeach ?>
             <?php endif ?>

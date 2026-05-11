@@ -194,8 +194,8 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
 <?php if (!$isModal): ?>
     html, body {
         min-height: 100vh;
-        background: #080c18;
-        color: #e2e8f0;
+        background: #f0e8d0;
+        color: #4a3520;
         font-family: system-ui, -apple-system, sans-serif;
         display: flex;
         flex-direction: column;
@@ -218,13 +218,13 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
         .modal-card {
             width: 100%;
             max-width: min(960px, calc(100vw - 16px));
-            background: #0f1729;
-            border: 1px solid rgba(184,134,11,0.35);
+            background: #f4e4c1;
+            border: 1px solid rgba(139,90,43,0.35);
             border-radius: 12px;
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 8px 40px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.03);
+            box-shadow: 0 3px 12px rgba(139,90,43,0.18);
         }
 
         /* When rendered inside the city overlay, fill the bldg-wrap height */
@@ -246,25 +246,24 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
         .left-panel {
             width: 280px;
             flex-shrink: 0;
-            background: #080c18;
-            border-right: 1px solid rgba(184,134,11,0.2);
+            background: #ede0c4;
+            border-right: 1px solid rgba(139,90,43,0.35);
             display: flex;
             flex-direction: column;
         }
 
         /* Gold name banner */
         .bldg-banner {
-            background: linear-gradient(180deg, #1c1400 0%, #0d0900 100%);
-            border-bottom: 2px solid rgba(212,160,23,0.5);
+            background: #e8d8b0;
+            border-bottom: 2px solid rgba(139,90,43,0.4);
             padding: 12px 14px;
             text-align: center;
             font-size: 0.82rem;
             font-weight: 900;
             letter-spacing: 0.12em;
             text-transform: uppercase;
-            color: #f0d080;
+            color: #8b5a2b;
             line-height: 1.3;
-            text-shadow: 0 0 16px rgba(212,160,23,0.4);
         }
 
         /* Large sprite area */
@@ -272,7 +271,7 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             display: flex;
             justify-content: center;
             padding: 22px 0 12px;
-            background: radial-gradient(ellipse at center, rgba(212,160,23,0.06) 0%, transparent 70%);
+            background: radial-gradient(ellipse at center, rgba(139,90,43,0.06) 0%, transparent 70%);
         }
 
         #bldg-img {
@@ -281,7 +280,7 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             height: 160px;
             object-fit: contain;
             border-radius: 8px;
-            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.6));
+            filter: drop-shadow(0 4px 12px rgba(139,90,43,0.25));
         }
 
         /* Level badge */
@@ -297,20 +296,20 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             justify-content: center;
             padding: 5px 20px;
             clip-path: polygon(12px 0%, calc(100% - 12px) 0%, 100% 50%, calc(100% - 12px) 100%, 12px 100%, 0% 50%);
-            color: #f0d080;
-            background: linear-gradient(180deg, #1a1200 0%, #0d0900 100%);
-            border: 2px solid rgba(212,160,23,0.6);
+            color: #fff8ec;
+            background: linear-gradient(180deg, #c9925a, #9a6535);
+            border: none;
             font-size: 0.84rem;
             font-weight: 800;
             letter-spacing: 0.06em;
             white-space: nowrap;
-            box-shadow: 0 0 16px rgba(212,160,23,0.15);
+            box-shadow: 0 3px 12px rgba(139,90,43,0.18);
         }
 
         /* Description */
         .bldg-desc {
             font-size: 0.73rem;
-            color: #64748b;
+            color: #8b6f47;
             padding: 6px 16px 12px;
             line-height: 1.6;
             text-align: center;
@@ -319,7 +318,7 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
         /* Divider */
         .left-divider {
             border: none;
-            border-top: 1px solid rgba(184,134,11,0.15);
+            border-top: 1px solid rgba(139,90,43,0.2);
             margin: 0 12px;
         }
 
@@ -334,7 +333,7 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            color: rgba(184,134,11,0.6);
+            color: #8b6f47;
             margin-bottom: 8px;
         }
 
@@ -344,30 +343,30 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             align-items: center;
             padding: 4px 0;
             font-size: 0.76rem;
-            border-bottom: 1px solid rgba(255,255,255,0.03);
+            border-bottom: 1px solid rgba(139,90,43,0.1);
         }
 
         .bonus-row:last-child { border-bottom: none; }
-        .bonus-label { color: #64748b; }
-        .bonus-val   { color: #4ade80; font-weight: 700; font-variant-numeric: tabular-nums; }
+        .bonus-label { color: #8b6f47; }
+        .bonus-val   { color: #7fb069; font-weight: 700; font-variant-numeric: tabular-nums; }
 
         .no-bonus {
             font-size: 0.73rem;
-            color: #334155;
+            color: #8b6f47;
             font-style: italic;
         }
 
         /* Back button at bottom of left panel */
         .left-back {
             padding: 10px 16px;
-            border-top: 1px solid rgba(184,134,11,0.15);
+            border-top: 1px solid rgba(139,90,43,0.2);
         }
 
         .btn-back {
             display: inline-flex;
             align-items: center;
             gap: 5px;
-            color: #475569;
+            color: #8b6f47;
             text-decoration: none;
             font-size: 0.78rem;
             transition: color 0.15s;
@@ -377,7 +376,7 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             font-family: inherit;
         }
 
-        .btn-back:hover { color: #94a3b8; }
+        .btn-back:hover { color: #4a3520; }
 
         /* ────────────────────────────────────────
            RIGHT PANEL
@@ -385,7 +384,7 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
         .right-panel {
             flex: 1;
             min-width: 0;
-            background: #0f1729;
+            background: #f4e4c1;
             display: flex;
             flex-direction: column;
         }
@@ -393,8 +392,8 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
         /* Tab bar */
         .tab-bar {
             height: 42px;
-            background: #080c18;
-            border-bottom: 1px solid rgba(184,134,11,0.25);
+            background: #ede0c4;
+            border-bottom: 1px solid rgba(139,90,43,0.25);
             display: flex;
             align-items: stretch;
         }
@@ -407,7 +406,7 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             font-weight: 800;
             letter-spacing: 0.08em;
             text-transform: uppercase;
-            color: #475569;
+            color: #8b6f47;
             border-bottom: 2px solid transparent;
             border-top: none; border-left: none; border-right: none;
             background: none;
@@ -419,11 +418,11 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
         }
 
         .tab-item.tab-active {
-            color: #f0d080;
-            border-bottom-color: #d4a017;
+            color: #8b5a2b;
+            border-bottom-color: #c08858;
         }
 
-        .tab-item:hover:not(.tab-active) { color: #94a3b8; }
+        .tab-item:hover:not(.tab-active) { color: #4a3520; }
 
         .tab-spacer { flex: 1; }
 
@@ -438,7 +437,7 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
         .tab-pane.tab-scroll {
             overflow-y: auto;
             scrollbar-width: thin;
-            scrollbar-color: rgba(184,134,11,0.2) transparent;
+            scrollbar-color: rgba(139,90,43,0.2) transparent;
         }
 
         .tab-close {
@@ -446,10 +445,10 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             align-items: center;
             justify-content: center;
             width: 42px;
-            color: #475569;
+            color: #8b6f47;
             text-decoration: none;
             font-size: 1rem;
-            border-left: 1px solid rgba(184,134,11,0.2);
+            border-left: 1px solid rgba(139,90,43,0.2);
             transition: color 0.15s, background 0.15s;
             background: none;
             border-top: none; border-right: none; border-bottom: none;
@@ -457,12 +456,12 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             font-family: inherit;
         }
 
-        .tab-close:hover { color: #ef4444; background: rgba(239,68,68,0.08); }
+        .tab-close:hover { color: #c0604d; background: rgba(192,96,77,0.08); }
 
         /* Main content area */
         .right-content {
             flex: 1;
-            background: #0a0e1a;
+            background: #f4e4c1;
             display: flex;
             min-height: 0;
         }
@@ -472,11 +471,11 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             width: 220px;
             flex-shrink: 0;
             padding: 18px 16px;
-            border-right: 1px solid rgba(184,134,11,0.15);
+            border-right: 1px solid rgba(139,90,43,0.15);
             display: flex;
             flex-direction: column;
             gap: 10px;
-            background: rgba(0,0,0,0.2);
+            background: rgba(237,224,196,0.5);
         }
 
         .icon-canvas-wrap {
@@ -490,15 +489,15 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             height: 80px;
             object-fit: contain;
             border-radius: 8px;
-            border: 1px solid rgba(184,134,11,0.25);
-            background: rgba(212,160,23,0.05);
-            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+            border: 1px solid rgba(139,90,43,0.25);
+            background: rgba(139,90,43,0.05);
+            filter: drop-shadow(0 2px 8px rgba(139,90,43,0.2));
         }
 
         .sub-bldg-name {
             font-size: 0.88rem;
             font-weight: 800;
-            color: #f0d080;
+            color: #8b5a2b;
             text-align: center;
         }
 
@@ -512,25 +511,25 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
         }
 
         .level-arrow .arrow {
-            color: #d4a017;
+            color: #c08858;
             font-size: 1.1rem;
         }
 
-        .level-num { color: #94a3b8; }
+        .level-num { color: #8b6f47; }
 
         .new-bonuses-title {
             font-size: 0.6rem;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            color: rgba(184,134,11,0.6);
+            color: #8b6f47;
             margin-top: 4px;
         }
 
         /* In-queue state sub-left */
         .queue-label {
             font-size: 0.78rem;
-            color: #fbbf24;
+            color: #d4824d;
             font-weight: 700;
             text-align: center;
             animation: pulse-glow 2s ease-in-out infinite;
@@ -548,7 +547,7 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
         #countdown {
             font-size: 1.1rem;
             font-weight: 800;
-            color: #f0d080;
+            color: #8b5a2b;
             font-variant-numeric: tabular-nums;
             font-family: monospace;
         }
@@ -568,7 +567,7 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            color: rgba(184,134,11,0.7);
+            color: #8b6f47;
         }
 
         /* Resource rows */
@@ -578,18 +577,18 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             gap: 8px;
             padding: 7px 11px;
             border-radius: 7px;
-            border: 1px solid rgba(45,64,96,0.5);
+            border: 1px solid rgba(139,90,43,0.25);
             font-size: 0.8rem;
-            background: rgba(0,0,0,0.25);
+            background: rgba(237,224,196,0.5);
             transition: border-color 0.15s;
         }
 
-        .res-req-row.ok  { border-color: rgba(22,101,52,0.8); background: rgba(34,197,94,0.04); }
-        .res-req-row.bad { border-color: rgba(127,29,29,0.8); background: rgba(239,68,68,0.04); }
+        .res-req-row.ok  { border-color: rgba(127,176,105,0.8); background: rgba(127,176,105,0.06); }
+        .res-req-row.bad { border-color: rgba(192,96,77,0.8); background: rgba(192,96,77,0.06); }
 
         .res-check { font-size: 0.85rem; width: 16px; text-align: center; flex-shrink: 0; }
         .res-emoji { font-size: 1rem; flex-shrink: 0; }
-        .res-name  { color: #94a3b8; flex: 1; }
+        .res-name  { color: #4a3520; flex: 1; }
 
         .res-amounts {
             font-weight: 700;
@@ -598,8 +597,8 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             font-size: 0.78rem;
         }
 
-        .res-req-row.ok  .res-amounts { color: #4ade80; }
-        .res-req-row.bad .res-amounts { color: #f87171; }
+        .res-req-row.ok  .res-amounts { color: #7fb069; }
+        .res-req-row.bad .res-amounts { color: #c0604d; }
 
         /* Castle prereq cards */
         .prereq-cards {
@@ -616,16 +615,16 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             gap: 5px;
             padding: 10px 6px;
             border-radius: 8px;
-            border: 1px solid rgba(45,64,96,0.5);
-            background: rgba(0,0,0,0.25);
+            border: 1px solid rgba(139,90,43,0.25);
+            background: rgba(237,224,196,0.5);
             text-decoration: none;
             transition: border-color 0.15s, background 0.15s;
             cursor: pointer;
         }
 
-        .prereq-card:hover { border-color: rgba(184,134,11,0.3); background: rgba(255,255,255,0.02); }
-        .prereq-card.met   { border-color: rgba(22,101,52,0.7); }
-        .prereq-card.unmet { border-color: rgba(127,29,29,0.7); }
+        .prereq-card:hover { border-color: rgba(139,90,43,0.5); background: #ede0c4; }
+        .prereq-card.met   { border-color: rgba(127,176,105,0.7); }
+        .prereq-card.unmet { border-color: rgba(192,96,77,0.7); }
 
         .prereq-canvas-wrap img {
             image-rendering: pixelated;
@@ -637,7 +636,7 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
 
         .prereq-card-name {
             font-size: 0.63rem;
-            color: #94a3b8;
+            color: #8b6f47;
             text-align: center;
             line-height: 1.2;
         }
@@ -649,17 +648,17 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             border-radius: 4px;
         }
 
-        .prereq-lv-badge.met   { background: rgba(22,101,52,0.5); color: #86efac; border: 1px solid rgba(34,197,94,0.3); }
-        .prereq-lv-badge.unmet { background: rgba(127,29,29,0.5); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); }
+        .prereq-lv-badge.met   { background: rgba(127,176,105,0.3); color: #4a7a30; border: 1px solid rgba(127,176,105,0.5); }
+        .prereq-lv-badge.unmet { background: rgba(192,96,77,0.2); color: #a03020; border: 1px solid rgba(192,96,77,0.4); }
 
         /* ────────────────────────────────────────
            BOTTOM ACTION BAR
         ──────────────────────────────────────── */
         .action-bar {
             height: 68px;
-            border-top: 1px solid rgba(184,134,11,0.2);
+            border-top: 1px solid rgba(139,90,43,0.2);
             display: flex;
-            background: #080c18;
+            background: #e8d8b0;
             overflow: hidden;
         }
 
@@ -677,17 +676,17 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             font-family: inherit;
         }
 
-        .action-btn:hover:not(:disabled) { filter: brightness(1.12); }
+        .action-btn:hover:not(:disabled) { filter: brightness(1.1); }
         .action-btn:active:not(:disabled) { transform: scaleY(0.97); }
         .action-btn:disabled { opacity: 0.38; cursor: not-allowed; filter: grayscale(0.6); }
 
         .action-btn + .action-btn {
-            border-left: 1px solid rgba(184,134,11,0.2);
+            border-left: 1px solid rgba(139,90,43,0.2);
         }
 
         .action-btn-top {
             font-size: 0.7rem;
-            color: rgba(255,255,255,0.6);
+            color: rgba(255,248,236,0.8);
             display: flex;
             align-items: center;
             gap: 4px;
@@ -698,19 +697,23 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             font-size: 0.88rem;
             font-weight: 900;
             letter-spacing: 0.06em;
-            color: #fff;
+            color: #fff8ec;
             white-space: nowrap;
             text-transform: uppercase;
         }
 
-        /* Instant button — amber/orange */
+        /* Instant button — amber wooden */
         .btn-instant {
-            background: linear-gradient(180deg, #d97706 0%, #92400e 100%);
+            background: linear-gradient(180deg, #c9925a 0%, #9a6535 100%);
+            border-bottom: 3px solid #6b4120;
+            border-radius: 8px;
         }
 
-        /* Upgrade button — gold/amber gradient */
+        /* Upgrade button — wooden gradient */
         .btn-upgrade-action {
-            background: linear-gradient(180deg, #c8870a 0%, #9a6508 100%);
+            background: linear-gradient(180deg, #c9925a 0%, #9a6535 100%);
+            border-bottom: 3px solid #6b4120;
+            border-radius: 8px;
         }
 
         /* ────────────────────────────────────────
@@ -720,16 +723,16 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             width: 100%;
             max-width: min(960px, calc(100vw - 16px));
             margin-top: 16px;
-            background: #0f1729;
-            border: 1px solid rgba(184,134,11,0.3);
+            background: #f4e4c1;
+            border: 1px solid rgba(139,90,43,0.3);
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            box-shadow: 0 3px 12px rgba(139,90,43,0.18);
         }
 
         .caravan-header {
-            background: linear-gradient(180deg, #1a2744 0%, #0f1729 100%);
-            border-bottom: 1px solid rgba(184,134,11,0.25);
+            background: #e8d8b0;
+            border-bottom: 1px solid rgba(139,90,43,0.25);
             padding: 10px 16px;
             display: flex;
             align-items: center;
@@ -743,12 +746,12 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            color: #d4a017;
+            color: #8b5a2b;
         }
 
         .caravan-refresh-cd {
             font-size: 0.72rem;
-            color: #fbbf24;
+            color: #d4824d;
             font-variant-numeric: tabular-nums;
             font-family: monospace;
         }
@@ -764,8 +767,8 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
         }
 
         .caravan-slot {
-            background: rgba(0,0,0,0.25);
-            border: 1px solid rgba(45,64,96,0.5);
+            background: #ede0c4;
+            border: 1px solid rgba(139,90,43,0.35);
             border-radius: 9px;
             padding: 12px 14px;
             display: flex;
@@ -774,7 +777,7 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             transition: border-color 0.15s, opacity 0.2s;
         }
 
-        .caravan-slot:hover:not(.bought) { border-color: rgba(184,134,11,0.3); }
+        .caravan-slot:hover:not(.bought) { border-color: rgba(139,90,43,0.6); }
 
         .caravan-slot.bought {
             opacity: 0.38;
@@ -800,34 +803,34 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
         .caravan-slot-label {
             font-size: 0.82rem;
             font-weight: 700;
-            color: #e2e8f0;
+            color: #4a3520;
             line-height: 1.2;
         }
 
         .caravan-slot-price {
             font-size: 0.76rem;
-            color: #64748b;
+            color: #8b6f47;
             display: flex;
             align-items: center;
             gap: 4px;
         }
 
         .caravan-slot-price strong {
-            color: #f0d080;
+            color: #8b5a2b;
             font-variant-numeric: tabular-nums;
         }
 
         .btn-caravan-buy {
             margin-top: auto;
             padding: 6px 12px;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 0.78rem;
             font-weight: 800;
             cursor: pointer;
             border: none;
-            border-bottom: 2px solid #075985;
-            background: linear-gradient(180deg, #0ea5e9, #0369a1);
-            color: #fff;
+            border-bottom: 3px solid #6b4120;
+            background: linear-gradient(180deg, #c9925a, #9a6535);
+            color: #fff8ec;
             transition: filter 0.15s;
             white-space: nowrap;
             font-family: inherit;
@@ -835,17 +838,17 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             letter-spacing: 0.04em;
         }
 
-        .btn-caravan-buy:hover:not(:disabled) { filter: brightness(1.12); }
+        .btn-caravan-buy:hover:not(:disabled) { filter: brightness(1.1); }
         .btn-caravan-buy:disabled {
-            background: rgba(30,41,59,0.5);
-            color: #475569;
+            background: rgba(139,90,43,0.2);
+            color: #8b6f47;
             cursor: not-allowed;
             border-bottom-color: transparent;
         }
 
         .caravan-loading {
             font-size: 0.8rem;
-            color: #475569;
+            color: #8b6f47;
             padding: 16px 0;
             text-align: center;
         }
@@ -857,22 +860,22 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             width: 100%;
             max-width: min(960px, calc(100vw - 16px));
             margin-top: 16px;
-            background: #0f1729;
-            border: 1px solid rgba(184,134,11,0.3);
+            background: #f4e4c1;
+            border: 1px solid rgba(139,90,43,0.3);
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            box-shadow: 0 3px 12px rgba(139,90,43,0.18);
         }
 
         .barrack-section-header {
-            background: linear-gradient(180deg, #1a2744 0%, #0f1729 100%);
-            border-bottom: 1px solid rgba(184,134,11,0.25);
+            background: #e8d8b0;
+            border-bottom: 1px solid rgba(139,90,43,0.25);
             padding: 10px 16px;
             font-size: 0.68rem;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            color: #d4a017;
+            color: #8b5a2b;
         }
 
         .barrack-inner {
@@ -880,8 +883,8 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
         }
 
         .troop-row {
-            background: rgba(0,0,0,0.25);
-            border: 1px solid rgba(45,64,96,0.5);
+            background: #ede0c4;
+            border: 1px solid rgba(139,90,43,0.35);
             border-radius: 9px;
             padding: 12px 14px;
             margin-bottom: 8px;
@@ -908,30 +911,30 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
         .troop-badge.cav { background: #8b5cf6; }
         .troop-badge.rgd { background: #22c55e; }
 
-        .troop-name  { font-weight: 700; font-size: 0.9rem; flex: 1; color: #e2e8f0; }
-        .troop-count { font-size: 0.76rem; color: #64748b; }
+        .troop-name  { font-weight: 700; font-size: 0.9rem; flex: 1; color: #4a3520; }
+        .troop-count { font-size: 0.76rem; color: #8b6f47; }
 
         .troop-stats {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 4px;
             font-size: 0.7rem;
-            color: #64748b;
+            color: #8b6f47;
             margin-bottom: 8px;
         }
 
-        .troop-stats span { color: #e2e8f0; font-weight: 700; }
+        .troop-stats span { color: #4a3520; font-weight: 700; }
 
         .troop-cost {
             display: flex;
             gap: 8px;
             font-size: 0.7rem;
-            color: #64748b;
+            color: #8b6f47;
             margin-bottom: 10px;
             flex-wrap: wrap;
         }
 
-        .troop-cost span { color: #f0d080; }
+        .troop-cost span { color: #8b5a2b; }
 
         .train-row {
             display: flex;
@@ -943,9 +946,9 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             width: 76px;
             padding: 5px 8px;
             border-radius: 6px;
-            border: 1px solid rgba(184,134,11,0.25);
-            background: rgba(0,0,0,0.3);
-            color: #e2e8f0;
+            border: 1px solid rgba(139,90,43,0.25);
+            background: rgba(240,232,208,0.8);
+            color: #4a3520;
             font-size: 0.83rem;
             font-family: inherit;
         }
@@ -953,29 +956,29 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
         .btn-train {
             flex: 1;
             padding: 6px 12px;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 0.8rem;
             font-weight: 800;
             cursor: pointer;
             border: none;
-            border-bottom: 2px solid #075985;
-            background: linear-gradient(180deg, #0ea5e9, #0369a1);
-            color: #fff;
+            border-bottom: 3px solid #6b4120;
+            background: linear-gradient(180deg, #c9925a, #9a6535);
+            color: #fff8ec;
             transition: filter 0.15s;
             font-family: inherit;
         }
 
-        .btn-train:hover:not(:disabled) { filter: brightness(1.12); }
+        .btn-train:hover:not(:disabled) { filter: brightness(1.1); }
         .btn-train:disabled {
-            background: rgba(30,41,59,0.5);
-            color: #475569;
+            background: rgba(139,90,43,0.2);
+            color: #8b6f47;
             cursor: not-allowed;
             border-bottom-color: transparent;
         }
 
         .lock-msg {
             font-size: 0.72rem;
-            color: #475569;
+            color: #8b6f47;
             font-style: italic;
         }
 
@@ -986,13 +989,13 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            color: rgba(184,134,11,0.6);
+            color: #8b6f47;
             margin-bottom: 6px;
         }
 
         .queue-item {
-            background: rgba(212,160,23,0.06);
-            border: 1px solid rgba(212,160,23,0.3);
+            background: #ede0c4;
+            border: 1px solid rgba(139,90,43,0.35);
             border-radius: 6px;
             padding: 7px 11px;
             margin-bottom: 5px;
@@ -1002,7 +1005,7 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             align-items: center;
         }
 
-        .queue-item-cd { color: #fbbf24; font-weight: 700; font-variant-numeric: tabular-nums; font-family: monospace; }
+        .queue-item-cd { color: #d4824d; font-weight: 700; font-variant-numeric: tabular-nums; font-family: monospace; }
 
         /* ────────────────────────────────────────
            BARRACK — LoK-Style Troop UI
@@ -1011,8 +1014,8 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
         /* Type sub-tabs (INFANTERIE | FERNKAMPF | KAVALLERIE) */
         .brk-type-tabs {
             display: flex;
-            background: #060a14;
-            border-bottom: 1px solid rgba(184,134,11,0.2);
+            background: #e8d8b0;
+            border-bottom: 1px solid rgba(139,90,43,0.2);
         }
 
         .brk-type-tab {
@@ -1022,7 +1025,7 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             font-weight: 800;
             letter-spacing: 0.07em;
             text-transform: uppercase;
-            color: #475569;
+            color: #8b6f47;
             background: none;
             border: none;
             border-bottom: 2px solid transparent;
@@ -1032,8 +1035,8 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             font-family: inherit;
         }
 
-        .brk-type-tab:hover  { color: #94a3b8; }
-        .brk-type-tab.active { color: #f0d080; border-bottom-color: #d4a017; }
+        .brk-type-tab:hover  { color: #4a3520; }
+        .brk-type-tab.active { color: #8b5a2b; border-bottom-color: #c08858; }
 
         /* Tier card row */
         .brk-tier-row {
@@ -1041,18 +1044,18 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             gap: 7px;
             padding: 10px 12px;
             overflow-x: auto;
-            background: #060a14;
-            border-bottom: 1px solid rgba(184,134,11,0.15);
+            background: #ede0c4;
+            border-bottom: 1px solid rgba(139,90,43,0.15);
             scrollbar-width: thin;
-            scrollbar-color: rgba(184,134,11,0.2) transparent;
+            scrollbar-color: rgba(139,90,43,0.2) transparent;
         }
 
         .brk-tier-card {
             flex: 0 0 72px;
             height: 90px;
             border-radius: 10px;
-            border: 2px solid rgba(45,64,96,0.6);
-            background: rgba(0,0,0,0.35);
+            border: 2px solid rgba(139,90,43,0.3);
+            background: rgba(240,232,208,0.5);
             cursor: pointer;
             display: flex;
             flex-direction: column;
@@ -1065,14 +1068,14 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
         }
 
         .brk-tier-card:hover:not(.locked) {
-            border-color: rgba(184,134,11,0.4);
-            background: rgba(255,255,255,0.03);
+            border-color: rgba(139,90,43,0.6);
+            background: #ede0c4;
         }
 
         .brk-tier-card.selected {
-            border-color: var(--brk-color, #0ea5e9);
-            box-shadow: 0 0 12px var(--brk-color, #0ea5e9);
-            background: rgba(0,0,0,0.5);
+            border-color: var(--brk-color, #c08858);
+            box-shadow: 0 0 10px rgba(139,90,43,0.25);
+            background: rgba(237,224,196,0.8);
         }
 
         .brk-tier-card.locked {
@@ -1106,7 +1109,7 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
         .brk-tier-count {
             font-size: 0.67rem;
             font-weight: 700;
-            color: #e2e8f0;
+            color: #4a3520;
             font-variant-numeric: tabular-nums;
         }
 
@@ -1123,9 +1126,9 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             padding: 9px 16px;
             font-size: 0.92rem;
             font-weight: 800;
-            color: #f0d080;
-            background: linear-gradient(90deg, #1a1000 0%, #060a14 100%);
-            border-bottom: 1px solid rgba(184,134,11,0.2);
+            color: #8b5a2b;
+            background: #e8d8b0;
+            border-bottom: 1px solid rgba(139,90,43,0.2);
             letter-spacing: 0.03em;
         }
 
@@ -1134,7 +1137,7 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             overflow-y: auto;
             padding: 6px 0;
             scrollbar-width: thin;
-            scrollbar-color: rgba(184,134,11,0.2) transparent;
+            scrollbar-color: rgba(139,90,43,0.2) transparent;
         }
 
         .brk-stat-row {
@@ -1142,21 +1145,21 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             align-items: center;
             gap: 8px;
             padding: 6px 16px;
-            border-bottom: 1px solid rgba(255,255,255,0.03);
+            border-bottom: 1px solid rgba(139,90,43,0.1);
             font-size: 0.8rem;
         }
 
         .brk-stat-icon { flex: 0 0 18px; text-align: center; font-size: 0.9rem; }
-        .brk-stat-label { flex: 1; color: #64748b; }
-        .brk-stat-val { font-weight: 700; color: #e2e8f0; font-variant-numeric: tabular-nums; }
+        .brk-stat-label { flex: 1; color: #8b6f47; }
+        .brk-stat-val { font-weight: 700; color: #4a3520; font-variant-numeric: tabular-nums; }
 
         /* Train section */
         .brk-train-section {
             display: flex;
             gap: 8px;
             padding: 10px 16px;
-            border-top: 1px solid rgba(184,134,11,0.15);
-            background: #060a14;
+            border-top: 1px solid rgba(139,90,43,0.15);
+            background: #e8d8b0;
             flex-shrink: 0;
         }
 
@@ -1164,9 +1167,9 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             width: 80px;
             padding: 7px 10px;
             border-radius: 7px;
-            border: 1px solid rgba(184,134,11,0.25);
-            background: rgba(0,0,0,0.4);
-            color: #e2e8f0;
+            border: 1px solid rgba(139,90,43,0.25);
+            background: rgba(240,232,208,0.8);
+            color: #4a3520;
             font-size: 0.88rem;
             font-weight: 700;
             text-align: center;
@@ -1176,11 +1179,11 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
         .brk-train-btn {
             flex: 1;
             padding: 8px;
-            border-radius: 7px;
+            border-radius: 8px;
             border: none;
-            border-bottom: 2px solid #1e3a8a;
-            background: linear-gradient(180deg, #2563eb, #1d4ed8);
-            color: #fff;
+            border-bottom: 3px solid #6b4120;
+            background: linear-gradient(180deg, #c9925a, #9a6535);
+            color: #fff8ec;
             font-size: 0.82rem;
             font-weight: 800;
             letter-spacing: 0.06em;
@@ -1190,18 +1193,18 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             text-transform: uppercase;
         }
 
-        .brk-train-btn:hover:not(:disabled) { filter: brightness(1.12); }
+        .brk-train-btn:hover:not(:disabled) { filter: brightness(1.1); }
         .brk-train-btn:disabled {
-            background: rgba(30,41,59,0.5);
-            color: #475569;
+            background: rgba(139,90,43,0.2);
+            color: #8b6f47;
             cursor: not-allowed;
             border-bottom-color: transparent;
         }
 
         /* Queue bar */
         .brk-queue-bar {
-            background: rgba(212,160,23,0.04);
-            border-top: 1px solid rgba(184,134,11,0.15);
+            background: #ede0c4;
+            border-top: 1px solid rgba(139,90,43,0.15);
             padding: 8px 16px;
             flex-shrink: 0;
         }
@@ -1211,7 +1214,7 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            color: rgba(212,160,23,0.6);
+            color: #8b6f47;
             margin-bottom: 6px;
         }
 
@@ -1220,16 +1223,16 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             align-items: center;
             gap: 8px;
             padding: 6px 10px;
-            background: rgba(212,160,23,0.06);
-            border: 1px solid rgba(212,160,23,0.25);
+            background: #f4e4c1;
+            border: 1px solid rgba(139,90,43,0.35);
             border-radius: 6px;
             margin-bottom: 4px;
             font-size: 0.78rem;
         }
 
         .brk-queue-icon { font-size: 1rem; flex-shrink: 0; }
-        .brk-queue-info { flex: 1; color: #e2e8f0; }
-        .brk-queue-cd   { color: #fbbf24; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; font-family: monospace; }
+        .brk-queue-info { flex: 1; color: #4a3520; }
+        .brk-queue-cd   { color: #d4824d; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; font-family: monospace; }
 
         /* #tab-truppen must fill the right panel height */
         #tab-truppen {
@@ -1246,21 +1249,22 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             bottom: 1.5rem;
             left: 50%;
             transform: translateX(-50%);
-            background: #0f1729;
-            border: 1px solid rgba(184,134,11,0.3);
+            background: #f4e4c1;
+            border: 1px solid rgba(139,90,43,0.3);
+            border-left: 4px solid #c08858;
             border-radius: 8px;
             padding: 8px 18px;
             font-size: 0.85rem;
             font-weight: 700;
+            color: #4a3520;
             display: none;
             z-index: 9000;
             white-space: nowrap;
-            backdrop-filter: blur(4px);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+            box-shadow: 0 3px 12px rgba(139,90,43,0.18);
         }
 
-        #bm-toast.ok  { border-color: rgba(34,197,94,0.5); color: #22c55e; }
-        #bm-toast.err { border-color: rgba(239,68,68,0.5); color: #ef4444; }
+        #bm-toast.ok  { border-left-color: #7fb069; color: #4a7a30; }
+        #bm-toast.err { border-left-color: #c0604d; color: #a03020; }
 
         /* ────────────────────────────────────────
            RESPONSIVE — stack panels on narrow
@@ -1271,7 +1275,7 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             .left-panel {
                 width: 100%;
                 border-right: none;
-                border-bottom: 1px solid #2a3a55;
+                border-bottom: 1px solid rgba(139,90,43,0.3);
             }
 
             .bldg-canvas-wrap { padding: 14px 0 8px; }
@@ -1281,7 +1285,7 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
             .sub-left {
                 width: 100%;
                 border-right: none;
-                border-bottom: 1px solid #1e2d42;
+                border-bottom: 1px solid rgba(139,90,43,0.2);
             }
 
             .action-btn-label { font-size: 0.76rem; }
@@ -1339,7 +1343,7 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
                 <!-- Back link -->
                 <div class="left-back">
                     <?php if ($isModal): ?>
-                    <button class="btn-back" onclick="window.closeBldgModal?.()" style="background:none;border:none;cursor:pointer;color:#e2e8f0">← Zurück</button>
+                    <button class="btn-back" onclick="window.closeBldgModal?.()" style="background:none;border:none;cursor:pointer;color:#4a3520">← Zurück</button>
                     <?php else: ?>
                     <a href="/city" class="btn-back">← Zurück</a>
                     <?php endif ?>
@@ -1414,7 +1418,7 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
                             $check = $ok ? '✓' : '✗';
                         ?>
                         <div class="res-req-row <?= $cls ?>">
-                            <span class="res-check" style="color:<?= $ok ? '#22c55e' : '#ef4444' ?>"><?= $check ?></span>
+                            <span class="res-check" style="color:<?= $ok ? '#7fb069' : '#c0604d' ?>"><?= $check ?></span>
                             <span class="res-emoji"><?= $r['emoji'] ?></span>
                             <span class="res-name"><?= $r['name'] ?></span>
                             <span class="res-amounts">
@@ -1567,9 +1571,9 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
                 <?php if ($buildingCode === 'trading_post'): ?>
                 <div id="tab-caravan" class="tab-pane tab-scroll"<?= $activeTab !== 'caravan' ? ' style="display:none"' : '' ?>
                      x-data="caravanApp()" x-init="boot()">
-                    <div style="padding:10px 16px;border-bottom:1px solid #2a3a55;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
-                        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#64748b">Caravan — Rotierender Markt</div>
-                        <div style="font-size:.72rem;color:#fbbf24;font-variant-numeric:tabular-nums">
+                    <div style="padding:10px 16px;border-bottom:1px solid rgba(139,90,43,0.25);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
+                        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#8b6f47">Caravan — Rotierender Markt</div>
+                        <div style="font-size:.72rem;color:#d4824d;font-variant-numeric:tabular-nums">
                             Nächster Refresh: <span x-text="refreshLabel">…</span>
                         </div>
                     </div>
@@ -1578,7 +1582,7 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
                             <div class="caravan-loading">Lade Caravan…</div>
                         </template>
                         <template x-if="!loading && error">
-                            <div class="caravan-loading" style="color:#ef4444" x-text="error"></div>
+                            <div class="caravan-loading" style="color:#c0604d" x-text="error"></div>
                         </template>
                         <template x-if="!loading && !error">
                             <div class="caravan-grid">
@@ -1622,14 +1626,14 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
                     <div style="padding:20px 16px">
                     <?php if ($__member === null): ?>
                         <div style="text-align:center;padding:20px 0">
-                            <p style="font-size:.85rem;color:#94a3b8;margin-bottom:14px">
+                            <p style="font-size:.85rem;color:#8b6f47;margin-bottom:14px">
                                 Du bist derzeit in keiner Allianz. Tritt einer Allianz bei oder gründe deine eigene,
                                 um von gemeinsamen Buffs und koordiniertem Spiel zu profitieren.
                             </p>
                             <a href="/alliance"
                                style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;
-                                      border-radius:6px;background:linear-gradient(180deg,#2563eb,#1e3a8a);
-                                      color:#fff;font-size:.82rem;font-weight:700;text-decoration:none">
+                                      border-radius:8px;background:linear-gradient(180deg,#c9925a,#9a6535);
+                                      border-bottom:3px solid #6b4120;color:#fff8ec;font-size:.82rem;font-weight:700;text-decoration:none">
                                 ⚔ Allianz beitreten oder gründen
                             </a>
                         </div>
@@ -1644,27 +1648,27 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
                         $__roleLabel = $__roleLabelMap[$__member['role']] ?? $__member['role'];
                     ?>
                         <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
-                            <div style="flex-shrink:0;width:52px;height:52px;border-radius:7px;background:#0f172a;
-                                        border:2px solid #fbbf24;display:flex;align-items:center;justify-content:center;
-                                        font-size:.78rem;font-weight:900;color:#fbbf24;letter-spacing:.04em">
+                            <div style="flex-shrink:0;width:52px;height:52px;border-radius:7px;background:#ede0c4;
+                                        border:2px solid #c08858;display:flex;align-items:center;justify-content:center;
+                                        font-size:.78rem;font-weight:900;color:#8b5a2b;letter-spacing:.04em">
                                 [<?= htmlspecialchars((string)$__member['tag']) ?>]
                             </div>
                             <div>
-                                <div style="font-size:1.05rem;font-weight:800;color:#e2e8f0">
+                                <div style="font-size:1.05rem;font-weight:800;color:#4a3520">
                                     <?= htmlspecialchars((string)$__member['name']) ?>
                                 </div>
-                                <div style="font-size:.75rem;color:#64748b;margin-top:2px">
-                                    Deine Rolle: <strong style="color:#fbbf24"><?= htmlspecialchars($__roleLabel) ?></strong>
+                                <div style="font-size:.75rem;color:#8b6f47;margin-top:2px">
+                                    Deine Rolle: <strong style="color:#8b5a2b"><?= htmlspecialchars($__roleLabel) ?></strong>
                                 </div>
                             </div>
                         </div>
                         <a href="/alliance"
                            style="display:inline-flex;align-items:center;gap:6px;padding:7px 16px;
-                                  border-radius:6px;background:#1e293b;border:1px solid #334155;
-                                  color:#e2e8f0;font-size:.8rem;font-weight:600;text-decoration:none;
-                                  transition:background .15s"
-                           onmouseover="this.style.background='#293548'"
-                           onmouseout="this.style.background='#1e293b'">
+                                  border-radius:8px;background:linear-gradient(180deg,#c9925a,#9a6535);
+                                  border-bottom:3px solid #6b4120;
+                                  color:#fff8ec;font-size:.8rem;font-weight:600;text-decoration:none"
+                           onmouseover="this.style.filter='brightness(1.1)'"
+                           onmouseout="this.style.filter=''">
                             ⚔ Zur Allianz-Übersicht
                         </a>
                     <?php endif ?>
@@ -1688,8 +1692,8 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
                 <div id="tab-heilen" class="tab-pane tab-scroll"<?= $activeTab !== 'heilen' ? ' style="display:none"' : '' ?>>
                     <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:40px;text-align:center;gap:12px">
                         <div style="font-size:3rem">🏥</div>
-                        <div style="font-size:.95rem;font-weight:700;color:#e2e8f0">Heilung — Demnächst</div>
-                        <div style="font-size:.8rem;color:#64748b;max-width:300px;line-height:1.6">
+                        <div style="font-size:.95rem;font-weight:700;color:#4a3520">Heilung — Demnächst</div>
+                        <div style="font-size:.8rem;color:#8b6f47;max-width:300px;line-height:1.6">
                             Verwundete Truppen werden automatisch geheilt. Das Heilungs-System wird in einem kommenden Sprint implementiert.
                         </div>
                     </div>
@@ -1702,15 +1706,15 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
                      x-data="treasureApp()" x-init="init()">
 
                     <!-- Sub-Tab bar: SCHÄTZE / SCHATZKISTEN -->
-                    <div style="display:flex;gap:0;border-bottom:1px solid rgba(184,134,11,0.3);margin-bottom:0;flex-shrink:0">
+                    <div style="display:flex;gap:0;border-bottom:1px solid rgba(139,90,43,0.3);margin-bottom:0;flex-shrink:0;background:#e8d8b0">
                         <button @click="treasureTab='treasure'"
-                                :style="treasureTab==='treasure'?'border-bottom:2px solid #d4a017;color:#f0d080':''"
-                                style="padding:10px 20px;background:none;border:none;border-bottom:2px solid transparent;color:#64748b;font-weight:700;font-size:0.8rem;text-transform:uppercase;cursor:pointer">
+                                :style="treasureTab==='treasure'?'border-bottom:2px solid #c08858;color:#8b5a2b':''"
+                                style="padding:10px 20px;background:none;border:none;border-bottom:2px solid transparent;color:#8b6f47;font-weight:700;font-size:0.8rem;text-transform:uppercase;cursor:pointer">
                             Schätze
                         </button>
                         <button @click="treasureTab='chest'"
-                                :style="treasureTab==='chest'?'border-bottom:2px solid #d4a017;color:#f0d080':''"
-                                style="padding:10px 20px;background:none;border:none;border-bottom:2px solid transparent;color:#64748b;font-weight:700;font-size:0.8rem;text-transform:uppercase;cursor:pointer">
+                                :style="treasureTab==='chest'?'border-bottom:2px solid #c08858;color:#8b5a2b':''"
+                                style="padding:10px 20px;background:none;border:none;border-bottom:2px solid transparent;color:#8b6f47;font-weight:700;font-size:0.8rem;text-transform:uppercase;cursor:pointer">
                             Schatzkisten
                         </button>
                     </div>
@@ -1724,7 +1728,7 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
                                 <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
                                     <template x-for="t in allTreasures" :key="t.treasure_code">
                                         <div @click="selectTreasure(t)"
-                                             :style="`border:2px solid ${gradeColor(t.grade)};background:#0a0e1a;border-radius:8px;padding:6px;cursor:pointer;opacity:${t.is_unlocked?1:0.6};position:relative;outline:${selectedTreasure?.treasure_code===t.treasure_code?'2px solid #fff':'none'};outline-offset:2px`">
+                                             :style="`border:2px solid ${gradeColor(t.grade)};background:#ede0c4;border-radius:8px;padding:6px;cursor:pointer;opacity:${t.is_unlocked?1:0.6};position:relative;outline:${selectedTreasure?.treasure_code===t.treasure_code?'2px solid #8b5a2b':'none'};outline-offset:2px`">
                                             <div x-show="!t.is_unlocked" style="position:absolute;top:4px;right:4px;font-size:0.7rem">🔒</div>
                                             <div x-show="!t.is_unlocked && t.fragments > 0"
                                                  style="position:absolute;bottom:4px;left:4px;font-size:0.62rem;color:#fbbf24">
@@ -1741,7 +1745,7 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
                                             </div>
                                         </div>
                                     </template>
-                                    <div x-show="allTreasures.length===0" style="grid-column:1/-1;text-align:center;color:#475569;font-size:0.78rem;padding:20px;font-style:italic">
+                                    <div x-show="allTreasures.length===0" style="grid-column:1/-1;text-align:center;color:#8b6f47;font-size:0.78rem;padding:20px;font-style:italic">
                                         Laden…
                                     </div>
                                 </div>
@@ -1750,51 +1754,51 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
                             <!-- Right: Slot Grid + Detail + Boost -->
                             <div>
                                 <!-- Slot Grid -->
-                                <div style="background:#0a0e1a;border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:12px;margin-bottom:12px">
-                                    <div style="font-size:0.72rem;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-bottom:10px">Ausrüstungsslots</div>
+                                <div style="background:#ede0c4;border:1px solid rgba(139,90,43,0.3);border-radius:8px;padding:12px;margin-bottom:12px">
+                                    <div style="font-size:0.72rem;font-weight:700;color:#8b6f47;text-transform:uppercase;margin-bottom:10px">Ausrüstungsslots</div>
                                     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
                                         <template x-for="slot in [1,2,3,4,5,6]" :key="slot">
-                                            <div :style="`border:2px solid ${slotUnlocked(slot)?'rgba(184,134,11,0.5)':'#1e293b'};background:${slotUnlocked(slot)?'#0f1729':'#070d1a'};border-radius:8px;padding:8px;text-align:center;cursor:${slotUnlocked(slot)?'pointer':'default'}`"
+                                            <div :style="`border:2px solid ${slotUnlocked(slot)?'rgba(139,90,43,0.5)':'rgba(139,90,43,0.15)'};background:${slotUnlocked(slot)?'#f4e4c1':'#e8d8b0'};border-radius:8px;padding:8px;text-align:center;cursor:${slotUnlocked(slot)?'pointer':'default'}`"
                                                  @click="slotUnlocked(slot) && equipToSlot(slot)">
                                                 <div x-show="!slotUnlocked(slot)" style="font-size:1.2rem">🔒</div>
-                                                <div x-show="slotUnlocked(slot) && !getEquipped(slot)" style="font-size:1.5rem;color:#334155">＋</div>
+                                                <div x-show="slotUnlocked(slot) && !getEquipped(slot)" style="font-size:1.5rem;color:#8b6f47">＋</div>
                                                 <div x-show="slotUnlocked(slot) && getEquipped(slot)" style="font-size:1.2rem">
                                                     <span x-text="getEquipped(slot) ? gradeIcon(getEquipped(slot).grade) : ''"></span>
                                                 </div>
-                                                <div style="font-size:0.6rem;color:#475569;margin-top:3px" x-text="slotLockLevel(slot)"></div>
+                                                <div style="font-size:0.6rem;color:#8b6f47;margin-top:3px" x-text="slotLockLevel(slot)"></div>
                                             </div>
                                         </template>
                                     </div>
                                 </div>
 
                                 <!-- Selected Treasure Detail -->
-                                <div x-show="selectedTreasure" style="background:#0a0e1a;border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:12px">
+                                <div x-show="selectedTreasure" style="background:#ede0c4;border:1px solid rgba(139,90,43,0.3);border-radius:8px;padding:12px">
                                     <div style="font-size:0.85rem;font-weight:800;margin-bottom:4px" :style="`color:${gradeColor(selectedTreasure?.grade)}`" x-text="selectedTreasure?.name"></div>
-                                    <div style="font-size:0.7rem;color:#64748b;margin-bottom:10px">
+                                    <div style="font-size:0.7rem;color:#8b6f47;margin-bottom:10px">
                                         🧩 <span x-text="selectedTreasure?.fragments"></span> Fragmente · Lv.<span x-text="selectedTreasure?.level"></span>
                                     </div>
                                     <template x-for="stat in (selectedTreasure?.stats_at_level ?? [])" :key="stat.type">
-                                        <div style="display:flex;justify-content:space-between;font-size:0.75rem;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
-                                            <span style="color:#94a3b8" x-text="statName(stat.type)"></span>
-                                            <span style="color:#ffd700;font-weight:700" x-text="'+'+stat.value.toFixed(1)+(stat.type.includes('capacity')?'':'%')"></span>
+                                        <div style="display:flex;justify-content:space-between;font-size:0.75rem;padding:3px 0;border-bottom:1px solid rgba(139,90,43,0.1)">
+                                            <span style="color:#8b6f47" x-text="statName(stat.type)"></span>
+                                            <span style="color:#8b5a2b;font-weight:700" x-text="'+'+stat.value.toFixed(1)+(stat.type.includes('capacity')?'':'%')"></span>
                                         </div>
                                     </template>
                                     <div style="display:flex;gap:8px;margin-top:12px" x-show="selectedTreasure?.is_unlocked">
-                                        <button class="btn-game btn-game-sm" @click="equipSelected()" x-show="!selectedTreasure?.equipped_slot">Anlegen</button>
-                                        <button class="btn-game btn-game-sm" style="background:linear-gradient(180deg,#ef4444,#b91c1c)" @click="unequipSelected()" x-show="selectedTreasure?.equipped_slot">Ablegen</button>
+                                        <button style="padding:5px 12px;border:none;border-radius:8px;background:linear-gradient(180deg,#c9925a,#9a6535);border-bottom:3px solid #6b4120;color:#fff8ec;font-size:0.78rem;font-weight:800;cursor:pointer" @click="equipSelected()" x-show="!selectedTreasure?.equipped_slot">Anlegen</button>
+                                        <button style="padding:5px 12px;border:none;border-radius:8px;background:linear-gradient(180deg,#c87060,#a05040);border-bottom:3px solid #6a2a1e;color:#fff;font-size:0.78rem;font-weight:800;cursor:pointer" @click="unequipSelected()" x-show="selectedTreasure?.equipped_slot">Ablegen</button>
                                     </div>
                                 </div>
 
                                 <!-- Treasure Boost section -->
-                                <div style="background:linear-gradient(180deg,#1a2744,#0f1729);border:1px solid rgba(59,130,246,0.3);border-radius:8px;padding:12px;margin-top:12px">
-                                    <div style="font-size:0.72rem;font-weight:800;color:#60a5fa;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">Treasure Boost</div>
+                                <div style="background:#ede0c4;border:1px solid rgba(95,158,160,0.35);border-radius:8px;padding:12px;margin-top:12px">
+                                    <div style="font-size:0.72rem;font-weight:800;color:#5f9ea0;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">Treasure Boost</div>
                                     <template x-for="(value, key) in equippedStats" :key="key">
                                         <div style="display:flex;justify-content:space-between;font-size:0.75rem;padding:2px 0">
-                                            <span style="color:#94a3b8" x-text="statName(key)"></span>
-                                            <span style="color:#ffd700;font-weight:700" x-text="'+'+value.toFixed(1)+'%'"></span>
+                                            <span style="color:#8b6f47" x-text="statName(key)"></span>
+                                            <span style="color:#8b5a2b;font-weight:700" x-text="'+'+value.toFixed(1)+'%'"></span>
                                         </div>
                                     </template>
-                                    <div x-show="Object.keys(equippedStats).length===0" style="color:#334155;font-size:0.75rem;font-style:italic">Keine Schätze angelegt</div>
+                                    <div x-show="Object.keys(equippedStats).length===0" style="color:#8b6f47;font-size:0.75rem;font-style:italic">Keine Schätze angelegt</div>
                                 </div>
                             </div>
                         </div>
@@ -1804,39 +1808,39 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
                     <div x-show="treasureTab==='chest'" style="padding:14px">
                         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
                             <!-- Silver Chest -->
-                            <div style="background:#0a0e1a;border:2px solid rgba(148,163,184,0.4);border-radius:12px;padding:16px;text-align:center">
+                            <div style="background:#ede0c4;border:2px solid rgba(139,90,43,0.4);border-radius:12px;padding:16px;text-align:center">
                                 <div style="font-size:3rem;margin-bottom:8px">🪙</div>
-                                <div style="font-weight:800;color:#94a3b8;font-size:0.9rem;margin-bottom:4px">Silbertruhe</div>
-                                <div style="font-size:0.72rem;color:#475569;margin-bottom:12px">
+                                <div style="font-weight:800;color:#8b6f47;font-size:0.9rem;margin-bottom:4px">Silbertruhe</div>
+                                <div style="font-size:0.72rem;color:#8b6f47;margin-bottom:12px">
                                     Kostenlos: <span x-text="chestStatus.free_silver_remaining"></span>/5 heute
                                 </div>
-                                <button class="btn-game btn-game-sm" style="width:100%"
+                                <button style="width:100%;padding:7px;border:none;border-radius:8px;background:linear-gradient(180deg,#c9925a,#9a6535);border-bottom:3px solid #6b4120;color:#fff8ec;font-size:0.8rem;font-weight:800;cursor:pointer"
                                         @click="openChest('silver')"
                                         :disabled="chestStatus.free_silver_remaining <= 0 && chestStatus.silver_count <= 0">
                                     <span x-text="chestStatus.free_silver_remaining > 0 ? 'KOSTENLOS' : 'ÖFFNEN ('+chestStatus.silver_count+')'"></span>
                                 </button>
                             </div>
                             <!-- Gold Chest -->
-                            <div style="background:#0a0e1a;border:2px solid rgba(251,191,36,0.4);border-radius:12px;padding:16px;text-align:center">
+                            <div style="background:#ede0c4;border:2px solid rgba(192,136,88,0.5);border-radius:12px;padding:16px;text-align:center">
                                 <div style="font-size:3rem;margin-bottom:8px">📦</div>
-                                <div style="font-weight:800;color:#fbbf24;font-size:0.9rem;margin-bottom:4px">Goldtruhe</div>
-                                <div style="font-size:0.72rem;color:#475569;margin-bottom:12px">
+                                <div style="font-weight:800;color:#8b5a2b;font-size:0.9rem;margin-bottom:4px">Goldtruhe</div>
+                                <div style="font-size:0.72rem;color:#8b6f47;margin-bottom:12px">
                                     Vorhanden: <span x-text="chestStatus.gold_count"></span> · oder 50 💎
                                 </div>
-                                <button class="btn-game btn-game-sm" style="width:100%;background:linear-gradient(180deg,#b45309,#92400e)"
+                                <button style="width:100%;padding:7px;border:none;border-radius:8px;background:linear-gradient(180deg,#c9925a,#9a6535);border-bottom:3px solid #6b4120;color:#fff8ec;font-size:0.8rem;font-weight:800;cursor:pointer"
                                         @click="openChest('gold')"
                                         :disabled="chestStatus.gold_count <= 0">
                                     ÖFFNEN
                                 </button>
                             </div>
                             <!-- Platinum Chest -->
-                            <div style="background:#0a0e1a;border:2px solid rgba(45,212,191,0.4);border-radius:12px;padding:16px;text-align:center">
+                            <div style="background:#ede0c4;border:2px solid rgba(95,158,160,0.4);border-radius:12px;padding:16px;text-align:center">
                                 <div style="font-size:3rem;margin-bottom:8px">💎</div>
-                                <div style="font-weight:800;color:#2dd4bf;font-size:0.9rem;margin-bottom:4px">Platintruhe</div>
-                                <div style="font-size:0.72rem;color:#475569;margin-bottom:12px">
+                                <div style="font-weight:800;color:#5f9ea0;font-size:0.9rem;margin-bottom:4px">Platintruhe</div>
+                                <div style="font-size:0.72rem;color:#8b6f47;margin-bottom:12px">
                                     Vorhanden: <span x-text="chestStatus.platinum_count"></span> · oder 200 💎
                                 </div>
-                                <button class="btn-game btn-game-sm" style="width:100%;background:linear-gradient(180deg,#0e7490,#164e63)"
+                                <button style="width:100%;padding:7px;border:none;border-radius:8px;background:linear-gradient(180deg,#c9925a,#9a6535);border-bottom:3px solid #6b4120;color:#fff8ec;font-size:0.8rem;font-weight:800;cursor:pointer"
                                         @click="openChest('platinum')"
                                         :disabled="chestStatus.platinum_count <= 0">
                                     ÖFFNEN
@@ -1845,12 +1849,12 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
                         </div>
 
                         <!-- Last Chest Opening Result -->
-                        <div x-show="lastChestReward" x-cloak style="margin-top:16px;background:#0a0e1a;border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:16px">
-                            <div style="font-size:0.8rem;font-weight:700;color:#f0d080;margin-bottom:10px">Du hast erhalten:</div>
+                        <div x-show="lastChestReward" x-cloak style="margin-top:16px;background:#ede0c4;border:1px solid rgba(139,90,43,0.3);border-radius:8px;padding:16px">
+                            <div style="font-size:0.8rem;font-weight:700;color:#8b5a2b;margin-bottom:10px">Du hast erhalten:</div>
                             <template x-for="reward in lastChestReward" :key="reward.name">
                                 <div style="display:flex;align-items:center;gap:8px;padding:4px 0">
                                     <span style="font-size:1rem">✨</span>
-                                    <span style="font-size:0.82rem;color:#e2e8f0" x-text="reward.name + (reward.quantity > 1 ? ' ×'+reward.quantity : '')"></span>
+                                    <span style="font-size:0.82rem;color:#4a3520" x-text="reward.name + (reward.quantity > 1 ? ' ×'+reward.quantity : '')"></span>
                                 </div>
                             </template>
                         </div>
@@ -2073,7 +2077,7 @@ if (btnInstant) {
                 '</div>';
         });
         // Cost rows
-        html += '<div class="brk-stat-row" style="margin-top:6px;border-top:1px solid #1e2d42;padding-top:6px">' +
+        html += '<div class="brk-stat-row" style="margin-top:6px;border-top:1px solid rgba(139,90,43,0.15);padding-top:6px">' +
             '<span class="brk-stat-icon">⏱</span>' +
             '<span class="brk-stat-label">Zeit/Einheit</span>' +
             '<span class="brk-stat-val">' + fmtTimeSec(t.time) + '</span>' +
@@ -2087,7 +2091,7 @@ if (btnInstant) {
                 '</div>';
         });
         // In city count
-        html += '<div class="brk-stat-row" style="border-top:1px solid #1e2d42;padding-top:6px;margin-top:6px">' +
+        html += '<div class="brk-stat-row" style="border-top:1px solid rgba(139,90,43,0.15);padding-top:6px;margin-top:6px">' +
             '<span class="brk-stat-icon">🏰</span>' +
             '<span class="brk-stat-label">In Stadt</span>' +
             '<span class="brk-stat-val">' + fmtNum(t.in_city) + '</span>' +
@@ -2267,7 +2271,7 @@ function treasureApp() {
         },
 
         gradeColor(grade) {
-            return { normal: '#94a3b8', rare: '#60a5fa', epic: '#c4b5fd', legendary: '#fbbf24', mythic: '#2dd4bf' }[grade] || '#94a3b8';
+            return { normal: '#8b6f47', rare: '#5f9ea0', epic: '#9b7cc8', legendary: '#c08858', mythic: '#5f9ea0' }[grade] || '#8b6f47';
         },
         gradeIcon(grade) {
             return { normal: '🪨', rare: '💙', epic: '💜', legendary: '⭐', mythic: '💎' }[grade] || '🔮';

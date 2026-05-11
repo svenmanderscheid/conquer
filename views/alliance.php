@@ -45,8 +45,8 @@ $csrf = $session['csrf_token'];
 
         html, body {
             min-height: 100vh;
-            background: #080c18;
-            color: #e2e8f0;
+            background: var(--c-bg, #f0e8d0);
+            color: var(--c-text, #4a3520);
             font-family: system-ui, -apple-system, sans-serif;
         }
 
@@ -61,23 +61,23 @@ $csrf = $session['csrf_token'];
 
         /* ── Section card — extends game-panel from main.css ── */
         .card {
-            background: var(--c-panel, #0f1729);
-            border: 1px solid var(--c-border, rgba(184,134,11,0.3));
+            background: var(--c-panel, #f4e4c1);
+            border: 1px solid var(--c-border, rgba(139,90,43,0.35));
             border-radius: 12px;
             overflow: hidden;
             margin-bottom: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.03);
+            box-shadow: 0 4px 20px var(--c-shadow, rgba(139,90,43,0.18));
         }
 
         .card-header {
-            background: linear-gradient(180deg, #1a2744 0%, #0f1729 100%);
-            border-bottom: 1px solid rgba(184,134,11,0.25);
+            background: var(--c-panel3, #e8d8b0);
+            border-bottom: 1px solid var(--c-border, rgba(139,90,43,0.35));
             padding: 10px 16px;
             font-size: 0.7rem;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            color: var(--c-gold, #d4a017);
+            color: var(--c-wood-dark, #8b5a2b);
             display: flex;
             align-items: center;
             gap: 8px;
@@ -90,8 +90,8 @@ $csrf = $session['csrf_token'];
         /* ── Tabs ── */
         .tab-bar {
             display: flex;
-            border-bottom: 1px solid rgba(184,134,11,0.25);
-            background: #080c18;
+            border-bottom: 1px solid var(--c-border, rgba(139,90,43,0.35));
+            background: var(--c-panel3, #e8d8b0);
         }
 
         .tab-btn {
@@ -100,7 +100,7 @@ $csrf = $session['csrf_token'];
             font-weight: 800;
             letter-spacing: 0.07em;
             text-transform: uppercase;
-            color: #64748b;
+            color: var(--c-muted, #8b6f47);
             background: none;
             border: none;
             border-bottom: 2px solid transparent;
@@ -110,8 +110,8 @@ $csrf = $session['csrf_token'];
             font-family: inherit;
         }
 
-        .tab-btn:hover          { color: #e2e8f0; }
-        .tab-btn.tab-active     { color: #f0d080; border-bottom-color: #d4a017; }
+        .tab-btn:hover          { color: var(--c-text, #4a3520); }
+        .tab-btn.tab-active     { color: var(--c-wood-dark, #8b5a2b); border-bottom-color: var(--c-gold, #c08858); }
 
         /* ── Alliance info panel ── */
         .alliance-banner {
@@ -120,9 +120,9 @@ $csrf = $session['csrf_token'];
             gap: 18px;
             margin-bottom: 16px;
             padding: 16px;
-            background: linear-gradient(135deg, rgba(26,39,68,0.6) 0%, rgba(8,12,24,0.6) 100%);
+            background: var(--c-panel2, #ede0c4);
             border-radius: 10px;
-            border: 1px solid rgba(184,134,11,0.2);
+            border: 1px solid var(--c-border, rgba(139,90,43,0.35));
         }
 
         .alliance-tag-badge {
@@ -130,44 +130,43 @@ $csrf = $session['csrf_token'];
             width: 68px;
             height: 68px;
             border-radius: 10px;
-            background: linear-gradient(180deg, #1a1200 0%, #0d0900 100%);
-            border: 2px solid rgba(212,160,23,0.6);
+            background: var(--c-panel3, #e8d8b0);
+            border: 2px solid var(--c-gold, #c08858);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 0.82rem;
             font-weight: 900;
-            color: #f0d080;
+            color: var(--c-wood-dark, #8b5a2b);
             letter-spacing: 0.04em;
-            box-shadow: 0 0 16px rgba(212,160,23,0.15);
+            box-shadow: 0 0 16px rgba(192,136,88,0.15);
         }
 
         .alliance-title {
             font-size: 1.3rem;
             font-weight: 900;
-            color: #f0d080;
-            text-shadow: 0 0 20px rgba(212,160,23,0.3);
+            color: var(--c-wood-dark, #8b5a2b);
         }
 
         .alliance-meta {
             font-size: 0.78rem;
-            color: #64748b;
+            color: var(--c-muted, #8b6f47);
             margin-top: 4px;
             line-height: 1.5;
         }
 
-        .alliance-meta strong { color: #d4a017; }
+        .alliance-meta strong { color: var(--c-wood-dark, #8b5a2b); }
 
         .alliance-desc {
             font-size: 0.82rem;
-            color: #94a3b8;
+            color: var(--c-text, #4a3520);
             line-height: 1.6;
             margin-top: 12px;
             padding: 10px 14px;
-            background: rgba(0,0,0,0.3);
+            background: var(--c-panel3, #e8d8b0);
             border-radius: 8px;
-            border: 1px solid rgba(184,134,11,0.15);
-            border-left: 3px solid rgba(212,160,23,0.4);
+            border: 1px solid var(--c-border, rgba(139,90,43,0.35));
+            border-left: 3px solid var(--c-gold, #c08858);
         }
 
         /* ── Member list ── */
@@ -177,24 +176,24 @@ $csrf = $session['csrf_token'];
             gap: 10px;
             padding: 9px 12px;
             border-radius: 7px;
-            border: 1px solid rgba(45,64,96,0.6);
-            background: rgba(0,0,0,0.25);
+            border: 1px solid var(--c-border, rgba(139,90,43,0.35));
+            border-bottom: 1px solid rgba(139,90,43,0.12);
+            background: transparent;
             margin-bottom: 6px;
             font-size: 0.82rem;
             transition: border-color 0.15s, background 0.15s;
         }
 
         .member-row:hover {
-            border-color: rgba(184,134,11,0.25);
-            background: rgba(255,255,255,0.02);
+            background: rgba(192,136,88,0.08);
         }
 
         .member-avatar {
             width: 30px;
             height: 30px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #7c1e0e, #4a0d05);
-            border: 1px solid rgba(212,160,23,0.35);
+            background: var(--c-panel3, #e8d8b0);
+            border: 1px solid var(--c-border, rgba(139,90,43,0.35));
             display: flex;
             align-items: center;
             justify-content: center;
@@ -205,7 +204,7 @@ $csrf = $session['csrf_token'];
         .member-username {
             flex: 1;
             font-weight: 700;
-            color: #e2e8f0;
+            color: var(--c-text, #4a3520);
         }
 
         .role-badge {
@@ -217,15 +216,15 @@ $csrf = $session['csrf_token'];
             letter-spacing: 0.06em;
         }
 
-        .role-leader       { background: #d97706; color: #fff; }
-        .role-vice_leader  { background: #7c3aed; color: #fff; }
-        .role-officer      { background: #0369a1; color: #fff; }
-        .role-veteran      { background: #166534; color: #fff; }
-        .role-member       { background: rgba(51,65,85,0.6); color: #94a3b8; border: 1px solid #334155; }
+        .role-leader       { background: #c08858; color: #fff; }
+        .role-vice_leader  { background: #9070c8; color: #fff; }
+        .role-officer      { background: var(--c-info, #5f9ea0); color: #fff; }
+        .role-veteran      { background: var(--c-success, #7fb069); color: #fff; }
+        .role-member       { background: var(--c-panel3, #e8d8b0); color: var(--c-muted, #8b6f47); border: 1px solid var(--c-border, rgba(139,90,43,0.35)); }
 
         .member-joined {
             font-size: 0.68rem;
-            color: #475569;
+            color: var(--c-muted, #8b6f47);
             font-family: monospace;
         }
 
@@ -233,8 +232,8 @@ $csrf = $session['csrf_token'];
         .chat-messages {
             height: 340px;
             overflow-y: auto;
-            background: rgba(0,0,0,0.4);
-            border: 1px solid rgba(45,64,96,0.6);
+            background: var(--c-panel2, #ede0c4);
+            border: 1px solid var(--c-border, rgba(139,90,43,0.35));
             border-radius: 8px;
             padding: 10px 12px;
             display: flex;
@@ -242,35 +241,35 @@ $csrf = $session['csrf_token'];
             gap: 7px;
             margin-bottom: 10px;
             scrollbar-width: thin;
-            scrollbar-color: rgba(184,134,11,0.2) transparent;
+            scrollbar-color: var(--c-border, rgba(139,90,43,0.35)) transparent;
         }
 
         .chat-messages::-webkit-scrollbar { width: 5px; }
-        .chat-messages::-webkit-scrollbar-thumb { background: rgba(184,134,11,0.2); border-radius: 3px; }
+        .chat-messages::-webkit-scrollbar-thumb { background: var(--c-border, rgba(139,90,43,0.35)); border-radius: 3px; }
 
         .chat-msg {
             font-size: 0.8rem;
             line-height: 1.4;
             padding: 3px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.03);
+            border-bottom: 1px solid rgba(139,90,43,0.08);
         }
 
         .chat-msg:last-child { border-bottom: none; }
 
         .chat-msg-name {
             font-weight: 800;
-            color: #f0d080;
+            color: var(--c-wood-dark, #8b5a2b);
             margin-right: 6px;
         }
 
         .chat-msg-text {
-            color: #cbd5e1;
+            color: var(--c-text, #4a3520);
             word-break: break-word;
         }
 
         .chat-msg-time {
             font-size: 0.62rem;
-            color: #475569;
+            color: var(--c-muted, #8b6f47);
             margin-left: 6px;
             font-family: monospace;
         }
@@ -282,10 +281,10 @@ $csrf = $session['csrf_token'];
 
         .chat-input {
             flex: 1;
-            background: rgba(0,0,0,0.35);
-            border: 1px solid rgba(184,134,11,0.25);
+            background: #fdf6e8;
+            border: 1px solid var(--c-border, rgba(139,90,43,0.35));
             border-radius: 7px;
-            color: #e2e8f0;
+            color: var(--c-text, #4a3520);
             font-size: 0.85rem;
             padding: 9px 12px;
             outline: none;
@@ -293,8 +292,8 @@ $csrf = $session['csrf_token'];
             font-family: inherit;
         }
 
-        .chat-input:focus { border-color: rgba(212,160,23,0.6); }
-        .chat-input::placeholder { color: #475569; }
+        .chat-input:focus { border-color: var(--c-gold, #c08858); }
+        .chat-input::placeholder { color: var(--c-muted, #8b6f47); }
 
         /* ── Buttons — use btn-game from main.css; local aliases for compat ── */
         .btn {
@@ -319,22 +318,22 @@ $csrf = $session['csrf_token'];
         .btn:active:not(:disabled) { transform: translateY(1px); }
 
         .btn-primary {
-            background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
-            color: #fff;
-            border-bottom: 2px solid #1e3a8a;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            background: linear-gradient(180deg, #c9925a 0%, #9a6535 100%);
+            color: #fff8ec;
+            border-bottom: 2px solid #6b4120;
+            box-shadow: 0 2px 8px var(--c-shadow, rgba(139,90,43,0.18));
         }
         .btn-success {
-            background: linear-gradient(180deg, #16a34a 0%, #15803d 100%);
+            background: linear-gradient(180deg, #8fc076 0%, #6a9454 100%);
             color: #fff;
-            border-bottom: 2px solid #166534;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            border-bottom: 2px solid #4a6e38;
+            box-shadow: 0 2px 8px var(--c-shadow, rgba(139,90,43,0.18));
         }
         .btn-danger {
-            background: linear-gradient(180deg, #dc2626 0%, #b91c1c 100%);
+            background: linear-gradient(180deg, #d4705a 0%, #b0503e 100%);
             color: #fff;
-            border-bottom: 2px solid #991b1b;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            border-bottom: 2px solid #8a3028;
+            box-shadow: 0 2px 8px var(--c-shadow, rgba(139,90,43,0.18));
         }
         .btn-sm { padding: 5px 12px; font-size: 0.72rem; }
 
@@ -347,10 +346,10 @@ $csrf = $session['csrf_token'];
 
         .search-input {
             flex: 1;
-            background: rgba(0,0,0,0.35);
-            border: 1px solid rgba(184,134,11,0.25);
+            background: #fdf6e8;
+            border: 1px solid var(--c-border, rgba(139,90,43,0.35));
             border-radius: 7px;
-            color: #e2e8f0;
+            color: var(--c-text, #4a3520);
             font-size: 0.85rem;
             padding: 8px 12px;
             outline: none;
@@ -358,8 +357,8 @@ $csrf = $session['csrf_token'];
             font-family: inherit;
         }
 
-        .search-input:focus { border-color: rgba(212,160,23,0.6); }
-        .search-input::placeholder { color: #475569; }
+        .search-input:focus { border-color: var(--c-gold, #c08858); }
+        .search-input::placeholder { color: var(--c-muted, #8b6f47); }
 
         .alliance-list-row {
             display: flex;
@@ -367,25 +366,25 @@ $csrf = $session['csrf_token'];
             gap: 12px;
             padding: 10px 14px;
             border-radius: 8px;
-            border: 1px solid rgba(45,64,96,0.5);
-            background: rgba(0,0,0,0.25);
+            border: 1px solid var(--c-border, rgba(139,90,43,0.35));
+            background: var(--c-panel2, #ede0c4);
             margin-bottom: 6px;
             font-size: 0.82rem;
             transition: border-color 0.15s, background 0.15s;
         }
 
         .alliance-list-row:hover {
-            border-color: rgba(184,134,11,0.3);
-            background: rgba(255,255,255,0.02);
+            border-color: var(--c-gold, #c08858);
+            background: rgba(192,136,88,0.08);
         }
 
         .alliance-list-tag {
             flex-shrink: 0;
             padding: 3px 9px;
             border-radius: 5px;
-            background: rgba(212,160,23,0.1);
-            border: 1px solid rgba(212,160,23,0.5);
-            color: #f0d080;
+            background: rgba(192,136,88,0.12);
+            border: 1px solid var(--c-gold, #c08858);
+            color: var(--c-wood-dark, #8b5a2b);
             font-size: 0.7rem;
             font-weight: 900;
             letter-spacing: 0.06em;
@@ -394,12 +393,12 @@ $csrf = $session['csrf_token'];
         .alliance-list-name {
             flex: 1;
             font-weight: 700;
-            color: #e2e8f0;
+            color: var(--c-text, #4a3520);
         }
 
         .alliance-list-count {
             font-size: 0.74rem;
-            color: #64748b;
+            color: var(--c-muted, #8b6f47);
         }
 
         /* ── Create form ── */
@@ -413,16 +412,16 @@ $csrf = $session['csrf_token'];
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            color: #64748b;
+            color: var(--c-muted, #8b6f47);
             margin-bottom: 6px;
         }
 
         .form-input, .form-textarea {
             width: 100%;
-            background: rgba(0,0,0,0.35);
-            border: 1px solid rgba(184,134,11,0.25);
+            background: #fdf6e8;
+            border: 1px solid var(--c-border, rgba(139,90,43,0.35));
             border-radius: 7px;
-            color: #e2e8f0;
+            color: var(--c-text, #4a3520);
             font-size: 0.85rem;
             padding: 9px 12px;
             outline: none;
@@ -430,8 +429,8 @@ $csrf = $session['csrf_token'];
             font-family: inherit;
         }
 
-        .form-input:focus, .form-textarea:focus { border-color: rgba(212,160,23,0.6); }
-        .form-input::placeholder, .form-textarea::placeholder { color: #475569; }
+        .form-input:focus, .form-textarea:focus { border-color: var(--c-gold, #c08858); }
+        .form-input::placeholder, .form-textarea::placeholder { color: var(--c-muted, #8b6f47); }
 
         .form-textarea {
             min-height: 80px;
@@ -440,7 +439,7 @@ $csrf = $session['csrf_token'];
 
         .hint {
             font-size: 0.68rem;
-            color: #475569;
+            color: var(--c-muted, #8b6f47);
             margin-top: 4px;
         }
 
@@ -450,8 +449,8 @@ $csrf = $session['csrf_token'];
             bottom: 1.5rem;
             left: 50%;
             transform: translateX(-50%);
-            background: #0f1729;
-            border: 1px solid rgba(184,134,11,0.3);
+            background: var(--c-panel, #f4e4c1);
+            border-left: 4px solid var(--c-gold, #c08858);
             border-radius: 8px;
             padding: 8px 18px;
             font-size: 0.85rem;
@@ -460,17 +459,18 @@ $csrf = $session['csrf_token'];
             z-index: 9000;
             white-space: nowrap;
             backdrop-filter: blur(4px);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+            color: var(--c-text, #4a3520);
+            box-shadow: 0 4px 20px var(--c-shadow, rgba(139,90,43,0.18));
         }
 
-        #al-toast.ok  { border-color: rgba(34,197,94,0.5); color: #22c55e; }
-        #al-toast.err { border-color: rgba(239,68,68,0.5); color: #ef4444; }
+        #al-toast.ok  { border-left-color: var(--c-success, #7fb069); color: var(--c-success, #7fb069); }
+        #al-toast.err { border-left-color: var(--c-danger, #c0604d);  color: var(--c-danger, #c0604d); }
 
         /* ── Leave modal confirmation ── */
         .confirm-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.78);
+            background: rgba(74,53,32,0.6);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -479,31 +479,32 @@ $csrf = $session['csrf_token'];
         }
 
         .confirm-box {
-            background: #0f1729;
-            border: 1px solid rgba(239,68,68,0.4);
+            background: var(--c-panel, #f4e4c1);
+            border: 1px solid rgba(192,96,77,0.5);
             border-radius: 12px;
             padding: 28px;
             max-width: 360px;
             width: 100%;
             text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.85);
+            color: var(--c-text, #4a3520);
+            box-shadow: 0 20px 60px var(--c-shadow, rgba(139,90,43,0.18));
         }
 
         .confirm-box h3 {
             font-size: 1.05rem;
             font-weight: 800;
             margin-bottom: 10px;
-            color: #f0d080;
+            color: var(--c-wood-dark, #8b5a2b);
         }
 
         .confirm-box p {
             font-size: 0.82rem;
-            color: #94a3b8;
+            color: var(--c-muted, #8b6f47);
             margin-bottom: 22px;
             line-height: 1.6;
         }
 
-        .confirm-box strong { color: #e2e8f0; }
+        .confirm-box strong { color: var(--c-text, #4a3520); }
 
         .confirm-btns {
             display: flex;
@@ -543,11 +544,11 @@ $csrf = $session['csrf_token'];
             </div>
 
             <template x-if="loading">
-                <div style="color:#64748b;font-size:.82rem;text-align:center;padding:16px 0">Suche...</div>
+                <div style="color:var(--c-muted,#8b6f47);font-size:.82rem;text-align:center;padding:16px 0">Suche...</div>
             </template>
 
             <template x-if="!loading && alliances.length === 0">
-                <div style="color:#475569;font-size:.82rem;text-align:center;padding:16px 0">Keine Allianzen gefunden.</div>
+                <div style="color:var(--c-muted,#8b6f47);font-size:.82rem;text-align:center;padding:16px 0">Keine Allianzen gefunden.</div>
             </template>
 
             <template x-for="a in alliances" :key="a.id">
@@ -637,13 +638,13 @@ $csrf = $session['csrf_token'];
 
         <!-- ── Info tab ── -->
         <div class="card-body" x-show="tab === 'info'">
-            <p style="font-size:.85rem;color:#94a3b8;line-height:1.6">
+            <p style="font-size:.85rem;color:var(--c-text,#4a3520);line-height:1.6">
                 Willkommen in der Allianz
-                <strong style="color:#e2e8f0"><?= htmlspecialchars((string)$myAlliance['name']) ?></strong>.
+                <strong style="color:var(--c-wood-dark,#8b5a2b)"><?= htmlspecialchars((string)$myAlliance['name']) ?></strong>.
                 Nutze den Chat-Tab um mit deinen Mitstreitern zu kommunizieren, und den Mitglieder-Tab
                 um die Zusammensetzung deiner Allianz zu sehen.
             </p>
-            <p style="font-size:.75rem;color:#475569;margin-top:10px">
+            <p style="font-size:.75rem;color:var(--c-muted,#8b6f47);margin-top:10px">
                 Weitere Allianz-Features (Territorien, Alliance-Buffs, War-Declare) folgen in späteren Sprints.
             </p>
         </div>
@@ -652,7 +653,7 @@ $csrf = $session['csrf_token'];
         <div class="card-body" x-show="tab === 'members'">
 
             <template x-if="membersLoading">
-                <div style="color:#64748b;font-size:.82rem;text-align:center;padding:16px 0">Lade Mitglieder...</div>
+                <div style="color:var(--c-muted,#8b6f47);font-size:.82rem;text-align:center;padding:16px 0">Lade Mitglieder...</div>
             </template>
 
             <template x-for="m in memberList" :key="m.player_id">
@@ -664,7 +665,7 @@ $csrf = $session['csrf_token'];
             </template>
 
             <template x-if="!membersLoading && memberList.length === 0">
-                <div style="color:#475569;font-size:.82rem;text-align:center;padding:16px 0">Keine Mitglieder gefunden.</div>
+                <div style="color:var(--c-muted,#8b6f47);font-size:.82rem;text-align:center;padding:16px 0">Keine Mitglieder gefunden.</div>
             </template>
         </div>
 
@@ -679,7 +680,7 @@ $csrf = $session['csrf_token'];
                     </div>
                 </template>
                 <template x-if="messages.length === 0">
-                    <div style="color:#475569;font-size:.8rem;text-align:center;padding:20px 0">
+                    <div style="color:var(--c-muted,#8b6f47);font-size:.8rem;text-align:center;padding:20px 0">
                         Noch keine Nachrichten. Schreib die erste!
                     </div>
                 </template>
@@ -697,7 +698,7 @@ $csrf = $session['csrf_token'];
                     Senden
                 </button>
             </div>
-            <div style="font-size:.7rem;color:#475569;margin-top:5px">
+            <div style="font-size:.7rem;color:var(--c-muted,#8b6f47);margin-top:5px">
                 Max. 200 Zeichen &bull; 1 Nachricht alle 3 Sekunden
             </div>
         </div>

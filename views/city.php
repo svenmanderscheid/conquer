@@ -78,15 +78,15 @@ foreach ($troopQueue as $tq) {
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-            --bg:      #080c18;
-            --surface: #0f1729;
-            --border:  rgba(184,134,11,0.3);
-            --text:    #e2e8f0;
-            --muted:   #94a3b8;
-            --accent:  #d4a017;
-            --gold:    #f0d080;
-            --green:   #22c55e;
-            --red:     #ef4444;
+            --bg:      var(--c-bg, #f0e8d0);
+            --surface: var(--c-panel, #f4e4c1);
+            --border:  var(--c-border, rgba(139,90,43,0.35));
+            --text:    var(--c-text, #4a3520);
+            --muted:   var(--c-muted, #8b6f47);
+            --accent:  var(--c-gold, #c08858);
+            --gold:    var(--c-gold-l, #d4a070);
+            --green:   #7fb069;
+            --red:     #c0604d;
         }
 
         html, body {
@@ -114,8 +114,8 @@ foreach ($troopQueue as $tq) {
         .topbar {
             flex: 0 0 48px;
             height: 48px;
-            background: linear-gradient(180deg, #1a0d00 0%, #0f0700 100%);
-            border-bottom: 1px solid rgba(184,134,11,0.4);
+            background: var(--c-panel2, #ede0c4);
+            border-bottom: 1px solid var(--c-border, rgba(139,90,43,0.35));
             padding: 0 1rem;
             display: flex;
             align-items: center;
@@ -125,7 +125,7 @@ foreach ($troopQueue as $tq) {
         .topbar-title {
             font-size: 0.95rem;
             font-weight: 700;
-            color: #f0d080;
+            color: var(--c-wood-dark, #8b5a2b);
             white-space: nowrap;
             text-decoration: none;
             letter-spacing: 0.03em;
@@ -142,12 +142,12 @@ foreach ($troopQueue as $tq) {
             display: flex;
             align-items: center;
             gap: 0.25rem;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(184,134,11,0.2);
+            background: var(--c-panel, #f4e4c1);
+            border: 1px solid var(--c-border, rgba(139,90,43,0.35));
             border-radius: 5px;
             padding: 0.2rem 0.5rem;
             font-size: 0.75rem;
-            color: #f0d080;
+            color: var(--c-text, #4a3520);
             font-weight: 600;
         }
 
@@ -162,19 +162,19 @@ foreach ($troopQueue as $tq) {
             border-radius: 5px;
             font-size: 0.78rem;
             cursor: pointer;
-            border: 1px solid rgba(184,134,11,0.3);
-            background: rgba(0,0,0,0.3);
-            color: #94a3b8;
+            border: 1px solid var(--c-border, rgba(139,90,43,0.35));
+            background: var(--c-panel, #f4e4c1);
+            color: var(--c-muted, #8b6f47);
             text-decoration: none;
             transition: border-color 0.15s, color 0.15s;
         }
-        .btn:hover { border-color: #d4a017; color: #f0d080; }
+        .btn:hover { border-color: var(--c-wood-dark, #8b5a2b); color: var(--c-wood-dark, #8b5a2b); }
 
         /* ── Canvas wrapper ── */
         #city-wrap {
             flex: 1;
             overflow: auto;
-            background: #050810;
+            background: var(--c-bg, #f0e8d0);
             position: relative;
         }
 
@@ -187,18 +187,18 @@ foreach ($troopQueue as $tq) {
         /* ── Tooltip ── */
         #city-tooltip {
             position: fixed;
-            background: linear-gradient(180deg, #1a2744 0%, #0f1729 100%);
-            border: 1px solid rgba(212,160,23,0.6);
-            border-radius: 6px;
+            background: var(--c-panel, #f4e4c1);
+            border: 1px solid var(--c-border, rgba(139,90,43,0.35));
+            border-radius: 8px;
             padding: 0.4rem 0.9rem;
             font-size: 0.78rem;
             font-weight: 600;
-            color: #f0d080;
+            color: var(--c-text, #4a3520);
             pointer-events: none;
             display: none;
             z-index: 30;
             white-space: nowrap;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+            box-shadow: 0 4px 16px var(--c-shadow, rgba(139,90,43,0.18));
         }
 
         /* ── Building Popup (three-part: above / spacer / below) ── */
@@ -222,16 +222,16 @@ foreach ($troopQueue as $tq) {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: linear-gradient(180deg, rgba(26,39,68,0.97) 0%, rgba(8,12,24,0.97) 100%);
-            border: 1px solid rgba(212,160,23,0.7);
+            background: var(--c-panel, #f4e4c1);
+            border: 1px solid var(--c-border, rgba(139,90,43,0.35));
             border-radius: 20px;
             padding: 6px 18px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.8), 0 0 12px rgba(212,160,23,0.15);
+            box-shadow: 0 4px 16px var(--c-shadow, rgba(139,90,43,0.18));
         }
         #bp-name {
             font-size: 0.85rem;
             font-weight: 800;
-            color: #f0d080;
+            color: var(--c-wood-dark, #8b5a2b);
             white-space: nowrap;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -239,9 +239,9 @@ foreach ($troopQueue as $tq) {
         #bp-badge {
             font-size: 0.7rem;
             font-weight: 800;
-            color: #d4a017;
-            background: rgba(212,160,23,0.15);
-            border: 1px solid rgba(212,160,23,0.3);
+            color: var(--c-wood-dark, #8b5a2b);
+            background: rgba(139,90,43,0.12);
+            border: 1px solid var(--c-border, rgba(139,90,43,0.35));
             border-radius: 10px;
             padding: 1px 8px;
             white-space: nowrap;
@@ -279,29 +279,29 @@ foreach ($troopQueue as $tq) {
             width: 52px;
             height: 58px;
             clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-            background: linear-gradient(160deg, #7c3008 0%, #4a1a04 100%);
+            background: linear-gradient(160deg, #c9925a 0%, #9a6535 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            filter: drop-shadow(0 3px 6px rgba(0,0,0,0.8));
+            filter: drop-shadow(0 3px 6px rgba(139,90,43,0.5));
             transition: filter 0.12s, transform 0.12s;
         }
         .hex-wrap.hex-primary .hex-shape {
-            background: linear-gradient(160deg, #c8870a 0%, #9a6508 100%);
-            filter: drop-shadow(0 3px 8px rgba(200,135,10,0.5));
+            background: linear-gradient(160deg, #d4a070 0%, #a06830 100%);
+            filter: drop-shadow(0 3px 8px rgba(192,136,88,0.6));
         }
         .hex-wrap:hover .hex-shape {
-            filter: drop-shadow(0 3px 14px rgba(212,160,23,0.7)) brightness(1.2);
+            filter: drop-shadow(0 3px 14px rgba(139,90,43,0.7)) brightness(1.12);
             transform: scale(1.08);
         }
         .hex-icon { font-size: 1.05rem; line-height: 1; }
         .hex-label {
             font-size: 0.6rem;
-            color: #f0d080;
+            color: var(--c-wood-dark, #8b5a2b);
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            text-shadow: 0 1px 4px rgba(0,0,0,0.95);
+            text-shadow: 0 1px 3px rgba(255,255,255,0.6);
             white-space: nowrap;
         }
 
@@ -330,17 +330,17 @@ foreach ($troopQueue as $tq) {
             display: flex;
             align-items: center;
             gap: 5px;
-            background: rgba(10,18,35,0.88);
-            border: 1px solid rgba(34,197,94,0.6);
+            background: var(--c-panel, #f4e4c1);
+            border: 1px solid rgba(127,176,105,0.6);
             border-radius: 12px;
             padding: 3px 8px 3px 6px;
-            box-shadow: 0 0 8px rgba(34,197,94,0.3), 0 2px 6px rgba(0,0,0,0.6);
+            box-shadow: 0 0 8px rgba(127,176,105,0.3), 0 2px 6px var(--c-shadow, rgba(139,90,43,0.18));
             animation: badge-pulse 2s ease-in-out infinite;
         }
 
         @keyframes badge-pulse {
-            0%, 100% { box-shadow: 0 0 6px rgba(34,197,94,0.2), 0 2px 6px rgba(0,0,0,0.6); }
-            50%       { box-shadow: 0 0 14px rgba(34,197,94,0.55), 0 2px 8px rgba(0,0,0,0.7); }
+            0%, 100% { box-shadow: 0 0 6px rgba(127,176,105,0.2), 0 2px 6px var(--c-shadow, rgba(139,90,43,0.18)); }
+            50%       { box-shadow: 0 0 14px rgba(127,176,105,0.55), 0 2px 8px var(--c-shadow, rgba(139,90,43,0.25)); }
         }
 
         .city-badge-icon {
@@ -352,22 +352,22 @@ foreach ($troopQueue as $tq) {
             font-size: 0.68rem;
             font-family: monospace;
             font-variant-numeric: tabular-nums;
-            color: #86efac;
+            color: var(--c-success, #7fb069);
             white-space: nowrap;
             letter-spacing: 0.02em;
         }
 
-        /* Research badge uses purple tint */
+        /* Research badge uses info tint */
         .city-badge.badge-research .city-badge-inner {
-            border-color: rgba(167,139,250,0.6);
-            box-shadow: 0 0 8px rgba(167,139,250,0.3), 0 2px 6px rgba(0,0,0,0.6);
-            animation: badge-pulse-purple 2s ease-in-out infinite;
+            border-color: rgba(95,158,160,0.6);
+            box-shadow: 0 0 8px rgba(95,158,160,0.3), 0 2px 6px var(--c-shadow, rgba(139,90,43,0.18));
+            animation: badge-pulse-info 2s ease-in-out infinite;
         }
-        .city-badge.badge-research .city-badge-timer { color: #c4b5fd; }
+        .city-badge.badge-research .city-badge-timer { color: var(--c-info, #5f9ea0); }
 
-        @keyframes badge-pulse-purple {
-            0%, 100% { box-shadow: 0 0 6px rgba(167,139,250,0.2), 0 2px 6px rgba(0,0,0,0.6); }
-            50%       { box-shadow: 0 0 14px rgba(167,139,250,0.55), 0 2px 8px rgba(0,0,0,0.7); }
+        @keyframes badge-pulse-info {
+            0%, 100% { box-shadow: 0 0 6px rgba(95,158,160,0.2), 0 2px 6px var(--c-shadow, rgba(139,90,43,0.18)); }
+            50%       { box-shadow: 0 0 14px rgba(95,158,160,0.55), 0 2px 8px var(--c-shadow, rgba(139,90,43,0.25)); }
         }
 
         /* ── Left side activity panel ── */
@@ -386,12 +386,12 @@ foreach ($troopQueue as $tq) {
             display: flex;
             align-items: center;
             gap: 8px;
-            background: linear-gradient(180deg, rgba(15,23,42,0.95) 0%, rgba(8,12,24,0.95) 100%);
-            border: 1px solid rgba(184,134,11,0.25);
+            background: var(--c-panel, #f4e4c1);
+            border: 1px solid var(--c-border, rgba(139,90,43,0.35));
             border-radius: 10px;
             padding: 5px 10px 5px 6px;
             backdrop-filter: blur(8px);
-            box-shadow: 0 2px 12px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.03);
+            box-shadow: 0 2px 12px var(--c-shadow, rgba(139,90,43,0.18));
             min-width: 175px;
         }
 
@@ -406,9 +406,9 @@ foreach ($troopQueue as $tq) {
             flex-shrink: 0;
         }
 
-        .cap-icon-wrap.cap-build    { background: rgba(245,158,11,0.2); border: 1px solid rgba(245,158,11,0.4); }
-        .cap-icon-wrap.cap-research { background: rgba(167,139,250,0.2); border: 1px solid rgba(167,139,250,0.4); }
-        .cap-icon-wrap.cap-troop    { background: rgba(34,197,94,0.2); border: 1px solid rgba(34,197,94,0.4); }
+        .cap-icon-wrap.cap-build    { background: rgba(212,130,77,0.2); border: 1px solid rgba(212,130,77,0.45); }
+        .cap-icon-wrap.cap-research { background: rgba(95,158,160,0.15); border: 1px solid rgba(95,158,160,0.4); }
+        .cap-icon-wrap.cap-troop    { background: rgba(127,176,105,0.2); border: 1px solid rgba(127,176,105,0.4); }
 
         .cap-text {
             flex: 1;
@@ -421,7 +421,7 @@ foreach ($troopQueue as $tq) {
         .cap-name {
             font-size: 0.68rem;
             font-weight: 700;
-            color: #e2e8f0;
+            color: var(--c-text, #4a3520);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -431,19 +431,19 @@ foreach ($troopQueue as $tq) {
             font-size: 0.64rem;
             font-family: monospace;
             font-variant-numeric: tabular-nums;
-            color: #64748b;
+            color: var(--c-muted, #8b6f47);
             white-space: nowrap;
         }
 
-        .cap-timer.cap-timer-build    { color: #fbbf24; }
-        .cap-timer.cap-timer-research { color: #c4b5fd; }
-        .cap-timer.cap-timer-troop    { color: #4ade80; }
+        .cap-timer.cap-timer-build    { color: var(--c-warning, #d4824d); }
+        .cap-timer.cap-timer-research { color: var(--c-info, #5f9ea0); }
+        .cap-timer.cap-timer-troop    { color: var(--c-success, #7fb069); }
 
         /* ── Building modal overlay ── */
         #bldg-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.82);
+            background: rgba(74,53,32,0.6);
             z-index: 4000;
             align-items: center;
             justify-content: center;
@@ -458,7 +458,8 @@ foreach ($troopQueue as $tq) {
             flex-direction: column;
             max-height: calc(100vh - 100px);
             border-radius: 12px;
-            box-shadow: 0 24px 80px rgba(0,0,0,0.9), 0 0 0 1px rgba(184,134,11,0.15);
+            box-shadow: 0 24px 80px var(--c-shadow, rgba(139,90,43,0.18)), 0 0 0 1px var(--c-border, rgba(139,90,43,0.35));
+            background: var(--c-panel, #f4e4c1);
         }
     </style>
 </head>
@@ -496,18 +497,18 @@ foreach ($troopQueue as $tq) {
      x-data="hospitalApp()" x-init="loadHospital()"
      x-show="hospitalWounded.length > 0" x-cloak
      style="position:fixed;right:12px;bottom:80px;z-index:150;width:220px">
-    <div style="background:linear-gradient(180deg,rgba(15,23,42,0.97),rgba(8,12,24,0.97));border:1px solid rgba(239,68,68,0.35);border-radius:10px;padding:10px 12px;backdrop-filter:blur(8px);box-shadow:0 2px 12px rgba(0,0,0,0.7)">
+    <div style="background:var(--c-panel,#f4e4c1);border:1px solid rgba(192,96,77,0.4);border-radius:10px;padding:10px 12px;backdrop-filter:blur(8px);box-shadow:0 2px 12px var(--c-shadow,rgba(139,90,43,0.18))">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-            <div style="font-size:0.68rem;font-weight:800;color:#f87171;text-transform:uppercase;letter-spacing:0.06em">🏥 Hospital</div>
-            <button style="font-size:0.62rem;padding:3px 9px;border-radius:5px;background:linear-gradient(180deg,#dc2626,#b91c1c);border:none;border-bottom:2px solid #991b1b;color:#fff;cursor:pointer;font-weight:800;letter-spacing:0.04em;text-transform:uppercase;box-shadow:0 2px 6px rgba(0,0,0,0.4)"
+            <div style="font-size:0.68rem;font-weight:800;color:var(--c-danger,#c0604d);text-transform:uppercase;letter-spacing:0.06em">🏥 Hospital</div>
+            <button style="font-size:0.62rem;padding:3px 9px;border-radius:5px;background:linear-gradient(180deg,#c0604d,#9a3e30);border:none;border-bottom:2px solid #7a2e22;color:#fff8ec;cursor:pointer;font-weight:800;letter-spacing:0.04em;text-transform:uppercase;box-shadow:0 2px 6px var(--c-shadow,rgba(139,90,43,0.18))"
                     @click="instantHeal()">
                 Sofort (50💎)
             </button>
         </div>
         <template x-for="w in hospitalWounded" :key="w.troop_code">
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:0.72rem">
-                <span style="color:#e2e8f0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px" x-text="w.troop_name ?? w.troop_code"></span>
-                <span style="color:#f87171;font-weight:700;white-space:nowrap;margin-left:6px" x-text="Number(w.count).toLocaleString()"></span>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--c-border,rgba(139,90,43,0.35));font-size:0.72rem">
+                <span style="color:var(--c-text,#4a3520);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px" x-text="w.troop_name ?? w.troop_code"></span>
+                <span style="color:var(--c-danger,#c0604d);font-weight:700;white-space:nowrap;margin-left:6px" x-text="Number(w.count).toLocaleString()"></span>
             </div>
         </template>
     </div>
@@ -1084,9 +1085,9 @@ function render() {
             const fontSize = b.size >= 160 ? 13 : 11;
             ctx.font      = `bold ${fontSize}px monospace`;
             const tw = ctx.measureText(label).width;
-            ctx.fillStyle = 'rgba(15,23,42,0.85)';
+            ctx.fillStyle = 'rgba(240,232,208,0.9)';
             ctx.fillRect(badgeX - tw/2 - 4, badgeY - fontSize - 2, tw + 8, fontSize + 6);
-            ctx.fillStyle = inQueue ? '#f59e0b' : '#e2e8f0';
+            ctx.fillStyle = inQueue ? '#d4824d' : '#4a3520';
             ctx.textAlign    = 'center';
             ctx.textBaseline = 'bottom';
             ctx.fillText(label, badgeX, badgeY);
@@ -1100,9 +1101,9 @@ function render() {
             const fs    = b.size >= 160 ? 12 : 10;
             ctx.font      = `${fs}px system-ui`;
             const tw2 = ctx.measureText(name).width;
-            ctx.fillStyle = 'rgba(15,23,42,0.75)';
+            ctx.fillStyle = 'rgba(240,232,208,0.82)';
             ctx.fillRect(lx - tw2/2 - 3, ly - fs - 1, tw2 + 6, fs + 4);
-            ctx.fillStyle    = '#94a3b8';
+            ctx.fillStyle    = '#8b6f47';
             ctx.textAlign    = 'center';
             ctx.textBaseline = 'bottom';
             ctx.fillText(name, lx, ly);
@@ -1124,7 +1125,7 @@ async function openBuildingModal(code, tab = 'upgrade') {
     closePopup();
     const overlay = document.getElementById('bldg-overlay');
     const wrap    = document.getElementById('bldg-wrap');
-    wrap.innerHTML = '<p style="color:#64748b;text-align:center;padding:60px 0;font-family:system-ui">Laden…</p>';
+    wrap.innerHTML = '<p style="color:var(--c-muted,#8b6f47);text-align:center;padding:60px 0;font-family:system-ui">Laden…</p>';
     overlay.style.display = 'flex';
 
     const r    = await fetch(`/city/building/${code}?modal=1&tab=${encodeURIComponent(tab)}`);

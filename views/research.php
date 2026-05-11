@@ -439,7 +439,7 @@ $isEmbed = isset($_GET['embed']);
     <link rel="stylesheet" href="/assets/css/main.css">
     <?php if ($isEmbed): ?>
     <style>
-        html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #0f172a; color: #e2e8f0; font-family: system-ui, -apple-system, sans-serif; }
+        html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: var(--c-bg, #f0e8d0); color: var(--c-text, #4a3520); font-family: system-ui, -apple-system, sans-serif; }
         #game { width: 100%; height: 100%; display: flex; flex-direction: column; margin-top: 0; }
     </style>
     <?php endif ?>
@@ -449,8 +449,8 @@ $isEmbed = isset($_GET['embed']);
         html, body {
             height: 100%;
             overflow: hidden;
-            background: #080c18;
-            color: #e2e8f0;
+            background: var(--c-bg, #f0e8d0);
+            color: var(--c-text, #4a3520);
             font-family: system-ui, -apple-system, sans-serif;
             display: flex;
             justify-content: center;
@@ -469,30 +469,31 @@ $isEmbed = isset($_GET['embed']);
         .queue-banner {
             flex-shrink: 0;
             height: 40px;
-            background: linear-gradient(90deg, #0a1a3a 0%, #060e24 100%);
-            border-bottom: 1px solid rgba(59,130,246,0.35);
+            background: var(--c-panel2, #ede0c4);
+            border-bottom: 2px solid var(--c-border, rgba(139,90,43,0.35));
             padding: 0 1rem;
             display: flex;
             align-items: center;
             gap: 0.75rem;
             font-size: 0.78rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            color: var(--c-text, #4a3520);
+            box-shadow: 0 2px 8px var(--c-shadow, rgba(139,90,43,0.18));
         }
         .qb-dot {
             width: 8px; height: 8px; border-radius: 50%;
-            background: #3b82f6;
-            box-shadow: 0 0 8px rgba(59,130,246,0.6);
+            background: var(--c-gold, #c08858);
+            box-shadow: 0 0 8px rgba(192,136,88,0.5);
             animation: pulse-dot 1.5s infinite;
         }
         @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.35} }
-        .qb-name { color: #fbbf24; font-weight: 800; letter-spacing: 0.02em; }
-        .qb-eta  { color: #64748b; margin-left: auto; font-family: monospace; }
+        .qb-name { color: var(--c-wood-dark, #8b5a2b); font-weight: 800; letter-spacing: 0.02em; }
+        .qb-eta  { color: var(--c-muted, #8b6f47); margin-left: auto; font-family: monospace; }
         .btn-instant-banner {
             padding: 0.28rem 0.9rem;
             border-radius: 5px;
             border: none;
-            border-bottom: 2px solid #4c1d95;
-            background: linear-gradient(180deg, #7c3aed 0%, #6d28d9 100%);
+            border-bottom: 2px solid #5a3880;
+            background: linear-gradient(180deg, #9070c8 0%, #7050a8 100%);
             color: #fff;
             font-size: 0.72rem;
             font-weight: 800;
@@ -501,7 +502,7 @@ $isEmbed = isset($_GET['embed']);
             font-family: inherit;
             text-transform: uppercase;
             letter-spacing: 0.04em;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            box-shadow: 0 2px 8px var(--c-shadow, rgba(139,90,43,0.18));
         }
         .btn-instant-banner:hover { filter: brightness(1.15); }
 
@@ -509,14 +510,14 @@ $isEmbed = isset($_GET['embed']);
         .tab-bar {
             flex-shrink: 0;
             display: flex;
-            background: #0f1729;
-            border-bottom: 1px solid rgba(184,134,11,0.3);
+            background: var(--c-panel3, #e8d8b0);
+            border-bottom: 1px solid var(--c-border, rgba(139,90,43,0.35));
         }
         .tab-btn {
             padding: 11px 24px;
             font-size: 0.8rem;
             font-weight: 700;
-            color: #64748b;
+            color: var(--c-muted, #8b6f47);
             border: none;
             background: none;
             cursor: pointer;
@@ -527,8 +528,8 @@ $isEmbed = isset($_GET['embed']);
             transition: color 0.15s, border-color 0.15s;
             font-family: inherit;
         }
-        .tab-btn:hover { color: #e2e8f0; }
-        .tab-btn.active { color: #f0d080; border-bottom-color: #d4a017; }
+        .tab-btn:hover { color: var(--c-text, #4a3520); }
+        .tab-btn.active { color: var(--c-wood-dark, #8b5a2b); border-bottom-color: var(--c-gold, #c08858); }
 
         /* ── Tree scroll area ── */
         .tree-wrap {
@@ -544,12 +545,12 @@ $isEmbed = isset($_GET['embed']);
             overflow-y: auto;
             padding: 24px;
             scrollbar-width: thin;
-            scrollbar-color: rgba(184,134,11,0.3) #080c18;
-            background: #080c18;
+            scrollbar-color: var(--c-border, rgba(139,90,43,0.35)) var(--c-bg, #f0e8d0);
+            background: var(--c-bg, #f0e8d0);
         }
         .tree-scroll::-webkit-scrollbar { height: 6px; width: 6px; }
-        .tree-scroll::-webkit-scrollbar-track { background: #080c18; }
-        .tree-scroll::-webkit-scrollbar-thumb { background: rgba(184,134,11,0.3); border-radius: 3px; }
+        .tree-scroll::-webkit-scrollbar-track { background: var(--c-bg, #f0e8d0); }
+        .tree-scroll::-webkit-scrollbar-thumb { background: var(--c-border, rgba(139,90,43,0.35)); border-radius: 3px; }
 
         .tree-canvas { position: relative; }
         .tree-svg {
@@ -564,8 +565,8 @@ $isEmbed = isset($_GET['embed']);
             position: absolute;
             width: 190px;
             height: 70px;
-            background: #0f1729;
-            border: 1px solid rgba(45,64,96,0.8);
+            background: var(--c-panel, #f4e4c1);
+            border: 1px solid var(--c-border, rgba(139,90,43,0.35));
             border-radius: 8px;
             display: flex;
             align-items: center;
@@ -574,26 +575,28 @@ $isEmbed = isset($_GET['embed']);
             cursor: pointer;
             z-index: 1;
             transition: border-color 0.15s, box-shadow 0.15s;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            box-shadow: 0 2px 8px var(--c-shadow, rgba(139,90,43,0.18));
+            color: var(--c-text, #4a3520);
         }
         .node-card:hover {
-            border-color: rgba(212,160,23,0.7);
-            box-shadow: 0 0 12px rgba(212,160,23,0.2), 0 2px 8px rgba(0,0,0,0.5);
+            border-color: var(--c-gold, #c08858);
+            box-shadow: 0 0 12px rgba(192,136,88,0.25), 0 2px 8px var(--c-shadow, rgba(139,90,43,0.18));
         }
         .node-card.selected {
-            border-color: #d4a017 !important;
-            box-shadow: 0 0 16px rgba(212,160,23,0.35), 0 2px 8px rgba(0,0,0,0.5) !important;
+            border-color: var(--c-gold, #c08858) !important;
+            box-shadow: 0 0 16px rgba(192,136,88,0.35), 0 2px 8px var(--c-shadow, rgba(139,90,43,0.18)) !important;
         }
-        .node-card.locked { opacity: 0.38; }
-        .node-card.locked:hover { border-color: rgba(45,64,96,0.8); box-shadow: none; cursor: default; }
-        .node-card.maxed .nc-bar-text { color: #fbbf24; }
+        .node-card.locked { opacity: 0.45; }
+        .node-card.locked:hover { border-color: var(--c-border, rgba(139,90,43,0.35)); box-shadow: none; cursor: default; }
+        .node-card.maxed { border-color: var(--c-gold, #c08858); background: var(--c-panel2, #ede0c4); }
+        .node-card.maxed .nc-bar-text { color: var(--c-wood-dark, #8b5a2b); }
 
         .nc-icon {
             width: 52px;
             height: 52px;
             flex-shrink: 0;
             border-radius: 6px;
-            border: 2px solid #3b82f6;
+            border: 2px solid var(--c-border, rgba(139,90,43,0.35));
             display: flex;
             align-items: center;
             justify-content: center;
@@ -608,7 +611,7 @@ $isEmbed = isset($_GET['embed']);
         }
         .nc-name {
             font-size: 0.64rem;
-            color: #e2e8f0;
+            color: var(--c-text, #4a3520);
             font-weight: 700;
             line-height: 1.2;
             overflow: hidden;
@@ -619,9 +622,9 @@ $isEmbed = isset($_GET['embed']);
         .nc-bar {
             position: relative;
             height: 14px;
-            background: rgba(0,0,0,0.4);
+            background: rgba(139,90,43,0.1);
             border-radius: 3px;
-            border: 1px solid rgba(45,64,96,0.6);
+            border: 1px solid var(--c-border, rgba(139,90,43,0.35));
             overflow: hidden;
             display: flex;
             align-items: center;
@@ -630,18 +633,18 @@ $isEmbed = isset($_GET['embed']);
         .nc-fill {
             position: absolute;
             left: 0; top: 0; bottom: 0;
-            background: linear-gradient(90deg, #1d4ed8 0%, #60a5fa 100%);
+            background: linear-gradient(90deg, var(--c-gold, #c08858) 0%, #d4a070 100%);
             border-radius: 2px;
             transition: width 0.3s;
         }
         .nc-fill.maxed {
-            background: linear-gradient(90deg, #b8860b, #fbbf24);
-            box-shadow: 0 0 6px rgba(251,191,36,0.3);
+            background: linear-gradient(90deg, var(--c-wood-dark, #8b5a2b), var(--c-gold, #c08858));
+            box-shadow: 0 0 6px rgba(192,136,88,0.3);
         }
         .nc-bar-text {
             position: relative;
             font-size: 0.58rem;
-            color: #94a3b8;
+            color: var(--c-muted, #8b6f47);
             z-index: 1;
             font-weight: 700;
         }
@@ -649,9 +652,9 @@ $isEmbed = isset($_GET['embed']);
             position: absolute;
             top: 4px; right: 4px;
             width: 8px; height: 8px;
-            background: #22c55e;
+            background: var(--c-success, #7fb069);
             border-radius: 50%;
-            box-shadow: 0 0 6px rgba(34,197,94,0.6);
+            box-shadow: 0 0 6px rgba(127,176,105,0.6);
             animation: pulse-dot 1s infinite;
         }
 
@@ -659,7 +662,7 @@ $isEmbed = isset($_GET['embed']);
         .rm-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.75);
+            background: rgba(74,53,32,0.6);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -667,19 +670,20 @@ $isEmbed = isset($_GET['embed']);
             backdrop-filter: blur(2px);
         }
         .rm-card {
-            background: #0f1729;
-            border: 1px solid rgba(184,134,11,0.4);
+            background: var(--c-panel, #f4e4c1);
+            border: 2px solid var(--c-border, rgba(139,90,43,0.35));
             border-radius: 12px;
             width: 420px;
             max-width: calc(100vw - 24px);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.03);
+            box-shadow: 0 20px 60px rgba(139,90,43,0.3);
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            color: var(--c-text, #4a3520);
         }
         .rm-header {
-            background: linear-gradient(180deg, #1c1400 0%, #130e00 100%);
-            border-bottom: 1px solid rgba(184,134,11,0.35);
+            background: var(--c-panel3, #e8d8b0);
+            border-bottom: 1px solid var(--c-border, rgba(139,90,43,0.35));
             padding: 12px 14px;
             display: flex;
             align-items: center;
@@ -688,14 +692,14 @@ $isEmbed = isset($_GET['embed']);
         .rm-title {
             font-size: 0.92rem;
             font-weight: 800;
-            color: #f0d080;
+            color: var(--c-wood-dark, #8b5a2b);
             letter-spacing: 0.03em;
         }
         .rm-close {
-            background: rgba(239,68,68,0.1);
-            border: 1px solid rgba(239,68,68,0.3);
+            background: rgba(192,96,77,0.1);
+            border: 1px solid rgba(192,96,77,0.35);
             border-radius: 5px;
-            color: #f87171;
+            color: var(--c-danger, #c0604d);
             cursor: pointer;
             font-size: 0.9rem;
             padding: 3px 10px;
@@ -703,13 +707,13 @@ $isEmbed = isset($_GET['embed']);
             font-family: inherit;
             line-height: 1.5;
         }
-        .rm-close:hover { color: #ef4444; background: rgba(239,68,68,0.2); }
+        .rm-close:hover { color: var(--c-danger, #c0604d); background: rgba(192,96,77,0.2); }
         .rm-body {
             padding: 14px;
             display: flex;
             flex-direction: column;
             gap: 10px;
-            background: #0f1729;
+            background: var(--c-panel, #f4e4c1);
         }
         .rm-top {
             display: flex;
@@ -726,32 +730,32 @@ $isEmbed = isset($_GET['embed']);
         .rm-icon {
             width: 80px;
             height: 80px;
-            background: linear-gradient(180deg, #1a1200 0%, #0d0900 100%);
-            border: 2px solid rgba(212,160,23,0.5);
+            background: var(--c-panel2, #ede0c4);
+            border: 2px solid var(--c-gold, #c08858);
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 2rem;
-            box-shadow: 0 0 16px rgba(212,160,23,0.1);
+            box-shadow: 0 0 16px rgba(192,136,88,0.15);
         }
         .rm-bar-wrap {
             width: 80px;
             height: 6px;
-            background: rgba(0,0,0,0.4);
+            background: rgba(139,90,43,0.12);
             border-radius: 999px;
-            border: 1px solid rgba(255,255,255,0.05);
+            border: 1px solid var(--c-border, rgba(139,90,43,0.35));
             overflow: hidden;
         }
         .rm-bar-fill {
             height: 100%;
-            background: linear-gradient(90deg, #b8860b, #fbbf24);
+            background: linear-gradient(90deg, var(--c-wood-dark, #8b5a2b), var(--c-gold, #c08858));
             border-radius: 999px;
             transition: width 0.3s;
         }
         .rm-bar-text {
             font-size: 0.65rem;
-            color: #94a3b8;
+            color: var(--c-muted, #8b6f47);
             font-weight: 600;
         }
         .rm-right {
@@ -768,9 +772,9 @@ $isEmbed = isset($_GET['embed']);
             font-size: 0.95rem;
             font-weight: 800;
         }
-        .rm-lv-cur  { color: #64748b; }
-        .rm-lv-arr  { color: #d4a017; font-size: 1.1rem; }
-        .rm-lv-next { color: #f0d080; }
+        .rm-lv-cur  { color: var(--c-muted, #8b6f47); }
+        .rm-lv-arr  { color: var(--c-gold, #c08858); font-size: 1.1rem; }
+        .rm-lv-next { color: var(--c-wood-dark, #8b5a2b); }
         .rm-stats {
             display: flex;
             flex-direction: column;
@@ -780,20 +784,20 @@ $isEmbed = isset($_GET['embed']);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(34,197,94,0.06);
-            border: 1px solid rgba(34,197,94,0.18);
+            background: rgba(127,176,105,0.08);
+            border: 1px solid rgba(127,176,105,0.25);
             border-radius: 5px;
             padding: 5px 9px;
             font-size: 0.78rem;
-            color: #94a3b8;
+            color: var(--c-text, #4a3520);
         }
         .rm-stat-val {
             font-weight: 700;
-            color: #4ade80;
+            color: var(--c-success, #7fb069);
         }
         .rm-time-row {
             font-size: 0.72rem;
-            color: #64748b;
+            color: var(--c-muted, #8b6f47);
             display: flex;
             align-items: center;
             gap: 4px;
@@ -803,9 +807,9 @@ $isEmbed = isset($_GET['embed']);
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            color: rgba(184,134,11,0.6);
+            color: var(--c-muted, #8b6f47);
             padding-bottom: 5px;
-            border-bottom: 1px solid rgba(184,134,11,0.15);
+            border-bottom: 1px solid var(--c-border, rgba(139,90,43,0.35));
         }
         .rm-resources {
             display: grid;
@@ -818,12 +822,13 @@ $isEmbed = isset($_GET['embed']);
             gap: 6px;
             font-size: 0.73rem;
             padding: 5px 9px;
-            background: rgba(0,0,0,0.3);
+            background: var(--c-panel2, #ede0c4);
             border-radius: 5px;
-            border: 1px solid rgba(45,64,96,0.6);
+            border: 1px solid var(--c-border, rgba(139,90,43,0.35));
+            color: var(--c-text, #4a3520);
         }
-        .rm-res-row.ok  { border-color: rgba(34,197,94,0.35); background: rgba(34,197,94,0.04); }
-        .rm-res-row.nok { border-color: rgba(239,68,68,0.35); color: #fca5a5; background: rgba(239,68,68,0.04); }
+        .rm-res-row.ok  { border-color: rgba(127,176,105,0.5); background: rgba(127,176,105,0.08); }
+        .rm-res-row.nok { border-color: rgba(192,96,77,0.45); color: var(--c-danger, #c0604d); background: rgba(192,96,77,0.06); }
         .rm-res-amount { margin-left: auto; font-weight: 700; }
         .rm-res-check  { font-size: 0.8rem; margin-left: 4px; }
         .rm-academy {
@@ -831,28 +836,28 @@ $isEmbed = isset($_GET['embed']);
             align-items: center;
             gap: 10px;
             padding: 8px 10px;
-            background: rgba(0,0,0,0.3);
+            background: var(--c-panel2, #ede0c4);
             border-radius: 6px;
-            border: 1px solid rgba(45,64,96,0.6);
+            border: 1px solid var(--c-border, rgba(139,90,43,0.35));
             font-size: 0.78rem;
             cursor: pointer;
             transition: background 0.12s;
         }
-        .rm-academy:hover { background: rgba(255,255,255,0.04); }
-        .rm-academy.nok { border-color: rgba(239,68,68,0.4); }
-        .rm-academy.ok  { border-color: rgba(34,197,94,0.35); }
+        .rm-academy:hover { background: var(--c-panel3, #e8d8b0); }
+        .rm-academy.nok { border-color: rgba(192,96,77,0.45); }
+        .rm-academy.ok  { border-color: rgba(127,176,105,0.5); }
         .rm-acad-icon { font-size: 1.4rem; line-height: 1; }
-        .rm-acad-text { flex: 1; color: #94a3b8; }
+        .rm-acad-text { flex: 1; color: var(--c-muted, #8b6f47); }
         .rm-acad-badge {
             font-size: 0.7rem;
             font-weight: 800;
             padding: 2px 8px;
             border-radius: 10px;
-            background: rgba(0,0,0,0.3);
-            color: #64748b;
+            background: var(--c-panel3, #e8d8b0);
+            color: var(--c-muted, #8b6f47);
         }
-        .rm-acad-badge.nok { background: rgba(239,68,68,0.15); color: #ef4444; }
-        .rm-acad-badge.ok  { background: rgba(34,197,94,0.15); color: #22c55e; }
+        .rm-acad-badge.nok { background: rgba(192,96,77,0.15); color: var(--c-danger, #c0604d); }
+        .rm-acad-badge.ok  { background: rgba(127,176,105,0.15); color: var(--c-success, #7fb069); }
         .rm-req-list {
             display: flex;
             flex-direction: column;
@@ -863,49 +868,49 @@ $isEmbed = isset($_GET['embed']);
             align-items: center;
             gap: 10px;
             padding: 6px 10px;
-            background: rgba(0,0,0,0.3);
+            background: var(--c-panel2, #ede0c4);
             border-radius: 5px;
-            border: 1px solid rgba(45,64,96,0.6);
+            border: 1px solid var(--c-border, rgba(139,90,43,0.35));
             font-size: 0.76rem;
             cursor: pointer;
             transition: background 0.12s;
         }
-        .rm-req-row:hover { background: rgba(255,255,255,0.04); }
-        .rm-req-row.ok  { border-color: rgba(34,197,94,0.35); }
-        .rm-req-row.nok { border-color: rgba(239,68,68,0.35); }
+        .rm-req-row:hover { background: var(--c-panel3, #e8d8b0); }
+        .rm-req-row.ok  { border-color: rgba(127,176,105,0.5); }
+        .rm-req-row.nok { border-color: rgba(192,96,77,0.45); }
         .rm-req-icon { font-size: 1rem; line-height: 1; }
-        .rm-req-name { flex: 1; color: #94a3b8; }
+        .rm-req-name { flex: 1; color: var(--c-muted, #8b6f47); }
         .rm-req-badge {
             font-size: 0.7rem;
             font-weight: 800;
             padding: 2px 7px;
             border-radius: 10px;
         }
-        .rm-req-badge.ok  { background: rgba(34,197,94,0.15); color: #22c55e; }
-        .rm-req-badge.nok { background: rgba(239,68,68,0.15); color: #ef4444; }
+        .rm-req-badge.ok  { background: rgba(127,176,105,0.15); color: var(--c-success, #7fb069); }
+        .rm-req-badge.nok { background: rgba(192,96,77,0.15); color: var(--c-danger, #c0604d); }
         .rm-lock-msg {
             font-size: 0.74rem;
-            color: #fca5a5;
+            color: var(--c-danger, #c0604d);
             padding: 7px 10px;
-            background: rgba(239,68,68,0.06);
+            background: rgba(192,96,77,0.06);
             border-radius: 6px;
-            border: 1px solid rgba(239,68,68,0.2);
+            border: 1px solid rgba(192,96,77,0.25);
         }
         .rm-actions {
             display: flex;
             gap: 8px;
             padding: 12px 14px;
-            border-top: 1px solid rgba(184,134,11,0.15);
-            background: rgba(0,0,0,0.2);
+            border-top: 1px solid var(--c-border, rgba(139,90,43,0.35));
+            background: var(--c-panel3, #e8d8b0);
         }
         .rm-btn-start {
             flex: 1;
             padding: 10px;
-            background: linear-gradient(180deg, #0ea5e9 0%, #0369a1 100%);
+            background: linear-gradient(180deg, #c9925a 0%, #9a6535 100%);
             border: none;
-            border-bottom: 2px solid #075985;
+            border-bottom: 2px solid #6b4120;
             border-radius: 7px;
-            color: #fff;
+            color: #fff8ec;
             font-weight: 800;
             cursor: pointer;
             font-size: 0.85rem;
@@ -915,13 +920,13 @@ $isEmbed = isset($_GET['embed']);
             transition: filter 0.15s;
         }
         .rm-btn-start:hover:not(:disabled) { filter: brightness(1.12); }
-        .rm-btn-start:disabled { background: rgba(30,58,79,0.5); color: #475569; cursor: default; border-bottom-color: transparent; }
+        .rm-btn-start:disabled { background: var(--c-panel2, #ede0c4); color: var(--c-muted, #8b6f47); cursor: default; border-bottom-color: transparent; }
         .rm-btn-instant {
             flex: 1;
             padding: 10px;
-            background: linear-gradient(180deg, #7c3aed 0%, #5b21b6 100%);
+            background: linear-gradient(180deg, #9070c8 0%, #7050a8 100%);
             border: none;
-            border-bottom: 2px solid #3b0764;
+            border-bottom: 2px solid #5a3880;
             border-radius: 7px;
             color: #fff;
             font-weight: 800;
@@ -933,15 +938,15 @@ $isEmbed = isset($_GET['embed']);
             transition: filter 0.15s;
         }
         .rm-btn-instant:hover:not(:disabled) { filter: brightness(1.12); }
-        .rm-btn-instant:disabled { background: rgba(45,27,105,0.4); color: #475569; cursor: default; border-bottom-color: transparent; }
+        .rm-btn-instant:disabled { background: var(--c-panel2, #ede0c4); color: var(--c-muted, #8b6f47); cursor: default; border-bottom-color: transparent; }
         .rm-maxed-bar {
             text-align: center;
             padding: 12px;
             font-size: 0.88rem;
             font-weight: 800;
-            color: #fbbf24;
-            background: rgba(251,191,36,0.06);
-            border-top: 1px solid rgba(251,191,36,0.2);
+            color: var(--c-wood-dark, #8b5a2b);
+            background: rgba(192,136,88,0.08);
+            border-top: 1px solid var(--c-border, rgba(139,90,43,0.35));
             letter-spacing: 0.04em;
         }
 
@@ -951,8 +956,8 @@ $isEmbed = isset($_GET['embed']);
             overflow-y: auto;
             padding: 1.25rem;
             scrollbar-width: thin;
-            scrollbar-color: rgba(184,134,11,0.3) #080c18;
-            background: #080c18;
+            scrollbar-color: var(--c-border, rgba(139,90,43,0.35)) var(--c-bg, #f0e8d0);
+            background: var(--c-bg, #f0e8d0);
         }
         .buffs-grid {
             display: grid;
@@ -964,20 +969,20 @@ $isEmbed = isset($_GET['embed']);
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            color: #d4a017;
+            color: var(--c-wood-dark, #8b5a2b);
             margin-bottom: 0.6rem;
             padding-bottom: 4px;
-            border-bottom: 1px solid rgba(184,134,11,0.2);
+            border-bottom: 1px solid var(--c-border, rgba(139,90,43,0.35));
         }
         .buff-row {
             display: flex;
             justify-content: space-between;
             font-size: 0.73rem;
             padding: 0.25rem 0;
-            border-bottom: 1px solid rgba(255,255,255,0.03);
+            border-bottom: 1px solid rgba(139,90,43,0.08);
         }
         .buff-row:last-child { border-bottom: none; }
-        .buff-label { color: #64748b; }
+        .buff-label { color: var(--c-muted, #8b6f47); }
 
         /* ── Toast ── */
         .toast {
@@ -989,9 +994,12 @@ $isEmbed = isset($_GET['embed']);
             z-index: 9000; pointer-events: none;
             display: none;
             backdrop-filter: blur(4px);
+            background: var(--c-panel, #f4e4c1);
+            color: var(--c-text, #4a3520);
+            border-left: 4px solid var(--c-gold, #c08858);
         }
-        .toast.ok  { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.4); color: #22c55e; }
-        .toast.err { background: rgba(239,68,68,0.12);  border: 1px solid rgba(239,68,68,0.4);  color: #ef4444; }
+        .toast.ok  { border-left-color: var(--c-success, #7fb069); color: var(--c-success, #7fb069); }
+        .toast.err { border-left-color: var(--c-danger, #c0604d);  color: var(--c-danger, #c0604d); }
     </style>
 </head>
 <body>
@@ -1002,7 +1010,7 @@ $isEmbed = isset($_GET['embed']);
     <!-- Queue banner (hidden when no queue) -->
     <div class="queue-banner" id="queue-banner" style="<?= $queueRow ? '' : 'display:none' ?>">
         <div class="qb-dot"></div>
-        <span style="color:#64748b;font-size:.65rem;text-transform:uppercase;font-weight:800">In Forschung</span>
+        <span style="color:var(--c-muted,#8b6f47);font-size:.65rem;text-transform:uppercase;font-weight:800">In Forschung</span>
         <span class="qb-name" id="qb-name"><?= $queueRow ? htmlspecialchars($allNodes[$queueRow['research_code']]['name'] ?? $queueRow['research_code']) . ' &rarr; Lv ' . (int)$queueRow['level_to'] : '' ?></span>
         <span class="qb-eta" id="qb-eta">&#x23F1; &hellip;</span>
         <button class="btn-instant-banner" onclick="instantFinishBanner()">&#x1F48E; Sofort</button>
@@ -1079,7 +1087,7 @@ $isEmbed = isset($_GET['embed']);
                     ?>
                     <div class="buff-row">
                         <span class="buff-label"><?= htmlspecialchars($label) ?></span>
-                        <span class="buff-val" style="font-weight:700;color:<?= $active ? '#22c55e' : '#64748b' ?>"><?= $disp ?></span>
+                        <span class="buff-val" style="font-weight:700;color:<?= $active ? 'var(--c-success,#7fb069)' : 'var(--c-muted,#8b6f47)' ?>"><?= $disp ?></span>
                     </div>
                     <?php endforeach ?>
                 </div>
@@ -1203,7 +1211,7 @@ function drawConnections(canvasId, connections) {
             d = `M${fx},${fy} H${mx} V${ty} H${tx}`;
         }
         path.setAttribute('d', d);
-        path.setAttribute('stroke', '#3a5580');
+        path.setAttribute('stroke', 'rgba(139,90,43,0.4)');
         path.setAttribute('stroke-width', '2');
         path.setAttribute('fill', 'none');
         svg.appendChild(path);
@@ -1381,7 +1389,7 @@ function renderDetailPanel(code) {
                     <span class="rm-req-icon">&#x1F52C;</span>
                     <span class="rm-req-name">${reqName}</span>
                     <span class="rm-req-badge ${ok ? 'ok' : 'nok'}">Lv ${needed} (${ok ? '&#x2713;' : have + '/' + needed})</span>
-                    <span style="color:#64748b;font-size:.7rem;margin-left:auto">&#x2192;</span>
+                    <span style="color:var(--c-muted,#8b6f47);font-size:.7rem;margin-left:auto">&#x2192;</span>
                 </div>`;
             }).join('');
         } else {
@@ -1402,7 +1410,7 @@ function renderDetailPanel(code) {
             acadEl.innerHTML = `<span class="rm-acad-icon">&#x1F3DB;</span>
                 <span class="rm-acad-text">Akademie erforderlich</span>
                 <span class="rm-acad-badge ${ok ? 'ok' : 'nok'}">Lv ${reqAcadLevel}</span>
-                <span style="color:#64748b;font-size:.7rem;margin-left:auto">&#x2192;</span>`;
+                <span style="color:var(--c-muted,#8b6f47);font-size:.7rem;margin-left:auto">&#x2192;</span>`;
             acadEl.style.display = '';
         } else {
             acadEl.style.display = 'none';

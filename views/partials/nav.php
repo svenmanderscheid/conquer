@@ -46,12 +46,12 @@ $_fmt  = fn(mixed $n): string => number_format((int) $n, 0, '.', ',');
     /* Top row — main menu */
     .cnav-top {
         height: 40px;
-        background: linear-gradient(180deg, #7c1e0e 0%, #4a0d05 55%, #6b1a0a 100%);
-        border-bottom: 2px solid #b8860b;
+        background: var(--c-panel2);
+        border-bottom: 2px solid var(--c-border);
         box-shadow:
-            inset 0 1px 0 rgba(255,220,100,0.18),
-            inset 0 -1px 0 rgba(0,0,0,0.35),
-            0 3px 8px rgba(0,0,0,0.55);
+            inset 0 1px 0 rgba(255,255,255,0.18),
+            inset 0 -1px 0 rgba(139,90,43,0.15),
+            0 3px 8px var(--c-shadow);
         display: flex;
         align-items: stretch;
         justify-content: center;
@@ -74,42 +74,42 @@ $_fmt  = fn(mixed $n): string => number_format((int) $n, 0, '.', ',');
         align-items: center;
         gap: 5px;
         padding: 0 12px;
-        color: #f0d080;
+        color: var(--c-text);
         text-decoration: none;
         font-size: 0.76rem;
         font-weight: 600;
         white-space: nowrap;
-        border-right: 1px solid rgba(184,134,11,0.25);
+        border-right: 1px solid var(--c-border);
         cursor: pointer;
         transition: background 0.1s, color 0.1s;
         position: relative;
     }
-    .cnav-left .nav-item:first-child { border-left: 1px solid rgba(184,134,11,0.25); }
-    .cnav-right .nav-item            { border-right: none; border-left: 1px solid rgba(184,134,11,0.25); }
+    .cnav-left .nav-item:first-child { border-left: 1px solid var(--c-border); }
+    .cnav-right .nav-item            { border-right: none; border-left: 1px solid var(--c-border); }
 
-    .nav-item:hover         { background: rgba(255,210,60,0.13); color: #ffd700; text-decoration: none; }
-    .nav-item.nav-active    { background: rgba(255,210,60,0.2); color: #ffd700; box-shadow: inset 0 -2px 0 #ffd700; }
+    .nav-item:hover         { background: rgba(139,90,43,0.1); color: var(--c-wood-dark); text-decoration: none; }
+    .nav-item.nav-active    { background: rgba(139,90,43,0.15); color: var(--c-wood-dark); box-shadow: inset 0 -2px 0 var(--c-wood-dark); }
     .nav-item.nav-dim       { opacity: 0.42; cursor: default; pointer-events: none; }
 
     .nav-icon  { font-size: 0.9rem; line-height: 1; }
-    .nav-badge { color: #ffd700; font-weight: 700; }
+    .nav-badge { color: var(--c-wood-dark); font-weight: 700; }
 
-    .nav-gems       { color: #c4b5fd; }
-    .nav-gems:hover { color: #ddd6fe !important; background: rgba(167,139,250,0.12) !important; }
+    .nav-gems       { color: var(--c-muted); }
+    .nav-gems:hover { color: var(--c-wood-dark) !important; background: rgba(139,90,43,0.1) !important; }
 
     /* Resource bar — second row */
     .cnav-res {
         height: 32px;
-        background: linear-gradient(180deg, #3a0c04 0%, #2a0802 100%);
-        border-bottom: 1px solid rgba(184,134,11,0.4);
+        background: var(--c-panel2);
+        border-bottom: 1px solid var(--c-border);
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 1.5rem;
         font-size: 0.78rem;
         font-weight: 600;
-        color: #f0d080;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.45);
+        color: var(--c-muted);
+        box-shadow: 0 2px 6px var(--c-shadow);
     }
     .res-item {
         display: flex;
@@ -117,7 +117,7 @@ $_fmt  = fn(mixed $n): string => number_format((int) $n, 0, '.', ',');
         gap: 5px;
     }
     .res-icon  { font-size: 1rem; line-height: 1; }
-    .res-value { color: #ffd700; font-variant-numeric: tabular-nums; }
+    .res-value { color: var(--c-text); font-variant-numeric: tabular-nums; }
 </style>
 
 <nav id="conquer-nav">

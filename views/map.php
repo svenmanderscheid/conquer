@@ -19,8 +19,8 @@ declare(strict_types=1);
         html, body {
             width: 100%; height: 100%;
             overflow: hidden;
-            background: #060e1c;
-            color: #e2e8f0;
+            background: #f0e8d0;
+            color: #4a3520;
             font-family: system-ui, -apple-system, sans-serif;
             -webkit-user-select: none; user-select: none;
             display: flex;
@@ -57,14 +57,14 @@ declare(strict_types=1);
         #coord-bar {
             position: absolute;
             bottom: 10px; left: 50%; transform: translateX(-50%);
-            background: rgba(8,12,24,0.88);
-            border: 1px solid rgba(184,134,11,0.3); border-radius: 6px;
+            background: #f4e4c1;
+            border: 1px solid rgba(139,90,43,0.3); border-radius: 6px;
             padding: 3px 12px;
-            font-size: 0.75rem; color: #64748b; white-space: nowrap;
+            font-size: 0.75rem; color: #8b6f47; white-space: nowrap;
             pointer-events: none;
-            backdrop-filter: blur(4px);
+            box-shadow: 0 3px 12px rgba(139,90,43,0.18);
         }
-        #coord-bar strong { color: #94a3b8; }
+        #coord-bar strong { color: #4a3520; }
 
         /* Nav bar top-left of map */
         #navbar {
@@ -74,32 +74,32 @@ declare(strict_types=1);
         }
         .nav-btn {
             padding: 5px 13px;
-            background: rgba(8,12,24,0.9); border: 1px solid rgba(184,134,11,0.3); border-radius: 6px;
-            color: #94a3b8; font-size: 0.8rem; line-height: 1.4;
+            background: #f4e4c1; border: 1px solid rgba(139,90,43,0.35); border-radius: 6px;
+            color: #8b6f47; font-size: 0.8rem; line-height: 1.4;
             cursor: pointer; text-decoration: none;
             transition: border-color 0.15s, color 0.15s;
-            backdrop-filter: blur(4px);
+            box-shadow: 0 3px 12px rgba(139,90,43,0.18);
         }
-        .nav-btn:hover  { border-color: rgba(212,160,23,0.6); color: #f0d080; }
-        .nav-btn.active { border-color: rgba(212,160,23,0.7); color: #f0d080; background: rgba(212,160,23,0.08); }
+        .nav-btn:hover  { border-color: rgba(139,90,43,0.6); color: #4a3520; }
+        .nav-btn.active { border-color: rgba(139,90,43,0.7); color: #8b5a2b; background: rgba(139,90,43,0.08); }
 
         /* ── Right: sidebar ── */
         #sidebar {
             flex: 0 0 270px;
             height: 100%;
-            background: #080c18;
-            border-left: 1px solid rgba(184,134,11,0.3);
+            background: #f4e4c1;
+            border-left: 1px solid rgba(139,90,43,0.3);
             display: flex; flex-direction: column;
             overflow-y: auto;
         }
 
         .panel {
             padding: 12px 14px;
-            border-bottom: 1px solid rgba(184,134,11,0.2);
+            border-bottom: 1px solid rgba(139,90,43,0.2);
         }
         .panel-title {
             font-size: 0.7rem; font-weight: 800; letter-spacing: 0.08em;
-            color: #d4a017; text-transform: uppercase; margin-bottom: 10px;
+            color: #8b5a2b; text-transform: uppercase; margin-bottom: 10px;
         }
 
         /* Minimap canvas */
@@ -122,59 +122,59 @@ declare(strict_types=1);
         }
         .ctrl-btn {
             width: 32px; height: 32px;
-            background: linear-gradient(180deg, #1a2744 0%, #0f1729 100%);
-            border: 1px solid rgba(184,134,11,0.3); border-radius: 5px;
-            color: #e2e8f0; font-size: 1.1rem; line-height: 1;
+            background: #f4e4c1;
+            border: 1px solid rgba(139,90,43,0.35); border-radius: 5px;
+            color: #4a3520; font-size: 1.1rem; line-height: 1;
             cursor: pointer;
             display: flex; align-items: center; justify-content: center;
             transition: filter 0.15s, border-color 0.15s;
             flex-shrink: 0;
         }
-        .ctrl-btn:hover { filter: brightness(1.2); border-color: rgba(212,160,23,0.6); }
-        .zoom-label { font-size: 0.8rem; color: #64748b; flex: 1; }
-        .zoom-label strong { color: #94a3b8; }
+        .ctrl-btn:hover { filter: brightness(0.95); border-color: rgba(139,90,43,0.6); }
+        .zoom-label { font-size: 0.8rem; color: #8b6f47; flex: 1; }
+        .zoom-label strong { color: #4a3520; }
 
         /* Jump to city btn */
         .jump-btn {
             display: block; width: 100%; padding: 7px 0;
-            background: linear-gradient(180deg, #1a2744 0%, #0f1729 100%);
-            border: 1px solid rgba(184,134,11,0.3); border-radius: 6px;
-            color: #94a3b8; font-size: 0.82rem;
+            background: linear-gradient(180deg, #c9925a, #9a6535);
+            border: none; border-bottom: 3px solid #6b4120; border-radius: 8px;
+            color: #fff8ec; font-size: 0.82rem;
             cursor: pointer; text-align: center;
-            transition: filter 0.15s, border-color 0.15s, color 0.15s;
+            transition: filter 0.15s;
             margin-top: 10px;
         }
-        .jump-btn:hover { filter: brightness(1.15); border-color: rgba(212,160,23,0.6); color: #f0d080; }
+        .jump-btn:hover { filter: brightness(1.1); }
 
         /* Legend */
         .legend-grid {
             display: grid; grid-template-columns: 1fr 1fr;
             gap: 5px 12px;
         }
-        .leg-row { display: flex; align-items: center; gap: 6px; font-size: 0.72rem; color: #64748b; }
-        .leg-swatch { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.15); }
+        .leg-row { display: flex; align-items: center; gap: 6px; font-size: 0.72rem; color: #8b6f47; }
+        .leg-swatch { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; border: 1px solid rgba(139,90,43,0.2); }
 
         /* Tile info */
         #tile-info {
-            font-size: 0.78rem; color: #64748b; min-height: 60px;
+            font-size: 0.78rem; color: #8b6f47; min-height: 60px;
         }
         .tile-info-row { margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center; }
-        .tile-info-row .lbl { color: #64748b; }
-        .tile-info-row .val { color: #94a3b8; font-weight: 600; text-align: right; }
-        .tile-info-empty { color: rgba(184,134,11,0.25); font-style: italic; }
+        .tile-info-row .lbl { color: #8b6f47; }
+        .tile-info-row .val { color: #4a3520; font-weight: 600; text-align: right; }
+        .tile-info-empty { color: rgba(139,90,43,0.4); font-style: italic; }
         .tile-info-name {
-            font-size: 0.9rem; font-weight: 700; color: #f0d080;
+            font-size: 0.9rem; font-weight: 700; color: #8b5a2b;
             margin-bottom: 8px; padding-bottom: 6px;
-            border-bottom: 1px solid rgba(184,134,11,0.25);
+            border-bottom: 1px solid rgba(139,90,43,0.25);
         }
         /* HP bar */
         .hp-bar-wrap { margin-bottom: 8px; }
         .hp-bar-label {
             display: flex; justify-content: space-between;
-            font-size: 0.7rem; color: #64748b; margin-bottom: 3px;
+            font-size: 0.7rem; color: #8b6f47; margin-bottom: 3px;
         }
         .hp-bar-track {
-            height: 6px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05);
+            height: 6px; background: rgba(139,90,43,0.15); border: 1px solid rgba(139,90,43,0.15);
             border-radius: 3px; overflow: hidden;
         }
         .hp-bar-fill {
@@ -187,67 +187,67 @@ declare(strict_types=1);
             gap: 4px 8px; margin-top: 6px;
         }
         .stat-cell {
-            background: rgba(0,0,0,0.3); border: 1px solid rgba(184,134,11,0.2); border-radius: 4px;
+            background: #ede0c4; border: 1px solid rgba(139,90,43,0.2); border-radius: 4px;
             padding: 4px 6px; text-align: center;
         }
-        .stat-cell .stat-val { font-size: 0.85rem; font-weight: 700; color: #e2e8f0; }
-        .stat-cell .stat-lbl { font-size: 0.62rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+        .stat-cell .stat-val { font-size: 0.85rem; font-weight: 700; color: #4a3520; }
+        .stat-cell .stat-lbl { font-size: 0.62rem; color: #8b6f47; text-transform: uppercase; letter-spacing: 0.05em; }
 
         /* ── Modal base ── */
         .modal-overlay {
             position: fixed; inset: 0; z-index: 200;
-            background: rgba(0,0,0,0.78);
+            background: rgba(74,53,32,0.6);
             backdrop-filter: blur(3px);
             display: flex; align-items: center; justify-content: center;
         }
         .modal-box {
-            background: #0f1729; border: 1px solid rgba(184,134,11,0.4);
+            background: #f4e4c1; border: 1px solid rgba(139,90,43,0.4);
             border-radius: 12px; padding: 1.5rem;
             width: 380px; max-width: 95vw; max-height: 90vh; overflow-y: auto;
-            box-shadow: 0 16px 64px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.04);
+            box-shadow: 0 3px 12px rgba(139,90,43,0.18);
         }
-        .modal-title { font-size: 1rem; font-weight: 800; margin-bottom: 1rem; color: #f0d080; letter-spacing: 0.04em; }
-        .modal-sub   { font-size: 0.68rem; color: #64748b; text-transform: uppercase;
+        .modal-title { font-size: 1rem; font-weight: 800; margin-bottom: 1rem; color: #8b5a2b; letter-spacing: 0.04em; }
+        .modal-sub   { font-size: 0.68rem; color: #8b6f47; text-transform: uppercase;
                        letter-spacing: 0.08em; margin: 0.75rem 0 0.4rem; font-weight: 800; }
         .troop-pick  {
-            background: rgba(0,0,0,0.3); border: 1px solid rgba(184,134,11,0.25);
+            background: #ede0c4; border: 1px solid rgba(139,90,43,0.25);
             border-radius: 6px; padding: 0.5rem 0.6rem; margin-bottom: 0.4rem;
         }
         .troop-pick-header {
             display: flex; justify-content: space-between; align-items: baseline;
             margin-bottom: 0.35rem;
         }
-        .troop-pick-name  { font-size: 0.82rem; font-weight: 600; }
-        .troop-pick-avail { font-size: 0.72rem; color: #64748b; }
+        .troop-pick-name  { font-size: 0.82rem; font-weight: 600; color: #4a3520; }
+        .troop-pick-avail { font-size: 0.72rem; color: #8b6f47; }
         .troop-pick-controls { display: flex; align-items: center; gap: 0.4rem; }
         .troop-pick-slider {
-            flex: 1; accent-color: #d4a017; cursor: pointer; height: 4px;
+            flex: 1; accent-color: #c08858; cursor: pointer; height: 4px;
         }
         .troop-pick-slider:disabled { opacity: 0.3; cursor: not-allowed; }
         .troop-pick-input {
             width: 68px; padding: 0.2rem 0.35rem; border-radius: 4px;
-            border: 1px solid rgba(184,134,11,0.3); background: rgba(0,0,0,0.35);
-            color: #e2e8f0; font-size: 0.8rem; text-align: right;
+            border: 1px solid rgba(139,90,43,0.3); background: rgba(240,232,208,0.8);
+            color: #4a3520; font-size: 0.8rem; text-align: right;
         }
         .troop-pick-max {
             padding: 0.2rem 0.45rem; border-radius: 4px; font-size: 0.72rem;
-            background: rgba(0,0,0,0.3); border: 1px solid rgba(184,134,11,0.3);
-            color: #94a3b8; cursor: pointer; white-space: nowrap;
+            background: #ede0c4; border: 1px solid rgba(139,90,43,0.3);
+            color: #8b6f47; cursor: pointer; white-space: nowrap;
             transition: border-color 0.15s, color 0.15s;
         }
-        .troop-pick-max:hover { border-color: rgba(212,160,23,0.7); color: #f0d080; }
+        .troop-pick-max:hover { border-color: rgba(139,90,43,0.6); color: #4a3520; }
         .modal-actions { display: flex; gap: 0.5rem; margin-top: 1rem; }
         .modal-btn {
-            flex: 1; padding: 0.55rem; border-radius: 6px; border: none;
+            flex: 1; padding: 0.55rem; border-radius: 8px; border: none;
             font-size: 0.85rem; font-weight: 700; cursor: pointer;
             transition: filter 0.15s;
         }
-        .modal-btn-cancel  { background: rgba(255,255,255,0.08); color: #94a3b8; border: 1px solid rgba(255,255,255,0.1); }
-        .modal-btn-cancel:hover { filter: brightness(1.2); }
-        .modal-btn-red     { background: linear-gradient(180deg, #dc2626 0%, #b91c1c 100%); color: #fff; border-bottom: 2px solid #991b1b; }
-        .modal-btn-red:hover { filter: brightness(1.12); }
-        .modal-btn-orange  { background: linear-gradient(180deg, #c8870a 0%, #9a6508 100%); color: #fff8e0; border-bottom: 2px solid #6b4306; }
-        .modal-btn-orange:hover { filter: brightness(1.12); }
+        .modal-btn-cancel  { background: #ede0c4; color: #8b6f47; border: 1px solid rgba(139,90,43,0.3); }
+        .modal-btn-cancel:hover { filter: brightness(0.95); }
+        .modal-btn-red     { background: linear-gradient(180deg, #c87060 0%, #a05040 100%); color: #fff; border-bottom: 3px solid #6a2a1e; }
+        .modal-btn-red:hover { filter: brightness(1.1); }
+        .modal-btn-orange  { background: linear-gradient(180deg, #c9925a 0%, #9a6535 100%); color: #fff8ec; border-bottom: 3px solid #6b4120; }
+        .modal-btn-orange:hover { filter: brightness(1.1); }
         .modal-btn-purple  { background: linear-gradient(180deg, #7c3aed 0%, #6d28d9 100%); color: #fff; border-bottom: 2px solid #4c1d95; }
         .modal-btn-purple:hover { filter: brightness(1.12); }
         .modal-btn:disabled { filter: grayscale(0.6) opacity(0.5); cursor: not-allowed; }
@@ -255,14 +255,14 @@ declare(strict_types=1);
         /* ── LoK Attack Overlay ── */
         .atk-overlay {
             position: fixed; inset: 0; z-index: 300;
-            background: rgba(0,0,0,0.75);
+            background: rgba(74,53,32,0.6);
             display: flex; align-items: center; justify-content: center;
         }
         .atk-dialog {
             display: flex; width: 90vw; max-width: 900px;
             height: 80vh; max-height: 620px;
             border-radius: 12px; overflow: hidden;
-            box-shadow: 0 24px 64px rgba(0,0,0,0.7);
+            box-shadow: 0 3px 12px rgba(139,90,43,0.18);
             position: relative;
         }
         .atk-back {
@@ -277,7 +277,7 @@ declare(strict_types=1);
         .atk-left {
             flex: 0 0 30%; display: flex; align-items: center; justify-content: center;
             padding: 48px 14px 14px;
-            background: #0a1220;
+            background: #ede0c4;
         }
         .atk-target-panel {
             display: flex; flex-direction: column; align-items: center;
@@ -294,75 +294,75 @@ declare(strict_types=1);
             background: linear-gradient(180deg,#7f1d1d,#450a0a);
             border-color: #ef4444;
         }
-        .atk-coords { font-size: 0.75rem; color: #94a3b8; }
-        .atk-city-img { font-size: 4.5rem; line-height: 1; filter: drop-shadow(0 4px 8px rgba(0,0,0,.5)); }
+        .atk-coords { font-size: 0.75rem; color: #8b6f47; }
+        .atk-city-img { font-size: 4.5rem; line-height: 1; filter: drop-shadow(0 4px 8px rgba(139,90,43,0.3)); }
         .atk-name-row {
             display: flex; align-items: center; gap: 10px;
-            font-size: 0.85rem; color: #e2e8f0; font-weight: 700;
+            font-size: 0.85rem; color: #4a3520; font-weight: 700;
         }
         .atk-lvl-hex {
-            background: rgba(0,0,0,0.4); border: 2px solid #ef4444; border-radius: 6px;
-            padding: 2px 8px; font-weight: 900; color: #ef4444; font-size: 1rem;
+            background: rgba(192,96,77,0.15); border: 2px solid #c0604d; border-radius: 6px;
+            padding: 2px 8px; font-weight: 900; color: #c0604d; font-size: 1rem;
         }
         .atk-monster-lv {
-            font-size: 1.4rem; font-weight: 900; color: #e2e8f0;
+            font-size: 1.4rem; font-weight: 900; color: #4a3520;
             display: flex; align-items: center; gap: 8px;
         }
-        .atk-skull { font-size: 1.8rem; color: #ef4444; }
+        .atk-skull { font-size: 1.8rem; color: #c0604d; }
         .atk-hp-track {
-            width: 100%; height: 12px; background: rgba(0,0,0,0.4);
-            border: 1px solid rgba(184,134,11,0.2); border-radius: 6px; overflow: hidden;
+            width: 100%; height: 12px; background: rgba(139,90,43,0.15);
+            border: 1px solid rgba(139,90,43,0.2); border-radius: 6px; overflow: hidden;
         }
-        .atk-hp-fill { height: 100%; background: #ef4444; border-radius: 6px; }
+        .atk-hp-fill { height: 100%; background: #c0604d; border-radius: 6px; }
         .atk-reward {
-            width: 100%; background: rgba(0,0,0,0.35); border: 2px solid rgba(212,160,23,0.5); border-radius: 8px;
+            width: 100%; background: rgba(237,224,196,0.6); border: 2px solid rgba(192,136,88,0.5); border-radius: 8px;
             padding: 8px;
         }
         .atk-reward-hdr {
-            font-size: 0.68rem; font-weight: 900; color: #f0d080;
+            font-size: 0.68rem; font-weight: 900; color: #8b5a2b;
             text-transform: uppercase; text-align: center; letter-spacing: .07em;
             margin-bottom: 6px;
         }
-        .atk-reward-body { font-size: 0.72rem; color: #94a3b8; text-align: center; }
+        .atk-reward-body { font-size: 0.72rem; color: #8b6f47; text-align: center; }
         /* Right panel */
         .atk-right {
             flex: 1; display: flex; flex-direction: column;
-            background: #080c18; border-left: 1px solid rgba(184,134,11,0.3);
+            background: #f4e4c1; border-left: 1px solid rgba(139,90,43,0.3);
             overflow: hidden;
         }
         /* Tabs */
         .atk-tabs {
             display: flex; align-items: center; gap: 10px;
-            background: #0f1729; border-bottom: 2px solid rgba(184,134,11,0.3);
+            background: #e8d8b0; border-bottom: 2px solid rgba(139,90,43,0.3);
             flex-shrink: 0; padding: 0 14px;
         }
         .atk-tab-title {
             flex: 1; padding: 11px 0;
-            font-size: 0.9rem; font-weight: 900; color: #f0d080;
+            font-size: 0.9rem; font-weight: 900; color: #8b5a2b;
             text-transform: uppercase; letter-spacing: .05em;
         }
         .atk-tab-march {
             padding: 4px 12px; border-radius: 4px;
-            background: rgba(184,134,11,0.15); border: 1px solid rgba(212,160,23,0.4);
-            font-size: 0.72rem; font-weight: 700; color: #f0d080;
+            background: rgba(139,90,43,0.12); border: 1px solid rgba(139,90,43,0.35);
+            font-size: 0.72rem; font-weight: 700; color: #8b5a2b;
             text-transform: uppercase; letter-spacing: .06em;
         }
         /* Body */
         .atk-body { flex: 1; display: flex; overflow: hidden; min-height: 0; }
         /* Troop list */
         .atk-list {
-            flex: 0 0 56%; border-right: 1px solid rgba(184,134,11,0.25);
+            flex: 0 0 56%; border-right: 1px solid rgba(139,90,43,0.25);
             overflow-y: auto; padding: 6px 8px;
             display: flex; flex-direction: column; gap: 2px;
         }
-        .atk-loading { color: #64748b; text-align: center; padding: 2rem; font-size: 0.85rem; }
+        .atk-loading { color: #8b6f47; text-align: center; padding: 2rem; font-size: 0.85rem; }
         .atk-row { display: flex; align-items: center; gap: 7px; padding: 5px 2px; }
         .atk-icon {
             flex: 0 0 46px; height: 46px; border-radius: 6px; position: relative;
             display: flex; align-items: center; justify-content: center;
             font-size: 1.3rem; font-weight: 900; color: #fff;
         }
-        .atk-t1 { background: rgba(51,65,85,0.8); border: 2px solid #475569; }
+        .atk-t1 { background: rgba(212,196,168,0.8); border: 2px solid #8b6f47; }
         .atk-t2 { background: #1d4ed8; border: 2px solid #3b82f6; }
         .atk-t3 { background: #92400e; border: 2px solid #f59e0b; }
         .atk-t4 { background: #5b21b6; border: 2px solid #8b5cf6; }
@@ -377,9 +377,9 @@ declare(strict_types=1);
         .atk-t4 .atk-tbadge { background: #3b0764; border-color: #8b5cf6; color: #c4b5fd; }
         .atk-t5 .atk-tbadge { background: #7f1d1d; border-color: #ef4444; color: #fca5a5; }
         .atk-mid { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-        .atk-cnt { font-size: 0.88rem; font-weight: 700; color: #e2e8f0; }
+        .atk-cnt { font-size: 0.88rem; font-weight: 700; color: #4a3520; }
         .atk-srow { display: flex; align-items: center; gap: 4px; }
-        .atk-sl { flex: 1; accent-color: #d4a017; height: 6px; cursor: pointer; }
+        .atk-sl { flex: 1; accent-color: #c08858; height: 6px; cursor: pointer; }
         .atk-sl:disabled { opacity: .3; cursor: not-allowed; }
         .atk-arr {
             flex: 0 0 30px; height: 22px; font-size: 0.62rem;
@@ -391,8 +391,8 @@ declare(strict_types=1);
         .atk-arr:disabled { opacity: .3; cursor: not-allowed; }
         .atk-num {
             flex: 0 0 60px; padding: 3px 5px;
-            background: rgba(0,0,0,0.4); border: 1px solid rgba(184,134,11,0.25); border-radius: 4px;
-            color: #e2e8f0; font-size: 0.82rem; text-align: right;
+            background: rgba(240,232,208,0.8); border: 1px solid rgba(139,90,43,0.25); border-radius: 4px;
+            color: #4a3520; font-size: 0.82rem; text-align: right;
         }
         /* Formation panel */
         .atk-form {
@@ -402,16 +402,16 @@ declare(strict_types=1);
         .atk-presets { display: flex; gap: 5px; }
         .atk-preset {
             flex: 1; height: 27px; border-radius: 14px;
-            background: rgba(0,0,0,0.3); border: 1px solid rgba(184,134,11,0.25);
-            color: #94a3b8; font-size: 0.82rem; font-weight: 700; cursor: pointer;
+            background: #ede0c4; border: 1px solid rgba(139,90,43,0.25);
+            color: #8b6f47; font-size: 0.82rem; font-weight: 700; cursor: pointer;
             transition: all .15s;
         }
-        .atk-preset:hover { border-color: rgba(212,160,23,0.6); color: #f0d080; }
-        .atk-preset.is-active { background: rgba(212,160,23,0.15); border-color: #d4a017; color: #f0d080; }
+        .atk-preset:hover { border-color: rgba(139,90,43,0.6); color: #4a3520; }
+        .atk-preset.is-active { background: rgba(139,90,43,0.15); border-color: #c08858; color: #8b5a2b; }
         .atk-cap-row {
             display: flex; align-items: center; gap: 6px; font-size: 0.75rem;
-            color: #94a3b8; font-weight: 600;
-            background: rgba(0,0,0,0.3); border: 1px solid rgba(184,134,11,0.2); border-radius: 5px;
+            color: #8b6f47; font-weight: 600;
+            background: #ede0c4; border: 1px solid rgba(139,90,43,0.2); border-radius: 5px;
             padding: 4px 8px;
         }
         .atk-grid {
@@ -419,30 +419,30 @@ declare(strict_types=1);
         }
         .atk-card {
             display: flex; flex-direction: column; align-items: center;
-            background: #0f1729; border: 2px solid rgba(184,134,11,0.2); border-radius: 6px;
+            background: #f4e4c1; border: 2px solid rgba(139,90,43,0.2); border-radius: 6px;
             padding: 3px; gap: 2px; transition: border-color .15s;
         }
-        .atk-card.is-sel { border-color: #ef4444; }
+        .atk-card.is-sel { border-color: #c0604d; }
         .atk-card-icon { width: 100%; aspect-ratio: 1; }
-        .atk-card-cnt { font-size: 0.68rem; font-weight: 700; color: #e2e8f0; text-align: center; }
+        .atk-card-cnt { font-size: 0.68rem; font-weight: 700; color: #4a3520; text-align: center; }
         /* Info bar */
         .atk-info {
             display: flex; padding: 5px 12px; gap: 16px; flex-shrink: 0;
-            background: #0f1729; border-top: 1px solid rgba(184,134,11,0.25);
+            background: #e8d8b0; border-top: 1px solid rgba(139,90,43,0.25);
         }
         .atk-info-item { flex: 1; }
-        .atk-info-lbl { display: block; font-size: 0.62rem; color: #64748b; text-transform: uppercase; letter-spacing: .05em; }
-        .atk-info-val { display: block; font-size: 0.82rem; font-weight: 700; color: #e2e8f0; }
+        .atk-info-lbl { display: block; font-size: 0.62rem; color: #8b6f47; text-transform: uppercase; letter-spacing: .05em; }
+        .atk-info-val { display: block; font-size: 0.82rem; font-weight: 700; color: #4a3520; }
         /* Buttons row */
         .atk-foot { display: flex; height: 52px; flex-shrink: 0; }
         .atk-empty {
-            flex: 0 0 28%; background: linear-gradient(180deg,#c8870a,#9a6508); border: none; border-radius: 0;
-            color: #fff8e0; font-size: 0.95rem; font-weight: 900;
+            flex: 0 0 28%; background: linear-gradient(180deg,#c9925a,#9a6535); border: none; border-radius: 0;
+            color: #fff8ec; font-size: 0.95rem; font-weight: 900;
             text-transform: uppercase; letter-spacing: .05em; cursor: pointer;
-            border-right: 1px solid #6b4306;
+            border-right: 1px solid #6b4120;
             transition: filter 0.15s;
         }
-        .atk-empty:hover { filter: brightness(1.15); }
+        .atk-empty:hover { filter: brightness(1.1); }
         .atk-go {
             flex: 1; border: none; cursor: pointer;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -450,10 +450,10 @@ declare(strict_types=1);
         }
         .atk-go:hover:not(:disabled) { opacity: .88; }
         .atk-go:disabled { opacity: .4; cursor: not-allowed; }
-        .atk-go-blue { background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%); }
-        .atk-go-red  { background: linear-gradient(180deg, #dc2626 0%, #b91c1c 100%); border-radius: 0; }
-        .atk-go-time { font-size: 0.72rem; color: rgba(255,255,255,.7); line-height: 1; }
-        .atk-go-lbl  { font-size: 0.95rem; font-weight: 900; color: #fff; text-transform: uppercase; line-height: 1.3; }
+        .atk-go-blue { background: linear-gradient(180deg, #c9925a 0%, #9a6535 100%); }
+        .atk-go-red  { background: linear-gradient(180deg, #c87060 0%, #a05040 100%); border-radius: 0; }
+        .atk-go-time { font-size: 0.72rem; color: rgba(255,248,236,.85); line-height: 1; }
+        .atk-go-lbl  { font-size: 0.95rem; font-weight: 900; color: #fff8ec; text-transform: uppercase; line-height: 1.3; }
 
         /* ── Hex Popup ── */
         #hex-popup {
@@ -469,30 +469,30 @@ declare(strict_types=1);
         }
         .hex-btn {
             width: 52px; height: 52px;
-            border-radius: 50%;
-            border: 2px solid rgba(184,134,11,0.3);
-            background: rgba(8,12,24,0.88);
+            border-radius: 8px;
+            border: 1px solid rgba(139,90,43,0.35);
+            background: #f4e4c1;
             cursor: pointer;
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
             font-size: 0.52rem; font-weight: 700;
             text-transform: uppercase; letter-spacing: 0.04em;
-            color: #94a3b8;
+            color: #8b6f47;
             transition: background 0.15s, border-color 0.15s, color 0.15s;
             gap: 2px;
-            backdrop-filter: blur(4px);
+            box-shadow: 0 3px 12px rgba(139,90,43,0.18);
         }
-        .hex-btn:hover:not(:disabled) { background: rgba(26,39,68,0.9); color: #e2e8f0; border-color: rgba(212,160,23,0.5); }
+        .hex-btn:hover:not(:disabled) { background: #ede0c4; color: #4a3520; border-color: rgba(139,90,43,0.6); }
         .hex-btn:disabled { opacity: 0.4; cursor: not-allowed; }
         .hex-btn .hex-btn-icon { font-size: 1.3rem; line-height: 1; }
-        .hex-btn.hex-red   { border-color: rgba(239,68,68,0.5); color: #f87171; }
-        .hex-btn.hex-red:hover:not(:disabled) { border-color: #ef4444; background: rgba(239,68,68,0.15); }
-        .hex-btn.hex-orange { border-color: rgba(245,158,11,0.5); color: #fbbf24; }
-        .hex-btn.hex-orange:hover:not(:disabled) { border-color: #f59e0b; background: rgba(245,158,11,0.12); }
-        .hex-btn.hex-purple { border-color: rgba(139,92,246,0.5); color: #a78bfa; }
+        .hex-btn.hex-red   { border-color: rgba(192,96,77,0.5); color: #c0604d; }
+        .hex-btn.hex-red:hover:not(:disabled) { border-color: #c0604d; background: rgba(192,96,77,0.12); }
+        .hex-btn.hex-orange { border-color: rgba(212,130,77,0.5); color: #d4824d; }
+        .hex-btn.hex-orange:hover:not(:disabled) { border-color: #d4824d; background: rgba(212,130,77,0.12); }
+        .hex-btn.hex-purple { border-color: rgba(139,92,246,0.5); color: #7c5cbf; }
         .hex-btn.hex-purple:hover:not(:disabled) { border-color: #8b5cf6; background: rgba(139,92,246,0.12); }
-        .hex-btn.hex-green  { border-color: rgba(34,197,94,0.5); color: #86efac; }
-        .hex-btn.hex-green:hover:not(:disabled) { border-color: #22c55e; background: rgba(34,197,94,0.12); }
+        .hex-btn.hex-green  { border-color: rgba(127,176,105,0.5); color: #5a8a42; }
+        .hex-btn.hex-green:hover:not(:disabled) { border-color: #7fb069; background: rgba(127,176,105,0.12); }
 
         /* Formation presets */
         .formation-bar {
@@ -500,17 +500,17 @@ declare(strict_types=1);
         }
         .formation-slot {
             flex: 1; padding: 4px; border-radius: 4px;
-            border: 1px solid rgba(184,134,11,0.2); background: rgba(0,0,0,0.3);
-            font-size: 0.65rem; color: #64748b; text-align: center;
+            border: 1px solid rgba(139,90,43,0.2); background: #ede0c4;
+            font-size: 0.65rem; color: #8b6f47; text-align: center;
             cursor: pointer; transition: border-color 0.15s, color 0.15s;
         }
-        .formation-slot:hover { border-color: rgba(212,160,23,0.5); color: #94a3b8; }
-        .formation-slot.active { border-color: #d4a017; color: #f0d080; }
+        .formation-slot:hover { border-color: rgba(139,90,43,0.5); color: #4a3520; }
+        .formation-slot.active { border-color: #c08858; color: #8b5a2b; }
         .formation-save-btn {
-            font-size: 0.65rem; color: #64748b; background: none; border: none;
+            font-size: 0.65rem; color: #8b6f47; background: none; border: none;
             cursor: pointer; padding: 2px 6px; transition: color 0.15s;
         }
-        .formation-save-btn:hover { color: #22c55e; }
+        .formation-save-btn:hover { color: #7fb069; }
 
         /* Profile modal */
         .profile-header {
@@ -518,38 +518,38 @@ declare(strict_types=1);
         }
         .profile-avatar {
             width: 52px; height: 52px; border-radius: 10px;
-            background: linear-gradient(135deg, #7c1e0e, #4a0d05);
-            border: 2px solid #d4a017;
+            background: linear-gradient(135deg, #d4a070, #c08858);
+            border: 2px solid #8b5a2b;
             display: flex; align-items: center; justify-content: center;
             font-size: 1.5rem; flex-shrink: 0;
         }
         .profile-info { flex: 1; }
-        .profile-name { font-size: 1.05rem; font-weight: 800; color: #f0d080; }
-        .profile-tag  { font-size: 0.72rem; color: #64748b; margin-top: 2px; }
+        .profile-name { font-size: 1.05rem; font-weight: 800; color: #8b5a2b; }
+        .profile-tag  { font-size: 0.72rem; color: #8b6f47; margin-top: 2px; }
         .profile-stats-grid {
             display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; margin-top: 0.75rem;
         }
-        .pstat { background: rgba(0,0,0,0.3); border: 1px solid rgba(184,134,11,0.2); border-radius: 6px; padding: 6px; text-align: center; }
-        .pstat-val { font-size: 0.88rem; font-weight: 700; color: #e2e8f0; }
-        .pstat-lbl { font-size: 0.6rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
+        .pstat { background: #ede0c4; border: 1px solid rgba(139,90,43,0.2); border-radius: 6px; padding: 6px; text-align: center; }
+        .pstat-val { font-size: 0.88rem; font-weight: 700; color: #4a3520; }
+        .pstat-lbl { font-size: 0.6rem; color: #8b6f47; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
 
         /* Profile tabs */
         .profile-tabs {
-            display: flex; border-bottom: 1px solid rgba(184,134,11,0.25); margin: 0.75rem -1.5rem; padding: 0 1.5rem;
+            display: flex; border-bottom: 1px solid rgba(139,90,43,0.25); margin: 0.75rem -1.5rem; padding: 0 1.5rem;
             gap: 0; overflow-x: auto;
         }
         .profile-tab-btn {
             padding: 7px 14px; font-size: 0.7rem; font-weight: 700;
             text-transform: uppercase; letter-spacing: 0.05em;
-            color: #64748b; background: none; border: none;
+            color: #8b6f47; background: none; border: none;
             border-bottom: 2px solid transparent;
             cursor: pointer; white-space: nowrap; margin-bottom: -1px;
             transition: color 0.15s, border-color 0.15s;
         }
-        .profile-tab-btn.active { color: #f0d080; border-bottom-color: #d4a017; }
-        .profile-tab-btn:hover { color: #94a3b8; }
+        .profile-tab-btn.active { color: #8b5a2b; border-bottom-color: #c08858; }
+        .profile-tab-btn:hover { color: #4a3520; }
         .profile-tab-placeholder {
-            padding: 2rem; text-align: center; color: rgba(184,134,11,0.2); font-style: italic;
+            padding: 2rem; text-align: center; color: rgba(139,90,43,0.3); font-style: italic;
         }
 
         /* Rally time picker */
@@ -558,12 +558,12 @@ declare(strict_types=1);
         }
         .time-option {
             padding: 10px 16px; border-radius: 8px;
-            border: 2px solid rgba(184,134,11,0.25); background: rgba(0,0,0,0.3);
-            color: #94a3b8; font-size: 0.85rem; font-weight: 700;
+            border: 2px solid rgba(139,90,43,0.25); background: #ede0c4;
+            color: #8b6f47; font-size: 0.85rem; font-weight: 700;
             cursor: pointer; transition: border-color 0.15s, color 0.15s, background 0.15s;
         }
-        .time-option:hover { border-color: rgba(212,160,23,0.6); color: #f0d080; }
-        .time-option.selected { border-color: #d4a017; color: #f0d080; background: rgba(212,160,23,0.1); }
+        .time-option:hover { border-color: rgba(139,90,43,0.6); color: #4a3520; }
+        .time-option.selected { border-color: #c08858; color: #8b5a2b; background: rgba(139,90,43,0.1); }
 
         /* Emoji picker */
         .emoji-grid {
@@ -571,13 +571,13 @@ declare(strict_types=1);
         }
         .emoji-option {
             width: 44px; height: 44px; border-radius: 8px;
-            border: 2px solid rgba(184,134,11,0.2); background: rgba(0,0,0,0.3);
+            border: 2px solid rgba(139,90,43,0.2); background: #ede0c4;
             font-size: 1.4rem; cursor: pointer; display: flex;
             align-items: center; justify-content: center;
             transition: border-color 0.15s, background 0.15s;
         }
-        .emoji-option:hover { border-color: rgba(139,92,246,0.6); background: rgba(139,92,246,0.12); }
-        .emoji-option.selected { border-color: #8b5cf6; background: rgba(139,92,246,0.2); }
+        .emoji-option:hover { border-color: rgba(139,92,246,0.5); background: rgba(139,92,246,0.1); }
+        .emoji-option.selected { border-color: #8b5cf6; background: rgba(139,92,246,0.15); }
 
         /* Skin changer */
         .skin-grid {
@@ -585,36 +585,37 @@ declare(strict_types=1);
         }
         .skin-option {
             width: 80px; border-radius: 8px;
-            border: 2px solid rgba(184,134,11,0.2); background: rgba(0,0,0,0.3);
+            border: 2px solid rgba(139,90,43,0.2); background: #ede0c4;
             padding: 8px 4px 6px; text-align: center;
             cursor: pointer; transition: border-color 0.15s;
         }
-        .skin-option:hover { border-color: rgba(212,160,23,0.6); }
-        .skin-option.equipped { border-color: #22c55e; }
+        .skin-option:hover { border-color: rgba(139,90,43,0.6); }
+        .skin-option.equipped { border-color: #7fb069; }
         .skin-option-icon { font-size: 1.8rem; }
-        .skin-option-name { font-size: 0.6rem; color: #64748b; margin-top: 4px; }
-        .skin-option.equipped .skin-option-name { color: #86efac; }
+        .skin-option-name { font-size: 0.6rem; color: #8b6f47; margin-top: 4px; }
+        .skin-option.equipped .skin-option-name { color: #4a7a30; }
 
         /* ── Attack button ── */
         .btn-attack {
             display: block; width: 100%; margin-top: 10px;
-            padding: 0.45rem; border-radius: 6px;
-            background: linear-gradient(180deg, #dc2626 0%, #b91c1c 100%);
-            border: none; border-bottom: 2px solid #991b1b;
+            padding: 0.45rem; border-radius: 8px;
+            background: linear-gradient(180deg, #c87060 0%, #a05040 100%);
+            border: none; border-bottom: 3px solid #6a2a1e;
             color: #fff; font-size: 0.82rem; font-weight: 700;
             cursor: pointer; transition: filter 0.15s;
         }
-        .btn-attack:hover { filter: brightness(1.12); }
+        .btn-attack:hover { filter: brightness(1.1); }
 
         /* ── Toast ── */
         #map-toast {
             position: fixed; bottom: 1.2rem; left: 50%; transform: translateX(-50%);
-            background: rgba(8,12,24,0.92); border: 1px solid rgba(184,134,11,0.3); border-radius: 8px;
-            padding: 0.5rem 1.1rem; font-size: 0.82rem; z-index: 300;
-            white-space: nowrap; display: none; backdrop-filter: blur(4px);
+            background: #f4e4c1; border: 1px solid rgba(139,90,43,0.3); border-left: 4px solid #c08858; border-radius: 8px;
+            padding: 0.5rem 1.1rem; font-size: 0.82rem; z-index: 300; color: #4a3520;
+            white-space: nowrap; display: none;
+            box-shadow: 0 3px 12px rgba(139,90,43,0.18);
         }
-        #map-toast.ok  { border-color: rgba(34,197,94,0.5); color: #22c55e; }
-        #map-toast.err { border-color: rgba(239,68,68,0.5); color: #ef4444; }
+        #map-toast.ok  { border-left-color: #7fb069; color: #4a7a30; }
+        #map-toast.err { border-left-color: #c0604d; color: #a03020; }
 
         /* ── Active march badge ── */
         .march-badge {
@@ -622,13 +623,13 @@ declare(strict_types=1);
             border-radius: 6px; padding: 0.35rem 0.55rem; margin-bottom: 0.4rem;
             font-size: 0.72rem;
         }
-        .march-badge.monster  { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.3); }
-        .march-badge.pvp      { background: rgba(127,29,29,0.15); border: 1px solid rgba(153,27,27,0.4);  }
-        .march-badge.return   { background: rgba(212,160,23,0.06); border: 1px solid rgba(184,134,11,0.25); }
-        .march-badge-label    { color: #e2e8f0; font-weight: 600; }
-        .march-badge-state    { color: #ef4444; font-variant-numeric: tabular-nums; }
-        .march-badge.return .march-badge-state { color: #f0d080; }
-        .march-badge.pvp    .march-badge-state { color: #fca5a5; }
+        .march-badge.monster  { background: rgba(192,96,77,0.08); border: 1px solid rgba(192,96,77,0.3); }
+        .march-badge.pvp      { background: rgba(192,96,77,0.12); border: 1px solid rgba(160,80,64,0.35); }
+        .march-badge.return   { background: rgba(139,90,43,0.06); border: 1px solid rgba(139,90,43,0.25); }
+        .march-badge-label    { color: #4a3520; font-weight: 600; }
+        .march-badge-state    { color: #c0604d; font-variant-numeric: tabular-nums; }
+        .march-badge.return .march-badge-state { color: #8b5a2b; }
+        .march-badge.pvp    .march-badge-state { color: #a03020; }
     </style>
 </head>
 <body x-data="mapApp()" x-init="boot()">
@@ -696,7 +697,7 @@ declare(strict_types=1);
                         <!-- Resource node -->
                         <template x-if="tileInfo.occupant?.type === 'resource'">
                             <div>
-                                <div class="tile-info-name" style="color:#22c55e">
+                                <div class="tile-info-name" style="color:#7fb069">
                                     ◆ <span x-text="tileInfo.occupant.label"></span>
                                 </div>
                                 <div class="tile-info-row">
@@ -743,26 +744,26 @@ declare(strict_types=1);
                                     <span class="val" x-text="charmTimeLeft(tileInfo.occupant.expires_at, tick)"></span>
                                 </div>
                                 <div style="margin-top:8px">
-                                    <div style="font-size:.7rem;color:#64748b;margin-bottom:4px">Truppen auswählen:</div>
+                                    <div style="font-size:.7rem;color:#8b6f47;margin-bottom:4px">Truppen auswählen:</div>
                                     <template x-if="charmTroopsLoading">
-                                        <div style="font-size:.7rem;color:#475569;padding:4px 0">Laden…</div>
+                                        <div style="font-size:.7rem;color:#8b6f47;padding:4px 0">Laden…</div>
                                     </template>
                                     <template x-if="!charmTroopsLoading && charmTroops.length === 0">
-                                        <div style="font-size:.7rem;color:#ef4444">Keine Truppen verfügbar</div>
+                                        <div style="font-size:.7rem;color:#c0604d">Keine Truppen verfügbar</div>
                                     </template>
                                     <template x-for="t in charmTroops" :key="t.code">
-                                        <label style="display:flex;align-items:center;gap:6px;font-size:.72rem;color:#cbd5e1;margin-bottom:3px">
+                                        <label style="display:flex;align-items:center;gap:6px;font-size:.72rem;color:#4a3520;margin-bottom:3px">
                                             <input type="number" :id="'charm-t-' + t.code"
                                                    min="0" :max="t.count"
                                                    x-model.number="t.toSend"
-                                                   style="width:52px;padding:2px 4px;border-radius:3px;border:1px solid rgba(184,134,11,0.3);background:rgba(0,0,0,0.4);color:#e2e8f0">
+                                                   style="width:52px;padding:2px 4px;border-radius:3px;border:1px solid rgba(139,90,43,0.3);background:rgba(240,232,208,0.8);color:#4a3520">
                                             <span x-text="t.name + ' (' + t.count + ')'"></span>
                                         </label>
                                     </template>
                                 </div>
                                 <button
-                                    style="margin-top:8px;width:100%;padding:6px;border:none;border-radius:5px;
-                                           background:linear-gradient(180deg,#a855f7,#7e22ce);color:#fff;
+                                    style="margin-top:8px;width:100%;padding:6px;border:none;border-radius:8px;
+                                           background:linear-gradient(180deg,#c9925a,#9a6535);border-bottom:3px solid #6b4120;color:#fff8ec;
                                            font-weight:700;font-size:.8rem;cursor:pointer"
                                     :disabled="charmCollecting || charmTroops.reduce((s,t)=>s+(t.toSend||0),0)===0"
                                     @click="collectCharm(tileInfo.occupant.id, tileInfo.x, tileInfo.y)"
@@ -779,25 +780,25 @@ declare(strict_types=1);
         <!-- Field object (gather) panel -->
         <div class="panel" x-show="tileInfo && tileInfo.type === 'field_object'" x-cloak>
             <div class="panel-title">Ressourcenfeld</div>
-            <div style="font-size:0.85rem;font-weight:800;color:#f0d080;margin-bottom:6px">
+            <div style="font-size:0.85rem;font-weight:800;color:#8b5a2b;margin-bottom:6px">
                 🌾 <span x-text="fieldObjectName(tileInfo?.object_name)"></span>
                 <span x-show="tileInfo?.level"> Lv.<span x-text="tileInfo?.level"></span></span>
             </div>
-            <div style="font-size:0.75rem;color:#94a3b8;margin-bottom:6px">
+            <div style="font-size:0.75rem;color:#8b6f47;margin-bottom:6px">
                 Ressourcen:
-                <span style="color:#ffd700;font-weight:700" x-text="(tileInfo?.resource_amount ?? 0).toLocaleString()"></span>
+                <span style="color:#8b5a2b;font-weight:700" x-text="(tileInfo?.resource_amount ?? 0).toLocaleString()"></span>
                 /
                 <span x-text="(tileInfo?.resource_max ?? 0).toLocaleString()"></span>
             </div>
-            <div x-show="tileInfo?.is_occupied" style="font-size:0.72rem;color:#f87171;margin-bottom:6px">
+            <div x-show="tileInfo?.is_occupied" style="font-size:0.72rem;color:#c0604d;margin-bottom:6px">
                 Wird bereits gesammelt
             </div>
             <!-- Resource progress bar -->
-            <div style="height:6px;background:rgba(0,0,0,0.4);border:1px solid rgba(184,134,11,0.15);border-radius:3px;overflow:hidden;margin-bottom:12px">
-                <div style="height:100%;background:#22c55e;border-radius:3px;transition:width 0.3s"
+            <div style="height:6px;background:rgba(139,90,43,0.15);border:1px solid rgba(139,90,43,0.15);border-radius:3px;overflow:hidden;margin-bottom:12px">
+                <div style="height:100%;background:#7fb069;border-radius:3px;transition:width 0.3s"
                      :style="`width:${tileInfo && tileInfo.resource_max > 0 ? Math.round((tileInfo.resource_amount/tileInfo.resource_max)*100) : 0}%`"></div>
             </div>
-            <button style="width:100%;padding:7px;border:none;border-radius:6px;background:linear-gradient(180deg,#16a34a,#15803d);color:#fff;font-size:0.82rem;font-weight:700;cursor:pointer"
+            <button style="width:100%;padding:7px;border:none;border-radius:8px;background:linear-gradient(180deg,#c9925a,#9a6535);border-bottom:3px solid #6b4120;color:#fff8ec;font-size:0.82rem;font-weight:700;cursor:pointer"
                     @click="dispatchGather()"
                     :disabled="tileInfo?.is_occupied">
                 🚶 Sammeln
@@ -1064,19 +1065,19 @@ declare(strict_types=1);
 <div class="modal-overlay" x-show="rallyModal" @click.self="rallyModal=false" style="display:none">
     <div class="modal-box">
         <div class="modal-title" style="color:#f59e0b">🏳 Rally starten</div>
-        <div style="font-size:0.82rem;color:#94a3b8;margin-bottom:0.75rem"
+        <div style="font-size:0.82rem;color:#8b6f47;margin-bottom:0.75rem"
              x-text="rallyTarget ? 'Ziel: ' + (rallyTarget.player_name ?? rallyTarget.player) + ' (' + rallyTarget.x + ', ' + rallyTarget.y + ')' : ''"></div>
 
         <div class="modal-sub">Rally-Timer</div>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:0.75rem">
-            <div style="flex:1;background:rgba(0,0,0,0.35);border:1px solid rgba(184,134,11,0.3);border-radius:6px;padding:8px 12px;font-size:0.85rem;font-weight:700;color:#f0d080;text-align:center"
+            <div style="flex:1;background:#ede0c4;border:1px solid rgba(139,90,43,0.3);border-radius:6px;padding:8px 12px;font-size:0.85rem;font-weight:700;color:#8b5a2b;text-align:center"
                  x-text="rallyMinutes + ' Minuten'"></div>
             <button class="modal-btn modal-btn-orange" style="flex:0 0 auto;padding:8px 14px"
                     @click="rallyTimePicker=true">Ändern</button>
         </div>
 
         <div class="modal-sub">Truppen auswählen</div>
-        <template x-if="rallyLoading"><div style="text-align:center;color:#475569;padding:1rem">Truppen laden…</div></template>
+        <template x-if="rallyLoading"><div style="text-align:center;color:#8b6f47;padding:1rem">Truppen laden…</div></template>
         <template x-if="!rallyLoading">
             <div>
                 <template x-for="t in rallyTroops" :key="t.code">
@@ -1092,7 +1093,7 @@ declare(strict_types=1);
                         </div>
                     </div>
                 </template>
-                <div style="font-size:0.72rem;color:#64748b;margin-top:0.5rem"
+                <div style="font-size:0.72rem;color:#8b6f47;margin-top:0.5rem"
                      x-text="'Gesamt: ' + rallyTroops.reduce((s,t)=>s+(t.toSend||0),0).toLocaleString() + ' Truppen'"></div>
             </div>
         </template>
@@ -1127,7 +1128,7 @@ declare(strict_types=1);
         <div class="modal-title" style="color:#f59e0b">👤 Spielerprofil</div>
 
         <template x-if="enemyProfileLoading">
-            <div style="text-align:center;color:#475569;padding:2rem">Profil laden…</div>
+            <div style="text-align:center;color:#8b6f47;padding:2rem">Profil laden…</div>
         </template>
 
         <template x-if="!enemyProfileLoading && enemyProfile">
@@ -1168,58 +1169,58 @@ declare(strict_types=1);
     <div class="modal-box" style="width:380px;padding:0;overflow:hidden">
 
         <!-- Header mit Avatar + Basis-Info -->
-        <div style="background:linear-gradient(135deg,#1a0500,#3d0a00);padding:16px;display:flex;gap:14px;align-items:center;border-bottom:1px solid #5c1d0a">
-            <div style="width:64px;height:64px;border-radius:8px;background:linear-gradient(135deg,#7c1e0e,#4a0d05);border:2px solid #d4a017;display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0">⚔</div>
+        <div style="background:#e8d8b0;padding:16px;display:flex;gap:14px;align-items:center;border-bottom:1px solid rgba(139,90,43,0.3)">
+            <div style="width:64px;height:64px;border-radius:8px;background:linear-gradient(135deg,#d4a070,#c08858);border:2px solid #8b5a2b;display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0">⚔</div>
             <div style="flex:1;min-width:0">
-                <div style="font-size:1rem;font-weight:800;color:#f0d080;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" x-text="ownProfile?.username ?? ''"></div>
-                <div style="font-size:0.72rem;color:#94a3b8;margin-top:2px" x-text="ownProfile?.alliance_tag ? '[' + ownProfile.alliance_tag + '] ' + (ownProfile.alliance_name ?? '') : 'Keine Allianz'"></div>
+                <div style="font-size:1rem;font-weight:800;color:#8b5a2b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" x-text="ownProfile?.username ?? ''"></div>
+                <div style="font-size:0.72rem;color:#8b6f47;margin-top:2px" x-text="ownProfile?.alliance_tag ? '[' + ownProfile.alliance_tag + '] ' + (ownProfile.alliance_name ?? '') : 'Keine Allianz'"></div>
             </div>
         </div>
 
         <!-- Stats -->
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(184,134,11,0.15)">
-            <div style="background:#080c18;padding:10px;text-align:center">
-                <div style="font-size:0.9rem;font-weight:700;color:#e2e8f0" x-text="(ownProfile?.power ?? 0).toLocaleString()"></div>
-                <div style="font-size:0.6rem;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Macht</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(139,90,43,0.15)">
+            <div style="background:#ede0c4;padding:10px;text-align:center">
+                <div style="font-size:0.9rem;font-weight:700;color:#4a3520" x-text="(ownProfile?.power ?? 0).toLocaleString()"></div>
+                <div style="font-size:0.6rem;color:#8b6f47;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Macht</div>
             </div>
-            <div style="background:#080c18;padding:10px;text-align:center">
-                <div style="font-size:0.9rem;font-weight:700;color:#e2e8f0" x-text="ownProfile?.castle_level ?? '?'"></div>
-                <div style="font-size:0.6rem;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Castle Lv</div>
+            <div style="background:#ede0c4;padding:10px;text-align:center">
+                <div style="font-size:0.9rem;font-weight:700;color:#4a3520" x-text="ownProfile?.castle_level ?? '?'"></div>
+                <div style="font-size:0.6rem;color:#8b6f47;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Castle Lv</div>
             </div>
-            <div style="background:#080c18;padding:10px;text-align:center">
-                <div style="font-size:0.9rem;font-weight:700;color:#e2e8f0" x-text="(ownProfile?.kill_count ?? 0).toLocaleString()"></div>
-                <div style="font-size:0.6rem;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Kills</div>
+            <div style="background:#ede0c4;padding:10px;text-align:center">
+                <div style="font-size:0.9rem;font-weight:700;color:#4a3520" x-text="(ownProfile?.kill_count ?? 0).toLocaleString()"></div>
+                <div style="font-size:0.6rem;color:#8b6f47;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Kills</div>
             </div>
         </div>
 
         <!-- Lord Level + AP -->
-        <div style="padding:12px 16px;border-bottom:1px solid rgba(184,134,11,0.2)">
+        <div style="padding:12px 16px;border-bottom:1px solid rgba(139,90,43,0.2)">
             <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px">
-                <span style="font-size:0.78rem;font-weight:700;color:#f0d080">Lord Lv <span x-text="ownProfile?.lord_level ?? 0"></span></span>
-                <span style="font-size:0.65rem;color:#64748b">XP: <span x-text="(ownProfile?.lord_xp ?? 0).toLocaleString()"></span></span>
+                <span style="font-size:0.78rem;font-weight:700;color:#8b5a2b">Lord Lv <span x-text="ownProfile?.lord_level ?? 0"></span></span>
+                <span style="font-size:0.65rem;color:#8b6f47">XP: <span x-text="(ownProfile?.lord_xp ?? 0).toLocaleString()"></span></span>
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
-                <span style="font-size:0.7rem;color:#64748b;white-space:nowrap">⚡ AP</span>
-                <div style="flex:1;height:8px;background:rgba(0,0,0,0.4);border:1px solid rgba(184,134,11,0.15);border-radius:4px;overflow:hidden">
-                    <div style="height:100%;background:linear-gradient(90deg,#b8860b,#ffd700);border-radius:4px;transition:width 0.3s"
+                <span style="font-size:0.7rem;color:#8b6f47;white-space:nowrap">⚡ AP</span>
+                <div style="flex:1;height:8px;background:rgba(139,90,43,0.15);border:1px solid rgba(139,90,43,0.15);border-radius:4px;overflow:hidden">
+                    <div style="height:100%;background:linear-gradient(90deg,#c08858,#d4a070);border-radius:4px;transition:width 0.3s"
                          :style="'width:' + Math.min(100, Math.round((ownProfile?.action_points ?? 0) / 200 * 100)) + '%'"></div>
                 </div>
-                <span style="font-size:0.7rem;color:#fbbf24;white-space:nowrap" x-text="(ownProfile?.action_points ?? 0) + ' / 200'"></span>
+                <span style="font-size:0.7rem;color:#d4824d;white-space:nowrap" x-text="(ownProfile?.action_points ?? 0) + ' / 200'"></span>
             </div>
         </div>
 
         <!-- Nav Buttons -->
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(184,134,11,0.15)">
-            <a href="#" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 6px;background:#080c18;color:#94a3b8;text-decoration:none;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;transition:color 0.15s" onmouseover="this.style.color='#f0d080'" onmouseout="this.style.color='#94a3b8'">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(139,90,43,0.15)">
+            <a href="#" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 6px;background:#ede0c4;color:#8b6f47;text-decoration:none;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;transition:color 0.15s" onmouseover="this.style.color='#8b5a2b'" onmouseout="this.style.color='#8b6f47'">
                 <span style="font-size:1.2rem">📜</span>VERLAUF
             </a>
-            <a href="/alliance" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 6px;background:#080c18;color:#94a3b8;text-decoration:none;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;transition:color 0.15s" onmouseover="this.style.color='#f0d080'" onmouseout="this.style.color='#94a3b8'">
+            <a href="/alliance" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 6px;background:#ede0c4;color:#8b6f47;text-decoration:none;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;transition:color 0.15s" onmouseover="this.style.color='#8b5a2b'" onmouseout="this.style.color='#8b6f47'">
                 <span style="font-size:1.2rem">⚔</span>ALLIANZ
             </a>
-            <a href="#" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 6px;background:#080c18;color:#94a3b8;text-decoration:none;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;transition:color 0.15s" onmouseover="this.style.color='#f0d080'" onmouseout="this.style.color='#94a3b8'">
+            <a href="#" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 6px;background:#ede0c4;color:#8b6f47;text-decoration:none;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;transition:color 0.15s" onmouseover="this.style.color='#8b5a2b'" onmouseout="this.style.color='#8b6f47'">
                 <span style="font-size:1.2rem">📖</span>MEISTER
             </a>
-            <a href="#" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 6px;background:#080c18;color:#94a3b8;text-decoration:none;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;transition:color 0.15s" onmouseover="this.style.color='#f0d080'" onmouseout="this.style.color='#94a3b8'">
+            <a href="#" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 6px;background:#ede0c4;color:#8b6f47;text-decoration:none;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;transition:color 0.15s" onmouseover="this.style.color='#8b5a2b'" onmouseout="this.style.color='#8b6f47'">
                 <span style="font-size:1.2rem">💎</span>SCHATZ
             </a>
         </div>
@@ -1234,8 +1235,8 @@ declare(strict_types=1);
 <!-- ── Emoji Picker Modal ── -->
 <div class="modal-overlay" x-show="emojiModal" @click.self="emojiModal=false" style="display:none">
     <div class="modal-box" style="max-width:320px;text-align:center">
-        <div class="modal-title" style="color:#8b5cf6">😀 Emoji senden</div>
-        <div style="font-size:0.75rem;color:#64748b;margin-bottom:0.5rem">5 Sekunden über deiner Stadt sichtbar</div>
+        <div class="modal-title" style="color:#7c5cbf">😀 Emoji senden</div>
+        <div style="font-size:0.75rem;color:#8b6f47;margin-bottom:0.5rem">5 Sekunden über deiner Stadt sichtbar</div>
         <div class="emoji-grid">
             <template x-for="e in emojiList" :key="e">
                 <button class="emoji-option" :class="selectedEmoji===e ? 'selected' : ''"
@@ -1253,7 +1254,7 @@ declare(strict_types=1);
 <div class="modal-overlay" x-show="skinModal" @click.self="skinModal=false" style="display:none">
     <div class="modal-box" style="text-align:center">
         <div class="modal-title">👕 City Skin</div>
-        <div style="font-size:0.75rem;color:#64748b;margin-bottom:0.75rem">Skin für deine Stadt wählen</div>
+        <div style="font-size:0.75rem;color:#8b6f47;margin-bottom:0.75rem">Skin für deine Stadt wählen</div>
         <div class="skin-grid">
             <!-- "NO SKIN" always shown -->
             <div class="skin-option" :class="!equippedSkin ? 'equipped' : ''"
@@ -1361,7 +1362,7 @@ function mapApp() {
         },
 
         shrineColor(tier) {
-            return { S: '#f59e0b', A: '#a78bfa', B: '#60a5fa', C: '#94a3b8' }[tier] ?? '#94a3b8';
+            return { S: '#d4824d', A: '#9b7cc8', B: '#5f9ea0', C: '#8b6f47' }[tier] ?? '#8b6f47';
         },
 
         marchEta(m, _tick) {
@@ -1786,7 +1787,7 @@ function mapApp() {
 
         // ── Charm helpers ─────────────────────────────────────────────────────
         charmGradeColor(grade) {
-            return { normal: '#94a3b8', epic: '#a855f7', legendary: '#f59e0b' }[grade] ?? '#94a3b8';
+            return { normal: '#8b6f47', epic: '#9b7cc8', legendary: '#d4824d' }[grade] ?? '#8b6f47';
         },
         charmGradeLabel(grade) {
             return { normal: 'Normal', epic: 'Epic', legendary: 'Legendary' }[grade] ?? grade;

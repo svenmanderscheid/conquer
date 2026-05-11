@@ -364,6 +364,20 @@ if (preg_match('#^/city/building/([a-z_]+)$#', $path, $m)) {
 }
 
 // ---------------------------------------------------------------------------
+// Dev UI Preview (local only)
+// ---------------------------------------------------------------------------
+
+if ($path === '/dev/ui-preview') {
+    $appCfg = require ROOT_DIR . '/config/app.php';
+    if (($appCfg['env'] ?? 'production') !== 'production') {
+        require ROOT_DIR . '/views/dev/ui_preview.php';
+        exit;
+    }
+    http_response_code(404);
+    exit;
+}
+
+// ---------------------------------------------------------------------------
 // Landing page — redirect logged-in players straight to their city
 // ---------------------------------------------------------------------------
 
