@@ -253,6 +253,38 @@
     }
     .admin-btn-sm { padding: 3px 8px; font-size: 0.72rem; }
 
+    /* ---- Tabs inside card ---- */
+    .admin-tab-btn {
+      flex: 1;
+      padding: 10px 12px;
+      background: transparent;
+      border: none;
+      border-right: 1px solid #1e293b;
+      color: #64748b;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+    .admin-tab-btn:last-child { border-right: none; }
+    .admin-tab-btn:hover { background: rgba(255,255,255,.04); color: #94a3b8; }
+    .admin-tab-active { background: rgba(59,130,246,.12) !important; color: #93c5fd !important; border-bottom: 2px solid #3b82f6; }
+
+    /* ---- Input ---- */
+    .admin-input {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      color: #e2e8f0;
+      padding: 6px 8px;
+      font-size: 0.82rem;
+      width: 100%;
+      font-family: inherit;
+    }
+    .admin-input:focus { outline: none; border-color: #3b82f6; }
+
     /* ---- Form ---- */
     .admin-form-row {
       display: grid;
@@ -336,6 +368,7 @@
       font-size: 0.85rem;
     }
   </style>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body>
 

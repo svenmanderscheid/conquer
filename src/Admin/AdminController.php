@@ -166,10 +166,14 @@ final class AdminController
         $playerId = (int) ($_POST['player_id'] ?? 0);
 
         match ($action) {
-            'grant-gems' => self::actionGrantGems($db, $adminSession, $playerId),
-            'ban'        => self::actionBan($db, $adminSession, $playerId),
+            'grant-gems'   => self::actionGrantGems($db, $adminSession, $playerId),
+            'ban'          => self::actionBan($db, $adminSession, $playerId),
             'grant-shield' => self::actionGrantShield($db, $adminSession, $playerId),
-            default      => self::actionNotFound(),
+            'set-resources' => self::actionSetResources($db, $adminSession, $playerId),
+            'add-troops'   => self::actionAddTroops($db, $adminSession, $playerId),
+            'set-building' => self::actionSetBuilding($db, $adminSession, $playerId),
+            'set-research' => self::actionSetResearch($db, $adminSession, $playerId),
+            default        => self::actionNotFound(),
         };
     }
 
@@ -282,6 +286,163 @@ final class AdminController
         );
 
         self::redirectWithFlash("/admin/players/{$playerId}", "{$hours}h Schutzschild gewährt.");
+    }
+
+    private static function actionSetResources(
+        Connection $db,
+        array $adminSession,
+        int $playerId,
+    ): void {
+        if ($playerId <= 0) {
+            self::redirectWithFlash('/admin/players', 'Ungültige Spieler-ID.');
+            return;
+        }
+
+        $cityRow = $db->query(
+            'SELECT id FROM cities WHERE player_id = ? LIMIT 1',
+            [$playerId],
+        )->fetch();
+
+        if ($cityRow === false) {
+            self::redirectWithFlash("/admin/players/{$playerId}", 'Keine Stadt gefunden.');
+            return;
+        }
+
+        $cityId = (int) $cityRow['id'];
+        $food   = max(0, (int) ($_POST['food']   ?? 0));
+        $lumber = max(0, (int) ($_POST['lumber'] ?? 0));
+        $stone  = max(0, (int) ($_POST['stone']  ?? 0));
+        $gold   = max(0, (int) ($_POST['gold']   ?? 0));
+
+        $db->execute(
+            'UPDATE cities SET food = ?, lumber = ?, stone = ?, gold = ? WHERE id = ?',
+            [$food, $lumber, $stone, $gold, $cityId],
+        );
+
+        AdminAuth::log($adminSession['id'], 'admin.set_resources', 'player', $playerId,
+            ['food' => $food, 'lumber' => $lumber, 'stone' => $stone, 'gold' => $gold]);
+
+        self::redirectWithFlash("/admin/players/{$playerId}", 'Ressourcen gesetzt.');
+    }
+
+    private static function actionAddTroops(
+        Connection $db,
+        array $adminSession,
+        int $playerId,
+    ): void {
+        if ($playerId <= 0) {
+            self::redirectWithFlash('/admin/players', 'Ungültige Spieler-ID.');
+            return;
+        }
+
+        $cityRow = $db->query(
+            'SELECT id FROM cities WHERE player_id = ? LIMIT 1',
+            [$playerId],
+        )->fetch();
+
+        if ($cityRow === false) {
+            self::redirectWithFlash("/admin/players/{$playerId}", 'Keine Stadt gefunden.');
+            return;
+        }
+
+        $cityId    = (int) $cityRow['id'];
+        $troopCode = (int) ($_POST['troop_code'] ?? 0);
+        $count     = (int) ($_POST['count'] ?? 0);
+
+        if ($troopCode <= 0 || $count < 0 || $count > 1_000_000) {
+            self::redirectWithFlash("/admin/players/{$playerId}", 'Ungültige Truppendaten.');
+            return;
+        }
+
+        $db->execute(
+            'INSERT INTO city_troops (city_id, troop_code, count)
+             VALUES (?, ?, ?)
+             ON DUPLICATE KEY UPDATE count = ?',
+            [$cityId, $troopCode, $count, $count],
+        );
+
+        AdminAuth::log($adminSession['id'], 'admin.set_troops', 'player', $playerId,
+            ['troop_code' => $troopCode, 'count' => $count]);
+
+        self::redirectWithFlash("/admin/players/{$playerId}", "Truppen gesetzt ({$count}x Code {$troopCode}).");
+    }
+
+    private static function actionSetBuilding(
+        Connection $db,
+        array $adminSession,
+        int $playerId,
+    ): void {
+        if ($playerId <= 0) {
+            self::redirectWithFlash('/admin/players', 'Ungültige Spieler-ID.');
+            return;
+        }
+
+        $cityRow = $db->query(
+            'SELECT id FROM cities WHERE player_id = ? LIMIT 1',
+            [$playerId],
+        )->fetch();
+
+        if ($cityRow === false) {
+            self::redirectWithFlash("/admin/players/{$playerId}", 'Keine Stadt gefunden.');
+            return;
+        }
+
+        $cityId       = (int) $cityRow['id'];
+        $buildingCode = preg_replace('/[^a-z_]/', '', strtolower(trim($_POST['building_code'] ?? '')));
+        $level        = max(0, min(30, (int) ($_POST['level'] ?? 1)));
+
+        if ($buildingCode === '') {
+            self::redirectWithFlash("/admin/players/{$playerId}", 'Ungültiger Gebäude-Code.');
+            return;
+        }
+
+        $db->execute(
+            'INSERT INTO city_buildings (city_id, building_code, level)
+             VALUES (?, ?, ?)
+             ON DUPLICATE KEY UPDATE level = ?',
+            [$cityId, $buildingCode, $level, $level],
+        );
+
+        // Sync castle_level shortcut
+        if ($buildingCode === 'castle') {
+            $db->execute('UPDATE cities SET castle_level = ? WHERE id = ?', [$level, $cityId]);
+        }
+
+        AdminAuth::log($adminSession['id'], 'admin.set_building', 'player', $playerId,
+            ['building' => $buildingCode, 'level' => $level]);
+
+        self::redirectWithFlash("/admin/players/{$playerId}", "Gebäude '{$buildingCode}' auf Level {$level} gesetzt.");
+    }
+
+    private static function actionSetResearch(
+        Connection $db,
+        array $adminSession,
+        int $playerId,
+    ): void {
+        if ($playerId <= 0) {
+            self::redirectWithFlash('/admin/players', 'Ungültige Spieler-ID.');
+            return;
+        }
+
+        $researchCode = preg_replace('/[^a-z_]/', '', strtolower(trim($_POST['research_code'] ?? '')));
+        $level        = max(0, min(30, (int) ($_POST['level'] ?? 1)));
+
+        if ($researchCode === '') {
+            self::redirectWithFlash("/admin/players/{$playerId}", 'Ungültiger Forschungs-Code.');
+            return;
+        }
+
+        $db->execute(
+            'INSERT INTO player_research (player_id, world_id, research_code, level)
+             VALUES (?, 1, ?, ?)
+             ON DUPLICATE KEY UPDATE level = ?',
+            [$playerId, $researchCode, $level, $level],
+        );
+
+        AdminAuth::log($adminSession['id'], 'admin.set_research', 'player', $playerId,
+            ['research' => $researchCode, 'level' => $level]);
+
+        self::redirectWithFlash("/admin/players/{$playerId}", "Forschung '{$researchCode}' auf Level {$level} gesetzt.");
     }
 
     private static function actionNotFound(): void
