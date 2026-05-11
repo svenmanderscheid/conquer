@@ -21,7 +21,7 @@ final class AdminController
     public static function loginPage(): void
     {
         if (AdminAuth::isLoggedIn()) {
-            header('Location: /admin');
+            header('Location: ' . APP_BASE . '/admin');
             exit;
         }
 
@@ -33,7 +33,7 @@ final class AdminController
     public static function loginPost(): void
     {
         if (AdminAuth::isLoggedIn()) {
-            header('Location: /admin');
+            header('Location: ' . APP_BASE . '/admin');
             exit;
         }
 
@@ -55,7 +55,7 @@ final class AdminController
         try {
             $ok = AdminAuth::login($username, $password);
             if ($ok) {
-                header('Location: /admin');
+                header('Location: ' . APP_BASE . '/admin');
                 exit;
             }
             $error = 'Ungültiger Benutzername oder Passwort.';
@@ -330,7 +330,7 @@ final class AdminController
     private static function redirectWithFlash(string $url, string $message): void
     {
         $_SESSION['admin_flash'] = $message;
-        header('Location: ' . $url);
+        header('Location: ' . APP_BASE . $url);
         exit;
     }
 }

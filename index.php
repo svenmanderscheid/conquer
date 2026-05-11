@@ -23,6 +23,10 @@ require_once ROOT_DIR . '/src/Bootstrap.php';
 
 $_rawPath   = parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH) ?? '/';
 $_scriptDir = rtrim(dirname((string) ($_SERVER['SCRIPT_NAME'] ?? '/')), '/\\');
+
+// APP_BASE: the sub-directory prefix (e.g. "/conquer" on localhost, "" on production)
+// Used for generating correct redirect URLs from controllers.
+define('APP_BASE', $_scriptDir === '/' ? '' : $_scriptDir);
 // Strip the base directory (e.g. /conquer) from the path when running in a sub-folder
 if ($_scriptDir !== '' && $_scriptDir !== '/' && str_starts_with($_rawPath, $_scriptDir)) {
     $_rawPath = substr($_rawPath, strlen($_scriptDir));

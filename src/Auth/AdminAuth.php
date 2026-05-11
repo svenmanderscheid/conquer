@@ -93,7 +93,7 @@ final class AdminAuth
         }
 
         session_destroy();
-        header('Location: /admin/login');
+        header('Location: ' . APP_BASE . '/admin/login');
         exit;
     }
 
@@ -105,7 +105,7 @@ final class AdminAuth
     public static function requireAuth(): array
     {
         if (!self::isLoggedIn()) {
-            header('Location: /admin/login');
+            header('Location: ' . APP_BASE . '/admin/login');
             exit;
         }
 
