@@ -251,6 +251,46 @@ final class TreasuryService
     }
 
     // ─────────────────────────────────────────────────────────────────────────
+    // Spend (for internal Alliance systems)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Deducts resources directly from the treasury (e.g. for alliance research costs).
+     * Does NOT log a donation record — this is a spend, not a donation.
+     *
+     * @throws \RuntimeException when the treasury has insufficient resources.
+     */
+    public static function spend(
+        int $allianceId,
+        int $food,
+        int $lumber,
+        int $stone,
+        int $gold,
+    ): void {
+        if ($food < 0 || $lumber < 0 || $stone < 0 || $gold < 0) {
+            throw new \RuntimeException('Negative Ausgabe ist nicht erlaubt.');
+        }
+
+        $db      = Connection::getInstance();
+        $balance = self::getBalance($allianceId);
+
+        if ($balance['food']   < $food)   throw new \RuntimeException("Zu wenig Nahrung im Schatzamt. Vorhanden: {$balance['food']}, benötigt: {$food}.");
+        if ($balance['lumber'] < $lumber) throw new \RuntimeException("Zu wenig Holz im Schatzamt. Vorhanden: {$balance['lumber']}, benötigt: {$lumber}.");
+        if ($balance['stone']  < $stone)  throw new \RuntimeException("Zu wenig Stein im Schatzamt. Vorhanden: {$balance['stone']}, benötigt: {$stone}.");
+        if ($balance['gold']   < $gold)   throw new \RuntimeException("Zu wenig Gold im Schatzamt. Vorhanden: {$balance['gold']}, benötigt: {$gold}.");
+
+        $db->execute(
+            'UPDATE alliance_treasury
+             SET food   = GREATEST(0, food   - :f),
+                 lumber = GREATEST(0, lumber - :l),
+                 stone  = GREATEST(0, stone  - :s),
+                 gold   = GREATEST(0, gold   - :g)
+             WHERE alliance_id = :aid',
+            [':f' => $food, ':l' => $lumber, ':s' => $stone, ':g' => $gold, ':aid' => $allianceId],
+        );
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
     // Private helpers
     // ─────────────────────────────────────────────────────────────────────────
 

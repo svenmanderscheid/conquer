@@ -790,6 +790,114 @@ final class AllianceHandler
     }
 
     // -------------------------------------------------------------------------
+    // GET /api/alliance/research/data
+    // -------------------------------------------------------------------------
+
+    /**
+     * Returns all research node definitions (static data).
+     */
+    public static function researchData(array $session): void
+    {
+        $session = \Conquer\Auth\Session::current();
+        if ($session === null) {
+            Response::error(401, 'UNAUTHENTICATED', 'Not logged in.');
+        }
+
+        $data = \Conquer\Game\Alliance\AllianceResearchService::getData();
+        Response::ok(['nodes' => array_values($data)]);
+    }
+
+    // -------------------------------------------------------------------------
+    // GET /api/alliance/research/state
+    // -------------------------------------------------------------------------
+
+    /**
+     * Returns the current research state for the player's alliance.
+     */
+    public static function researchState(array $session): void
+    {
+        $session = \Conquer\Auth\Session::current();
+        if ($session === null) {
+            Response::error(401, 'UNAUTHENTICATED', 'Not logged in.');
+        }
+
+        $db       = Connection::getInstance();
+        $playerId = (int) $session['player_id'];
+
+        $member = $db->query(
+            'SELECT alliance_id FROM alliance_members WHERE player_id = ?',
+            [$playerId],
+        )->fetch();
+
+        if ($member === false) {
+            Response::error(403, 'NOT_MEMBER', 'Du bist kein Mitglied einer Allianz.');
+        }
+
+        $allianceId = (int) $member['alliance_id'];
+
+        // Process finished queue entries lazily
+        \Conquer\Game\Alliance\AllianceResearchService::processTick($allianceId);
+
+        $state = \Conquer\Game\Alliance\AllianceResearchService::getState($allianceId);
+        Response::ok($state);
+    }
+
+    // -------------------------------------------------------------------------
+    // POST /api/alliance/research/start
+    // -------------------------------------------------------------------------
+
+    /**
+     * Starts a research for the player's alliance.
+     * Body: { "research_code": "ally_troops_hp" }
+     * Only leader, vice_leader, and officer may start research.
+     */
+    public static function researchStart(array $session): void
+    {
+        $session = \Conquer\Auth\Session::current();
+        if ($session === null) {
+            Response::error(401, 'UNAUTHENTICATED', 'Not logged in.');
+        }
+
+        $supplied = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+        if ($supplied === '' || !hash_equals($session['csrf_token'], $supplied)) {
+            Response::error(403, 'CSRF_INVALID', 'CSRF token missing or invalid.');
+        }
+
+        $body = json_decode(file_get_contents('php://input') ?: '', true) ?? [];
+        $code = trim((string) ($body['research_code'] ?? ''));
+
+        if ($code === '') {
+            Response::error(400, 'MISSING_FIELD', 'research_code ist erforderlich.');
+        }
+
+        $db       = Connection::getInstance();
+        $playerId = (int) $session['player_id'];
+
+        $member = $db->query(
+            'SELECT alliance_id, role FROM alliance_members WHERE player_id = ?',
+            [$playerId],
+        )->fetch();
+
+        if ($member === false) {
+            Response::error(403, 'NOT_MEMBER', 'Du bist kein Mitglied einer Allianz.');
+        }
+
+        if (!in_array($member['role'], ['leader', 'vice_leader', 'officer'], true)) {
+            Response::error(403, 'FORBIDDEN', 'Nur Anführer, Vize-Anführer und Offiziere können Allianz-Forschung starten.');
+        }
+
+        $allianceId = (int) $member['alliance_id'];
+
+        try {
+            $queueId = \Conquer\Game\Alliance\AllianceResearchService::start($allianceId, $playerId, $code);
+        } catch (\RuntimeException $e) {
+            Response::error(400, 'RESEARCH_FAILED', $e->getMessage());
+        }
+
+        Response::ok(['queue_id' => $queueId ?? 0]);
+    }
+
+    // -------------------------------------------------------------------------
     // GET /api/alliance/diplomacy
     // -------------------------------------------------------------------------
 
