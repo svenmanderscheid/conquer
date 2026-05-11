@@ -1537,6 +1537,7 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
                     $queueData = array_map(function($qe) {
                         $qt = TroopData::get((int)$qe['troop_code']);
                         return [
+                            'queue_id'    => (int)$qe['id'],
                             'slot'        => (int)$qe['barrack_slot'],
                             'name'        => $qt['name'] ?? 'Einheit',
                             'count'       => (int)$qe['count'],
@@ -2111,6 +2112,52 @@ if (btnInstant) {
                 trainBtn.textContent = 'AUSBILDEN';
             }
         }
+
+        // Show/hide promote button
+        let promoteSection = document.getElementById('brk-promote-section');
+        if (!promoteSection) {
+            promoteSection = document.createElement('div');
+            promoteSection.id = 'brk-promote-section';
+            const trainSection = document.querySelector('.brk-train-section');
+            if (trainSection) trainSection.parentNode.insertBefore(promoteSection, trainSection.nextSibling);
+        }
+        if (t.tier < 5 && t.in_city > 0 && t.unlocked) {
+            promoteSection.style.display = '';
+            promoteSection.innerHTML =
+                `<div style="display:flex;gap:8px;padding:8px 16px;border-top:1px solid rgba(139,90,43,0.12);background:#e8d8b0;flex-shrink:0">
+                    <input type="number" id="brk-promote-count" class="brk-train-input" value="100" min="1"
+                           max="${t.in_city}" style="width:80px"
+                           title="Anzahl zu befördern (max: ${fmtNum(t.in_city)})">
+                    <button onclick="brkPromote(${t.code})"
+                            style="flex:1;padding:8px;border-radius:8px;border:none;border-bottom:3px solid #5a3880;background:linear-gradient(180deg,#9070c8,#7050a8);color:#fff;font-size:.82rem;font-weight:800;letter-spacing:.06em;cursor:pointer;text-transform:uppercase;font-family:inherit">
+                        ⬆ ZUM NÄCHSTEN TIER
+                    </button>
+                </div>`;
+        } else {
+            promoteSection.style.display = 'none';
+            promoteSection.innerHTML = '';
+        }
+    }
+
+    async function brkPromote(troopCode) {
+        const countInput = document.getElementById('brk-promote-count');
+        const count = parseInt(countInput?.value ?? '0', 10);
+        if (!count || count < 1) { showToast('Ungültige Anzahl', 'err'); return; }
+        if (!confirm(count + ' Truppen zum nächsten Tier befördern?')) return;
+        try {
+            const r = await fetch('/api/troops/promote', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': CSRF },
+                body:    JSON.stringify({ troop_code: troopCode, count }),
+            });
+            const j = await r.json();
+            if (j.ok) {
+                showToast('Beförderung gestartet! ' + count + ' Truppen werden befördert.', 'ok');
+                setTimeout(() => window.location.reload(), 900);
+            } else {
+                showToast(j.message ?? j.error ?? 'Fehler', 'err');
+            }
+        } catch { showToast('Netzwerkfehler', 'err'); }
     }
 
     function brkRenderQueue() {
@@ -2120,13 +2167,66 @@ if (btnInstant) {
         bar.style.display = '';
         let html = '<div class="brk-queue-title">Trainings-Queue</div>';
         BRK_QUEUE.forEach(q => {
+            const cancelBtn = q.queue_id
+                ? `<button style="font-size:.58rem;padding:2px 6px;border-radius:4px;background:rgba(192,96,77,.15);color:#c0604d;border:1px solid rgba(192,96,77,.4);cursor:pointer;font-weight:800;text-transform:uppercase;margin-left:4px" onclick="brkCancelTrain(${q.queue_id})">✕</button>`
+                : '';
+            const speedupBtn = q.queue_id
+                ? `<button style="font-size:.58rem;padding:2px 6px;border-radius:4px;background:rgba(192,136,88,.15);color:#c08858;border:1px solid rgba(192,136,88,.4);cursor:pointer;font-weight:800;text-transform:uppercase;margin-left:2px" onclick="brkSpeedupTrain(${q.queue_id})">⏩</button>`
+                : '';
             html += '<div class="brk-queue-item">' +
                 '<div class="brk-queue-icon">⚔</div>' +
                 '<div class="brk-queue-info"><span>' + q.count + '× ' + q.name + '</span></div>' +
                 '<div class="brk-queue-cd" data-finish="' + q.finishes_at + '">—</div>' +
+                cancelBtn + speedupBtn +
                 '</div>';
         });
         bar.innerHTML = html;
+    }
+
+    async function brkCancelTrain(queueId) {
+        if (!confirm('Training abbrechen? Anteilige Ressourcen werden zurückerstattet.')) return;
+        try {
+            const r = await fetch('/api/troops/cancel-train/' + queueId, {
+                method:  'POST',
+                headers: { 'X-CSRF-Token': CSRF, 'Content-Type': 'application/json' },
+            });
+            const j = await r.json();
+            if (j.ok) {
+                showToast('Training abgebrochen. Refund: ' + j.data.refunded_food + ' Nahrung', 'ok');
+                setTimeout(() => window.location.reload(), 700);
+            } else {
+                showToast(j.message ?? j.error ?? 'Fehler', 'err');
+            }
+        } catch { showToast('Netzwerkfehler', 'err'); }
+    }
+
+    async function brkSpeedupTrain(queueId) {
+        const itemMap = [
+            { code: 10103031, name: 'Training +1h' },
+            { code: 10103032, name: 'Training +3h' },
+            { code: 10103001, name: 'Generic +5m' },
+            { code: 10103003, name: 'Generic +1h' },
+        ];
+        const list = itemMap.map((it, i) => (i + 1) + '. ' + it.name + ' (Code: ' + it.code + ')').join('\n');
+        const choice = prompt('Speedup-Item auswählen:\n' + list + '\n\nItem-Code eingeben:');
+        if (!choice) return;
+        const itemCode = parseInt(choice.trim(), 10);
+        if (!itemCode) { showToast('Ungültiger Item-Code.', 'err'); return; }
+        try {
+            const r = await fetch('/api/troops/speedup-train/' + queueId, {
+                method:  'POST',
+                headers: { 'X-CSRF-Token': CSRF, 'Content-Type': 'application/json' },
+                body:    JSON.stringify({ item_code: itemCode }),
+            });
+            const j = await r.json();
+            if (j.ok) {
+                const msg = j.data.instantly_finished ? 'Training sofort abgeschlossen!' : 'Speedup angewendet!';
+                showToast(msg, 'ok');
+                setTimeout(() => window.location.reload(), 700);
+            } else {
+                showToast(j.message ?? j.error ?? 'Fehler', 'err');
+            }
+        } catch { showToast('Netzwerkfehler', 'err'); }
     }
 
     // Type tab clicks

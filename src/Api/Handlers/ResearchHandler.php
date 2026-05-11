@@ -348,6 +348,192 @@ final class ResearchHandler
     }
 
     // -------------------------------------------------------------------------
+    // POST /api/research/cancel/:queue_id
+    // -------------------------------------------------------------------------
+
+    /**
+     * Cancels the active research queue entry.
+     * Per spec: no resource refund for research cancellation.
+     */
+    public static function cancel(array $params): void
+    {
+        $session = Session::current();
+        if ($session === null) {
+            Response::error(401, 'UNAUTHENTICATED', 'Not logged in.');
+        }
+
+        $supplied = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+        if ($supplied === '' || !hash_equals($session['csrf_token'], $supplied)) {
+            Response::error(403, 'CSRF_INVALID', 'CSRF token missing or invalid.');
+        }
+
+        $queueId  = (int) ($params['queue_id'] ?? 0);
+        $playerId = (int) $session['player_id'];
+        $worldId  = 1;
+
+        if ($queueId <= 0) {
+            Response::error(400, 'INVALID_INPUT', 'Invalid queue_id.');
+        }
+
+        $db = Connection::getInstance();
+
+        $entry = $db->query(
+            'SELECT id FROM research_queue
+             WHERE id = ? AND player_id = ? AND world_id = ? AND is_processed = 0',
+            [$queueId, $playerId, $worldId],
+        )->fetch();
+
+        if ($entry === false) {
+            Response::error(404, 'NOT_FOUND', 'Research queue entry not found or already completed.');
+        }
+
+        // Delete (no refund — per spec).
+        $db->execute('DELETE FROM research_queue WHERE id = ?', [$queueId]);
+
+        Response::ok(['cancelled' => true]);
+    }
+
+    // -------------------------------------------------------------------------
+    // POST /api/research/speedup/:queue_id
+    // -------------------------------------------------------------------------
+
+    /**
+     * Applies a speedup item to the active research queue entry.
+     * Accepts generic and research-specific speedup items.
+     * If finishes_at moves into the past, research is completed immediately.
+     *
+     * Body: {"item_code": 10103021}
+     */
+    public static function speedup(array $params): void
+    {
+        $session = Session::current();
+        if ($session === null) {
+            Response::error(401, 'UNAUTHENTICATED', 'Not logged in.');
+        }
+
+        $supplied = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+        if ($supplied === '' || !hash_equals($session['csrf_token'], $supplied)) {
+            Response::error(403, 'CSRF_INVALID', 'CSRF token missing or invalid.');
+        }
+
+        $queueId  = (int) ($params['queue_id'] ?? 0);
+        $playerId = (int) $session['player_id'];
+        $worldId  = 1;
+
+        if ($queueId <= 0) {
+            Response::error(400, 'INVALID_INPUT', 'Invalid queue_id.');
+        }
+
+        $body     = json_decode(file_get_contents('php://input') ?: '', true) ?? [];
+        $itemCode = (int) ($body['item_code'] ?? 0);
+
+        if ($itemCode <= 0) {
+            Response::error(400, 'MISSING_FIELD', 'item_code is required.');
+        }
+
+        // Load item definition.
+        $itemsJson = file_get_contents(ROOT_DIR . '/data/items.json') ?: '{}';
+        $itemsData = json_decode($itemsJson, true) ?? [];
+        $itemDef   = null;
+        foreach ($itemsData['items'] ?? [] as $item) {
+            if ((int) $item['code'] === $itemCode) {
+                $itemDef = $item;
+                break;
+            }
+        }
+
+        if ($itemDef === null) {
+            Response::error(400, 'UNKNOWN_ITEM', 'Item code ' . $itemCode . ' not found.');
+        }
+
+        $cat    = $itemDef['category']    ?? '';
+        $subcat = $itemDef['subcategory'] ?? '';
+        if ($cat !== 'speedup' || !in_array($subcat, ['generic', 'research'], true)) {
+            Response::error(400, 'WRONG_ITEM_TYPE', 'This item cannot be used for research speedups.');
+        }
+
+        $durationSeconds = (int) ($itemDef['duration_seconds'] ?? 0);
+        if ($durationSeconds <= 0) {
+            Response::error(400, 'ITEM_NO_DURATION', 'Item has no valid duration.');
+        }
+
+        $db = Connection::getInstance();
+
+        $entry = $db->query(
+            'SELECT id, research_code, level_to,
+                    TIMESTAMPDIFF(SECOND, UTC_TIMESTAMP(), finishes_at) AS secs_remaining
+             FROM   research_queue
+             WHERE  id = ? AND player_id = ? AND world_id = ? AND is_processed = 0',
+            [$queueId, $playerId, $worldId],
+        )->fetch();
+
+        if ($entry === false) {
+            Response::error(404, 'NOT_FOUND', 'Research queue entry not found or already completed.');
+        }
+
+        $invRow = $db->query(
+            'SELECT id, quantity FROM player_inventory WHERE player_id = ? AND item_code = ? LIMIT 1',
+            [$playerId, $itemCode],
+        )->fetch();
+
+        if ($invRow === false || (int) $invRow['quantity'] < 1) {
+            Response::error(400, 'NOT_ENOUGH_ITEMS', 'You do not have this speedup item.');
+        }
+
+        $secsLeft  = max(0, (int) $entry['secs_remaining']);
+        $newSecs   = max(0, $secsLeft - $durationSeconds);
+        $isInstant = ($newSecs === 0);
+        $resCode   = (string) $entry['research_code'];
+        $levelTo   = (int) $entry['level_to'];
+        $entryId   = (int) $entry['id'];
+
+        $db->transaction(function () use (
+            $db, $entryId, $playerId, $worldId, $resCode, $levelTo,
+            $itemCode, $invRow, $durationSeconds, $isInstant
+        ): void {
+            // Deduct item from inventory.
+            if ((int) $invRow['quantity'] === 1) {
+                $db->execute('DELETE FROM player_inventory WHERE id = ?', [(int) $invRow['id']]);
+            } else {
+                $db->execute(
+                    'UPDATE player_inventory SET quantity = quantity - 1 WHERE id = ?',
+                    [(int) $invRow['id']],
+                );
+            }
+
+            if ($isInstant) {
+                $db->execute(
+                    'INSERT INTO player_research (player_id, world_id, research_code, level)
+                     VALUES (?, ?, ?, ?)
+                     ON DUPLICATE KEY UPDATE level = ?',
+                    [$playerId, $worldId, $resCode, $levelTo, $levelTo],
+                );
+                $db->execute(
+                    'UPDATE research_queue
+                     SET is_processed = 1, finishes_at = UTC_TIMESTAMP()
+                     WHERE id = ?',
+                    [$entryId],
+                );
+            } else {
+                $db->execute(
+                    'UPDATE research_queue
+                     SET finishes_at = DATE_SUB(finishes_at, INTERVAL ? SECOND)
+                     WHERE id = ?',
+                    [$durationSeconds, $entryId],
+                );
+            }
+        });
+
+        Response::ok([
+            'speedup_applied'    => true,
+            'item_code'          => $itemCode,
+            'duration_seconds'   => $durationSeconds,
+            'instantly_finished' => $isInstant,
+            'secs_remaining'     => $isInstant ? 0 : $newSecs,
+        ]);
+    }
+
+    // -------------------------------------------------------------------------
     // POST /api/research/instant
     // -------------------------------------------------------------------------
 

@@ -24,6 +24,12 @@ foreach ($queue as $entry) {
     $inQueue[$entry['building_code']] = $entry;
 }
 
+// Build queue IDs for Cancel/Speedup buttons
+$buildQueueIds = [];
+foreach ($queue as $entry) {
+    $buildQueueIds[$entry['building_code']] = (int)$entry['id'];
+}
+
 $fmt = static fn (int|string $n): string => number_format((int) $n, 0, '.', ',');
 
 // Build JSON data for canvas labels / queue overlay
@@ -35,6 +41,7 @@ foreach ($buildings as $code => $building) {
         'inQueue'    => $queued !== null,
         'levelTo'    => $queued ? (int) $queued['level_to'] : null,
         'finishesAt' => $queued ? strtotime($queued['finishes_at']) : null,
+        'queueId'    => $queued ? (int) $queued['id'] : null,
     ];
 }
 
@@ -42,13 +49,14 @@ foreach ($buildings as $code => $building) {
 $researchQueue = [];
 try {
     $rq = \Conquer\Db\Connection::getInstance()->query(
-        'SELECT research_code, level_to, finishes_at FROM research_queue
+        'SELECT id, research_code, level_to, finishes_at FROM research_queue
          WHERE player_id = ? AND is_processed = 0 AND finishes_at > UTC_TIMESTAMP()
          ORDER BY finishes_at ASC LIMIT 1',
         [(int)$session['player_id']]
     )->fetch();
     if ($rq) {
         $researchQueue = [
+            'id'         => (int)$rq['id'],
             'code'       => $rq['research_code'],
             'levelTo'    => (int)$rq['level_to'],
             'finishesAt' => strtotime($rq['finishes_at']),
@@ -61,6 +69,7 @@ $troopQueueForJs = [];
 $troopQueue = $state['troop_queue'] ?? [];
 foreach ($troopQueue as $tq) {
     $troopQueueForJs[] = [
+        'id'         => (int)$tq['id'],
         'code'       => $tq['troop_code'],
         'count'      => (int)$tq['count'],
         'finishesAt' => strtotime($tq['finishes_at']),
@@ -439,6 +448,36 @@ foreach ($troopQueue as $tq) {
         .cap-timer.cap-timer-research { color: var(--c-info, #5f9ea0); }
         .cap-timer.cap-timer-troop    { color: var(--c-success, #7fb069); }
 
+        .cap-actions {
+            display: flex;
+            gap: 4px;
+            margin-top: 3px;
+        }
+        .cap-action-btn {
+            font-size: 0.58rem;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            line-height: 1.5;
+            transition: filter 0.12s;
+            pointer-events: auto;
+        }
+        .cap-action-btn:hover { filter: brightness(1.15); }
+        .cap-action-btn.cancel {
+            background: rgba(192,96,77,0.15);
+            color: var(--c-danger, #c0604d);
+            border: 1px solid rgba(192,96,77,0.4);
+        }
+        .cap-action-btn.speedup {
+            background: rgba(192,136,88,0.15);
+            color: var(--c-gold, #c08858);
+            border: 1px solid rgba(192,136,88,0.4);
+        }
+
         /* ── Building modal overlay ── */
         #bldg-overlay {
             position: fixed;
@@ -576,6 +615,7 @@ const BUILDINGS_DATA = <?= json_encode($buildingsForCanvas) ?>;
 // Queue data from PHP
 const RESEARCH_QUEUE = <?= json_encode($researchQueue) ?>;
 const TROOP_QUEUE    = <?= json_encode($troopQueueForJs) ?>;
+const CSRF_TOKEN     = <?= json_encode($session['csrf_token'] ?? '') ?>;
 
 // ---------------------------------------------------------------------------
 // Canvas setup
@@ -871,6 +911,9 @@ function renderActivityPanel() {
                 icon:       '🔨',
                 name:       name + ' → Lv ' + data.levelTo,
                 finishesAt: data.finishesAt,
+                queueId:    data.queueId,
+                cancelUrl:  data.queueId ? '/api/city/cancel-build/' + data.queueId : null,
+                speedupUrl: data.queueId ? '/api/city/speedup-build/' + data.queueId : null,
             });
         }
     }
@@ -883,6 +926,9 @@ function renderActivityPanel() {
             icon:       '🔬',
             name:       resName + ' Lv ' + RESEARCH_QUEUE.levelTo,
             finishesAt: RESEARCH_QUEUE.finishesAt,
+            queueId:    RESEARCH_QUEUE.id,
+            cancelUrl:  RESEARCH_QUEUE.id ? '/api/research/cancel/' + RESEARCH_QUEUE.id : null,
+            speedupUrl: RESEARCH_QUEUE.id ? '/api/research/speedup/' + RESEARCH_QUEUE.id : null,
         });
     }
 
@@ -895,6 +941,9 @@ function renderActivityPanel() {
                 icon:       '⚔',
                 name:       tq.count + '× ' + troopName,
                 finishesAt: tq.finishesAt,
+                queueId:    tq.id,
+                cancelUrl:  tq.id ? '/api/troops/cancel-train/' + tq.id : null,
+                speedupUrl: tq.id ? '/api/troops/speedup-train/' + tq.id : null,
             });
         });
     }
@@ -906,6 +955,13 @@ function renderActivityPanel() {
         for (const row of rows) {
             const div = document.createElement('div');
             div.className = 'cap-row';
+            div.style.pointerEvents = 'auto';
+            const cancelBtn = row.cancelUrl
+                ? `<button class="cap-action-btn cancel" onclick="capCancel('${row.cancelUrl}','${row.type}')">✕ Abbruch</button>`
+                : '';
+            const speedupBtn = row.speedupUrl
+                ? `<button class="cap-action-btn speedup" onclick="capSpeedup('${row.speedupUrl}','${row.type}')">⏩ Speedup</button>`
+                : '';
             div.innerHTML =
                 `<div class="cap-icon-wrap cap-${row.type}">${row.icon}</div>
                  <div class="cap-text">
@@ -913,6 +969,7 @@ function renderActivityPanel() {
                      <span class="cap-timer cap-timer-${row.type}" data-finishes="${row.finishesAt}">
                          ${fmtCountdown(row.finishesAt * 1000 - Date.now())}
                      </span>
+                     <div class="cap-actions">${cancelBtn}${speedupBtn}</div>
                  </div>`;
             activityPanel.appendChild(div);
         }
@@ -925,6 +982,77 @@ function renderActivityPanel() {
             }
         });
     }
+}
+
+// ---------------------------------------------------------------------------
+// Activity panel — Cancel / Speedup helpers
+// ---------------------------------------------------------------------------
+async function capCancel(url, type) {
+    const label = type === 'research'
+        ? 'Forschung abbrechen? (keine Ressourcen-Rückgabe)'
+        : type === 'build'
+            ? 'Bau abbrechen? Ressourcen werden zurückerstattet.'
+            : 'Training abbrechen? Anteilige Ressourcen werden zurückerstattet.';
+    if (!confirm(label)) return;
+    try {
+        const r = await fetch(url, {
+            method:  'POST',
+            headers: { 'X-CSRF-Token': CSRF_TOKEN, 'Content-Type': 'application/json' },
+        });
+        const j = await r.json();
+        if (j.ok) {
+            setTimeout(() => window.location.reload(), 400);
+        } else {
+            alert(j.message ?? j.error ?? 'Fehler');
+        }
+    } catch { alert('Netzwerkfehler'); }
+}
+
+async function capSpeedup(url, type) {
+    // Show a simple prompt to input the item_code for now.
+    // In a future iteration this would be a full item-picker modal.
+    const itemMap = {
+        build:    [
+            { code: 10103011, name: 'Bau +1h' },
+            { code: 10103012, name: 'Bau +3h' },
+            { code: 10103013, name: 'Bau +8h' },
+            { code: 10103001, name: 'Generic +5m' },
+            { code: 10103003, name: 'Generic +1h' },
+        ],
+        research: [
+            { code: 10103021, name: 'Forschung +1h' },
+            { code: 10103022, name: 'Forschung +3h' },
+            { code: 10103023, name: 'Forschung +8h' },
+            { code: 10103001, name: 'Generic +5m' },
+            { code: 10103003, name: 'Generic +1h' },
+        ],
+        troop:    [
+            { code: 10103031, name: 'Training +1h' },
+            { code: 10103032, name: 'Training +3h' },
+            { code: 10103001, name: 'Generic +5m' },
+            { code: 10103003, name: 'Generic +1h' },
+        ],
+    };
+    const items = itemMap[type] ?? itemMap.build;
+    const itemList = items.map((it, i) => (i + 1) + '. ' + it.name + ' (' + it.code + ')').join('\n');
+    const choice = prompt('Speedup-Item auswählen:\n' + itemList + '\n\nItem-Code eingeben:');
+    if (!choice) return;
+    const itemCode = parseInt(choice.trim(), 10);
+    if (!itemCode) { alert('Ungültiger Item-Code.'); return; }
+    try {
+        const r = await fetch(url, {
+            method:  'POST',
+            headers: { 'X-CSRF-Token': CSRF_TOKEN, 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ item_code: itemCode }),
+        });
+        const j = await r.json();
+        if (j.ok) {
+            const msg = j.data.instantly_finished ? 'Sofort fertig!' : 'Speedup angewendet!';
+            setTimeout(() => window.location.reload(), 400);
+        } else {
+            alert(j.message ?? j.error ?? 'Fehler');
+        }
+    } catch { alert('Netzwerkfehler'); }
 }
 
 // ---------------------------------------------------------------------------

@@ -1013,6 +1013,9 @@ $isEmbed = isset($_GET['embed']);
         <span style="color:var(--c-muted,#8b6f47);font-size:.65rem;text-transform:uppercase;font-weight:800">In Forschung</span>
         <span class="qb-name" id="qb-name"><?= $queueRow ? htmlspecialchars($allNodes[$queueRow['research_code']]['name'] ?? $queueRow['research_code']) . ' &rarr; Lv ' . (int)$queueRow['level_to'] : '' ?></span>
         <span class="qb-eta" id="qb-eta">&#x23F1; &hellip;</span>
+        <button class="btn-instant-banner" style="background:linear-gradient(180deg,#c87060,#a05040);border-bottom-color:#6a2a1e"
+                onclick="cancelResearchBanner()" title="Forschung abbrechen (keine Rückgabe)">&#x2715; Abbruch</button>
+        <button class="btn-instant-banner" onclick="speedupResearchBanner()">&#x23E9; Speedup</button>
         <button class="btn-instant-banner" onclick="instantFinishBanner()">&#x1F48E; Sofort</button>
     </div>
 
@@ -1146,6 +1149,7 @@ $isEmbed = isset($_GET['embed']);
 const RES_DATA = <?= json_encode([
     'research'     => $researchLevels,
     'queue'        => $queueRow ? [
+        'id'          => (int)$queueRow['id'],
         'code'        => $queueRow['research_code'],
         'name'        => $allNodes[$queueRow['research_code']]['name'] ?? $queueRow['research_code'],
         'level_to'    => (int)$queueRow['level_to'],
@@ -1559,6 +1563,62 @@ async function instantFinish() {
 
 function instantFinishBanner() {
     instantFinish();
+}
+
+async function cancelResearchBanner() {
+    if (!queue) return;
+    if (!confirm('Forschung abbrechen? Ressourcen werden NICHT zurückerstattet.')) return;
+    try {
+        const r = await fetch('/api/research/cancel/' + queue.id, {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': RES_DATA.csrf },
+        });
+        const j = await r.json();
+        if (j.ok) {
+            window.location.reload();
+        } else {
+            showToast(j.message ?? j.error ?? 'Fehler', 'err');
+        }
+    } catch (e) {
+        showToast('Netzwerkfehler: ' + e.message, 'err');
+    }
+}
+
+async function speedupResearchBanner() {
+    if (!queue) return;
+    const itemMap = [
+        { code: 10103021, name: 'Forschung +1h' },
+        { code: 10103022, name: 'Forschung +3h' },
+        { code: 10103023, name: 'Forschung +8h' },
+        { code: 10103001, name: 'Generic +5m' },
+        { code: 10103003, name: 'Generic +1h' },
+    ];
+    const list = itemMap.map((it, i) => (i + 1) + '. ' + it.name + ' (Code: ' + it.code + ')').join('\n');
+    const choice = prompt('Speedup-Item auswählen:\n' + list + '\n\nItem-Code eingeben:');
+    if (!choice) return;
+    const itemCode = parseInt(choice.trim(), 10);
+    if (!itemCode) { showToast('Ungültiger Item-Code.', 'err'); return; }
+    try {
+        const r = await fetch('/api/research/speedup/' + queue.id, {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': RES_DATA.csrf },
+            body:    JSON.stringify({ item_code: itemCode }),
+        });
+        const j = await r.json();
+        if (j.ok) {
+            if (j.data.instantly_finished) {
+                showToast('Forschung sofort abgeschlossen!', 'ok');
+                setTimeout(() => window.location.reload(), 800);
+            } else {
+                showToast('Speedup angewendet! Noch: ' + j.data.secs_remaining + 's', 'ok');
+                await pollState();
+            }
+        } else {
+            showToast(j.message ?? j.error ?? 'Fehler', 'err');
+        }
+    } catch (e) {
+        showToast('Netzwerkfehler: ' + e.message, 'err');
+    }
 }
 
 async function pollState() {

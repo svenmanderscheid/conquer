@@ -96,11 +96,17 @@ if (str_starts_with($path, '/api/')) {
     $router->get('/api/city/state',                         [\Conquer\Api\Handlers\CityHandler::class, 'state']);
     $router->post('/api/city/upgrade-building',             [\Conquer\Api\Handlers\CityHandler::class, 'upgradeBuilding']);
     $router->post('/api/city/instant-build/:queue_id',      [\Conquer\Api\Handlers\CityHandler::class, 'instantBuild']);
+    $router->post('/api/city/cancel-build/:queue_id',       [\Conquer\Api\Handlers\CityHandler::class, 'cancelBuild']);
+    $router->post('/api/city/speedup-build/:queue_id',      [\Conquer\Api\Handlers\CityHandler::class, 'speedupBuild']);
     $router->post('/api/city/wall-repair',                  fn() => \Conquer\Api\Handlers\CityHandler::repairWall($session));
 
     // Troops
-    $router->get('/api/troops/list',         [\Conquer\Api\Handlers\TroopHandler::class, 'list']);
-    $router->post('/api/troops/train',       [\Conquer\Api\Handlers\TroopHandler::class, 'train']);
+    $router->get('/api/troops/list',               [\Conquer\Api\Handlers\TroopHandler::class, 'list']);
+    $router->post('/api/troops/train',             [\Conquer\Api\Handlers\TroopHandler::class, 'train']);
+    $router->post('/api/troops/cancel-train/:queue_id', [\Conquer\Api\Handlers\TroopHandler::class, 'cancelTrain']);
+    $router->post('/api/troops/speedup-train/:queue_id', [\Conquer\Api\Handlers\TroopHandler::class, 'speedupTrain']);
+    $router->post('/api/troops/promote',           [\Conquer\Api\Handlers\TroopHandler::class, 'promote']);
+    $router->post('/api/troops/heal',              [\Conquer\Api\Handlers\TroopHandler::class, 'heal']);
 
     // March
     $router->post('/api/march/dispatch',         [\Conquer\Api\Handlers\MarchHandler::class, 'dispatch']);
@@ -123,9 +129,11 @@ if (str_starts_with($path, '/api/')) {
     $router->get('/api/map/field-object/:id',  fn($p) => \Conquer\Api\Handlers\MapHandler::fieldObject($session, (int) $p['id']));
 
     // Research
-    $router->get('/api/research/state',      [\Conquer\Api\Handlers\ResearchHandler::class, 'state']);
-    $router->post('/api/research/start',     [\Conquer\Api\Handlers\ResearchHandler::class, 'start']);
-    $router->post('/api/research/instant',   [\Conquer\Api\Handlers\ResearchHandler::class, 'instant']);
+    $router->get('/api/research/state',                  [\Conquer\Api\Handlers\ResearchHandler::class, 'state']);
+    $router->post('/api/research/start',                 [\Conquer\Api\Handlers\ResearchHandler::class, 'start']);
+    $router->post('/api/research/instant',               [\Conquer\Api\Handlers\ResearchHandler::class, 'instant']);
+    $router->post('/api/research/cancel/:queue_id',      [\Conquer\Api\Handlers\ResearchHandler::class, 'cancel']);
+    $router->post('/api/research/speedup/:queue_id',     [\Conquer\Api\Handlers\ResearchHandler::class, 'speedup']);
 
     // Trading / Caravan
     $router->get('/api/trading/caravan',      [\Conquer\Api\Handlers\TradingHandler::class, 'caravan']);
