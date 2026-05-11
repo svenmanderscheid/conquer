@@ -74,7 +74,7 @@ try {
           <tr>
             <td style="color:#475569;"><?= (int) $msg['id'] ?></td>
             <td>
-              <a href="/admin/players?q=<?= urlencode($msg['username']) ?>" style="color:#93c5fd;text-decoration:none;">
+              <a href="<?= APP_BASE ?>/admin/players?q=<?= urlencode($msg['username']) ?>" style="color:#93c5fd;text-decoration:none;">
                 <?= htmlspecialchars($msg['username']) ?>
               </a>
             </td>
@@ -84,7 +84,7 @@ try {
             </td>
             <?php if (($adminSession['role'] ?? '') === 'superadmin'): ?>
               <td>
-                <form method="post" action="/admin/action/delete-chat" onsubmit="return confirm('Nachricht l\u00f6schen?')">
+                <form method="post" action="<?= APP_BASE ?>/admin/action/delete-chat" onsubmit="return confirm('Nachricht l\u00f6schen?')">
                   <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
                   <input type="hidden" name="message_id" value="<?= (int) $msg['id'] ?>">
                   <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm">L&ouml;schen</button>

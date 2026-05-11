@@ -94,7 +94,7 @@ function buildPageUrl(int $p, string $q, ?int $id): string {
 <!-- Search -->
 <div class="admin-card" style="margin-bottom:20px;">
   <div class="admin-card-body">
-    <form method="get" action="/admin/players" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
+    <form method="get" action="<?= APP_BASE ?>/admin/players" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
       <div class="admin-form-group" style="flex:1;min-width:180px;margin-bottom:0;">
         <label>Username suchen</label>
         <input type="text" name="q" value="<?= htmlspecialchars($search) ?>" placeholder="Spieler suchen...">
@@ -106,7 +106,7 @@ function buildPageUrl(int $p, string $q, ?int $id): string {
       <div style="display:flex;gap:8px;align-items:center;">
         <button type="submit" class="admin-btn admin-btn-primary">Suchen</button>
         <?php if ($search !== '' || $searchId !== null): ?>
-          <a href="/admin/players" class="admin-btn" style="background:#334155;color:#94a3b8;">Zur&uuml;cksetzen</a>
+          <a href="<?= APP_BASE ?>/admin/players" class="admin-btn" style="background:#334155;color:#94a3b8;">Zur&uuml;cksetzen</a>
         <?php endif ?>
       </div>
     </form>
@@ -161,7 +161,7 @@ function buildPageUrl(int $p, string $q, ?int $id): string {
               <?= $p['last_active_at'] ? htmlspecialchars(substr($p['last_active_at'], 0, 16)) : '&mdash;' ?>
             </td>
             <td>
-              <a href="/admin/players/<?= (int) $p['id'] ?>" class="admin-btn admin-btn-primary admin-btn-sm">Details</a>
+              <a href="<?= APP_BASE ?>/admin/players/<?= (int) $p['id'] ?>" class="admin-btn admin-btn-primary admin-btn-sm">Details</a>
             </td>
           </tr>
         <?php endforeach ?>

@@ -59,7 +59,7 @@ try {
             </td>
             <td><?= htmlspecialchars($a['name']) ?></td>
             <td>
-              <a href="/admin/players?q=<?= urlencode($a['leader_name'] ?? '') ?>" style="color:#93c5fd;text-decoration:none;">
+              <a href="<?= APP_BASE ?>/admin/players?q=<?= urlencode($a['leader_name'] ?? '') ?>" style="color:#93c5fd;text-decoration:none;">
                 <?= htmlspecialchars($a['leader_name'] ?? '—') ?>
               </a>
             </td>

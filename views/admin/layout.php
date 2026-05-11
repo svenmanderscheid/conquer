@@ -343,18 +343,18 @@
   <div class="admin-logo">&#9876; <span>Conquer</span> Admin</div>
   <nav class="admin-nav">
     <div class="admin-nav-section">Uebersicht</div>
-    <a href="/admin" <?= ($activePage ?? '') === 'dashboard' ? 'class="active"' : '' ?>>&#128202; Dashboard</a>
+    <a href="<?= APP_BASE ?>/admin" <?= ($activePage ?? '') === 'dashboard' ? 'class="active"' : '' ?>>&#128202; Dashboard</a>
 
     <div class="admin-nav-section">Spieler</div>
-    <a href="/admin/players"   <?= ($activePage ?? '') === 'players'   ? 'class="active"' : '' ?>>&#128100; Spieler</a>
-    <a href="/admin/alliances" <?= ($activePage ?? '') === 'alliances' ? 'class="active"' : '' ?>>&#9876; Allianzen</a>
+    <a href="<?= APP_BASE ?>/admin/players"   <?= ($activePage ?? '') === 'players'   ? 'class="active"' : '' ?>>&#128100; Spieler</a>
+    <a href="<?= APP_BASE ?>/admin/alliances" <?= ($activePage ?? '') === 'alliances' ? 'class="active"' : '' ?>>&#9876; Allianzen</a>
 
     <div class="admin-nav-section">Welt</div>
-    <a href="/admin/world" <?= ($activePage ?? '') === 'world' ? 'class="active"' : '' ?>>&#128506; Weltverwaltung</a>
-    <a href="/admin/chat"  <?= ($activePage ?? '') === 'chat'  ? 'class="active"' : '' ?>>&#128172; Chat Moderation</a>
+    <a href="<?= APP_BASE ?>/admin/world" <?= ($activePage ?? '') === 'world' ? 'class="active"' : '' ?>>&#128506; Weltverwaltung</a>
+    <a href="<?= APP_BASE ?>/admin/chat"  <?= ($activePage ?? '') === 'chat'  ? 'class="active"' : '' ?>>&#128172; Chat Moderation</a>
 
     <div class="admin-nav-section">System</div>
-    <a href="/admin/audit" <?= ($activePage ?? '') === 'audit' ? 'class="active"' : '' ?>>&#128203; Audit Log</a>
+    <a href="<?= APP_BASE ?>/admin/audit" <?= ($activePage ?? '') === 'audit' ? 'class="active"' : '' ?>>&#128203; Audit Log</a>
   </nav>
   <div class="admin-sidebar-footer">
     <?= htmlspecialchars($adminSession['username'] ?? '') ?> &bull;
@@ -368,7 +368,7 @@
     <span class="admin-badge <?= ($adminSession['role'] ?? '') === 'superadmin' ? 'admin-badge-super' : 'admin-badge-mod' ?>">
       <?= ($adminSession['role'] ?? '') === 'superadmin' ? '&#9733; Superadmin' : 'Moderator' ?>
     </span>
-    <a href="/admin/logout" class="admin-logout">Abmelden</a>
+    <a href="<?= APP_BASE ?>/admin/logout" class="admin-logout">Abmelden</a>
   </div>
   <div id="admin-content">
     <?php if (!empty($_SESSION['admin_flash'])): ?>

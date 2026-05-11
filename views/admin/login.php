@@ -104,7 +104,7 @@
     <div class="error"><?= htmlspecialchars($error) ?></div>
   <?php endif ?>
 
-  <form method="post" action="/admin/login">
+  <form method="post" action="<?= APP_BASE ?>/admin/login">
     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf ?? '') ?>">
 
     <label for="admin-username">Benutzername</label>

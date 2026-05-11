@@ -129,7 +129,7 @@ try {
             <td><?= (int) $p['castle_level'] ?></td>
             <td><?= htmlspecialchars($p['created_at']) ?></td>
             <td>
-              <a href="/admin/players/<?= (int) $p['id'] ?>" class="admin-btn admin-btn-primary admin-btn-sm">Details</a>
+              <a href="<?= APP_BASE ?>/admin/players/<?= (int) $p['id'] ?>" class="admin-btn admin-btn-primary admin-btn-sm">Details</a>
             </td>
           </tr>
         <?php endforeach ?>

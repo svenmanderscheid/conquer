@@ -97,7 +97,7 @@ function statRow(string $label, mixed $value): void {
 ?>
 
 <div style="margin-bottom:16px;">
-  <a href="/admin/players" style="color:#64748b;text-decoration:none;font-size:0.8rem;">&larr; Alle Spieler</a>
+  <a href="<?= APP_BASE ?>/admin/players" style="color:#64748b;text-decoration:none;font-size:0.8rem;">&larr; Alle Spieler</a>
 </div>
 
 <?php if ($dbError !== null): ?>
@@ -187,7 +187,7 @@ function statRow(string $label, mixed $value): void {
   <div class="admin-card-body" style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start;">
 
     <!-- Grant Gems -->
-    <form method="post" action="/admin/action/grant-gems" style="display:flex;gap:8px;align-items:center;">
+    <form method="post" action="<?= APP_BASE ?>/admin/action/grant-gems" style="display:flex;gap:8px;align-items:center;">
       <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
       <input type="hidden" name="player_id" value="<?= (int) $player['id'] ?>">
       <input
@@ -204,7 +204,7 @@ function statRow(string $label, mixed $value): void {
     </form>
 
     <!-- Grant Shield -->
-    <form method="post" action="/admin/action/grant-shield" style="display:flex;gap:8px;align-items:center;">
+    <form method="post" action="<?= APP_BASE ?>/admin/action/grant-shield" style="display:flex;gap:8px;align-items:center;">
       <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf) ?>">
       <input type="hidden" name="player_id" value="<?= (int) $player['id'] ?>">
       <input
@@ -223,7 +223,7 @@ function statRow(string $label, mixed $value): void {
     <!-- Ban Player -->
     <form
       method="post"
-      action="/admin/action/ban"
+      action="<?= APP_BASE ?>/admin/action/ban"
       onsubmit="return confirm('Spieler wirklich sperren?')"
       style="display:flex;gap:8px;align-items:center;"
     >
