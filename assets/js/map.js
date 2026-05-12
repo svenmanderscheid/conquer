@@ -119,7 +119,7 @@ const ConquerMap = (() => {
     let onTileInfo, onHover;
 
     // Camera (world-pixel coords of top-left corner of canvas)
-    let camX = 0, camY = 0, zoomIdx = 2; // default 4×
+    let camX = 0, camY = 0, zoomIdx = 1; // default 2×
 
     // Drag state
     let dragging = false, dragSX = 0, dragSY = 0, dragCX = 0, dragCY = 0, didDrag = false;
@@ -130,12 +130,17 @@ const ConquerMap = (() => {
     // Selected tile (shows border + keeps info panel open)
     let selectedTile = null;
 
+    // Sidebar open state — starts closed
+    let sidebarOpen = false;
+
     // Active marches for line overlay
     let activeMarches = [];
     let myPlayerId    = null;
     let myAllianceId  = null;
     let onCityClick    = () => {};
     let onMonsterClick = () => {};
+    let onCharmClick   = () => {};
+    let onGatherClick  = () => {};
 
     // -------------------------------------------------------------------------
     // Helpers
@@ -170,6 +175,8 @@ const ConquerMap = (() => {
         myAllianceId  = opts.myAllianceId  ?? null;
         onCityClick   = opts.onCityClick   ?? (() => {});
         onMonsterClick = opts.onMonsterClick ?? (() => {});
+        onCharmClick  = opts.onCharmClick  ?? (() => {});
+        onGatherClick = opts.onGatherClick ?? (() => {});
 
         ctx   = canvas.getContext('2d');
         mmCtx = minimap.getContext('2d');
@@ -203,14 +210,85 @@ const ConquerMap = (() => {
         });
     }
 
-    // Draw custom terrain tile, or fall back to a solid colour while loading
+    // Procedural terrain drawing — canvas-based, no external PNGs required.
+    // Falls back to PNG if loaded; otherwise draws a rich procedural tile.
     function drawTerrainTile(imgIdx, destX, destY, destSize) {
         const dx = Math.round(destX), dy = Math.round(destY);
         if (terrainLoaded[imgIdx]) {
             ctx.drawImage(terrainImgs[imgIdx], dx, dy, destSize, destSize);
+            return;
+        }
+        // We need the tile coords to drive the deterministic hash.
+        // destX/destY are screen coords — back-calculate tile coords.
+        const s  = destSize;
+        const tx = Math.round((camX + destX) / s);
+        const ty = Math.round((camY + destY) / s);
+        drawTerrainTileProc(ctx, tx, ty, dx, dy, s);
+    }
+
+    // Procedural terrain — called when PNG sprites are not yet loaded.
+    // Uses tileHash() for deterministic, position-stable results.
+    const GREEN_VARIANTS = ['#4a9e2f', '#3d8a24', '#52aa35', '#2d6b18'];
+    const DIRT_VARIANTS  = ['#8b6d44', '#9a7a52'];
+    const PATH_COLOR     = '#c4a96a';
+    const WATER_TINT     = 'rgba(30,100,160,0.18)';
+    const PATH_INTERVAL  = 64;  // road every N tiles
+    const PATH_WIDTH_PX  = 4;   // road width in logical px (scaled with tile)
+    const TREE_THRESHOLD = 0.08;
+    const DIRT_THRESHOLD = 0.12;
+    const BORDER_DIST    = 20;  // tiles from edge get water tint
+
+    function drawTerrainTileProc(c, tx, ty, dx, dy, s) {
+        // 1 — Base grass color (4 variants)
+        const h0 = tileHash(seed,       tx, ty);
+        const h1 = tileHash(seed + 7,   tx, ty);
+        const h2 = tileHash(seed + 13,  tx, ty);
+        const h3 = tileHash(seed + 31,  tx, ty);
+
+        // Dirt patch?
+        if (h0 < DIRT_THRESHOLD) {
+            c.fillStyle = DIRT_VARIANTS[h1 < 0.5 ? 0 : 1];
         } else {
-            ctx.fillStyle = imgIdx === 3 ? '#c8a050' : '#5cb83c';
-            ctx.fillRect(dx, dy, destSize, destSize);
+            c.fillStyle = GREEN_VARIANTS[Math.floor(h1 * GREEN_VARIANTS.length)];
+        }
+        c.fillRect(dx, dy, s, s);
+
+        // 2 — Path: horizontal road on every PATH_INTERVAL-th row
+        if (ty % PATH_INTERVAL === 0) {
+            const pw = Math.max(2, Math.round(s * (PATH_WIDTH_PX / 32)));
+            const py = dy + Math.round((s - pw) / 2);
+            c.fillStyle = PATH_COLOR;
+            c.fillRect(dx, py, s, pw);
+        }
+        // Vertical road on every PATH_INTERVAL-th column
+        if (tx % PATH_INTERVAL === 0) {
+            const pw = Math.max(2, Math.round(s * (PATH_WIDTH_PX / 32)));
+            const px = dx + Math.round((s - pw) / 2);
+            c.fillStyle = PATH_COLOR;
+            c.fillRect(px, dy, pw, s);
+        }
+
+        // 3 — World-border water tint
+        if (tx < BORDER_DIST || ty < BORDER_DIST ||
+            tx >= MAP_SIZE - BORDER_DIST || ty >= MAP_SIZE - BORDER_DIST) {
+            c.fillStyle = WATER_TINT;
+            c.fillRect(dx, dy, s, s);
+        }
+
+        // 4 — Tree: small circle + trunk on ~8% of tiles, only if no entity
+        if (h2 < TREE_THRESHOLD && !entities[`${tx},${ty}`]) {
+            const cx  = dx + Math.round(s * 0.5);
+            const cy  = dy + Math.round(s * 0.38);
+            const r   = Math.max(2, Math.round(s * 0.22));
+            // Trunk
+            c.fillStyle = '#6b4c2a';
+            c.fillRect(cx - Math.max(1, Math.round(r * 0.25)), cy + r - 1, Math.max(2, Math.round(r * 0.5)), Math.max(2, Math.round(r * 0.55)));
+            // Canopy
+            c.beginPath();
+            c.arc(cx, cy, r, 0, Math.PI * 2);
+            // Slight color variation per tree
+            c.fillStyle = h3 < 0.5 ? '#1a5c10' : '#236614';
+            c.fill();
         }
     }
 
@@ -841,6 +919,24 @@ const ConquerMap = (() => {
             return;
         }
 
+        // Charm click → directly open charm collect modal
+        if (isCharm) {
+            onCharmClick(tileEntity);
+            return;
+        }
+
+        // Field object (resource gather) → directly open gather modal
+        if (tileEntity?.type === 'field_object' || tileEntity?.type === 'resource') {
+            onGatherClick(tileEntity);
+            return;
+        }
+
+        // Empty terrain tile — toggle sidebar
+        if (!tileEntity) {
+            toggleSidebar();
+            return;
+        }
+
         // Optimistically show coords while loading
         onTileInfo({ x: tileX, y: tileY, occupant: null });
 
@@ -994,5 +1090,25 @@ const ConquerMap = (() => {
     function setMyPlayerId(id)   { myPlayerId   = id; }
     function setMyAllianceId(id) { myAllianceId = id; }
 
-    return { init, jumpToCity, jumpTo, zoomIn, zoomOut, currentZoom, setMarches, refreshEntities, setMyPlayerId, setMyAllianceId };
+    function toggleSidebar() {
+        sidebarOpen = !sidebarOpen;
+        const sidebar = document.getElementById('sidebar');
+        if (!sidebar) return;
+        if (sidebarOpen) {
+            sidebar.style.flex    = '0 0 270px';
+            sidebar.style.display = 'flex';
+            // Shift the hud-bottom right edge
+            const hudBottom = document.getElementById('hud-bottom');
+            if (hudBottom) hudBottom.style.right = '282px';
+        } else {
+            sidebar.style.flex    = '0 0 0';
+            sidebar.style.display = 'none';
+            const hudBottom = document.getElementById('hud-bottom');
+            if (hudBottom) hudBottom.style.right = '0';
+        }
+        // Resize canvas after sidebar toggle
+        setTimeout(resizeMain, 20);
+    }
+
+    return { init, jumpToCity, jumpTo, zoomIn, zoomOut, currentZoom, setMarches, refreshEntities, setMyPlayerId, setMyAllianceId, toggleSidebar };
 })();

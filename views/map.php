@@ -53,18 +53,60 @@ declare(strict_types=1);
             image-rendering: crisp-edges;
         }
 
-        /* Coord display at bottom of main canvas */
+        /* ── Coord-Nav-Bar (bottom-center of map) ── */
         #coord-bar {
             position: absolute;
-            bottom: 10px; left: 50%; transform: translateX(-50%);
-            background: #f4e4c1;
-            border: 1px solid rgba(139,90,43,0.3); border-radius: 6px;
-            padding: 3px 12px;
-            font-size: 0.75rem; color: #8b6f47; white-space: nowrap;
-            pointer-events: none;
-            box-shadow: 0 3px 12px rgba(139,90,43,0.18);
+            bottom: 74px; left: 50%; transform: translateX(-50%);
+            display: flex; align-items: center; gap: 6px;
+            background: rgba(74,53,32,0.82);
+            border: 1px solid rgba(192,136,88,0.45); border-radius: 8px;
+            padding: 5px 10px;
+            font-size: 0.75rem; color: #fff8ec; white-space: nowrap;
+            pointer-events: auto;
+            box-shadow: 0 3px 12px rgba(74,53,32,0.4);
+            z-index: 10;
+            user-select: none;
         }
-        #coord-bar strong { color: #4a3520; }
+        #coord-bar .cb-label { color: rgba(255,248,236,0.6); font-size: 0.68rem; }
+        #coord-bar strong { color: #fde68a; }
+        .cb-input {
+            width: 52px; padding: 2px 5px;
+            background: rgba(244,228,193,0.15); border: 1px solid rgba(192,136,88,0.4);
+            border-radius: 4px; color: #fff8ec; font-size: 0.75rem; text-align: center;
+        }
+        .cb-input:focus { outline: none; border-color: var(--c-gold, #c08858); }
+        .cb-btn {
+            background: rgba(192,136,88,0.25); border: 1px solid rgba(192,136,88,0.4);
+            border-radius: 5px; color: #fde68a; font-size: 0.8rem;
+            padding: 2px 7px; cursor: pointer; line-height: 1.4;
+            transition: background 0.15s;
+        }
+        .cb-btn:hover { background: rgba(192,136,88,0.45); }
+        /* Bookmark dropdown */
+        #cb-bm-dropdown {
+            position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+            margin-bottom: 6px;
+            background: rgba(74,53,32,0.95); border: 1px solid rgba(192,136,88,0.4);
+            border-radius: 8px; min-width: 180px; z-index: 20;
+            box-shadow: 0 4px 16px rgba(74,53,32,0.5);
+            display: none;
+        }
+        #cb-bm-dropdown.open { display: block; }
+        .cb-bm-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 6px 10px; font-size: 0.72rem; color: #fff8ec;
+            cursor: pointer; transition: background 0.1s;
+            border-bottom: 1px solid rgba(192,136,88,0.2);
+        }
+        .cb-bm-item:last-child { border-bottom: none; }
+        .cb-bm-item:hover { background: rgba(192,136,88,0.2); }
+        .cb-bm-del {
+            background: none; border: none; color: rgba(255,100,80,0.7);
+            cursor: pointer; font-size: 0.75rem; padding: 0 2px;
+            line-height: 1;
+        }
+        .cb-bm-del:hover { color: #ef4444; }
+        .cb-bm-empty { padding: 8px 10px; font-size: 0.72rem; color: rgba(255,248,236,0.4); font-style: italic; }
 
         /* Nav bar top-left of map */
         #navbar {
@@ -83,14 +125,15 @@ declare(strict_types=1);
         .nav-btn:hover  { border-color: rgba(139,90,43,0.6); color: #4a3520; }
         .nav-btn.active { border-color: rgba(139,90,43,0.7); color: #8b5a2b; background: rgba(139,90,43,0.08); }
 
-        /* ── Right: sidebar ── */
+        /* ── Right: sidebar — hidden by default, toggles on empty tile click or ☰ button ── */
         #sidebar {
-            flex: 0 0 270px;
+            flex: 0 0 0;
             height: 100%;
             background: #f4e4c1;
             border-left: 1px solid rgba(139,90,43,0.3);
-            display: flex; flex-direction: column;
+            display: none; flex-direction: column;
             overflow-y: auto;
+            transition: flex 0.2s;
         }
 
         .panel {
@@ -634,7 +677,7 @@ declare(strict_types=1);
 </head>
 <body x-data="mapApp()" x-init="boot()">
 <?php $hudCurrentView = 'map'; require __DIR__ . '/partials/hud.php'; ?>
-<style>#hud-bottom { right: 282px; }</style>
+<!-- hud-bottom right edge is managed dynamically by ConquerMap.toggleSidebar() -->
 <div id="app">
 
     <!-- ── Left: Detail Map ── -->
@@ -644,11 +687,29 @@ declare(strict_types=1);
         <nav id="navbar">
             <a href="/city" class="nav-btn">City</a>
             <span class="nav-btn active">Map</span>
+            <button class="nav-btn" onclick="ConquerMap.toggleSidebar()" title="Sidebar ein-/ausblenden">&#x2630; Sidebar</button>
         </nav>
 
+        <!-- Coordinate navigation bar — bookmark + jump-to -->
         <div id="coord-bar">
-            Zoom <strong x-text="zoom + '×'"></strong>
-            <span x-show="hoverTile"> &nbsp;·&nbsp; (<strong x-text="hoverTile"></strong>)</span>
+            <!-- Bookmark button + dropdown -->
+            <div style="position:relative">
+                <button class="cb-btn" id="cb-bm-btn" title="Bookmark / Lesezeichen">&#x2B50;</button>
+                <div id="cb-bm-dropdown">
+                    <div id="cb-bm-list"></div>
+                </div>
+            </div>
+            <!-- Current hover / viewport coords -->
+            <span class="cb-label">X:</span>
+            <input type="number" id="cb-x" class="cb-input" min="1" max="1024" placeholder="—">
+            <span class="cb-label">Y:</span>
+            <input type="number" id="cb-y" class="cb-input" min="1" max="1024" placeholder="—">
+            <!-- Jump button -->
+            <button class="cb-btn" id="cb-jump-btn" title="Zu Koordinaten springen">&#x1F535;</button>
+            <!-- Zoom display -->
+            <span style="margin-left:4px;color:rgba(255,248,236,0.5)">|</span>
+            <span class="cb-label">Zoom</span>
+            <strong x-text="zoom + '×'"></strong>
         </div>
     </div>
 
@@ -1332,7 +1393,7 @@ const MY_PLAYER_ID = <?= json_encode((int) $session['player_id']) ?>;
 
 function mapApp() {
     return {
-        zoom:         4,
+        zoom:         2,
         myCity:       null,
         myAllianceId: null,
         tileInfo:     null,
@@ -1463,7 +1524,10 @@ function mapApp() {
                         this.charmTroops = [];
                     }
                 },
-                onHover: (x, y) => { this.hoverTile = x !== null ? `${x}, ${y}` : ''; },
+                onHover: (x, y) => {
+                    this.hoverTile = x !== null ? `${x}, ${y}` : '';
+                    this.updateCoordBar(x, y);
+                },
 
                 onCityClick: (entity, screenX, screenY) => {
                     this.hexPopupEntity = entity;
@@ -1491,6 +1555,42 @@ function mapApp() {
                     this.attackModal  = true;
                     this.loadAttackTroops(this.attackTroops);
                 },
+
+                // Charm click — directly show charm collect in sidebar info
+                onCharmClick: (entity) => {
+                    this.tileInfo = {
+                        x:       entity.x,
+                        y:       entity.y,
+                        occupant: {
+                            type:          'charm',
+                            id:            entity.id,
+                            grade:         entity.grade ?? 'normal',
+                            stat_category: entity.stat_category ?? '',
+                            bonus_pct:     entity.bonus_pct ?? 0,
+                            expires_at:    entity.expires_at ?? '',
+                        },
+                    };
+                    this.loadCharmTroops();
+                    // Ensure sidebar is visible
+                    if (!sidebarOpenFlag()) ConquerMap.toggleSidebar();
+                },
+
+                // Gather click — directly trigger gather dispatch
+                onGatherClick: (entity) => {
+                    // Populate tileInfo for the field-object sidebar panel
+                    this.tileInfo = {
+                        x:               entity.x,
+                        y:               entity.y,
+                        type:            'field_object',
+                        object_name:     entity.object_name ?? entity.resource_type ?? '',
+                        level:           entity.level ?? 1,
+                        resource_amount: entity.resource_amount ?? 0,
+                        resource_max:    entity.resource_max ?? 0,
+                        is_occupied:     entity.is_occupied ?? false,
+                    };
+                    // Ensure sidebar is visible
+                    if (!sidebarOpenFlag()) ConquerMap.toggleSidebar();
+                },
             });
 
             ConquerMap.setMyPlayerId(MY_PLAYER_ID);
@@ -1509,6 +1609,14 @@ function mapApp() {
         doZoomIn()   { ConquerMap.zoomIn();     this.zoom = ConquerMap.currentZoom(); },
         doZoomOut()  { ConquerMap.zoomOut();    this.zoom = ConquerMap.currentZoom(); },
         jumpToCity() { ConquerMap.jumpToCity(); },
+
+        // Called by mapApp to keep coord inputs in sync with hover tile
+        updateCoordBar(x, y) {
+            const xEl = document.getElementById('cb-x');
+            const yEl = document.getElementById('cb-y');
+            if (xEl && x !== null) xEl.value = x + 1;
+            if (yEl && y !== null) yEl.value = y + 1;
+        },
 
         jumpToMarch(m) {
             const tx = m.state === 'returning' ? (this.myCity?.x ?? m.target_x) : m.target_x;
@@ -1995,6 +2103,106 @@ function mapApp() {
         },
     };
 }
+
+// Helper: returns true if the sidebar is currently visible
+function sidebarOpenFlag() {
+    const sb = document.getElementById('sidebar');
+    return sb ? sb.style.display !== 'none' && sb.style.display !== '' : false;
+}
+
+// ── Coordinate Bar: bookmarks + jump-to ──────────────────────────────────
+(function initCoordBar() {
+    'use strict';
+
+    const BM_KEY     = 'conquer_bookmarks';
+    const BM_MAX     = 8;
+    const xEl        = document.getElementById('cb-x');
+    const yEl        = document.getElementById('cb-y');
+    const jumpBtn    = document.getElementById('cb-jump-btn');
+    const bmBtn      = document.getElementById('cb-bm-btn');
+    const bmDropdown = document.getElementById('cb-bm-dropdown');
+    const bmList     = document.getElementById('cb-bm-list');
+
+    if (!xEl || !yEl || !jumpBtn || !bmBtn) return;
+
+    // ── Bookmark helpers ──────────────────────────────────────────────────
+    function bmLoad() {
+        try { return JSON.parse(localStorage.getItem(BM_KEY) ?? '[]'); }
+        catch { return []; }
+    }
+    function bmSave(bms) {
+        localStorage.setItem(BM_KEY, JSON.stringify(bms.slice(0, BM_MAX)));
+    }
+    function bmRender() {
+        const bms = bmLoad();
+        if (bms.length === 0) {
+            bmList.innerHTML = '<div class="cb-bm-empty">Keine Lesezeichen</div>';
+            return;
+        }
+        bmList.innerHTML = '';
+        bms.forEach(function (bm, idx) {
+            const row = document.createElement('div');
+            row.className = 'cb-bm-item';
+            row.innerHTML =
+                '<span>&#x2B50; X:' + bm.x + ' Y:' + bm.y + '</span>' +
+                '<button class="cb-bm-del" title="Löschen">&#x2715;</button>';
+            row.querySelector('.cb-bm-del').addEventListener('click', function (e) {
+                e.stopPropagation();
+                const list = bmLoad();
+                list.splice(idx, 1);
+                bmSave(list);
+                bmRender();
+            });
+            row.addEventListener('click', function () {
+                if (typeof ConquerMap !== 'undefined') ConquerMap.jumpTo(bm.x - 1, bm.y - 1);
+                bmDropdown.classList.remove('open');
+            });
+            bmList.appendChild(row);
+        });
+    }
+
+    // ── Bookmark button: add current camera center or toggle dropdown ──────
+    bmBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        const xVal = parseInt(xEl.value, 10);
+        const yVal = parseInt(yEl.value, 10);
+        if (!isNaN(xVal) && !isNaN(yVal)) {
+            const bms = bmLoad();
+            // Avoid duplicates
+            const exists = bms.some(function (b) { return b.x === xVal && b.y === yVal; });
+            if (!exists) {
+                bms.unshift({ x: xVal, y: yVal });
+                bmSave(bms);
+            }
+        }
+        bmRender();
+        bmDropdown.classList.toggle('open');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function (e) {
+        if (!bmDropdown.contains(e.target) && e.target !== bmBtn) {
+            bmDropdown.classList.remove('open');
+        }
+    });
+
+    // ── Jump button ────────────────────────────────────────────────────────
+    jumpBtn.addEventListener('click', function () {
+        const tx = parseInt(xEl.value, 10);
+        const ty = parseInt(yEl.value, 10);
+        if (!isNaN(tx) && !isNaN(ty) && typeof ConquerMap !== 'undefined') {
+            // UI coords are 1-based; ConquerMap uses 0-based
+            ConquerMap.jumpTo(Math.max(0, tx - 1), Math.max(0, ty - 1));
+        }
+    });
+
+    // Allow Enter key in inputs to jump
+    [xEl, yEl].forEach(function (el) {
+        el.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') jumpBtn.click();
+        });
+    });
+}());
 </script>
 </body>
 </html>
