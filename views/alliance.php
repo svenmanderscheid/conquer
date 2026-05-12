@@ -639,69 +639,99 @@ $csrf = $session['csrf_token'];
         </div>
 
         <!-- ── Research tab ── -->
-        <div class="card-body" x-show="tab === 'research'" style="padding-bottom:8px">
+        <div x-show="tab === 'research'" style="padding-bottom:12px">
 
             <!-- Active queue banner -->
             <template x-if="researchActiveCode">
-                <div style="background:var(--c-panel3,#e8d8b0);border:1px solid var(--c-gold,#c08858);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:.8rem;display:flex;align-items:center;gap:10px">
-                    <span style="font-size:1.1rem">&#x231B;</span>
-                    <div>
-                        <strong style="color:var(--c-wood-dark,#8b5a2b)" x-text="researchNodeName(researchActiveCode)"></strong>
-                        wird erforscht
-                        <span style="color:var(--c-muted,#8b6f47)">— fertig: <span x-text="fmtDate(researchFinishesAt)"></span></span>
+                <div style="background:linear-gradient(135deg,var(--c-panel3,#e8d8b0),#ede0c4);border:1px solid var(--c-gold,#c08858);border-radius:10px;padding:12px 16px;margin:12px 16px 4px;font-size:.82rem;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(139,90,43,0.12)">
+                    <span style="font-size:1.4rem;flex-shrink:0">&#x231B;</span>
+                    <div style="flex:1;min-width:0">
+                        <div style="font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--c-gold,#c08858);margin-bottom:2px">Aktive Forschung</div>
+                        <strong style="color:var(--c-wood-dark,#8b5a2b);font-size:.88rem" x-text="researchNodeName(researchActiveCode)"></strong>
+                        <span style="color:var(--c-muted,#8b6f47);font-size:.75rem"> &mdash; fertig: <span x-text="fmtDate(researchFinishesAt)"></span></span>
                     </div>
+                </div>
+            </template>
+
+            <!-- Loading state -->
+            <template x-if="researchNodes.length === 0">
+                <div style="color:var(--c-muted,#8b6f47);font-size:.82rem;text-align:center;padding:28px 0">
+                    <div style="font-size:1.6rem;margin-bottom:8px">&#x1F52C;</div>
+                    Lade Forschungs-Daten&hellip;
                 </div>
             </template>
 
             <!-- Node cards per tree -->
             <template x-for="tree in ['battle','production','special']" :key="tree">
-                <div style="margin-bottom:16px">
-                    <div style="font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--c-wood-dark,#8b5a2b);margin-bottom:8px" x-text="treeLabel(tree)"></div>
-                    <template x-for="node in researchNodesForTree(tree)" :key="node.code">
-                        <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;border:1px solid var(--c-border,rgba(139,90,43,.35));background:var(--c-panel2,#ede0c4);margin-bottom:6px">
-                            <!-- Level pips -->
-                            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;min-width:36px">
-                                <span style="font-size:0.65rem;font-weight:800;color:var(--c-muted,#8b6f47);text-transform:uppercase">Level</span>
-                                <span style="font-size:1rem;font-weight:900;color:var(--c-wood-dark,#8b5a2b)" x-text="node.level + '/10'"></span>
-                            </div>
+                <div x-show="researchNodesForTree(tree).length > 0" style="margin-bottom:4px">
+                    <!-- Tree header -->
+                    <div style="font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--c-wood-dark,#8b5a2b);padding:10px 16px 6px;display:flex;align-items:center;gap:6px">
+                        <span x-text="treeIcon(tree)" style="font-size:.95rem"></span>
+                        <span x-text="treeLabel(tree)"></span>
+                        <span style="flex:1;height:1px;background:var(--c-border,rgba(139,90,43,.35));margin-left:6px"></span>
+                        <span style="font-size:.6rem;color:var(--c-muted,#8b6f47)" x-text="researchNodesForTree(tree).filter(n=>n.level>=10).length + '/' + researchNodesForTree(tree).length + ' Max'"></span>
+                    </div>
 
-                            <!-- Info -->
-                            <div style="flex:1;min-width:0">
-                                <div style="font-size:.82rem;font-weight:800;color:var(--c-text,#4a3520)" x-text="node.name"></div>
-                                <div style="font-size:.7rem;color:var(--c-muted,#8b6f47)" x-text="bonusText(node)"></div>
-                                <template x-if="node.cost_next">
-                                    <div style="font-size:.68rem;color:var(--c-muted,#8b6f47);margin-top:2px">
-                                        Kosten: &#x1FAB5; <span x-text="node.cost_next.lumber"></span>
-                                        / &#x1FAA8; <span x-text="node.cost_next.stone"></span>
-                                        / &#x1FA99; <span x-text="node.cost_next.gold"></span>
+                    <!-- Card grid -->
+                    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;padding:0 12px 8px">
+                        <template x-for="node in researchNodesForTree(tree)" :key="node.code">
+                            <div :style="`background:${nodeCardBg(node)};border:1px solid ${nodeCardBorder(node)};border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;transition:box-shadow 0.15s;${node.in_queue?'box-shadow:0 0 0 2px var(--c-gold,#c08858)':''}`">
+
+                                <!-- Card header: icon + name + level badge -->
+                                <div style="display:flex;align-items:flex-start;gap:8px">
+                                    <div :style="`width:32px;height:32px;border-radius:7px;background:${nodeCardAccent(node)};border:1px solid ${nodeCardBorder(node)};display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0`"
+                                         x-text="nodeCardIcon(node)"></div>
+                                    <div style="flex:1;min-width:0">
+                                        <div style="font-size:.76rem;font-weight:800;color:var(--c-text,#4a3520);line-height:1.2;word-break:break-word" x-text="node.name"></div>
+                                        <div style="font-size:.65rem;color:var(--c-muted,#8b6f47);margin-top:1px" x-text="bonusText(node)"></div>
                                     </div>
-                                </template>
-                            </div>
+                                    <!-- Level badge -->
+                                    <div :style="`flex-shrink:0;min-width:36px;text-align:center;background:${node.level>=10?'rgba(127,176,105,0.18)':'rgba(139,90,43,0.1)'};border-radius:6px;padding:2px 5px`">
+                                        <div style="font-size:.56rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--c-muted,#8b6f47)">Lv</div>
+                                        <div :style="`font-size:.9rem;font-weight:900;color:${node.level>=10?'#7fb069':'var(--c-wood-dark,#8b5a2b)'}`" x-text="node.level + '/10'"></div>
+                                    </div>
+                                </div>
 
-                            <!-- Action -->
-                            <div style="flex-shrink:0">
-                                <template x-if="node.level >= 10">
-                                    <span style="font-size:.7rem;font-weight:700;color:var(--c-success,#7fb069)">&#x2714; Max</span>
-                                </template>
-                                <template x-if="node.in_queue">
-                                    <span style="font-size:.7rem;color:var(--c-muted,#8b6f47)">&#x231B; Aktiv</span>
-                                </template>
-                                <template x-if="node.level < 10 && !node.in_queue && canStartResearch">
-                                    <button
-                                        class="btn-game btn-game-blue btn-game-sm"
-                                        :disabled="researchStarting || researchActiveCode !== null"
-                                        @click="startResearch(node.code)"
-                                        x-text="researchStarting ? 'Starte...' : ('→ L' + (node.level + 1))"
-                                    ></button>
-                                </template>
+                                <!-- Progress bar -->
+                                <div style="height:4px;background:rgba(139,90,43,0.15);border-radius:2px;overflow:hidden">
+                                    <div :style="`height:100%;width:${node.level*10}%;background:${node.level>=10?'#7fb069':'var(--c-gold,#c08858)'};border-radius:2px;transition:width 0.4s`"></div>
+                                </div>
+
+                                <!-- Cost + button row -->
+                                <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:2px">
+                                    <div style="font-size:.62rem;color:var(--c-muted,#8b6f47);min-width:0;flex:1">
+                                        <template x-if="node.cost_next && node.level < 10">
+                                            <span>
+                                                &#x1FAB5; <span x-text="fmtNum(node.cost_next.lumber)"></span>
+                                                &nbsp;&#x1FAA8; <span x-text="fmtNum(node.cost_next.stone)"></span>
+                                                &nbsp;&#x1FA99; <span x-text="fmtNum(node.cost_next.gold)"></span>
+                                            </span>
+                                        </template>
+                                    </div>
+                                    <div style="flex-shrink:0">
+                                        <template x-if="node.level >= 10">
+                                            <span style="font-size:.68rem;font-weight:700;color:#7fb069">&#x2714; Max</span>
+                                        </template>
+                                        <template x-if="node.in_queue">
+                                            <span style="font-size:.68rem;color:var(--c-gold,#c08858);font-weight:700">&#x231B; Aktiv</span>
+                                        </template>
+                                        <template x-if="node.level < 10 && !node.in_queue && canStartResearch">
+                                            <button
+                                                class="btn-game btn-game-blue btn-game-sm"
+                                                :disabled="researchStarting || researchActiveCode !== null"
+                                                @click="startResearch(node.code)"
+                                                x-text="researchStarting ? 'Starte...' : ('&#x2192; L' + (node.level + 1))"
+                                            ></button>
+                                        </template>
+                                        <template x-if="node.level < 10 && !node.in_queue && !canStartResearch">
+                                            <span style="font-size:.65rem;color:var(--c-muted,#8b6f47);font-style:italic">Kein Zugang</span>
+                                        </template>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </template>
+                        </template>
+                    </div>
                 </div>
-            </template>
-
-            <template x-if="researchNodes.length === 0">
-                <div style="color:var(--c-muted,#8b6f47);font-size:.82rem;text-align:center;padding:20px 0">Lade Forschungs-Daten...</div>
             </template>
         </div>
 
@@ -896,7 +926,7 @@ function allianceBrowse() {
                     alToast('Allianz beigetreten!', 'ok');
                     setTimeout(() => location.reload(), 900);
                 } else {
-                    alToast(json.error?.message ?? json.error?.code ?? 'Fehler', 'err');
+                    alToast(json.message ?? json.error ?? 'Fehler', 'err');
                 }
             } catch (e) {
                 alToast('Netzwerkfehler', 'err');
@@ -925,7 +955,7 @@ function allianceBrowse() {
                     alToast('Allianz gegründet!', 'ok');
                     setTimeout(() => location.reload(), 900);
                 } else {
-                    alToast(json.error?.message ?? json.error?.code ?? 'Fehler', 'err');
+                    alToast(json.message ?? json.error ?? 'Fehler', 'err');
                 }
             } catch (e) {
                 alToast('Netzwerkfehler', 'err');
@@ -1038,7 +1068,7 @@ function allianceMember() {
                     this.chatInput = '';
                     await this.loadChat(true);
                 } else {
-                    alToast(json.error?.message ?? json.error?.code ?? 'Fehler', 'err');
+                    alToast(json.message ?? json.error ?? 'Fehler', 'err');
                 }
             } catch (e) {
                 alToast('Netzwerkfehler', 'err');
@@ -1094,8 +1124,52 @@ function allianceMember() {
         },
 
         treeLabel(tree) {
-            const labels = { battle: '⚔ Kampf', production: '🌾 Produktion', special: '✨ Spezial' };
+            const labels = { battle: 'Kampf', production: 'Produktion', special: 'Spezial' };
             return labels[tree] ?? tree;
+        },
+
+        treeIcon(tree) {
+            const icons = { battle: '&#x2694;', production: '&#x1F33E;', special: '&#x2728;' };
+            return icons[tree] ?? '&#x1F4CA;';
+        },
+
+        fmtNum(n) {
+            if (!n) return '0';
+            return Number(n).toLocaleString('de-DE');
+        },
+
+        nodeCardBg(node) {
+            if (node.in_queue)   return 'rgba(192,136,88,0.12)';
+            if (node.level >= 10) return 'rgba(127,176,105,0.08)';
+            const treeColors = { battle: 'rgba(30,58,95,0.25)', production: 'rgba(26,58,42,0.25)', special: 'rgba(113,63,18,0.18)' };
+            return treeColors[node.tree] ?? 'var(--c-panel2,#ede0c4)';
+        },
+
+        nodeCardBorder(node) {
+            if (node.in_queue)    return 'var(--c-gold,#c08858)';
+            if (node.level >= 10) return 'rgba(127,176,105,0.6)';
+            const treeColors = { battle: 'rgba(59,130,246,0.45)', production: 'rgba(16,185,129,0.45)', special: 'rgba(192,136,88,0.45)' };
+            return treeColors[node.tree] ?? 'var(--c-border,rgba(139,90,43,.35))';
+        },
+
+        nodeCardAccent(node) {
+            if (node.level >= 10) return 'rgba(127,176,105,0.18)';
+            const treeColors = { battle: 'rgba(59,130,246,0.15)', production: 'rgba(16,185,129,0.15)', special: 'rgba(192,136,88,0.15)' };
+            return treeColors[node.tree] ?? 'rgba(139,90,43,0.1)';
+        },
+
+        nodeCardIcon(node) {
+            const stat = node.stat ?? '';
+            const tree = node.tree ?? '';
+            if (stat.includes('hp'))       return '&#x2764;';
+            if (stat.includes('atk'))      return '&#x2694;';
+            if (stat.includes('def'))      return '&#x1F6E1;';
+            if (stat.includes('spd'))      return '&#x1F4A8;';
+            if (stat.includes('prod'))     return '&#x2699;';
+            if (stat.includes('gather'))   return '&#x26CF;';
+            if (tree === 'production')     return '&#x1F33E;';
+            if (tree === 'special')        return '&#x2728;';
+            return '&#x1F4CA;';
         },
 
         bonusText(node) {
@@ -1127,7 +1201,7 @@ function allianceMember() {
                     this.researchNodes = []; // force reload
                     await this.loadResearch();
                 } else {
-                    alToast(json.error?.message ?? json.error?.code ?? 'Fehler', 'err');
+                    alToast(json.message ?? json.error ?? 'Fehler', 'err');
                 }
             } catch (e) {
                 alToast('Netzwerkfehler', 'err');
@@ -1148,7 +1222,7 @@ function allianceMember() {
                     alToast('Du hast die Allianz verlassen.', 'ok');
                     setTimeout(() => location.reload(), 900);
                 } else {
-                    alToast(json.error?.message ?? json.error?.code ?? 'Fehler', 'err');
+                    alToast(json.message ?? json.error ?? 'Fehler', 'err');
                     this.confirmLeave = false;
                 }
             } catch (e) {

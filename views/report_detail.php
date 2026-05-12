@@ -53,7 +53,11 @@ $totalAbsorption = 0;
 $totalInjured    = 0;
 $totalSurvived   = 0;
 
-foreach ($troops as $t) {
+foreach ($troops as $tKey => $t) {
+    // Handle both array-of-objects [{code,sent,...}] and map {code: count} formats
+    if (!is_array($t)) {
+        $t = ['code' => (int) $tKey, 'sent' => (int) $t, 'survived' => 0, 'injured' => 0];
+    }
     $sent    = (int) ($t['sent']     ?? 0);
     $injured = (int) ($t['injured']  ?? $t['lost'] ?? 0);
     $surv    = (int) ($t['survived'] ?? 0);

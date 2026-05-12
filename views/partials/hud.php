@@ -877,32 +877,50 @@ try {
 } catch (\Throwable) {}
 ?>
 <style>
-/* ── Bottom Chat ────────────────────────────────────────────────────────── */
-#hud-chat-widget {
+/* ── Bottom Chat bar (preview strip, always visible) ────────────────────── */
+#hud-chat-bar {
     position: fixed;
     bottom: 0;
-    left: 12px;
-    width: 320px;
-    z-index: 100;
-    font-family: system-ui, -apple-system, sans-serif;
+    left: 0;
+    right: 0;
+    z-index: 8900;
+    pointer-events: none;
+}
+
+#hud-chat-bar-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    align-items: flex-end;
+    padding: 0 12px;
     pointer-events: all;
 }
 
-#hud-chat-header {
+#hud-chat-preview {
+    width: 340px;
     background: var(--c-panel3, #e8d8b0);
     border: 1px solid var(--c-border, rgba(139,90,43,0.35));
     border-bottom: none;
     border-radius: 10px 10px 0 0;
-    padding: 5px 10px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    overflow: hidden;
     cursor: pointer;
+    font-family: system-ui, -apple-system, sans-serif;
+    box-shadow: 0 -2px 10px var(--c-shadow, rgba(139,90,43,0.18));
+    flex-shrink: 0;
     user-select: none;
     -webkit-user-select: none;
 }
 
-#hud-chat-header-title {
+#hud-chat-preview-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px 4px;
+    border-bottom: 1px solid var(--c-border, rgba(139,90,43,0.35));
+    background: var(--c-panel3, #e8d8b0);
+}
+
+#hud-chat-preview-title {
     flex: 1;
     font-size: 0.68rem;
     font-weight: 800;
@@ -911,33 +929,127 @@ try {
     color: var(--c-wood-dark, #8b5a2b);
 }
 
-#hud-chat-chevron {
-    font-size: 0.75rem;
+.hud-chat-open-btn {
+    font-size: 0.62rem;
+    font-weight: 700;
     color: var(--c-muted, #8b6f47);
-    transition: transform 0.2s;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0 2px;
+    line-height: 1;
+    font-family: inherit;
+    transition: color 0.15s;
 }
 
-#hud-chat-body {
-    background: var(--c-panel, #f4e4c1);
-    border: 1px solid var(--c-border, rgba(139,90,43,0.35));
-    border-top: none;
+.hud-chat-open-btn:hover {
+    color: var(--c-wood-dark, #8b5a2b);
+}
+
+#hud-chat-preview-msgs {
+    padding: 4px 10px 6px;
     display: flex;
     flex-direction: column;
-    height: 380px;
-    overflow: hidden;
+    gap: 2px;
+    min-height: 40px;
 }
 
-.hud-chat-tabs {
+.hud-chat-preview-msg {
+    font-size: 0.72rem;
+    line-height: 1.35;
+    color: var(--c-text, #4a3520);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.hud-chat-preview-msg-user {
+    font-weight: 800;
+    color: var(--c-gold, #c08858);
+    margin-right: 3px;
+}
+
+.hud-chat-preview-empty {
+    font-size: 0.7rem;
+    color: var(--c-muted, #8b6f47);
+    font-style: italic;
+    padding: 4px 0;
+}
+
+/* ── Chat Modal ─────────────────────────────────────────────────────────── */
+#hud-chat-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9600;
+    background: rgba(74,53,32,0.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+#hud-chat-modal.hud-chat-modal-open {
     display: flex;
-    border-bottom: 1px solid var(--c-border, rgba(139,90,43,0.35));
-    background: var(--c-panel2, #ede0c4);
+}
+
+#hud-chat-modal-box {
+    width: 600px;
+    max-width: calc(100vw - 24px);
+    height: 500px;
+    max-height: calc(100vh - 80px);
+    background: var(--c-panel, #f4e4c1);
+    border: 1px solid var(--c-border, rgba(139,90,43,0.35));
+    border-radius: 14px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 8px 40px rgba(74,53,32,0.4);
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+#hud-chat-modal-topbar {
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 14px;
+    height: 44px;
+    background: var(--c-panel3, #e8d8b0);
+    border-bottom: 1px solid var(--c-border, rgba(139,90,43,0.35));
+}
+
+#hud-chat-modal-title {
+    flex: 1;
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: var(--c-wood-dark, #8b5a2b);
+}
+
+.hud-chat-modal-close {
+    background: rgba(192,96,77,0.1);
+    border: 1px solid rgba(192,96,77,0.35);
+    border-radius: 5px;
+    color: var(--c-danger, #c0604d);
+    font-size: 0.85rem;
+    padding: 3px 9px;
+    cursor: pointer;
+    line-height: 1.5;
+    transition: background 0.15s;
+}
+
+.hud-chat-modal-close:hover { background: rgba(192,96,77,0.22); }
+
+/* Tab bar inside modal */
+.hud-chat-modal-tabs {
+    flex-shrink: 0;
+    display: flex;
+    background: var(--c-panel2, #ede0c4);
+    border-bottom: 1px solid var(--c-border, rgba(139,90,43,0.35));
 }
 
 .hud-chat-tab-btn {
     flex: 1;
-    padding: 5px 8px;
-    font-size: 0.65rem;
+    padding: 7px 12px;
+    font-size: 0.68rem;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -957,13 +1069,14 @@ try {
     border-bottom-color: var(--c-gold, #c08858);
 }
 
+/* Message list */
 .hud-chat-messages {
     flex: 1;
     overflow-y: auto;
-    padding: 7px 10px;
+    padding: 8px 14px;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 5px;
     scrollbar-width: thin;
     scrollbar-color: var(--c-border, rgba(139,90,43,0.35)) transparent;
 }
@@ -972,7 +1085,7 @@ try {
 .hud-chat-messages::-webkit-scrollbar-thumb { background: var(--c-border, rgba(139,90,43,0.35)); border-radius: 2px; }
 
 .hud-chat-msg {
-    font-size: 0.78rem;
+    font-size: 0.8rem;
     line-height: 1.4;
     word-break: break-word;
 }
@@ -990,15 +1103,16 @@ try {
 .hud-chat-msg-time {
     font-size: 0.62rem;
     color: var(--c-muted, #8b6f47);
-    margin-left: 4px;
+    margin-left: 5px;
     font-family: monospace;
 }
 
+/* Input row */
 .hud-chat-input-row {
     flex-shrink: 0;
     display: flex;
     gap: 6px;
-    padding: 7px 8px;
+    padding: 8px 12px;
     border-top: 1px solid var(--c-border, rgba(139,90,43,0.35));
     background: var(--c-panel2, #ede0c4);
 }
@@ -1007,10 +1121,10 @@ try {
     flex: 1;
     background: #fdf6e8;
     border: 1px solid var(--c-border, rgba(139,90,43,0.35));
-    border-radius: 5px;
+    border-radius: 6px;
     color: var(--c-text, #4a3520);
-    font-size: 0.78rem;
-    padding: 5px 8px;
+    font-size: 0.8rem;
+    padding: 6px 10px;
     outline: none;
     transition: border-color 0.15s;
     font-family: inherit;
@@ -1018,18 +1132,18 @@ try {
 }
 
 .hud-chat-input:focus { border-color: var(--c-gold, #c08858); }
-.hud-chat-input::placeholder { color: var(--c-muted, #8b6f47); font-size: 0.72rem; }
+.hud-chat-input::placeholder { color: var(--c-muted, #8b6f47); font-size: 0.75rem; }
 
 .hud-chat-send-btn {
     flex-shrink: 0;
     background: linear-gradient(180deg, #c9925a, #9a6535);
     border: none;
     border-bottom: 2px solid #6b4120;
-    border-radius: 5px;
+    border-radius: 6px;
     color: #fff8ec;
-    font-size: 0.68rem;
+    font-size: 0.72rem;
     font-weight: 800;
-    padding: 4px 10px;
+    padding: 5px 14px;
     cursor: pointer;
     font-family: inherit;
     transition: filter 0.15s;
@@ -1041,17 +1155,34 @@ try {
 .hud-chat-send-btn:disabled { filter: grayscale(0.5) opacity(0.6); cursor: not-allowed; }
 
 @media (max-width: 480px) {
-    #hud-chat-widget { display: none; }
+    #hud-chat-preview { width: 240px; }
+    #hud-chat-modal-box { height: 420px; }
 }
 </style>
 
-<div id="hud-chat-widget">
-    <div id="hud-chat-header" onclick="hudChatToggle()">
-        <span id="hud-chat-header-title">&#x1F4AC; Chat</span>
-        <span id="hud-chat-chevron">&#x25B2;</span>
+<!-- ── Chat preview bar ──────────────────────────────────────────────────── -->
+<div id="hud-chat-bar">
+<div id="hud-chat-bar-inner">
+    <div id="hud-chat-preview" onclick="hudChatOpenModal()">
+        <div id="hud-chat-preview-header">
+            <span id="hud-chat-preview-title">&#x1F4AC; Chat</span>
+            <button class="hud-chat-open-btn" onclick="event.stopPropagation();hudChatOpenModal()" title="Chat öffnen">&#x2B0C;</button>
+        </div>
+        <div id="hud-chat-preview-msgs">
+            <div class="hud-chat-preview-empty" id="hud-chat-preview-empty">Lade&hellip;</div>
+        </div>
     </div>
-    <div id="hud-chat-body">
-        <div class="hud-chat-tabs">
+</div>
+</div>
+
+<!-- ── Chat Modal ────────────────────────────────────────────────────────── -->
+<div id="hud-chat-modal">
+    <div id="hud-chat-modal-box">
+        <div id="hud-chat-modal-topbar">
+            <span id="hud-chat-modal-title">&#x1F4AC; Chat</span>
+            <button class="hud-chat-modal-close" onclick="hudChatCloseModal()">&#x2715;</button>
+        </div>
+        <div class="hud-chat-modal-tabs">
             <button class="hud-chat-tab-btn hud-chat-tab-active" id="hud-chat-tab-world" onclick="hudChatSwitchTab('world')">&#x1F30D; Welt</button>
             <?php if ($_hud_in_alliance): ?>
             <button class="hud-chat-tab-btn" id="hud-chat-tab-alliance" onclick="hudChatSwitchTab('alliance')">&#x2694; Allianz</button>
@@ -1070,29 +1201,45 @@ try {
 (function () {
 'use strict';
 
-const HUD_CHAT_CSRF      = <?= json_encode((string) ($session['csrf_token'] ?? '')) ?>;
-const HUD_IN_ALLIANCE    = <?= $_hud_in_alliance ? 'true' : 'false' ?>;
+const HUD_CHAT_CSRF   = <?= json_encode((string) ($session['csrf_token'] ?? '')) ?>;
+const HUD_IN_ALLIANCE = <?= $_hud_in_alliance ? 'true' : 'false' ?>;
 
-let hudChatOpen    = true;
-let hudChatTab     = 'world';
-let hudChatLastId  = 0;
-let hudChatAliLastId = 0;
-let hudChatPollTimer = null;
-let hudChatSending = false;
+let hudChatModalOpen  = false;
+let hudChatTab        = 'world';
+let hudChatLastId     = 0;
+let hudChatAliLastId  = 0;
+let hudChatPollTimer  = null;
+let hudChatSending    = false;
 
-const widgetEl  = document.getElementById('hud-chat-widget');
-const bodyEl    = document.getElementById('hud-chat-body');
-const chevronEl = document.getElementById('hud-chat-chevron');
+// Preview messages (last 2 per tab)
+let hudChatPreviewMsgs = [];
+
+const modalEl   = document.getElementById('hud-chat-modal');
 const msgsEl    = document.getElementById('hud-chat-msgs');
 const inputEl   = document.getElementById('hud-chat-input');
 const sendBtn   = document.getElementById('hud-chat-send');
+const previewEl = document.getElementById('hud-chat-preview-msgs');
 
-// ── Toggle open/closed ─────────────────────────────────────────────────────
-window.hudChatToggle = function () {
-    hudChatOpen = !hudChatOpen;
-    bodyEl.style.display    = hudChatOpen ? 'flex' : 'none';
-    chevronEl.textContent   = hudChatOpen ? '▲' : '▼';
+// ── Open / close modal ─────────────────────────────────────────────────────
+window.hudChatOpenModal = function () {
+    hudChatModalOpen = true;
+    modalEl.classList.add('hud-chat-modal-open');
+    msgsEl.innerHTML = '';
+    hudChatLastId    = 0;
+    hudChatAliLastId = 0;
+    hudChatLoad(false);
+    setTimeout(function () { inputEl.focus(); }, 80);
 };
+
+window.hudChatCloseModal = function () {
+    hudChatModalOpen = false;
+    modalEl.classList.remove('hud-chat-modal-open');
+};
+
+// Close when clicking the backdrop
+modalEl.addEventListener('click', function (e) {
+    if (e.target === modalEl) hudChatCloseModal();
+});
 
 // ── Tab switch ─────────────────────────────────────────────────────────────
 window.hudChatSwitchTab = function (tab) {
@@ -1105,6 +1252,24 @@ window.hudChatSwitchTab = function (tab) {
     hudChatAliLastId = 0;
     hudChatLoad(false);
 };
+
+// ── Render preview strip (last 2 msgs) ────────────────────────────────────
+function hudChatUpdatePreview(msgs) {
+    if (!msgs || msgs.length === 0) return;
+    hudChatPreviewMsgs = msgs.slice(-2);
+    const emptyEl = document.getElementById('hud-chat-preview-empty');
+    if (emptyEl) emptyEl.remove();
+    previewEl.innerHTML = '';
+    hudChatPreviewMsgs.forEach(function (m) {
+        const tag  = m.alliance_tag ? '[' + hudChatEsc(m.alliance_tag) + '] ' : '';
+        const div  = document.createElement('div');
+        div.className = 'hud-chat-preview-msg';
+        div.innerHTML =
+            '<span class="hud-chat-preview-msg-user">' + tag + hudChatEsc(m.username) + ':</span> ' +
+            hudChatEsc(m.message);
+        previewEl.appendChild(div);
+    });
+}
 
 // ── Load / poll messages ───────────────────────────────────────────────────
 async function hudChatLoad(poll) {
@@ -1125,21 +1290,33 @@ async function hudChatLoad(poll) {
         const msgs = json.data.messages ?? [];
         if (msgs.length === 0 && poll) return;
 
-        if (!poll) {
-            msgsEl.innerHTML = '';
+        // Update preview strip (always, even when modal is closed)
+        if (!poll || msgs.length > 0) {
+            hudChatUpdatePreview(msgs);
         }
 
-        msgs.forEach(function (m) {
-            const tag    = m.alliance_tag ? '[' + hudChatEsc(m.alliance_tag) + '] ' : '';
-            const time   = (m.created_at ?? m.sent_at ?? '').substring(11, 16);
-            const div    = document.createElement('div');
-            div.className = 'hud-chat-msg';
-            div.innerHTML  =
-                '<span class="hud-chat-msg-user">' + tag + hudChatEsc(m.username) + '</span>' +
-                '<span class="hud-chat-msg-text">' + hudChatEsc(m.message) + '</span>' +
-                '<span class="hud-chat-msg-time">' + hudChatEsc(time) + '</span>';
-            msgsEl.appendChild(div);
-        });
+        // Only update the modal message list when it's open
+        if (hudChatModalOpen) {
+            if (!poll) {
+                msgsEl.innerHTML = '';
+            }
+
+            msgs.forEach(function (m) {
+                const tag  = m.alliance_tag ? '[' + hudChatEsc(m.alliance_tag) + '] ' : '';
+                const time = (m.created_at ?? m.sent_at ?? '').substring(11, 16);
+                const div  = document.createElement('div');
+                div.className = 'hud-chat-msg';
+                div.innerHTML =
+                    '<span class="hud-chat-msg-user">' + tag + hudChatEsc(m.username) + '</span>' +
+                    '<span class="hud-chat-msg-text">' + hudChatEsc(m.message) + '</span>' +
+                    '<span class="hud-chat-msg-time">' + hudChatEsc(time) + '</span>';
+                msgsEl.appendChild(div);
+            });
+
+            if (msgs.length > 0) {
+                msgsEl.scrollTop = msgsEl.scrollHeight;
+            }
+        }
 
         if (msgs.length > 0) {
             const lastMsg = msgs[msgs.length - 1];
@@ -1148,7 +1325,6 @@ async function hudChatLoad(poll) {
             } else {
                 hudChatAliLastId = lastMsg.id ?? hudChatAliLastId;
             }
-            msgsEl.scrollTop = msgsEl.scrollHeight;
         }
     } catch { /* silent on poll */ }
 }
@@ -1158,7 +1334,7 @@ window.hudChatSend = async function () {
     const msg = (inputEl.value ?? '').trim();
     if (!msg || hudChatSending) return;
 
-    hudChatSending  = true;
+    hudChatSending   = true;
     sendBtn.disabled = true;
 
     const url = hudChatTab === 'world' ? '/api/chat/world' : '/api/chat/alliance';
@@ -1174,7 +1350,6 @@ window.hudChatSend = async function () {
             inputEl.value = '';
             await hudChatLoad(true);
         }
-        // Silently ignore cooldown / errors in HUD chat
     } catch { /* silent */ }
 
     hudChatSending   = false;
@@ -1185,7 +1360,7 @@ window.hudChatSend = async function () {
 function hudChatStartPoll() {
     if (hudChatPollTimer) clearInterval(hudChatPollTimer);
     hudChatPollTimer = setInterval(function () {
-        if (hudChatOpen) hudChatLoad(true);
+        hudChatLoad(true);
     }, 8000);
 }
 
@@ -1270,42 +1445,139 @@ function hudChatEsc(str) {
 </div>
 
 <!-- ── INVENTORY MODAL ─────────────────────────────────────────────────────── -->
+<style>
+/* ── Inventory modal extras ──────────────────────────────────────────────── */
+.inv-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 8px;
+    padding: 12px 14px;
+}
+
+.inv-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    background: var(--c-panel2, #ede0c4);
+    border: 1px solid var(--c-border, rgba(139,90,43,0.35));
+    border-radius: 8px;
+    padding: 8px 6px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    text-align: center;
+}
+
+.inv-item:hover {
+    border-color: var(--c-gold, #c08858);
+    background: #e8d5af;
+}
+
+.inv-item-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.inv-item-name {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--c-text, #4a3520);
+    line-height: 1.2;
+    word-break: break-word;
+    hyphens: auto;
+}
+
+.inv-item-qty {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: var(--c-wood-dark, #8b5a2b);
+    background: rgba(139,90,43,0.12);
+    border-radius: 999px;
+    padding: 1px 8px;
+    min-width: 28px;
+    text-align: center;
+}
+
+.inv-use-btn {
+    width: 100%;
+    background: linear-gradient(180deg, #c9925a, #9a6535);
+    border: none;
+    border-bottom: 2px solid #6b4120;
+    border-radius: 5px;
+    color: #fff8ec;
+    font-size: 0.62rem;
+    font-weight: 800;
+    padding: 3px 0;
+    cursor: pointer;
+    font-family: inherit;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    transition: filter 0.15s;
+    margin-top: 2px;
+}
+
+.inv-use-btn:hover { filter: brightness(1.1); }
+.inv-use-btn:disabled { filter: grayscale(0.5) opacity(0.6); cursor: not-allowed; }
+
+.inv-loading {
+    padding: 24px 0;
+    text-align: center;
+    color: var(--c-muted, #8b6f47);
+    font-size: 0.82rem;
+    font-style: italic;
+}
+
+.inv-empty {
+    padding: 24px 0;
+    text-align: center;
+    color: var(--c-muted, #8b6f47);
+    font-size: 0.82rem;
+    font-style: italic;
+}
+
+.inv-toast {
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--c-panel3, #e8d8b0);
+    border: 1px solid var(--c-border, rgba(139,90,43,0.35));
+    border-radius: 8px;
+    padding: 7px 18px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--c-wood-dark, #8b5a2b);
+    white-space: nowrap;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.inv-toast.inv-toast-ok  { color: #16a34a; border-color: #16a34a; }
+.inv-toast.inv-toast-err { color: #c0604d; border-color: #c0604d; }
+.inv-toast.inv-toast-show { opacity: 1; }
+</style>
+
 <div id="hud-inventory-modal" class="hud-modal" style="display:none">
-    <div class="hud-modal-inner">
+    <div class="hud-modal-inner" style="max-width:760px;margin:auto;height:auto;max-height:80vh;border-radius:14px;position:relative;">
         <div class="hud-modal-topbar">
             <span class="hud-modal-title">&#x1F4E6; Inventar</span>
             <button class="hud-modal-close" onclick="hudCloseInventory()">&#x2715;</button>
         </div>
         <div class="hud-tab-bar">
-            <button class="hud-tab-btn hud-tab-active" data-invtab="res" onclick="hudInvTab('res')">Ressourcen</button>
-            <button class="hud-tab-btn" data-invtab="boosts" onclick="hudInvTab('boosts')">Boosts</button>
-            <button class="hud-tab-btn" data-invtab="speedups" onclick="hudInvTab('speedups')">Speedups</button>
+            <button class="hud-tab-btn hud-tab-active" data-invtab="all" onclick="hudInvTab('all')">Alle</button>
+            <button class="hud-tab-btn" data-invtab="resource_pack" onclick="hudInvTab('resource_pack')">Ressourcen</button>
+            <button class="hud-tab-btn" data-invtab="boost" onclick="hudInvTab('boost')">Boosts</button>
+            <button class="hud-tab-btn" data-invtab="speedup" onclick="hudInvTab('speedup')">Speedups</button>
             <button class="hud-tab-btn" data-invtab="misc" onclick="hudInvTab('misc')">Sonstiges</button>
         </div>
-        <div class="hud-tab-content hud-tab-visible" id="hud-invtab-res">
-            <div class="hud-placeholder">
-                <span style="font-size:1.5rem">&#x1F33E;</span>
-                Kommt bald &mdash; Ressourcen-Pakete
-            </div>
+        <div id="hud-inv-body" style="overflow-y:auto;max-height:calc(80vh - 100px)">
+            <div class="inv-loading" id="hud-inv-loading">Lade Inventar&hellip;</div>
+            <div class="inv-grid" id="hud-inv-grid" style="display:none"></div>
+            <div class="inv-empty" id="hud-inv-empty" style="display:none">Keine Items in dieser Kategorie.</div>
         </div>
-        <div class="hud-tab-content" id="hud-invtab-boosts">
-            <div class="hud-placeholder">
-                <span style="font-size:1.5rem">&#x26A1;</span>
-                Kommt bald &mdash; Boosts
-            </div>
-        </div>
-        <div class="hud-tab-content" id="hud-invtab-speedups">
-            <div class="hud-placeholder">
-                <span style="font-size:1.5rem">&#x23F1;</span>
-                Kommt bald &mdash; Speedups
-            </div>
-        </div>
-        <div class="hud-tab-content" id="hud-invtab-misc">
-            <div class="hud-placeholder">
-                <span style="font-size:1.5rem">&#x1F4CB;</span>
-                Kommt bald &mdash; Sonstiges
-            </div>
-        </div>
+        <div class="inv-toast" id="hud-inv-toast"></div>
     </div>
 </div>
 
@@ -1465,10 +1737,131 @@ function hudLoadReport(id) {
 }
 
 // ── Inventory modal ────────────────────────────────────────────────────────
-const inventoryModal = document.getElementById('hud-inventory-modal');
+const inventoryModal  = document.getElementById('hud-inventory-modal');
+const invGridEl       = document.getElementById('hud-inv-grid');
+const invLoadingEl    = document.getElementById('hud-inv-loading');
+const invEmptyEl      = document.getElementById('hud-inv-empty');
+const invToastEl      = document.getElementById('hud-inv-toast');
+
+let invItems        = [];   // all items from API
+let invTab          = 'all';
+let invLoaded       = false;
+let invUsing        = null; // item_code being used
+
+// Category icons for inventory items
+const INV_ICONS = {
+    speedup:       '&#x23F1;',
+    boost:         '&#x26A1;',
+    resource_pack: '&#x1F4E6;',
+    chest:         '&#x1F4DC;',
+    teleport:      '&#x1F5FA;',
+    shield:        '&#x1F6E1;',
+    vip:           '&#x2B50;',
+    other:         '&#x1F4CB;',
+};
+
+function invIcon(cat) {
+    return INV_ICONS[cat] ?? INV_ICONS.other;
+}
+
+function invShowToast(msg, type) {
+    invToastEl.innerHTML   = msg;
+    invToastEl.className   = 'inv-toast inv-toast-' + type + ' inv-toast-show';
+    setTimeout(function () { invToastEl.classList.remove('inv-toast-show'); }, 2500);
+}
+
+function invRender() {
+    const filtered = invTab === 'all'
+        ? invItems
+        : invItems.filter(function (it) { return it.category === invTab; });
+
+    invGridEl.innerHTML = '';
+
+    if (filtered.length === 0) {
+        invGridEl.style.display  = 'none';
+        invEmptyEl.style.display = 'block';
+        return;
+    }
+
+    invEmptyEl.style.display = 'none';
+    invGridEl.style.display  = 'grid';
+
+    filtered.forEach(function (it) {
+        const card = document.createElement('div');
+        card.className = 'inv-item';
+        card.innerHTML =
+            '<div class="inv-item-icon">' + invIcon(it.category) + '</div>' +
+            '<div class="inv-item-name">' + hudEsc(it.name) + '</div>' +
+            '<div class="inv-item-qty">x' + hudEsc(String(it.quantity)) + '</div>' +
+            '<button class="inv-use-btn" data-code="' + (it.item_code|0) + '"' +
+            (invUsing !== null ? ' disabled' : '') + '>Benutzen</button>';
+
+        card.querySelector('.inv-use-btn').addEventListener('click', function (e) {
+            e.stopPropagation();
+            hudInvUse(it.item_code, card.querySelector('.inv-use-btn'));
+        });
+
+        invGridEl.appendChild(card);
+    });
+}
+
+async function hudInvUse(itemCode, btn) {
+    if (invUsing !== null) return;
+    invUsing     = itemCode;
+    btn.disabled = true;
+    btn.textContent = '...';
+
+    try {
+        const res  = await fetch('/api/inventory/use', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': HUD_CSRF },
+            body:    JSON.stringify({ item_code: itemCode, quantity: 1 }),
+        });
+        const json = await res.json();
+        if (json.ok) {
+            invShowToast('Verwendet!', 'ok');
+            // Reload inventory
+            invLoaded = false;
+            await hudInvLoad();
+        } else {
+            invShowToast(json.message ?? json.error ?? 'Fehler', 'err');
+            btn.disabled    = false;
+            btn.textContent = 'Benutzen';
+        }
+    } catch {
+        invShowToast('Netzwerkfehler', 'err');
+        btn.disabled    = false;
+        btn.textContent = 'Benutzen';
+    }
+
+    invUsing = null;
+}
+
+async function hudInvLoad() {
+    if (invLoaded) {
+        invRender();
+        return;
+    }
+    invLoadingEl.style.display = 'block';
+    invGridEl.style.display    = 'none';
+    invEmptyEl.style.display   = 'none';
+
+    try {
+        const res  = await fetch('/api/inventory');
+        const json = await res.json();
+        if (json.ok && Array.isArray(json.data.items)) {
+            invItems  = json.data.items.filter(function (it) { return it.quantity > 0; });
+            invLoaded = true;
+        }
+    } catch { /* silent */ }
+
+    invLoadingEl.style.display = 'none';
+    invRender();
+}
 
 window.hudOpenInventory = function () {
     inventoryModal.style.display = 'flex';
+    hudInvLoad();
 };
 
 window.hudCloseInventory = function () {
@@ -1476,12 +1869,11 @@ window.hudCloseInventory = function () {
 };
 
 window.hudInvTab = function (tab) {
+    invTab = tab;
     document.querySelectorAll('#hud-inventory-modal .hud-tab-btn').forEach(function (b) {
         b.classList.toggle('hud-tab-active', b.dataset.invtab === tab);
     });
-    document.querySelectorAll('#hud-inventory-modal .hud-tab-content').forEach(function (c) {
-        c.classList.toggle('hud-tab-visible', c.id === 'hud-invtab-' + tab);
-    });
+    invRender();
 };
 
 // Close inventory modal when clicking the backdrop

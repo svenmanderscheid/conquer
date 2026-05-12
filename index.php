@@ -255,12 +255,14 @@ if (preg_match('#^/auth/(google|discord)/callback$#', $path, $m)) {
         $oauth    = new \Conquer\Auth\OAuth(\Conquer\Bootstrap::getConfig()['oauth'] ?? []);
         $playerId = $oauth->handleCallback($provider, $code, $state);
 
+        // Destroy any previous session before creating the new one.
+        \Conquer\Auth\Session::destroy();
         \Conquer\Auth\Session::create(
             $playerId,
             $_SERVER['REMOTE_ADDR'] ?? '',
             $_SERVER['HTTP_USER_AGENT'] ?? '',
         );
-        header('Location: /');
+        header('Location: ' . APP_BASE . '/city');
     } catch (\Throwable $e) {
         \Conquer\Logger::getInstance()->error('OAuth callback failed: ' . $e->getMessage());
         header('Location: /?auth_error=failed');

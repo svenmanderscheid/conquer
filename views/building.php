@@ -2420,11 +2420,13 @@ function treasureApp() {
             try {
                 const r = await fetch('/api/treasure/equip', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-Token': <?= json_encode($session['csrf_token'] ?? '') ?>,
+                    },
                     body: JSON.stringify({
                         treasure_code: this.selectedTreasure.treasure_code,
                         slot,
-                        csrf_token: <?= json_encode($session['csrf_token'] ?? '') ?>,
                     }),
                 });
                 const j = await r.json();
@@ -2444,10 +2446,12 @@ function treasureApp() {
             try {
                 const r = await fetch('/api/treasure/unequip', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-Token': <?= json_encode($session['csrf_token'] ?? '') ?>,
+                    },
                     body: JSON.stringify({
                         treasure_code: this.selectedTreasure.treasure_code,
-                        csrf_token: <?= json_encode($session['csrf_token'] ?? '') ?>,
                     }),
                 });
                 const j = await r.json();
@@ -2462,11 +2466,11 @@ function treasureApp() {
             try {
                 const r = await fetch('/api/treasure/open-chest', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        chest_type: type,
-                        csrf_token: <?= json_encode($session['csrf_token'] ?? '') ?>,
-                    }),
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-Token': <?= json_encode($session['csrf_token'] ?? '') ?>,
+                    },
+                    body: JSON.stringify({ chest_type: type }),
                 });
                 const j = await r.json();
                 if (j.ok) {
@@ -2502,7 +2506,7 @@ function caravanApp() {
                 const json = await res.json();
 
                 if (!json.ok) {
-                    this.error = json.error?.message ?? json.error?.code ?? 'Ladefehler';
+                    this.error = json.message ?? json.error ?? 'Ladefehler';
                     return;
                 }
 
@@ -2537,7 +2541,9 @@ function caravanApp() {
                     if (idx !== -1) this.slots[idx].bought = true;
                     this._toast(json.data.slot.label + ' gekauft!', 'ok');
                 } else {
-                    this._toast(json.error?.message ?? json.error?.code ?? 'Kauf fehlgeschlagen', 'err');
+                    // API returns { ok: false, error: "CODE", message: "..." }
+                    // json.error is a string (the error code), json.message is the human text.
+                    this._toast(json.message ?? json.error ?? 'Kauf fehlgeschlagen', 'err');
                 }
             } catch (e) {
                 this._toast('Netzwerkfehler', 'err');
