@@ -489,6 +489,7 @@ foreach ($troopQueue as $tq) {
             overflow-y: auto;
             padding: 60px 8px 20px;
             backdrop-filter: blur(2px);
+            animation: overlay-fade-in 0.18s ease;
         }
         #bldg-wrap {
             width: 100%;
@@ -499,6 +500,7 @@ foreach ($troopQueue as $tq) {
             border-radius: 12px;
             box-shadow: 0 24px 80px var(--c-shadow, rgba(139,90,43,0.18)), 0 0 0 1px var(--c-border, rgba(139,90,43,0.35));
             background: var(--c-panel, #f4e4c1);
+            animation: modal-slide-in 0.22s cubic-bezier(0.34, 1.3, 0.64, 1);
         }
     </style>
 </head>

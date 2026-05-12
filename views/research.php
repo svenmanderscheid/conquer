@@ -668,6 +668,7 @@ $isEmbed = isset($_GET['embed']);
             justify-content: center;
             z-index: 5000;
             backdrop-filter: blur(2px);
+            animation: overlay-fade-in 0.18s ease;
         }
         .rm-card {
             background: var(--c-panel, #f4e4c1);
@@ -680,6 +681,7 @@ $isEmbed = isset($_GET['embed']);
             flex-direction: column;
             overflow: hidden;
             color: var(--c-text, #4a3520);
+            animation: modal-slide-in 0.22s cubic-bezier(0.34, 1.3, 0.64, 1);
         }
         .rm-header {
             background: var(--c-panel3, #e8d8b0);

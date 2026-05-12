@@ -454,6 +454,7 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
     display: flex;
     align-items: stretch;
     justify-content: center;
+    animation: overlay-fade-in 0.18s ease;
 }
 
 .hud-modal-inner {
@@ -463,6 +464,7 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    animation: modal-slide-in 0.22s cubic-bezier(0.34, 1.3, 0.64, 1);
 }
 
 .hud-modal-topbar {
@@ -989,6 +991,11 @@ try {
 
 #hud-chat-modal.hud-chat-modal-open {
     display: flex;
+    animation: overlay-fade-in 0.18s ease;
+}
+
+#hud-chat-modal.hud-chat-modal-open #hud-chat-modal-box {
+    animation: modal-slide-in 0.22s cubic-bezier(0.34, 1.3, 0.64, 1);
 }
 
 #hud-chat-modal-box {

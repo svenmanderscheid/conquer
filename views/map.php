@@ -199,12 +199,14 @@ declare(strict_types=1);
             background: rgba(74,53,32,0.6);
             backdrop-filter: blur(3px);
             display: flex; align-items: center; justify-content: center;
+            animation: overlay-fade-in 0.18s ease;
         }
         .modal-box {
             background: #f4e4c1; border: 1px solid rgba(139,90,43,0.4);
             border-radius: 12px; padding: 1.5rem;
             width: 380px; max-width: 95vw; max-height: 90vh; overflow-y: auto;
             box-shadow: 0 3px 12px rgba(139,90,43,0.18);
+            animation: modal-slide-in 0.22s cubic-bezier(0.34, 1.3, 0.64, 1);
         }
         .modal-title { font-size: 1rem; font-weight: 800; margin-bottom: 1rem; color: #8b5a2b; letter-spacing: 0.04em; }
         .modal-sub   { font-size: 0.68rem; color: #8b6f47; text-transform: uppercase;
@@ -257,6 +259,7 @@ declare(strict_types=1);
             position: fixed; inset: 0; z-index: 300;
             background: rgba(74,53,32,0.6);
             display: flex; align-items: center; justify-content: center;
+            animation: overlay-fade-in 0.18s ease;
         }
         .atk-dialog {
             display: flex; width: 90vw; max-width: 900px;
@@ -264,6 +267,7 @@ declare(strict_types=1);
             border-radius: 12px; overflow: hidden;
             box-shadow: 0 3px 12px rgba(139,90,43,0.18);
             position: relative;
+            animation: modal-slide-in 0.22s cubic-bezier(0.34, 1.3, 0.64, 1);
         }
         .atk-back {
             position: absolute; top: 10px; left: 10px; z-index: 10;
