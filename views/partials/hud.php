@@ -381,11 +381,12 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
     justify-content: flex-end;
     align-items: flex-end;
     gap: 8px;
-    pointer-events: all;
+    pointer-events: none;
 }
 
 /* Action bar panel wrapping all nav buttons */
 #hud-action-bar {
+    pointer-events: all;
     display: flex;
     gap: 6px;
     align-items: flex-end;
@@ -1228,6 +1229,7 @@ try {
 (function () {
 'use strict';
 
+const HUD_APP_BASE    = <?= json_encode(APP_BASE) ?>;
 const HUD_CHAT_CSRF   = <?= json_encode((string) ($session['csrf_token'] ?? '')) ?>;
 const HUD_IN_ALLIANCE = <?= $_hud_in_alliance ? 'true' : 'false' ?>;
 
@@ -1303,10 +1305,10 @@ async function hudChatLoad(poll) {
     let url;
     if (hudChatTab === 'world') {
         const sid = poll && hudChatLastId > 0 ? '?since_id=' + hudChatLastId : '';
-        url = '/api/chat/world' + sid;
+        url = HUD_APP_BASE + '/api/chat/world' + sid;
     } else {
         const sid = poll && hudChatAliLastId > 0 ? '?since_id=' + hudChatAliLastId : '';
-        url = '/api/chat/alliance' + sid;
+        url = HUD_APP_BASE + '/api/chat/alliance' + sid;
     }
 
     try {
@@ -1364,7 +1366,7 @@ window.hudChatSend = async function () {
     hudChatSending   = true;
     sendBtn.disabled = true;
 
-    const url = hudChatTab === 'world' ? '/api/chat/world' : '/api/chat/alliance';
+    const url = HUD_APP_BASE + (hudChatTab === 'world' ? '/api/chat/world' : '/api/chat/alliance');
 
     try {
         const res  = await fetch(url, {

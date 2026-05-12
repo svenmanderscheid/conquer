@@ -119,7 +119,7 @@ const ConquerMap = (() => {
     let onTileInfo, onHover;
 
     // Camera (world-pixel coords of top-left corner of canvas)
-    let camX = 0, camY = 0, zoomIdx = 1; // default 2×
+    let camX = 0, camY = 0, zoomIdx = 0; // default 1×
 
     // Drag state
     let dragging = false, dragSX = 0, dragSY = 0, dragCX = 0, dragCY = 0, didDrag = false;

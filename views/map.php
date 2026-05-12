@@ -1397,7 +1397,7 @@ const MY_PLAYER_ID = <?= json_encode((int) $session['player_id']) ?>;
 
 function mapApp() {
     return {
-        zoom:         2,
+        zoom:         1,
         myCity:       null,
         myAllianceId: null,
         tileInfo:     null,
