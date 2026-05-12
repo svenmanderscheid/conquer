@@ -363,7 +363,7 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
     flex-shrink: 0;
 }
 
-/* ── BOTTOM NAV ──────────────────────────────────────────────────────────── */
+/* ── BOTTOM NAV / ACTION BAR (bottom-right) ──────────────────────────────── */
 #hud-bottom {
     position: fixed;
     bottom: 0;
@@ -384,19 +384,31 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
     pointer-events: all;
 }
 
+/* Action bar panel wrapping all nav buttons */
+#hud-action-bar {
+    display: flex;
+    gap: 6px;
+    align-items: flex-end;
+    background: rgba(74,53,32,0.72);
+    border: 1px solid var(--c-border);
+    border-radius: 14px 14px 0 0;
+    padding: 8px 10px 0;
+    box-shadow: 0 -2px 12px rgba(74,53,32,0.3);
+}
+
 .hud-nav-btn {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 3px;
-    width: 58px;
-    height: 58px;
+    width: 60px;
+    height: 60px;
     padding: 6px 4px;
-    background: linear-gradient(180deg, #c9925a, #9a6535);
-    border: none;
-    border-bottom: 3px solid #6b4120;
-    border-radius: 10px;
+    background: rgba(244,228,193,0.12);
+    border: 1px solid rgba(244,228,193,0.22);
+    border-bottom: none;
+    border-radius: 10px 10px 0 0;
     color: #fff8ec;
     font-size: 0.58rem;
     font-weight: 700;
@@ -405,29 +417,31 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
     cursor: pointer;
     text-decoration: none;
     box-shadow: 0 2px 10px var(--c-shadow);
-    transition: filter 0.15s, background 0.15s;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
     position: relative;
     -webkit-tap-highlight-color: transparent;
 }
 
 .hud-nav-btn:hover {
-    filter: brightness(1.1);
+    background: rgba(192,136,88,0.35);
+    border-color: var(--c-gold);
+    color: var(--c-gold);
     text-decoration: none;
-    color: #fff8ec;
 }
 
 .hud-nav-btn .hud-nav-icon {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     line-height: 1;
 }
 
 .hud-nav-primary {
-    background: linear-gradient(180deg, #d4a070, #a06830);
-    border-bottom: 3px solid #6b4120;
+    background: rgba(201,146,90,0.3);
+    border-color: rgba(201,146,90,0.5);
 }
 
 .hud-nav-primary:hover {
-    filter: brightness(1.1);
+    background: rgba(201,146,90,0.5);
+    border-color: var(--c-gold);
 }
 
 .hud-nav-badge {
@@ -842,28 +856,34 @@ $_hud_grade_colors_json = json_encode($_hud_grade_colors, JSON_HEX_TAG);
     <?php endif ?>
 </div>
 
-<!-- ── BOTTOM NAV ─────────────────────────────────────────────────────────── -->
+<!-- ── BOTTOM NAV / ACTION BAR (bottom-right, LoK style) ─────────────────── -->
 <div id="hud-bottom">
 <div id="hud-bottom-inner">
-    <button onclick="hudOpenInventory()" class="hud-nav-btn" title="Inventory">
-        <span class="hud-nav-icon">&#x1F4E6;</span>
-        <span>Inventory</span>
-    </button>
-    <a href="/alliance" class="hud-nav-btn" title="Allianz">
-        <span class="hud-nav-icon">&#x2694;</span>
-        <span>Allianz</span>
-    </a>
-    <button onclick="hudOpenMessages()" class="hud-nav-btn hud-nav-messages" title="Nachrichten">
-        <span class="hud-nav-icon">&#x2709;</span>
-        <span>Nachrichten</span>
-        <?php if ($_hud_unread > 0): ?>
-            <span class="hud-nav-badge"><?= $_hud_unread ?></span>
-        <?php endif ?>
-    </button>
-    <a href="<?= $_hud_toggle_href ?>" class="hud-nav-btn hud-nav-primary" title="<?= htmlspecialchars($_hud_toggle_label) ?>">
-        <span class="hud-nav-icon"><?= $_hud_toggle_icon ?></span>
-        <span><?= htmlspecialchars($_hud_toggle_label) ?></span>
-    </a>
+    <div id="hud-action-bar">
+        <button onclick="hudOpenQuestLog()" class="hud-nav-btn" title="Quests">
+            <span class="hud-nav-icon">&#x1F3AF;</span>
+            <span>Quest</span>
+        </button>
+        <button onclick="hudOpenInventory()" class="hud-nav-btn" title="Inventory">
+            <span class="hud-nav-icon">&#x1F392;</span>
+            <span>Inv</span>
+        </button>
+        <button onclick="hudOpenMessages()" class="hud-nav-btn hud-nav-messages" title="Nachrichten">
+            <span class="hud-nav-icon">&#x1F4DC;</span>
+            <span>Berichte</span>
+            <?php if ($_hud_unread > 0): ?>
+                <span class="hud-nav-badge"><?= $_hud_unread ?></span>
+            <?php endif ?>
+        </button>
+        <a href="/alliance" class="hud-nav-btn" title="Allianz">
+            <span class="hud-nav-icon">&#x269C;</span>
+            <span>Allianz</span>
+        </a>
+        <a href="<?= $_hud_toggle_href ?>" class="hud-nav-btn hud-nav-primary" title="<?= htmlspecialchars($_hud_toggle_label) ?>">
+            <span class="hud-nav-icon"><?= $_hud_toggle_icon ?></span>
+            <span><?= htmlspecialchars($_hud_toggle_label) ?></span>
+        </a>
+    </div>
 </div>
 </div>
 
@@ -1889,6 +1909,11 @@ inventoryModal.addEventListener('click', function (e) {
         hudCloseInventory();
     }
 });
+
+// ── Quest log (stub — Sprint 5+) ───────────────────────────────────────────
+window.hudOpenQuestLog = function () {
+    alert('Quest-Log kommt in Sprint 5!');
+};
 
 // ── Utility ────────────────────────────────────────────────────────────────
 function hudEsc(str) {
