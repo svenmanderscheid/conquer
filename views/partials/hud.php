@@ -1475,6 +1475,22 @@ function hudChatEsc(str) {
 
 <!-- ── INVENTORY MODAL ─────────────────────────────────────────────────────── -->
 <style>
+/* ── Inventory modal — opaque centered float ─────────────────────────────── */
+#hud-inventory-modal {
+    background: rgba(30, 20, 10, 0.82);
+    align-items: center;
+}
+
+#hud-inventory-modal .hud-modal-inner {
+    background: #f4e4c1;
+    border: 2px solid var(--c-border);
+    box-shadow: 0 12px 48px rgba(30,20,10,0.55), 0 4px 16px rgba(139,90,43,0.25);
+}
+
+#hud-inv-body {
+    background: #f4e4c1;
+}
+
 /* ── Inventory modal extras ──────────────────────────────────────────────── */
 .inv-grid {
     display: grid;
@@ -1588,7 +1604,7 @@ function hudChatEsc(str) {
 .inv-toast.inv-toast-show { opacity: 1; }
 </style>
 
-<div id="hud-inventory-modal" class="hud-modal" style="display:none">
+<div id="hud-inventory-modal" class="hud-modal" style="display:none;align-items:center">
     <div class="hud-modal-inner" style="max-width:760px;margin:auto;height:auto;max-height:80vh;border-radius:14px;position:relative;">
         <div class="hud-modal-topbar">
             <span class="hud-modal-title">&#x1F4E6; Inventar</span>
