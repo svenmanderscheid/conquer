@@ -8,7 +8,7 @@ final class AdminController
 {
     public static function loginPage(): void
     {
-        if(AdminAuth::isLoggedIn()){header('Location: '.APP_BASE.'/admin');exit;}
+        if(AdminAuth::isLoggedIn()){header('Location: '.APP_BASE.(AdminAuth::mustChangePassword()?'/admin/change-password':'/admin'));exit;}
         $csrf=self::getCsrfToken();$error='';require ROOT_DIR.'/views/admin/login.php';
     }
     public static function loginPost(): void
@@ -18,12 +18,34 @@ final class AdminController
         if(!is_string($token)||!hash_equals($csrf,$token))$error='Ungültige Anfrage. Bitte lade die Seite neu.';
         else try {
             $user=$_POST['username']??'';$password=$_POST['password']??'';
-            if(is_string($user)&&is_string($password)&&AdminAuth::login(trim($user),$password)){header('Location: '.APP_BASE.'/admin');exit;}
+            if(is_string($user)&&is_string($password)&&AdminAuth::login(trim($user),$password)){header('Location: '.APP_BASE.(AdminAuth::mustChangePassword()?'/admin/change-password':'/admin'));exit;}
             $error='Ungültiger Benutzername oder Passwort.';
         }catch(\RuntimeException $e){$error='Anmeldung nicht möglich. Bitte versuche es später erneut.';}
         require ROOT_DIR.'/views/admin/login.php';
     }
     public static function logout(): void {AdminAuth::logout();}
+    public static function changePasswordPage(): void
+    {
+        $admin=AdminAuth::current();
+        if($admin===null){header('Location: '.APP_BASE.'/admin/login');exit;}
+        if(!AdminAuth::mustChangePassword()){header('Location: '.APP_BASE.'/admin');exit;}
+        $csrf=self::getCsrfToken();$error='';require ROOT_DIR.'/views/admin/change_password.php';
+    }
+    public static function changePasswordPost(): void
+    {
+        $admin=AdminAuth::current();
+        if($admin===null){header('Location: '.APP_BASE.'/admin/login');exit;}
+        $csrf=self::getCsrfToken();$error='';$token=$_POST['csrf_token']??'';
+        if(!is_string($token)||!hash_equals($csrf,$token))$error='Ungültige Anfrage. Bitte lade die Seite neu.';
+        else {
+            $current=$_POST['current_password']??'';$new=$_POST['new_password']??'';$confirm=$_POST['confirm_password']??'';
+            if(!is_string($current)||!is_string($new)||!is_string($confirm))$error='Ungültige Passwortangaben.';
+            elseif($new!==$confirm)$error='Die beiden neuen Passwörter stimmen nicht überein.';
+            else try{AdminAuth::changeRequiredPassword($current,$new);$_SESSION['admin_flash']='Dein Passwort wurde geändert.';$_SESSION['admin_flash_kind']='success';header('Location: '.APP_BASE.'/admin',true,303);exit;}
+            catch(\DomainException $e){$error=$e->getMessage();}
+        }
+        require ROOT_DIR.'/views/admin/change_password.php';
+    }
     public static function dashboard(): void {self::render('dashboard','Übersicht');}
     public static function rewards(): void {self::render('rewards','Beute & Drops');}
     public static function lands(): void {self::render('lands','Länder & Entwicklung');}

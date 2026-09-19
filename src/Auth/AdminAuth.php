@@ -41,7 +41,7 @@ final class AdminAuth
 
         $db  = Connection::getInstance();
         $row = $db->query(
-            'SELECT id, username, password_hash, role FROM admin_users WHERE username = ? LIMIT 1',
+            'SELECT id, username, password_hash, role, must_change_password FROM admin_users WHERE username = ? LIMIT 1',
             [$username],
         )->fetch();
 
@@ -62,6 +62,7 @@ final class AdminAuth
             'id'       => (int) $row['id'],
             'username' => $row['username'],
             'role'     => $row['role'],
+            'must_change_password' => (bool) $row['must_change_password'],
         ];
 
         self::log((int) $row['id'], 'admin.login');
@@ -111,7 +112,13 @@ final class AdminAuth
             exit;
         }
 
-        return $_SESSION[self::SESSION_KEY];
+        $admin = $_SESSION[self::SESSION_KEY];
+        if (!empty($admin['must_change_password'])) {
+            header('Location: ' . APP_BASE . '/admin/change-password');
+            exit;
+        }
+
+        return $admin;
     }
 
     /**
@@ -122,6 +129,38 @@ final class AdminAuth
         return isset($_SESSION[self::SESSION_KEY])
             && is_array($_SESSION[self::SESSION_KEY])
             && !empty($_SESSION[self::SESSION_KEY]['id']);
+    }
+
+    /** Return the active session without applying the password-change redirect. */
+    public static function current(): ?array
+    {
+        return self::isLoggedIn() ? $_SESSION[self::SESSION_KEY] : null;
+    }
+
+    public static function mustChangePassword(): bool
+    {
+        return !empty($_SESSION[self::SESSION_KEY]['must_change_password']);
+    }
+
+    /** Replace an initial password and unlock the remaining admin area. */
+    public static function changeRequiredPassword(string $currentPassword, string $newPassword): void
+    {
+        $admin = self::current();
+        if ($admin === null) throw new \DomainException('Bitte melde dich erneut an.');
+        if (!self::mustChangePassword()) throw new \DomainException('Für dieses Konto ist kein Passwortwechsel erforderlich.');
+        if (strlen($newPassword) < 14 || strlen($newPassword) > 200) throw new \DomainException('Das neue Passwort muss mindestens 14 Zeichen lang sein.');
+        if (strcasecmp($newPassword, (string) $admin['username']) === 0) throw new \DomainException('Benutzername und Passwort dürfen nicht identisch sein.');
+
+        $db = Connection::getInstance();
+        $row = $db->query('SELECT password_hash FROM admin_users WHERE id = ? LIMIT 1', [(int) $admin['id']])->fetch();
+        if ($row === false || !password_verify($currentPassword, (string) $row['password_hash'])) throw new \DomainException('Das bisherige Passwort ist nicht korrekt.');
+        if (password_verify($newPassword, (string) $row['password_hash'])) throw new \DomainException('Wähle ein neues Passwort.');
+
+        $hash = password_hash($newPassword, PASSWORD_ARGON2ID);
+        $db->execute('UPDATE admin_users SET password_hash = ?, must_change_password = 0 WHERE id = ?', [$hash, (int) $admin['id']]);
+        $_SESSION[self::SESSION_KEY]['must_change_password'] = false;
+        session_regenerate_id(true);
+        self::log((int) $admin['id'], 'admin.password_changed');
     }
 
     // -------------------------------------------------------------------------
@@ -135,13 +174,14 @@ final class AdminAuth
         string $username,
         string $password,
         string $role = 'moderator',
+        bool $mustChangePassword = false,
     ): int {
         $hash = password_hash($password, PASSWORD_ARGON2ID);
 
         $db = Connection::getInstance();
         $db->execute(
-            'INSERT INTO admin_users (username, password_hash, role) VALUES (?, ?, ?)',
-            [$username, $hash, $role],
+            'INSERT INTO admin_users (username, password_hash, role, must_change_password) VALUES (?, ?, ?, ?)',
+            [$username, $hash, $role, $mustChangePassword ? 1 : 0],
         );
 
         return $db->lastInsertId();

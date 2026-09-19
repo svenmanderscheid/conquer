@@ -113,6 +113,10 @@ if (str_starts_with($_normalizedPath, '/admin')) {
             => \Conquer\Admin\AdminController::loginPage(),
         $adminUri === '/admin/login' && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST'
             => \Conquer\Admin\AdminController::loginPost(),
+        $adminUri === '/admin/change-password' && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET'
+            => \Conquer\Admin\AdminController::changePasswordPage(),
+        $adminUri === '/admin/change-password' && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST'
+            => \Conquer\Admin\AdminController::changePasswordPost(),
         $adminUri === '/admin/logout'
             => \Conquer\Admin\AdminController::logout(),
         $adminUri === '/admin' || $adminUri === '/admin/'

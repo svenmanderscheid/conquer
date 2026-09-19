@@ -6,7 +6,7 @@ declare(strict_types=1);
  * CLI helper — create an admin_users record.
  *
  * Usage (run from repo root):
- *   php bin/create_admin.php <username> <password> [superadmin|moderator]
+ *   php bin/create_admin.php <username> <password> [superadmin|moderator] [--must-change]
  *
  * Example:
  *   php bin/create_admin.php ekki secret123 superadmin
@@ -25,9 +25,10 @@ if (PHP_SAPI !== 'cli') {
 $username = $argv[1] ?? null;
 $password = $argv[2] ?? null;
 $role     = $argv[3] ?? 'moderator';
+$mustChange = in_array('--must-change', $argv, true);
 
 if ($username === null || $password === null) {
-    fwrite(STDERR, "Usage: php bin/create_admin.php <username> <password> [superadmin|moderator]\n");
+    fwrite(STDERR, "Usage: php bin/create_admin.php <username> <password> [superadmin|moderator] [--must-change]\n");
     exit(1);
 }
 
@@ -37,11 +38,12 @@ if (!in_array($role, ['superadmin', 'moderator'], true)) {
 }
 
 try {
-    $id = \Conquer\Auth\AdminAuth::createAdmin($username, $password, $role);
+    $id = \Conquer\Auth\AdminAuth::createAdmin($username, $password, $role, $mustChange);
     echo "Admin created successfully.\n";
     echo "  ID       : {$id}\n";
     echo "  Username : {$username}\n";
     echo "  Role     : {$role}\n";
+    echo "  Change   : " . ($mustChange ? 'required at first login' : 'not required') . "\n";
 } catch (\Throwable $e) {
     fwrite(STDERR, "Error: " . $e->getMessage() . "\n");
     exit(1);

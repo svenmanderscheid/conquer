@@ -43,6 +43,7 @@ final class FeatureDatabase
             }
             \Conquer\Db\MigrationSql::apply(\Conquer\Db\Connection::getInstance()->getPdo(), (string)file_get_contents(ROOT_DIR.'/migrations/0103_security_rate_limits.sql'));
             \Conquer\Db\MigrationSql::apply(\Conquer\Db\Connection::getInstance()->getPdo(), (string)file_get_contents(ROOT_DIR.'/migrations/0104_api_receipts_and_activity.sql'));
+            \Conquer\Db\MigrationSql::apply(\Conquer\Db\Connection::getInstance()->getPdo(), (string)file_get_contents(ROOT_DIR.'/migrations/0105_admin_password_change.sql'));
         }catch(\Throwable $e){$this->close();throw $e;}
     }
     public function close(): void
