@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Conquer\Game\Research;
 
+use Conquer\Game\World\WorldContext;
+
 use Conquer\Db\Connection;
 
 /**
@@ -17,8 +19,8 @@ use Conquer\Db\Connection;
  *   infantry_hp at Lv 3 (0.03) + troops_hp at Lv 2 (0.02) → infantry_hp total = 0.03,
  *   effectiveMultiplier uses both.
  *
- * Integer flat bonuses (march_size, hospital_capacity, etc.) are stored as int
- * sums; all percentage buffs are stored as float.
+ * Additional march slots are stored as int
+ * sums; army size, hospital capacity and other percentage buffs remain float.
  */
 final class BuffEngine
 {
@@ -29,9 +31,7 @@ final class BuffEngine
      * Anything not in this list is treated as a percentage (float).
      */
     private const FLAT_INT_STATS = [
-        'march_size'        => true,
         'march_limit'       => true,
-        'hospital_capacity' => true,
     ];
 
     // -------------------------------------------------------------------------
@@ -51,14 +51,11 @@ final class BuffEngine
      *
      * @return array<string, int|float>
      */
-    public static function getBuffs(int $playerId, int $worldId = 1): array
+    public static function getBuffs(int $playerId, ?int $worldId = null, ?int $coordX = null, ?int $coordY = null): array
     {
+        $worldId??=WorldContext::id();
         $result   = [];
         $research = self::loadPlayerResearch($playerId, $worldId);
-
-        if (empty($research)) {
-            return $result;
-        }
 
         foreach ($research as $code => $playerLevel) {
             if ($playerLevel <= 0) {
@@ -70,7 +67,7 @@ final class BuffEngine
                 continue;
             }
 
-            $buffKey = ResearchData::buffKey($node);
+            $buffKey = $code === 'march_limit' ? 'march_limit' : ResearchData::buffKey($node);
             if ($buffKey === '') {
                 // Unlock-type nodes produce no numeric buff.
                 continue;
@@ -103,7 +100,38 @@ final class BuffEngine
             }
         }
 
-        return $result;
+        $aliases = ['all_attack'=>'troops_atk', 'all_defense'=>'troops_def', 'all_hp'=>'troops_hp',
+            'infantry_attack'=>'infantry_atk', 'infantry_defense'=>'infantry_def',
+            'ranged_attack'=>'ranged_atk', 'cavalry_attack'=>'cavalry_atk'];
+        foreach (\Conquer\Game\Treasure\TreasureService::getEquippedStats($playerId, $worldId) as $key => $value) {
+            if (in_array($key, ['march_capacity','hospital_capacity'], true)) {
+                $result[$key.'_flat'] = ($result[$key.'_flat'] ?? 0) + (int)$value;
+                continue;
+            }
+            $key = $aliases[$key] ?? $key;
+            $result[$key] = ($result[$key] ?? 0.0) + (float) $value / 100;
+        }
+        $direct=array_values(array_unique(array_merge(\Conquer\Game\Kingdom\KingdomInventory::DIRECT_BOOSTS,array_keys(\Conquer\Game\Charm\CharmEffects::KEYS))));
+        $charms = Connection::getInstance()->query('SELECT stat_category,bonus_pct FROM player_charms_active WHERE player_id=? AND (source_map_charm_id IS NULL OR world_id=?) AND expires_at>UTC_TIMESTAMP() AND stat_category IN ('.implode(',',array_fill(0,count($direct),'?')).')',[$playerId,$worldId,...$direct])->fetchAll();
+        foreach ($charms as $charm) {
+            $key=\Conquer\Game\Charm\CharmEffects::key($charm['stat_category']);
+            $result[$key]=($result[$key]??0.0)+(float)$charm['bonus_pct']/100;
+        }
+        foreach (\Conquer\Game\Player\MasteryService::bonuses($playerId,$worldId) as $key=>$value) {
+            $result[$key]=($result[$key]??0)+$value;
+        }
+        foreach (\Conquer\Game\Community\CommunityService::bonuses($playerId,$worldId) as $key=>$value) {
+            $result[$key]=($result[$key]??0)+$value;
+        }
+        foreach (\Conquer\Game\Alliance\AllianceTerritoryService::bonusesAt($playerId,$worldId,$coordX,$coordY) as $key=>$value) {
+            $result[$key]=($result[$key]??0)+$value;
+        }
+        // Construction and production already receive VIP through CityState/ResourceTick.
+        // Research and training consume this shared map for both previews and real queues.
+        $vip=\Conquer\Game\Vip\VipService::status($playerId)['bonuses'];
+        $result['research_speed']=($result['research_speed']??0.0)+$vip['research_speed']/100;
+        $result['training_speed']=($result['training_speed']??0.0)+$vip['troop_training_speed']/100;
+        return ResearchEffects::normalize($result) + \Conquer\Game\City\BuildingProgression::forPlayer($playerId,$worldId);
     }
 
     /**

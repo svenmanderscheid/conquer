@@ -29,11 +29,12 @@ final class Session
         $token      = bin2hex(random_bytes(32));
         $csrfToken  = bin2hex(random_bytes(32));
         $expiresAt  = gmdate('Y-m-d H:i:s', time() + self::LIFETIME_SECS);
+        $activeWorld=(int)($db->query('SELECT world_id FROM cities WHERE player_id=? ORDER BY world_id LIMIT 1',[$playerId])->fetchColumn()?:1);
 
         $db->execute(
-            'INSERT INTO sessions (player_id, token, csrf_token, ip_address, user_agent, expires_at)
-             VALUES (?, ?, ?, ?, ?, ?)',
-            [$playerId, $token, $csrfToken, $ip, substr($userAgent, 0, 255), $expiresAt],
+            'INSERT INTO sessions (player_id, token, csrf_token, ip_address, user_agent, expires_at, active_world_id)
+             VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [$playerId, $token, $csrfToken, $ip, substr($userAgent, 0, 255), $expiresAt,$activeWorld],
         );
 
         self::setCookie($token, self::LIFETIME_SECS);
@@ -50,6 +51,7 @@ final class Session
             );
         }
         self::$current = null;
+        \Conquer\Game\World\WorldContext::bind(1);
         self::setCookie('', -1);
     }
 
@@ -76,7 +78,7 @@ final class Session
 
         $db  = Connection::getInstance();
         $row = $db->query(
-            'SELECT s.id, s.player_id, s.csrf_token, s.expires_at,
+            'SELECT s.id, s.player_id, s.csrf_token, s.expires_at,s.active_world_id,
                     p.username, p.is_banned, p.vip_level, p.gems
              FROM   sessions s
              JOIN   players  p ON p.id = s.player_id
@@ -93,6 +95,9 @@ final class Session
             self::destroy();
             return null;
         }
+        $owned=$db->query('SELECT id FROM cities WHERE player_id=? AND world_id=?',[$row['player_id'],$row['active_world_id']])->fetchColumn();
+        if(!$owned){$fallback=$db->query('SELECT world_id FROM cities WHERE player_id=? ORDER BY world_id LIMIT 1',[$row['player_id']])->fetchColumn();if($fallback){$row['active_world_id']=(int)$fallback;$db->execute('UPDATE sessions SET active_world_id=? WHERE id=?',[$fallback,$row['id']]);}}
+        \Conquer\Game\World\WorldContext::bind((int)$row['active_world_id'],(int)$row['player_id']);
 
         // Touch last_active — best-effort, no exception on failure
         try {
@@ -113,6 +118,13 @@ final class Session
         return self::current() !== null;
     }
 
+    /** The world service already persists and validates selection before updating the request cache. */
+    public static function setActiveWorld(int $worldId): void
+    {
+        if(self::$current!==null)self::$current['active_world_id']=$worldId;
+        \Conquer\Game\World\WorldContext::bind($worldId,self::$current===null?null:(int)self::$current['player_id']);
+    }
+
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
@@ -127,7 +139,7 @@ final class Session
         setcookie(self::COOKIE_NAME, $value, [
             'expires'  => time() + $maxAge,
             'path'     => '/',
-            'secure'   => ($_SERVER['HTTPS'] ?? '') !== '',
+            'secure'   => !empty($_SERVER['HTTPS']) && strtolower((string)$_SERVER['HTTPS']) !== 'off',
             'httponly' => true,
             'samesite' => 'Lax',
         ]);

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Prestigemedaille">
+<title>Prestigemedaille</title>
+<!-- Original code-native storybook item illustration. Value, quantity and rarity are rendered by the game UI. -->
+<g stroke="#493b33" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+<path d="M35 57 22 113 45 105 58 121 70 68Z" fill="#24559c" />
+<path d="M62 67 72 122 85 106 108 115 94 57Z" fill="#438fe4" />
+<circle cx="64" cy="57" r="46" fill="#e4af38" />
+<circle cx="64" cy="57" r="36" fill="#ffe07a" />
+<path d="M65 22V91C85 91 99 76 100 58 98 37 86 24 65 22" fill="#cf922d" stroke="none"/>
+<path d="M37 47 49 57 63 37 77 57 91 47 84 77H44Z" fill="#e4af38" />
+<path d="M44 74H84V84H44Z" fill="#b97925" />
+<circle cx="38" cy="44" r="4" fill="#fff6df" />
+<circle cx="64" cy="34" r="4" fill="#fff6df" />
+<circle cx="92" cy="44" r="4" fill="#fff6df" />
+<path d="M29 44C33 27 47 18 61 17" fill="none" stroke="#fff6df" stroke-width="4"/>
+</g>
+</svg>

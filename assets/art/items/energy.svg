@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Aktionspunkte-Trank">
+<title>Aktionspunkte-Trank</title>
+<!-- Original code-native storybook item illustration. Value, quantity and rarity are rendered by the game UI. -->
+<g stroke="#493b33" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+<path d="M48 9H80L82 28 92 40C104 52 110 75 104 96 99 111 83 118 63 118 43 118 28 110 23 96 17 75 24 52 36 40L46 28Z" fill="#6bc2d7" />
+<path d="M66 29V118C84 118 99 111 104 96 110 75 104 52 92 40L82 28H67Z" fill="#287f9f" stroke="none"/>
+<path d="M44 8 46 26H82L84 8Z" fill="#e4af38" />
+<path d="M51 13H76" fill="none" stroke="#fff6df" stroke-width="4"/>
+<path d="M62 31 39 75H60L51 110 89 60H68L78 31Z" fill="#e4af38" />
+<path d="M66 37 45 71H63L57 94 78 65H63L73 37Z" fill="#ffe07a" stroke="none"/>
+<path d="M35 49 29 67" fill="none" stroke="#dbffff" stroke-width="5"/>
+</g>
+</svg>

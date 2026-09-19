@@ -30,8 +30,8 @@ final class VipService
      * @var list<int>
      */
     private const THRESHOLDS = [
-        0,          // VIP 0  — no VIP (starting state)
-        200,        // VIP 1
+        0,          // VIP 0  — retained for legacy/corrupt-state recovery
+        200,        // VIP 1 — automatic starting state
         500,        // VIP 2
         1_000,      // VIP 3
         5_000,      // VIP 4
@@ -84,6 +84,7 @@ final class VipService
     ];
 
     private const MAX_LEVEL = 20;
+    public const DAILY_POINTS = 10;
 
     // -------------------------------------------------------------------------
     // Public API
@@ -137,7 +138,7 @@ final class VipService
         $db = Connection::getInstance();
 
         $row = $db->query(
-            'SELECT vip_points, vip_level FROM players WHERE id = ?',
+            'SELECT vip_points, vip_level, last_vip_login FROM players WHERE id = ?',
             [$playerId],
         )->fetch();
 
@@ -152,7 +153,7 @@ final class VipService
         }
 
         $points = (int) $row['vip_points'];
-        $level  = (int) $row['vip_level'];
+        $level  = self::levelForPoints($points);
 
         // Points to next level: threshold for level+1, or 0 if already at max
         $nextLevelPoints = ($level < self::MAX_LEVEL)
@@ -164,7 +165,29 @@ final class VipService
             'points'            => $points,
             'next_level_points' => $nextLevelPoints,
             'bonuses'           => self::bonuses($level),
+            'passive_bonuses'    => self::bonuses($level),
+            'level_points'      => self::THRESHOLDS[$level],
+            'points_remaining'  => max(0, $nextLevelPoints - $points),
+            'progress_points'   => $points - self::THRESHOLDS[$level],
+            'progress_required' => $level < self::MAX_LEVEL ? $nextLevelPoints - self::THRESHOLDS[$level] : 0,
+            'max_level'         => self::MAX_LEVEL,
+            'is_max'            => $level === self::MAX_LEVEL,
+            'next_bonuses'      => $level < self::MAX_LEVEL ? self::bonuses($level + 1) : null,
+            'building_slots'    => $level >= 4 ? 2 : 1,
+            'daily_points'      => self::DAILY_POINTS,
+            'daily_claimed'     => $row['last_vip_login'] === gmdate('Y-m-d'),
+            'daily_resets_at'   => gmdate('Y-m-d\T00:00:00\Z', strtotime('tomorrow UTC')),
+            'levels'            => self::levels(),
         ];
+    }
+
+    public static function levels(): array
+    {
+        $levels=[];
+        foreach(self::THRESHOLDS as $level=>$points) {
+            $levels[]=['level'=>$level,'points'=>$points,'bonuses'=>self::bonuses($level),'building_slots'=>$level>=4?2:1];
+        }
+        return $levels;
     }
 
     /**
@@ -175,31 +198,20 @@ final class VipService
     public static function dailyLogin(int $playerId): bool
     {
         $db = Connection::getInstance();
+        $claim=static function()use($db,$playerId):bool{
+            $row=$db->query('SELECT vip_points,last_vip_login FROM players WHERE id=? FOR UPDATE',[$playerId])->fetch();
+            if(!$row||($row['last_vip_login']!==null&&$row['last_vip_login']>=gmdate('Y-m-d')))return false;
+            self::addPoints($playerId,self::DAILY_POINTS);
+            $db->execute('UPDATE players SET last_vip_login=? WHERE id=?',[gmdate('Y-m-d'),$playerId]);
+            return true;
+        };
+        return $db->getPdo()->inTransaction()?$claim():$db->transaction($claim);
+    }
 
-        // Fetch current points first so we can compute the new level
-        $row = $db->query(
-            'SELECT vip_points FROM players WHERE id = ?',
-            [$playerId],
-        )->fetch();
-
-        if ($row === false) {
-            return false;
-        }
-
-        $newPoints = (int) $row['vip_points'] + 10;
-        $newLevel  = self::levelForPoints($newPoints);
-
-        $affected = $db->execute(
-            'UPDATE players
-             SET    vip_points    = vip_points + 10,
-                    vip_level     = ?,
-                    last_vip_login = CURDATE()
-             WHERE  id = ?
-               AND  (last_vip_login IS NULL OR last_vip_login < CURDATE())',
-            [$newLevel, $playerId],
-        );
-
-        return $affected > 0;
+    public static function claimDaily(int $playerId): array
+    {
+        if(!self::dailyLogin($playerId))throw new \DomainException('Deine täglichen VIP-Punkte wurden heute bereits abgeholt.');
+        return ['message'=>'+'.self::DAILY_POINTS.' VIP-Punkte erhalten.','points'=>self::DAILY_POINTS];
     }
 
     /**
@@ -214,25 +226,23 @@ final class VipService
 
         $db = Connection::getInstance();
 
-        // Fetch current total first so we can recalculate level
-        $row = $db->query(
-            'SELECT vip_points FROM players WHERE id = ?',
-            [$playerId],
-        )->fetch();
-
-        if ($row === false) {
-            return;
-        }
-
-        $newPoints = (int) $row['vip_points'] + $points;
-        $newLevel  = self::levelForPoints($newPoints);
-
-        $db->execute(
-            'UPDATE players
-             SET vip_points = vip_points + ?,
-                 vip_level  = ?
-             WHERE id = ?',
-            [$points, $newLevel, $playerId],
-        );
+        $credit=static function()use($db,$playerId,$points):void{
+            $row=$db->query('SELECT vip_points FROM players WHERE id=? FOR UPDATE',[$playerId])->fetch();
+            if(!$row)return;
+            $oldPoints=max(0,(int)$row['vip_points']);
+            // The legacy column is a signed INT. Keep earned totals without overflow.
+            $newPoints=$oldPoints+min($points,2147483647-$oldPoints);
+            $newLevel=self::levelForPoints($newPoints);
+            if($newLevel!==self::levelForPoints($oldPoints)) {
+                // Account-wide perks start now, never retroactively over offline production.
+                foreach($db->query('SELECT * FROM cities WHERE player_id=? ORDER BY id',[$playerId])->fetchAll() as $city) {
+                    $buildings=[];
+                    foreach($db->query('SELECT building_code,level FROM city_buildings WHERE city_id=?',[$city['id']])->fetchAll() as $building)$buildings[$building['building_code']]=['level'=>(int)$building['level']];
+                    \Conquer\Game\City\ResourceTick::persist($city,$buildings);
+                }
+            }
+            $db->execute('UPDATE players SET vip_points=?,vip_level=? WHERE id=?',[$newPoints,$newLevel,$playerId]);
+        };
+        if($db->getPdo()->inTransaction())$credit();else $db->transaction($credit);
     }
 }

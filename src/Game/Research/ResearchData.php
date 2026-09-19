@@ -82,6 +82,17 @@ final class ResearchData
         return self::$nodes;
     }
 
+    /** Historical definitions for settlement only; never available for research. */
+    public static function retiredTroopUnlocks(): array
+    {
+        static $nodes = null;
+        if ($nodes === null) {
+            $data = json_decode((string)file_get_contents(ROOT_DIR.'/data/retired-troop-research.json'), true, 512, JSON_THROW_ON_ERROR);
+            $nodes = array_column($data['nodes'], null, 'code');
+        }
+        return $nodes;
+    }
+
     /**
      * Short combat stats that, when appearing in the "general" category,
      * must be prefixed with "troops_" to form their buff key.
@@ -227,6 +238,11 @@ final class ResearchData
 
             $treeNodes = [];
             foreach ($data['nodes'] as $node) {
+                // IDs address persisted player levels. A collision must never silently
+                // replace one technology with another (both original trees had resource_protect).
+                if (isset(self::$nodes[$node['code']])) {
+                    throw new \RuntimeException('Duplicate research code: ' . $node['code']);
+                }
                 // Attach the tree name so callers know which tree a node belongs to.
                 $node['tree']               = $treeName;
                 self::$nodes[$node['code']] = $node;

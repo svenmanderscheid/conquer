@@ -9,6 +9,7 @@ use Conquer\Db\Connection;
 use Conquer\Game\Treasure\ChestService;
 use Conquer\Game\Treasure\TreasureData;
 use Conquer\Game\Treasure\TreasureService;
+use Conquer\Game\World\WorldContext;
 
 /**
  * Handles /api/treasure/* endpoints.
@@ -72,8 +73,8 @@ final class TreasureHandler
         self::requireCsrf($session);
 
         $body         = self::jsonBody();
-        $treasureCode = (int) ($body['treasure_code'] ?? 0);
-        $slot         = (int) ($body['slot']          ?? 0);
+        $treasureCode = self::integer($body, 'treasure_code');
+        $slot         = self::integer($body, 'slot');
 
         if ($treasureCode <= 0) {
             Response::error(400, 'MISSING_FIELD', 'treasure_code is required.');
@@ -100,37 +101,7 @@ final class TreasureHandler
         $ok = TreasureService::equipTreasure($playerId, $treasureCode, $slot, $treasureHouseLevel);
 
         if (!$ok) {
-            // Determine the specific failure reason for a helpful message.
-            $db  = Connection::getInstance();
-            $row = $db->query(
-                'SELECT fragments, equipped_slot FROM player_treasures
-                 WHERE  player_id = ? AND treasure_code = ?',
-                [$playerId, $treasureCode],
-            )->fetch();
-
-            if ($row === false) {
-                Response::error(404, 'TREASURE_NOT_OWNED', 'You do not own this treasure.');
-            }
-
-            $level = (int) floor((int) $row['fragments'] / 10);
-            if ($level < 1) {
-                Response::error(400, 'TREASURE_LOCKED',
-                    'Collect at least 10 fragments to unlock this treasure.');
-            }
-
-            // Check slot occupation.
-            $occupant = $db->query(
-                'SELECT treasure_code FROM player_treasures
-                 WHERE  player_id = ? AND equipped_slot = ? AND treasure_code != ?',
-                [$playerId, $slot, $treasureCode],
-            )->fetchColumn();
-
-            if ($occupant !== false) {
-                Response::error(409, 'SLOT_OCCUPIED',
-                    'Slot ' . $slot . ' is already occupied. Unequip the other treasure first.');
-            }
-
-            Response::error(500, 'EQUIP_FAILED', 'Failed to equip treasure.');
+            Response::error(400, 'TREASURE_LOCKED', 'Dieser Schatz ist noch nicht freigeschaltet oder der Platz ist gesperrt.');
         }
 
         $equippedStats = TreasureService::getEquippedStats($playerId);
@@ -158,7 +129,7 @@ final class TreasureHandler
         self::requireCsrf($session);
 
         $body         = self::jsonBody();
-        $treasureCode = (int) ($body['treasure_code'] ?? 0);
+        $treasureCode = self::integer($body, 'treasure_code');
 
         if ($treasureCode <= 0) {
             Response::error(400, 'MISSING_FIELD', 'treasure_code is required.');
@@ -219,45 +190,17 @@ final class TreasureHandler
             Response::error(400, 'INVALID_FIELD', 'chest_type must be silver, gold, or platinum.');
         }
 
-        $playerId    = (int) $session['player_id'];
-        $buyWithGems = (bool) ($body['buy_with_gems'] ?? false);
-
-        // For paid chests purchased with GEMS on-the-fly.
-        if ($buyWithGems && $chestType !== 'silver') {
-            $gemCost = $chestType === 'gold'
-                ? ChestService::GOLD_CHEST_COST_GEMS
-                : ChestService::PLATINUM_CHEST_COST_GEMS;
-
-            $db         = Connection::getInstance();
-            $playerGems = (int) ($session['gems'] ?? 0);
-
-            // Re-read gems from DB to ensure freshness.
-            $gemsRow = $db->query('SELECT gems FROM players WHERE id = ?', [$playerId])->fetchColumn();
-            $playerGems = $gemsRow !== false ? (int) $gemsRow : 0;
-
-            if ($playerGems < $gemCost) {
-                Response::error(400, 'NOT_ENOUGH_GEMS',
-                    'Need ' . $gemCost . ' GEMS to buy a ' . $chestType . ' chest, have ' . $playerGems . '.');
-            }
-
-            $db->transaction(function (Connection $db) use ($playerId, $gemCost, $chestType): void {
-                $db->execute('UPDATE players SET gems = gems - ? WHERE id = ?', [$gemCost, $playerId]);
-                ChestService::addChest($playerId, $chestType, 1);
-            });
-        }
-
-        // Open the chest (deducts from inventory or free uses).
-        try {
-            $rewards = ChestService::openChest($playerId, $chestType);
-        } catch (\RuntimeException $e) {
-            $msg = $e->getMessage();
-            match ($msg) {
-                'NO_SILVER_CHEST'   => Response::error(400, 'NO_CHEST', 'No silver chests available and all free opens used for today.'),
-                'NO_GOLD_CHEST'     => Response::error(400, 'NO_CHEST', 'No gold chests available. Use buy_with_gems=true to purchase one.'),
-                'NO_PLATINUM_CHEST' => Response::error(400, 'NO_CHEST', 'No platinum chests available. Use buy_with_gems=true to purchase one.'),
-                default             => Response::error(500, 'OPEN_FAILED', 'Failed to open chest: ' . $msg),
-            };
-        }
+        $playerId=(int)$session['player_id'];
+        $free=($body['free']??false)===true;
+        $buy=($body['buy_with_gems']??false)===true;
+          if($free&&$buy)Response::error(400,'INVALID_FIELD','Kostenlos öffnen und Kaufen sind getrennte Aktionen.');
+          try{
+            $open=static fn():array=>$free?ChestService::openFreeChest($playerId,$chestType):
+                ($buy?ChestService::purchaseAndOpenChest($playerId,$chestType):ChestService::openChest($playerId,$chestType));
+            $rewards=array_key_exists('operation_key',$body)
+                ? \Conquer\Game\Operation::run($playerId,array_replace($body,['action'=>'treasure.open','expected_world_id'=>WorldContext::id()]),$open)
+                : $open();
+        }catch(\DomainException $e){Response::error($e->getCode()===503?503:400,'CHEST_UNAVAILABLE',$e->getMessage());}
 
         // Return updated chest status alongside rewards.
         $status = ChestService::getChestStatus($playerId);
@@ -296,6 +239,7 @@ final class TreasureHandler
      */
     private static function requireCsrf(array $session): void
     {
+        WorldContext::assertActionAvailable();
         $supplied = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
         if ($supplied === '' || !hash_equals((string) $session['csrf_token'], $supplied)) {
             Response::error(403, 'CSRF_INVALID', 'CSRF token missing or invalid.');
@@ -314,7 +258,9 @@ final class TreasureHandler
         /** @var array<string, mixed>|null $decoded */
         $decoded = $raw !== '' ? json_decode($raw, true) : null;
 
-        return is_array($decoded) ? $decoded : [];
+        $body = is_array($decoded) ? $decoded : [];
+        WorldContext::current($body['expected_world_id'] ?? null);
+        return $body;
     }
 
     /**
@@ -322,23 +268,21 @@ final class TreasureHandler
      */
     private static function getTreasureHouseLevel(int $playerId): int
     {
-        $db = Connection::getInstance();
-
-        $level = $db->query(
-            'SELECT cb.level
-             FROM   city_buildings cb
-             JOIN   cities c ON c.id = cb.city_id
-             WHERE  c.player_id = ? AND cb.building_code = ?
-             LIMIT  1',
-            [$playerId, 'treasure_house'],
-        )->fetchColumn();
-
-        return $level !== false ? (int) $level : 1;
+        return TreasureService::houseLevel($playerId);
     }
 
     /**
      * Returns the minimum Treasure House level needed to unlock the given slot.
      */
+    private static function integer(array $body, string $key): int
+    {
+        $value=$body[$key]??null;
+        if ((!is_int($value)&&!is_string($value)) || filter_var($value,FILTER_VALIDATE_INT,['options'=>['min_range'=>1,'max_range'=>2147483647]])===false) {
+            Response::error(400,'INVALID_FIELD','Ungültiger Wert: '.$key);
+        }
+        return (int)$value;
+    }
+
     private static function slotRequiredLevel(int $slot): int
     {
         return match ($slot) {

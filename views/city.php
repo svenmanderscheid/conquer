@@ -82,6 +82,7 @@ foreach ($troopQueue as $tq) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Conquer — <?= htmlspecialchars($city['name']) ?></title>
+    <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR.'/assets/css/fantasy-fonts.css') ?>">
     <link rel="stylesheet" href="/assets/css/main.css">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -503,6 +504,7 @@ foreach ($troopQueue as $tq) {
             animation: modal-slide-in 0.22s cubic-bezier(0.34, 1.3, 0.64, 1);
         }
     </style>
+<link rel="stylesheet" href="<?= htmlspecialchars(APP_BASE, ENT_QUOTES) ?>/assets/css/village-theme.css?v=<?= filemtime(__DIR__ . "/../assets/css/village-theme.css") ?>">
 </head>
 <body>
 <?php $hudCurrentView = 'city'; require __DIR__ . '/partials/hud.php'; ?>

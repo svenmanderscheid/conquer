@@ -183,41 +183,15 @@ final class InventoryService
      */
     public static function useItem(int $playerId, int $cityId, int $itemCode, array $context = []): array
     {
-        $def = self::getItemDef($itemCode);
-
-        if ($def === null) {
-            return ['ok' => false, 'effect' => 'Unknown item.'];
+        try {
+            $owned = \Conquer\Game\World\WorldContext::city($playerId);
+            if ((int)$owned['id'] !== $cityId) throw new \DomainException('Diese Stadt gehört nicht zur aktiven Welt.');
+            $response = \Conquer\Game\Kingdom\KingdomService::action($playerId,
+                array_replace($context, ['action'=>'inventory.use','item_code'=>$itemCode,'quantity'=>1]));
+            return ['ok'=>true,'effect'=>$response['message']] + $response['result'];
+        } catch (\DomainException $e) {
+            return ['ok'=>false,'effect'=>$e->getMessage(),'status'=>in_array($e->getCode(),[403,409,503],true)?$e->getCode():400];
         }
-
-        // Verify possession before attempting to apply
-        $db  = Connection::getInstance();
-        $row = $db->query(
-            'SELECT quantity FROM player_inventory WHERE player_id = ? AND item_code = ?',
-            [$playerId, $itemCode],
-        )->fetch();
-
-        if ($row === false || (int) $row['quantity'] < 1) {
-            return ['ok' => false, 'effect' => 'Item not in inventory.'];
-        }
-
-        $category = (string) ($def['category'] ?? '');
-
-        $result = match ($category) {
-            'speedup'       => self::applySpeedup($playerId, $cityId, $def, $context),
-            'resource_pack' => self::applyResourcePack($playerId, $cityId, $def),
-            'boost'         => self::applyBoost($playerId, $def),
-            'ap_refill'     => self::applyApRefill($playerId, $def),
-            'chest'         => self::applyChest($playerId, $def),
-            'vip_point'     => self::applyVipPoint($playerId, $def),
-            default         => ['ok' => false, 'effect' => 'Unsupported item category: ' . $category],
-        };
-
-        // Only deduct the item if the application succeeded
-        if ($result['ok']) {
-            self::removeItems($playerId, $itemCode, 1);
-        }
-
-        return $result;
     }
 
     // -------------------------------------------------------------------------
@@ -248,7 +222,7 @@ final class InventoryService
         $queueId   = (int)   ($context['queue_id']   ?? 0);
 
         // Healing speed-ups target the hospital, not a queue row
-        if ($subcategory === 'healing') {
+        if ($subcategory === 'healing' || ($subcategory === 'generic' && $queueType === 'healing')) {
             return self::applyHealingSpeedup($cityId, $durationSeconds);
         }
 
@@ -346,7 +320,7 @@ final class InventoryService
             $affected = $db->execute(
                 'UPDATE hospital_wounded
                  SET    healing_ends_at = GREATEST(UTC_TIMESTAMP(), DATE_SUB(healing_ends_at, INTERVAL ? SECOND))
-                 WHERE  city_id = ?',
+                 WHERE  city_id = ? AND healing_count>0 AND healing_ends_at>UTC_TIMESTAMP()',
                 [$durationSeconds, $cityId],
             );
         } catch (\PDOException) {
@@ -627,6 +601,43 @@ final class InventoryService
         foreach ($items as $item) {
             $code = (int) ($item['code'] ?? 0);
             if ($code > 0) {
+                // Use the isolated artwork from the user-supplied inventory close-ups.
+                // Values, durations, counts and rarity frames remain live UI data.
+                $category=(string)($item['category']??'');
+                if ($category==='resource_pack' && in_array($item['resource']??'',['food','lumber','stone','gold','gems'],true)) {
+                    $resource=(string)$item['resource'];
+                    $name=$resource==='gems'&&(int)($item['amount']??0)>=100?'resource-gems-pile':'resource-'.$resource;
+                    $item['icon']='reference/'.$name.'.png';
+                    $item['icon_framed']=false;
+                } elseif ($category==='speedup') {
+                    $role=in_array($item['subcategory']??'',['building','research','training','healing'],true)?(string)$item['subcategory']:'generic';
+                    $item['icon']='reference/speedup-'.$role.'-v2.png';
+                    $item['icon_framed']=false;
+                } elseif ($category==='ap_refill') {
+                    $item['icon']='reference/action-points.png';$item['icon_framed']=false;
+                } elseif ($category==='vip_point') {
+                    $item['icon']='reference/vip-points.png';$item['icon_framed']=false;
+                } elseif ($category==='fragment_pack' && ($item['subcategory']??'')==='dragon_egg') {
+                    $egg=['rare'=>'green','epic'=>'red','legendary'=>'gold'][$item['rarity']??'']??null;
+                    if($egg!==null){$item['icon']='reference/dragon-egg-'.$egg.'.png';$item['icon_framed']=false;}
+                } elseif ($category==='fragment_pack' && in_array($item['rarity']??'',['normal','rare','epic','legendary'],true)) {
+                    $item['icon']='reference/fragment-'.$item['rarity'].'.png';$item['icon_framed']=false;
+                } elseif ($category==='teleport') {
+                    $item['icon_framed']=false;
+                }
+                if (($item['category'] ?? '') === 'material') {
+                    $building = ($item['subcategory'] ?? '') === 'building';
+                    $item['usage_context'] = $building ? 'building' : 'unavailable';
+                    $item['usage_hint'] = $building
+                        ? 'Baumaterial: Wird bei einem passenden Gebäudeausbau automatisch verbraucht.'
+                        : 'Für diesen Gegenstand ist noch keine Spielwirkung hinterlegt. Er bleibt sicher in deinem Inventar.';
+                } elseif (($item['category'] ?? '') === 'speedup') {
+                    $item['usage_context'] = 'queue';
+                    $item['usage_hint'] = 'Wähle einen passenden laufenden Auftrag. Ohne laufenden Auftrag bleibt der Beschleuniger erhalten.';
+                } else {
+                    $item['usage_context'] = 'direct';
+                    $item['usage_hint'] = (string)($item['description_de'] ?? $item['description'] ?? '');
+                }
                 self::$defs[$code] = $item;
             }
         }

@@ -1,0 +1,236 @@
+/* Interior materials from the supplied LOK references.
+   Geometry, pagination, controls and the common window shell remain in their owners. */
+body.mobile-game :is(#panel-dialog,#game-dialog) {
+  font-family:'Trebuchet MS','Segoe UI',sans-serif;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(h2,h3,h4,.stat-box strong) {
+  font-family:'Trebuchet MS','Segoe UI',sans-serif;
+  font-weight:700;
+  color:var(--popup-ink,#f5f7fc);
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.muted,.panel-heading p,.section-heading>span,.form-help,.loading p) {
+  color:var(--popup-muted,#adcae9);
+}
+
+/* Navy recessed blocks sit inside a flat painted slate window. */
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.panel,.game-card,.raid-card,.objective-card,.help-card,.help-details) {
+  background:var(--popup-inset,#1b293b);
+  border-color:var(--popup-line,#617189);
+  border-radius:5px;
+  box-shadow:inset 0 1px #7b8da333,0 1px 0 #0a142233;
+  color:var(--popup-ink,#f5f7fc);
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.game-card>p,.help-card p,.help-details p,.raid-card p,.objective-card p,.objective-card>small) {
+  color:var(--popup-muted,#adcae9);
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.detail-row,.setting-row,.log-entry,.troop-select-row) {
+  border-color:#8a9ab233;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.detail-row>span,.setting-row small,.log-entry,.troop-select-row small) {
+  color:var(--popup-muted,#adcae9);
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.detail-row strong,.setting-row strong,.troop-select-row strong) {
+  color:var(--popup-ink,#f5f7fc);
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.list-row,.report,.battle-unit,.confirmation-note) {
+  background:var(--popup-inset,#1b293b);
+  border-color:var(--popup-line,#617189);
+  border-radius:4px;
+  box-shadow:inset 0 1px #b3c7e018;
+  color:var(--popup-ink,#f5f7fc);
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.list-row p,.report small,.member-identity small,.confirmation-note) {
+  color:var(--popup-muted,#adcae9);
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) .member-identity img {
+  background:#263c59;
+  border-color:#9fb9d8;
+  box-shadow:0 0 0 1px #0b1625;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) .member-identity strong {
+  color:var(--popup-ink,#f5f7fc);
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.costs>span,.treasury>span) {
+  background:var(--popup-deep,#111c2b);
+  border-color:#667a96;
+  color:#ffea53;
+  box-shadow:inset 0 1px #07101b;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) .costs>span.insufficient {
+  background:#382433;
+  border-color:#c16d74;
+  color:#ff8075;
+}
+
+/* Numeric information uses bright values over a dark inset, without a wood grain. */
+body.mobile-game :is(#panel-dialog,#game-dialog) .stats-grid {
+  background:var(--popup-inset,#1b293b);
+  border-color:var(--popup-line,#617189);
+  box-shadow:inset 0 1px #08121f;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) .stat-box {
+  background:none;
+  border-color:#8198b533;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) .stat-box strong { color:#ffed54; }
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.stat-box small,.stat-box>span) { color:var(--popup-muted,#adcae9); }
+
+/* Heraldic colors belong to the banners, rather than every management panel. */
+body.mobile-game :is(#panel-dialog,#game-dialog) .profile-banner {
+  background:linear-gradient(135deg,#ffb63b 0 15%,#ff8b17 15% 54%,#ed530f 54% 82%,#ff9526 82%);
+  border-color:#ffdd53;
+  box-shadow:inset 0 0 0 3px #bd480b,inset 0 0 0 5px #ffd342;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) .profile-banner .portrait {
+  background:#18263c;
+  border-color:#ffe24a;
+  box-shadow:0 0 0 2px #b75b0a,0 2px 0 #6b3109;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) .profile-banner h2 {
+  color:#fff6dc;
+  text-shadow:0 2px #8e350d,1px 0 #8e350d,-1px 0 #8e350d;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) .profile-crown { color:#ffe45d; text-shadow:0 2px #ad4809; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .profile-data .detail-row {
+  background:linear-gradient(105deg,var(--popup-deep,#111c2b) 0 34%,#25334a 34%);
+  border-color:#485c75;
+  box-shadow:none;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) .profile-wallet { background:none; border-color:var(--popup-line,#617189); }
+body.mobile-game :is(#panel-dialog,#game-dialog) .profile-wallet>div {
+  background:var(--popup-inset,#1b293b);
+  border-color:#536981;
+  box-shadow:inset 0 1px #9db6d422;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) .profile-wallet small { color:var(--popup-muted,#adcae9); }
+body.mobile-game :is(#panel-dialog,#game-dialog) .profile-wallet strong { color:#ffea44; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .profile-wallet strong span { color:var(--popup-muted,#adcae9); }
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.profile-bio,.alliance-description) {
+  background:var(--popup-paper,#e7e8ec);
+  border-color:#afb8c8;
+  border-radius:4px;
+  color:#1b2635;
+  box-shadow:inset 0 1px #fff,0 1px 0 #101b2933;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) .alliance-banner {
+  background:linear-gradient(135deg,#536db5 0 16%,#304e94 16% 70%,#223b78 70%);
+  border-color:#b9c9e5;
+  box-shadow:inset 0 0 0 3px #172749,inset 0 0 0 4px #6d8aca;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) .alliance-banner .crest { color:#ffda48; text-shadow:0 3px #182347; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .alliance-banner h2 { color:var(--popup-ink,#f5f7fc); text-shadow:0 2px #13203c; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .alliance-banner .tag { color:#c2e0ff; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .avatar-choice { background:#253c5c; border-color:#6782a7; box-shadow:inset 0 1px #acc6e533; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .avatar-choice:has(input:checked) {
+  background:#364d91;
+  border-color:#acd8ff;
+  box-shadow:inset 0 0 0 2px #75a7df66;
+}
+
+/* Quest and achievement rows use the same slate vocabulary as the profile. */
+body.mobile-game :is(#panel-dialog,#game-dialog) .quest-row {
+  background:#24334b;
+  border-color:#5c7598;
+  border-left-color:#7d9bcf;
+  box-shadow:inset 0 1px #b6cbea22,0 1px 0 #111c2b;
+  color:var(--popup-ink,#f5f7fc);
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) .quest-row h3 { color:var(--popup-ink,#f5f7fc); }
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.quest-row p,.quest-progress>small) { color:var(--popup-muted,#adcae9); }
+body.mobile-game :is(#panel-dialog,#game-dialog) .quest-icon { color:#ffdf5b; text-shadow:0 2px #111b2d; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .quest-rewards { color:#ffe259; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .achievement {
+  background:var(--popup-inset,#1b293b);
+  border-color:#586d87;
+  color:var(--popup-ink,#f5f7fc);
+  box-shadow:inset 0 1px #a8bfd622;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) .achievement.unlocked { background:#2c4164; border-color:#8fb3ec; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .achievement.unlocked h3 { color:#fff2bb; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .achievement p { color:var(--popup-muted,#adcae9); }
+body.mobile-game :is(#panel-dialog,#game-dialog) .achievement>span { color:#ffdb4f; }
+
+/* Troops and rankings remain easy to compare in quiet inset rows. */
+body.mobile-game :is(#panel-dialog,#game-dialog) .army-unit {
+  background:var(--popup-inset,#1b293b);
+  border-color:#637b9c;
+  box-shadow:inset 0 1px #a1bbd422;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) .army-unit-portrait { border-color:#a4bedf; background:#2e4e78; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .unit-art { background:radial-gradient(ellipse,#6d95ca33,transparent 68%); }
+body.mobile-game :is(#panel-dialog,#game-dialog) .army-unit-copy h3 { color:var(--popup-ink,#f5f7fc); }
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.army-unit-copy>span,.army-unit-stats) { color:var(--popup-muted,#adcae9); }
+body.mobile-game :is(#panel-dialog,#game-dialog) .army-tier-tabs { border-color:var(--popup-line,#617189); }
+body.mobile-game :is(#panel-dialog,#game-dialog) .army-tier-tabs>button {
+  background:linear-gradient(#456aab 0 48%,#31528d 48%);
+  color:#ecf3ff;
+  border-color:#7a9bcb #203550 #101d32;
+  box-shadow:inset 0 1px #afcff355,0 2px 0 #0e192b;
+  text-shadow:0 1px #0d1a31;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) .army-tier-tabs>button.selected {
+  background:linear-gradient(#747dcc 0 48%,#4a4db6 48%);
+  border-color:#c4c6f0 #40428a #242454;
+  color:#fff;
+  box-shadow:inset 0 1px #dce7ff66,0 2px 0 #171941;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) .game-card.unit-locked { background:#283446; border-color:#5a6b82; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .unit-locked .badge { background:#253247; border-color:#657996; color:#b2c5df; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .unit-locked .card-top h3 { color:#c6d7ea; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .unit-requirements { background:#142339; border-color:#8096b7; color:#c7d9ef; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .unit-requirements .muted { color:var(--popup-muted,#adcae9); }
+body.mobile-game :is(#panel-dialog,#game-dialog) .ranking-table th { color:var(--popup-muted,#adcae9); }
+body.mobile-game :is(#panel-dialog,#game-dialog) .ranking-table td { background:#23334c; border-color:#5e7593; color:var(--popup-ink,#f5f7fc); }
+body.mobile-game :is(#panel-dialog,#game-dialog) .ranking-table td:first-child { color:#ffdf54; border-color:#5e7593; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .ranking-table td:last-child { color:#ffea59; border-color:#5e7593; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .ranking-table .self td { background:#374c79; border-color:#91b9ef; }
+
+/* The boss illustration supplies the warm color; the window itself stays slate. */
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.hero-expedition,.campaign-card) {
+  background:linear-gradient(115deg,#20314b 0 64%,#31465f 64%);
+  border-color:#849bbb;
+  box-shadow:inset 0 0 0 2px #142137,inset 0 3px #a5c1df22;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.hero-copy h2,.campaign-card h2,.raid-header h2) { color:var(--popup-ink,#f5f7fc); text-shadow:0 2px #0b172a; }
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.hero-copy p,.campaign-card p,.campaign-meta,.raid-header p,.boss-info p,.log-entry small) { color:var(--popup-muted,#adcae9); }
+body.mobile-game :is(#panel-dialog,#game-dialog) .hero-art:before { background:#4f7bb033; border-color:#87a5cc55; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .raid-coalition { color:#c5deff; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .raid-header { background:#25354e; border-color:#7792b8; box-shadow:inset 0 1px #adc5e233; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .raid-progress span { background:#17243a; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .raid-progress span.done { background:#57dbea; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .phase-step { background:#1b2a40; border-color:#546b8b; color:#aac4e4; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .phase-step.active { background:#454fb0; border-color:#9ea9f0; color:#fff; box-shadow:inset 0 1px #c2cbff66; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .phase-step.done { background:#254958; border-color:#4b9bab; color:#b4f3ec; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .objective-card>span { color:#ffdf66; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .boss-panel { background:#25334a; border-color:#8e9eb5; box-shadow:inset 0 1px #b1c3dd22; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .boss-info h3 { color:#ffdf76; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .health-caption { color:#ffc1b5; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .reward-box { background:#2c4164; border-color:#a3b8db; box-shadow:inset 0 0 0 2px #182b48,inset 0 3px #b3d1f533; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .reward-box h3 { color:#ffe46b; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .reward-box p { color:#c5dcf7; }
+
+/* Shared feedback remains semantic: blue information, amber warnings, green success. */
+body.mobile-game :is(#panel-dialog,#game-dialog) .empty { background:#25354a; border-color:#69819f; box-shadow:inset 0 1px #b1c6df22; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .empty h3 { color:var(--popup-ink,#f5f7fc); }
+body.mobile-game :is(#panel-dialog,#game-dialog) .empty p { color:var(--popup-muted,#adcae9); }
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.empty-icon,.card-icon,.help-card>span) { color:#c1d9f6; text-shadow:0 2px #10203a; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .help-details summary { color:#d9e9ff; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .notice { background:#263d59; border-color:#6d91b7; color:#d0e4ff; box-shadow:none; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .notice.blue { background:#234364; border-color:#6a9bc4; color:#c6e5ff; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .notice.warning { background:#423d38; border-color:#c8a75d; color:#ffe6a2; }
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.badge,.pill) {
+  background:var(--popup-deep,#111c2b);
+  border-color:#607895;
+  color:#ffe45b;
+  box-shadow:inset 0 1px #93aecb22;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) .badge.blue { background:#253f66; border-color:#729ed4; color:#c6e4ff; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .badge.green { background:#1d4145; border-color:#73b9a7; color:#b7f1cf; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .badge.muted { background:#29364b; border-color:#5b718e; color:#adc3dd; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .gold-text { color:#ffdf5b; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .eyebrow { color:#b3d2f5; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .success { color:#a3f39d; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .progress-track { background:#101d2f; border-color:#6782a5; box-shadow:inset 0 1px #030b14; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .progress-track>span { background:linear-gradient(#81b5ed 0 40%,#4acfe1 40%); }
+body.mobile-game :is(#panel-dialog,#game-dialog) .progress-track.green>span { background:linear-gradient(#d0f473 0 40%,#89cf35 40%); }
+body.mobile-game :is(#panel-dialog,#game-dialog) .progress-track.red>span { background:linear-gradient(#ffad8c 0 40%,#ed5949 40%); }

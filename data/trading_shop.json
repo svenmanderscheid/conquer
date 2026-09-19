@@ -1,0 +1,1015 @@
+{
+  "version": 1,
+  "caravan_hours": 8,
+  "weekly_reset": "Monday 00:00 UTC",
+  "vip": [
+    {
+      "id": "vip_01",
+      "vip_level": 1,
+      "item_code": 10106001,
+      "quantity": 1,
+      "limit": 10,
+      "price": {
+        "resource": "gems",
+        "amount": 50
+      },
+      "discount": 50,
+      "reference_total": 500
+    },
+    {
+      "id": "vip_02",
+      "vip_level": 1,
+      "item_code": 10103001,
+      "quantity": 1,
+      "limit": 50,
+      "price": {
+        "resource": "food",
+        "amount": 3000
+      },
+      "discount": 40,
+      "reference_total": 150000
+    },
+    {
+      "id": "vip_03",
+      "vip_level": 2,
+      "item_code": 10201004,
+      "quantity": 1,
+      "limit": 20,
+      "price": {
+        "resource": "gems",
+        "amount": 14
+      },
+      "discount": 80,
+      "reference_total": 280
+    },
+    {
+      "id": "vip_04",
+      "vip_level": 2,
+      "item_code": 10201011,
+      "quantity": 1,
+      "limit": 20,
+      "price": {
+        "resource": "gems",
+        "amount": 14
+      },
+      "discount": 80,
+      "reference_total": 280
+    },
+    {
+      "id": "vip_05",
+      "vip_level": 2,
+      "item_code": 10201019,
+      "quantity": 1,
+      "limit": 20,
+      "price": {
+        "resource": "gems",
+        "amount": 14
+      },
+      "discount": 80,
+      "reference_total": 280
+    },
+    {
+      "id": "vip_06",
+      "vip_level": 2,
+      "item_code": 10101032,
+      "quantity": 1,
+      "limit": 20,
+      "price": {
+        "resource": "gems",
+        "amount": 14
+      },
+      "discount": 80,
+      "reference_total": 280
+    },
+    {
+      "id": "vip_07",
+      "vip_level": 3,
+      "item_code": 10300001,
+      "quantity": 1,
+      "limit": 20,
+      "price": {
+        "resource": "food",
+        "amount": 10000
+      },
+      "discount": 50,
+      "reference_total": 200000
+    },
+    {
+      "id": "vip_08",
+      "vip_level": 3,
+      "item_code": 10202017,
+      "quantity": 1,
+      "limit": 5,
+      "price": {
+        "resource": "gems",
+        "amount": 100
+      },
+      "discount": 50,
+      "reference_total": 500
+    },
+    {
+      "id": "vip_09",
+      "vip_level": 3,
+      "item_code": 10202015,
+      "quantity": 1,
+      "limit": 5,
+      "price": {
+        "resource": "gems",
+        "amount": 100
+      },
+      "discount": 50,
+      "reference_total": 500
+    },
+    {
+      "id": "vip_10",
+      "vip_level": 3,
+      "item_code": 10202013,
+      "quantity": 1,
+      "limit": 5,
+      "price": {
+        "resource": "gems",
+        "amount": 100
+      },
+      "discount": 50,
+      "reference_total": 500
+    },
+    {
+      "id": "vip_11",
+      "vip_level": 3,
+      "item_code": 10202023,
+      "quantity": 1,
+      "limit": 5,
+      "price": {
+        "resource": "gems",
+        "amount": 100
+      },
+      "discount": 50,
+      "reference_total": 500
+    },
+    {
+      "id": "vip_12",
+      "vip_level": 4,
+      "item_code": 10206001,
+      "quantity": 1,
+      "limit": 30,
+      "price": {
+        "resource": "gold",
+        "amount": 5000
+      },
+      "discount": 50,
+      "reference_total": 150000
+    },
+    {
+      "id": "vip_13",
+      "vip_level": 4,
+      "item_code": 10104001,
+      "quantity": 1,
+      "limit": 20,
+      "price": {
+        "resource": "gems",
+        "amount": 50
+      },
+      "discount": 80,
+      "reference_total": 1000
+    },
+    {
+      "id": "vip_14",
+      "vip_level": 4,
+      "item_code": 10102011,
+      "quantity": 1,
+      "limit": 5,
+      "price": {
+        "resource": "gems",
+        "amount": 40
+      },
+      "discount": 80,
+      "reference_total": 200
+    },
+    {
+      "id": "vip_15",
+      "vip_level": 4,
+      "item_code": 10203003,
+      "quantity": 1,
+      "limit": 20,
+      "price": {
+        "resource": "gold",
+        "amount": 15000
+      },
+      "discount": 40,
+      "reference_total": 300000
+    },
+    {
+      "id": "vip_16",
+      "vip_level": 5,
+      "item_code": 10103003,
+      "quantity": 1,
+      "limit": 50,
+      "price": {
+        "resource": "gems",
+        "amount": 20
+      },
+      "discount": 50,
+      "reference_total": 1000
+    },
+    {
+      "id": "vip_17",
+      "vip_level": 5,
+      "item_code": 10103005,
+      "quantity": 1,
+      "limit": 20,
+      "price": {
+        "resource": "gems",
+        "amount": 100
+      },
+      "discount": 50,
+      "reference_total": 2000
+    },
+    {
+      "id": "vip_18",
+      "vip_level": 6,
+      "item_code": 10202001,
+      "quantity": 1,
+      "limit": 5,
+      "price": {
+        "resource": "gems",
+        "amount": 20
+      },
+      "discount": 80,
+      "reference_total": 100
+    },
+    {
+      "id": "vip_19",
+      "vip_level": 6,
+      "item_code": 10202003,
+      "quantity": 1,
+      "limit": 5,
+      "price": {
+        "resource": "gems",
+        "amount": 20
+      },
+      "discount": 80,
+      "reference_total": 100
+    },
+    {
+      "id": "vip_20",
+      "vip_level": 6,
+      "item_code": 10202005,
+      "quantity": 1,
+      "limit": 5,
+      "price": {
+        "resource": "gems",
+        "amount": 20
+      },
+      "discount": 80,
+      "reference_total": 100
+    },
+    {
+      "id": "vip_21",
+      "vip_level": 6,
+      "item_code": 10202007,
+      "quantity": 1,
+      "limit": 5,
+      "price": {
+        "resource": "gems",
+        "amount": 20
+      },
+      "discount": 80,
+      "reference_total": 100
+    },
+    {
+      "id": "vip_22",
+      "vip_level": 6,
+      "item_code": 10300003,
+      "quantity": 1,
+      "limit": 10,
+      "price": {
+        "resource": "gems",
+        "amount": 100
+      },
+      "discount": 80,
+      "reference_total": 1000
+    },
+    {
+      "id": "vip_23",
+      "vip_level": 7,
+      "item_code": 10202002,
+      "quantity": 1,
+      "limit": 5,
+      "price": {
+        "resource": "gems",
+        "amount": 60
+      },
+      "discount": 80,
+      "reference_total": 300
+    },
+    {
+      "id": "vip_24",
+      "vip_level": 7,
+      "item_code": 10202004,
+      "quantity": 1,
+      "limit": 5,
+      "price": {
+        "resource": "gems",
+        "amount": 60
+      },
+      "discount": 80,
+      "reference_total": 300
+    },
+    {
+      "id": "vip_25",
+      "vip_level": 7,
+      "item_code": 10202006,
+      "quantity": 1,
+      "limit": 5,
+      "price": {
+        "resource": "gems",
+        "amount": 60
+      },
+      "discount": 80,
+      "reference_total": 300
+    },
+    {
+      "id": "vip_26",
+      "vip_level": 7,
+      "item_code": 10202008,
+      "quantity": 1,
+      "limit": 5,
+      "price": {
+        "resource": "gems",
+        "amount": 60
+      },
+      "discount": 80,
+      "reference_total": 300
+    },
+    {
+      "id": "vip_27",
+      "vip_level": 8,
+      "item_code": 10201005,
+      "quantity": 1,
+      "limit": 20,
+      "price": {
+        "resource": "gems",
+        "amount": 100
+      },
+      "discount": 80,
+      "reference_total": 2000
+    },
+    {
+      "id": "vip_28",
+      "vip_level": 8,
+      "item_code": 10201013,
+      "quantity": 1,
+      "limit": 20,
+      "price": {
+        "resource": "gems",
+        "amount": 100
+      },
+      "discount": 80,
+      "reference_total": 2000
+    },
+    {
+      "id": "vip_29",
+      "vip_level": 8,
+      "item_code": 10201021,
+      "quantity": 1,
+      "limit": 20,
+      "price": {
+        "resource": "gems",
+        "amount": 100
+      },
+      "discount": 80,
+      "reference_total": 2000
+    },
+    {
+      "id": "vip_30",
+      "vip_level": 8,
+      "item_code": 10201029,
+      "quantity": 1,
+      "limit": 20,
+      "price": {
+        "resource": "gems",
+        "amount": 100
+      },
+      "discount": 80,
+      "reference_total": 2000
+    },
+    {
+      "id": "vip_31",
+      "vip_level": 8,
+      "item_code": 10202009,
+      "quantity": 1,
+      "limit": 5,
+      "price": {
+        "resource": "gems",
+        "amount": 120
+      },
+      "discount": 80,
+      "reference_total": 600
+    },
+    {
+      "id": "vip_32",
+      "vip_level": 9,
+      "item_code": 10106002,
+      "quantity": 1,
+      "limit": 10,
+      "price": {
+        "resource": "gems",
+        "amount": 250
+      },
+      "discount": 50,
+      "reference_total": 2500
+    },
+    {
+      "id": "vip_33",
+      "vip_level": 9,
+      "item_code": 10202019,
+      "quantity": 1,
+      "limit": 5,
+      "price": {
+        "resource": "gems",
+        "amount": 200
+      },
+      "discount": 80,
+      "reference_total": 1000
+    },
+    {
+      "id": "vip_34",
+      "vip_level": 9,
+      "item_code": 10202018,
+      "quantity": 1,
+      "limit": 5,
+      "price": {
+        "resource": "gems",
+        "amount": 200
+      },
+      "discount": 60,
+      "reference_total": 1000
+    },
+    {
+      "id": "vip_35",
+      "vip_level": 9,
+      "item_code": 10202016,
+      "quantity": 1,
+      "limit": 5,
+      "price": {
+        "resource": "gems",
+        "amount": 200
+      },
+      "discount": 60,
+      "reference_total": 1000
+    },
+    {
+      "id": "vip_36",
+      "vip_level": 9,
+      "item_code": 10202014,
+      "quantity": 1,
+      "limit": 5,
+      "price": {
+        "resource": "gems",
+        "amount": 200
+      },
+      "discount": 60,
+      "reference_total": 1000
+    },
+    {
+      "id": "vip_37",
+      "vip_level": 10,
+      "item_code": 10300002,
+      "quantity": 1,
+      "limit": 5,
+      "price": {
+        "resource": "gems",
+        "amount": 1000
+      },
+      "discount": 50,
+      "reference_total": 5000
+    },
+    {
+      "id": "vip_38",
+      "vip_level": 10,
+      "item_code": 10105002,
+      "quantity": 1,
+      "limit": 20,
+      "price": {
+        "resource": "gems",
+        "amount": 100
+      },
+      "discount": 80,
+      "reference_total": 2000
+    },
+    {
+      "id": "vip_39",
+      "vip_level": 11,
+      "item_code": 10202020,
+      "quantity": 1,
+      "limit": 5,
+      "price": {
+        "resource": "gems",
+        "amount": 500
+      },
+      "discount": 80,
+      "reference_total": 2500
+    },
+    {
+      "id": "vip_40",
+      "vip_level": 11,
+      "item_code": 10202024,
+      "quantity": 1,
+      "limit": 5,
+      "price": {
+        "resource": "gems",
+        "amount": 200
+      },
+      "discount": 60,
+      "reference_total": 1000
+    },
+    {
+      "id": "vip_41",
+      "vip_level": 12,
+      "item_code": 10203018,
+      "quantity": 1,
+      "limit": 10,
+      "price": {
+        "resource": "gems",
+        "amount": 250
+      },
+      "discount": 50,
+      "reference_total": 2500
+    },
+    {
+      "id": "vip_42",
+      "vip_level": 12,
+      "item_code": 10203026,
+      "quantity": 1,
+      "limit": 10,
+      "price": {
+        "resource": "gems",
+        "amount": 250
+      },
+      "discount": 50,
+      "reference_total": 2500
+    },
+    {
+      "id": "vip_43",
+      "vip_level": 12,
+      "item_code": 10203035,
+      "quantity": 1,
+      "limit": 10,
+      "price": {
+        "resource": "gems",
+        "amount": 250
+      },
+      "discount": 50,
+      "reference_total": 2500
+    },
+    {
+      "id": "vip_44",
+      "vip_level": 13,
+      "item_code": 10203019,
+      "quantity": 1,
+      "limit": 5,
+      "price": {
+        "resource": "gems",
+        "amount": 725
+      },
+      "discount": 50,
+      "reference_total": 3625
+    },
+    {
+      "id": "vip_45",
+      "vip_level": 13,
+      "item_code": 10203027,
+      "quantity": 1,
+      "limit": 5,
+      "price": {
+        "resource": "gems",
+        "amount": 725
+      },
+      "discount": 50,
+      "reference_total": 3625
+    },
+    {
+      "id": "vip_46",
+      "vip_level": 13,
+      "item_code": 10203036,
+      "quantity": 1,
+      "limit": 5,
+      "price": {
+        "resource": "gems",
+        "amount": 725
+      },
+      "discount": 50,
+      "reference_total": 3625
+    },
+    {
+      "id": "vip_47",
+      "vip_level": 13,
+      "item_code": 10300004,
+      "quantity": 1,
+      "limit": 5,
+      "price": {
+        "resource": "gems",
+        "amount": 3000
+      },
+      "discount": 50,
+      "reference_total": 15000
+    },
+    {
+      "id": "vip_48",
+      "vip_level": 14,
+      "item_code": 10203020,
+      "quantity": 1,
+      "limit": 3,
+      "price": {
+        "resource": "gems",
+        "amount": 1650
+      },
+      "discount": 50,
+      "reference_total": 4950
+    },
+    {
+      "id": "vip_49",
+      "vip_level": 14,
+      "item_code": 10203028,
+      "quantity": 1,
+      "limit": 3,
+      "price": {
+        "resource": "gems",
+        "amount": 1650
+      },
+      "discount": 50,
+      "reference_total": 4950
+    },
+    {
+      "id": "vip_50",
+      "vip_level": 14,
+      "item_code": 10203037,
+      "quantity": 1,
+      "limit": 3,
+      "price": {
+        "resource": "gems",
+        "amount": 1650
+      },
+      "discount": 50,
+      "reference_total": 4950
+    },
+    {
+      "id": "vip_51",
+      "vip_level": 15,
+      "item_code": 10203006,
+      "quantity": 1,
+      "limit": 1,
+      "price": {
+        "resource": "gems",
+        "amount": 6500
+      },
+      "discount": 50,
+      "reference_total": 6500
+    },
+    {
+      "id": "vip_52",
+      "vip_level": 16,
+      "item_code": 10105003,
+      "quantity": 1,
+      "limit": 3,
+      "price": {
+        "resource": "gems",
+        "amount": 2000
+      },
+      "discount": 50,
+      "reference_total": 6000
+    }
+  ],
+  "market": [
+    {
+      "id": "market_01",
+      "treasure_code": 60100104,
+      "quantity": 1,
+      "limit": 1,
+      "price": {
+        "resource": "gold",
+        "amount": 60000
+      },
+      "discount": 40
+    },
+    {
+      "id": "market_02",
+      "treasure_code": 60300113,
+      "quantity": 1,
+      "limit": 1,
+      "price": {
+        "resource": "gems",
+        "amount": 200
+      },
+      "discount": 60
+    },
+    {
+      "id": "market_03",
+      "item_code": 10201026,
+      "quantity": 1,
+      "limit": 1,
+      "price": {
+        "resource": "stone",
+        "amount": 8000
+      },
+      "discount": 20
+    },
+    {
+      "id": "market_04",
+      "treasure_code": 60100006,
+      "quantity": 1,
+      "limit": 1,
+      "price": {
+        "resource": "lumber",
+        "amount": 80000
+      },
+      "discount": 20
+    },
+    {
+      "id": "market_05",
+      "item_code": 10202025,
+      "quantity": 1,
+      "limit": 1,
+      "price": {
+        "resource": "gems",
+        "amount": 100
+      },
+      "discount": 80
+    },
+    {
+      "id": "market_06",
+      "item_code": 10202009,
+      "quantity": 1,
+      "limit": 1,
+      "price": {
+        "resource": "stone",
+        "amount": 210000
+      },
+      "discount": 30
+    },
+    {
+      "id": "market_07",
+      "item_code": 10202003,
+      "quantity": 1,
+      "limit": 1,
+      "price": {
+        "resource": "gold",
+        "amount": 40000
+      },
+      "discount": 20
+    },
+    {
+      "id": "market_08",
+      "treasure_code": 60100105,
+      "quantity": 1,
+      "limit": 1,
+      "price": {
+        "resource": "lumber",
+        "amount": 80000
+      },
+      "discount": 20
+    },
+    {
+      "id": "market_09",
+      "item_code": 10103004,
+      "quantity": 1,
+      "limit": 1,
+      "price": {
+        "resource": "gold",
+        "amount": 60000
+      },
+      "discount": 40
+    },
+    {
+      "id": "market_10",
+      "treasure_code": 60100006,
+      "quantity": 1,
+      "limit": 1,
+      "price": {
+        "resource": "gems",
+        "amount": 40
+      },
+      "discount": 60
+    },
+    {
+      "id": "market_11",
+      "item_code": 10201004,
+      "quantity": 1,
+      "limit": 1,
+      "price": {
+        "resource": "gems",
+        "amount": 20
+      },
+      "discount": 40
+    },
+    {
+      "id": "market_12",
+      "item_code": 10202001,
+      "quantity": 1,
+      "limit": 1,
+      "price": {
+        "resource": "gold",
+        "amount": 40000
+      },
+      "discount": 20
+    },
+    {
+      "id": "market_13",
+      "item_code": 10201011,
+      "quantity": 1,
+      "limit": 1,
+      "price": {
+        "resource": "gems",
+        "amount": 20
+      },
+      "discount": 40
+    },
+    {
+      "id": "market_14",
+      "item_code": 10202003,
+      "quantity": 1,
+      "limit": 1,
+      "price": {
+        "resource": "gold",
+        "amount": 40000
+      },
+      "discount": 20
+    },
+    {
+      "id": "market_15",
+      "item_code": 10201019,
+      "quantity": 1,
+      "limit": 1,
+      "price": {
+        "resource": "gems",
+        "amount": 20
+      },
+      "discount": 40
+    },
+    {
+      "id": "market_16",
+      "item_code": 10202005,
+      "quantity": 1,
+      "limit": 1,
+      "price": {
+        "resource": "gold",
+        "amount": 40000
+      },
+      "discount": 20
+    },
+    {
+      "id": "market_17",
+      "item_code": 10101032,
+      "quantity": 1,
+      "limit": 1,
+      "price": {
+        "resource": "gems",
+        "amount": 20
+      },
+      "discount": 40
+    },
+    {
+      "id": "market_18",
+      "item_code": 10202007,
+      "quantity": 1,
+      "limit": 1,
+      "price": {
+        "resource": "gold",
+        "amount": 40000
+      },
+      "discount": 20
+    },
+    {
+      "id": "market_19",
+      "item_code": 10103003,
+      "quantity": 1,
+      "limit": 1,
+      "price": {
+        "resource": "food",
+        "amount": 50000
+      },
+      "discount": 40
+    },
+    {
+      "id": "market_20",
+      "item_code": 10103011,
+      "quantity": 1,
+      "limit": 1,
+      "price": {
+        "resource": "food",
+        "amount": 50000
+      },
+      "discount": 40
+    },
+    {
+      "id": "market_21",
+      "item_code": 10103021,
+      "quantity": 1,
+      "limit": 1,
+      "price": {
+        "resource": "food",
+        "amount": 50000
+      },
+      "discount": 40
+    },
+    {
+      "id": "market_22",
+      "item_code": 10103031,
+      "quantity": 1,
+      "limit": 1,
+      "price": {
+        "resource": "food",
+        "amount": 50000
+      },
+      "discount": 40
+    },
+    {
+      "id": "market_23",
+      "item_code": 10103041,
+      "quantity": 1,
+      "limit": 1,
+      "price": {
+        "resource": "food",
+        "amount": 50000
+      },
+      "discount": 40
+    },
+    {
+      "id": "market_24",
+      "item_code": 10300001,
+      "quantity": 1,
+      "limit": 1,
+      "price": {
+        "resource": "food",
+        "amount": 10000
+      },
+      "discount": 50
+    },
+    {
+      "id": "market_25",
+      "item_code": 10105002,
+      "quantity": 1,
+      "limit": 1,
+      "price": {
+        "resource": "gems",
+        "amount": 150
+      },
+      "discount": 50
+    },
+    {
+      "id": "market_26",
+      "treasure_code": 60300115,
+      "quantity": 1,
+      "limit": 1,
+      "price": {
+        "resource": "gems",
+        "amount": 120
+      },
+      "discount": 60
+    },
+    {
+      "id": "market_27",
+      "item_code": 10102011,
+      "quantity": 1,
+      "limit": 1,
+      "price": {
+        "resource": "gold",
+        "amount": 40000
+      },
+      "discount": 40
+    },
+    {
+      "id": "market_28",
+      "item_code": 10102051,
+      "quantity": 1,
+      "limit": 1,
+      "price": {
+        "resource": "lumber",
+        "amount": 40000
+      },
+      "discount": 40
+    },
+    {
+      "id": "market_29",
+      "item_code": 10202013,
+      "quantity": 1,
+      "limit": 1,
+      "price": {
+        "resource": "gems",
+        "amount": 120
+      },
+      "discount": 40
+    },
+    {
+      "id": "market_30",
+      "item_code": 10103001,
+      "quantity": 1,
+      "limit": 1,
+      "price": {
+        "resource": "food",
+        "amount": 5000
+      },
+      "discount": 40
+    }
+  ]
+}

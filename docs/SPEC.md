@@ -1581,11 +1581,11 @@ Reports are stored in DB indefinitely. Players can mark them read; old reports a
 
 When attacking a Monster (`MARCH_TYPE_MONSTER`):
 
-- Monster has fixed stats (HP, Attack, Defense, count) from `data/monsters.json`.
+- Monster has fixed stats (HP, Attack, Defense, count) from `data/monsters.json` and an authoritative required-power threshold derived from its family, level and the matching march or rally progression.
 - Monster does NOT have a counter type (treated as neutral, modifier always 1.00) — alternative: assign type based on monster lore [OPEN]. Default: neutral.
 - Attacker uses normal effective stats.
-- Monster takes damage; if HP × count is depleted, monster dies → drops fire.
-- Attacker takes losses per normal mortality rules.
+- Each troop contributes its catalogue `power`; attack, defence, HP and vs-monster bonuses modify the effective army power. At 100% of the monster's current required power the attack wins; at 120% or more it is a clean win. Damaged monsters require proportionally less power.
+- A failed attack persists proportional monster damage. Its wound ratio is `(.05 + .30 × underpower) × level_factor`, where `level_factor` rises from .5 at level 1 to 1 at level 10; it is capped at 35%. A narrow win below 120% causes at most 3% wounded, scaled by monster level.
 - **Stamina (Action Points)** is consumed (see §14).
 
 ### 9.10 Battle vs Shrine garrison
@@ -1653,22 +1653,23 @@ The `hospital_capacity` research (Battle Tree) provides up to +100% across 10 le
 
 ### 10.3 Wounded queue
 
-Wounded troops occupy hospital capacity. Healing happens automatically over time:
+Wounded troops occupy hospital capacity and wait until the player selects troops and pays to start treatment. One batch heals over time; newly arriving wounded wait separately:
 
 ```
 heal_time_per_troop = troop.heal_time
-                    × (1 - research.healing_time_reduced_total)
-                    × (1 - treasure.healing_speed_total)
-                    × (1 - vip.healing_speed)
+                    × max(0.05, 1 - buffs.healing_time_reduced)
+                    ÷ max(1, 1 + buffs.healing_speed)
+
+batch_seconds = ceil(sum(selected_count × heal_time_per_troop))
 ```
 
 When healed, a wounded troop returns to the active troop pool.
 
 ### 10.4 Healing cost
 
-Healing costs **resources** [DEFAULT — start at 50% of training cost], paid per troop healed. Player can pause healing if resources are insufficient.
+Healing costs **resources** by troop tier: T1–T10 cost 10%, 12%, 15%, 18%, 22%, 27%, 32%, 37%, 42% and 45% of training cost, rounded up per resource per troop and paid when starting the selected batch. If resources are insufficient, treatment cannot start. Existing treatment continues while offline.
 
-A player can pay GEMS or use Recover items (`ITEM_CODE_RECOVER_*`) to instantly finish hospital healing.
+A player can use healing or general speedup items to reduce the active batch's remaining time. Crystals cannot start or finish healing. Base seconds per troop for T1–T10 are 1, 1, 1, 2, 2, 3, 4, 5, 6 and 8 for every troop type; existing treatments retain their end time. See `docs/CRYSTAL_ECONOMY.md`. Commands use authenticated, world-scoped hospital endpoints and replay-safe operation receipts. Migration `0091_hospital_healing.sql` preserves previously running legacy treatments; new wounds have no timer until paid.
 
 ### 10.5 Hospital overflow
 
@@ -2031,7 +2032,7 @@ Each monster entry includes:
 
 ### 14.5 Monster combat
 
-Monster combat uses the same battle engine (§9) with these adjustments:
+Monster combat uses the deterministic power-threshold variant in §9.9 with these adjustments:
 
 - Monsters have NO buff stack (no research, no treasures)
 - Monsters have no counter type (always neutral 1.00 modifier) — [OPEN: should monsters have type? Default: no]
@@ -2039,7 +2040,7 @@ Monster combat uses the same battle engine (§9) with these adjustments:
 - Player troops fight with full buff stack
 - Treasures with `vs Monster HP/Atk/Def` apply (Legendary tier has these)
 
-If the player kills the monster, drops are rolled and added to inventory. If the player loses (rare for matched levels), troops are wounded/dead per normal rules.
+If the player kills the monster, drops are rolled and added to inventory. Failed early attacks deliberately wound only a small share of the formation; the full curve and 35% ceiling are defined in §9.9.
 
 ### 14.6 Monster drops
 
@@ -2670,19 +2671,9 @@ total_resource_production_bonus = 1.00 (VIP)
 
 ### 18.2 GEMS spending
 
-The Premium Shop offers items priced in GEMS:
+Current owner decision (2026-09-18): **crystals buy the server-owned VIP catalogue and skins**. The VIP shop contains all 52 offers transcribed from the supplied reference images, including speedups, resources, boosts, chests and fragments at their pictured VIP prices and weekly limits. Higher VIP levels retain access to lower-level offers.
 
-| Category | Items | GEM Cost (Default) |
-|---|---|---|
-| **Speedups** | 1m / 5m / 10m / 30m / 1h / 3h / 8h / 1d (all types) | 5 / 20 / 35 / 90 / 160 / 380 / 800 / 1500 |
-| **Resources** | 1k / 5k / 10k / 50k / 100k / 500k / 1M / 5M / 10M packs | scales: 5 / 20 / 35 / 150 / 280 / 1200 / 2200 / 9000 / 16000 |
-| **Boosts** | 8h / 1d resource/gathering boosts | 200 / 500 |
-| **Action Points** | 10 / 20 / 50 / 100 packs | 50 / 95 / 220 / 400 |
-| **Chests** | Silver / Gold / Platinum chests (treasure fragments) | 100 / 500 / 2000 |
-| **VIP Points** | direct VIP point packages | 1 GEM = 1 VIP Point |
-| **Castle Skins** | (Phase 4+) cosmetic city skins | 500 - 5000 |
-
-[DEFAULT prices — to be tuned with monetization analysis]
+There is no general crystal-to-time conversion. Direct building, research and healing completions, purchases through the inventory shop or caravan, and legacy purchase URLs remain restricted to their explicitly allowed cases. Existing resource-priced trades, owned items and earned rewards remain available. Details and healing balance: `docs/CRYSTAL_ECONOMY.md`.
 
 ### 18.3 GEM bundles (real-money packages)
 
@@ -2716,6 +2707,14 @@ Visual reskins for the player's city, applied to the map view. Acquired via:
 - Conquest Event victory (top alliances)
 
 Castle skins are **purely cosmetic**. No gameplay effect.
+
+The current collection contains 18 castle skins. The mythic Drachenfestung uses its own animated 3D silhouette: a warm basalt and aged-bronze keep crowned by an emerald dragon whose wings, breath glow and three restrained smoke puffs move with the shared scene clock. Reduced-motion mode freezes the 3D motion and loads the static map portrait. See `docs/CASTLE_SKINS.md` for the renderer and verification contract.
+
+### 18.6 March skins
+
+Implemented on 2026-09-13: each castle theme has a matching march skin, selected independently in the skin collection. The equipped march skin adds a final speed factor of **1.05** to newly dispatched marches; owning several skins does not stack this bonus. Appearance and travel timing are saved when the army is sent or reserved, including rally participation and return journeys. Every premium march skin uses a distinct silhouette, movement and matching arrival effect; every premium castle skin includes a visible animation.
+
+The Grenzlandzug is free to claim from Castle level 2 and grants the same bonus. Initial catalog prices are 1,200 GEMS for legendary and 2,400 GEMS for mythic march skins. Purchases are permanent and idempotent. There is no additional set bonus. Current castle skins remain freely selectable; paid castle bundles are not introduced by this feature. See `docs/MARCH_SKINS.md` and `data/march_skins.json` for the API and server-owned catalog.
 
 ---
 
@@ -2979,7 +2978,7 @@ CREATE TABLE players (
     last_login      DATETIME NULL,
     is_banned       TINYINT(1) DEFAULT 0,
     vip_level       SMALLINT DEFAULT 1,
-    vip_points      INT DEFAULT 0,
+    vip_points      INT DEFAULT 200,
     gems            INT DEFAULT 0,
     INDEX (last_login)
 );
@@ -4223,4 +4222,3 @@ Updates and amendments should bump the version (1.7, 1.8, ...) and append a chan
 | 1.4 | 2026-05-04 | Sven Manderscheid + Claude | **Crystal resource removed completely** (§3.6 rewritten as T5/Mythic costs note, §3.7 GEMS expanded with full F2P income table, §6.4 crystal_gathering_speed removed, §7.4 Crystal Mine entry removed, §22 schema crystal column removed, §27 OQ-6 rewritten). T5 troops now cost only standard resources. **GEMS drops from monsters added** (15% chance × 10/30/40 GEMS for solo, scaling for rally/boss monsters — see §14.15). **Charm drop table finalized** (4-tier per Lv: 0-3/4-6/7-8/9-10, only Orc/Skeleton/Golem drop charms — see §14.14). **F2P Endgame target updated to ~12 months for Castle L30 + T5** (§14.12 rewritten to match owner's design intent). **§7.10 World Spawn System added** with full hourly cron-tick spawn table for all entity types per sector. Goblin spawn rates updated to 6/4/2/1 per sector/h (Lv 1-5). **§28 Asset Specifications added** — references new asset specification PDF companion document (16 pages, all sprite specs + AI prompts + monster animation prompts). New `data/charms.json` ships with this version; `data/monsters.json` updated with charm_drop blocks per finalized table and gems_drop blocks per all monsters; new `data/world_spawn.json` ships with spawn rates and caps. |
 | 1.5 | 2026-05-04 | Sven Manderscheid + Claude | **Project renamed from "Ascendancy" to "Conquer"**. After extensive trademark/domain research showed "Ascendancy" was heavily conflict-laden (Logic Factory 1995 4X, OneMoreTurnGames 2025 Kickstarter, Natures Ascendancy EU TM, Path of Exile association, ascendancy.com premium-priced), the project owner decided to use **"Conquer" as a temporary internal working codename** for the duration of development. The final marketing name will be chosen later, likely with assistance from an EU trademark lawyer (€500-1500 for proper recherche). All 17 occurrences of "Ascendancy" in this spec have been replaced with "Conquer". The asset specification PDF has been renamed to `Conquer_Asset_Specifications.pdf`. **No technical changes** in this version — this is purely a project-name rebrand. All gameplay mechanics, balance values, drop tables, and roadmap items remain unchanged from v1.4. |
 | 1.6 | 2026-05-06 | Sven Manderscheid + Claude | **Visual style decision: Pixelart**. The game adopts a pixelart aesthetic (16-bit SNES-style with curated 32-color palette) inspired by Kingdom Two Crowns, Songs of Conquest, and Mindustry. **§28 rewritten** with three sub-sections: 28.1 Visual style decision, 28.2 Sprite-set architecture (re-skinnable via `assets/sprites/<set>/` with `active.json` controlling the active set), 28.3 Asset Specifications PDF reference, 28.4 Sprint 0 asset plan. The asset specifications PDF has been **completely rewritten** as v2.0 Pixelart Edition (18 pages) — includes the full 32-color palette specification, pixelart-tuned AI generation prompts, 4-8 frame animation conventions, and tools recommendations (Aseprite, Piskel). New artifacts shipped with this version: `data/palette/conquer-32.gpl` (GIMP/Aseprite palette file), `assets/sprites/active.json` (active set config), `assets/sprites/pixel/manifest.json` (set metadata), and the empty folder structure for the `pixel` sprite set. Tile base size reduced from 64×64 to 32×32 px for better pixelart readability and mobile fit. CLAUDE.md updated with pixelart conventions for code (`image-rendering: pixelated` requirement, integer-only zoom, sprite-set resolution via `Conquer\Assets\SpriteResolver` Sprint 2 deliverable). **No game mechanics changed** — this is purely a visual direction commitment. |
-

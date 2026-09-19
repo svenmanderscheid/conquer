@@ -1,0 +1,11 @@
+window.ConquerWorldPanel=function(ctx){
+  'use strict';
+  const {api,esc,fmt,toast}=ctx;
+  let state=null,loading=false,busy=false;
+  const host=()=>document.querySelector('#content');
+  function render(tab){if(tab!=='worlds')return false;if(host().querySelector('.world-selector'))return true;load();return true;}
+  async function load(){if(loading)return;loading=true;host().innerHTML='<p role="status">Welten werden geladen …</p>';try{state=await api('worlds/state');if(document.querySelector('#panel-dialog')?.dataset.panel==='worlds')paint();}catch(e){if(document.querySelector('#panel-dialog')?.dataset.panel==='worlds')host().innerHTML=`<p role="alert">${esc(e.message)}</p><button class="button" data-action="worlds-reload">Erneut laden</button>`;}finally{loading=false;}}
+  function paint(){host().innerHTML=`<section class="world-selector"><p>Jede Welt hat eine eigene Stadt, Ressourcen, Forschung und Allianz. Dein Konto, Inventar, Prestige und ausgerüstete Relikte gelten für alle Welten.</p><div class="progression-grid">${state.worlds.map(w=>`<article class="panel"><h2>${esc(w.name)}</h2><p>${esc({open:'Offen',running:'Läuft',paused:'Pausiert',closed:'Geschlossen'}[w.status]||w.status)} · ${fmt(w.map_size)} × ${fmt(w.map_size)} Felder</p><p>${w.owned?`${esc(w.city_name)} · Burgstufe ${fmt(w.castle_level)}`:'Neues Königreich gründen'}</p><p>Spieltempo ×${Number(w.speed_factor)} · Sammeln ×${Number(w.gather_factor)}</p>${w.selected?'<strong>Aktive Welt</strong>':`<button class="button gold" data-action="worlds-select" data-world="${Number(w.id)}" data-kind="${w.owned?'select':'join'}" ${w.can_select||w.can_join?'':'disabled'}>${w.owned?'Welt öffnen':'Welt beitreten'}</button>`}</article>`).join('')}</div></section>`;}
+  function onClick(action,button){if(action==='worlds-reload'){load();return true;}if(action!=='worlds-select')return false;if(busy)return true;busy=true;button.disabled=true;const request=button.dataset.requestId??=(crypto.randomUUID?.()||'world_'+Date.now()+'_'+Math.random().toString(36).slice(2));api('worlds/action',{action:button.dataset.kind,world_id:Number(button.dataset.world),expected_world_id:state.active_world_id,request_id:request}).then(()=>{location.href=ctx.base+'/city#worlds';}).catch(e=>{toast(e.message);button.disabled=false;busy=false;});return true;}
+  return {render,onClick};
+};

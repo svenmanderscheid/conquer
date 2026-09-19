@@ -1,0 +1,26 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
+const base=process.env.BUG_REPORT_URL||'http://127.0.0.1:18976';
+assert(/^http:\/\/127\.0\.0\.1:\d+$/.test(base),'Disposable local preview required');
+const output=path.resolve(__dirname,'../artifacts/bug-reports');fs.mkdirSync(output,{recursive:true});
+(async()=>{
+ const browser=await chromium.launch({headless:true,channel:process.env.PLAYWRIGHT_CHANNEL||'chrome'}),errors=[];
+ try{
+  const page=await browser.newPage({viewport:{width:1280,height:800},hasTouch:true});page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(20000);
+  await page.goto(base);await page.locator('[data-mode="login"]').click();await page.locator('[name="username"]').fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');
+  await Promise.all([page.waitForURL('**/city'),page.locator('#auth-submit').click()]);await page.locator('#city-frame').waitFor();
+  await page.locator('#hud-menu').click();const menuEntry=page.locator('[data-action="dialog-tab"][data-id="bugreport"]');await menuEntry.waitFor();assert.match(await menuEntry.innerText(),/Bug melden/);await menuEntry.click();await page.locator('.bug-report-panel').waitFor();
+  for(const [width,height] of [[1280,800],[390,844],[320,700],[568,320]]){
+   await page.setViewportSize({width,height});
+   const issues=await page.evaluate(()=>{const panel=document.querySelector('#panel-dialog'),form=document.querySelector('.bug-report-panel form'),submit=form?.querySelector('button[type=submit]'),bad=[];if(panel.scrollWidth>panel.clientWidth+2)bad.push('panel overflow');if(form.scrollWidth>form.clientWidth+2)bad.push('form overflow');const r=submit.getBoundingClientRect();if(r.right>innerWidth+2||r.left<0)bad.push('submit horizontal reach');return bad;});
+   assert.deepEqual(issues,[],`responsive bug form at ${width}x${height}`);await page.screenshot({path:path.join(output,`player-${width}x${height}.png`)});
+  }
+  await page.setViewportSize({width:390,height:844});await page.locator('[name="category"]').selectOption('interface');await page.locator('[name="severity"]').selectOption('blocking');await page.locator('[name="title"]').fill('Inventarknopf reagiert nicht');await page.locator('[name="description"]').fill('Nach der Auswahl eines Gegenstands bleibt der Aktionsknopf weiterhin gesperrt.');await page.locator('[name="reproduction_steps"]').fill('Inventar öffnen, Gegenstand antippen und Aktionsknopf prüfen.');await page.locator('[name="expected_result"]').fill('Der Aktionsknopf wird verfügbar.');await page.locator('form[data-form="bug-report"] button[type="submit"]').click();
+  await page.locator('.bug-report-success').waitFor();const receipt=await page.locator('.bug-report-success strong').innerText();assert.match(receipt,/^#\d+$/);await page.screenshot({path:path.join(output,'player-success.png')});
+  const admin=await browser.newPage({viewport:{width:1280,height:900}});admin.on('pageerror',e=>errors.push(e.message));await admin.goto(base+'/admin/login');await admin.locator('[name="username"]').fill('PreviewAdmin');await admin.locator('[name="password"]').fill('PreviewFixture!2026');await admin.getByRole('button',{name:'Anmelden',exact:true}).click();await admin.waitForURL(base+'/admin');
+  assert.match(await admin.locator('#admin-nav').innerText(),/Bugmeldungen · 1/);await admin.goto(base+'/admin/bug-reports?world_id=1');const card=admin.locator('.bug-report-card');await card.waitFor();assert.match(await card.innerText(),/Inventarknopf reagiert nicht/);await card.locator('details summary').click();assert.match(await card.locator('.bug-technical').innerText(),/390x844/);await card.locator('[name="status"]').selectOption('in_progress');await card.locator('[name="priority"]').selectOption('urgent');await card.locator('[name="admin_note"]').fill('Auf schmalem Bildschirm reproduziert.');await card.locator('[name="reason"]').fill('Meldung geprüft');await card.getByRole('button',{name:'Bearbeitung speichern'}).click();await admin.waitForURL('**/admin/bug-reports?world_id=1');assert.match(await admin.locator('.notice.success').innerText(),/aktualisiert/);assert.match(await admin.locator('.bug-report-card').innerText(),/In Bearbeitung/);await admin.screenshot({path:path.join(output,'admin-inbox.png'),fullPage:true});
+  await admin.setViewportSize({width:320,height:700});assert.equal(await admin.evaluate(()=>document.documentElement.scrollWidth>innerWidth+2),false,'admin inbox has no horizontal overflow at 320px');await admin.screenshot({path:path.join(output,'admin-320x700.png'),fullPage:true});
+  assert.deepEqual(errors,[],'No browser errors');console.log('ALL BUG REPORT BROWSER CHECKS PASSED · '+output);
+ }finally{await browser.close();}
+})().catch(error=>{console.error(error);process.exitCode=1;});

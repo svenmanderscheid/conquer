@@ -1,0 +1,8 @@
+{
+  "lakes":[{"x":75,"y":65,"rx":2.6,"ry":1.7},{"x":99,"y":79,"rx":3.5,"ry":2.3},{"x":42,"y":132,"rx":4,"ry":2.8},{"x":149,"y":151,"rx":4.8,"ry":3},{"x":207,"y":42,"rx":3.8,"ry":2.5},{"x":174,"y":219,"rx":5,"ry":2.8},{"x":113,"y":28,"rx":3,"ry":2},{"x":128,"y":128,"rx":18,"ry":15}],
+  "rivers":{"sides":[64,192],"period":19,"amplitude":13,"detailPeriod":8.5,"detailAmplitude":3.5,"bankWidth":0.83},
+  "streams":[{"from":52,"to":106,"base":78,"period":9,"amplitude":2,"detailPeriod":19,"detailAmplitude":3},{"from":134,"to":200,"base":153,"period":13,"amplitude":3,"detailPeriod":1,"detailAmplitude":0},{"from":179,"to":224,"base":43,"period":11,"amplitude":2,"detailPeriod":1,"detailAmplitude":0}],
+  "streamBankWidth":0.55,
+  "lakeBankScale":1.13,
+  "biomes":{"centerX":128,"centerY":128,"transitionWidth":52}
+}

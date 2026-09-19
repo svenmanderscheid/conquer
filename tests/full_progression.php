@@ -1,0 +1,91 @@
+<?php
+declare(strict_types=1);
+if(PHP_SAPI!=='cli')exit(1);
+define('ROOT_DIR',dirname(__DIR__));require ROOT_DIR.'/src/Autoloader.php';(new \Conquer\Autoloader(ROOT_DIR.'/src'))->register();require __DIR__.'/Support/FeatureDatabase.php';
+date_default_timezone_set('UTC');\Conquer\Logger::init(sys_get_temp_dir().'/conquer-feature-test.log','ERROR');
+use Conquer\Db\Connection;
+use Conquer\Game\Conquest\EventService;
+use Conquer\Game\Player\MasteryService;
+use Conquer\Game\Operation;
+use Conquer\Game\Research\BuffEngine;
+use Conquer\Game\Research\ResearchEffects;
+use Conquer\Auth\AccountService;
+use Conquer\Game\Expedition\{EncounterCatalog,ExpeditionRules,ExpeditionService};
+function ok(bool $condition,string $label):void{if(!$condition)throw new RuntimeException($label);echo 'PASS '.$label."\n";}
+function denies(callable $fn,string $label):void{try{$fn();}catch(DomainException|RuntimeException $e){ok(true,$label);return;}throw new RuntimeException('Expected rejection: '.$label);}
+function operation(int $pid,array $b):array{$b['operation_key']??='test_'.bin2hex(random_bytes(14));return Operation::run($pid,$b,fn()=>str_starts_with($b['action'],'mastery.')?MasteryService::change($pid,$b):EventService::action($pid,$b));}
+$fixture=null;$failed=false;
+try{
+ $fixture=new \ConquerTests\FeatureDatabase();$db=Connection::getInstance();$password='FixturePassword_2026';
+ foreach([1,2]as$pid){$db->execute('INSERT INTO players(id,username,email,password_hash) VALUES(?,?,?,?)',[$pid,'Feature'.$pid,'feature'.$pid.'@tests.invalid',password_hash($password,PASSWORD_DEFAULT)]);$db->execute("INSERT INTO cities(id,player_id,world_id,name,coord_x,coord_y,castle_level,food,lumber,stone,gold) VALUES(?,?,1,?, ?,40,12,100000,100000,100000,100000)",[$pid,$pid,'Feature city '.$pid,40+$pid*6]);foreach(\Conquer\Game\City\CityState::BUILDING_CODES as$code)$db->execute('INSERT INTO city_buildings(city_id,building_code,level) VALUES(?,?,?)',[$pid,$code,$code==='castle'?12:1]);$db->execute('INSERT INTO city_troops(city_id,troop_code,count) VALUES(?,50100101,1000)',[$pid]);}
+ \Conquer\Game\Player\LordLevel::addXp(1,\Conquer\Game\Player\LordLevel::totalForLevel(11));
+ ok(MasteryService::snapshot(1)['available']===11,'lord progression grants finite mastery points');
+ $body=['action'=>'mastery.apply','ranks'=>['gather_1'=>1],'revision'=>0,'operation_key'=>'mastery_idempotent_0001'];operation(1,$body);operation(1,$body);
+ ok(MasteryService::snapshot(1)['spent']===1,'mastery retry spends one point');
+ ok(abs(BuffEngine::getBuffs(1)['food_production']-.02)<.000001,'mastery modifies actual production buffs');
+ denies(fn()=>operation(1,array_replace($body,['ranks'=>['attack_0'=>1]])),'changed operation payload is rejected');
+ operation(1,['action'=>'mastery.apply','ranks'=>['gather_1'=>5],'revision'=>1]);
+ denies(fn()=>operation(1,['action'=>'mastery.apply','ranks'=>['gather_1'=>6],'revision'=>2]),'mastery maximum level enforced');
+ operation(1,['action'=>'mastery.apply','ranks'=>[],'revision'=>2]);ok(MasteryService::snapshot(1)['available']===11,'respec returns exactly the earned points');
+ \Conquer\Game\Treasure\TreasureService::addFragments(1,60500002,1000);$db->execute('INSERT INTO player_treasure_loadouts(player_id,world_id,slot,treasure_code) VALUES(1,1,1,60500002)');
+ $buffs=BuffEngine::getBuffs(1);ok(($buffs['hospital_capacity_flat']??0)>=2000&&($buffs['resource_protection']??0)>=.2,'relic flat hospital and fractional protection are distinct');
+ \Conquer\Game\Treasure\TreasureService::addFragments(1,60400002,1000);$db->execute('INSERT INTO player_treasure_loadouts(player_id,world_id,slot,treasure_code) VALUES(1,1,2,60400002)');
+ $buffs=BuffEngine::getBuffs(1);ok(ResearchEffects::limits($buffs)['march_capacity']>50000,'flat relic march capacity applies to real march limit');
+ $settings=['enabled'=>1,'next_start'=>gmdate('Y-m-d H:i:s',time()-600),'interval_hours'=>2,'duration_hours'=>1,'invasion_enabled'=>1,'invasion_interval_hours'=>2,'invasion_next_start'=>gmdate('Y-m-d H:i:s',time()-60)];
+ denies(fn()=>EventService::saveSettings(1,array_replace($settings,['duration_hours'=>3])),'overlapping event schedule rejected');
+ denies(fn()=>EventService::saveSettings(1,array_replace($settings,['next_start'=>'2026-02-30 18:00:00'])),'invalid calendar date rejected');
+ EventService::saveSettings(1,$settings);EventService::tick(1);EventService::tick(1);
+ ok((int)$db->query('SELECT COUNT(*) FROM conquest_events')->fetchColumn()===1,'scheduler creates one announced event on repeated ticks');
+ $event=$db->query('SELECT * FROM conquest_events')->fetch();ok($event['state']==='active'&&(int)$event['phase']===1,'first quarter activates C phase');
+ $db->execute("INSERT INTO alliances(id,world_id,name,tag,leader_id) VALUES(1,1,'Feature A','FAA',1),(2,1,'Feature B','FAB',2)");
+ $db->execute("INSERT INTO alliance_members(alliance_id,player_id,role) VALUES(1,1,'leader'),(2,2,'leader')");
+ $db->execute("INSERT INTO shrines(world_id,shrine_code,tier,coord_x,coord_y) VALUES(1,'FEATURE_C','C',80,80)");$shrine=$db->lastInsertId();
+ $db->execute('INSERT INTO shrine_captures(shrine_id,alliance_id,captured_at,secured_at,garrison_troops_json) VALUES(?,1,?,?,?)',[$shrine,gmdate('Y-m-d H:i:s',time()-4200),gmdate('Y-m-d H:i:s',time()-600),'{}']);
+ $db->execute('INSERT INTO shrine_garrisons(shrine_id,player_id,city_id,troops_json,alliance_id) VALUES(?,1,1,?,1)',[$shrine,'{"50100101":10}']);
+ EventService::tick(1);$points=(int)$db->query('SELECT SUM(points) FROM conquest_score_ticks')->fetchColumn();EventService::tick(1);
+ ok($points>=9&&(int)$db->query('SELECT SUM(points) FROM conquest_score_ticks')->fetchColumn()===$points,'hold-time scoring catches up once without duplicate points');
+ EventService::assertShrineOpen(['shrine_code'=>'CONGRESS','world_id'=>1,'shrine_tier'=>'S']);EventService::assertShrineOpen(['shrine_code'=>'SHRINE_ICE','world_id'=>1,'shrine_tier'=>'S']);
+ ok(true,'Congress and regional shrine event stay independent');
+ denies(fn()=>EventService::assertShrineOpen(['shrine_code'=>'TEST_S','world_id'=>1,'shrine_tier'=>'S']),'late tier remains locked during first event phase');
+ $db->execute('UPDATE conquest_events SET ends_at=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 1 SECOND) WHERE id=?',[$event['id']]);EventService::tick(1);
+ ok((bool)$db->query('SELECT event_id FROM conquest_results WHERE event_id=?',[$event['id']])->fetchColumn(),'event ending stores final result and MVP list');
+ $gold=(int)$db->query('SELECT gold FROM cities WHERE id=1')->fetchColumn();$claim=['action'=>'event.claim','id'=>(int)$event['id'],'operation_key'=>'event_claim_receipt_0001'];operation(1,$claim);$after=(int)$db->query('SELECT gold FROM cities WHERE id=1')->fetchColumn();operation(1,$claim);
+ ok($after>$gold&&(int)$db->query('SELECT gold FROM cities WHERE id=1')->fetchColumn()===$after,'event reward receipt prevents duplicate credit');
+ denies(fn()=>operation(2,['action'=>'event.claim','id'=>(int)$event['id']]),'nonparticipant cannot claim event reward');
+ $invasion=$db->query("SELECT * FROM world_invasions WHERE state='active'")->fetch();$iid=(int)$invasion['id'];
+ operation(1,['action'=>'invasion.supply','id'=>$iid,'amount'=>100]);ok((int)$db->query('SELECT contribution FROM invasion_contributions WHERE invasion_id=? AND player_id=1',[$iid])->fetchColumn()===10,'invasion supply counts only delivered contribution');
+ operation(1,['action'=>'invasion.dispatch','id'=>$iid,'troops'=>[50100101=>100]]);ok((int)$db->query('SELECT count FROM city_troops WHERE city_id=1 AND troop_code=50100101')->fetchColumn()===900,'invasion army reserves real troops');
+ denies(fn()=>operation(1,['action'=>'invasion.dispatch','id'=>$iid,'troops'=>[50100101=>100]]),'one active invasion army limit enforced');
+ $db->execute('UPDATE world_invasions SET target=11 WHERE id=?',[$iid]);$db->execute('UPDATE invasion_missions SET arrival_at=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 30 SECOND),return_at=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 10 SECOND) WHERE invasion_id=?',[$iid]);
+ EventService::tick(1);EventService::tick(1);ok((int)$db->query('SELECT count FROM city_troops WHERE city_id=1 AND troop_code=50100101')->fetchColumn()===1000,'invasion army settles and returns once after offline time');
+ ok($db->query('SELECT state FROM world_invasions WHERE id=?',[$iid])->fetchColumn()==='victory'&&(int)$db->query('SELECT chapter FROM world_chapters WHERE world_id=1')->fetchColumn()===2,'world victory unlocks next persistent chapter');
+ operation(1,['action'=>'invasion.claim','id'=>$iid]);denies(fn()=>operation(1,['action'=>'invasion.claim','id'=>$iid]),'invasion reward cannot be claimed twice');
+ $classic=EncounterCatalog::create('ashen_lord','normal',1,1);ok($classic['hp']===ExpeditionRules::BOSS_HP&&$classic['reward']===ExpeditionRules::REWARD,'original encounter balance preserved');
+ denies(fn()=>EncounterCatalog::create('frost_warden','normal',10,1),'new boss locked until world chapter');
+ $frost=EncounterCatalog::create('frost_warden','heroic',12,2);ok($frost['hp']===12000&&$frost['pass']===2400,'boss family and difficulty scale immutable encounter goals');
+ $raid=['encounter_rules'=>json_encode($frost)];ok(EncounterCatalog::damage($raid,[50100101=>10],'pass',[])>ExpeditionRules::strength([50100101=>10],'pass',[]),'frost pass rewards infantry tactic');
+ $created=ExpeditionService::action(1,['action'=>'create','name'=>'Frost test','boss_code'=>'frost_warden','difficulty'=>'heroic']);
+ $stored=$db->query('SELECT * FROM expeditions WHERE id=?',[$created['expedition_id']])->fetch();ok($stored['boss_code']==='frost_warden'&&(int)$stored['boss_hp']===12000&&EncounterCatalog::rules($stored)['pass']===2400,'real expedition creation persists chosen boss difficulty and rules');
+ denies(fn()=>AccountService::action(1,['action'=>'password.change','current_password'=>'bad','new_password'=>'NewFixturePassword']),'password change requires old password');
+ $recovery=AccountService::action(1,['action'=>'recovery.generate','current_password'=>$password]);ok(strlen($recovery['recovery_code'])===39,'recovery code is generated once for authenticated owner');
+ ok(!str_contains((string)$db->query('SELECT code_hash FROM account_recovery_codes WHERE player_id=1')->fetchColumn(),$recovery['recovery_code']),'recovery database stores only a hash');
+ $db->execute("INSERT INTO sessions(player_id,token,csrf_token,ip_address,expires_at) VALUES(1,?,?,?,DATE_ADD(UTC_TIMESTAMP(),INTERVAL 1 HOUR))",[bin2hex(random_bytes(32)),bin2hex(random_bytes(32)),'127.0.0.1']);
+ AccountService::recover('Feature1',$recovery['recovery_code'],'ReplacementFixturePassword');ok(password_verify('ReplacementFixturePassword',$db->query('SELECT password_hash FROM players WHERE id=1')->fetchColumn()),'recovery changes actual password');
+ ok((int)$db->query('SELECT COUNT(*) FROM sessions WHERE player_id=1')->fetchColumn()===0,'recovery revokes every old login session');
+ denies(fn()=>AccountService::recover('Feature1',$recovery['recovery_code'],'AnotherFixturePassword'),'used recovery code cannot be replayed');
+ $db->execute("INSERT INTO worlds(id,name,slug,status,map_size) VALUES(2,'Feature second','feature-second','open',256)");
+ $db->execute("INSERT INTO cities(id,player_id,world_id,name,coord_x,coord_y,castle_level,food,lumber,stone,gold) VALUES(3,1,2,'Second city',40,40,4,10000,10000,10000,10000)");
+ foreach(\Conquer\Game\City\CityState::BUILDING_CODES as$code)$db->execute('INSERT INTO city_buildings(city_id,building_code,level) VALUES(3,?,?)',[$code,$code==='castle'?4:1]);
+ \Conquer\Game\World\WorldContext::run(2,function()use($db):void{
+     ok(MasteryService::snapshot(1)['available']===1,'selected world supplies its own mastery budget');
+     operation(1,['action'=>'mastery.apply','ranks'=>['defense_0'=>1],'revision'=>0]);
+     ok(MasteryService::snapshot(1)['spent']===1&&MasteryService::snapshot(1,1)['spent']===0,'mastery points never cross world boundaries');
+     ok(EventService::state(1)['events']===[],'conquest read model excludes other worlds');
+     denies(fn()=>operation(1,['action'=>'event.claim','id'=>1]),'foreign world event cannot credit current city');
+ });
+ ok(\Conquer\Game\World\WorldContext::id()===1,'background context restores caller world');
+ $objectiveCount=(int)$db->query("SELECT COUNT(DISTINCT tier) FROM shrines WHERE world_id=1 AND shrine_code LIKE 'EVENT_%'")->fetchColumn();
+ ok($objectiveCount===4,'enabled Conquest supplies one real objective per phase');
+ echo "ALL PROGRESSION CHECKS PASSED\n";
+}catch(Throwable $e){$failed=true;fwrite(STDERR,'FAIL '.$e->getMessage()."\n");}finally{if($fixture)$fixture->close();}
+exit($failed?1:0);

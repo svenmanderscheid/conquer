@@ -1,0 +1,2 @@
+ALTER TABLE expeditions ADD COLUMN IF NOT EXISTS encounter_rules JSON NULL;
+ALTER TABLE expeditions ADD COLUMN IF NOT EXISTS difficulty VARCHAR(16) NOT NULL DEFAULT 'normal';

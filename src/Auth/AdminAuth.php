@@ -12,14 +12,11 @@ use Conquer\Db\Connection;
  * Admin accounts are stored in admin_users — completely separate from
  * game player accounts.
  *
- * Rate limit: max 5 login attempts per IP per minute, tracked in memory
- * via a dedicated DB table (admin_login_attempts reusing login_attempts).
+ * Atomic limits are shared across workers, by IP and account name.
  */
 final class AdminAuth
 {
     private const SESSION_KEY     = 'admin';
-    private const MAX_ATTEMPTS    = 5;
-    private const ATTEMPT_WINDOW  = 60; // seconds
 
     // -------------------------------------------------------------------------
     // Login / Logout
@@ -34,7 +31,13 @@ final class AdminAuth
     public static function login(string $username, string $password): bool
     {
         $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
-        self::enforceRateLimit($ip);
+        $retry = \Conquer\Security\RateLimit::consume('admin.ip', $ip, 5, 60);
+        if (!$retry) $retry = \Conquer\Security\RateLimit::consume('admin.account', strtolower(trim($username)), 5, 900);
+        if ($retry > 0) {
+            header('Retry-After: ' . $retry);
+            http_response_code(429);
+            throw new \RuntimeException('Zu viele Anmeldeversuche. Bitte warte kurz.');
+        }
 
         $db  = Connection::getInstance();
         $row = $db->query(
@@ -43,7 +46,6 @@ final class AdminAuth
         )->fetch();
 
         if ($row === false || !password_verify($password, $row['password_hash'])) {
-            self::recordFailedAttempt($ip);
             return false;
         }
 
@@ -183,43 +185,4 @@ final class AdminAuth
         }
     }
 
-    // -------------------------------------------------------------------------
-    // Rate limiting (re-uses login_attempts table if present, else degrades)
-    // -------------------------------------------------------------------------
-
-    private static function enforceRateLimit(string $ip): void
-    {
-        try {
-            $db = Connection::getInstance();
-            $count = (int) $db->query(
-                'SELECT COUNT(*) FROM login_attempts
-                  WHERE ip = ?
-                    AND attempted_at > DATE_SUB(UTC_TIMESTAMP(), INTERVAL ? SECOND)',
-                [$ip, self::ATTEMPT_WINDOW],
-            )->fetchColumn();
-
-            if ($count >= self::MAX_ATTEMPTS) {
-                throw new \RuntimeException('Too many login attempts. Please wait a minute.');
-            }
-        } catch (\RuntimeException $e) {
-            // Re-throw rate limit exceptions as-is
-            if (str_contains($e->getMessage(), 'Too many')) {
-                throw $e;
-            }
-            // login_attempts table may not exist — degrade gracefully
-        }
-    }
-
-    private static function recordFailedAttempt(string $ip): void
-    {
-        try {
-            $db = Connection::getInstance();
-            $db->execute(
-                "INSERT INTO login_attempts (ip, attempted_at) VALUES (?, UTC_TIMESTAMP())",
-                [$ip],
-            );
-        } catch (\Throwable) {
-            // Degrade gracefully
-        }
-    }
 }

@@ -1,0 +1,232 @@
+/* Inventory layout. Shared materials and rarity colours live in village-theme.css. */
+body.mobile-game #panel-dialog[data-panel="inventory"] #content { padding:0!important; overflow:hidden; }
+body.mobile-game #panel-dialog .inventory-shell.inventory-paged {
+  display:flex; flex:1; flex-direction:column; min-width:0; min-height:0;
+  width:100%; max-width:none; padding:0; margin:0; gap:0; overflow:hidden;
+}
+body.mobile-game #panel-dialog .inventory-backpack.inventory-paged .inventory-category-tabs {
+  display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:5px;
+  flex:none; margin:0; padding:10px 12px 8px; border-bottom:1px solid var(--ui-line);
+}
+body.mobile-game #panel-dialog .inventory-backpack .inventory-category-tabs button {
+  min-width:0; min-height:44px; padding:7px 2px; justify-content:center;
+  font:800 14px/1.2 var(--ui-font); overflow-wrap:anywhere;
+}
+body.mobile-game #panel-dialog :is(.inventory-scope-bar,.inventory-views) {
+  display:flex; flex:none; flex-wrap:wrap; align-items:center; gap:6px;
+  padding:7px 12px; margin:0; border-bottom:1px solid var(--ui-line);
+}
+body.mobile-game #panel-dialog :is(.inventory-scope-bar,.inventory-views) button {
+  min-height:36px; padding:6px 12px; font-size:12px; font-weight:700;
+}
+body.mobile-game #panel-dialog .inventory-scope-bar>span {
+  margin-left:auto; font-size:12px; color:var(--ui-muted); white-space:nowrap;
+}
+body.mobile-game #panel-dialog .inventory-paged #inventory-body { gap:0; overflow:hidden; }
+body.mobile-game #panel-dialog .inventory-backpack.inventory-paged :is(.inventory-scroll-board,.inventory-scroll-list) {
+  display:block; flex:1; min-height:0; min-width:0; overflow-y:auto; overflow-x:hidden;
+  overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:var(--ui-line) var(--ui-paper);
+  padding:22px; touch-action:pan-y; container-type:normal;
+}
+body.mobile-game #panel-dialog .inventory-backpack.inventory-paged .inventory-page-grid {
+  display:grid; width:100%; max-width:1080px; margin:0 auto; min-height:0; height:auto;
+  grid-template-columns:repeat(var(--inventory-columns,4),minmax(0,1fr));
+  grid-template-rows:none; grid-auto-rows:auto; align-content:start; justify-content:start;
+  gap:22px; container-type:normal;
+}
+body.mobile-game #panel-dialog .inventory-backpack.inventory-paged .loot-card {
+  display:block; aspect-ratio:1; min-width:0; min-height:0; width:100%; padding:0;
+  border:0; border-radius:15px; cursor:pointer; text-align:center;
+}
+body.mobile-game #panel-dialog .inventory-backpack.inventory-paged .loot-card.is-unowned { opacity:.72; filter:none; }
+body.mobile-game #panel-dialog .inventory-backpack.inventory-paged .loot-tile.is-unowned { opacity:1; filter:none; }
+body.mobile-game #panel-dialog .inventory-backpack.inventory-paged .inventory-equipment-page {
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); grid-auto-rows:min-content; gap:12px;
+}
+body.mobile-game #panel-dialog .inventory-backpack.inventory-paged .relic-slot { min-width:0; padding:12px; }
+body.mobile-game #panel-dialog .inventory-backpack.inventory-paged .inventory-bonus-page>div {
+  display:flex; justify-content:space-between; gap:12px; padding:15px 8px;
+  border-bottom:1px solid var(--ui-line); color:var(--ui-ink);
+}
+body.mobile-game #panel-dialog .inventory-backpack.inventory-paged .inventory-bonus-page strong { color:var(--ui-green-dark); white-space:nowrap; }
+body.mobile-game #panel-dialog .inventory-empty {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  flex:1; min-height:0; padding:20px; text-align:center; overflow:auto;
+}
+body.mobile-game #panel-dialog .inventory-empty>img { width:70px; height:70px; object-fit:contain; }
+body.mobile-game #panel-dialog .inventory-empty h3 { margin:12px 0 6px; font-size:19px; }
+body.mobile-game #panel-dialog .inventory-empty p { color:var(--ui-muted); max-width:320px; }
+body.mobile-game #game-dialog .inventory-dialog-heading {
+  display:grid; grid-template-columns:110px minmax(0,1fr); gap:18px; align-items:center; margin:0 0 18px; padding:0;
+}
+body.mobile-game #game-dialog .inventory-dialog-heading>.loot-tile { width:110px; }
+body.mobile-game #game-dialog .inventory-dialog :is(.inventory-kicker,.inventory-owned) { color:var(--ui-muted); letter-spacing:0; font-size:13px; }
+body.mobile-game #game-dialog .inventory-dialog-heading h2 { font-size:22px; line-height:1.25; color:var(--ui-ink); }
+body.mobile-game #game-dialog .inventory-effect { margin:0 0 18px; padding:16px 0; border-color:var(--ui-line); }
+body.mobile-game #game-dialog .inventory-effect p { color:var(--ui-ink); font-size:14px; line-height:1.6; }
+body.mobile-game #game-dialog .inventory-dialog form { display:flex; flex-direction:column; gap:8px; }
+body.mobile-game #game-dialog .inventory-dialog :is(select,.button) { min-height:44px; }
+body.mobile-game #game-dialog .inventory-use-footer { display:flex; flex-direction:column; gap:10px; margin-top:10px; }
+body.mobile-game #game-dialog .inventory-use-footer>span { color:var(--ui-muted); font-size:12px; text-align:center; }
+@media(max-width:699px) {
+  body.mobile-game #panel-dialog .inventory-backpack.inventory-paged .inventory-category-tabs { padding:7px 6px; gap:3px; }
+  body.mobile-game #panel-dialog .inventory-backpack .inventory-category-tabs button { font-size:clamp(10px,2.8vw,13px); }
+  body.mobile-game #panel-dialog :is(.inventory-scope-bar,.inventory-views) { padding:6px 9px; gap:4px; }
+  body.mobile-game #panel-dialog :is(.inventory-scope-bar,.inventory-views) button { font-size:11px; padding:5px 9px; }
+  body.mobile-game #panel-dialog .inventory-scope-bar>span { font-size:10px; }
+  body.mobile-game #panel-dialog .inventory-backpack.inventory-paged :is(.inventory-scroll-board,.inventory-scroll-list) { padding:16px 12px; }
+  body.mobile-game #panel-dialog .inventory-backpack.inventory-paged .inventory-page-grid { gap:16px 12px; }
+  body.mobile-game #panel-dialog .inventory-backpack.inventory-paged .inventory-equipment-page { grid-template-columns:1fr; }
+  body.mobile-game #game-dialog .inventory-dialog-heading { grid-template-columns:86px minmax(0,1fr); gap:12px; }
+  body.mobile-game #game-dialog .inventory-dialog-heading>.loot-tile { width:86px; }
+}
+@media(max-width:359px) {
+  body.mobile-game #panel-dialog .inventory-backpack.inventory-paged :is(.inventory-scroll-board,.inventory-scroll-list) { padding:12px 9px; }
+  body.mobile-game #panel-dialog .inventory-backpack.inventory-paged .inventory-page-grid { gap:13px 9px; }
+}
+@media(max-height:539px) {
+  body.mobile-game #panel-dialog .inventory-backpack.inventory-paged .inventory-category-tabs { padding:4px 8px; }
+  body.mobile-game #panel-dialog .inventory-backpack .inventory-category-tabs button { min-height:40px; }
+  body.mobile-game #panel-dialog :is(.inventory-scope-bar,.inventory-views) { padding:4px 8px; }
+  body.mobile-game #panel-dialog .inventory-backpack.inventory-paged .inventory-page-grid { max-width:840px; gap:14px; }
+  body.mobile-game #game-dialog .inventory-dialog-heading { grid-template-columns:64px minmax(0,1fr); margin-bottom:10px; }
+  body.mobile-game #game-dialog .inventory-dialog-heading>.loot-tile { width:64px; }
+  body.mobile-game #game-dialog .inventory-effect { padding:10px 0; margin-bottom:10px; }
+}
+
+/* Item selection and details share the inventory instead of opening a dialog. */
+body.mobile-game #panel-dialog .inventory-browser {
+  display:grid; grid-template-columns:minmax(0,1fr) minmax(260px,35%);
+  flex:1; min-width:0; min-height:0; overflow:hidden;
+}
+body.mobile-game #panel-dialog .inventory-backpack.inventory-paged .inventory-browser .inventory-scroll-board { padding:18px; }
+body.mobile-game #panel-dialog .inventory-backpack.inventory-paged .inventory-browser .inventory-page-grid { gap:16px; }
+body.mobile-game #panel-dialog .inventory-inspector {
+  min-width:0; min-height:0; padding:22px; margin:12px 12px 12px 0;
+  border:1px solid var(--ui-line); overflow:auto; overscroll-behavior:contain;
+  scrollbar-width:thin; touch-action:pan-y;
+}
+body.mobile-game #panel-dialog .inventory-inspector .inventory-dialog {
+  display:flex; flex-direction:column; min-width:0; min-height:100%;
+}
+body.mobile-game #panel-dialog .inventory-inspector .inventory-dialog-heading {
+  display:flex; flex-direction:column; gap:16px; margin:0 0 18px; text-align:center;
+}
+body.mobile-game #panel-dialog .inventory-inspector .inventory-dialog-heading>.loot-tile { width:124px; flex:none; }
+body.mobile-game #panel-dialog .inventory-inspector .inventory-dialog-heading>div { min-width:0; }
+body.mobile-game #panel-dialog .inventory-inspector :is(.inventory-kicker,.inventory-owned) {
+  color:var(--ui-muted); font-size:13px; letter-spacing:0; line-height:1.35;
+}
+body.mobile-game #panel-dialog .inventory-inspector h2 { margin:6px 0; color:var(--ui-ink); font-size:23px; line-height:1.2; overflow-wrap:anywhere; }
+body.mobile-game #panel-dialog .inventory-inspector .inventory-effect { margin:0 0 16px; padding:14px 0; border-color:var(--ui-line); }
+body.mobile-game #panel-dialog .inventory-inspector .inventory-effect p { margin:0; color:var(--ui-ink); font-size:15px; line-height:1.45; }
+body.mobile-game #panel-dialog .inventory-inspector form { display:flex; flex-direction:column; gap:8px; margin-top:auto; }
+body.mobile-game #panel-dialog .inventory-inspector :is(select,.button) { min-width:0; width:100%; min-height:44px; }
+body.mobile-game #panel-dialog .inventory-inspector .inventory-use-footer { display:flex; flex-direction:column; gap:8px; margin-top:8px; }
+body.mobile-game #panel-dialog .inventory-inspector .inventory-use-footer>span { color:var(--ui-muted); font-size:13px; text-align:center; }
+body.mobile-game #panel-dialog .inventory-use-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+body.mobile-game #panel-dialog .inventory-use-actions>button:only-child { grid-column:1/-1; }
+body.mobile-game #panel-dialog .inventory-use-actions>.button { padding:8px 5px; font-size:14px; white-space:normal; }
+body.mobile-game #panel-dialog .inventory-use-hint { color:var(--ui-muted); font-size:12px; line-height:1.35; text-align:center; }
+@media(max-width:999px) {
+  body.mobile-game #panel-dialog .inventory-browser { grid-template-columns:minmax(0,1fr) minmax(220px,38%); }
+  body.mobile-game #panel-dialog .inventory-inspector { padding:14px; margin:10px 10px 10px 0; }
+  body.mobile-game #panel-dialog .inventory-backpack.inventory-paged .inventory-browser .inventory-scroll-board { padding:14px; }
+  body.mobile-game #panel-dialog .inventory-backpack.inventory-paged .inventory-browser .inventory-page-grid { gap:12px; }
+}
+@media(max-width:539px) {
+  body.mobile-game #panel-dialog .inventory-browser { grid-template-columns:minmax(0,1fr); grid-template-rows:minmax(110px,1fr) minmax(0,1fr); }
+  body.mobile-game #panel-dialog .inventory-inspector { margin:0 8px 8px; padding:12px; }
+  body.mobile-game #panel-dialog .inventory-inspector .inventory-dialog-heading { display:grid; grid-template-columns:72px minmax(0,1fr); gap:12px; text-align:left; margin-bottom:8px; }
+  body.mobile-game #panel-dialog .inventory-inspector .inventory-dialog-heading>.loot-tile { width:72px; }
+  body.mobile-game #panel-dialog .inventory-inspector h2 { font-size:19px; }
+  body.mobile-game #panel-dialog .inventory-inspector :is(.inventory-kicker,.inventory-owned) { font-size:12px; }
+  body.mobile-game #panel-dialog .inventory-inspector .inventory-effect { padding:8px 0; margin-bottom:8px; }
+  body.mobile-game #panel-dialog .inventory-inspector .inventory-effect p { font-size:13px; }
+  body.mobile-game #panel-dialog .inventory-backpack.inventory-paged .inventory-browser .inventory-scroll-board { padding:12px; }
+  body.mobile-game #panel-dialog .inventory-backpack.inventory-paged .inventory-browser .inventory-page-grid { gap:12px; }
+}
+@media(max-height:539px) and (min-width:540px) {
+  body.mobile-game #panel-dialog .inventory-inspector { padding:10px; margin:6px 6px 6px 0; }
+  body.mobile-game #panel-dialog .inventory-inspector .inventory-dialog-heading { display:grid; grid-template-columns:54px minmax(0,1fr); gap:10px; text-align:left; margin-bottom:6px; }
+  body.mobile-game #panel-dialog .inventory-inspector .inventory-dialog-heading>.loot-tile { width:54px; }
+  body.mobile-game #panel-dialog .inventory-inspector h2 { font-size:17px; margin:3px 0; }
+  body.mobile-game #panel-dialog .inventory-inspector :is(.inventory-kicker,.inventory-owned) { font-size:11px; }
+  body.mobile-game #panel-dialog .inventory-inspector .inventory-effect { padding:6px 0; margin-bottom:6px; }
+  body.mobile-game #panel-dialog .inventory-inspector .inventory-effect p { font-size:13px; }
+  body.mobile-game #panel-dialog .inventory-inspector .inventory-use-footer { gap:5px; margin-top:5px; }
+}
+
+/* Read-only resource and speedup overview opened from the inventory title bar. */
+#inventory-overview-button { display:none; }
+body.mobile-game #panel-dialog[data-panel="inventory"] #inventory-overview-button {
+  display:grid; place-items:center; box-sizing:border-box;
+  flex:0 0 38px; width:38px; height:38px;
+  min-width:38px; min-height:38px; padding:5px; margin-left:auto;
+}
+#inventory-overview-button svg { display:block; width:25px; height:25px; fill:none; stroke:currentColor; stroke-width:3; stroke-linecap:round; stroke-linejoin:round; }
+body.mobile-game #panel-dialog[data-panel="inventory"] .panel-close { margin-left:0; }
+@media(max-width:700px) {
+  body.mobile-game #panel-dialog[data-panel="inventory"] #inventory-overview-button {
+    flex-basis:34px; width:34px; height:34px; min-width:34px; min-height:34px; padding:4px;
+  }
+  #inventory-overview-button svg { width:23px; height:23px; }
+}
+@media(max-height:540px) {
+  body.mobile-game #panel-dialog[data-panel="inventory"] #inventory-overview-button {
+    flex-basis:28px; width:28px; height:28px; min-width:28px; min-height:28px; padding:3px;
+  }
+  #inventory-overview-button svg { width:20px; height:20px; }
+}
+body.mobile-game #game-dialog:has(.inventory-overview) {
+  width:min(680px,calc(100dvw - 24px))!important;
+  height:min(620px,calc(100dvh - 24px))!important;
+}
+body.mobile-game #game-dialog:has(.inventory-overview) #dialog-content { display:flex; padding:0; overflow:hidden; }
+.inventory-overview { display:flex; flex-direction:column; flex:1; min-width:0; min-height:0; }
+.inventory-overview-tabs { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; padding:12px 14px 10px; flex:none; }
+.inventory-overview-tabs button { min-width:0; min-height:44px; font-size:15px; font-weight:800; padding:8px; }
+.inventory-overview-scroll { min-height:0; min-width:0; flex:1; overflow:auto; overscroll-behavior:contain; touch-action:pan-y; scrollbar-width:thin; padding:0 14px; }
+.inventory-overview-table { width:100%; margin:0; table-layout:fixed; border-spacing:0; border-collapse:separate; font-size:15px; }
+.inventory-overview-table th,.inventory-overview-table td { padding:12px 10px; border:0; line-height:1.35; }
+.inventory-overview-table thead th { position:sticky; top:0; z-index:1; font-size:12px; text-align:right; }
+.inventory-overview-table thead th:first-child { text-align:left; width:42%; }
+.inventory-overview-table tbody th { text-align:left; font-weight:700; }
+.inventory-overview-table td { text-align:right; font-weight:800; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.inventory-overview-identity { display:flex; align-items:center; gap:12px; min-width:0; }
+.inventory-overview-identity>span:last-child { min-width:0; overflow-wrap:anywhere; }
+.inventory-overview-art { position:relative; display:block; flex:0 0 45px; width:45px; height:45px; border-radius:10px; }
+.inventory-overview-art>img { width:100%; height:100%; object-fit:contain; }
+.inventory-overview-art>img.inventory-overview-specialty { position:absolute; width:46%; height:46%; left:-2px; bottom:-1px; }
+.inventory-overview-table.is-speedups thead th:first-child { width:48%; }
+.inventory-overview-footer { flex:none; padding:10px 18px 14px; }
+.inventory-overview-note { margin:0; text-align:center; font-size:12px; line-height:1.45; }
+.inventory-overview-units { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin-bottom:10px; }
+.inventory-overview-units[hidden] { display:none; }
+.inventory-overview-units button { display:flex; align-items:center; justify-content:center; gap:7px; min-height:44px; padding:7px 5px; font-size:13px; font-weight:700; }
+.inventory-overview-units button span { display:grid; place-items:center; width:20px; height:20px; border:1px solid var(--ui-line); border-radius:5px; }
+.inventory-overview-units button:not(.active) span { font-size:0; }
+.inventory-overview-sr { position:absolute; width:1px; height:1px; margin:-1px; clip-path:inset(50%); overflow:hidden; white-space:nowrap; }
+@media(max-width:520px) {
+  .inventory-overview-tabs { padding:8px 9px; gap:6px; }
+  .inventory-overview-scroll { padding:0 9px; }
+  .inventory-overview-table { font-size:12px; }
+  .inventory-overview-table th,.inventory-overview-table td { padding:11px 5px; }
+  .inventory-overview-table thead th { font-size:11px; }
+  .inventory-overview-art { flex-basis:32px; width:32px; height:36px; }
+  .inventory-overview-identity { gap:6px; }
+  .inventory-overview-footer { padding:9px 10px 12px; }
+  .inventory-overview-note { font-size:11px; }
+  .inventory-overview-units { gap:5px; }
+  .inventory-overview-units button { font-size:12px; gap:5px; }
+}
+@media(max-height:539px) {
+  body.mobile-game #game-dialog:has(.inventory-overview) .popup-heading { flex-basis:42px; min-height:42px; }
+  .inventory-overview-tabs { padding:5px 10px; }
+  .inventory-overview-tabs button { min-height:40px; }
+  .inventory-overview-table th,.inventory-overview-table td { padding:7px; }
+  .inventory-overview-art { flex-basis:30px; width:30px; height:30px; }
+  .inventory-overview-footer { padding:6px 12px; }
+  .inventory-overview-units { margin-bottom:4px; }
+  .inventory-overview-note { font-size:10px; }
+}

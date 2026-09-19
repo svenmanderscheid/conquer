@@ -1,0 +1,217 @@
+/* Map-first game HUD: five illustrated destinations above the living playfield.
+   Load after game-theme.css; map-overlay.css owns the map's local tools. */
+.mobile-game .page-heading h1,.mobile-game #player-hud-name,.game-dock-item .dock-label{font-family:var(--ui-font)!important}
+body.mobile-game { --hud-ink:#111f32; --hud-blue:#2d5790; --hud-gold:#f0ca6c; --hud-dock-bottom:14px; --hud-dock-height:87px; margin:0; }
+/* Keep routine sync announcements accessible without adding a page footer. */
+body.mobile-game > #save-state { position:fixed; width:1px; height:1px; padding:0; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+body.mobile-game > #save-state.error { z-index:85; top:110px; right:12px; width:auto; height:auto; max-width:calc(100vw - 24px); padding:7px 10px; overflow:visible; clip-path:none; white-space:normal; border:1px solid #c18365; border-radius:4px; background:#392b2eee; color:#ffe2c9; font-size:11px; }
+.mobile-game .game-layout { display:block; max-width:none; margin:0; min-height:100dvh; }
+.mobile-game .sidebar,.mobile-game .journal { display:none; }
+.mobile-game .brand { display:none; }
+.mobile-game #main { min-width:0; padding:105px clamp(20px,4vw,64px) 145px; margin:0 auto; max-width:1600px; }
+.mobile-game #content { max-width:1400px; margin:0 auto; }
+.mobile-game .page-heading { max-width:1400px; margin:0 auto 22px; display:flex; align-items:center; justify-content:flex-start; gap:14px; padding:0 0 15px; }
+.mobile-game:not(.playfield-mode) .page-heading { display:flex; }
+.mobile-game .page-heading>div { min-width:0; }
+.mobile-game .panel-close { display:grid; place-items:center; flex:none; width:34px; height:34px; margin-left:auto; border:1px solid #7895af; border-radius:4px; background:linear-gradient(#58789b,#294366); color:#f2ebd8; font-size:24px; line-height:1; padding:0; box-shadow:inset 0 1px #c5dcec44,0 2px 0 #162c44; }
+.mobile-game .page-heading h1 { font:normal 28px/1.2 Georgia,serif; margin:3px 0 0; }
+.mobile-game .page-heading .eyebrow { font-size:8px; letter-spacing:1.2px; }
+.mobile-game .heading-status { display:none; }
+.mobile-game .panel-back { width:43px; height:43px; min-width:43px; padding:0; flex:none; display:grid; place-items:center; border:2px solid #0e1c30; border-radius:5px; background:linear-gradient(#7eb1df,#457caf 58%,#386aa3 59%); color:#fff5d8; font-size:26px; box-shadow:inset 0 1px #d2edff,0 2px 0 #061224; }
+.mobile-game .panel-back svg { width:25px; height:25px; }
+.mobile-game.playfield-mode { overflow:hidden; background:#8aa15b; }
+.mobile-game.playfield-mode .game-layout { height:100dvh; min-height:0; }
+.mobile-game.playfield-mode #main { max-width:none; height:100dvh; min-height:0; padding:0; overflow:hidden; }
+.mobile-game.playfield-mode #content { height:100%; max-width:none; margin:0; padding:0; }
+.mobile-game.playfield-mode .page-heading { display:none; }
+.mobile-game.city-mode .scene-wrap { position:fixed; inset:0; width:100%; height:100dvh; border:0; border-radius:0; box-shadow:none; margin:0; background:#8faf79; }
+.mobile-game.city-mode .scene-wrap>div:first-child { height:100%; }
+.mobile-game.city-mode .city-frame { display:block; width:100%; height:100dvh; border:0; background:#8faf79; }
+.mobile-game.city-mode .city-playfield { position:fixed; inset:0; width:100%; height:100dvh; overflow:hidden; background:#8faf79; }
+.mobile-game.city-mode .city-playfield>.city-frame { position:absolute; inset:0; width:100%; height:100%; }
+.mobile-game.city-mode .scene-label,.mobile-game.city-mode .scene-buttons,.mobile-game.city-mode .village-caption { display:none; }
+
+/* The top edge is open scenery. Only the profile and individual resources have backing. */
+.mobile-game .topbar { position:fixed; z-index:60; inset:12px 18px auto; height:auto; min-height:0; padding:0; margin:0; display:flex; align-items:flex-start; justify-content:space-between; gap:20px; background:none; border:0; box-shadow:none; pointer-events:none; }
+.mobile-game #account-button { order:0; display:flex; align-items:center; gap:10px; flex:0 1 auto; min-width:0; width:auto; max-width:290px; padding:0 13px 0 0; margin:0; text-align:left; border:0; border-radius:5px; background:linear-gradient(90deg,#1d2b3deb,#263448c7); box-shadow:0 1px 0 #dde8f744; color:#fff5df; pointer-events:auto; overflow:hidden; }
+.mobile-game #account-button .avatar { width:62px; height:65px; flex:0 0 62px; border:3px solid #e7b43f; border-radius:6px; margin:0; background:#183153; box-shadow:inset 0 0 0 1px #fff4b6,0 0 0 1px #473521,0 2px 4px #101a2a99; }
+.mobile-game #account-button .avatar img { width:100%; height:100%; object-fit:cover; object-position:center 20%; }
+.mobile-game #player-hud-name { display:block; min-width:0; max-width:186px; font:700 17px/1.35 'Segoe UI',system-ui,sans-serif; color:#f8f5e9; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-shadow:0 2px #0c1823; }
+.mobile-game #player-hud-name small { display:block; color:#ffac3a; font-size:15px; font-weight:700; line-height:1.3; margin-top:4px; padding-top:3px; border-top:1px solid #c5d6ee22; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.mobile-game .profile-chevron { display:none; }
+.mobile-game #resources { order:1; position:static; inset:auto; transform:none; display:flex; justify-content:flex-end; align-items:center; gap:8px; flex:0 1 auto; min-width:0; width:auto; padding:6px 0 0; margin:0; pointer-events:auto; }
+.mobile-game #resources .resource { position:relative; display:flex; align-items:center; justify-content:flex-start; gap:5px; flex:0 1 122px; min-width:94px; width:auto; height:35px; padding:2px 11px 2px 2px; border:0; border-radius:3px; background:#192533c9; box-shadow:inset 0 1px #d3e4fa2b,0 1px #060d1933; color:#fff9de; overflow:visible; }
+.mobile-game #resources .resource-icon { display:grid; place-items:center; width:36px; height:40px; flex:0 0 36px; margin-top:-3px; }
+.mobile-game #resources .resource-icon img { width:46px; height:46px; max-width:none; object-fit:contain; filter:drop-shadow(0 2px 1px #0c1528); }
+.mobile-game #resources .resource>span:last-child { min-width:0; }
+.mobile-game #resources .resource strong { display:block; font-size:17px; line-height:1.2; white-space:nowrap; text-shadow:0 2px #071323; font-variant-numeric:tabular-nums; }
+/* Legacy resource styles explicitly show labels; the reference HUD only displays amounts. */
+.mobile-game #resources .resource small { display:none!important; }
+.mobile-game #resources .resource:hover { background:#2b3f54e6; }
+
+/* Five plaques: colorful objects rise above the blue face; labels sit on dark enamel. */
+.mobile-game #navigation.game-dock { position:fixed; z-index:70; left:auto; right:19px; bottom:var(--hud-dock-bottom); display:grid; grid-template-columns:repeat(4,89px) 108px; gap:7px; width:auto; max-width:calc(100vw - 26px); height:var(--hud-dock-height); padding:0; margin:0; overflow:visible; border:0; border-radius:0; background:none; box-shadow:none; scrollbar-width:none; pointer-events:none; }
+.game-dock-item { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; align-self:end; width:100%; min-width:0; height:72px; padding:0; margin:0; border:3px solid #0c1a2f; border-radius:7px; background:linear-gradient(163deg,#96bbda 0%,#5d91c0 12%,#507eaf 64%,#15283f 65%); box-shadow:inset 0 0 0 1px #a9d7fa6e,inset 3px 0 #102a474d,0 3px 0 #061122,0 4px 6px #14203977; cursor:pointer; pointer-events:auto; isolation:isolate; color:#fff7dc; }
+.game-dock-item:before,.game-dock-item:after { content:''; position:absolute; top:3px; width:8px; height:8px; border-top:2px solid #dfc383; pointer-events:none; opacity:.9; }
+.game-dock-item:before { left:3px; border-left:2px solid #dfc383; }
+.game-dock-item:after { right:3px; border-right:2px solid #dfc383; }
+.game-dock-item .dock-icon { position:absolute; z-index:1; left:50%; top:-22px; transform:translateX(-50%); width:72px; height:73px; max-width:none; object-fit:contain; pointer-events:none; filter:drop-shadow(0 2px 1px #101b2ccc); }
+.game-dock-item:last-child .dock-icon { width:92px; height:85px; top:-31px; }
+.game-dock-item .dock-label { position:relative; display:grid; place-items:center; width:100%; min-height:23px; padding:2px 2px 3px; border-radius:0 0 3px 3px; background:#102039; font:800 12px/1.05 'Segoe UI',system-ui,sans-serif; letter-spacing:-.1px; color:#fff7e4; text-transform:uppercase; text-shadow:0 2px 1px #000,1px 0 #07111f,-1px 0 #07111f; white-space:nowrap; }
+.game-dock-item.current { border-color:#f4cb6b; background:linear-gradient(163deg,#bbdcf1,#79a9d5 16%,#466fbb 64%,#182b47 65%); box-shadow:inset 0 0 0 1px #10284f,0 3px 0 #503c24,0 0 11px #f4c55a55; }
+.game-dock-item.current .dock-label { color:#ffe9a1; background:#233555; }
+.game-dock-item:hover { filter:brightness(1.12); }
+.game-dock-item:active { translate:0 2px; }
+.game-dock-item .nav-badge,.game-dock-item .dock-badge { position:absolute; z-index:3; top:-12px; right:-3px; display:grid; place-items:center; min-width:21px; height:21px; padding:1px 4px; border:1px solid #ffe1ae; border-radius:50%; background:#ef4327; color:white; font-size:11px; font-weight:800; box-shadow:0 2px 3px #06122488; }
+.game-quick-actions { position:fixed; z-index:65; right:23px; bottom:125px; display:flex; flex-direction:column; gap:11px; padding:0; margin:0; pointer-events:none; }
+.game-quick-actions>button { position:relative; display:grid; place-items:center; width:57px; height:57px; min-width:0; padding:5px; border:3px solid #101c2d; border-radius:50%; background:radial-gradient(circle at 35% 22%,#7cadd4,#2b5b8b 58%,#152b42 60%); box-shadow:inset 0 0 0 2px #9db3c8,inset 0 0 0 4px #203d5b,0 3px 3px #14233266; cursor:pointer; pointer-events:auto; }
+.game-quick-actions>button>img { width:50px; height:50px; max-width:none; object-fit:contain; filter:drop-shadow(0 2px #13233799); }
+.game-quick-actions>button>svg { width:35px; height:35px; color:#ffe3a0; }
+.game-quick-actions>button>span { position:absolute; left:50%; top:100%; transform:translateX(-50%); color:#fff2cb; background:#122237dc; border:1px solid #7695b477; border-radius:3px; padding:1px 5px; font-size:9px; white-space:nowrap; pointer-events:none; }
+.game-quick-actions>button:hover { filter:brightness(1.15); }
+
+/* One short next step rather than a permanently open journal. */
+.hud-objective { position:fixed; z-index:55; left:18px; bottom:170px; display:flex; align-items:center; gap:10px; max-width:370px; min-height:53px; padding:3px 13px 3px 4px; border:0; border-radius:4px; background:linear-gradient(90deg,#142339e8,#263950b3); box-shadow:0 1px #d4e5fa22; color:#f7f1df; cursor:pointer; text-align:left; }
+.hud-objective .hud-objective-icon,.hud-objective>img { width:48px; height:49px; flex:none; object-fit:contain; filter:drop-shadow(0 2px #102333); }
+.hud-objective>span { display:block; min-width:0; }
+.hud-objective strong { display:block; color:#fff2d2; font-size:13px; font-weight:700; line-height:1.25; }
+.hud-objective small { display:block; margin-top:4px; font-size:11px; color:#b9d6e9; line-height:1.3; }
+.mobile-game.city-mode .hud-objective { bottom:25px; max-width:340px; }
+.city-building-button,.city-building-tool { position:fixed; z-index:55; bottom:95px; left:18px; display:flex; align-items:center; gap:8px; width:auto; min-height:43px; padding:7px 11px; border:2px solid #182a41; border-radius:6px; background:linear-gradient(#86aaca,#456f9d); color:#fff1d1; font-size:12px; font-weight:700; box-shadow:inset 0 1px #d5f0fb,0 2px 0 #102335; }
+.city-building-button img,.city-building-tool img { width:30px; height:30px; object-fit:contain; }
+.city-building-tool>span { font-size:25px; line-height:1; }
+.city-building-tool>small { font-size:11px; }
+.mobile-game:not(.playfield-mode) .hud-objective { display:none; }
+.mobile-game:not(.playfield-mode) .game-quick-actions { bottom:125px; }
+.mobile-game #toast { z-index:90; bottom:120px; }
+
+/* Secondary destinations live in a compact game window. */
+.mobile-game #game-dialog { z-index:100; border:3px solid #abc0d0; border-top:4px solid #e3d5ab; border-radius:7px; background:linear-gradient(150deg,#3f526c,#273c56); box-shadow:inset 0 0 0 2px #11233b,0 25px 80px #07101dbb; }
+.mobile-game #game-dialog::backdrop { background:#071323b8; backdrop-filter:blur(3px); }
+.mobile-game #game-dialog .dialog-close { color:#e9f1f6; border-color:#839aaf; background:linear-gradient(#6685a5,#334e73); box-shadow:inset 0 1px #d2e2ee55,0 2px 0 #16283d; }
+.mobile-game #game-dialog .menu-groups { gap:18px; }
+.mobile-game #game-dialog.menu-dialog { width:min(620px,calc(100vw - 28px)); padding:25px; }
+.mobile-game #game-dialog.menu-dialog h2 { font-size:25px; margin-bottom:17px; }
+.mobile-game #game-dialog .menu-groups h3 { color:#b9cce0; font-size:9px; margin-bottom:8px; }
+.mobile-game #game-dialog .menu-grid { gap:7px; }
+.mobile-game #game-dialog .menu-link { min-height:49px; padding:8px 11px; gap:9px; border:1px solid #708ba8; background:linear-gradient(#426589,#29476c); color:#f0e3c4; font-size:12px; border-radius:4px; box-shadow:inset 0 1px #a1c5de55,0 2px 0 #162c48; }
+.mobile-game #game-dialog .menu-link .nav-emblem { width:29px; height:30px; border-color:#c4b575; background:linear-gradient(#698dab,#304c6a); box-shadow:inset 0 0 0 2px #1b3650; }
+.mobile-game #game-dialog .menu-link.selected { border-color:#f1d28c; background:linear-gradient(#687e9a,#405b80); }
+.mobile-game #game-dialog .menu-link>span:last-child { color:#b2c9de; }
+.mobile-game #game-dialog .menu-link>img { width:32px; height:32px; object-fit:contain; }
+
+@media(max-width:1100px) {
+  .mobile-game .topbar { inset:10px 12px auto; gap:14px; }
+  .mobile-game #account-button { max-width:230px; }
+  .mobile-game #account-button .avatar { width:54px; height:57px; flex-basis:54px; }
+  .mobile-game #player-hud-name { font-size:15px; }
+  .mobile-game #player-hud-name small { font-size:13px; }
+  .mobile-game #resources { gap:5px; }
+  .mobile-game #resources .resource { min-width:80px; height:32px; padding-right:8px; gap:2px; }
+  .mobile-game #resources .resource strong { font-size:15px; }
+  .mobile-game #resources .resource-icon { width:30px; flex-basis:30px; }
+  .mobile-game #resources .resource-icon img { width:40px; height:40px; }
+  .mobile-game #navigation.game-dock { grid-template-columns:repeat(4,79px) 92px; gap:5px; right:12px; }
+  .hud-objective { max-width:310px; }
+  .mobile-game.city-mode .hud-objective { max-width:280px; }
+}
+@media(max-width:700px) {
+  body.mobile-game { --hud-dock-bottom:calc(7px + env(safe-area-inset-bottom,0px)); --hud-dock-height:68px; }
+  .mobile-game .topbar { inset:8px 8px auto; display:flex; flex-direction:column; align-items:flex-start; gap:5px; }
+  .mobile-game #account-button { max-width:min(230px,calc(100vw - 16px)); padding-right:10px; gap:8px; }
+  .mobile-game #account-button .avatar { width:47px; height:49px; flex-basis:47px; border-width:2px; }
+  .mobile-game #player-hud-name { font-size:13px; max-width:161px; }
+  .mobile-game #player-hud-name small { font-size:12px; line-height:1.1; padding-top:2px; margin-top:2px; }
+  .mobile-game #resources { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); justify-content:start; gap:5px; padding:0; width:min(380px,calc(100vw - 16px)); }
+  .mobile-game #resources .resource { min-width:0; width:100%; height:38px; padding:2px 8px 2px 4px; gap:7px; border:1px solid #62758b88; background:linear-gradient(90deg,#172435eb,#24354ae0); box-shadow:inset 0 1px #d8e8fb33,0 2px 3px #07111e66; }
+  .mobile-game #resources .resource-icon { width:34px; height:38px; flex-basis:34px; margin-top:0; }
+  .mobile-game #resources .resource-icon img { width:40px; height:40px; }
+  .mobile-game #resources .resource>span:last-child { display:flex; min-width:0; flex:1; align-items:baseline; justify-content:space-between; gap:6px; }
+  .mobile-game #resources .resource strong { min-width:0; overflow:hidden; font-size:14px; line-height:1.1; text-overflow:ellipsis; }
+  .mobile-game #resources .resource small { display:block!important; flex:none; color:#bac9d9; font-size:8px; line-height:1; text-transform:uppercase; letter-spacing:.35px; }
+  .mobile-game #navigation.game-dock { left:6px; right:6px; bottom:var(--hud-dock-bottom); grid-template-columns:repeat(5,minmax(0,1fr)); gap:4px; width:auto; max-width:none; height:68px; }
+  .game-dock-item { height:56px; border-width:2px; border-radius:5px; }
+  .game-dock-item:before,.game-dock-item:after { top:2px; width:5px; height:5px; border-top-width:1px; }
+  .game-dock-item:before { left:2px; border-left-width:1px; }
+  .game-dock-item:after { right:2px; border-right-width:1px; }
+  .game-dock-item .dock-icon { width:54px; height:57px; top:-21px; }
+  .game-dock-item:last-child .dock-icon { width:63px; height:65px; top:-27px; }
+  .game-dock-item .dock-label { min-height:18px; font-size:10px; letter-spacing:-.3px; padding:2px 1px; }
+  .game-dock-item .nav-badge,.game-dock-item .dock-badge { width:17px; height:17px; min-width:17px; top:-10px; right:-2px; font-size:9px; padding:0 3px; }
+  .game-quick-actions { right:10px; bottom:calc(93px + env(safe-area-inset-bottom,0px)); gap:10px; }
+  .game-quick-actions>button { width:43px; height:43px; padding:3px; border-width:2px; box-shadow:inset 0 0 0 1px #acbdcf,inset 0 0 0 3px #203d5b,0 2px 3px #14233266; }
+  .game-quick-actions>button>img { width:40px; height:40px; }
+  .game-quick-actions>button>svg { width:28px; height:28px; }
+  .game-quick-actions>button>span { font-size:8px; padding:0 3px; }
+  .hud-objective { left:8px; bottom:145px; width:auto; max-width:200px; min-height:39px; padding:3px 8px 3px 3px; gap:6px; }
+  .hud-objective .hud-objective-icon,.hud-objective>img { width:35px; height:37px; }
+  .hud-objective strong { font-size:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .hud-objective small { display:none; }
+  .mobile-game.world-mode .hud-objective { display:none; }
+  .mobile-game.city-mode .hud-objective { bottom:calc(92px + env(safe-area-inset-bottom,0px)); max-width:200px; }
+  .city-building-button,.city-building-tool { bottom:calc(142px + env(safe-area-inset-bottom,0px)); left:8px; min-height:35px; font-size:10px; padding:4px 7px; gap:5px; }
+  .city-building-button img,.city-building-tool img { width:25px; height:25px; }
+  .mobile-game #main { padding:105px 14px 115px; }
+  .mobile-game .page-heading { margin-bottom:18px; gap:10px; padding-bottom:12px; }
+  .mobile-game .page-heading h1 { font-size:23px; }
+  .mobile-game .page-heading .eyebrow { font-size:7px; letter-spacing:.8px; }
+  .mobile-game .panel-back { width:35px; height:35px; min-width:35px; font-size:22px; }
+  .mobile-game:not(.playfield-mode) .game-quick-actions { bottom:calc(92px + env(safe-area-inset-bottom,0px)); }
+  .mobile-game #toast { bottom:calc(90px + env(safe-area-inset-bottom,0px)); width:calc(100% - 22px); max-width:450px; font-size:12px; }
+  .mobile-game #game-dialog { width:calc(100% - 18px); max-height:calc(100dvh - 24px); padding:27px 19px 22px; }
+  .mobile-game #game-dialog.menu-dialog { width:calc(100% - 20px); padding:26px 17px 21px; }
+  .mobile-game #game-dialog .menu-groups { gap:15px; }
+  .mobile-game #game-dialog.menu-dialog h2 { font-size:23px; }
+  .mobile-game #game-dialog .menu-link { min-height:47px; padding:7px 8px; gap:7px; font-size:11px; }
+}
+@media(max-width:360px) {
+  .mobile-game #resources .resource { padding-right:6px; gap:4px; }
+  .mobile-game #resources .resource strong { font-size:13px; }
+  .mobile-game #resources .resource small { font-size:7px; letter-spacing:0; }
+  .mobile-game #resources .resource-icon { width:29px; flex-basis:29px; }
+  .mobile-game #resources .resource-icon img { width:35px; height:35px; }
+  .game-dock-item .dock-icon { width:48px; height:53px; top:-17px; }
+  .game-dock-item:last-child .dock-icon { width:56px; height:61px; top:-23px; }
+  .game-dock-item .dock-label { font-size:9px; }
+  .mobile-game .page-heading h1 { font-size:21px; }
+  .mobile-game #game-dialog .menu-link { font-size:10px; gap:6px; }
+}
+/* A phone in landscape has little vertical room. Keep the resource block beside
+   the profile and stack each label below its value. */
+@media(orientation:landscape) and (max-height:520px) {
+  .mobile-game .topbar { inset:6px 8px auto; flex-direction:row; align-items:flex-start; gap:7px; }
+  .mobile-game #account-button { width:min(210px,41vw); max-width:41vw; min-height:46px; padding-right:7px; gap:6px; }
+  .mobile-game #account-button .avatar { width:42px; height:45px; flex-basis:42px; }
+  .mobile-game #player-hud-name { max-width:calc(41vw - 55px); font-size:12px; }
+  .mobile-game #player-hud-name small { font-size:10px; }
+  .mobile-game #resources { width:min(430px,57vw); margin-left:auto; grid-template-columns:repeat(2,minmax(0,1fr)); gap:4px; }
+  .mobile-game #resources .resource { height:34px; padding:1px 6px 1px 3px; gap:4px; }
+  .mobile-game #resources .resource-icon { width:30px; height:34px; flex-basis:30px; }
+  .mobile-game #resources .resource-icon img { width:36px; height:36px; }
+  .mobile-game #resources .resource>span:last-child { flex-direction:column; align-items:flex-start; justify-content:center; gap:0; }
+  .mobile-game #resources .resource strong { font-size:13px; }
+  .mobile-game #resources .resource small { max-width:100%; overflow:hidden; font-size:7px; text-overflow:ellipsis; white-space:nowrap; }
+}
+@media(max-height:520px) and (min-width:701px) {
+  body.mobile-game { --hud-dock-bottom:8px; --hud-dock-height:63px; }
+  .mobile-game #navigation.game-dock { grid-template-columns:repeat(5,67px); }
+  .game-dock-item { height:49px; }
+  .game-dock-item .dock-icon { width:51px; height:54px; top:-21px; }
+  .game-dock-item:last-child .dock-icon { width:58px; height:62px; top:-28px; }
+  .game-dock-item .dock-label { font-size:10px; min-height:18px; }
+  .game-quick-actions { bottom:86px; flex-direction:row; }
+  .game-quick-actions>button { width:44px; height:44px; }
+  .game-quick-actions>button>img { width:38px; height:38px; }
+  .hud-objective { display:none; }
+}
+@media(prefers-reduced-motion:reduce) { .game-dock-item:active { translate:none; } }
+.reduced-motion .game-dock-item:active { translate:none; }
+/* Context windows temporarily take the place of the floating shortcuts. */
+body.mobile-game:has(.map-overlay-panel:not([hidden])) .game-quick-actions,
+body.mobile-game:has(.map-overlay-panel:not([hidden])) .hud-objective{visibility:hidden;pointer-events:none}
+body.mobile-game .menu-link{justify-content:flex-start}
+body.mobile-game .menu-link>span:last-child{margin-left:0}
+/* Village fills the viewport behind the parent HUD, including after rotation. */
+.mobile-game.city-mode.playfield-mode #main>#content,.mobile-game.city-mode.playfield-mode #playfield-content{position:fixed;inset:0;width:100%;height:100dvh;max-width:none;min-height:0;margin:0;padding:0;overflow:hidden}
+.mobile-game.city-mode.playfield-mode .city-playfield{position:absolute;inset:0;width:100%;height:100%;max-width:none;margin:0;padding:0;border:0;border-radius:0}
+.mobile-game.city-mode.playfield-mode .city-playfield>.city-frame{display:block;position:absolute;inset:0;width:100%;height:100%;max-width:none;margin:0;padding:0;border:0;border-radius:0}

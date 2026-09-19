@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Produktionsbonus lumber">
+<title>Produktionsbonus lumber</title>
+<!-- Original code-native storybook item illustration. Value, quantity and rarity are rendered by the game UI. -->
+<g stroke="#493b33" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+<g transform="translate(-2 -1) scale(.85)">
+<path d="M32 40 64 17C75 9 99 17 105 36 112 55 108 66 91 80L61 101Z" fill="#70472f" />
+<path d="M49 37 68 23C78 20 91 21 98 34L65 62Z" fill="#b98448" stroke="none"/>
+<path d="M77 23 67 35M92 32 73 53" fill="none" stroke="#dca762" stroke-width="4"/>
+<ellipse cx="48" cy="72" rx="30" ry="34" fill="#dba25d" />
+<ellipse cx="48" cy="72" rx="22" ry="26" fill="#f0c786" />
+<path d="M53 90C30 94 29 58 47 56 63 54 67 83 50 83 38 84 38 66 47 65 54 65 56 75 49 76" fill="none" stroke="#aa743f" stroke-width="4"/>
+<path d="M61 26C57 10 39 10 37 12 38 25 47 29 61 26Z" fill="#74a452" />
+</g>
+<g transform="translate(6 4) scale(.98)">
+<path d="M90 56 112 83H100V108H79V83H67Z" fill="#69c92d" />
+<path d="M90 62 74 80H84V102H90Z" fill="#b3ed66" stroke="none"/>
+<path d="M77 79 90 63 100 75" fill="none" stroke="#deffb0" stroke-width="2"/>
+</g>
+</g>
+</svg>

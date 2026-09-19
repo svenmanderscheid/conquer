@@ -1,0 +1,1 @@
+ALTER TABLE rallies ADD COLUMN IF NOT EXISTS result_json LONGTEXT NULL AFTER message;

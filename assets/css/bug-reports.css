@@ -1,0 +1,82 @@
+.bug-report-panel {
+  max-width: 780px;
+  margin: 0 auto;
+}
+.bug-report-intro {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  margin-bottom: 18px;
+  border: 1px solid var(--ui-line);
+  border-radius: 14px;
+  background: var(--ui-gold-soft);
+}
+.bug-report-intro > span,
+.bug-report-seal {
+  display: grid;
+  place-items: center;
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--ui-primary);
+  color: var(--ui-card-light);
+  font: 700 30px/1 var(--ui-font);
+}
+.bug-report-intro h2,
+.bug-report-success h2 { margin: 0 0 4px; }
+.bug-report-intro p { margin: 0; color: var(--ui-muted); }
+.bug-report-panel form { display: grid; gap: 16px; }
+.bug-report-panel form > label:not(.bug-diagnostics),
+.bug-report-fields label {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 7px;
+}
+.bug-report-panel :is(input:not([type="checkbox"]), select, textarea) {
+  width: 100%;
+  min-width: 0;
+}
+.bug-report-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.bug-report-panel textarea { resize: vertical; }
+.bug-report-panel label small {
+  font-weight: normal;
+  color: var(--ui-muted);
+}
+.bug-diagnostics {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--ui-line);
+  border-radius: 12px;
+  background: var(--ui-card);
+}
+.bug-diagnostics input {
+  width: 20px;
+  min-height: 20px;
+  margin-top: 2px;
+  accent-color: var(--ui-primary);
+}
+.bug-diagnostics small { display: block; margin-top: 3px; }
+.bug-report-success { max-width: 620px; margin: 0 auto; text-align: center; }
+.bug-report-success .bug-report-seal { margin: 0 auto 14px; background: var(--ui-green); }
+@media (max-width: 539px) {
+  .bug-report-fields { grid-template-columns: 1fr; }
+  .bug-report-intro { align-items: flex-start; padding: 13px; }
+  .bug-report-intro > span { flex-basis: 42px; width: 42px; height: 42px; }
+  .bug-report-panel textarea { min-height: 88px; }
+}
+@media (max-height: 520px) and (orientation: landscape) {
+  .bug-report-intro { padding: 10px; margin-bottom: 10px; }
+  .bug-report-panel form { gap: 10px; }
+  .bug-report-panel textarea { min-height: 60px; }
+}

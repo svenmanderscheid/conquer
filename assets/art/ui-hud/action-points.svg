@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>Aktionspunkte</title>
+  <path fill="#586D50" stroke="#70472F" stroke-width="4" stroke-linejoin="round" d="m36 5-23 32h16l-3 22 26-36H36Z"/>
+  <path fill="#F1E2BD" d="m35 17-12 16h12l-2 12 11-16H32Z"/>
+  <path fill="none" stroke="#C5A361" stroke-width="3" stroke-linecap="round" d="m11 13 4 4m-4 0 4-4M49 44l4 4m-4 0 4-4"/>
+</svg>

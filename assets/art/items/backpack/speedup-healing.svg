@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><title>Beschleuniger · Heilung</title><defs>
+  <linearGradient id="face" x1="0" y1="0" x2=".35" y2="1"><stop stop-color="#c2f4fa"/><stop offset=".45" stop-color="#7ad9f2"/><stop offset="1" stop-color="#37a2d6"/></linearGradient>
+  <linearGradient id="depth" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#317dac"/><stop offset="1" stop-color="#24559c"/></linearGradient>
+  <linearGradient id="steel" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#f2f5e9"/><stop offset=".5" stop-color="#c3d6d8"/><stop offset="1" stop-color="#7e9fac"/></linearGradient>
+  <g id="arrow" stroke="#493b33" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round">
+   <path d="M13 23H35Q38 23 40 26L68 59Q71 63 68 67L40 101Q38 104 35 104H13Q9 104 11 100L39 66Q41 63 39 60L11 27Q8 23 13 23Z" transform="translate(0 5)" fill="url(#depth)"/>
+   <path d="M13 23H35Q38 23 40 26L68 59Q71 63 68 67L40 101Q38 104 35 104H13Q9 104 11 100L39 66Q41 63 39 60L11 27Q8 23 13 23Z" fill="url(#face)"/>
+   <path d="M16 27H34L63 61H47Z" fill="#e6fbf5" stroke="none"/>
+   <path d="M46 67H64L36 99H16Z" fill="#2994c8" stroke="none"/>
+   <path d="m16 29 17 0 25 29" fill="none" stroke="#fffdf0" stroke-width="2.8"/>
+   <path d="m17 100 17 0 29-33" fill="none" stroke="#8ce2ef" stroke-width="2.4"/>
+   <path d="M46 62h16" stroke="#e1f8f1" stroke-width="2"/>
+  </g>
+ </defs><g transform="translate(9 -3) scale(.94)"><use href="#arrow" x="49"/><use href="#arrow"/></g><g transform="translate(1 70)" stroke="#493b33" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+   <rect x="1" y="4" width="57" height="50" rx="13" fill="#70472f" opacity=".18" stroke="none"/>
+   <rect x="1" y="0" width="57" height="50" rx="13" fill="#deebc9"/>
+   <path d="M8 14q0-8 9-8h22" stroke="#fffaf0" stroke-width="2.5" fill="none"/>
+   <g transform="translate(0 1) scale(.98)">
+   <path d="M23 5h12q2 0 2 2v10h10q2 0 2 2v12q0 2-2 2H37v10q0 2-2 2H23q-2 0-2-2V33H11q-2 0-2-2V19q0-2 2-2h10V7q0-2 2-2Z" fill="#7abd53"/>
+   <path d="M26 9h7v12h12v8H33v12h-7V29H13v-8h13Z" fill="#a3dc70" stroke="none"/>
+   <path d="M26 10v12H14" fill="none" stroke="#eef9c7" stroke-width="3"/>
+   <path d="M45 31H35v11" fill="none" stroke="#549447" stroke-width="2"/></g>
+  </g></svg>

@@ -1,0 +1,49 @@
+/* Give the main task room; secondary destinations live in the mobile menu. */
+.nav-more{display:none}
+body:has(#game-dialog[open]){overflow:hidden}
+.page-heading{margin-bottom:30px}
+.section-heading{margin-top:32px;margin-bottom:20px}
+.card-grid,.quick-grid{gap:20px}
+.game-card{padding:23px}
+.focus-layout .journal{display:none!important}
+.focus-layout .game-layout{grid-template-columns:112px minmax(0,1fr)}
+.focus-layout #main{padding:30px clamp(24px,3vw,52px) 50px}
+.focus-layout #content,.focus-layout .page-heading{max-width:1440px;margin-left:auto;margin-right:auto}
+.focus-layout .field-viewport{height:calc(100dvh - 285px);min-height:420px}
+.menu-dialog{width:660px;max-width:calc(100vw - 32px)}
+.menu-dialog h2{margin-bottom:26px}
+.menu-groups{display:grid;gap:24px}
+.menu-groups h3{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:#94abc7;margin:0 0 12px}
+.menu-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.menu-link{display:flex;align-items:center;gap:13px;min-width:0;min-height:54px;background:#1b314b;border:1px solid #3e536d;border-radius:7px;padding:10px 14px;color:#d8e3ef;text-align:left;cursor:pointer;font:inherit;font-size:13px}
+.menu-link svg,.menu-link>.nav-symbol{width:24px;height:24px;flex:none;font-size:22px;text-align:center;color:#dabd7e}
+.menu-link>span:last-child{margin-left:auto;color:#7894b1}
+.menu-link:hover,.menu-link.selected{border-color:#b99a60;background:#293e54;color:#f6dfac}
+@media(min-width:1650px){.focus-layout .game-layout{grid-template-columns:120px minmax(0,1fr)}}
+@media(min-width:781px) and (max-width:1280px){.focus-layout .game-layout{grid-template-columns:94px minmax(0,1fr)}.focus-layout #main{padding:28px}.card-grid{gap:16px}}
+@media(max-width:780px){
+  .focus-layout .game-layout{display:block}
+  #navigation{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;overflow:visible;width:100%}
+  #navigation .nav-secondary{display:none}
+  #navigation .nav-primary{order:var(--nav-order)}
+  #navigation .nav-more{display:flex;order:4}
+  #navigation .nav-item{min-width:0;width:auto;min-height:53px;flex:none;padding:6px 2px;gap:4px;font-size:10px}
+  #navigation .nav-item svg{width:21px;height:21px}
+  #navigation .nav-item .nav-symbol{font-size:21px;line-height:21px;height:21px}
+  .sidebar,.world-mode .sidebar{padding-top:5px;padding-bottom:max(5px,env(safe-area-inset-bottom));box-shadow:0 -4px 18px #08172b55}
+  #main,.world-mode #main,.focus-layout #main{padding:24px 18px 95px}
+  .page-heading{margin-bottom:26px}
+  .section-heading{margin-top:28px;margin-bottom:18px}
+  .card-grid,.quick-grid{gap:16px}
+  .game-card{padding:20px}
+  .focus-layout .field-viewport{height:calc(100dvh - 335px);min-height:310px}
+  .menu-dialog{padding:27px 20px}
+}
+@media(max-width:380px){
+  #main,.world-mode #main,.focus-layout #main{padding-left:13px;padding-right:13px}
+  .menu-grid{gap:7px}
+  .menu-link{gap:8px;padding:9px;font-size:12px}
+  .menu-link svg,.menu-link>.nav-symbol{width:20px}
+}
+
+@media(max-width:360px){.resource-icon{width:16px;height:22px}.resource-icon img{width:16px;height:18px;object-fit:contain}.resources .resource{gap:3px;padding:4px}.resource strong,.world-mode .resource strong{font-size:10px}.resource small{font-size:8px}}

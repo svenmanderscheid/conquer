@@ -24,7 +24,7 @@
     "gem_nodes_combined": 10,
     "solo_monsters_combined": 500,
     "treasure_goblins_combined": 80,
-    "deathkar_combined": 30,
+    "daemmerhorn_and_regional_bosses_combined": 30,
     "dragons_combined": 5,
     "magdar_combined": 1
   },
@@ -710,7 +710,7 @@
       "tier": "rare_endgame"
     },
     {
-      "monster": "Deathkar",
+      "monster": "Dämmerhorn",
       "code": 20200501,
       "level": 1,
       "spawn_per_sector_per_hour": 0.667,
@@ -718,7 +718,7 @@
       "tier": "rally_mid"
     },
     {
-      "monster": "Deathkar",
+      "monster": "Dämmerhorn",
       "code": 20200502,
       "level": 2,
       "spawn_per_sector_per_hour": 0.667,
@@ -726,7 +726,7 @@
       "tier": "rally_mid"
     },
     {
-      "monster": "Deathkar",
+      "monster": "Dämmerhorn",
       "code": 20200503,
       "level": 3,
       "spawn_per_sector_per_hour": 0.667,
@@ -734,7 +734,7 @@
       "tier": "rally_mid"
     },
     {
-      "monster": "Deathkar",
+      "monster": "Dämmerhorn",
       "code": 20200504,
       "level": 4,
       "spawn_per_sector_per_hour": 0.333,
@@ -742,7 +742,7 @@
       "tier": "rally_mid"
     },
     {
-      "monster": "Deathkar",
+      "monster": "Dämmerhorn",
       "code": 20200505,
       "level": 5,
       "spawn_per_sector_per_hour": 0.333,
@@ -750,7 +750,7 @@
       "tier": "rally_mid"
     },
     {
-      "monster": "Deathkar",
+      "monster": "Dämmerhorn",
       "code": 20200506,
       "level": 6,
       "spawn_per_sector_per_hour": 0.333,
@@ -758,7 +758,7 @@
       "tier": "rally_high"
     },
     {
-      "monster": "Deathkar",
+      "monster": "Dämmerhorn",
       "code": 20200507,
       "level": 7,
       "spawn_per_sector_per_hour": 0.075,
@@ -766,7 +766,7 @@
       "tier": "rally_high"
     },
     {
-      "monster": "Deathkar",
+      "monster": "Dämmerhorn",
       "code": 20200508,
       "level": 8,
       "spawn_per_sector_per_hour": 0.075,
@@ -774,7 +774,7 @@
       "tier": "rally_high"
     },
     {
-      "monster": "Deathkar",
+      "monster": "Dämmerhorn",
       "code": 20200509,
       "level": 9,
       "spawn_per_sector_per_hour": 0.075,
@@ -782,7 +782,7 @@
       "tier": "rally_high"
     },
     {
-      "monster": "Deathkar",
+      "monster": "Dämmerhorn",
       "code": 20200510,
       "level": 10,
       "spawn_per_sector_per_hour": 0.075,

@@ -1,0 +1,454 @@
+{
+  "schema_version": 1,
+  "purpose": "Produktionsmatrix für echte, anatomisch lesbare 8-Frame-Zyklen der 15 statischen Premium-Marschquellen.",
+  "coordinate_convention": {
+    "facing": "Alle Quellen blicken bildseitig nach rechts.",
+    "near_far": "near ist die dem Betrachter zugewandte Gliedmaße, far liegt hinter dem Rumpf.",
+    "frame_index": "0 bis 7; Frame 7 läuft ohne Doppelbild in Frame 0 zurück.",
+    "contact": "Ein Kontaktfuß bleibt flach auf derselben Grundlinie. toe ist noch belasteter Zehenkontakt; strike ist der erste flache Aufsatz.",
+    "swing": "Ein Swing-Fuß ist klar von der Grundlinie gelöst. Verdeckte Fernbeine werden als eigene Ebene rekonstruiert, ohne das Originalbein zu duplizieren.",
+    "follow_through": "Schwanz, Rüssel, Ohren, Schmuck und Tentakel folgen der Rumpfbewegung mindestens einen Frame verzögert."
+  },
+  "delivery": {
+    "frames": 8,
+    "alpha": "transparent",
+    "registration": "gleicher Anker und gleiche Leinwand in allen Frames",
+    "ground_rule": "Standphasen haben flachen Bodenkontakt ohne Rutschen; Flug- und Schwimmzyklen haben contacts: none.",
+    "silhouette_rule": "Gelenklücken, doppelte Originalglieder, abgeschnittene Schwanzspitzen und wechselnde Ausrüstungsformen sind unzulässig.",
+    "timing_rule": "Alle Frames eines Skins haben gleiche Dauer; loop_ms / 8 ergibt frame_ms."
+  },
+  "skins": [
+    {
+      "id": "astral",
+      "name": "Sternenwal",
+      "source": "asset-workflow/01-source/marches/astral/march-source.png",
+      "source_size": [1536, 1024],
+      "movement": "langsamer Himmelswal-Flossenschlag mit vertikalem Flukenimpuls",
+      "loop_ms": 1600,
+      "frame_ms": 200,
+      "contact_frames": [],
+      "contact_events": "none",
+      "tracks": {
+        "body": ["level", "rise", "rise", "apex", "level", "fall", "fall", "trough"],
+        "tail_peduncle": ["center", "up-1", "up-2", "up-max", "center", "down-1", "down-2", "down-max"],
+        "tail_flukes": ["flat", "pitch-down", "pitch-down", "flat-at-top", "flat", "pitch-up", "pitch-up", "flat-at-bottom"],
+        "near_pectoral_fin": ["neutral", "back-1", "back-max", "recover", "neutral", "forward-1", "forward-max", "recover"],
+        "far_pectoral_fin": ["neutral", "forward-1", "forward-max", "recover", "neutral", "back-1", "back-max", "recover"],
+        "small_ventral_fins": ["neutral", "trail", "trail-max", "trail", "neutral", "lead", "lead-max", "lead"]
+      },
+      "moving_parts_by_frame": [
+        ["tail_peduncle", "tail_flukes", "near_pectoral_fin", "far_pectoral_fin"],
+        ["body", "tail_peduncle", "tail_flukes", "near_pectoral_fin", "far_pectoral_fin"],
+        ["body", "tail_peduncle", "near_pectoral_fin", "far_pectoral_fin", "small_ventral_fins"],
+        ["tail_flukes", "near_pectoral_fin", "far_pectoral_fin", "small_ventral_fins"],
+        ["body", "tail_peduncle", "tail_flukes", "near_pectoral_fin", "far_pectoral_fin"],
+        ["body", "tail_peduncle", "tail_flukes", "near_pectoral_fin", "far_pectoral_fin"],
+        ["body", "tail_peduncle", "near_pectoral_fin", "far_pectoral_fin", "small_ventral_fins"],
+        ["tail_flukes", "near_pectoral_fin", "far_pectoral_fin", "small_ventral_fins"]
+      ],
+      "production_notes": "Goldene Orbitalreifen bleiben am Rumpf registriert; Kugeln dürfen leicht gegenphasig nachschwingen. Keine globale Wellenverzerrung."
+    },
+    {
+      "id": "clockwork",
+      "name": "Uhrwerkhase",
+      "source": "asset-workflow/01-source/marches/clockwork/march-source.png",
+      "source_size": [1312, 1199],
+      "movement": "schneller Hasenhoppser mit synchronem Hinterlauf-Schub und Vorderpfotenlandung",
+      "loop_ms": 640,
+      "frame_ms": 80,
+      "contact_frames": [0, 1, 2, 6, 7],
+      "contact_events": {"0": ["all_feet_load"], "2": ["hind_pair_toeoff"], "6": ["front_pair_strike"], "7": ["hind_pair_land"]},
+      "contacts_by_frame": [["front_near", "front_far", "hind_near", "hind_far"], ["hind_near", "hind_far"], ["hind_near", "hind_far"], [], [], [], ["front_near", "front_far"], ["front_near", "front_far", "hind_near", "hind_far"]],
+      "tracks": {
+        "front_near": ["flat-load", "lift", "tuck", "forward", "forward-max", "reach-down", "strike-flat", "flat-brake"],
+        "front_far": ["flat-load", "lift-delayed", "tuck", "forward", "forward-max", "reach-down", "strike-flat-delayed", "flat-brake"],
+        "hind_near": ["flat-crouch", "flat-push", "toe-push", "extended-air", "tuck-under", "forward-under", "reach", "strike-flat"],
+        "hind_far": ["flat-crouch", "flat-push", "toe-push-delayed", "extended-air", "tuck-under", "forward-under", "reach", "strike-flat-delayed"],
+        "ears": ["back-low", "back", "trail", "trail-max", "upright-recover", "forward", "forward-max", "back-low"],
+        "tail": ["down", "down", "trail", "trail-max", "up", "up-max", "recover", "down"],
+        "clock_key": ["angle-0", "angle-45", "angle-90", "angle-135", "angle-180", "angle-225", "angle-270", "angle-315"]
+      },
+      "moving_parts_by_frame": [
+        ["body", "ears", "tail"],
+        ["front_near", "front_far", "hind_near", "hind_far", "body", "ears", "clock_key"],
+        ["front_near", "front_far", "hind_near", "hind_far", "body", "ears", "tail", "clock_key"],
+        ["all_legs", "body", "ears", "tail", "clock_key"],
+        ["all_legs", "body", "ears", "tail", "clock_key"],
+        ["all_legs", "body", "ears", "tail", "clock_key"],
+        ["front_near", "front_far", "hind_near", "hind_far", "body", "ears", "tail", "clock_key"],
+        ["hind_near", "hind_far", "body", "ears", "tail", "clock_key"]
+      ],
+      "production_notes": "Kupferspiralen komprimieren in 0/1 und strecken in 3; Pfoten bleiben vollständige separate Formen, keine bloße Feder-Skalierung."
+    },
+    {
+      "id": "eclipse",
+      "name": "Finstersonnenwagen",
+      "source": "asset-workflow/01-source/marches/eclipse/march-source.png",
+      "source_size": [1536, 1024],
+      "movement": "reiterloses Schweben mit ruhigem Nickimpuls, arbeitenden Heckflossen und rotierender Korona",
+      "loop_ms": 1760,
+      "frame_ms": 220,
+      "contact_frames": [],
+      "contact_events": "none",
+      "tracks": {
+        "body": ["level", "rise-1", "rise-2", "apex", "level", "fall-1", "fall-2", "trough"],
+        "rear_fins": ["neutral", "open-1", "open-max", "hold", "neutral", "close-1", "close-max", "recover"],
+        "crescent_bow": ["level", "pitch-up", "pitch-up", "level", "level", "pitch-down", "pitch-down", "level"],
+        "pendants": ["center", "trail-left", "left-max", "recover", "center", "trail-right", "right-max", "recover"],
+        "eclipse_corona": ["angle-0", "angle-45", "angle-90", "angle-135", "angle-180", "angle-225", "angle-270", "angle-315"]
+      },
+      "moving_parts_by_frame": [
+        ["rear_fins", "pendants", "eclipse_corona"], ["body", "rear_fins", "crescent_bow", "pendants", "eclipse_corona"],
+        ["body", "rear_fins", "pendants", "eclipse_corona"], ["crescent_bow", "pendants", "eclipse_corona"],
+        ["body", "rear_fins", "pendants", "eclipse_corona"], ["body", "rear_fins", "crescent_bow", "pendants", "eclipse_corona"],
+        ["body", "rear_fins", "pendants", "eclipse_corona"], ["crescent_bow", "pendants", "eclipse_corona"]
+      ],
+      "production_notes": "Die schwarze Sonnenscheibe bleibt kreisrund; nur Korona und Zeiger drehen. Sitz, Rahmen und Vordercrescent dürfen nicht elastisch verformt werden."
+    },
+    {
+      "id": "emberforge",
+      "name": "Glutsalamander",
+      "source": "asset-workflow/01-source/marches/emberforge/march-source.png",
+      "source_size": [1536, 1024],
+      "movement": "niedriger sechsbeiniger Tripodengang mit segmentierter Schwanzwelle",
+      "loop_ms": 960,
+      "frame_ms": 120,
+      "contact_frames": [0, 1, 2, 3, 4, 5, 6, 7],
+      "contact_events": {"0": ["tripod_A_load"], "3": ["tripod_B_strike"], "4": ["tripod_B_load"], "7": ["tripod_A_strike"]},
+      "contacts_by_frame": [["near_front", "far_middle", "near_hind"], ["near_front", "far_middle", "near_hind"], ["near_front", "far_middle", "near_hind"], ["far_front", "near_middle", "far_hind"], ["far_front", "near_middle", "far_hind"], ["far_front", "near_middle", "far_hind"], ["far_front", "near_middle", "far_hind"], ["near_front", "far_middle", "near_hind"]],
+      "tripods": {"A": ["near_front", "far_middle", "near_hind"], "B": ["far_front", "near_middle", "far_hind"]},
+      "tracks": {
+        "tripod_A": ["flat-load", "flat-push", "toe", "lift", "swing-high", "swing-forward", "reach", "strike-flat"],
+        "tripod_B": ["lift", "swing-high", "swing-forward", "strike-flat", "flat-load", "flat-push", "toe", "lift"],
+        "body": ["low-A", "level", "high", "settle-B", "low-B", "level", "high", "settle-A"],
+        "tail_base": ["center", "left-1", "left-max", "recover", "center", "right-1", "right-max", "recover"],
+        "tail_mid": ["right-1", "center", "left-1", "left-max", "recover", "center", "right-1", "right-max"],
+        "tail_tip": ["right-max", "right-1", "center", "left-1", "left-max", "recover", "center", "right-1"]
+      },
+      "moving_parts_by_frame": [
+        ["tripod_B", "body", "tail_base", "tail_mid", "tail_tip"], ["tripod_B", "body", "tail_base", "tail_mid", "tail_tip"],
+        ["tripod_A", "tripod_B", "body", "tail_base", "tail_mid", "tail_tip"], ["tripod_A", "tripod_B", "body", "tail_base", "tail_mid", "tail_tip"],
+        ["tripod_A", "body", "tail_base", "tail_mid", "tail_tip"], ["tripod_A", "body", "tail_base", "tail_mid", "tail_tip"],
+        ["tripod_A", "tripod_B", "body", "tail_base", "tail_mid", "tail_tip"], ["tripod_A", "tripod_B", "body", "tail_base", "tail_mid", "tail_tip"]
+      ],
+      "production_notes": "Alle sechs Beine als vollständige Ebenen anlegen; das unter dem Bauch verdeckte Fernmittelbein rekonstruieren. Die Schwanzwelle läuft von Basis zu Spitze mit je einem Frame Verzögerung."
+    },
+    {
+      "id": "ironkeep",
+      "name": "Eisenkoloss",
+      "source": "asset-workflow/01-source/marches/ironkeep/march-source.png",
+      "source_size": [1230, 1278],
+      "movement": "schwerer zweibeiniger Marsch mit klarer Gewichtsübernahme",
+      "loop_ms": 1120,
+      "frame_ms": 140,
+      "contact_frames": [0, 1, 2, 3, 4, 5, 6, 7],
+      "contact_events": {"0": ["far_foot_strike"], "4": ["near_foot_strike"]},
+      "contacts_by_frame": [["near_leg", "far_leg"], ["far_leg"], ["far_leg"], ["far_leg"], ["near_leg", "far_leg"], ["near_leg"], ["near_leg"], ["near_leg"]],
+      "tracks": {
+        "near_leg": ["toe-contact", "lift", "swing-high", "reach", "strike-flat", "flat-load", "flat-push", "toe"],
+        "far_leg": ["strike-flat", "flat-load", "flat", "flat-push", "toe-contact", "lift", "swing-high", "reach"],
+        "pelvis": ["turn-far", "over-far", "center", "rise", "turn-near", "over-near", "center", "rise"],
+        "hammer_arm": ["forward", "forward-hold", "down", "back", "back-max", "recover", "forward", "forward-max"],
+        "shield_arm": ["back", "back-max", "recover", "forward", "forward-max", "forward-hold", "down", "back"],
+        "head": ["level", "down-impact", "level", "up", "level", "down-impact", "level", "up"]
+      },
+      "moving_parts_by_frame": [
+        ["near_leg", "far_leg", "pelvis", "hammer_arm", "shield_arm"], ["near_leg", "pelvis", "head", "hammer_arm", "shield_arm"],
+        ["near_leg", "pelvis", "hammer_arm", "shield_arm"], ["near_leg", "pelvis", "head", "hammer_arm", "shield_arm"],
+        ["near_leg", "far_leg", "pelvis", "hammer_arm", "shield_arm"], ["far_leg", "pelvis", "head", "hammer_arm", "shield_arm"],
+        ["far_leg", "pelvis", "hammer_arm", "shield_arm"], ["far_leg", "pelvis", "head", "hammer_arm", "shield_arm"]
+      ],
+      "production_notes": "Schild bleibt am Unterarm, Hammer bleibt in derselben Faust. Kein Fußrutschen: der belastete Steinfuß hat während seiner Standphase identische Sohlenposition."
+    },
+    {
+      "id": "jadecourt",
+      "name": "Jadeglockenlöwe",
+      "source": "asset-workflow/01-source/marches/jadecourt/march-source.png",
+      "source_size": [1374, 1145],
+      "movement": "kompakter Löwen-Galopp mit zwei Flugphasen und nachlaufender Glocke",
+      "loop_ms": 800,
+      "frame_ms": 100,
+      "contact_frames": [0, 1, 2, 4, 5, 6],
+      "contact_events": {"0": ["far_hind_strike"], "1": ["near_hind_strike"], "4": ["far_fore_strike"], "5": ["near_fore_strike"]},
+      "contacts_by_frame": [["far_hind"], ["far_hind", "near_hind"], ["near_hind"], [], ["far_fore"], ["far_fore", "near_fore"], ["near_fore"], []],
+      "tracks": {
+        "far_hind": ["strike-flat", "flat-push", "lift", "tuck", "tuck", "tuck", "extend", "reach"],
+        "near_hind": ["reach", "strike-flat", "flat-push", "lift", "tuck", "tuck", "tuck", "extend"],
+        "far_fore": ["tuck", "tuck", "tuck", "reach", "strike-flat", "flat-brake", "lift", "tuck"],
+        "near_fore": ["tuck", "tuck", "tuck", "tuck", "reach", "strike-flat", "flat-brake", "lift"],
+        "spine": ["extend", "extend-max", "rise-flight", "stretch-flight", "fore-impact", "compress", "compress-max", "gathered-flight"],
+        "tail": ["center", "trail-down", "down-max", "recover", "center", "trail-up", "up-max", "recover"],
+        "bell": ["center", "back-1", "back-max", "back-1", "center", "forward-1", "forward-max", "forward-1"]
+      },
+      "moving_parts_by_frame": [
+        ["far_hind", "near_hind", "spine", "tail", "bell"], ["far_hind", "near_hind", "spine", "tail", "bell"],
+        ["far_hind", "near_hind", "spine", "tail", "bell"], ["all_legs", "spine", "tail", "bell"],
+        ["far_fore", "near_fore", "spine", "tail", "bell"], ["far_fore", "near_fore", "spine", "tail", "bell"],
+        ["far_fore", "near_fore", "spine", "tail", "bell"], ["all_legs", "spine", "tail", "bell"]
+      ],
+      "production_notes": "Pagode bleibt stabil auf dem Rücken. Die sichtbaren Nahbeine überdecken die rekonstruierten Fernbeine sauber; die Glocke reagiert einen Frame nach dem Rumpfimpuls."
+    },
+    {
+      "id": "leviathan",
+      "name": "Korallenleviathan",
+      "source": "asset-workflow/01-source/marches/leviathan/march-source.png",
+      "source_size": [1536, 1024],
+      "movement": "serpentinenartiges Schwimmen mit S-Welle und versetzten Schmuckflossen",
+      "loop_ms": 1440,
+      "frame_ms": 180,
+      "contact_frames": [],
+      "contact_events": "none",
+      "tracks": {
+        "spine_front": ["center", "left-1", "left-max", "left-1", "center", "right-1", "right-max", "right-1"],
+        "spine_mid": ["right-max", "right-1", "center", "left-1", "left-max", "left-1", "center", "right-1"],
+        "tail_base": ["center", "right-1", "right-max", "right-1", "center", "left-1", "left-max", "left-1"],
+        "tail_fin": ["left-max", "left-1", "center", "right-1", "right-max", "right-1", "center", "left-1"],
+        "near_pectoral_fin": ["neutral", "back", "back-max", "recover", "neutral", "forward", "forward-max", "recover"],
+        "far_pectoral_fin": ["neutral", "forward", "forward-max", "recover", "neutral", "back", "back-max", "recover"],
+        "near_pelvic_fin": ["forward-max", "recover", "neutral", "back", "back-max", "recover", "neutral", "forward"],
+        "far_pelvic_fin": ["back-max", "recover", "neutral", "forward", "forward-max", "recover", "neutral", "back"]
+      },
+      "moving_parts_by_frame": [
+        ["spine_front", "spine_mid", "tail_base", "tail_fin", "all_fins"], ["spine_front", "spine_mid", "tail_base", "tail_fin", "all_fins"],
+        ["spine_front", "spine_mid", "tail_base", "tail_fin", "all_fins"], ["spine_front", "spine_mid", "tail_base", "tail_fin", "all_fins"],
+        ["spine_front", "spine_mid", "tail_base", "tail_fin", "all_fins"], ["spine_front", "spine_mid", "tail_base", "tail_fin", "all_fins"],
+        ["spine_front", "spine_mid", "tail_base", "tail_fin", "all_fins"], ["spine_front", "spine_mid", "tail_base", "tail_fin", "all_fins"]
+      ],
+      "production_notes": "Die S-Welle wird über getrennte Rumpfsegmente gezeichnet, nicht als Bildverbiegung. Korallengeweih und Perlenschmuck folgen nur gering und behalten ihre Form."
+    },
+    {
+      "id": "ravenloft",
+      "name": "Rabenfürst",
+      "source": "asset-workflow/01-source/marches/ravenloft/march-source.png",
+      "source_size": [1536, 1024],
+      "movement": "kräftiger Flügelschlag mit schnellerem Abwärtsschlag und gefächerten Schwanzfedern",
+      "loop_ms": 800,
+      "frame_ms": 100,
+      "contact_frames": [],
+      "contact_events": "none",
+      "tracks": {
+        "near_wing": ["top", "down-1", "down-2", "bottom-power", "bottom-recover", "up-1", "up-2", "top-recover"],
+        "far_wing": ["top-delayed", "down-1", "down-2", "bottom-power", "bottom-recover", "up-1", "up-2", "top"],
+        "primary_feathers": ["closed", "spread-1", "spread-max", "spread-max", "spread-1", "closed", "closed", "closed"],
+        "body": ["trough", "rise", "rise", "apex", "apex", "fall", "fall", "trough"],
+        "tail_fan": ["center", "down-1", "down-max", "recover", "center", "up-1", "up-max", "recover"],
+        "talons": ["relaxed", "trail", "trail", "curl", "curl-max", "recover", "relaxed", "relaxed"]
+      },
+      "moving_parts_by_frame": [
+        ["near_wing", "far_wing", "tail_fan"], ["near_wing", "far_wing", "primary_feathers", "body", "tail_fan", "talons"],
+        ["near_wing", "far_wing", "primary_feathers", "body", "tail_fan", "talons"], ["near_wing", "far_wing", "body", "tail_fan", "talons"],
+        ["near_wing", "far_wing", "primary_feathers", "talons"], ["near_wing", "far_wing", "primary_feathers", "body", "tail_fan", "talons"],
+        ["near_wing", "far_wing", "body", "tail_fan", "talons"], ["near_wing", "far_wing", "tail_fan"]
+      ],
+      "production_notes": "Jeder Flügel braucht Oberarm-, Unterarm- und Handschwingenebene mit festen Schultergelenken. Brustpanzer und Rückentürme bleiben formstabil; keine doppelte Flügelkontur am Ansatz."
+    },
+    {
+      "id": "rosehall",
+      "name": "Rosenhirsch",
+      "source": "asset-workflow/01-source/marches/rosehall/march-source.png",
+      "source_size": [1240, 1268],
+      "movement": "leichter Hirschgalopp mit gestreckter und gesammelter Flugphase",
+      "loop_ms": 640,
+      "frame_ms": 80,
+      "contact_frames": [0, 1, 2, 4, 5, 6],
+      "contact_events": {"0": ["far_hind_strike"], "1": ["near_hind_strike"], "4": ["far_fore_strike"], "5": ["near_fore_strike"]},
+      "contacts_by_frame": [["far_hind"], ["far_hind", "near_hind"], ["near_hind"], [], ["far_fore"], ["far_fore", "near_fore"], ["near_fore"], []],
+      "tracks": {
+        "far_hind": ["strike-flat", "flat-push", "lift", "tuck", "tuck", "tuck", "extend", "reach"],
+        "near_hind": ["reach", "strike-flat", "flat-push", "lift", "tuck", "tuck", "tuck", "extend"],
+        "far_fore": ["tuck", "tuck", "tuck", "reach", "strike-flat", "flat-brake", "lift", "tuck"],
+        "near_fore": ["tuck", "tuck", "tuck", "tuck", "reach", "strike-flat", "flat-brake", "lift"],
+        "spine": ["extend", "extend-max", "rise-flight", "stretch-flight", "fore-impact", "compress", "compress-max", "gathered-flight"],
+        "neck_head": ["forward", "forward", "level", "up", "down-impact", "down", "recover", "level"],
+        "tail": ["center", "trail-down", "down-max", "recover", "center", "trail-up", "up-max", "recover"],
+        "ears": ["forward", "back-1", "back-max", "back-1", "forward", "forward-max", "forward", "forward"]
+      },
+      "moving_parts_by_frame": [
+        ["far_hind", "near_hind", "spine", "neck_head", "tail", "ears"], ["far_hind", "near_hind", "spine", "tail", "ears"],
+        ["far_hind", "near_hind", "spine", "neck_head", "tail", "ears"], ["all_legs", "spine", "neck_head", "tail", "ears"],
+        ["far_fore", "near_fore", "spine", "neck_head", "tail", "ears"], ["far_fore", "near_fore", "spine", "neck_head", "tail", "ears"],
+        ["far_fore", "near_fore", "spine", "neck_head", "tail", "ears"], ["all_legs", "spine", "neck_head", "tail", "ears"]
+      ],
+      "production_notes": "Geweih, Rosen und Rüstung bleiben als stabile Kopf-/Rumpfgruppen. Blätter und Blütenblätter reagieren klein und verzögert; Hufe sind in Kontaktframes waagerecht."
+    },
+    {
+      "id": "sandspire",
+      "name": "Sonnenskarabäus",
+      "source": "asset-workflow/01-source/marches/sandspire/march-source.png",
+      "source_size": [1536, 1024],
+      "movement": "sechsbeiniger Insekten-Tripodengang unter ruhigem Sonnenpanzer",
+      "loop_ms": 880,
+      "frame_ms": 110,
+      "contact_frames": [0, 1, 2, 3, 4, 5, 6, 7],
+      "contact_events": {"0": ["tripod_A_load"], "3": ["tripod_B_strike"], "4": ["tripod_B_load"], "7": ["tripod_A_strike"]},
+      "contacts_by_frame": [["near_front", "far_middle", "near_hind"], ["near_front", "far_middle", "near_hind"], ["near_front", "far_middle", "near_hind"], ["far_front", "near_middle", "far_hind"], ["far_front", "near_middle", "far_hind"], ["far_front", "near_middle", "far_hind"], ["far_front", "near_middle", "far_hind"], ["near_front", "far_middle", "near_hind"]],
+      "tripods": {"A": ["near_front", "far_middle", "near_hind"], "B": ["far_front", "near_middle", "far_hind"]},
+      "tracks": {
+        "tripod_A": ["flat-load", "flat-push", "toe", "lift", "swing-high", "swing-forward", "reach", "strike-flat"],
+        "tripod_B": ["lift", "swing-high", "swing-forward", "strike-flat", "flat-load", "flat-push", "toe", "lift"],
+        "body": ["low-A", "roll-A", "high", "settle-B", "low-B", "roll-B", "high", "settle-A"],
+        "mandibles": ["open-mid", "open", "open-max", "close", "closed", "open", "open-mid", "close"],
+        "antennae": ["center", "back", "back-max", "recover", "center", "forward", "forward-max", "recover"]
+      },
+      "moving_parts_by_frame": [
+        ["tripod_B", "body", "mandibles", "antennae"], ["tripod_B", "body", "mandibles", "antennae"],
+        ["tripod_A", "tripod_B", "body", "mandibles", "antennae"], ["tripod_A", "tripod_B", "body", "mandibles", "antennae"],
+        ["tripod_A", "body", "mandibles", "antennae"], ["tripod_A", "body", "mandibles", "antennae"],
+        ["tripod_A", "tripod_B", "body", "mandibles", "antennae"], ["tripod_A", "tripod_B", "body", "mandibles", "antennae"]
+      ],
+      "production_notes": "Sechs Beine eindeutig trennen und verdeckte Farbbeine neu zeichnen. Der große Flügelpanzer und Sattel bleiben ruhig; der Gang darf nicht wie ein vierbeiniger Galopp wirken."
+    },
+    {
+      "id": "sapphire",
+      "name": "Saphirpfau",
+      "source": "asset-workflow/01-source/marches/sapphire/march-source.png",
+      "source_size": [1312, 1199],
+      "movement": "stolzierender Zweibein-Schritt mit gegenläufigem Schwanzfächer",
+      "loop_ms": 1040,
+      "frame_ms": 130,
+      "contact_frames": [0, 1, 2, 3, 4, 5, 6, 7],
+      "contact_events": {"0": ["near_foot_strike"], "4": ["far_foot_strike"]},
+      "contacts_by_frame": [["near_leg", "far_leg"], ["near_leg"], ["near_leg"], ["near_leg"], ["near_leg", "far_leg"], ["far_leg"], ["far_leg"], ["far_leg"]],
+      "tracks": {
+        "near_leg": ["strike-flat", "flat-load", "flat", "flat-push", "toe", "lift-high", "swing-forward", "reach"],
+        "far_leg": ["toe", "lift-high", "swing-forward", "reach", "strike-flat", "flat-load", "flat", "flat-push"],
+        "body": ["over-near", "down-impact", "center", "rise", "over-far", "down-impact", "center", "rise"],
+        "neck_head": ["up", "forward", "down", "recover", "up", "forward", "down", "recover"],
+        "tail_fan": ["right-max", "right-1", "center", "left-1", "left-max", "left-1", "center", "right-1"],
+        "tail_eye_feathers": ["closed-tight", "open-1", "open-max", "open-1", "closed-tight", "open-1", "open-max", "open-1"],
+        "chest_pendants": ["center", "back", "back-max", "recover", "center", "forward", "forward-max", "recover"]
+      },
+      "moving_parts_by_frame": [
+        ["near_leg", "far_leg", "body", "neck_head", "tail_fan", "tail_eye_feathers"], ["far_leg", "body", "neck_head", "tail_fan", "tail_eye_feathers", "chest_pendants"],
+        ["far_leg", "body", "neck_head", "tail_fan", "tail_eye_feathers", "chest_pendants"], ["near_leg", "far_leg", "body", "neck_head", "tail_fan", "chest_pendants"],
+        ["near_leg", "far_leg", "body", "neck_head", "tail_fan", "tail_eye_feathers"], ["near_leg", "body", "neck_head", "tail_fan", "tail_eye_feathers", "chest_pendants"],
+        ["near_leg", "body", "neck_head", "tail_fan", "tail_eye_feathers", "chest_pendants"], ["near_leg", "far_leg", "body", "neck_head", "tail_fan", "chest_pendants"]
+      ],
+      "production_notes": "Die beiden Beine als komplette Hüfte-Knie-Lauf-Zehen-Ketten freistellen. Der schwere Fächer bewegt sich weniger weit als der Rumpf und läuft einen Frame nach; einzelne Edelsteinfedern bleiben formstabil."
+    },
+    {
+      "id": "tempest",
+      "name": "Sturmqualle",
+      "source": "asset-workflow/01-source/marches/tempest/march-source.png",
+      "source_size": [1536, 1024],
+      "movement": "Quallenpuls mit kontrahierender Wolkenglocke und fortlaufender Tentakelwelle",
+      "loop_ms": 1600,
+      "frame_ms": 200,
+      "contact_frames": [],
+      "contact_events": "none",
+      "tentacle_groups": {
+        "A": ["left_outer", "center_left", "center_right", "right_outer"],
+        "B": ["left_inner", "center", "right_inner", "far_right"]
+      },
+      "tracks": {
+        "bell": ["expanded", "contract-1", "contract-2", "contracted", "release-1", "release-2", "expanded", "overshoot"],
+        "body": ["trough", "rise", "rise-max", "apex", "fall-1", "fall-2", "trough", "settle"],
+        "tentacle_group_A": ["trail-right", "curl-right", "right-max", "recover", "trail-left", "curl-left", "left-max", "recover"],
+        "tentacle_group_B": ["left-max", "recover", "trail-right", "curl-right", "right-max", "recover", "trail-left", "curl-left"],
+        "tentacle_tips": ["lag-left", "left-max", "recover", "lag-right", "right-max", "recover", "lag-left", "left-max"],
+        "lightning_veins": ["dim", "charge-1", "charge-2", "flash", "afterglow", "dim", "dim", "dim"]
+      },
+      "moving_parts_by_frame": [
+        ["bell", "all_tentacles", "tentacle_tips"], ["bell", "body", "all_tentacles", "tentacle_tips", "lightning_veins"],
+        ["bell", "body", "all_tentacles", "tentacle_tips", "lightning_veins"], ["bell", "body", "all_tentacles", "tentacle_tips", "lightning_veins"],
+        ["bell", "body", "all_tentacles", "tentacle_tips", "lightning_veins"], ["bell", "body", "all_tentacles", "tentacle_tips", "lightning_veins"],
+        ["bell", "body", "all_tentacles", "tentacle_tips"], ["bell", "body", "all_tentacles", "tentacle_tips"]
+      ],
+      "production_notes": "Mindestens acht sichtbare Tentakel als separate, durchgehende Kurvenebenen zeichnen. Die Welle wandert vom Ansatz zur Kristallspitze; keine identische Sinusbewegung aller Tentakel."
+    },
+    {
+      "id": "tidewatch",
+      "name": "Leuchtrücken",
+      "source": "asset-workflow/01-source/marches/tidewatch/march-source.png",
+      "source_size": [1312, 1199],
+      "movement": "ruhiger Meeresschildkröten-Schwimmzug mit kräftigem Vorderflossen-Abschlag",
+      "loop_ms": 1280,
+      "frame_ms": 160,
+      "contact_frames": [],
+      "contact_events": "none",
+      "tracks": {
+        "near_front_flipper": ["forward", "forward-max", "catch", "power-down", "power-back", "back-max", "recover-up", "forward"],
+        "far_front_flipper": ["forward-max", "catch", "power-down", "power-back", "back-max", "recover-up", "forward", "forward-max"],
+        "near_hind_flipper": ["neutral", "out", "out-max", "neutral", "in", "in-max", "neutral", "out"],
+        "far_hind_flipper": ["in-max", "neutral", "out", "out-max", "neutral", "in", "in-max", "neutral"],
+        "neck_head": ["level", "up-1", "up-max", "forward", "down-1", "down-max", "recover", "level"],
+        "water_wave_tail": ["crest-high", "fall", "trough", "rise", "crest-high", "fall", "trough", "rise"],
+        "castle_flags": ["left-max", "left", "center", "right", "right-max", "right", "center", "left"]
+      },
+      "moving_parts_by_frame": [
+        ["all_flippers", "neck_head", "water_wave_tail", "castle_flags"], ["all_flippers", "neck_head", "water_wave_tail", "castle_flags"],
+        ["all_flippers", "neck_head", "water_wave_tail", "castle_flags"], ["all_flippers", "neck_head", "water_wave_tail", "castle_flags"],
+        ["all_flippers", "neck_head", "water_wave_tail", "castle_flags"], ["all_flippers", "neck_head", "water_wave_tail", "castle_flags"],
+        ["all_flippers", "neck_head", "water_wave_tail", "castle_flags"], ["all_flippers", "neck_head", "water_wave_tail", "castle_flags"]
+      ],
+      "production_notes": "Vorderflossen am Schultergelenk neu zeichnen, damit Abschlag und Rückholphase Volumen behalten. Burg und Panzer sind eine stabile Masse; Fahnen und Leinen folgen verzögert."
+    },
+    {
+      "id": "winterhold",
+      "name": "Frostmammut",
+      "source": "asset-workflow/01-source/marches/winterhold/march-source.png",
+      "source_size": [1345, 1170],
+      "movement": "langsamer vierbeiniger Elefantengang mit mindestens drei belasteten Füßen und frei schwingendem Rüssel",
+      "loop_ms": 1280,
+      "frame_ms": 160,
+      "contact_frames": [0, 1, 2, 3, 4, 5, 6, 7],
+      "contact_events": {"0": ["far_fore_strike"], "2": ["near_hind_strike"], "4": ["far_hind_strike"], "6": ["near_fore_strike"]},
+      "contacts_by_frame": [["far_fore", "far_hind", "near_fore"], ["far_fore", "far_hind", "near_fore"], ["far_fore", "near_hind", "near_fore"], ["far_fore", "near_hind", "near_fore"], ["far_fore", "near_hind", "far_hind"], ["far_fore", "near_hind", "far_hind"], ["near_hind", "far_hind", "near_fore"], ["near_hind", "far_hind", "near_fore"]],
+      "tracks": {
+        "far_fore": ["strike-flat", "flat-load", "flat", "flat", "flat-push", "toe", "lift", "swing-forward"],
+        "near_hind": ["lift", "swing-forward", "strike-flat", "flat-load", "flat", "flat", "flat-push", "toe"],
+        "far_hind": ["flat", "flat", "lift", "swing-forward", "strike-flat", "flat-load", "flat", "flat"],
+        "near_fore": ["flat", "flat", "flat", "flat", "lift", "swing-forward", "strike-flat", "flat-load"],
+        "body": ["settle-FF", "level", "settle-NH", "level", "settle-FH", "level", "settle-NF", "level"],
+        "head": ["level", "down", "down-max", "recover", "level", "up", "up-max", "recover"],
+        "trunk": ["center", "back-1", "back-max", "curl-back", "center", "forward-1", "forward-max", "curl-forward"],
+        "ears": ["neutral", "back", "back-max", "recover", "neutral", "forward", "forward-max", "recover"],
+        "short_tail": ["right", "right-max", "recover", "center", "left", "left-max", "recover", "center"]
+      },
+      "moving_parts_by_frame": [
+        ["far_fore", "near_hind", "body", "head", "trunk", "ears", "short_tail"],
+        ["near_hind", "head", "trunk", "ears", "short_tail"],
+        ["near_hind", "far_hind", "body", "head", "trunk", "ears", "short_tail"],
+        ["far_hind", "head", "trunk", "ears", "short_tail"],
+        ["far_hind", "near_fore", "body", "head", "trunk", "ears", "short_tail"],
+        ["near_fore", "head", "trunk", "ears", "short_tail"],
+        ["far_fore", "near_fore", "body", "head", "trunk", "ears", "short_tail"],
+        ["far_fore", "head", "trunk", "ears", "short_tail"]
+      ],
+      "production_notes": "Die Quelle zeigt drei Beine deutlich; das verdeckte Fernhinterbein muss anatomisch ergänzt werden. Je Frame bleiben mindestens drei Füße belastet oder im Abrollkontakt. Rüssel nicht an Stoßzähne kleben und nicht als Ganzbildwelle bewegen."
+    },
+    {
+      "id": "yggdrasil",
+      "name": "Wurzelkoloss",
+      "source": "asset-workflow/01-source/marches/yggdrasil/march-source.png",
+      "source_size": [1312, 1199],
+      "movement": "schwerer zweibeiniger Wurzelschritt mit Greifarmen und träger Kronennachbewegung",
+      "loop_ms": 1440,
+      "frame_ms": 180,
+      "contact_frames": [0, 1, 2, 3, 4, 5, 6, 7],
+      "contact_events": {"0": ["far_root_foot_strike"], "4": ["near_root_foot_strike"]},
+      "contacts_by_frame": [["near_root_leg", "far_root_leg"], ["far_root_leg"], ["far_root_leg"], ["far_root_leg"], ["near_root_leg", "far_root_leg"], ["near_root_leg"], ["near_root_leg"], ["near_root_leg"]],
+      "tracks": {
+        "near_root_leg": ["toe-contact", "lift-clear", "swing-high", "reach", "strike-flat", "spread-load", "flat-push", "toe"],
+        "far_root_leg": ["strike-flat", "spread-load", "flat", "flat-push", "toe-contact", "lift-clear", "swing-high", "reach"],
+        "trunk": ["turn-far", "settle-far", "center", "rise", "turn-near", "settle-near", "center", "rise"],
+        "near_arm": ["back", "back-max", "recover", "forward", "forward-max", "hold", "down", "back"],
+        "far_arm": ["forward-max", "hold", "down", "back", "back-max", "recover", "forward", "forward-max"],
+        "crown": ["center", "lag-far", "far-max", "recover", "center", "lag-near", "near-max", "recover"],
+        "hanging_vines": ["near-max", "recover", "center", "far", "far-max", "recover", "center", "near"],
+        "light_orbs": ["trail-near", "near-max", "recover", "center", "trail-far", "far-max", "recover", "center"]
+      },
+      "moving_parts_by_frame": [
+        ["near_root_leg", "far_root_leg", "trunk", "near_arm", "far_arm", "crown", "hanging_vines", "light_orbs"],
+        ["near_root_leg", "trunk", "near_arm", "far_arm", "crown", "hanging_vines", "light_orbs"],
+        ["near_root_leg", "trunk", "near_arm", "far_arm", "crown", "hanging_vines", "light_orbs"],
+        ["near_root_leg", "trunk", "near_arm", "far_arm", "crown", "hanging_vines", "light_orbs"],
+        ["near_root_leg", "far_root_leg", "trunk", "near_arm", "far_arm", "crown", "hanging_vines", "light_orbs"],
+        ["far_root_leg", "trunk", "near_arm", "far_arm", "crown", "hanging_vines", "light_orbs"],
+        ["far_root_leg", "trunk", "near_arm", "far_arm", "crown", "hanging_vines", "light_orbs"],
+        ["far_root_leg", "trunk", "near_arm", "far_arm", "crown", "hanging_vines", "light_orbs"]
+      ],
+      "production_notes": "Wurzelfüße verformen sich nur beim Lastaufnehmen und bleiben in der Standphase am Boden verankert. Krone, Ranken und Orbs reagieren ein bis zwei Frames nach dem Stamm; keine globale Baum-Sinusverformung."
+    }
+  ]
+}

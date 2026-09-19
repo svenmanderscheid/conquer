@@ -23,6 +23,7 @@ if (file_exists(ROOT_DIR . '/config/app.php')) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Conquer — UI Preview (Dev)</title>
+<link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR.'/assets/css/fantasy-fonts.css') ?>">
 <link rel="stylesheet" href="/conquer/assets/css/main.css">
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <style>
@@ -42,6 +43,7 @@ body { padding: 32px; max-width: 1100px; margin: 0 auto; }
 .demo-box { padding: 20px; background: var(--c-panel); border: 1px solid var(--c-border); border-radius: 10px; }
 code { background: var(--c-stone); padding: 2px 6px; border-radius: 4px; font-size: 0.78rem; color: var(--c-wood-dark); }
 </style>
+<link rel="stylesheet" href="<?= htmlspecialchars(APP_BASE, ENT_QUOTES) ?>/assets/css/village-theme.css?v=<?= filemtime(__DIR__ . "/../../assets/css/village-theme.css") ?>">
 </head>
 <body x-data="{
     modal1: false,

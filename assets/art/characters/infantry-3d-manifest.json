@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "generated_at": "2026-09-15",
+  "shared_animations": ["Gehen", "Laufen", "Kampf Leerlauf"],
+  "export": {
+    "format": "glb",
+    "skeleton": "MeshyRig",
+    "include_rigged_character": true,
+    "all_added_animations": true,
+    "single_file": true
+  },
+  "tiers": [
+    {"tier": 1, "material": "Kette", "rarity": "ungewöhnlich", "color": "grün", "body_source": "infantry-t1-chainmail-meshy-apose-v1.png", "sword_source": "infantry-t1-chainmail-sword-meshy-v1.png", "shield_source": "infantry-t1-chainmail-shield-meshy-v1.png", "model": "infantry-t1-rigged.glb", "ui": "infantry-t1-ui-v1.png", "thumb": "infantry-t1-thumb-v1.webp", "report": "infantry-t1-report-v1.png", "rigged": true},
+    {"tier": 2, "material": "Bronze", "rarity": "ungewöhnlich", "color": "grün", "body_source": "infantry-t2-bronze-meshy-apose-v1.png", "sword_source": "infantry-t2-bronze-sword-meshy-v1.png", "shield_source": "infantry-t2-bronze-shield-meshy-v1.png", "model": "infantry-t2-rigged.glb", "ui": "infantry-t2-ui-v1.png", "thumb": "infantry-t2-thumb-v1.webp", "report": "infantry-t2-report-v1.png", "rigged": true},
+    {"tier": 3, "material": "Eisen", "rarity": "selten", "color": "blau", "body_source": "infantry-t3-iron-meshy-apose-v1.png", "sword_source": "infantry-t3-iron-sword-meshy-v1.png", "shield_source": "infantry-t3-iron-shield-meshy-v2.png", "model": "infantry-t3-rigged.glb", "ui": "infantry-t3-ui-v1.png", "thumb": "infantry-t3-thumb-v1.webp", "report": "infantry-t3-report-v1.png", "rigged": true},
+    {"tier": 4, "material": "Stahl", "rarity": "selten", "color": "blau", "body_source": "infantry-t4-steel-meshy-apose-v1.png", "sword_source": "infantry-t4-steel-sword-meshy-v1.png", "shield_source": "infantry-t4-steel-shield-meshy-v1.png", "model": "infantry-t4-rigged.glb", "ui": "infantry-t4-ui-v1.png", "thumb": "infantry-t4-thumb-v1.webp", "report": "infantry-t4-report-v1.png", "rigged": true},
+    {"tier": 5, "material": "Silber", "rarity": "episch", "color": "violett", "body_source": "infantry-t5-silver-meshy-apose-v1.png", "sword_source": "infantry-t5-silver-sword-meshy-v1.png", "shield_source": "infantry-t5-silver-shield-meshy-v2.png", "model": "infantry-t5-rigged.glb", "ui": "infantry-t5-ui-v1.png", "thumb": "infantry-t5-thumb-v1.webp", "report": "infantry-t5-report-v1.png", "rigged": true},
+    {"tier": 6, "material": "Gold", "rarity": "episch", "color": "violett", "body_source": "infantry-t6-gold-meshy-apose-v1.png", "sword_source": "infantry-t6-gold-sword-meshy-v1.png", "shield_source": "infantry-t6-gold-shield-meshy-v1.png", "model": "infantry-t6-rigged.glb", "ui": "infantry-t6-ui-v1.png", "thumb": "infantry-t6-thumb-v1.webp", "report": "infantry-t6-report-v1.png", "rigged": true},
+    {"tier": 7, "material": "Platin", "rarity": "legendär", "color": "orange", "body_source": "infantry-t7-platinum-meshy-apose-v1.png", "sword_source": "infantry-t7-platinum-sword-meshy-v1.png", "shield_source": "infantry-t7-platinum-shield-meshy-v1.png", "model": "infantry-t7-rigged.glb", "ui": "infantry-t7-ui-v1.png", "thumb": "infantry-t7-thumb-v1.webp", "report": "infantry-t7-report-v1.png", "rigged": true},
+    {"tier": 8, "material": "Diamant", "rarity": "legendär", "color": "orange", "body_source": "infantry-t8-diamond-meshy-apose-v1.png", "sword_source": "infantry-t8-diamond-sword-meshy-v2.png", "shield_source": "infantry-t8-diamond-shield-meshy-v1.png", "model": "infantry-t8-rigged.glb", "ui": "infantry-t8-ui-v1.png", "thumb": "infantry-t8-thumb-v1.webp", "report": "infantry-t8-report-v1.png", "rigged": true},
+    {"tier": 9, "material": "Mithril", "rarity": "mythisch", "color": "rot", "body_source": "infantry-t9-mithril-meshy-apose-v1.png", "sword_source": "infantry-t9-mithril-sword-meshy-v1.png", "shield_source": "infantry-t9-mithril-shield-meshy-v1.png", "model": "infantry-t9-rigged.glb", "ui": "infantry-t9-ui-v1.png", "thumb": "infantry-t9-thumb-v1.webp", "report": "infantry-t9-report-v1.png", "rigged": true},
+    {"tier": 10, "material": "Drachenstahl", "rarity": "göttlich", "color": "goldweiß", "body_source": "infantry-t10-dragonsteel-meshy-apose-v1.png", "sword_source": "infantry-t10-dragonsteel-sword-meshy-v1.png", "shield_source": "infantry-t10-dragonsteel-shield-meshy-v1.png", "model": "infantry-t10-rigged.glb", "ui": "infantry-t10-ui-v1.png", "thumb": "infantry-t10-thumb-v1.webp", "report": "infantry-t10-report-v1.png", "rigged": true}
+  ]
+}

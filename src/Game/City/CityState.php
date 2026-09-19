@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Conquer\Game\City;
 
+use Conquer\Game\World\WorldContext;
+
 use Conquer\Db\Connection;
 use Conquer\Game\City\TroopTrainer;
 use Conquer\Game\Vip\VipService;
@@ -12,13 +14,13 @@ use Conquer\Game\Alliance\AllianceResearchService;
 /**
  * Loads a player's city snapshot from the database.
  *
- * Returns a structured array with city info, all 13 buildings, and
+ * Returns a structured array with city info, all canonical buildings, and
  * the active build queue. Returns null when the player has no city yet.
  */
 final class CityState
 {
     /**
-     * The 13 canonical building codes (SPEC §4.1).
+     * The canonical building codes.
      * Order determines display order in the city view.
      */
     public const BUILDING_CODES = [
@@ -31,10 +33,13 @@ final class CityState
         'storage',
         'treasure_house',
         'barrack',
+        'archery_range',
+        'stable',
         'hospital',
         'academy',
         'trading_post',
         'hall_of_alliance',
+        'watch_tower',
     ];
 
     /** Display labels for each building code. */
@@ -48,10 +53,13 @@ final class CityState
         'storage'          => 'Storage',
         'treasure_house'   => 'Treasure House',
         'barrack'          => 'Barrack',
+        'archery_range'    => 'Schützenlager',
+        'stable'           => 'Reiterhof',
         'hospital'         => 'Hospital',
         'academy'          => 'Academy',
         'trading_post'     => 'Trading Post',
         'hall_of_alliance' => 'Hall of Alliance',
+        'watch_tower'      => 'Wachturm',
     ];
 
     // Static-only utility — no instantiation.
@@ -66,15 +74,27 @@ final class CityState
      *     build_queue: list<array<string, mixed>>
      * }|null  Null when the player has no city in this world.
      */
-    public static function loadForPlayer(int $playerId, int $worldId = 1): ?array
+    public static function loadForPlayer(int $playerId, ?int $worldId = null): ?array
+    {
+        $worldId??=WorldContext::id();
+        $db = Connection::getInstance();
+        $lock = 'conquer-player-' . $playerId;
+        if ((int) $db->query('SELECT GET_LOCK(?, 5)', [$lock])->fetchColumn() !== 1) {
+            throw new \RuntimeException('Dein Königreich wird gerade aktualisiert. Bitte versuche es erneut.');
+        }
+        try { return self::loadSnapshot($playerId, $worldId); }
+        finally { $db->query('SELECT RELEASE_LOCK(?)', [$lock]); }
+    }
+
+    private static function loadSnapshot(int $playerId, int $worldId): ?array
     {
         $db = Connection::getInstance();
 
         $city = $db->query(
-            'SELECT id, name, food, lumber, stone, gold, last_resource_update,
+            'SELECT id, player_id, world_id, name, food, lumber, stone, gold, last_resource_update,
                     wall_hp_current, wall_hp_max, wall_last_update,
                     castle_level, power,
-                    action_points, coord_x, coord_y, is_shielded
+                    action_points, coord_x, coord_y, is_shielded, shield_expires_at
              FROM   cities
              WHERE  player_id = ? AND world_id = ?',
             [$playerId, $worldId],
@@ -92,25 +112,38 @@ final class CityState
         // Reload buildings in case upgrades were applied.
         $buildings = self::loadBuildings($db, $cityId);
 
+        BuildingPlotService::complete($cityId,$buildings);
+        $city=array_replace($city,$db->query('SELECT food,lumber,stone,gold,last_resource_update FROM cities WHERE id=?',[$cityId])->fetch());
+
         // Credit any completed troop training.
         TroopTrainer::processQueue($db, $cityId);
+        \Conquer\Game\Defense\DefenseService::processPromotions($cityId);
+        \Conquer\Game\Hospital\HospitalService::processHealed($cityId);
 
         // Apply wall HP auto-regeneration (lazy, ~10%/hour).
-        self::applyWallRegen($db, $city);
+        $city=array_replace($city,\Conquer\Game\Defense\DefenseService::syncWall($cityId));
 
         // Load VIP status — used for production and build-time bonuses.
         $vip        = VipService::status($playerId);
         $vipBonuses = $vip['bonuses'];
 
         // Apply active production buffs multiplicatively.
-        $productionMultiplier = ActiveBuffService::getMultiplier($playerId, 'production_boost');
+        $worldSpeed=max(.01,(float)$db->query('SELECT speed_factor FROM worlds WHERE id=?',[$worldId])->fetchColumn());
+        $productionMultiplier = $worldSpeed*ActiveBuffService::getMultiplier($playerId, 'production_boost');
+        $researchBuffs = \Conquer\Game\Research\BuffEngine::getBuffs($playerId, $worldId);
+        $vipBonuses['construction_speed'] = ($vipBonuses['construction_speed'] ?? 0) + 100 * ($researchBuffs['construction_speed'] ?? 0);
+        $vipBonuses['talent_construction_speed'] = (float)($researchBuffs['talent_construction_speed']??0);
+        foreach (['food', 'lumber', 'stone', 'gold'] as $resource) {
+            $vipBonuses[$resource . '_prod_pct'] = (float) ($researchBuffs[$resource . '_production'] ?? $researchBuffs[($resource === 'lumber' ? 'wood' : $resource) . '_production'] ?? 0);
+            $vipBonuses[$resource . '_capacity_pct'] = (float)($researchBuffs[$resource.'_capacity'] ?? 0) + (float)($researchBuffs['resource_capacity'] ?? 0);
+        }
 
         // Load Alliance Research production bonuses (if player is in an alliance).
         $allianceResearchBonuses = ['food_pct' => 0.0, 'lumber_pct' => 0.0, 'stone_pct' => 0.0, 'gold_pct' => 0.0];
         try {
             $memberRow = $db->query(
-                'SELECT alliance_id FROM alliance_members WHERE player_id = ?',
-                [$playerId],
+                'SELECT alliance_id FROM alliance_members WHERE player_id = ? AND world_id = ?',
+                [$playerId,$worldId],
             )->fetch();
             if ($memberRow !== false) {
                 $allianceResearchBonuses = AllianceResearchService::getProductionBonuses((int) $memberRow['alliance_id']);
@@ -128,6 +161,7 @@ final class CityState
         }
 
         // Apply lazy resource production (no DB write on read).
+        $vip['bonuses'] = $vipBonuses;
         $city = ResourceTick::apply($city, $buildings, $productionMultiplier, $vipBonuses);
 
         // Recalculate power live so it's always correct on read.
@@ -137,6 +171,13 @@ final class CityState
         $troops     = self::loadTroops($db, $cityId);
         $troopQueue = self::loadTroopQueue($db, $cityId);
 
+        $productionRates = [];
+        foreach ($buildings as $code => $building) {
+            $productionRates[$code] = BuildingData::getHourlyRate($code, $building['level'], $vipBonuses) * $productionMultiplier;
+        }
+
+        foreach(BuildingPlotService::rows($cityId) as $plot){$code=$plot['building_code'];$productionRates[$code]=($productionRates[$code]??0)+BuildingData::getHourlyRate($code,(int)$plot['level'],$vipBonuses)*$productionMultiplier;}
+
         return [
             'city'        => $city,
             'buildings'   => $buildings,
@@ -144,6 +185,7 @@ final class CityState
             'troops'      => $troops,
             'troop_queue' => $troopQueue,
             'vip'         => $vip,
+            'production_rates' => $productionRates,
         ];
     }
 
@@ -151,7 +193,7 @@ final class CityState
 
     /**
      * Returns a map of building_code → {code, level}.
-     * All 13 codes are always present; missing DB rows default to level 1.
+     * All canonical codes are always present; missing DB rows default to level 1.
      *
      * @return array<string, array{code: string, level: int}>
      */

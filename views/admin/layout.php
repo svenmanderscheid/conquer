@@ -1,416 +1,61 @@
-<?php
-/**
- * Admin layout — wraps all admin pages.
- *
- * Expected variables (set before require):
- *   $adminSession  — from AdminAuth::requireAuth()
- *   $pageTitle     — string, page heading
- *   $activePage    — string, sidebar active state key
- *   $content       — string, ob_get_clean() from the inner view
- */
+<?php declare(strict_types=1);
+$descriptions=[
+    'dashboard'=>'Die wichtigsten Bereiche deines Königreichs, an einem Ort.',
+    'rewards'=>'Lege fest, welche Belohnungen deine Spieler erhalten.',
+    'items'=>'Alle Gegenstände mit Bild, Seltenheit und Beschreibung.',
+    'players'=>'Spieler finden, Fortschritt verwalten und Geschenke zustellen.',
+    'world'=>'Population, Spieltempo und Ereignisse deiner Welt steuern.',
+    'lands'=>'Landstufen, Beiträge und die Freigabe der drei Kartenbereiche einstellen.',
+    'alliances'=>'Allianzen und ihre Mitglieder im Blick behalten.',
+    'chat'=>'Unterhaltungen in deiner Welt nachvollziehen.',
+    'bug_reports'=>'Meldungen deiner Spieler prüfen, priorisieren und abschließen.',
+    'audit'=>'Nachsehen, wer welche Einstellung geändert hat.'
+];
+$globalPage=$activePage==='items'||($activePage==='rewards'&&($_GET['scope']??'global')!=='world');
+$newBugCount=(int)$db->query("SELECT COUNT(*) FROM bug_reports WHERE world_id=? AND status='new'",[$selectedWorld])->fetchColumn();
 ?>
-<!DOCTYPE html>
-<html lang="de">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><?= htmlspecialchars($pageTitle ?? 'Admin') ?> &mdash; Conquer</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, sans-serif;
-      background: #0f172a;
-      color: #e2e8f0;
-      display: flex;
-      min-height: 100vh;
-    }
-
-    /* ---- Sidebar ---- */
-    #admin-sidebar {
-      width: 220px;
-      flex-shrink: 0;
-      background: #1e293b;
-      border-right: 1px solid #334155;
-      display: flex;
-      flex-direction: column;
-    }
-    .admin-logo {
-      padding: 20px 16px;
-      border-bottom: 1px solid #334155;
-      font-weight: 800;
-      font-size: 1rem;
-      color: #f1f5f9;
-      letter-spacing: 0.02em;
-    }
-    .admin-logo span { color: #f59e0b; }
-    .admin-nav { flex: 1; padding: 12px 0; }
-    .admin-nav a {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 9px 16px;
-      color: #94a3b8;
-      text-decoration: none;
-      font-size: 0.82rem;
-      font-weight: 500;
-      transition: all 0.15s;
-      border-left: 2px solid transparent;
-    }
-    .admin-nav a:hover,
-    .admin-nav a.active {
-      color: #f1f5f9;
-      background: rgba(59, 130, 246, 0.1);
-      border-left-color: #3b82f6;
-      padding-left: 14px;
-    }
-    .admin-nav-section {
-      padding: 8px 16px 4px;
-      font-size: 0.65rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #475569;
-    }
-    .admin-sidebar-footer {
-      padding: 12px 16px;
-      border-top: 1px solid #334155;
-      font-size: 0.75rem;
-      color: #64748b;
-    }
-
-    /* ---- Main ---- */
-    #admin-main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      min-width: 0;
-    }
-    #admin-topbar {
-      height: 52px;
-      flex-shrink: 0;
-      background: #1e293b;
-      border-bottom: 1px solid #334155;
-      display: flex;
-      align-items: center;
-      padding: 0 20px;
-      gap: 12px;
-    }
-    .admin-topbar-title {
-      flex: 1;
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: #f1f5f9;
-    }
-    .admin-badge {
-      font-size: 0.7rem;
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-weight: 700;
-    }
-    .admin-badge-super {
-      background: rgba(245, 158, 11, 0.2);
-      color: #f59e0b;
-      border: 1px solid rgba(245, 158, 11, 0.3);
-    }
-    .admin-badge-mod {
-      background: rgba(59, 130, 246, 0.2);
-      color: #60a5fa;
-      border: 1px solid rgba(59, 130, 246, 0.3);
-    }
-    .admin-logout {
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      border-radius: 5px;
-      color: #f87171;
-      font-size: 0.75rem;
-      padding: 4px 10px;
-      cursor: pointer;
-      text-decoration: none;
-      transition: background 0.15s;
-    }
-    .admin-logout:hover {
-      background: rgba(239, 68, 68, 0.2);
-    }
-    #admin-content {
-      flex: 1;
-      overflow-y: auto;
-      padding: 24px;
-    }
-
-    /* ---- Flash message ---- */
-    .admin-flash {
-      background: rgba(34, 197, 94, 0.1);
-      border: 1px solid rgba(34, 197, 94, 0.3);
-      border-radius: 8px;
-      color: #86efac;
-      padding: 12px 16px;
-      font-size: 0.82rem;
-      margin-bottom: 20px;
-    }
-
-    /* ---- Cards ---- */
-    .admin-card {
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 10px;
-      margin-bottom: 20px;
-      overflow: hidden;
-    }
-    .admin-card-header {
-      padding: 14px 18px;
-      border-bottom: 1px solid #334155;
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: #94a3b8;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-    .admin-card-body { padding: 18px; }
-
-    /* ---- Stats grid ---- */
-    .admin-stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-    .admin-stat {
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 10px;
-      padding: 18px;
-    }
-    .admin-stat-label {
-      font-size: 0.72rem;
-      color: #64748b;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 6px;
-    }
-    .admin-stat-value {
-      font-size: 1.6rem;
-      font-weight: 800;
-      color: #f1f5f9;
-    }
-    .admin-stat-sub {
-      font-size: 0.7rem;
-      color: #475569;
-      margin-top: 4px;
-    }
-
-    /* ---- Table ---- */
-    .admin-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.82rem;
-    }
-    .admin-table th {
-      text-align: left;
-      padding: 10px 12px;
-      background: #0f172a;
-      color: #64748b;
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      border-bottom: 1px solid #334155;
-    }
-    .admin-table td {
-      padding: 10px 12px;
-      border-bottom: 1px solid #1a2744;
-      color: #cbd5e1;
-    }
-    .admin-table tr:last-child td { border-bottom: none; }
-    .admin-table tr:hover td { background: rgba(255, 255, 255, 0.02); }
-
-    /* ---- Buttons ---- */
-    .admin-btn {
-      padding: 6px 14px;
-      border-radius: 6px;
-      font-size: 0.78rem;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      transition: opacity 0.15s;
-    }
-    .admin-btn:hover { opacity: 0.85; }
-    .admin-btn-primary { background: #3b82f6; color: white; }
-    .admin-btn-danger {
-      background: rgba(239, 68, 68, 0.15);
-      color: #f87171;
-      border: 1px solid rgba(239, 68, 68, 0.3);
-    }
-    .admin-btn-warning {
-      background: rgba(245, 158, 11, 0.15);
-      color: #fcd34d;
-      border: 1px solid rgba(245, 158, 11, 0.3);
-    }
-    .admin-btn-sm { padding: 3px 8px; font-size: 0.72rem; }
-
-    /* ---- Tabs inside card ---- */
-    .admin-tab-btn {
-      flex: 1;
-      padding: 10px 12px;
-      background: transparent;
-      border: none;
-      border-right: 1px solid #1e293b;
-      color: #64748b;
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .04em;
-      cursor: pointer;
-      transition: background .15s, color .15s;
-    }
-    .admin-tab-btn:last-child { border-right: none; }
-    .admin-tab-btn:hover { background: rgba(255,255,255,.04); color: #94a3b8; }
-    .admin-tab-active { background: rgba(59,130,246,.12) !important; color: #93c5fd !important; border-bottom: 2px solid #3b82f6; }
-
-    /* ---- Input ---- */
-    .admin-input {
-      background: #0f172a;
-      border: 1px solid #334155;
-      border-radius: 6px;
-      color: #e2e8f0;
-      padding: 6px 8px;
-      font-size: 0.82rem;
-      width: 100%;
-      font-family: inherit;
-    }
-    .admin-input:focus { outline: none; border-color: #3b82f6; }
-
-    /* ---- Form ---- */
-    .admin-form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 16px;
-    }
-    .admin-form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-bottom: 16px;
-    }
-    .admin-form-group label {
-      font-size: 0.75rem;
-      color: #94a3b8;
-      font-weight: 600;
-    }
-    .admin-form-group input,
-    .admin-form-group select,
-    .admin-form-group textarea {
-      background: #0f172a;
-      border: 1px solid #334155;
-      border-radius: 6px;
-      color: #e2e8f0;
-      padding: 8px 10px;
-      font-size: 0.82rem;
-      outline: none;
-      transition: border-color 0.15s;
-    }
-    .admin-form-group input:focus,
-    .admin-form-group select:focus,
-    .admin-form-group textarea:focus {
-      border-color: #3b82f6;
-    }
-
-    /* ---- Pagination ---- */
-    .admin-pagination {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-      margin-top: 16px;
-    }
-    .admin-pagination a,
-    .admin-pagination span {
-      padding: 5px 10px;
-      border-radius: 5px;
-      font-size: 0.78rem;
-      text-decoration: none;
-    }
-    .admin-pagination a {
-      background: #1e293b;
-      border: 1px solid #334155;
-      color: #94a3b8;
-    }
-    .admin-pagination a:hover { border-color: #3b82f6; color: #f1f5f9; }
-    .admin-pagination span {
-      background: #3b82f6;
-      color: white;
-      font-weight: 700;
-    }
-
-    /* ---- Tag / pill ---- */
-    .admin-tag {
-      display: inline-block;
-      padding: 2px 7px;
-      border-radius: 999px;
-      font-size: 0.68rem;
-      font-weight: 700;
-    }
-    .admin-tag-green { background: rgba(34,197,94,0.15); color: #86efac; border: 1px solid rgba(34,197,94,0.3); }
-    .admin-tag-red   { background: rgba(239,68,68,0.15);  color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
-    .admin-tag-blue  { background: rgba(59,130,246,0.15); color: #93c5fd; border: 1px solid rgba(59,130,246,0.3); }
-    .admin-tag-amber { background: rgba(245,158,11,0.15); color: #fcd34d; border: 1px solid rgba(245,158,11,0.3); }
-
-    /* ---- Empty state ---- */
-    .admin-empty {
-      text-align: center;
-      padding: 48px 24px;
-      color: #475569;
-      font-size: 0.85rem;
-    }
-  </style>
-  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-</head>
-<body>
-
-<div id="admin-sidebar">
-  <div class="admin-logo">&#9876; <span>Conquer</span> Admin</div>
-  <nav class="admin-nav">
-    <div class="admin-nav-section">Uebersicht</div>
-    <a href="<?= APP_BASE ?>/admin" <?= ($activePage ?? '') === 'dashboard' ? 'class="active"' : '' ?>>&#128202; Dashboard</a>
-
-    <div class="admin-nav-section">Spieler</div>
-    <a href="<?= APP_BASE ?>/admin/players"   <?= ($activePage ?? '') === 'players'   ? 'class="active"' : '' ?>>&#128100; Spieler</a>
-    <a href="<?= APP_BASE ?>/admin/alliances" <?= ($activePage ?? '') === 'alliances' ? 'class="active"' : '' ?>>&#9876; Allianzen</a>
-
-    <div class="admin-nav-section">Welt</div>
-    <a href="<?= APP_BASE ?>/admin/world" <?= ($activePage ?? '') === 'world' ? 'class="active"' : '' ?>>&#128506; Weltverwaltung</a>
-    <a href="<?= APP_BASE ?>/admin/chat"  <?= ($activePage ?? '') === 'chat'  ? 'class="active"' : '' ?>>&#128172; Chat Moderation</a>
-
-    <div class="admin-nav-section">System</div>
-    <a href="<?= APP_BASE ?>/admin/audit" <?= ($activePage ?? '') === 'audit' ? 'class="active"' : '' ?>>&#128203; Audit Log</a>
-  </nav>
-  <div class="admin-sidebar-footer">
-    <?= htmlspecialchars($adminSession['username'] ?? '') ?> &bull;
-    <?= ($adminSession['role'] ?? '') === 'superadmin' ? 'Superadmin' : 'Moderator' ?>
-  </div>
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title><?= ah($pageTitle) ?> · Conquer Verwaltung</title>
+<link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR.'/assets/css/fantasy-fonts.css') ?>">
+<link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/admin-backoffice.css?v=<?= filemtime(ROOT_DIR.'/assets/css/admin-backoffice.css') ?>">
+<link rel="icon" href="<?= APP_BASE ?>/assets/icons/conquer.svg">
+<link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/village-theme.css?v=<?= filemtime(ROOT_DIR.'/assets/css/village-theme.css') ?>">
+<script src="<?= APP_BASE ?>/assets/js/admin-backoffice.js?v=<?= filemtime(ROOT_DIR.'/assets/js/admin-backoffice.js') ?>" defer></script>
+</head><body class="admin-village">
+<a class="skip-link" href="#main">Zum Inhalt</a>
+<aside class="sidebar">
+    <a class="brand" href="<?= APP_BASE ?>/admin"><?= adminIcon('hud/city.svg','brand-mark') ?><span>CONQUER<small>Deine Verwaltung</small></span></a>
+    <button type="button" class="secondary mobile-menu" aria-expanded="false" aria-controls="admin-nav">☰ Menü</button>
+    <nav id="admin-nav" aria-label="Verwaltung">
+    <?php foreach([
+        'Start'=>['dashboard'=>['','Übersicht','hud/city.svg']],
+        'Spielinhalte'=>['rewards'=>['/rewards','Beute & Drops','items/chest-gold.svg'],'items'=>['/items','Gegenstände','hud/inventory.svg'],'world'=>['/world','Welten & Spawns','hud/world.svg'],'lands'=>['/lands','Länder & Entwicklung','hud/world.svg']],
+        'Gemeinschaft'=>['players'=>['/players','Spieler & Geschenke','knight.png'],'alliances'=>['/alliances','Allianzen','hud/alliance.svg'],'chat'=>['/chat','Chatprotokoll','hud/reports.svg'],'bug_reports'=>['/bug-reports','Bugmeldungen'.($newBugCount?' · '.$newBugCount:''),'hud/quest.svg']],
+        'Verlauf'=>['audit'=>['/audit','Änderungsprotokoll','hud/quest.svg']]
+    ] as $group=>$links): ?><div class="nav-caption"><?= ah($group) ?></div>
+        <?php foreach($links as $key=>[$path,$label,$icon]): ?><a <?= $activePage===$key?'class="active" aria-current="page"':'' ?> href="<?= APP_BASE ?>/admin<?= $path ?>?world_id=<?= $selectedWorld ?>"><?= adminIcon($icon) ?><span><?= ah($label) ?></span></a><?php endforeach ?>
+    <?php endforeach ?>
+    </nav>
+    <div class="sidebar-bottom"><strong><?= ah($adminSession['username']) ?></strong><small><?= $canEdit?'Administrator · voller Zugriff':'Moderator · Lesezugriff' ?></small><a href="<?= APP_BASE ?>/admin/logout">Abmelden →</a></div>
+</aside>
+<div class="shell">
+<header class="topbar"><span><?= $globalPage?'🌐 Spielinhalte · alle Welten':'Verwaltung deiner Welt' ?></span>
+<?php if(!$globalPage): ?><form method="get" class="world-picker"><?php if($activePage==='rewards'): ?><input type="hidden" name="scope" value="world"><?php foreach(['type','source'] as $queryKey)if(is_string($_GET[$queryKey]??null)): ?><input type="hidden" name="<?= $queryKey ?>" value="<?= ah($_GET[$queryKey]) ?>"><?php endif;endif ?><label for="world-picker">Aktive Welt</label><select id="world-picker" name="world_id" aria-label="Aktive Verwaltungswelt"><?php foreach($worlds as $w): ?><option value="<?= (int)$w['id'] ?>" <?= (int)$w['id']===$selectedWorld?'selected':'' ?>><?= ah($w['name']) ?></option><?php endforeach ?></select><button class="secondary" type="submit">Wechseln</button></form><?php else: ?><span class="pill">Für alle Welten</span><?php endif ?>
+</header>
+<main id="main">
+<div class="page-heading"><div><h1><?= ah($pageTitle) ?></h1><p><?= ah($descriptions[$activePage]??'Dein Spielerprofil und die zugehörige Stadt verwalten.') ?></p></div><a class="button secondary" href="<?= APP_BASE ?>/city#city">Spiel öffnen ↗</a></div>
+<?php if(isset($_SESSION['admin_flash'])): ?><div class="notice <?= ah($_SESSION['admin_flash_kind']??'success') ?>" role="<?= ($_SESSION['admin_flash_kind']??'')==='error'?'alert':'status' ?>"><?= ah($_SESSION['admin_flash']) ?></div><?php unset($_SESSION['admin_flash'],$_SESSION['admin_flash_kind']);endif ?>
+<?php if(!$canEdit): ?><div class="notice">Du kannst alle Einstellungen ansehen. Zum Speichern ist ein Administratorkonto erforderlich.</div><?php endif ?>
+<noscript><div class="notice">Bitte aktiviere JavaScript für die Bildauswahl und das Hinzufügen von Beuteeinträgen.</div></noscript>
+<?= $content ?>
+</main>
+<footer><span>Conquer · Verwaltung</span><span>Änderungen sind im Verlauf nachvollziehbar. Zeitangaben in UTC.</span></footer>
 </div>
-
-<div id="admin-main">
-  <div id="admin-topbar">
-    <div class="admin-topbar-title"><?= htmlspecialchars($pageTitle ?? 'Admin') ?></div>
-    <span class="admin-badge <?= ($adminSession['role'] ?? '') === 'superadmin' ? 'admin-badge-super' : 'admin-badge-mod' ?>">
-      <?= ($adminSession['role'] ?? '') === 'superadmin' ? '&#9733; Superadmin' : 'Moderator' ?>
-    </span>
-    <a href="<?= APP_BASE ?>/admin/logout" class="admin-logout">Abmelden</a>
-  </div>
-  <div id="admin-content">
-    <?php if (!empty($_SESSION['admin_flash'])): ?>
-      <div class="admin-flash"><?= htmlspecialchars($_SESSION['admin_flash']) ?></div>
-      <?php unset($_SESSION['admin_flash']); ?>
-    <?php endif ?>
-    <?= $content ?? '' ?>
-  </div>
-</div>
-
-</body>
-</html>
+<dialog id="item-picker-dialog" aria-labelledby="item-picker-title">
+    <div class="picker-header"><div><h2 id="item-picker-title">Gegenstand auswählen</h2><p>Suche nach Name oder Gegenstandsnummer.</p></div><button type="button" class="secondary" data-picker-close aria-label="Auswahl schließen">✕</button></div>
+    <div class="picker-filters"><label>Suche<input type="search" id="item-picker-search" placeholder="z. B. Nahrung, Beschleuniger …"></label><label>Kategorie<select id="item-picker-category"><option value="">Alle Kategorien</option><?php foreach(\Conquer\Admin\ItemPresentation::CATEGORIES+['fragments'=>'Zufällige Reliktfragmente'] as $key=>$label): ?><option value="<?= ah($key) ?>"><?= ah($label) ?></option><?php endforeach ?></select></label></div>
+    <p class="picker-count" aria-live="polite"></p><div class="picker-results"></div>
+</dialog>
+<script type="application/json" id="admin-item-catalog"><?= json_encode(\Conquer\Admin\ItemPresentation::catalog(true),JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_THROW_ON_ERROR) ?></script>
+</body></html>

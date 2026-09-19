@@ -33,24 +33,26 @@ final class PlayerHandler
 
         $playerId = (int) $session['player_id'];
         $db       = Connection::getInstance();
+        $worldId=\Conquer\Game\World\WorldContext::id();
 
         $player = $db->query(
-            'SELECT p.id, p.username, p.lord_xp, p.lord_level, p.vip_level, p.kill_count,
+            'SELECT p.id, p.username, p.vip_level, p.kill_count,
                     c.castle_level, c.power, c.coord_x, c.coord_y,
                     a.tag AS alliance_tag, a.name AS alliance_name
              FROM   players p
-             LEFT JOIN cities c ON c.player_id = p.id AND c.world_id = 1
-             LEFT JOIN alliance_members am ON am.player_id = p.id
+             JOIN cities c ON c.player_id = p.id AND c.world_id = ?
+             LEFT JOIN alliance_members am ON am.player_id = p.id AND am.world_id = ?
              LEFT JOIN alliances a ON a.id = am.alliance_id
              WHERE  p.id = ?',
-            [$playerId],
+            [$worldId,$worldId,$playerId],
         )->fetch();
 
         if ($player === false) Response::error(404, 'NOT_FOUND', 'Spieler nicht gefunden.');
 
         $ap     = ActionPoints::get($playerId);
-        $lordXp = (int) $player['lord_xp'];
-        $lordLv = (int) $player['lord_level'];
+        $lord=LordLevel::snapshot($playerId,$worldId);
+        $lordXp = $lord['xp'];
+        $lordLv = $lord['level'];
 
         Response::ok([
             'id'             => $playerId,
@@ -70,7 +72,7 @@ final class PlayerHandler
             'ap_regen_per_h' => $ap['regen_per_hour'],
             'coord_x'        => (int) ($player['coord_x'] ?? 0),
             'coord_y'        => (int) ($player['coord_y'] ?? 0),
-            'world_id'       => 1,
+            'world_id'       => $worldId,
         ]);
     }
 
@@ -85,17 +87,18 @@ final class PlayerHandler
         if ($targetId <= 0) Response::error(400, 'INVALID_INPUT', 'Ungültige Spieler-ID.');
 
         $db = Connection::getInstance();
+        $worldId=\Conquer\Game\World\WorldContext::id();
 
         $player = $db->query(
-            'SELECT p.id, p.username, p.lord_level, p.kill_count, p.vip_level,
+            'SELECT p.id, p.username, p.kill_count, p.vip_level,
                     c.castle_level, c.power,
                     a.tag AS alliance_tag, a.name AS alliance_name
              FROM   players p
-             LEFT JOIN cities c ON c.player_id = p.id AND c.world_id = 1
-             LEFT JOIN alliance_members am ON am.player_id = p.id
+             JOIN cities c ON c.player_id = p.id AND c.world_id = ?
+             LEFT JOIN alliance_members am ON am.player_id = p.id AND am.world_id = ?
              LEFT JOIN alliances a ON a.id = am.alliance_id
              WHERE  p.id = ?',
-            [$targetId],
+            [$worldId,$worldId,$targetId],
         )->fetch();
 
         if ($player === false) Response::error(404, 'NOT_FOUND', 'Spieler nicht gefunden.');
@@ -105,8 +108,8 @@ final class PlayerHandler
             'SELECT ct.troop_code, ct.count
              FROM   city_troops ct
              JOIN   cities c ON c.id = ct.city_id
-             WHERE  c.player_id = ? AND c.world_id = 1 AND ct.count > 0',
-            [$targetId],
+             WHERE  c.player_id = ? AND c.world_id = ? AND ct.count > 0',
+            [$targetId,$worldId],
         )->fetchAll();
 
         $troops = [];
@@ -123,9 +126,9 @@ final class PlayerHandler
             'power'         => (int) ($player['power'] ?? 0),
             'kill_count'    => (int) $player['kill_count'],
             'vip_level'     => (int) $player['vip_level'],
-            'lord_level'    => (int) $player['lord_level'],
+            'lord_level'    => LordLevel::snapshot($targetId,$worldId)['level'],
             'troops'        => $troops,
-            'world_id'      => 1,
+            'world_id'      => $worldId,
         ]);
     }
 

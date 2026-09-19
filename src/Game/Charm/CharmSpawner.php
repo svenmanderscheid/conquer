@@ -8,8 +8,8 @@ use Conquer\Db\Connection;
 /**
  * Spawns a charm on the map when a monster is killed.
  *
- * Drop rate: 100% for Orc / Skeleton / Golem.
- * Grade probabilities depend on monster level (from data/charms.json).
+ * Every active field-monster definition drops exactly one charm.
+ * Grade weights may come from the resolved, world-aware reward snapshot.
  */
 final class CharmSpawner
 {
@@ -40,28 +40,39 @@ final class CharmSpawner
     private const GRADE_OFFSET = ['normal' => 1, 'epic' => 2, 'legendary' => 3];
 
     /** Bonus percent per grade */
-    private const BONUS_PCT = ['normal' => 3.0, 'epic' => 5.0, 'legendary' => 10.0];
+    private const BONUS_PCT = ['normal' => 3.0, 'epic' => 6.0, 'legendary' => 10.0];
 
     /** Duration in seconds per grade */
     private const DURATION_SECS = ['normal' => 1800, 'epic' => 7200, 'legendary' => 14400];
 
     /**
      * Spawn a charm at the given tile position. Called after a monster kill.
-     * Drop rate is 100% for solo monster types (Orc/Skeleton/Golem).
-     * Other monster types are silently ignored.
+     * Inactive catalog templates are ignored; active solo and rally monsters
+     * use the same persisted bonus/duration snapshot.
      *
      * @param int $monsterCode  field_monsters.monster_code value
      */
-    public static function spawn(int $worldId, int $x, int $y, int $monsterCode): void
+    public static function spawn(
+        int $worldId,
+        int $x,
+        int $y,
+        int $monsterCode,
+        ?int $sourceReceiptId = null,
+        ?int $effectiveMonsterLevel = null,
+        ?array $definitionSnapshot = null,
+    ): ?int
     {
-        $level   = $monsterCode % 100;
-        $typeIdx = (int) floor($monsterCode / 100) % 100;
-
-        // Only Orc (1), Skeleton (2), Golem (3) drop charms
-        if (!in_array($typeIdx, [1, 2, 3], true)) return;
-
-        // Roll grade
-        $grade = self::rollGrade($level);
+        $definition=$definitionSnapshot??\Conquer\Game\Map\MonsterData::get($monsterCode);
+        if (!\Conquer\Game\Map\MonsterData::isActive($monsterCode)) {
+            return null;
+        }
+        $level = max(1, $effectiveMonsterLevel ?? (int)($definition['level'] ?? ($monsterCode % 100)));
+        $custom=$definition['admin_charms']??null;
+        if($custom!==null){
+            $roll=random_int(1,100);$grade=$roll<=$custom['normal']?'normal':($roll<=$custom['normal']+$custom['epic']?'epic':'legendary');
+        }else{
+            $grade = self::rollGrade($level);
+        }
 
         // Roll stat category (uniform)
         $categoryIdx = array_rand(self::CATEGORIES);
@@ -75,10 +86,13 @@ final class CharmSpawner
         $db = Connection::getInstance();
         $db->execute(
             'INSERT INTO map_charms
-                (world_id, coord_x, coord_y, stat_category, grade, charm_code, spawned_at, expires_at)
-             VALUES (?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), ?)',
-            [$worldId, $x, $y, $category, $grade, $charmCode, $expiresAt],
+                (source_receipt_id, world_id, coord_x, coord_y, stat_category, grade,
+                 charm_code, bonus_pct, effect_duration_seconds, spawned_at, expires_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), ?)',
+            [$sourceReceiptId, $worldId, $x, $y, $category, $grade, $charmCode,
+             self::bonusPct($grade), self::durationSecs($grade), $expiresAt],
         );
+        return $db->lastInsertId();
     }
 
     /** Get bonus_pct for a grade */

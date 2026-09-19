@@ -436,6 +436,7 @@ $isEmbed = isset($_GET['embed']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conquer — Forschung</title>
+    <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR.'/assets/css/fantasy-fonts.css') ?>">
     <link rel="stylesheet" href="/assets/css/main.css">
     <?php if ($isEmbed): ?>
     <style>
@@ -1003,6 +1004,7 @@ $isEmbed = isset($_GET['embed']);
         .toast.ok  { border-left-color: var(--c-success, #7fb069); color: var(--c-success, #7fb069); }
         .toast.err { border-left-color: var(--c-danger, #c0604d);  color: var(--c-danger, #c0604d); }
     </style>
+<link rel="stylesheet" href="<?= htmlspecialchars(APP_BASE, ENT_QUOTES) ?>/assets/css/village-theme.css?v=<?= filemtime(__DIR__ . "/../assets/css/village-theme.css") ?>">
 </head>
 <body>
 <?php if (!$isEmbed): $hudCurrentView = 'research'; require __DIR__ . '/partials/hud.php'; endif ?>
@@ -1018,7 +1020,6 @@ $isEmbed = isset($_GET['embed']);
         <button class="btn-instant-banner" style="background:linear-gradient(180deg,#c87060,#a05040);border-bottom-color:#6a2a1e"
                 onclick="cancelResearchBanner()" title="Forschung abbrechen (keine Rückgabe)">&#x2715; Abbruch</button>
         <button class="btn-instant-banner" onclick="speedupResearchBanner()">&#x23E9; Speedup</button>
-        <button class="btn-instant-banner" onclick="instantFinishBanner()">&#x1F48E; Sofort</button>
     </div>
 
     <!-- Tab bar -->
@@ -1137,7 +1138,6 @@ $isEmbed = isset($_GET['embed']);
         </div>
         <div class="rm-actions" id="rm-actions">
             <button class="rm-btn-start" id="rm-btn-start" disabled>Erforschen</button>
-            <button class="rm-btn-instant" id="rm-btn-instant" disabled>Sofort (? &#x1F48E;)</button>
         </div>
         <div class="rm-maxed-bar" id="rm-maxed-bar" style="display:none">&#x2713; Maximal erforscht</div>
     </div>
@@ -1434,24 +1434,10 @@ function renderDetailPanel(code) {
         const inQueue    = queue !== null;
         const canStart   = !lockReason && !inQueue && entry !== null;
         const btnStart = document.getElementById('rm-btn-start');
-        const btnInst  = document.getElementById('rm-btn-instant');
 
         btnStart.disabled = !canStart;
         btnStart.onclick  = canStart ? () => startResearch(code, nextLv) : null;
 
-        if (inQueue && queue.code === code) {
-            const secsLeft = Math.max(0, Math.floor(
-                (new Date(queue.finishes_at.replace(' ', 'T') + 'Z') - Date.now()) / 1000
-            ));
-            const gemCost = Math.max(1, Math.ceil(secsLeft / 60));
-            btnInst.disabled    = false;
-            btnInst.innerHTML   = `Sofort (${gemCost} &#x1F48E;)`;
-            btnInst.onclick     = () => instantFinish();
-        } else {
-            btnInst.disabled  = true;
-            btnInst.innerHTML = 'Sofort (? &#x1F48E;)';
-            btnInst.onclick   = null;
-        }
     }
 
     document.getElementById('research-modal').style.display = 'flex';
@@ -1544,27 +1530,6 @@ async function startResearch(code, levelTo) {
     } catch (e) {
         showToast('Netzwerkfehler: ' + e.message, 'err');
     }
-}
-
-async function instantFinish() {
-    try {
-        const r = await fetch('/api/research/instant', {
-            method:  'POST',
-            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': RES_DATA.csrf },
-        });
-        const j = await r.json();
-        if (j.ok) {
-            window.location.reload();
-        } else {
-            showToast(j.message ?? j.error ?? 'Fehler', 'err');
-        }
-    } catch (e) {
-        showToast('Netzwerkfehler: ' + e.message, 'err');
-    }
-}
-
-function instantFinishBanner() {
-    instantFinish();
 }
 
 async function cancelResearchBanner() {

@@ -1,0 +1,28 @@
+/* Persistent landmark boundaries show the actual occupied cells, even before selection. */
+.map-overlay-shell :is(.atlas-marker--shrine,.atlas-marker--congress){--landmark-rgb:120,242,120;--landmark-ink:#d5f7b0}
+.map-overlay-shell .atlas-marker--shrine[data-shrine=ice]{--landmark-rgb:106,216,255;--landmark-ink:#e0fcff}
+.map-overlay-shell .atlas-marker--shrine[data-shrine=sand]{--landmark-rgb:255,210,86;--landmark-ink:#fff0b0}
+.map-overlay-shell .atlas-marker--shrine[data-shrine=lava]{--landmark-rgb:255,126,63;--landmark-ink:#ffd8a9}
+.map-overlay-shell .atlas-marker--congress{--landmark-rgb:120,226,255;--landmark-ink:#fff2b0}
+.map-overlay-shell :is(.atlas-marker--shrine,.atlas-marker--congress) .atlas-marker-ground{inset:0;width:100%;height:100%;border-radius:0!important;border:2px solid var(--landmark-ink);background:linear-gradient(90deg,#fff0bf24 1px,transparent 1px),linear-gradient(#fff0bf24 1px,transparent 1px),radial-gradient(ellipse,rgba(var(--landmark-rgb),.15),transparent 74%);background-size:var(--tile-size) var(--tile-size),var(--tile-size) var(--tile-size),100% 100%;box-shadow:inset 0 0 15px rgba(var(--landmark-rgb),.2),0 0 8px rgba(var(--landmark-rgb),.3);pointer-events:none}
+/* Rendered sprites include transparent camera margins: compensate without growing hit areas. */
+.map-overlay-shell .atlas-marker--shrine img{width:calc(var(--tile-size)*7.8);height:calc(var(--tile-size)*7.8);margin-left:calc(var(--tile-size)*-3.9);bottom:calc(var(--tile-size)*-.6)}
+.map-overlay-shell .atlas-marker--congress img{width:calc(var(--tile-size)*9);height:calc(var(--tile-size)*9);margin-left:calc(var(--tile-size)*-4.5);bottom:calc(var(--tile-size)*-.5)}
+.map-overlay-shell :is(.atlas-marker--shrine,.atlas-marker--congress) img{z-index:2;filter:drop-shadow(0 6px 3px #18362f80) drop-shadow(0 0 7px rgba(var(--landmark-rgb),.65));animation:landmark-hover 4.8s ease-in-out infinite;will-change:transform}
+.map-overlay-shell :is(.atlas-marker--shrine,.atlas-marker--congress) :is(.atlas-marker-name,.atlas-marker-level){z-index:5;border-color:var(--landmark-ink);font-weight:800;box-shadow:0 2px 4px #14273590}
+.atlas-landmark-effects{position:absolute;inset:0;pointer-events:none;color:rgb(var(--landmark-rgb));z-index:auto}
+.atlas-landmark-effects i{position:absolute;display:block;pointer-events:none}
+.landmark-halo{z-index:1;inset:-12%;border-radius:50%;background:radial-gradient(ellipse,rgba(var(--landmark-rgb),.05) 35%,rgba(var(--landmark-rgb),.45) 55%,transparent 70%);animation:landmark-breathe 3.4s ease-in-out infinite}
+.landmark-orbit{z-index:1;inset:-10% -12%;transform:scaleY(.65)}
+.landmark-orbit:before,.landmark-orbit:after{content:'';position:absolute;inset:0;border:3px dashed currentColor;border-radius:50%;box-shadow:0 0 12px rgba(var(--landmark-rgb),.7),inset 0 0 8px rgba(var(--landmark-rgb),.4);animation:landmark-orbit 18s linear infinite}
+.landmark-orbit:after{inset:9%;border:2px solid var(--landmark-ink);border-left-color:transparent;border-right-color:transparent;animation-direction:reverse;animation-duration:9s}
+.landmark-beacon{z-index:1;left:34%;width:32%;top:-19%;bottom:17%;background:linear-gradient(0deg,rgba(var(--landmark-rgb),.3),rgba(var(--landmark-rgb),.07) 64%,transparent);clip-path:polygon(30% 0,70% 0,100% 100%,0 100%);animation:landmark-breathe 4s ease-in-out infinite}
+.landmark-spark{z-index:3;left:calc(12% + var(--spark)*14%);top:68%;width:calc(var(--tile-size)*.13);height:calc(var(--tile-size)*.13);min-width:3px;min-height:3px;background:var(--landmark-ink);box-shadow:0 0 8px currentColor;border-radius:25%;animation:landmark-rise 3.6s ease-out infinite;animation-delay:calc(var(--spark)*-.6s)}
+.atlas-marker--congress .landmark-halo{background:radial-gradient(ellipse,#e8dd8433 24%,#63e4ff70 53%,transparent 72%)}
+.atlas-marker--congress .landmark-beacon{top:-35%;left:25%;width:50%}
+@keyframes landmark-breathe{0%,100%{opacity:.65;transform:scale(.96)}50%{opacity:1;transform:scale(1.045)}}
+@keyframes landmark-orbit{to{transform:rotate(360deg)}}
+@keyframes landmark-rise{0%{opacity:0;transform:translateY(0) rotate(0)}20%{opacity:1}100%{opacity:0;transform:translateY(calc(var(--tile-size)*-3.7)) rotate(150deg)}}
+@keyframes landmark-hover{0%,100%{transform:translateY(0)}50%{transform:translateY(calc(var(--tile-size)*-.15))}}
+@media(prefers-reduced-motion:reduce){.atlas-landmark-effects *,.atlas-landmark-effects :before,.atlas-landmark-effects :after,.map-overlay-shell :is(.atlas-marker--shrine,.atlas-marker--congress) img{animation:none!important;will-change:auto}.landmark-spark{opacity:.7}}
+body.reduced-motion .atlas-landmark-effects *,body.reduced-motion .atlas-landmark-effects :before,body.reduced-motion .atlas-landmark-effects :after,body.reduced-motion .map-overlay-shell :is(.atlas-marker--shrine,.atlas-marker--congress) img{animation:none!important;will-change:auto}

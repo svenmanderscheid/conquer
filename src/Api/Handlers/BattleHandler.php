@@ -1,92 +1,43 @@
 <?php
 declare(strict_types=1);
-
 namespace Conquer\Api\Handlers;
 
 use Conquer\Api\Response;
 use Conquer\Auth\Session;
-use Conquer\Db\Connection;
+use Conquer\Game\March\BattleReportService;
 
-/**
- * Handles /api/battle/* endpoints.
- *
- * GET /api/battle/reports     — paginated list of battle reports
- * GET /api/battle/report/:id  — full detail of one report
- */
 final class BattleHandler
 {
-    private function __construct() {}
-
-    /**
-     * GET /api/battle/reports?page=1
-     */
-    public static function reports(array $params): void
+    private static function session(): array
     {
         $session = Session::current();
-        if ($session === null) {
-            Response::error(401, 'UNAUTHENTICATED', 'Not logged in.');
-        }
-
-        $page     = max(1, (int) ($_GET['page'] ?? 1));
-        $perPage  = 20;
-        $offset   = ($page - 1) * $perPage;
-        $playerId = (int) $session['player_id'];
-
-        $db = Connection::getInstance();
-
-        try {
-            $rows = $db->query(
-                'SELECT id, target_type, target_x, target_y, outcome,
-                        attacker_read, created_at,
-                        JSON_UNQUOTE(JSON_EXTRACT(data_json, "$.monster_name")) AS monster_name
-                 FROM   battle_reports
-                 WHERE  attacker_id = ?
-                 ORDER  BY created_at DESC
-                 LIMIT  ? OFFSET ?',
-                [$playerId, $perPage, $offset],
-            )->fetchAll();
-        } catch (\PDOException) {
-            $rows = [];
-        }
-
-        Response::ok(['reports' => $rows, 'page' => $page]);
+        if (!$session) Response::error(401,'UNAUTHENTICATED','Bitte melde dich an.');
+        header('Cache-Control: no-store');
+        return $session;
     }
 
-    /**
-     * GET /api/battle/report/:id
-     */
+    public static function reports(array $params): void
+    {
+        $session = self::session();
+        $page = max(1,(int)($_GET['page'] ?? 1));
+        Response::ok(['reports'=>BattleReportService::list((int)$session['player_id'],$page),'page'=>$page]);
+    }
+
     public static function report(array $params): void
     {
-        $session = Session::current();
-        if ($session === null) {
-            Response::error(401, 'UNAUTHENTICATED', 'Not logged in.');
-        }
+        $session = self::session();
+        $row = BattleReportService::get((int)$session['player_id'],(int)($params['id'] ?? 0));
+        if (!$row) Response::error(404,'NOT_FOUND','Kampfbericht nicht gefunden.');
+        $row['data'] = $row['details'];
+        Response::ok(['report'=>$row]);
+    }
 
-        $reportId = (int) ($params['id'] ?? 0);
-        $playerId = (int) $session['player_id'];
-
-        $db = Connection::getInstance();
-
-        $row = $db->query(
-            'SELECT * FROM battle_reports WHERE id = ? AND attacker_id = ?',
-            [$reportId, $playerId],
-        )->fetch();
-
-        if ($row === false) {
-            Response::error(404, 'NOT_FOUND', 'Kampfbericht nicht gefunden.');
-        }
-
-        // Mark as read.
-        if (!(int) $row['attacker_read']) {
-            $db->execute(
-                'UPDATE battle_reports SET attacker_read = 1 WHERE id = ?',
-                [$reportId],
-            );
-        }
-
-        $row['data'] = json_decode($row['data_json'], true);
-        unset($row['data_json']);
-
-        Response::ok(['report' => $row]);
+    public static function delete(array $params): void
+    {
+        $session = self::session();
+        $csrf = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+        if ($csrf === '' || !hash_equals((string)$session['csrf_token'],$csrf)) Response::error(403,'CSRF_INVALID','Bitte lade das Spiel neu.');
+        if (!BattleReportService::delete((int)$session['player_id'],(int)($params['id'] ?? 0))) Response::error(404,'NOT_FOUND','Kampfbericht nicht gefunden.');
+        Response::ok(['deleted'=>true]);
     }
 }

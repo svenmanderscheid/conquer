@@ -1,0 +1,450 @@
+{
+  "version": 1,
+  "items": {
+    "10101013": {
+      "symbol": "FOOD_1K",
+      "item_code": 10201001,
+      "name": "1.000 Nahrung"
+    },
+    "10101001": {
+      "symbol": "CRYSTAL_10",
+      "item_code": 10201032,
+      "name": "10 Edelsteine"
+    },
+    "10104024": {
+      "symbol": "SILVER_CHEST",
+      "item_code": 10105001,
+      "name": "Silbertruhe"
+    },
+    "10103001": {
+      "symbol": "SPEEDUP_1M",
+      "item_code": 10203001,
+      "name": "Universell · 1 Minuten"
+    },
+    "10103032": {
+      "symbol": "SPEEDUP_TRAIN_1M",
+      "item_code": 10203021,
+      "name": "Ausbildung · 1 Minuten"
+    },
+    "10103042": {
+      "symbol": "RECOVER_1M",
+      "item_code": 10203029,
+      "name": "Heilung · 1 Minuten"
+    },
+    "10601001": {
+      "symbol": null,
+      "item_code": 120601001,
+      "name": "Unzugeordneter Gegenstand 10601001"
+    },
+    "10602002": {
+      "symbol": null,
+      "item_code": 120602002,
+      "name": "Unzugeordneter Gegenstand 10602002"
+    },
+    "10101022": {
+      "symbol": "LUMBER_1K",
+      "item_code": 10201008,
+      "name": "1.000 Holz"
+    },
+    "10601002": {
+      "symbol": null,
+      "item_code": 120601002,
+      "name": "Unzugeordneter Gegenstand 10601002"
+    },
+    "10602003": {
+      "symbol": null,
+      "item_code": 120602003,
+      "name": "Unzugeordneter Gegenstand 10602003"
+    },
+    "10101031": {
+      "symbol": "STONE_1K",
+      "item_code": 10201016,
+      "name": "1.000 Stein"
+    },
+    "10601003": {
+      "symbol": null,
+      "item_code": 120601003,
+      "name": "Unzugeordneter Gegenstand 10601003"
+    },
+    "10602004": {
+      "symbol": null,
+      "item_code": 120602004,
+      "name": "Unzugeordneter Gegenstand 10602004"
+    },
+    "10101040": {
+      "symbol": "GOLD_1K",
+      "item_code": 10201024,
+      "name": "1.000 Gold"
+    },
+    "10104025": {
+      "symbol": "GOLD_CHEST",
+      "item_code": 10105002,
+      "name": "Goldtruhe"
+    },
+    "10104027": {
+      "symbol": null,
+      "item_code": 120104027,
+      "name": "Unzugeordneter Gegenstand 10104027"
+    },
+    "10104026": {
+      "symbol": null,
+      "item_code": 120104026,
+      "name": "Unzugeordneter Gegenstand 10104026"
+    },
+    "10104100": {
+      "symbol": "RESOURCE_BOX_LV4",
+      "item_code": 10205004,
+      "name": "Rohstoffkiste Stufe 4"
+    },
+    "10104103": {
+      "symbol": "SPEEDUP_BOX_LV3",
+      "item_code": 120104103,
+      "name": "Beschleunigerkiste Stufe 3"
+    },
+    "10104107": {
+      "symbol": null,
+      "item_code": 120104107,
+      "name": "Unzugeordneter Gegenstand 10104107"
+    },
+    "10103043": {
+      "symbol": "RECOVER_5M",
+      "item_code": 10203030,
+      "name": "Heilung · 5 Minuten"
+    },
+    "10103033": {
+      "symbol": "SPEEDUP_TRAIN_5M",
+      "item_code": 10203022,
+      "name": "Ausbildung · 5 Minuten"
+    },
+    "10101049": {
+      "symbol": "ACTION_POINTS_10",
+      "item_code": 10300001,
+      "name": "Energieflasche · 10 AP"
+    },
+    "10604001": {
+      "symbol": null,
+      "item_code": 120604001,
+      "name": "Unzugeordneter Gegenstand 10604001"
+    },
+    "10104022": {
+      "symbol": null,
+      "item_code": 120104022,
+      "name": "Unzugeordneter Gegenstand 10104022"
+    },
+    "10101007": {
+      "symbol": null,
+      "item_code": 120101007,
+      "name": "Unzugeordneter Gegenstand 10101007"
+    },
+    "10101014": {
+      "symbol": "FOOD_5K",
+      "item_code": 10201002,
+      "name": "5.000 Nahrung"
+    },
+    "10101023": {
+      "symbol": "LUMBER_5K",
+      "item_code": 10201009,
+      "name": "5.000 Holz"
+    },
+    "10101032": {
+      "symbol": "STONE_5K",
+      "item_code": 10201017,
+      "name": "5.000 Stein"
+    },
+    "10103013": {
+      "symbol": "SPEEDUP_BUILDING_5M",
+      "item_code": 10203008,
+      "name": "Bauen · 5 Minuten"
+    },
+    "10103023": {
+      "symbol": "SPEEDUP_RESEARCH_5M",
+      "item_code": 10203015,
+      "name": "Forschung · 5 Minuten"
+    },
+    "10603023": {
+      "symbol": null,
+      "item_code": 120603023,
+      "name": "Unzugeordneter Gegenstand 10603023"
+    },
+    "10104023": {
+      "symbol": null,
+      "item_code": 120104023,
+      "name": "Unzugeordneter Gegenstand 10104023"
+    },
+    "10105012": {
+      "symbol": null,
+      "item_code": 120105012,
+      "name": "Unzugeordneter Gegenstand 10105012"
+    },
+    "10101015": {
+      "symbol": "FOOD_10K",
+      "item_code": 10201003,
+      "name": "10.000 Nahrung"
+    },
+    "10101024": {
+      "symbol": "LUMBER_10K",
+      "item_code": 10201010,
+      "name": "10.000 Holz"
+    },
+    "10101033": {
+      "symbol": "STONE_10K",
+      "item_code": 10201018,
+      "name": "10.000 Stein"
+    },
+    "10105013": {
+      "symbol": null,
+      "item_code": 120105013,
+      "name": "Unzugeordneter Gegenstand 10105013"
+    },
+    "10101016": {
+      "symbol": "FOOD_50K",
+      "item_code": 10101001,
+      "name": "50.000 Nahrung"
+    },
+    "10101025": {
+      "symbol": "LUMBER_50K",
+      "item_code": 10101011,
+      "name": "50.000 Holz"
+    },
+    "10101034": {
+      "symbol": "STONE_50K",
+      "item_code": 10101021,
+      "name": "50.000 Stein"
+    },
+    "10105014": {
+      "symbol": null,
+      "item_code": 120105014,
+      "name": "Unzugeordneter Gegenstand 10105014"
+    },
+    "10101002": {
+      "symbol": "CRYSTAL_100",
+      "item_code": 10201033,
+      "name": "100 Edelsteine"
+    },
+    "10101008": {
+      "symbol": "VIP_100",
+      "item_code": 10106001,
+      "name": "Prestigemedaille · 100 Punkte"
+    },
+    "10101042": {
+      "symbol": "GOLD_10K",
+      "item_code": 10201026,
+      "name": "10.000 Gold"
+    },
+    "10103034": {
+      "symbol": "SPEEDUP_TRAIN_10M",
+      "item_code": 10203023,
+      "name": "Ausbildung · 10 Minuten"
+    },
+    "10103044": {
+      "symbol": "RECOVER_10M",
+      "item_code": 10203031,
+      "name": "Heilung · 10 Minuten"
+    },
+    "10603024": {
+      "symbol": null,
+      "item_code": 120603024,
+      "name": "Unzugeordneter Gegenstand 10603024"
+    },
+    "10101043": {
+      "symbol": "GOLD_50K",
+      "item_code": 10201027,
+      "name": "50.000 Gold"
+    },
+    "10101044": {
+      "symbol": "GOLD_100K",
+      "item_code": 10101032,
+      "name": "100.000 Gold"
+    },
+    "10603025": {
+      "symbol": null,
+      "item_code": 120603025,
+      "name": "Unzugeordneter Gegenstand 10603025"
+    },
+    "10104104": {
+      "symbol": "SPEEDUP_BOX_LV4",
+      "item_code": 120104104,
+      "name": "Beschleunigerkiste Stufe 4"
+    },
+    "10604002": {
+      "symbol": null,
+      "item_code": 120604002,
+      "name": "Unzugeordneter Gegenstand 10604002"
+    },
+    "10104136": {
+      "symbol": null,
+      "item_code": 120104136,
+      "name": "Unzugeordneter Gegenstand 10104136"
+    },
+    "10104097": {
+      "symbol": "RESOURCE_BOX_LV1",
+      "item_code": 10205001,
+      "name": "Rohstoffkiste Stufe 1"
+    },
+    "10104098": {
+      "symbol": "RESOURCE_BOX_LV2",
+      "item_code": 10205002,
+      "name": "Rohstoffkiste Stufe 2"
+    },
+    "10603026": {
+      "symbol": null,
+      "item_code": 120603026,
+      "name": "Unzugeordneter Gegenstand 10603026"
+    },
+    "10104099": {
+      "symbol": "RESOURCE_BOX_LV3",
+      "item_code": 10205003,
+      "name": "Rohstoffkiste Stufe 3"
+    }
+  },
+  "unresolved": [
+    {
+      "source_code": 10101007,
+      "symbol": null,
+      "item_code": 120101007,
+      "reason": "missing_definition"
+    },
+    {
+      "source_code": 10104022,
+      "symbol": null,
+      "item_code": 120104022,
+      "reason": "missing_definition"
+    },
+    {
+      "source_code": 10104023,
+      "symbol": null,
+      "item_code": 120104023,
+      "reason": "missing_definition"
+    },
+    {
+      "source_code": 10104026,
+      "symbol": null,
+      "item_code": 120104026,
+      "reason": "missing_definition"
+    },
+    {
+      "source_code": 10104027,
+      "symbol": null,
+      "item_code": 120104027,
+      "reason": "missing_definition"
+    },
+    {
+      "source_code": 10104103,
+      "symbol": "SPEEDUP_BOX_LV3",
+      "item_code": 120104103,
+      "reason": "missing_effect"
+    },
+    {
+      "source_code": 10104104,
+      "symbol": "SPEEDUP_BOX_LV4",
+      "item_code": 120104104,
+      "reason": "missing_effect"
+    },
+    {
+      "source_code": 10104107,
+      "symbol": null,
+      "item_code": 120104107,
+      "reason": "missing_definition"
+    },
+    {
+      "source_code": 10104136,
+      "symbol": null,
+      "item_code": 120104136,
+      "reason": "missing_definition"
+    },
+    {
+      "source_code": 10105012,
+      "symbol": null,
+      "item_code": 120105012,
+      "reason": "missing_definition"
+    },
+    {
+      "source_code": 10105013,
+      "symbol": null,
+      "item_code": 120105013,
+      "reason": "missing_definition"
+    },
+    {
+      "source_code": 10105014,
+      "symbol": null,
+      "item_code": 120105014,
+      "reason": "missing_definition"
+    },
+    {
+      "source_code": 10601001,
+      "symbol": null,
+      "item_code": 120601001,
+      "reason": "missing_definition"
+    },
+    {
+      "source_code": 10601002,
+      "symbol": null,
+      "item_code": 120601002,
+      "reason": "missing_definition"
+    },
+    {
+      "source_code": 10601003,
+      "symbol": null,
+      "item_code": 120601003,
+      "reason": "missing_definition"
+    },
+    {
+      "source_code": 10602002,
+      "symbol": null,
+      "item_code": 120602002,
+      "reason": "missing_definition"
+    },
+    {
+      "source_code": 10602003,
+      "symbol": null,
+      "item_code": 120602003,
+      "reason": "missing_definition"
+    },
+    {
+      "source_code": 10602004,
+      "symbol": null,
+      "item_code": 120602004,
+      "reason": "missing_definition"
+    },
+    {
+      "source_code": 10603023,
+      "symbol": null,
+      "item_code": 120603023,
+      "reason": "missing_definition"
+    },
+    {
+      "source_code": 10603024,
+      "symbol": null,
+      "item_code": 120603024,
+      "reason": "missing_definition"
+    },
+    {
+      "source_code": 10603025,
+      "symbol": null,
+      "item_code": 120603025,
+      "reason": "missing_definition"
+    },
+    {
+      "source_code": 10603026,
+      "symbol": null,
+      "item_code": 120603026,
+      "reason": "missing_definition"
+    },
+    {
+      "source_code": 10604001,
+      "symbol": null,
+      "item_code": 120604001,
+      "reason": "missing_definition"
+    },
+    {
+      "source_code": 10604002,
+      "symbol": null,
+      "item_code": 120604002,
+      "reason": "missing_definition"
+    }
+  ],
+  "building_materials": {
+    "golden_pillar": 119000001,
+    "alliance_badge": 119000002
+  }
+}

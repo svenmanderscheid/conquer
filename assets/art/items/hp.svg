@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Lebenspunktebonus">
+<title>Lebenspunktebonus</title>
+<!-- Original code-native storybook item illustration. Value, quantity and rarity are rendered by the game UI. -->
+<g stroke="#493b33" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+<g transform="translate(0 2) scale(.8)">
+<path d="M47 29C48 17 57 9 64 8 76 13 82 21 83 34L77 46H50Z" fill="#e4af38" />
+<path d="M64 10 63 39 76 39 81 31C76 18 72 14 64 10" fill="#b85a25" stroke="none"/>
+<path d="M28 69C24 38 37 24 64 24S104 40 100 69L93 97 77 111 77 77H68V117H59V77H49V111L32 97Z" fill="#e4af38" />
+<path d="M64 26V116H68V77H77V111L93 97 100 69C102 43 91 29 64 26" fill="#c27a25" stroke="none"/>
+<path d="M31 62 56 68 53 79 39 77 39 93 31 88Z" fill="#302d2b" />
+<path d="M97 62 72 68 75 79 87 77 87 93 96 88Z" fill="#302d2b" />
+<path d="M30 53C33 36 41 30 57 28V56Z" fill="#ffe07a" stroke="none"/>
+<path d="M38 43C42 34 48 31 56 31" fill="none" stroke="#fff6df" stroke-width="4"/>
+<path d="M65 31V62" fill="none" stroke="#fff1a6" stroke-width="4"/>
+<path d="M36 97 46 105" fill="none" stroke="#ffd46a" stroke-width="3"/>
+</g>
+<g transform="translate(43 46) scale(.67)">
+<path d="M64 109 20 68C-4 44 19 14 42 23 53 26 61 35 64 40 71 24 91 17 106 26 123 37 125 57 109 73Z" fill="#e74754" />
+<path d="M64 108 109 72C125 56 121 38 110 29 114 45 103 57 92 66L64 89Z" fill="#a33031" stroke="none"/>
+<path d="M25 47C26 33 40 30 50 40" fill="none" stroke="#ffc6b3" stroke-width="7"/>
+</g>
+</g>
+</svg>

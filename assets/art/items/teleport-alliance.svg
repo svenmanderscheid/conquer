@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Zur Allianz teleportieren">
+<title>Allianz-Teleporter</title>
+<!-- Original code-native storybook item illustration. Values and rarity belong to the game UI. -->
+<g stroke="#493b33" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M18 103 28 43 64 20 100 43 110 103Z" fill="#d4c7a5"/>
+  <path d="M28 43 64 55 100 43 64 20Z" fill="#f1e2bd"/>
+  <path d="M37 48v48M91 48v48" fill="none" stroke="#756080" stroke-width="8"/>
+  <path d="M48 103V68h32v35" fill="#e9dfcf"/>
+  <path d="M55 103V82q9-12 18 0v21" fill="#70472f"/>
+  <path d="M34 17v35M94 17v35" fill="none"/>
+  <path d="m35 18 23 8-23 11Z" fill="#5c4270"/>
+  <path d="m93 18-23 8 23 11Z" fill="#80658f"/>
+  <path d="M16 108c17-13 31-9 48 1 17-10 31-14 48-1-17 14-34 15-48 4-14 11-31 10-48-4Z" fill="#3bd9e0"/>
+  <path d="M25 107c13-6 25-3 39 5 14-8 26-11 39-5" fill="none" stroke="#c3ffff"/>
+</g>
+</svg>

@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "description": "Usable Conquer inventory rewards per defeated rally monster. One shared pool; quantities are split among contributing armies. Legacy monster drop IDs are not inventory IDs.",
+  "deathkar": [
+    {"item_code": 10201025, "count": 5, "probability": 1},
+    {"item_code": 10203024, "count": 1, "probability": 1},
+    {"item_code": 10203032, "count": 1, "probability": 1},
+    {"item_code": 10201004, "count": 1, "probability": 0.2},
+    {"item_code": 10105002, "count": 1, "probability": 0.3}
+  ],
+  "dragon": [
+    {"item_code": 10201025, "count": 10, "probability": 1},
+    {"item_code": 10203010, "count": 2, "probability": 1},
+    {"item_code": 10203017, "count": 2, "probability": 1},
+    {"item_code": 10101003, "count": 1, "probability": 0.2},
+    {"item_code": 10105002, "count": 1, "probability": 0.3}
+  ],
+  "magdar": [
+    {"item_code": 10101032, "count": 5, "probability": 1},
+    {"item_code": 10103011, "count": 5, "probability": 1},
+    {"item_code": 10103021, "count": 5, "probability": 1},
+    {"item_code": 10105003, "count": 1, "probability": 0.3},
+    {"item_code": 10300002, "count": 1, "probability": 0.2}
+  ]
+}

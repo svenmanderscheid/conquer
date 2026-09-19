@@ -1,0 +1,32 @@
+{
+  "tool": "OpenAI built-in Imagegen",
+  "mode": "reference image edit",
+  "date": "2026-09-13",
+  "purpose": "Eight-pose articulated locomotion sheets for the 15 premium march creatures that previously had only a still illustration.",
+  "shared_prompt": "Using the supplied creature cutout as the exact character reference, create a strict 4-column by 2-row sprite sheet with eight consecutive locomotion poses. Keep the same creature identity, materials, palette, three-quarter right-facing view, storybook toon rendering, scale and lighting in every cell. Animate real body parts appropriate to the creature: articulated legs or claws with grounded contact, wings or fins with jointed strokes, and secondary follow-through in tail, ears, trunk, roots, ribbons or tentacles. Keep the full silhouette inside every cell with generous separation. No text, UI, scenery, ground shadow, extra creatures, cropped anatomy or merged neighboring poses.",
+  "motion_source": "docs/march-creature-motion-spec.json",
+  "character_source": "docs/premium-march-creature-art.json",
+  "retained_sheet_pattern": "asset-workflow/02-animation-sheets/<id>/sheet.png",
+  "frame_pattern": "artifacts/march-rig-frames/<id>/<frame>.png",
+  "production_motion_pattern": "assets/art/marches/animated-march-<id>.webp",
+  "production_still_pattern": "assets/art/marches/march-<id>.webp",
+  "build_tool": "tools/build-articulated-march-assets.py",
+  "validation_tool": "tools/validate-articulated-march-assets.cjs",
+  "assets": [
+    {"id":"ironkeep","movement":"heavy alternating stone-foot walk; shield arm counters the hammer arm; blue pennant follows through"},
+    {"id":"rosehall","movement":"four-beat stag gallop; articulated legs and hooves; ears, tail, ribbons and roses follow through"},
+    {"id":"sandspire","movement":"six-legged alternating scarab crawl; shell stays stable; antennae react to each planted step"},
+    {"id":"tidewatch","movement":"broad sea-turtle swim; shoulder-driven front-flipper power stroke; rear flippers, flag and ropes trail"},
+    {"id":"winterhold","movement":"weighty four-legged mammoth walk; clear planted feet; trunk, ears and tail swing with delayed inertia"},
+    {"id":"jadecourt","movement":"guardian-lion bound; four articulated paws; ceremonial bell swings one pose after the body impulse"},
+    {"id":"emberforge","movement":"six-legged salamander crawl; alternating contacts; segmented tail wave travels from base to tip"},
+    {"id":"ravenloft","movement":"jointed raven wingbeat with shoulder, forearm and flight feathers; head and tail counter the stroke"},
+    {"id":"clockwork","movement":"mechanical hare hopping cycle; complete articulated paws; copper springs compress and extend"},
+    {"id":"sapphire","movement":"proud peacock walk; alternating articulated feet; heavy sapphire fan follows the body with delay"},
+    {"id":"astral","movement":"slow celestial-whale swim; pectoral fins oppose each other; tail flukes drive a vertical beat"},
+    {"id":"leviathan","movement":"forward serpentine swim built from body segments; fins and tail follow the traveling S curve"},
+    {"id":"yggdrasil","movement":"root-foot colossus walk; planted roots bear weight; crown, vines and orbs lag behind the trunk"},
+    {"id":"tempest","movement":"jellyfish hover-swim; bell contracts and expands; at least eight tentacles carry offset traveling waves"},
+    {"id":"eclipse","movement":"riderless crescent chariot glide; wheel and corona rotate; ribbons and hanging details follow through"}
+  ]
+}

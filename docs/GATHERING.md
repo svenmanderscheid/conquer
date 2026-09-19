@@ -1,0 +1,13 @@
+# Sammelmärsche und besetzte Rohstofffelder
+
+Ein Ressourcenfeld wird erst bei Ankunft besetzt. `GatherService` rechnet alle fälligen Ankünfte am selben Feld nach `arrival_time, id` ab. Dadurch entscheidet nicht die Reihenfolge der Spielerabfragen über den Besitzer. Weitere gewöhnliche Sammler kehren ohne Kampf und ohne Verluste zurück, solange das Feld besetzt ist.
+
+`march_type=9` durchläuft Hinweg (`marching`), Sammeln (`arrived`) und Rückweg (`returning`). Die Sammeldauer steht in `gathering_finishes_at`. Rate und Traglast werden beim Losschicken festgehalten. Ein Rückruf gibt nur bereits gesammelte Ressourcen mit. Heimkehr und Beute werden einmalig gebucht.
+
+Beim Öffnen eines freien Rohstofffelds wählt der Marschdialog automatisch so viele verfügbare Truppen aus, dass ihre Traglast den aktuellen Feldvorrat vollständig abdeckt. Truppen mit höherer Traglast werden bevorzugt; bei gleicher Traglast wird die Auswahl proportional auf die verfügbaren Truppentypen verteilt. Reichen Truppen oder Marschkapazität nicht aus, wird die größtmögliche Traglast vorausgewählt. Die Auswahl bleibt anschließend vollständig manuell änderbar.
+
+Ein besetztes Feld kann über `POST /api/march/dispatch-field-attack` angegriffen werden. `march_type=15` belegt einen regulären Marschplatz. Eigene Truppen und Mitglieder derselben Allianz in derselben Welt sind ausgeschlossen. Stadtschilde schützen keine Sammler; der Angreifer gibt seinen Stadtschutz auf. Bei Ankunft werden Besitzer und Allianz erneut geprüft. Verlässt die angegriffene Besatzung das Feld oder wechselt der Besitzer, kehrt der Angriff ohne Kampf zurück. Nach einem Sieg sammeln die Überlebenden weiter; die besiegten Überlebenden kehren heim. Es gelten die üblichen PvP-Verlustanteile, ausschließlich für die beiden Feldarmeen. Beide Spieler erhalten einen Bericht.
+
+`FieldObjectService::withOccupations` liefert öffentliche Besetzung und `can_attack`. Nur der Besitzer erhält `gathering_finishes_at`. Die Haupt-App zeigt eigene aktive Märsche mit Status und Restzeit am linken Rand. Während des Sammelns entfallen Marschfigur und Verbindungslinie; der Countdown steht direkt am Feld und in dessen Menü. Offene Zielmenüs blenden die zusätzliche Marschliste aus, damit ihre Aktionen frei bleiben. Kleine Querformate verwenden eine scrollbar begrenzte Liste neben dem Truppensymbol.
+
+Prüfungen: `tests/gathering_lifecycle.php`, `tests/gathering_app.cjs`, `tests/march_composition.php` und `tests/march_windows.cjs`. Die Browserprüfung verwendet die getrennte Testinstanz aus `php tools/preview-feature-fixture.php --gathering --port=18958`; Port bei Bedarf mit `GATHERING_FIXTURE_URL` anpassen.

@@ -90,6 +90,7 @@ final class TreasureData
     public static function getUnlockSlots(int $treasureHouseLevel): int
     {
         return match (true) {
+            $treasureHouseLevel < 1   => 0,
             $treasureHouseLevel >= 25 => 6,
             $treasureHouseLevel >= 20 => 5,
             $treasureHouseLevel >= 10 => 4,

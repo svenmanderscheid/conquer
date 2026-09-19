@@ -95,7 +95,27 @@ foreach ($pending as $file) {
         // DDL statements (CREATE TABLE etc.) cause an implicit commit in
         // MySQL/MariaDB, so wrapping in a transaction is unreliable.
         // We run the SQL directly and record it immediately after.
-        $db->getPdo()->exec($sql);
+        // These two historical migrations were also applied manually on early
+        // development worlds. Resume them without dropping existing data.
+        if ($filename === '0050_add_defender_to_battle_reports.sql') {
+            $columns = $db->query('SHOW COLUMNS FROM battle_reports')->fetchAll(\PDO::FETCH_COLUMN);
+            if (!in_array('defender_id', $columns, true)) {
+                $db->execute('ALTER TABLE battle_reports ADD COLUMN defender_id INT NULL AFTER attacker_city_id');
+            }
+            if (!in_array('defender_read', $columns, true)) {
+                $db->execute('ALTER TABLE battle_reports ADD COLUMN defender_read TINYINT(1) NOT NULL DEFAULT 0 AFTER attacker_read');
+            }
+            $db->execute("ALTER TABLE battle_reports MODIFY COLUMN outcome ENUM('attacker_wins','defender_wins','draw','scouted') NOT NULL");
+            $indexes = $db->query('SHOW INDEX FROM battle_reports')->fetchAll();
+            if (!in_array('idx_defender', array_column($indexes, 'Key_name'), true)) {
+                $db->execute('ALTER TABLE battle_reports ADD INDEX idx_defender (defender_id, created_at)');
+            }
+        } elseif ($filename === '0050_add_monster_type_to_field_monsters.sql') {
+            $columns = $db->query('SHOW COLUMNS FROM field_monsters')->fetchAll(\PDO::FETCH_COLUMN);
+            if (!in_array('monster_type', $columns, true)) { $db->getPdo()->exec($sql); }
+        } else {
+            \Conquer\Db\MigrationSql::apply($db->getPdo(),$sql);
+        }
 
         $db->execute(
             'INSERT IGNORE INTO migrations (filename) VALUES (?)',

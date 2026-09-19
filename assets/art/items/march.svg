@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Marschgeschwindigkeit">
+<title>Marschgeschwindigkeit</title>
+<!-- Original code-native storybook item illustration. Value, quantity and rarity are rendered by the game UI. -->
+<g stroke="#493b33" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+<g transform="translate(27 3) scale(.77)">
+<path d="M57 53C34 51 19 33 16 20L12 41 3 32 7 56 1 50C7 78 24 94 55 96Z" fill="#aabeca" />
+<path d="M55 61C38 58 26 47 22 37L21 55 12 48C16 66 27 75 41 79L28 78C37 88 46 90 56 88Z" fill="#eff5ed" />
+<path d="M14 64C25 74 32 78 45 80" fill="none" stroke="#748fa7" stroke-width="3"/>
+</g>
+<path d="M42 39 75 33 85 66C93 63 102 68 108 80L120 97C109 114 67 119 42 112L16 116 12 99 22 78 40 66Z" fill="#70472f" />
+<path d="M44 43 58 41 52 68 35 84 30 106 18 107 21 84 43 69Z" fill="#aa743f" stroke="none"/>
+<path d="M40 37 77 31 81 48 42 57Z" fill="#e4af38" />
+<path d="M14 101C46 102 50 111 74 108 95 107 108 102 118 96L122 105C104 123 80 124 52 119L16 124 9 111Z" fill="#d6b984" />
+<path d="M65 65 85 62 89 74 68 79Z" fill="#e4af38" />
+<path d="M89 84 104 94" fill="none" stroke="#dba15d" stroke-width="4"/>
+</g>
+</svg>

@@ -1,0 +1,58 @@
+CREATE TABLE IF NOT EXISTS account_recovery_codes (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, player_id INT NOT NULL,
+ code_hash CHAR(64) NOT NULL UNIQUE, used_at DATETIME NULL,
+ created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, INDEX(player_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE IF NOT EXISTS player_masteries (
+ player_id INT NOT NULL, world_id INT NOT NULL DEFAULT 1, mastery_code VARCHAR(40) NOT NULL,
+ level TINYINT UNSIGNED NOT NULL DEFAULT 0, updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ PRIMARY KEY(player_id,world_id,mastery_code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE IF NOT EXISTS world_event_settings (
+ world_id INT PRIMARY KEY, enabled TINYINT NOT NULL DEFAULT 0,
+ next_start DATETIME NOT NULL, interval_hours INT UNSIGNED NOT NULL DEFAULT 336,
+ duration_hours INT UNSIGNED NOT NULL DEFAULT 168,
+ invasion_enabled TINYINT NOT NULL DEFAULT 0, invasion_interval_hours INT UNSIGNED NOT NULL DEFAULT 72,
+ invasion_next_start DATETIME NOT NULL, updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE IF NOT EXISTS conquest_score_ticks (
+ event_id BIGINT UNSIGNED NOT NULL, shrine_id INT NOT NULL, minute_at DATETIME NOT NULL,
+ alliance_id INT NOT NULL, points INT UNSIGNED NOT NULL,
+ PRIMARY KEY(event_id,shrine_id,minute_at), INDEX(event_id,alliance_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE IF NOT EXISTS conquest_results (
+ event_id BIGINT UNSIGNED PRIMARY KEY, result_json JSON NOT NULL,
+ created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE IF NOT EXISTS world_invasions (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, world_id INT NOT NULL, chapter INT UNSIGNED NOT NULL DEFAULT 1,
+ state ENUM('upcoming','active','victory','expired') NOT NULL DEFAULT 'upcoming',
+ target INT UNSIGNED NOT NULL, contribution INT UNSIGNED NOT NULL DEFAULT 0,
+ starts_at DATETIME NOT NULL, ends_at DATETIME NOT NULL,
+ created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, INDEX(world_id,state), UNIQUE(world_id,starts_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE IF NOT EXISTS invasion_contributions (
+ invasion_id BIGINT UNSIGNED NOT NULL, player_id INT NOT NULL, city_id INT NOT NULL,
+ contribution INT UNSIGNED NOT NULL DEFAULT 0, claimed TINYINT NOT NULL DEFAULT 0,
+ PRIMARY KEY(invasion_id,player_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE IF NOT EXISTS game_operation_receipts (
+ player_id INT NOT NULL, operation_key VARCHAR(64) NOT NULL, action VARCHAR(60) NOT NULL,
+ payload_hash CHAR(64) NOT NULL, result_json JSON NOT NULL,
+ created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(player_id,operation_key)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE IF NOT EXISTS world_chapters (
+ world_id INT PRIMARY KEY, chapter INT UNSIGNED NOT NULL DEFAULT 1,
+ updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE IF NOT EXISTS conquest_reward_claims (
+ event_id BIGINT UNSIGNED NOT NULL,player_id INT NOT NULL,reward_json JSON NOT NULL,
+ created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,PRIMARY KEY(event_id,player_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE IF NOT EXISTS invasion_missions (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,invasion_id BIGINT UNSIGNED NOT NULL,
+ player_id INT NOT NULL,city_id INT NOT NULL,troops_json JSON NOT NULL,damage INT UNSIGNED NOT NULL,
+ state ENUM('marching','returning','returned') NOT NULL DEFAULT 'marching',
+ arrival_at DATETIME NOT NULL,return_at DATETIME NOT NULL,created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ INDEX(player_id,state),INDEX(state,arrival_at,return_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

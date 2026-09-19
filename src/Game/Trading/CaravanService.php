@@ -171,22 +171,7 @@ final class CaravanService
 
         // --- resource check & deduction ---
         if ($currency === 'gems') {
-            // Gems are on the players table.
-            $playerRow = $db->query(
-                'SELECT gems FROM players WHERE id = ?',
-                [$playerId],
-            )->fetch();
-
-            if ($playerRow === false || (int) $playerRow['gems'] < $price) {
-                throw new \RuntimeException(
-                    'Nicht genug Gems. Benötigt: ' . $price . ', vorhanden: ' . (int) ($playerRow['gems'] ?? 0) . '.',
-                );
-            }
-
-            $db->execute(
-                'UPDATE players SET gems = gems - ? WHERE id = ? AND gems >= ?',
-                [$price, $playerId, $price],
-            );
+            \Conquer\Game\CrystalEconomy::reject();
         } else {
             // Resource currency (food / lumber / stone / gold).
             $allowed = ['food', 'lumber', 'stone', 'gold'];

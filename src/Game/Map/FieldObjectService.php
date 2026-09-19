@@ -30,17 +30,10 @@ final class FieldObjectService
     /** Maps object_type → resource column name in the cities table. */
     public const RESOURCE_BY_TYPE = [
         self::OBJECT_FARM     => 'food',
-        self::OBJECT_LUMBER   => 'wood',
+        self::OBJECT_LUMBER   => 'lumber',
         self::OBJECT_QUARRY   => 'stone',
         self::OBJECT_GOLD     => 'gold',
         self::OBJECT_GEM_NODE => 'gems',
-    ];
-
-    /** resource_max values per level. */
-    private const RESOURCE_MAX_BY_LEVEL = [
-        1 => 10_000,
-        2 => 50_000,
-        3 => 200_000,
     ];
 
     /** Number of tiles per sector edge (world is 256×256, 8 sectors → 64 tiles each). */
@@ -65,6 +58,26 @@ final class FieldObjectService
     private const MAX_PLACEMENT_ATTEMPTS = 20;
 
     private function __construct() {}
+
+    /** Public ownership, plus gathering times exclusively for the occupying player. */
+    public static function withOccupations(array $nodes,int $worldId,int $viewerId): array
+    {
+        if(!$nodes)return [];
+        $ids=array_map('intval',array_column($nodes,'id'));
+        \Conquer\Game\March\GatherService::refreshNodes($worldId,$ids);
+        $rows=Connection::getInstance()->query("SELECT o.id,o.resource_amount,m.id AS gatherer_march_id,m.player_id AS gatherer_player_id,m.gathering_finishes_at,COALESCE(k.display_name,p.username) AS gatherer_name,a.alliance_id AS gatherer_alliance_id FROM field_objects o LEFT JOIN marches m ON m.id=o.gatherer_march_id AND m.world_id=o.world_id AND m.target_id=o.id AND m.march_type=9 AND m.state='arrived' LEFT JOIN players p ON p.id=m.player_id LEFT JOIN kingdom_profiles k ON k.player_id=p.id LEFT JOIN alliance_members a ON a.player_id=m.player_id AND a.world_id=o.world_id WHERE o.world_id=? AND o.id IN (".implode(',',$ids).")",[$worldId])->fetchAll();
+        $owners=array_column($rows,null,'id');$alliance=\Conquer\Game\WorldRules::alliance($viewerId,$worldId);
+        foreach($nodes as &$node){
+            unset($node['gathering_finishes_at']);
+            $row=$owners[$node['id']]??[];$owner=(int)($row['gatherer_player_id']??0);
+            $node['resource_amount']=$row['resource_amount']??$node['resource_amount'];
+            foreach(['gatherer_march_id','gatherer_player_id','gatherer_name','gatherer_alliance_id'] as $key)$node[$key]=$row[$key]??null;
+            $node['is_own_gathering']=$owner>0&&$owner===$viewerId;
+            $node['can_attack']=$owner>0&&$owner!==$viewerId&&($alliance===null||$alliance!==(int)($row['gatherer_alliance_id']??0));
+            if($node['is_own_gathering'])$node['gathering_finishes_at']=$row['gathering_finishes_at'];
+        }unset($node);
+        return $nodes;
+    }
 
     // ─────────────────────────────────────────────────────────────────────────
     // Read helpers
@@ -232,11 +245,21 @@ final class FieldObjectService
      */
     public static function spawnObjects(int $worldId): void
     {
-        $db  = Connection::getInstance();
-        $log = self::log();
+        $db = Connection::getInstance();
+        if ($db->getPdo()->inTransaction()) {
+            self::spawnObjectsLocked($db, $worldId);
+            return;
+        }
+        $db->transaction(static function (Connection $db) use ($worldId): void {
+            self::spawnObjectsLocked($db, $worldId);
+        });
+    }
 
-        // Pre-load all occupied tiles for fast lookup.
-        $occupied = self::buildOccupiedSet($db, $worldId);
+    /** Placement checks and writes share the world's transaction lock. */
+    private static function spawnObjectsLocked(Connection $db, int $worldId): void
+    {
+        WorldPlacement::lockWorld($db, $worldId);
+        $log = self::log();
 
         $totalSpawned = 0;
 
@@ -248,7 +271,7 @@ final class FieldObjectService
 
                 foreach (self::SPAWN_COUNTS as $objectType => $count) {
                     for ($i = 0; $i < $count; $i++) {
-                        $coords = self::findFreeTile($originX, $originY, $occupied);
+                        $coords = self::findFreeTile($db, $worldId, $originX, $originY);
 
                         if ($coords === null) {
                             $log->warn(sprintf(
@@ -262,41 +285,31 @@ final class FieldObjectService
 
                         [$cx, $cy] = $coords;
                         $level       = random_int(1, 3);
-                        $resourceMax = self::RESOURCE_MAX_BY_LEVEL[$level];
+                        $resourceMax = FieldObjectData::capacity($objectType, $level);
 
-                        try {
-                            $db->execute(
-                                'INSERT INTO field_objects
-                                    (world_id, coord_x, coord_y, object_type, level,
-                                     resource_amount, resource_max,
-                                     spawned_at, expires_at)
-                                 VALUES
-                                    (?, ?, ?, ?, ?,
-                                     ?, ?,
-                                     UTC_TIMESTAMP(),
-                                     DATE_ADD(UTC_TIMESTAMP(), INTERVAL ? HOUR))',
-                                [
-                                    $worldId,
-                                    $cx,
-                                    $cy,
-                                    $objectType,
-                                    $level,
-                                    $resourceMax,
-                                    $resourceMax,
-                                    self::EXPIRE_HOURS,
-                                ],
-                            );
-
-                            $occupied[$cx . ',' . $cy] = true;
-                            $totalSpawned++;
-                        } catch (\PDOException $e) {
-                            $log->error(sprintf(
-                                '[FieldObjectService] spawn INSERT failed at (%d,%d): %s',
+                        $db->execute(
+                            'INSERT INTO field_objects
+                                (world_id, coord_x, coord_y, object_type, level,
+                                 resource_amount, resource_max,
+                                 spawned_at, expires_at)
+                             VALUES
+                                (?, ?, ?, ?, ?,
+                                 ?, ?,
+                                 UTC_TIMESTAMP(),
+                                 DATE_ADD(UTC_TIMESTAMP(), INTERVAL ? HOUR))',
+                            [
+                                $worldId,
                                 $cx,
                                 $cy,
-                                $e->getMessage(),
-                            ));
-                        }
+                                $objectType,
+                                $level,
+                                $resourceMax,
+                                $resourceMax,
+                                self::EXPIRE_HOURS,
+                            ],
+                        );
+
+                        $totalSpawned++;
                     }
                 }
             }
@@ -337,88 +350,19 @@ final class FieldObjectService
     // ─────────────────────────────────────────────────────────────────────────
 
     /**
-     * Builds a hash-set of "x,y" strings for tiles already occupied by any
-     * city, field monster, shrine or existing field object in the given world.
+     * Finds a land footprint with enough room for the single-tile node and
+     * the two-tile gap between resources. Never falls back to unchecked land.
      *
-     * @return array<string,true>
-     */
-    private static function buildOccupiedSet(Connection $db, int $worldId): array
-    {
-        $occupied = [];
-
-        // Cities
-        try {
-            $rows = $db->query(
-                'SELECT coord_x, coord_y FROM cities WHERE world_id = ?',
-                [$worldId],
-            )->fetchAll();
-            foreach ($rows as $r) {
-                $occupied[$r['coord_x'] . ',' . $r['coord_y']] = true;
-            }
-        } catch (\PDOException $e) {
-            self::log()->warn('[FieldObjectService] Could not load cities for occupied set: ' . $e->getMessage());
-        }
-
-        // Field monsters
-        try {
-            $rows = $db->query(
-                'SELECT coord_x, coord_y FROM field_monsters WHERE world_id = ?',
-                [$worldId],
-            )->fetchAll();
-            foreach ($rows as $r) {
-                $occupied[$r['coord_x'] . ',' . $r['coord_y']] = true;
-            }
-        } catch (\PDOException $e) {
-            self::log()->warn('[FieldObjectService] Could not load field_monsters for occupied set: ' . $e->getMessage());
-        }
-
-        // Existing field objects (non-expired)
-        try {
-            $rows = $db->query(
-                'SELECT coord_x, coord_y FROM field_objects
-                 WHERE  world_id = ? AND expires_at > UTC_TIMESTAMP()',
-                [$worldId],
-            )->fetchAll();
-            foreach ($rows as $r) {
-                $occupied[$r['coord_x'] . ',' . $r['coord_y']] = true;
-            }
-        } catch (\PDOException $e) {
-            self::log()->warn('[FieldObjectService] Could not load field_objects for occupied set: ' . $e->getMessage());
-        }
-
-        // Shrines (field_shrines table — uses coord_x/coord_y)
-        try {
-            $rows = $db->query(
-                'SELECT coord_x, coord_y FROM field_shrines WHERE world_id = ?',
-                [$worldId],
-            )->fetchAll();
-            foreach ($rows as $r) {
-                $occupied[$r['coord_x'] . ',' . $r['coord_y']] = true;
-            }
-        } catch (\PDOException) {
-            // Shrine table may not exist yet — silently skip
-        }
-
-        return $occupied;
-    }
-
-    /**
-     * Finds a random unoccupied tile within the sector starting at (originX, originY).
-     * Returns [x, y] or null after MAX_PLACEMENT_ATTEMPTS failures.
-     *
-     * @param array<string,true> $occupied
      * @return array{int,int}|null
      */
-    private static function findFreeTile(int $originX, int $originY, array &$occupied): ?array
+    private static function findFreeTile(Connection $db, int $worldId, int $originX, int $originY): ?array
     {
         $max = self::SECTOR_SIZE - 1;
 
         for ($attempt = 0; $attempt < self::MAX_PLACEMENT_ATTEMPTS; $attempt++) {
-            $cx  = $originX + random_int(0, $max);
-            $cy  = $originY + random_int(0, $max);
-            $key = $cx . ',' . $cy;
-
-            if (!isset($occupied[$key])) {
+            $cx = $originX + random_int(0, $max);
+            $cy = $originY + random_int(0, $max);
+            if (WorldPlacement::canPlace($db, $worldId, 'resource', $cx, $cy)) {
                 return [$cx, $cy];
             }
         }

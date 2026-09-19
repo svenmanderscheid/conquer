@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Conquer\Api\Handlers;
 
+use Conquer\Game\World\WorldContext;
+
 use Conquer\Api\Response;
 use Conquer\Auth\Session;
 use Conquer\Db\Connection;
@@ -23,7 +25,7 @@ final class MarchHandler
     /**
      * POST /api/march/dispatch
      *
-     * Body: { target_x: int, target_y: int, troops: {code: count, ...} }
+     * Body: { target_x: int, target_y: int, troops: {code: count, ...}, request_id?: string }
      */
     public static function dispatch(array $params): void
     {
@@ -37,14 +39,13 @@ final class MarchHandler
             Response::error(403, 'CSRF_INVALID', 'CSRF token missing or invalid.');
         }
 
-        $body = json_decode((string) file_get_contents('php://input'), true) ?? [];
-
-        $targetX = (int) ($body['target_x'] ?? -1);
-        $targetY = (int) ($body['target_y'] ?? -1);
-        $troops  = (array) ($body['troops']  ?? []);
-
-        if ($targetX < 0 || $targetY < 0) {
-            Response::error(400, 'INVALID_INPUT', 'target_x und target_y sind erforderlich.');
+        $body = self::readArmyRequest();
+        $targetX = $body['target_x'];
+        $targetY = $body['target_y'];
+        $troops = $body['troops'] ?? null;
+        if(isset($body['request_id'])&&!is_string($body['request_id']))Response::error(400,'REQUEST_ID_INVALID','request_id muss eine Zeichenfolge sein.');
+        if (!is_array($troops)) {
+            Response::error(400, 'INVALID_INPUT', 'Eine Truppenzusammenstellung ist erforderlich.');
         }
 
         $state = CityState::loadForPlayer((int) $session['player_id']);
@@ -64,8 +65,13 @@ final class MarchHandler
                 targetX:       $targetX,
                 targetY:       $targetY,
                 selectedTroops: $troops,
+                requestId: isset($body['request_id'])&&is_string($body['request_id'])?$body['request_id']:null,
             );
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException|\DomainException $e) {
+            if($e->getMessage()==='REQUEST_ID_CONFLICT')Response::error(409,'REQUEST_ID_CONFLICT','Diese Anfrage-ID wurde bereits für einen anderen Marsch verwendet.');
+            if($e->getMessage()==='REQUEST_ID_INVALID')Response::error(400,'REQUEST_ID_INVALID','request_id muss 16 bis 80 Zeichen aus Buchstaben, Zahlen, _ oder - enthalten.');
+            if($e->getMessage()==='REQUEST_BUSY')Response::error(409,'REQUEST_BUSY','Deine Marschdaten werden gerade aktualisiert. Versuche es erneut.');
+            if($e instanceof \DomainException)Response::error(in_array($e->getCode(),[403,409],true)?$e->getCode():422,'WORLD_RULE',$e->getMessage());
             if ($e->getMessage() === 'MARCH_SLOT_FULL') {
                 Response::error(400, 'march_slot_full', 'Alle Marsch-Slots belegt. Warte auf eine Rückkehr.');
             }
@@ -78,7 +84,7 @@ final class MarchHandler
     /**
      * POST /api/march/dispatch-charm
      *
-     * Body: { charm_id: int, target_x: int, target_y: int, troops: {code: count} }
+     * Body: { charm_id: int, target_x: int, target_y: int, troops: {code: count}, request_id?: string }
      */
     public static function dispatchCharm(array $params): void
     {
@@ -97,6 +103,7 @@ final class MarchHandler
         $targetX = (int) ($body['target_x'] ?? -1);
         $targetY = (int) ($body['target_y'] ?? -1);
         $troops  = (array) ($body['troops']  ?? []);
+        if(isset($body['request_id'])&&!is_string($body['request_id']))Response::error(400,'REQUEST_ID_INVALID','request_id muss eine Zeichenfolge sein.');
 
         if ($charmId <= 0 || $targetX < 0 || $targetY < 0) {
             Response::error(400, 'INVALID_INPUT', 'charm_id, target_x und target_y sind erforderlich.');
@@ -120,8 +127,13 @@ final class MarchHandler
                 targetY:        $targetY,
                 charmId:        $charmId,
                 selectedTroops: $troops,
+                requestId: isset($body['request_id'])&&is_string($body['request_id'])?$body['request_id']:null,
             );
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException|\DomainException $e) {
+            if($e->getMessage()==='REQUEST_ID_CONFLICT')Response::error(409,'REQUEST_ID_CONFLICT','Diese Anfrage-ID wurde bereits für einen anderen Marsch verwendet.');
+            if($e->getMessage()==='REQUEST_ID_INVALID')Response::error(400,'REQUEST_ID_INVALID','request_id muss 16 bis 80 Zeichen aus Buchstaben, Zahlen, _ oder - enthalten.');
+            if($e->getMessage()==='REQUEST_BUSY')Response::error(409,'REQUEST_BUSY','Deine Marschdaten werden gerade aktualisiert. Versuche es erneut.');
+            if($e instanceof \DomainException)Response::error(in_array($e->getCode(),[403,409],true)?$e->getCode():422,'WORLD_RULE',$e->getMessage());
             if ($e->getMessage() === 'MARCH_SLOT_FULL') {
                 Response::error(400, 'march_slot_full', 'Alle Marsch-Slots belegt. Warte auf eine Rückkehr.');
             }
@@ -148,14 +160,9 @@ final class MarchHandler
             Response::error(403, 'CSRF_INVALID', 'CSRF token missing or invalid.');
         }
 
-        $body    = json_decode((string) file_get_contents('php://input'), true) ?? [];
-        $targetX = (int) ($body['target_x'] ?? -1);
-        $targetY = (int) ($body['target_y'] ?? -1);
-        $troops  = (array) ($body['troops']  ?? []);
-
-        if ($targetX < 0 || $targetY < 0) {
-            Response::error(400, 'INVALID_INPUT', 'target_x und target_y sind erforderlich.');
-        }
+        $body = self::readArmyRequest();
+        $targetX=$body['target_x'];$targetY=$body['target_y'];$troops=$body['troops']??null;
+        if(!is_array($troops)){Response::error(400,'INVALID_INPUT','Eine Truppenzusammenstellung ist erforderlich.');}
 
         $state = CityState::loadForPlayer((int) $session['player_id']);
         if ($state === null) {
@@ -175,7 +182,8 @@ final class MarchHandler
                 targetY:        $targetY,
                 selectedTroops: $troops,
             );
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException|\DomainException $e) {
+            if($e instanceof \DomainException)Response::error(in_array($e->getCode(),[403,409],true)?$e->getCode():422,'WORLD_RULE',$e->getMessage());
             if ($e->getMessage() === 'MARCH_SLOT_FULL') {
                 Response::error(400, 'march_slot_full', 'Alle Marsch-Slots belegt. Warte auf eine Rückkehr.');
             }
@@ -227,7 +235,8 @@ final class MarchHandler
                 targetX:  $targetX,
                 targetY:  $targetY,
             );
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException|\DomainException $e) {
+            if($e instanceof \DomainException)Response::error(in_array($e->getCode(),[403,409],true)?$e->getCode():422,'WORLD_RULE',$e->getMessage());
             if ($e->getMessage() === 'MARCH_SLOT_FULL') {
                 Response::error(400, 'march_slot_full', 'Alle Marsch-Slots belegt. Warte auf eine Rückkehr.');
             }
@@ -240,22 +249,32 @@ final class MarchHandler
     /**
      * POST /api/march/dispatch-gather
      *
-     * Body: { target_x: int, target_y: int, troop_count: int }
+     * Body: { target_x: int, target_y: int, troops: {code: count} }
+     * Legacy clients may continue to send troop_count instead of troops.
      */
-    public static function dispatchGather(array $session): void
+    public static function dispatchGather(array $session,bool $attack=false): void
     {
+        if (!isset($session['player_id'], $session['csrf_token'])) {
+            Response::error(401, 'UNAUTHENTICATED', 'Bitte melde dich an.');
+        }
         $csrf = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
         if ($csrf === '' || !hash_equals($session['csrf_token'], $csrf)) {
             Response::error(403, 'CSRF_INVALID', 'CSRF token missing or invalid.');
         }
 
-        $body       = json_decode((string) file_get_contents('php://input'), true) ?? [];
-        $targetX    = (int) ($body['target_x']    ?? -1);
-        $targetY    = (int) ($body['target_y']    ?? -1);
-        $troopCount = (int) ($body['troop_count'] ?? 1000);
-
-        if ($targetX < 0 || $targetX > 255 || $targetY < 0 || $targetY > 255) {
-            Response::error(400, 'INVALID_INPUT', 'target_x und target_y müssen zwischen 0 und 255 liegen.');
+        $body = self::readArmyRequest();
+        $targetX = $body['target_x'];
+        $targetY = $body['target_y'];
+        $troops = null;
+        $troopCount = 0;
+        if (array_key_exists('troops', $body)) {
+            if (!is_array($body['troops'])) { Response::error(400, 'INVALID_INPUT', 'Eine gültige Truppenzusammenstellung ist erforderlich.'); }
+            $troops = $body['troops'];
+        } else {
+            $troopCount = $body['troop_count'] ?? null;
+            if (!is_int($troopCount) || $troopCount < 1 || $troopCount > \Conquer\Game\March\MarchArmy::MAX_CAP) {
+                Response::error(400, 'INVALID_INPUT', 'Entsende zwischen 1 und 50.000 Truppen zum Sammeln.');
+            }
         }
 
         $state = CityState::loadForPlayer((int) $session['player_id']);
@@ -272,8 +291,11 @@ final class MarchHandler
                 targetX:    $targetX,
                 targetY:    $targetY,
                 troopCount: $troopCount,
+                selectedTroops: $troops,
+                attack: $attack,
             );
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException|\DomainException $e) {
+            if($e instanceof \DomainException)Response::error(in_array($e->getCode(),[403,409],true)?$e->getCode():422,'WORLD_RULE',$e->getMessage());
             if ($e->getMessage() === 'MARCH_SLOT_FULL') {
                 Response::error(400, 'march_slot_full', 'Alle Marsch-Slots belegt. Warte auf eine Rückkehr.');
             }
@@ -289,61 +311,16 @@ final class MarchHandler
      * Body: { march_id: int }
      * Recalls a marching march — state must be 'marching', not yet arrived.
      */
-    public static function recall(array $session): void
+    public static function recall(array $params): void
     {
-        $csrf = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
-        if ($csrf === '' || !hash_equals($session['csrf_token'], $csrf)) {
-            Response::error(403, 'CSRF_INVALID', 'CSRF token missing or invalid.');
-        }
-
-        $body    = json_decode((string) file_get_contents('php://input'), true) ?? [];
-        $marchId = (int) ($body['march_id'] ?? 0);
-
-        if ($marchId <= 0) {
-            Response::error(400, 'INVALID_INPUT', 'march_id ist erforderlich.');
-        }
-
-        $db       = Connection::getInstance();
-        $playerId = (int) $session['player_id'];
-
-        // Load march and verify ownership
-        $march = $db->query(
-            "SELECT id, player_id, state, march_type, target_id
-             FROM marches
-             WHERE id = ?",
-            [$marchId],
-        )->fetch();
-
-        if ($march === false) {
-            Response::error(404, 'NOT_FOUND', 'March nicht gefunden.');
-        }
-
-        if ((int) $march['player_id'] !== $playerId) {
-            Response::error(403, 'FORBIDDEN', 'Das ist nicht dein March.');
-        }
-
-        if ($march['state'] !== 'marching') {
-            Response::error(409, 'WRONG_STATE', 'Nur marschierende Truppen können zurückgerufen werden.');
-        }
-
-        // Update march to returning
-        $db->execute(
-            "UPDATE marches
-             SET state = 'returning', return_time = UTC_TIMESTAMP(), haul_json = '{\"survivors\":{},\"loot\":{}}'
-             WHERE id = ? AND state = 'marching' AND player_id = ?",
-            [$marchId, $playerId],
-        );
-
-        // If this was a gather march, unlock the field object
-        if ((int) $march['march_type'] === MarchDispatcher::MARCH_GATHER && $march['target_id'] !== null) {
-            try {
-                \Conquer\Game\Map\FieldObjectService::unlockObject((int) $march['target_id']);
-            } catch (\Throwable) {
-                // Non-fatal — object may already be unlocked or expired
-            }
-        }
-
-        Response::ok(['recalled' => true]);
+        $session=Session::current();if(!$session)Response::error(401,'UNAUTHENTICATED','Bitte melde dich an.');
+        $csrf=$_SERVER['HTTP_X_CSRF_TOKEN']??'';if($csrf===''||!hash_equals($session['csrf_token'],$csrf))Response::error(403,'CSRF_INVALID','Bitte lade das Spiel neu.');
+        $body=json_decode(file_get_contents('php://input')?:'',true)??[];
+        if(!is_array($body))Response::error(400,'INVALID_JSON','Ungültige Anfrage.');
+        $body['action']='march.recall';
+        try{$result=\Conquer\Game\Defense\DefenseService::action((int)$session['player_id'],$body);}
+        catch(\RuntimeException|\DomainException $e){Response::error(in_array($e->getCode(),[403,409],true)?$e->getCode():422,'MARCH_RULE',$e->getMessage());}
+        Response::ok($result);
     }
 
     /**
@@ -369,119 +346,16 @@ final class MarchHandler
      * Body: { "target_player_id": int, "troops": {"50100101": 500} }
      * Sends troops as reinforcements to an alliance member's city.
      */
-    public static function dispatchReinforce(array $session): void
+    public static function dispatchReinforce(array $params): void
     {
-        $csrf = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
-        if ($csrf === '' || !hash_equals($session['csrf_token'], $csrf)) {
-            Response::error(403, 'CSRF_INVALID', 'CSRF token missing or invalid.');
-        }
-
-        $body           = json_decode((string) file_get_contents('php://input'), true) ?? [];
-        $targetPlayerId = (int) ($body['target_player_id'] ?? 0);
-        $troops         = (array) ($body['troops'] ?? []);
-
-        if ($targetPlayerId <= 0) {
-            Response::error(400, 'INVALID_INPUT', 'target_player_id ist erforderlich.');
-        }
-
-        if (empty($troops)) {
-            Response::error(400, 'INVALID_INPUT', 'Mindestens eine Truppenart muss ausgewählt werden.');
-        }
-
-        $playerId = (int) $session['player_id'];
-
-        if ($targetPlayerId === $playerId) {
-            Response::error(400, 'INVALID_INPUT', 'Du kannst keine Verstärkung zu dir selbst schicken.');
-        }
-
-        $db    = Connection::getInstance();
-        $state = CityState::loadForPlayer($playerId);
-        if ($state === null) {
-            Response::error(404, 'NO_CITY', 'Keine Stadt gefunden.');
-        }
-
-        $city   = $state['city'];
-        $cityId = (int) $city['id'];
-
-        // Verify both players are in the same alliance
-        $myAllianceRow = $db->query(
-            'SELECT alliance_id FROM alliance_members WHERE player_id = ?',
-            [$playerId],
-        )->fetch();
-
-        if ($myAllianceRow === false) {
-            Response::error(403, 'NOT_MEMBER', 'Du bist kein Mitglied einer Allianz.');
-        }
-
-        $targetAllianceRow = $db->query(
-            'SELECT alliance_id FROM alliance_members WHERE player_id = ?',
-            [$targetPlayerId],
-        )->fetch();
-
-        if ($targetAllianceRow === false || (int) $targetAllianceRow['alliance_id'] !== (int) $myAllianceRow['alliance_id']) {
-            Response::error(403, 'NOT_SAME_ALLIANCE', 'Verstärkung nur für Allianz-Mitglieder möglich.');
-        }
-
-        // Load target city coordinates
-        $targetCity = $db->query(
-            'SELECT id, coord_x, coord_y FROM cities WHERE player_id = ? LIMIT 1',
-            [$targetPlayerId],
-        )->fetch();
-
-        if ($targetCity === false) {
-            Response::error(404, 'TARGET_NO_CITY', 'Ziel-Spieler hat keine Stadt.');
-        }
-
-        $targetCityId = (int) $targetCity['id'];
-
-        // Check active reinforcement count at target (max 5 active reinforcement marches per city)
-        $activeReinforceCount = (int) $db->query(
-            "SELECT COUNT(*) FROM marches
-             WHERE march_type = 10 AND target_id = ? AND state IN ('marching','arrived')",
-            [$targetCityId],
-        )->fetchColumn();
-
-        if ($activeReinforceCount >= 5) {
-            Response::error(409, 'TOO_MANY_REINFORCEMENTS', 'Ziel-Stadt hat bereits zu viele Verstärkungen.');
-        }
-
-        // Validate troops exist in city
-        $cityTroops = $state['troops'] ?? [];
-        $validTroops = [];
-        foreach ($troops as $code => $count) {
-            $count = (int) $count;
-            if ($count <= 0) continue;
-            $available = (int) ($cityTroops[(int) $code] ?? 0);
-            if ($available < $count) {
-                Response::error(400, 'NOT_ENOUGH_TROOPS', "Nicht genug Truppen vom Typ {$code}. Vorhanden: {$available}.");
-            }
-            $validTroops[(int) $code] = $count;
-        }
-
-        if (empty($validTroops)) {
-            Response::error(400, 'INVALID_INPUT', 'Keine gültigen Truppen ausgewählt.');
-        }
-
-        try {
-            $marchId = MarchDispatcher::dispatchReinforce(
-                playerId:      $playerId,
-                cityId:        $cityId,
-                originX:       (int) $city['coord_x'],
-                originY:       (int) $city['coord_y'],
-                targetX:       (int) $targetCity['coord_x'],
-                targetY:       (int) $targetCity['coord_y'],
-                targetCityId:  $targetCityId,
-                targetPlayerId: $targetPlayerId,
-                selectedTroops: $validTroops,
-            );
-        } catch (\RuntimeException $e) {
-            if ($e->getMessage() === 'MARCH_SLOT_FULL') {
-                Response::error(400, 'march_slot_full', 'Alle Marsch-Slots belegt. Warte auf eine Rückkehr.');
-            }
-            Response::error(400, 'DISPATCH_FAILED', $e->getMessage());
-        }
-
-        Response::ok(['march_id' => $marchId ?? 0]);
+        $session=Session::current();if(!$session)Response::error(401,'UNAUTHENTICATED','Bitte melde dich an.');
+        $csrf=$_SERVER['HTTP_X_CSRF_TOKEN']??'';if($csrf===''||!hash_equals($session['csrf_token'],$csrf))Response::error(403,'CSRF_INVALID','Bitte lade das Spiel neu.');
+        $body=json_decode(file_get_contents('php://input')?:'',true)??[];
+        if(!is_array($body))Response::error(400,'INVALID_JSON','Ungültige Anfrage.');
+        $body['action']='reinforce';
+        try{$result=\Conquer\Game\Defense\DefenseService::action((int)$session['player_id'],$body);}
+        catch(\RuntimeException|\DomainException $e){Response::error(in_array($e->getCode(),[403,409],true)?$e->getCode():422,'MARCH_RULE',$e->getMessage());}
+        Response::ok($result);
     }
 
     /**
@@ -490,58 +364,16 @@ final class MarchHandler
      * Body: { "reinforcement_id": int }
      * Recalls active reinforcements — troops return to sender.
      */
-    public static function recallReinforcement(array $session): void
+    public static function recallReinforcement(array $params): void
     {
-        $csrf = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
-        if ($csrf === '' || !hash_equals($session['csrf_token'], $csrf)) {
-            Response::error(403, 'CSRF_INVALID', 'CSRF token missing or invalid.');
-        }
-
-        $body             = json_decode((string) file_get_contents('php://input'), true) ?? [];
-        $reinforcementId  = (int) ($body['reinforcement_id'] ?? 0);
-
-        if ($reinforcementId <= 0) {
-            Response::error(400, 'INVALID_INPUT', 'reinforcement_id ist erforderlich.');
-        }
-
-        $db       = Connection::getInstance();
-        $playerId = (int) $session['player_id'];
-
-        // Load reinforcement and verify ownership
-        $reinforcement = $db->query(
-            "SELECT r.id, r.march_id, r.sender_id, r.troops_json, r.state,
-                    m.origin_city_id, m.target_id AS target_city_id
-             FROM reinforcements r
-             JOIN marches m ON m.id = r.march_id
-             WHERE r.id = ? AND r.sender_id = ? AND r.state = 'active'",
-            [$reinforcementId, $playerId],
-        )->fetch();
-
-        if ($reinforcement === false) {
-            Response::error(404, 'NOT_FOUND', 'Verstärkung nicht gefunden oder nicht deine.');
-        }
-
-        $db->transaction(function (Connection $db) use ($reinforcement, $reinforcementId): void {
-            // Mark reinforcement as recalled
-            $db->execute(
-                "UPDATE reinforcements SET state = 'recalled', recalled_at = UTC_TIMESTAMP() WHERE id = ?",
-                [$reinforcementId],
-            );
-
-            // Return troops directly (no march needed — instant return for simplicity)
-            $troops = json_decode((string) ($reinforcement['troops_json'] ?? '{}'), true) ?? [];
-            foreach ($troops as $code => $count) {
-                $count = (int) $count;
-                if ($count <= 0) continue;
-                $db->execute(
-                    'INSERT INTO city_troops (city_id, troop_code, count) VALUES (?, ?, ?)
-                     ON DUPLICATE KEY UPDATE count = count + ?',
-                    [(int) $reinforcement['origin_city_id'], (int) $code, $count, $count],
-                );
-            }
-        });
-
-        Response::ok(['recalled' => true]);
+        $session=Session::current();if(!$session)Response::error(401,'UNAUTHENTICATED','Bitte melde dich an.');
+        $csrf=$_SERVER['HTTP_X_CSRF_TOKEN']??'';if($csrf===''||!hash_equals($session['csrf_token'],$csrf))Response::error(403,'CSRF_INVALID','Bitte lade das Spiel neu.');
+        $body=json_decode(file_get_contents('php://input')?:'',true)??[];
+        if(!is_array($body))Response::error(400,'INVALID_JSON','Ungültige Anfrage.');
+        $body['action']='reinforcement.recall';
+        try{$result=\Conquer\Game\Defense\DefenseService::action((int)$session['player_id'],$body);}
+        catch(\RuntimeException|\DomainException $e){Response::error(in_array($e->getCode(),[403,409],true)?$e->getCode():422,'MARCH_RULE',$e->getMessage());}
+        Response::ok($result);
     }
 
     /**
@@ -562,9 +394,9 @@ final class MarchHandler
                     r.troops_json, r.state, r.created_at
              FROM reinforcements r
              JOIN players p ON p.id = r.target_player_id
-             WHERE r.sender_id = ? AND r.state = 'active'
+             WHERE r.sender_id = ? AND r.sender_city_id = ? AND r.state = 'active'
              ORDER BY r.created_at DESC",
-            [$playerId],
+            [$playerId, $cityId],
         )->fetchAll();
 
         $received = [];
@@ -622,5 +454,22 @@ final class MarchHandler
         unset($m);
 
         Response::ok(['marches' => $marches]);
+    }
+
+    /** Strict input shared by the two editable troop-composition dialogs. */
+    private static function readArmyRequest(): array
+    {
+        $raw = (string) file_get_contents('php://input');
+        if (strlen($raw) > 8192) { Response::error(413, 'INVALID_INPUT', 'Die Anfrage ist zu groß.'); }
+        try { $body = json_decode($raw, true, 32, JSON_THROW_ON_ERROR); }
+        catch (\JsonException) { Response::error(400, 'INVALID_INPUT', 'Ungültige Anfrage.'); }
+        if (!is_array($body) || array_is_list($body)) { Response::error(400, 'INVALID_INPUT', 'Ein Aktionsobjekt ist erforderlich.'); }
+        $max = max(0, (int) Connection::getInstance()->query('SELECT map_size FROM worlds WHERE id=?', [WorldContext::id()])->fetchColumn() - 1);
+        foreach (['target_x', 'target_y'] as $key) {
+            if (!isset($body[$key]) || !is_int($body[$key]) || $body[$key] < 0 || $body[$key] > $max) {
+                Response::error(400, 'INVALID_INPUT', 'Zielkoordinaten müssen ganze Zahlen zwischen 0 und '.$max.' sein.');
+            }
+        }
+        return $body;
     }
 }

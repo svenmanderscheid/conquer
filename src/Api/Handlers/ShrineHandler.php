@@ -1,162 +1,65 @@
 <?php
 declare(strict_types=1);
-
 namespace Conquer\Api\Handlers;
 
 use Conquer\Api\Response;
 use Conquer\Auth\Session;
-use Conquer\Game\City\CityState;
-use Conquer\Game\Shrine\ShrineService;
+use Conquer\Game\Shrine\{ShrineService,CongressService};
 
-/**
- * Handles /api/shrines/* endpoints.
- *
- * GET  /api/shrines            — list all shrines with capture state
- * GET  /api/shrines/:id        — detail view of a single shrine
- * POST /api/shrines/:id/garrison — send troops to garrison a secured shrine
- * POST /api/shrines/:id/recall   — recall garrison troops back to city
- */
+/** Authenticated real march endpoints for alliance-controlled shrines. */
 final class ShrineHandler
 {
-    private function __construct() {}
-
-    // ── GET /api/shrines ──────────────────────────────────────────────────────
-
-    /**
-     * Returns all shrines in world 1 with their current ownership state.
-     *
-     * @param array<string, mixed> $session
-     */
     public static function list(array $session): void
     {
-        if (empty($session)) {
-            Response::error(401, 'UNAUTHENTICATED', 'Not logged in.');
-        }
-
-        $shrines = ShrineService::getAllShrines(1);
-
-        Response::ok(['shrines' => $shrines]);
+        self::player($session);CongressService::tick();Response::ok(['shrines'=>ShrineService::getAllShrines(\Conquer\Game\World\WorldContext::id())]);
     }
 
-    // ── GET /api/shrines/:id ──────────────────────────────────────────────────
-
-    /**
-     * Returns full detail for one shrine including bonuses and garrison.
-     *
-     * @param array<string, mixed> $session
-     */
-    public static function detail(array $session, int $shrineId): void
+    public static function detail(array $session,int $id): void
     {
-        if (empty($session)) {
-            Response::error(401, 'UNAUTHENTICATED', 'Not logged in.');
-        }
-
-        if ($shrineId <= 0) {
-            Response::error(400, 'INVALID_INPUT', 'Ungültige Shrine-ID.');
-        }
-
-        $shrine = ShrineService::getShrine($shrineId);
-
-        if ($shrine === null) {
-            Response::error(404, 'NOT_FOUND', 'Shrine nicht gefunden.');
-        }
-
-        Response::ok(['shrine' => $shrine]);
+        $pid=self::player($session);CongressService::tick();$shrine=CongressService::detail($id,$pid);
+        if(!$shrine)Response::error(404,'NOT_FOUND','Schrein nicht gefunden.');
+        Response::ok(['shrine'=>$shrine]);
     }
 
-    // ── POST /api/shrines/:id/garrison ────────────────────────────────────────
+    public static function attack(array $session,int $id): void {self::dispatch($session,$id,false);}
+    public static function garrison(array $session,int $id): void {self::dispatch($session,$id,true);}
 
-    /**
-     * Sends troops from the player's city to garrison the specified shrine.
-     *
-     * Expected JSON body:
-     *   { "troops": { "<troop_code>": <count>, ... } }
-     *
-     * @param array<string, mixed> $session
-     */
-    public static function garrison(array $session, int $shrineId): void
+    private static function dispatch(array $session,int $id,bool $garrison): void
     {
-        if (empty($session)) {
-            Response::error(401, 'UNAUTHENTICATED', 'Not logged in.');
-        }
-
-        // CSRF validation
-        $csrf = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
-        $sessionObj = Session::current();
-        if (
-            $sessionObj === null ||
-            $csrf === '' ||
-            !hash_equals((string) $sessionObj['csrf_token'], $csrf)
-        ) {
-            Response::error(403, 'CSRF_INVALID', 'CSRF token missing or invalid.');
-        }
-
-        if ($shrineId <= 0) {
-            Response::error(400, 'INVALID_INPUT', 'Ungültige Shrine-ID.');
-        }
-
-        $body   = json_decode((string) file_get_contents('php://input'), true) ?? [];
-        $troops = (array) ($body['troops'] ?? []);
-
-        if (empty($troops)) {
-            Response::error(400, 'INVALID_INPUT', 'Keine Truppen angegeben.');
-        }
-
-        $playerId = (int) $session['player_id'];
-
-        $state = CityState::loadForPlayer($playerId);
-        if ($state === null) {
-            Response::error(404, 'NO_CITY', 'Keine Stadt gefunden.');
-        }
-
-        $cityId = (int) $state['city']['id'];
-
-        try {
-            ShrineService::sendGarrison($playerId, $cityId, $shrineId, $troops);
-        } catch (\RuntimeException $e) {
-            Response::error(400, 'GARRISON_FAILED', $e->getMessage());
-        }
-
-        Response::ok(['garrisoned' => true]);
+        $pid=self::player($session,true);$body=self::body();
+        try{$result=CongressService::dispatch($pid,$id,$body['troops']??null,$garrison);}
+        catch(\RuntimeException $e){self::failure($e);}
+        Response::ok($result);
     }
 
-    // ── POST /api/shrines/:id/recall ──────────────────────────────────────────
-
-    /**
-     * Recalls the player's garrison from the specified shrine.
-     * Troops are returned to the player's primary city.
-     *
-     * @param array<string, mixed> $session
-     */
-    public static function recall(array $session, int $shrineId): void
+    public static function recall(array $session,int $id): void
     {
-        if (empty($session)) {
-            Response::error(401, 'UNAUTHENTICATED', 'Not logged in.');
-        }
+        $pid=self::player($session,true);self::body();
+        try{$result=CongressService::recall($pid,$id);}
+        catch(\RuntimeException $e){self::failure($e);}
+        Response::ok($result);
+    }
 
-        // CSRF validation
-        $csrf = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
-        $sessionObj = Session::current();
-        if (
-            $sessionObj === null ||
-            $csrf === '' ||
-            !hash_equals((string) $sessionObj['csrf_token'], $csrf)
-        ) {
-            Response::error(403, 'CSRF_INVALID', 'CSRF token missing or invalid.');
-        }
+    private static function body(): array
+    {
+        try{$object=json_decode((string)file_get_contents('php://input'),false,32,JSON_THROW_ON_ERROR);}
+        catch(\JsonException){Response::error(400,'INVALID_JSON','Ein gültiges JSON-Objekt ist erforderlich.');}
+        if(!$object instanceof \stdClass)Response::error(400,'INVALID_JSON','Ein JSON-Objekt ist erforderlich.');
+        $body=get_object_vars($object);
+        if(isset($body['troops'])&&$body['troops'] instanceof \stdClass)$body['troops']=get_object_vars($body['troops']);
+        return $body;
+    }
 
-        if ($shrineId <= 0) {
-            Response::error(400, 'INVALID_INPUT', 'Ungültige Shrine-ID.');
-        }
+    private static function player(array $session,bool $mutation=false): int
+    {
+        if(empty($session['player_id']))Response::error(401,'UNAUTHENTICATED','Bitte melde dich an.');
+        if($mutation){$current=Session::current();$csrf=$_SERVER['HTTP_X_CSRF_TOKEN']??'';if(!$current||$csrf===''||!hash_equals((string)$current['csrf_token'],$csrf))Response::error(403,'CSRF_INVALID','Ungültiges Sitzungstoken.');}
+        return (int)$session['player_id'];
+    }
 
-        $playerId = (int) $session['player_id'];
-
-        try {
-            ShrineService::recallGarrison($playerId, $shrineId);
-        } catch (\RuntimeException $e) {
-            Response::error(400, 'RECALL_FAILED', $e->getMessage());
-        }
-
-        Response::ok(['recalled' => true]);
+    private static function failure(\RuntimeException $e): never
+    {
+        $status=in_array($e->getCode(),[403,404],true)?$e->getCode():400;
+        Response::error($status,'SHRINE_ACTION_FAILED',$e->getMessage());
     }
 }

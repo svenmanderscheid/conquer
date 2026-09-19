@@ -11,7 +11,7 @@ use Conquer\Db\Connection;
  * - Max AP:          200
  * - Regen rate:      1 AP every 5 minutes (12 AP/hour)
  * - Monster cost:    10 AP  (normal monsters)
- * - Deathkar cost:   25 AP
+ * - Dämmerhorn cost: 25 AP
  * - Dragon cost:     30 AP  (Dragon / Wyrm / Wyvern)
  *
  * AP regeneration is computed lazily when get() is called.
@@ -38,51 +38,22 @@ final class ActionPoints
      */
     public static function get(int $playerId): array
     {
-        $db = Connection::getInstance();
-
-        $row = $db->query(
-            'SELECT action_points, last_ap_regen FROM players WHERE id = ?',
-            [$playerId],
-        )->fetch();
-
-        if ($row === false) {
-            throw new \RuntimeException('Player not found: ' . $playerId);
-        }
-
-        $stored      = (int) $row['action_points'];
-        $lastRegen   = new \DateTimeImmutable($row['last_ap_regen'], new \DateTimeZone('UTC'));
-        $now         = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
-
-        $minutesElapsed = (int) floor(($now->getTimestamp() - $lastRegen->getTimestamp()) / 60);
-        $intervals      = (int) floor($minutesElapsed / self::REGEN_INTERVAL_MINUTES);
-
-        $current = $stored;
-
-        if ($intervals > 0 && $stored < self::MAX_AP) {
-            $current = min(self::MAX_AP, $stored + $intervals);
-
-            // Advance last_ap_regen by exactly the consumed intervals
-            $secondsConsumed = $intervals * self::REGEN_INTERVAL_MINUTES * 60;
-            $newLastRegen    = $lastRegen->modify('+' . $secondsConsumed . ' seconds');
-
-            $db->execute(
-                'UPDATE players SET action_points = ?, last_ap_regen = ? WHERE id = ?',
-                [$current, $newLastRegen->format('Y-m-d H:i:s'), $playerId],
-            );
-        } elseif ($current >= self::MAX_AP && $stored !== self::MAX_AP) {
-            // Clamp to max if somehow above cap in DB
-            $db->execute(
-                'UPDATE players SET action_points = ? WHERE id = ?',
-                [self::MAX_AP, $playerId],
-            );
-            $current = self::MAX_AP;
-        }
-
-        return [
-            'current'        => $current,
-            'max'            => self::MAX_AP,
-            'regen_per_hour' => self::REGEN_PER_HOUR,
-        ];
+        $db=Connection::getInstance();
+        $regenerate=static function(Connection $db)use($playerId):array {
+            $row=$db->query('SELECT action_points,last_ap_regen FROM players WHERE id=? FOR UPDATE',[$playerId])->fetch();
+            if(!$row)throw new \RuntimeException('Player not found.');
+            $saved=$db->query('SELECT rate,fraction FROM player_ap_regeneration WHERE player_id=?',[$playerId])->fetch()?:['rate'=>1,'fraction'=>0];
+            $rate=1+max(0,(float)(MasteryService::bonuses($playerId)['talent_ap_regen']??0));
+            $elapsed=max(0,time()-strtotime($row['last_ap_regen'].' UTC'));
+            $stored=min(self::MAX_AP,max(0,(int)$row['action_points']));
+            $credit=$elapsed/300*(float)$saved['rate']+(float)$saved['fraction'];
+            $current=min(self::MAX_AP,$stored+(int)floor($credit+1e-9));
+            $fraction=$current===self::MAX_AP?0:max(0,$credit-floor($credit+1e-9));
+            $db->execute('UPDATE players SET action_points=?,last_ap_regen=UTC_TIMESTAMP() WHERE id=?',[$current,$playerId]);
+            $db->execute('INSERT INTO player_ap_regeneration(player_id,rate,fraction) VALUES(?,?,?) ON DUPLICATE KEY UPDATE rate=VALUES(rate),fraction=VALUES(fraction)',[$playerId,$rate,$fraction]);
+            return ['current'=>$current,'max'=>self::MAX_AP,'regen_per_hour'=>self::REGEN_PER_HOUR*$rate];
+        };
+        return $db->getPdo()->inTransaction()?$regenerate($db):$db->transaction($regenerate);
     }
 
     /**
@@ -119,7 +90,7 @@ final class ActionPoints
      * Returns the AP cost for attacking a named monster.
      *
      * Cost table:
-     *   'Deathkar'                    → 25 AP
+     *   'Dämmerhorn' / 'Deathkar'     → 25 AP
      *   'Dragon' / 'Wyrm' / 'Wyvern' → 30 AP
      *   everything else               → 10 AP
      */
@@ -127,7 +98,7 @@ final class ActionPoints
     {
         $name = strtolower(trim($monsterName));
 
-        if ($name === 'deathkar') {
+        if (in_array($name, ['dämmerhorn', 'deathkar'], true)) {
             return 25;
         }
 

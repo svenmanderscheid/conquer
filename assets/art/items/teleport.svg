@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Königreich teleportieren">
+<title>Königreich teleportieren</title>
+
+<!-- Original code-native storybook item illustration. Values and rarity belong to the game UI. -->
+<g stroke="#493b33" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+<g transform="translate(4 0) scale(.93)">
+<path d="M23 39 40 31 52 41 73 33 102 42V97L70 113 23 100Z" fill="#d4d1bc" />
+<path d="M66 47 102 42V97L70 113Z" fill="#8d9e9e" />
+<path d="M18 27H46V70H18ZM80 24H108V67H80Z" fill="#c9d2ce" />
+<path d="M20 24 32 10 47 26 47 33H17Z" fill="#2a72c9" />
+<path d="M80 24 94 7 110 25V33H78Z" fill="#438fe4" />
+<path d="M32 11V29H46L47 26Z" fill="#24559c" stroke="none"/>
+<path d="M94 8V30H108L110 25Z" fill="#24559c" stroke="none"/>
+<path d="M43 44H74V94H43Z" fill="#e9e1d2" />
+<path d="M39 46 59 25 79 46Z" fill="#2a72c9" />
+<path d="M53 72Q63 60 69 75V100L53 105Z" fill="#70472f" />
+<path d="M59 74V99" fill="none" stroke="#aa743f" stroke-width="3"/>
+<path d="M25 43H33V56H25ZM88 41H96V54H88Z" fill="#40535e" stroke-width="2"/>
+<path d="M24 77H32M34 89H41M76 63H82M91 79H97" fill="none" stroke="#a9b4ac" stroke-width="3"/>
+</g>
+<path d="M104 88C107 106 91 118 66 119 39 121 20 107 24 96 28 85 48 81 66 86 49 85 40 94 43 99 49 109 81 108 85 98L71 100 96 78 119 91Z" fill="#3bd9e0" />
+<path d="M29 102C39 116 72 121 94 107" fill="none" stroke="#bafcff" stroke-width="4"/>
+</g>
+</svg>

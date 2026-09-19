@@ -1,0 +1,42 @@
+.atlas-biome-label{position:absolute;top:66px;left:50%;transform:translateX(-50%);z-index:4;pointer-events:none;color:#fff4d1;text-shadow:0 2px 3px #152b32,0 0 8px #152b32;font:700 13px/1.2 Georgia,serif;letter-spacing:1px;white-space:nowrap}
+.map-overlay-shell .atlas-marker--congress{z-index:15000!important}
+.map-overlay-shell .atlas-marker--congress img{width:calc(var(--tile-size)*6.6);height:calc(var(--tile-size)*7);margin-left:calc(var(--tile-size)*-3.3);bottom:calc(var(--tile-size)*.3);filter:drop-shadow(0 12px 8px #14394b70)}
+.map-overlay-shell .atlas-marker--congress .atlas-marker-ground{background:radial-gradient(ellipse,#45ddfb38,transparent 68%);border:0;border-radius:50%!important}
+.map-overlay-shell .atlas-marker--congress .atlas-marker-name{opacity:1;color:#fff0b4;background:#223e5bec;border-color:#dec279}
+.map-overlay-shell .atlas-marker--congress .atlas-marker-level{background:#294766;border-color:#f4d786;color:#fff0c6;font-weight:800}
+.atlas-zone-jumps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin:8px 0 0;flex:none}
+.atlas-zone-jumps button{min-width:0;padding:7px 4px;border:1px solid #c1ab72;border-radius:4px;background:#314736;color:#fff3d3!important;font-weight:700;font-size:11px}
+.atlas-zone-jumps button:nth-child(2){background:#bad5dc;color:#243e57!important}.atlas-zone-jumps button:nth-child(3){background:#d6b76c;color:#573e1d!important}.atlas-zone-jumps button:nth-child(4){background:#593c3c;color:#ffceb1!important}
+.atlas-zone-jumps .atlas-congress-jump{grid-column:1/-1;background:linear-gradient(#456b90,#254667);color:#fff1bf!important}
+.map-overlay-shell .atlas-marker--shrine img{width:calc(var(--tile-size)*5.8);height:calc(var(--tile-size)*6.2);margin-left:calc(var(--tile-size)*-2.9);bottom:calc(var(--tile-size)*.15);filter:drop-shadow(0 5px 3px #182a3960)}
+.map-overlay-shell .atlas-marker--shrine .atlas-marker-ground{background:radial-gradient(ellipse,#e6daa12e,transparent 72%);border:0;border-radius:50%!important}
+.map-overlay-shell .atlas-marker--shrine .atlas-marker-name{opacity:1;background:#243b4bf0;color:#fff0be;border-color:#c7b580;max-width:180px}
+.map-overlay-shell .atlas-marker--shrine .atlas-marker-level{background:#294537;color:#eaf4cc;border-color:#8bad80}
+.map-overlay-shell .atlas-marker--shrine[data-shrine=ice] .atlas-marker-level{background:#304e64;border-color:#9bcbdc}
+.map-overlay-shell .atlas-marker--shrine[data-shrine=sand] .atlas-marker-level{background:#695333;border-color:#d5b866}
+.map-overlay-shell .atlas-marker--shrine[data-shrine=lava] .atlas-marker-level{background:#613835;border-color:#db9974}
+.map-overlay-shell .atlas-marker--shrine.is-event-active .atlas-marker-name{border-color:#ffe06e;box-shadow:0 0 8px #f4c95070}
+.atlas-shrine-jumps.atlas-zone-jumps{margin-top:5px;gap:4px}.atlas-shrine-jumps .atlas-shrine-jump{display:flex;flex-direction:column;align-items:center;padding:3px 2px;font-size:10px;line-height:1.15}.atlas-shrine-jump img{width:28px;height:28px;object-fit:contain}
+.shrine-event-badge{display:inline-block;margin-top:7px;padding:4px 8px;background:#263b54;border:1px solid #8ba4be;border-radius:4px;color:#c7d8ea;font-size:11px;font-weight:700}.shrine-event-badge.is-active{color:#ecf5b4;background:#354c2d;border-color:#a6c768}
+.shrine-panel[data-element=forest] .congress-hero{background:radial-gradient(ellipse,#589b5540,transparent 70%)}.shrine-panel[data-element=sand] .congress-hero{background:radial-gradient(ellipse,#d4a54d40,transparent 70%)}.shrine-panel[data-element=lava] .congress-hero{background:radial-gradient(ellipse,#e2784640,transparent 70%)}
+.shrine-panel .congress-rules>strong{color:#ffe6a3}.shrine-panel .shrine-event-time{color:#cbe7f3;font-weight:700}
+.atlas-shrine-jumps[hidden]{display:none}.atlas-actions-status{display:block;color:#c9d9bf;font-size:11px;margin:-2px 0 8px}
+@media(max-height:540px) and (min-width:500px){
+ .map-overlay-shell .map-overlay-navigation-panel{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:5px 12px;overflow:hidden}
+ .map-overlay-navigation-panel>.map-overlay-heading{grid-column:1/-1;margin-bottom:0}
+ .map-overlay-shell .map-overlay-navigation-grid{grid-column:1;grid-row:2/5;align-self:center;gap:8px;margin:0}
+ .map-overlay-shell .map-overlay-navigation-grid .atlas-minimap{width:min(160px,calc(100dvh - 145px));flex-shrink:1}
+ .map-overlay-navigation-panel>.atlas-jump{grid-column:2;grid-row:2;margin:0}
+ .map-overlay-navigation-panel>.atlas-zone-jumps{grid-column:2;grid-row:3;margin:0}
+ .map-overlay-navigation-panel>.atlas-shrine-jumps{grid-row:4}
+ .map-overlay-navigation-panel>.map-overlay-state{grid-column:1/-1;padding-top:2px}
+}
+.congress-panel{display:flex;flex-direction:column;gap:15px;min-height:0;flex:1;width:100%}
+body.mobile-game #game-dialog:has(.congress-panel) #dialog-content{display:flex;overflow:hidden}
+.congress-hero{display:flex;align-items:center;justify-content:center;gap:22px;background:radial-gradient(ellipse,#518faf4a,transparent 70%);flex:1;min-height:80px}
+.congress-hero img{width:min(40%,280px);max-height:280px;object-fit:contain}.congress-hero h3{font-size:22px;color:#fff0bd;margin:0 0 7px}.congress-hero p{color:#c2d6eb;margin:4px 0;font-size:13px}
+.congress-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.congress-stats>div{padding:12px 8px;background:#202e42;border:1px solid #677b92;border-radius:5px;text-align:center;min-width:0}.congress-stats small{display:block;color:#b8cbe1;font-size:11px}.congress-stats strong{display:block;color:#f6e4ad;margin-top:5px;font-size:16px}
+.congress-rules{padding:12px 15px;background:#283a50;border-left:3px solid #a8d2e6;color:#d0ddeb;font-size:13px;line-height:1.5}body.mobile-game #game-dialog .congress-rules p{margin:3px 0;font-size:inherit;line-height:inherit}
+.congress-actions{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:8px;margin-top:auto}.congress-actions .button{flex:1;min-width:0}
+@media(max-width:600px){.congress-panel{gap:9px}.congress-hero{gap:10px;min-height:100px}.congress-hero img{width:90px;height:90px;flex:none}.congress-hero h3{font-size:18px}.congress-hero p{font-size:11px}.congress-stats>div{padding:9px 4px}.congress-stats small{font-size:10px}.congress-stats strong{font-size:13px}.congress-rules{padding:8px 10px;font-size:11px}.congress-actions .button{min-width:0;font-size:11px}}
+@media(max-height:540px){.atlas-biome-label{top:51px;font-size:11px}.atlas-zone-jumps{gap:3px;margin-top:4px}.atlas-zone-jumps button{padding:4px;font-size:10px}.congress-panel{display:grid;grid-template-columns:1fr 1.25fr;gap:8px}.congress-hero{grid-row:1/3;min-height:0;flex-direction:column;gap:0;text-align:center}.congress-hero img{width:105px;max-height:105px}.congress-hero h3{font-size:15px}.congress-hero p{font-size:10px}.congress-stats>div{padding:5px 2px}.congress-stats strong{font-size:12px}.congress-stats small{font-size:9px}.congress-rules{font-size:10px;padding:5px 8px}.congress-actions{grid-column:1/-1}.congress-actions .button{min-height:30px;padding:5px;font-size:10px}}

@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin &mdash; Conquer</title>
+  <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR.'/assets/css/fantasy-fonts.css') ?>">
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     body {
@@ -90,8 +91,9 @@
       text-align: center;
     }
   </style>
+  <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/village-theme.css?v=<?= filemtime(ROOT_DIR.'/assets/css/village-theme.css') ?>">
 </head>
-<body>
+<body class="admin-village">
 <div class="login-box">
   <h1>&#9876; Conquer Admin</h1>
 

@@ -9,7 +9,7 @@ CREATE TABLE players (
     last_login      DATETIME NULL,
     is_banned       TINYINT(1) DEFAULT 0,
     vip_level       SMALLINT DEFAULT 1,
-    vip_points      INT DEFAULT 0,
+    vip_points      INT DEFAULT 200,
     gems            INT DEFAULT 0,
     INDEX (last_login)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

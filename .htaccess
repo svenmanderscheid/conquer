@@ -14,16 +14,23 @@
 # Front controller pattern — route all non-existing requests to index.php
 RewriteEngine On
 
+# Redirect before internal routing; use 308 to preserve methods and request bodies.
+RewriteCond %{HTTPS} off
+RewriteCond %{HTTP_HOST} !^(localhost|127\.0\.0\.1)(:\d+)?$ [NC]
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=308,L]
+
+# Also bounds chunked bodies before PHP attempts to parse JSON.
+LimitRequestBody 65536
+
+# Relative rules protect both domain-root and /conquer installations.
+RewriteRule ^(?:src|config|migrations|cron|tests|docs|data|vendor|node_modules|logs|sessions|cache|tmp|tools|bin|artifacts|asset-workflow|views|\.git|\.github|\.claude|\.codex[^/]*)(?:/|$) - [F,L,NC]
+
 # Don't rewrite if the request is for a real file or directory
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 
 # Route everything else through index.php
 RewriteRule ^(.*)$ index.php [QSA,L]
-
-# Force HTTPS once SSL cert is installed (uncomment after SSL is verified)
-# RewriteCond %{HTTPS} off
-# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
 # ============================================================================
 # Security headers
@@ -33,6 +40,8 @@ RewriteRule ^(.*)$ index.php [QSA,L]
     Header set X-Frame-Options "SAMEORIGIN"
     Header set Referrer-Policy "strict-origin-when-cross-origin"
     Header set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+    Header onsuccess unset Strict-Transport-Security
+    Header always set Strict-Transport-Security "max-age=31536000" "expr=%{HTTPS} == 'on'"
 </IfModule>
 
 # ============================================================================

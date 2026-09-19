@@ -1,0 +1,1 @@
+ALTER TABLE marches ADD COLUMN IF NOT EXISTS gathering_finishes_at DATETIME NULL;

@@ -1,0 +1,216 @@
+/* Shared illustrated game windows. Loaded after layout and legacy materials. */
+body.mobile-game :is(#panel-dialog,#game-dialog) {
+  --popup-surface:#404d61;
+  --popup-inset:#1b293b;
+  --popup-deep:#111c2b;
+  --popup-ink:#f5f7fc;
+  --popup-muted:#adcae9;
+  --popup-line:#617189;
+  --popup-paper:#e7e8ec;
+  --muted:var(--popup-muted);
+  --ink:var(--popup-ink);
+  --line:var(--popup-line);
+  --popup-title-pattern:linear-gradient(150deg,#203149 25%,transparent 25%),linear-gradient(210deg,#203149 25%,transparent 25%),linear-gradient(30deg,#17263a 25%,transparent 25%),linear-gradient(330deg,#17263a 25%,#1b2b42 25%);
+  background:var(--popup-surface);
+  border-color:var(--popup-paper);
+  border-top-color:var(--popup-paper);
+  border-radius:10px;
+  box-shadow:0 0 0 2px #101927,0 8px 0 #0a132750,0 20px 45px #09101f70;
+  color:var(--popup-ink);
+  font-family:'Segoe UI',system-ui,sans-serif;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog)::backdrop {
+  background:#07101e9c;
+  backdrop-filter:none;
+}
+body.mobile-game #game-dialog.march-dialog::backdrop { background:#07101e9c; backdrop-filter:none; }
+body.mobile-game:has(#panel-dialog[open]) #game-dialog::backdrop { background:#07101e73; backdrop-filter:none; }
+body.mobile-game #panel-dialog #content { background:var(--popup-surface); scrollbar-color:#93a8c4 var(--popup-inset); }
+body.mobile-game #panel-dialog .page-heading,
+body.mobile-game #game-dialog .popup-heading,
+body.mobile-game #game-dialog.march-dialog .march-command-heading {
+  position:relative; isolation:isolate; background:var(--popup-paper); border-bottom:3px solid var(--popup-deep); box-shadow:none;
+}
+body.mobile-game #panel-dialog .page-heading:before,
+body.mobile-game #game-dialog .popup-heading:before,
+body.mobile-game #game-dialog.march-dialog .march-command-heading:before {
+  content:''; position:absolute; z-index:-1; inset:0 auto 0 0; width:min(68%,440px);
+  background-image:var(--popup-title-pattern); background-size:28px 32px;
+  border-top:2px solid #647897; clip-path:polygon(0 0,calc(100% - 11px) 0,100% 100%,0 100%);
+}
+body.mobile-game #panel-dialog #page-title,
+body.mobile-game #game-dialog .popup-heading h2,
+body.mobile-game #game-dialog.march-dialog .march-command-heading h2 {
+  font-family:'Segoe UI',system-ui,sans-serif; font-weight:900; color:#fff;
+  text-transform:uppercase; letter-spacing:.25px; text-shadow:-1px -1px #07101b,1px -1px #07101b,-1px 1px #07101b,1px 2px #07101b;
+}
+body.mobile-game #panel-dialog #page-title { font-size:19px; }
+body.mobile-game #panel-dialog .panel-emblem .nav-emblem { background:none; border:0; box-shadow:none; color:#b9dbff; }
+body.mobile-game #panel-dialog .panel-close,
+body.mobile-game #game-dialog .dialog-close,
+body.mobile-game #game-dialog.march-dialog .dialog-close {
+  z-index:5; background:none; border:0; box-shadow:none; border-radius:3px; color:var(--popup-deep);
+  text-shadow:none; font:300 36px/1 'Segoe UI',sans-serif; padding:0; transform:none;
+}
+body.mobile-game #game-dialog .dialog-close { top:6px; right:8px; width:34px; height:34px; }
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.panel-close,.dialog-close):hover { background:#b9c6d5; color:#102f5a; }
+body.mobile-game #game-dialog.has-popup-heading { padding:0!important; }
+body.mobile-game #game-dialog .popup-heading { display:flex; align-items:center; min-height:48px; padding:8px 47px 8px 14px; margin:0; }
+body.mobile-game #game-dialog .popup-heading[hidden] { display:none; }
+body.mobile-game #game-dialog .popup-heading:before { width:calc(100% - 48px); }
+body.mobile-game #game-dialog .popup-heading h2 { font-size:18px; line-height:1.25; margin:0!important; padding:0!important; }
+body.mobile-game #game-dialog.has-popup-heading #dialog-content { padding:18px; }
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(h2,h3,h4,.stat-box strong) { font-family:'Segoe UI',system-ui,sans-serif; font-weight:750; }
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.muted,.form-help,.inventory-kicker,label) { color:var(--popup-muted); }
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(input[type=text],input[type=number],input[type=search],input[type=password],textarea,select,.number-control) {
+  color:var(--popup-ink); background:var(--popup-inset); border-color:#7185a1; border-radius:4px;
+  box-shadow:inset 0 2px #0b172c80; font-family:inherit;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(input,textarea)::placeholder { color:#9db0c8; }
+body.mobile-game :is(#panel-dialog,#game-dialog) select option { background:var(--popup-inset); color:var(--popup-ink); }
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.button,.menu-link,.rt-pagination>button,.inventory-pager>button,.march-pages button) {
+  --button-top:#65a8f4; --button-mid:#4587df; --button-low:#2766bc; --button-rim:#173963;
+  background:linear-gradient(var(--button-top) 0 49%,var(--button-mid) 50% 85%,var(--button-low) 86%);
+  border-color:var(--button-rim); border-radius:5px; color:white; font-weight:800; font-family:inherit;
+  text-shadow:0 1px #122339; box-shadow:inset 0 0 0 2px #c2e4ff55,0 2px 0 #09131f;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) .button.gold {
+  --button-top:#ffe14d; --button-mid:#ffcb19; --button-low:#f0a000; --button-rim:#8b5c07;
+  color:#222537; text-shadow:0 1px #fff1ab; box-shadow:inset 0 0 0 2px #fff19b99,0 2px 0 #191b26;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.button.danger,.button.march-attack) {
+  --button-top:#f86153; --button-mid:#dc3b37; --button-low:#a92331; --button-rim:#68202b;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) .button.march-gather {
+  --button-top:#b4e552; --button-mid:#81bf2e; --button-low:#509422; --button-rim:#365e24;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) button:disabled { opacity:.48; filter:saturate(.4); }
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(button,input,select,textarea):focus-visible { outline:2px solid #75e9ff; outline-offset:2px; }
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.subtabs,.army-tier-tabs,.inventory-views) { border-color:#8692a3; }
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.subtab,.army-tier-tabs>button,.inventory-views>button) {
+  background:#d5d8df; color:#46516a; border-color:#929aaa; border-radius:4px; font-weight:750; text-shadow:none; box-shadow:inset 0 1px #fff9;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.subtab.active,.army-tier-tabs>button.selected,.inventory-views>button.active) {
+  background:linear-gradient(#696dd0 0 49%,#4c50bd 50% 83%,#3637a0 84%); color:#fff; border-color:#303681;
+  box-shadow:inset 0 0 0 2px #a9aff355,0 2px #101a31; text-shadow:0 1px #141c49;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.detail-row,.inventory-effect,.setting-row) { border-color:#61718c66; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .detail-row>span { color:var(--popup-muted); }
+body.mobile-game :is(#panel-dialog,#game-dialog) .detail-row strong { color:#fff; }
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.costs>span,.treasury>span) { color:#fff; background:var(--popup-inset); border-color:#6e829f; box-shadow:none; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .costs>span.insufficient { color:#ffad97; background:#402631; border-color:#a4535b; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .notice { color:#d1eaff; background:#203b55; border-color:#659bc4; box-shadow:none; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .notice.warning { color:#ffe89d; background:#4b3d2a; border-color:#c8a544; }
+body.mobile-game #game-dialog .menu-link { background:linear-gradient(#497ec9 0 49%,#3265ad 50%); border-color:#162d50; }
+body.mobile-game #game-dialog .menu-link>span:last-child { color:#fff; }
+body.mobile-game #game-dialog .menu-link .nav-emblem { background:#142e53; border-color:#91bfff; box-shadow:inset 0 0 0 1px #263f66; color:#cce6ff; }
+body.mobile-game #game-dialog .menu-groups h3 { color:#bfd5f0; }
+body.mobile-game :is(#panel-dialog,#game-dialog)>#toast { background:#183955; border-color:#8bcaff; color:#fff; box-shadow:0 3px 10px #07101baa; }
+
+/* Research cards and item cabinets sit inside the same slate frame. */
+body.mobile-game #panel-dialog .rt-academy.rt-paged { background:var(--popup-inset); border-color:#142033; border-radius:4px; --rt-muted:#afc8e6; }
+body.mobile-game #panel-dialog .rt-academy.rt-paged .rt-academy-header { background:var(--popup-surface); border-color:#152237; }
+body.mobile-game #panel-dialog .rt-academy.rt-paged :is(.rt-academy-header>div,.rt-academy-header b,.rt-academy-upgrade) { color:#d3e3f6; }
+body.mobile-game #panel-dialog .rt-academy.rt-paged .rt-branches { background:var(--popup-paper); border-color:var(--popup-deep); }
+body.mobile-game #panel-dialog .rt-academy.rt-paged .rt-branch { background:#d5d8df; color:#4a5369; border-color:transparent; text-shadow:none; box-shadow:none; }
+body.mobile-game #panel-dialog .rt-academy.rt-paged .rt-branch.is-selected { background:linear-gradient(#696dd0 49%,#4c50bd 50% 83%,#3537a0 84%); color:#fff; border-color:#343c8b; box-shadow:inset 0 0 0 2px #aeb5ee55; }
+body.mobile-game #panel-dialog .rt-academy.rt-paged :is(.rt-chapter-toolbar>select,.rt-search) { background:var(--popup-deep); border-color:#70829d; color:#e5efff; }
+body.mobile-game #panel-dialog .rt-academy.rt-paged .rt-search input { background:transparent; border:0; box-shadow:none; color:#e5efff; }
+body.mobile-game #panel-dialog .rt-academy.rt-paged .rt-search button { background:#324764; color:#dbeaff; border-color:#6a80a0; }
+body.mobile-game #panel-dialog .rt-academy.rt-paged :is(.rt-chapter-caption,.rt-column-headings>span,.rt-pagination>span) { color:#cee2ff; }
+body.mobile-game #panel-dialog .rt-academy.rt-paged .rt-board { background:none; }
+body.mobile-game #panel-dialog .rt-academy.rt-paged .rt-node { background:#e7e8ec; color:#1a273b; border-color:#a5b5ce; box-shadow:0 2px #08121e,inset 0 0 0 1px #fff; }
+body.mobile-game #panel-dialog .rt-academy.rt-paged .rt-node-name { color:#1c293b; }
+body.mobile-game #panel-dialog .rt-academy.rt-paged .rt-node.rt-locked { background:#c7cdd8; border-color:#8d9db6; }
+body.mobile-game #panel-dialog .rt-academy.rt-paged .rt-node.rt-running { background:#d6f6fc; border-color:#34d8ff; }
+body.mobile-game #panel-dialog .rt-academy.rt-paged .rt-node.rt-complete { border-color:#ac77ee; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .rt-node-art { background:linear-gradient(#386295,#172e4a); border-color:#e8be54; color:#cfeaff; box-shadow:0 0 0 1px #101826,inset 0 0 0 1px #fff4; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .rt-node-art>i { background:#172f4e; color:#bce6ff; box-shadow:-1px -1px #73a6d299; }
+body.mobile-game #panel-dialog .rt-academy.rt-paged .rt-level-track { background:#0e1623; border-color:#344253; }
+body.mobile-game #panel-dialog .rt-academy.rt-paged .rt-pagination { background:var(--popup-deep); border-color:#546986; }
+body.mobile-game #panel-dialog .rt-academy.rt-paged .rt-pagination>button { background:linear-gradient(#598de0 49%,#3267b9 50%); border-color:#153357; color:#fff; box-shadow:inset 0 0 0 1px #96b8f166,0 2px #080e17; }
+body.mobile-game #game-dialog .research-requirement { background:var(--popup-inset); border-color:#72819a; box-shadow:none; }
+body.mobile-game #game-dialog .research-requirement.requirement-met { background:#173f48; border-color:#5ecdbd; }
+body.mobile-game #game-dialog .research-requirement-copy>strong { color:#fff; }
+body.mobile-game #game-dialog .research-requirement-copy>span { color:#b9cfe8; }
+body.mobile-game #game-dialog .research-requirement-copy>small { color:#ffa38d; }
+body.mobile-game #game-dialog .requirement-met .research-requirement-copy>small { color:#8fedb3; }
+body.mobile-game #panel-dialog .inventory-shell.inventory-paged { margin-inline:auto; }
+body.mobile-game #panel-dialog .inventory-paged .inventory-toolbar>select { background:var(--popup-inset); color:#fff; border-color:#8e9cb3; }
+body.mobile-game #panel-dialog :is(.loot-caption,.relic-slot strong,.relic-slot-name) { color:#f0f5ff; }
+body.mobile-game #panel-dialog :is(.loot-subtitle,.inventory-page-status,.inventory-page-status small) { color:#c0d3ec; }
+body.mobile-game #panel-dialog :is(.inventory-views,.inventory-pager) { border-color:#6f809a; }
+body.mobile-game #panel-dialog .loot-tile { box-shadow:0 0 0 1px #0d1524,inset 0 0 0 3px #0b152a,0 2px #152034; }
+body.mobile-game #game-dialog :is(.inventory-owned,.inventory-effect p,.inventory-use-footer>span) { color:#d2e3f9; }
+
+/* Combat keeps red attack and green gathering as meaningful action colours. */
+body.mobile-game #game-dialog.march-dialog .march-command-heading h2 { font-size:17px; }
+body.mobile-game #game-dialog.march-dialog .march-command-heading:before { width:43%; }
+body.mobile-game #game-dialog.march-dialog .march-layout { background:var(--popup-surface); }
+body.mobile-game #game-dialog.march-dialog .march-target { background:var(--popup-paper); border-color:#a6b5c7; box-shadow:inset 0 0 0 1px #fff8; color:#1c293e; }
+body.mobile-game #game-dialog.march-dialog .march-target h3 { font-family:'Segoe UI',system-ui,sans-serif; font-weight:800; color:#25334a; }
+body.mobile-game #game-dialog.march-dialog .march-coordinates { color:#52647e; }
+body.mobile-game #game-dialog.march-dialog .march-target-art { background:none; }
+body.mobile-game #game-dialog.march-dialog .march-target-stat { background:linear-gradient(#99d23d 50%,#6fae2d 51%); border-color:#4e722b; box-shadow:inset 0 1px #e5ffaa; }
+body.mobile-game #game-dialog.march-dialog .is-attack .march-target-stat { background:linear-gradient(#fd7053 50%,#e04736 51%); border-color:#982b30; box-shadow:inset 0 1px #ffb593; }
+body.mobile-game #game-dialog.march-dialog :is(.march-formation,.march-army) { background:var(--popup-inset); border-color:#142135; box-shadow:none; }
+body.mobile-game #game-dialog.march-dialog .march-unit-row { border-color:#5b71943b; }
+body.mobile-game #game-dialog.march-dialog :is(.march-unit-name small,.march-capacity,.march-summary span,.march-forecast,.march-toolbar h3,#march-available) { color:var(--popup-muted); }
+body.mobile-game #game-dialog.march-dialog :is(.march-unit-name strong,.march-summary strong,.march-capacity strong) { color:#fff; }
+body.mobile-game #game-dialog.march-dialog .march-row-max { background:linear-gradient(#ace04d 50%,#7bb730 51%); border-color:#3e6426; color:#152516; box-shadow:inset 0 1px #defc99,0 1px #0d1820; font-weight:800; }
+body.mobile-game #game-dialog.march-dialog .march-range { background:linear-gradient(to right,#41c8ff var(--fill,0%),#0c1727 var(--fill,0%)); border-color:#5177a7; }
+body.mobile-game #game-dialog.march-dialog .march-range::-webkit-slider-thumb { background:#a4de41; border-color:#294b20; box-shadow:inset 0 1px #e3ff99,0 1px #080f17; }
+body.mobile-game #game-dialog.march-dialog .march-footer { background:var(--popup-deep); border-color:#72839d; }
+body.mobile-game #game-dialog.march-dialog .march-footer .button { background:linear-gradient(var(--button-top) 49%,var(--button-mid) 50% 85%,var(--button-low) 86%); border-color:var(--button-rim); box-shadow:inset 0 0 0 2px #ffffb944,0 2px #09131f; }
+body.mobile-game #game-dialog.march-dialog .march-footer .march-presets .button.secondary,
+body.mobile-game #game-dialog.march-dialog .march-footer #march-confirm {
+  background:linear-gradient(var(--button-top) 49%,var(--button-mid) 50% 85%,var(--button-low) 86%); border-color:var(--button-rim); box-shadow:inset 0 0 0 2px #ffffff55,0 2px #09131f;
+}
+body.mobile-game #game-dialog.march-dialog .march-footer #march-confirm.march-gather { color:#172d17; text-shadow:0 1px #e5ff99; }
+body.mobile-game #game-dialog.march-dialog .march-target-stat :is(span,strong) { color:#20351b; text-shadow:0 1px #e3fbb855; }
+body.mobile-game #game-dialog.march-dialog .is-attack .march-target-stat :is(span,strong) { color:#411820; text-shadow:0 1px #ffc3a855; }
+body.mobile-game #game-dialog.march-dialog .march-rewards h4 { color:#38597b; }
+body.mobile-game #game-dialog.march-dialog .march-selected-card { border-color:#88d6ed; background:#101c2e; }
+
+/* Map target, search and coordinate cards use the same window materials. */
+body.mobile-game .map-overlay-shell .map-overlay-panel { background:#404d61; color:#eff5ff; border-color:#e7e8ec; box-shadow:0 0 0 1px #102039,0 6px 16px #09182a66; scrollbar-color:#93a8c4 #1b293b; }
+body.mobile-game .map-overlay-shell .map-overlay-heading { background:linear-gradient(100deg,#1b2b42 76%,#e7e8ec 76.5%); border-color:#111c2b; }
+body.mobile-game .map-overlay-shell .map-overlay-heading h2 { color:white; font:800 17px/1.2 'Segoe UI',system-ui,sans-serif!important; text-shadow:0 1px #091423; text-transform:uppercase; }
+body.mobile-game .map-overlay-shell :is(.map-overlay-close,.atlas-close) { color:#152237!important; background:#e7e8ec!important; border-color:transparent!important; box-shadow:none; }
+body.mobile-game .map-overlay-shell :is(.atlas-search input,.atlas-jump input) { background:#1b293b; color:#eff5ff; border-color:#788eae; box-shadow:inset 0 1px #0c1626; }
+body.mobile-game .map-overlay-shell .atlas-search input::placeholder { color:#b0c5e0; }
+body.mobile-game .map-overlay-shell .atlas-filters button { background:#c9cfdb; color:#344663; border-color:#8899b5; box-shadow:inset 0 1px #fff8; }
+body.mobile-game .map-overlay-shell .atlas-filters button[aria-pressed=true] { background:linear-gradient(#6c75ce 49%,#424bb5 50%); color:#fff; border-color:#a1b3ff; box-shadow:inset 0 1px #c9d6ff; }
+body.mobile-game .map-overlay-shell .atlas-nearby { border-color:#7186a34d; }
+body.mobile-game .map-overlay-shell .atlas-nearby-row { color:#f4f7ff; border-color:#7d95b133; background:transparent; }
+body.mobile-game .map-overlay-shell .atlas-nearby-row strong { color:#f4f7ff; }
+body.mobile-game .map-overlay-shell :is(.atlas-nearby-row small,.atlas-nearby-row em,.atlas-jump label,.map-overlay-state,.atlas-no-targets) { color:#c0d3ed; }
+body.mobile-game .map-overlay-shell .atlas-minimap { background:#253c5c!important; border-color:#96b6e2!important; }
+body.mobile-game .map-overlay-shell .atlas-zoom { background:#233b60; border-color:#96b6e2; box-shadow:inset 0 1px #b1ceff55; }
+body.mobile-game .map-overlay-shell :is(.atlas-zoom button,.atlas-zoom-value) { color:#fff; }
+body.mobile-game .map-overlay-shell :is(.atlas-jump button,.atlas-primary) { background:linear-gradient(#65a8f4 49%,#4587df 50% 85%,#2766bc 86%)!important; border-color:#173963!important; color:#fff!important; font-weight:800; box-shadow:inset 0 0 0 2px #c2e4ff55,0 2px #09131f; }
+body.mobile-game .map-overlay-shell .map-overlay-target-panel { background:#e7e8ec; }
+body.mobile-game .map-overlay-shell .atlas-detail { background:none; color:#283b57; }
+body.mobile-game .map-overlay-shell .atlas-target-heading h2 { font-family:'Segoe UI',system-ui,sans-serif!important; font-weight:800!important; color:#1b2b42; }
+body.mobile-game .map-overlay-shell :is(.atlas-target-heading small,.atlas-target-meta,.atlas-stat-pair span) { color:#4c6383; }
+body.mobile-game .map-overlay-shell .atlas-stat-pair strong { color:#233450; font-family:'Segoe UI',system-ui,sans-serif; font-weight:750; }
+body.mobile-game .map-overlay-shell .atlas-primary[data-kind="monsters"] { background:linear-gradient(#f86153 49%,#dc3b37 50% 85%,#a92331 86%)!important; border-color:#68202b!important; }
+body.mobile-game .map-overlay-shell .atlas-primary[data-kind="nodes"] { background:linear-gradient(#b4e552 49%,#81bf2e 50% 85%,#509422 86%)!important; border-color:#365e24!important; color:#183119!important; }
+@media(max-width:700px) {
+  body.mobile-game #panel-dialog #page-title { font-size:17px; }
+  body.mobile-game #panel-dialog .page-heading:before { width:calc(100% - 45px); }
+  body.mobile-game #game-dialog .popup-heading { min-height:43px; padding:7px 43px 7px 11px; }
+  body.mobile-game #game-dialog .popup-heading h2 { font-size:16px; }
+  body.mobile-game #game-dialog.has-popup-heading #dialog-content { padding:14px; }
+  body.mobile-game #game-dialog .dialog-close { top:4px; right:5px; width:31px; height:31px; font-size:32px; }
+  body.mobile-game #game-dialog.march-dialog .march-command-heading:before { width:calc(100% - 41px); }
+  body.mobile-game #game-dialog.march-dialog .march-command-heading h2 { font-size:15px; }
+}
+@media(max-height:540px) {
+  body.mobile-game #panel-dialog #page-title { font-size:16px; }
+  body.mobile-game #game-dialog .popup-heading { min-height:36px; padding-block:5px; }
+  body.mobile-game #game-dialog .popup-heading h2 { font-size:15px; }
+  body.mobile-game #game-dialog.march-dialog .march-command-heading:before { width:45%; }
+  body.mobile-game #game-dialog.march-dialog .march-command-heading h2 { font-size:14px; }
+  body.mobile-game #panel-dialog .profile-compact+.panel-pagination { margin-top:8px; }
+}

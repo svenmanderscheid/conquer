@@ -40,7 +40,20 @@ final class Bootstrap
 
         // 2. Configure PHP
         $env = $config['env'] ?? 'production';
-        ini_set('display_errors', $env === 'development' ? '1' : '0');
+        // Never disclose diagnostics to remote clients, even with a copied development config.
+        $showErrors = $env === 'development' && (PHP_SAPI === 'cli'
+            || in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1'], true));
+        ini_set('display_errors', $showErrors ? '1' : '0');
+        ini_set('session.use_strict_mode', '1');
+        ini_set('session.use_only_cookies', '1');
+        ini_set('session.cookie_httponly', '1');
+        ini_set('session.cookie_samesite', 'Lax');
+        $tls = !empty($_SERVER['HTTPS']) && strtolower((string)$_SERVER['HTTPS']) !== 'off';
+        ini_set('session.cookie_secure', $tls ? '1' : '0');
+        if (PHP_SAPI !== 'cli') {
+            header('Cache-Control: private, no-store');
+            if ($tls) header('Strict-Transport-Security: max-age=31536000');
+        }
         error_reporting(E_ALL);
         date_default_timezone_set('UTC');
 
@@ -59,7 +72,7 @@ final class Bootstrap
         Logger::init($logFile, $logLevel);
 
         // 5. Register error / exception handlers
-        self::registerHandlers($env);
+        self::registerHandlers($showErrors ? 'development' : 'production');
 
         // 6. Initialize DB connection (optional — site stays up without it)
         self::initDb($rootDir);
@@ -132,6 +145,10 @@ final class Bootstrap
 
             if (!headers_sent()) {
                 http_response_code(500);
+            }
+
+            if (str_contains((string)($_SERVER['REQUEST_URI'] ?? ''), '/api/')) {
+                \Conquer\Api\Response::error(500, 'INTERNAL_ERROR', 'Die Anfrage konnte nicht verarbeitet werden.');
             }
 
             if ($env === 'development') {

@@ -50,12 +50,16 @@ final class Response
      */
     private static function send(int $status, array $body): never
     {
+        $json=json_encode($body, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+        \Conquer\Security\ApiOperation::finish($status,$json);
         if (!headers_sent()) {
             http_response_code($status);
             header('Content-Type: application/json; charset=utf-8');
+            header('Cache-Control: private, no-store');
+            header('Expires: 0');
         }
 
-        echo json_encode($body, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+        echo $json;
         exit;
     }
 }

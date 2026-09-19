@@ -13,7 +13,7 @@ final class TroopData
     private function __construct() {}
 
     /**
-     * Returns all 15 troops indexed by code.
+     * Returns the supported T1–T10 troops indexed by code.
      *
      * @return array<int, array<string, mixed>>
      */
@@ -84,13 +84,41 @@ final class TroopData
     }
 
     /**
-     * Returns whether a troop is unlocked given the current barrack + academy level.
-     * Research unlock is not yet implemented (always treated as met for T1).
+     * Unlocks depend only on the troop's own school and the town center (castle).
      */
-    public static function isUnlocked(int $code, int $barrackLevel, int $academyLevel): bool
+    public static function isUnlocked(int $code, int $buildingLevel, int $castleLevel): bool
     {
         $t = self::get($code);
         if ($t === null) return false;
-        return $barrackLevel >= 1 && $academyLevel >= (int) $t['unlock_academy'];
+        return $buildingLevel >= (int)$t['unlock_building'] && $castleLevel >= (int)$t['unlock_castle'];
     }
+
+    public static function buildingFor(int $code): string
+    {
+        return [1=>'barrack', 2=>'archery_range', 3=>'stable'][(int)(self::get($code)['type'] ?? 1)];
+    }
+
+    public static function slotFor(int $code): int
+    {
+        return (int)(self::get($code)['type'] ?? 1);
+    }
+
+    /** Shared authoritative training read model for both city clients. */
+    public static function forCity(array $state, array $buffs, array $research, float $boost): array
+    {
+        $result=[];
+        $plotMultiplier=1+BuildingPlotService::trainingBonus((int)$state['city']['id']);
+        foreach(self::all() as $code=>$troop){
+            $building=self::buildingFor($code);
+            $level=(int)($state['buildings'][$building]['level'] ?? 0);
+            $troop['training_building']=$building;
+            $troop['barrack_slot']=self::slotFor($code);
+            $troop['unlocked']=self::isUnlocked($code,$level,(int)($state['buildings']['castle']['level']??0));
+            $troop['training']=\Conquer\Game\Research\ResearchEffects::training($code,$buffs,$boost*$plotMultiplier);
+            $result[]=$troop;
+        }
+        return $result;
+    }
+
+    public const PROMOTION_BUILDING_LEVEL = 13;
 }

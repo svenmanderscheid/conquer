@@ -401,7 +401,7 @@
             {
               "type": "research",
               "level": 2,
-              "code": "resource_protect"
+              "code": "production_resource_protect"
             }
           ]
         },
@@ -1497,7 +1497,7 @@
             {
               "type": "research",
               "level": 2,
-              "code": "resource_protect"
+              "code": "production_resource_protect"
             }
           ]
         },
@@ -2593,7 +2593,7 @@
             {
               "type": "research",
               "level": 2,
-              "code": "resource_protect"
+              "code": "production_resource_protect"
             }
           ]
         },
@@ -4201,7 +4201,7 @@
       ]
     },
     {
-      "code": "resource_protect",
+      "code": "production_resource_protect",
       "name": "Resource Protect",
       "row": "general",
       "category": "production",
@@ -4251,7 +4251,7 @@
             {
               "type": "research",
               "level": 1,
-              "code": "resource_protect"
+              "code": "production_resource_protect"
             }
           ]
         },
@@ -4274,7 +4274,7 @@
             {
               "type": "research",
               "level": 2,
-              "code": "resource_protect"
+              "code": "production_resource_protect"
             }
           ]
         },
@@ -4297,7 +4297,7 @@
             {
               "type": "research",
               "level": 3,
-              "code": "resource_protect"
+              "code": "production_resource_protect"
             }
           ]
         },
@@ -4320,11 +4320,12 @@
             {
               "type": "research",
               "level": 4,
-              "code": "resource_protect"
+              "code": "production_resource_protect"
             }
           ]
         }
-      ]
+      ],
+      "source_code": "resource_protect"
     },
     {
       "code": "research_speed",

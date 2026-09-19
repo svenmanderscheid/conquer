@@ -38,18 +38,11 @@ foreach ($queue as $entry) {
     }
 }
 
-// Gem cost for instant-build: 1 gem per minute remaining (min 1)
-$instantGemCost = 0;
-if ($queueEntry !== null) {
-    $secsLeft       = max(0, strtotime($queueEntry['finishes_at']) - time());
-    $instantGemCost = max(1, (int) ceil($secsLeft / 60));
-}
-
-
 $name     = CityState::BUILDING_NAMES[$buildingCode] ?? ucwords(str_replace('_', ' ', $buildingCode));
 $cost     = BuildingData::getCost($buildingCode, $nextLevel);
-$buildSec = BuildingData::getBuildTime($buildingCode, $nextLevel);
-$castleReqs = $buildingCode === 'castle' ? BuildingData::getCastleRequirements($nextLevel) : [];
+$buildSec = BuildingData::getBuildTime($buildingCode, $nextLevel, $state['vip']['bonuses'] ?? []);
+$itemRequirements = BuildingData::itemRequirements($buildingCode, $nextLevel, array_column(\Conquer\Game\Inventory\InventoryService::getInventory((int)$session['player_id']),'quantity','item_code'));
+$castleReqs = BuildingData::getUpgradeRequirements($buildingCode, $nextLevel);
 
 $fmt = static fn (int|string $n): string => number_format((int) $n, 0, '.', ',');
 
@@ -68,6 +61,8 @@ $canAfford =
     $city['lumber'] >= $cost['lumber'] &&
     $city['stone']  >= $cost['stone']  &&
     $city['gold']   >= $cost['gold'];
+
+foreach ($itemRequirements as $item) if (!$item['met']) $canAfford = false;
 
 // Check castle requirements are met
 $reqsMet = true;
@@ -127,20 +122,20 @@ $desc = $bldgDesc[$buildingCode] ?? 'Gebäude deiner Stadt.';
 function bldgBonuses(string $code, int $lv): array {
     if ($lv <= 0) return [];
     return match($code) {
-        'academy'          => [['Forschungsgeschwindigkeit', '+' . $lv . '.0%'],   ['Power', number_format($lv * 740)]],
-        'castle'           => [['Max. Gebäudelevel',         (string)$lv],          ['Power', number_format($lv * 2000)]],
-        'farm'             => [['Nahrungsproduktion',         number_format($lv * 500) . '/h'], ['Power', number_format($lv * 300)]],
-        'lumber_camp'      => [['Holzproduktion',             number_format($lv * 500) . '/h'], ['Power', number_format($lv * 300)]],
-        'quarry'           => [['Steinproduktion',            number_format($lv * 500) . '/h'], ['Power', number_format($lv * 300)]],
-        'gold_mine'        => [['Goldproduktion',             number_format($lv * 250) . '/h'], ['Power', number_format($lv * 400)]],
-        'storage'          => [['Lagerkapazität',             '+' . number_format($lv * 50000)],['Power', number_format($lv * 200)]],
-        'barrack'          => [['Trainingsslots',             (string)$lv],          ['Power', number_format($lv * 800)]],
-        'wall'             => [['Stadtverteidigung',          '+' . ($lv * 200)],    ['Power', number_format($lv * 600)]],
-        'hospital'         => [['Heilungskapazität',          number_format($lv * 1000)], ['Power', number_format($lv * 350)]],
-        'treasure_house'   => [['Ressourcenschutz',           number_format($lv * 10000)],['Power', number_format($lv * 250)]],
-        'trading_post'     => [['Handelslimit',               number_format($lv * 5000) . '/h'], ['Power', number_format($lv * 300)]],
-        'hall_of_alliance' => [['Allianzkapazität',           (string)($lv * 5)],    ['Power', number_format($lv * 500)]],
-        default            => [['Power', number_format($lv * 500)]],
+        'academy'          => [['Forschungsgeschwindigkeit', '+' . $lv . '.0%'],   ['Power', number_format(BuildingData::getTotalPower($code, $lv))]],
+        'castle'           => [['Max. Gebäudelevel',         (string)$lv],          ['Power', number_format(BuildingData::getTotalPower($code, $lv))]],
+        'farm'             => [['Nahrungsproduktion',         number_format($lv * 500) . '/h'], ['Power', number_format(BuildingData::getTotalPower($code, $lv))]],
+        'lumber_camp'      => [['Holzproduktion',             number_format($lv * 500) . '/h'], ['Power', number_format(BuildingData::getTotalPower($code, $lv))]],
+        'quarry'           => [['Steinproduktion',            number_format($lv * 500) . '/h'], ['Power', number_format(BuildingData::getTotalPower($code, $lv))]],
+        'gold_mine'        => [['Goldproduktion',             number_format($lv * 250) . '/h'], ['Power', number_format(BuildingData::getTotalPower($code, $lv))]],
+        'storage'          => [['Lagerkapazität',             '+' . number_format($lv * 50000)],['Power', number_format(BuildingData::getTotalPower($code, $lv))]],
+        'barrack'          => [['Trainingsslots',             (string)$lv],          ['Power', number_format(BuildingData::getTotalPower($code, $lv))]],
+        'wall'             => [['Stadtverteidigung',          '+' . ($lv * 200)],    ['Power', number_format(BuildingData::getTotalPower($code, $lv))]],
+        'hospital'         => [['Heilungskapazität',          number_format($lv * 1000)], ['Power', number_format(BuildingData::getTotalPower($code, $lv))]],
+        'treasure_house'   => [['Ressourcenschutz',           number_format($lv * 10000)],['Power', number_format(BuildingData::getTotalPower($code, $lv))]],
+        'trading_post'     => [['Handelslimit',               number_format($lv * 5000) . '/h'], ['Power', number_format(BuildingData::getTotalPower($code, $lv))]],
+        'hall_of_alliance' => [['Allianzkapazität',           (string)($lv * 5)],    ['Power', number_format(BuildingData::getTotalPower($code, $lv))]],
+        default            => [['Power', number_format(BuildingData::getTotalPower($code, $lv))]],
     };
 }
 
@@ -160,6 +155,8 @@ $resRows = [
     ['emoji' => '🪨', 'name' => 'Stein',    'have' => (int)$city['stone'],  'need' => (int)$cost['stone']],
     ['emoji' => '💰', 'name' => 'Gold',     'have' => (int)$city['gold'],   'need' => (int)$cost['gold']],
 ];
+
+foreach ($itemRequirements as $item) $resRows[] = ['emoji'=>'◆','name'=>$item['name'],'have'=>$item['owned'],'need'=>$item['count']];
 
 // Seconds remaining in queue
 $secsLeft = 0;
@@ -188,6 +185,7 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conquer — <?= htmlspecialchars($name) ?></title>
+    <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR.'/assets/css/fantasy-fonts.css') ?>">
 <?php endif ?>
 <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1292,6 +1290,7 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
         }
     </style>
 <?php if (!$isModal): ?>
+<link rel="stylesheet" href="<?= htmlspecialchars(APP_BASE, ENT_QUOTES) ?>/assets/css/village-theme.css?v=<?= filemtime(__DIR__ . "/../assets/css/village-theme.css") ?>">
 </head>
 <body>
 <?php $hudCurrentView = 'city'; require __DIR__ . '/partials/hud.php'; ?>
@@ -1468,18 +1467,6 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
 
                 <!-- ── Bottom action bar ── -->
                 <div class="action-bar">
-                    <button
-                        id="btn-instant"
-                        class="action-btn btn-instant"
-                        <?= $queueEntry === null ? 'disabled' : '' ?>
-                        data-queue-id="<?= $queueEntry !== null ? (int)$queueEntry['id'] : '' ?>"
-                        data-gem-cost="<?= $instantGemCost ?>"
-                    >
-                        <span class="action-btn-top">
-                            💎 <?= $queueEntry !== null ? number_format($instantGemCost) : '—' ?> Gems
-                        </span>
-                        <span class="action-btn-label">SOFORT UPGRADEN</span>
-                    </button>
 
                     <?php
                     // Upgrade button: disabled if in queue, can't afford, or reqs not met
@@ -1511,10 +1498,9 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
 
                 <!-- ── Tab pane: truppen (barrack only) ── -->
                 <?php if ($buildingCode === 'barrack'):
-                    $academyLevel = (int) ($buildings['academy']['level'] ?? 1);
-                    $barrackLevel = (int) ($buildings['barrack']['level'] ?? 1);
+                    $castleLevel = (int) ($buildings['castle']['level'] ?? 0);
                     $allTroops    = TroopData::all();
-                    $troopsData   = array_values(array_map(function($t) use ($barrackLevel, $academyLevel, $troops) {
+                    $troopsData   = array_values(array_map(function($t) use ($buildings, $castleLevel, $troops) {
                         return [
                             'code'          => (int)$t['code'],
                             'name'          => $t['name'],
@@ -1529,8 +1515,9 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
                             'need_stone'    => (int)$t['need_stone'],
                             'need_gold'     => (int)$t['need_gold'],
                             'time'          => (int)$t['time'],
-                            'unlock_academy'=> (int)$t['unlock_academy'],
-                            'unlocked'      => TroopData::isUnlocked((int)$t['code'], $barrackLevel, $academyLevel),
+                            'unlock_building'=> (int)$t['unlock_building'],
+                            'unlock_castle' => (int)$t['unlock_castle'],
+                            'unlocked'      => TroopData::isUnlocked((int)$t['code'], (int)($buildings[TroopData::buildingFor((int)$t['code'])]['level']??0), $castleLevel),
                             'in_city'       => (int)($troops[(int)$t['code']] ?? 0),
                         ];
                     }, $allTroops));
@@ -1902,7 +1889,7 @@ if (btnUpgrade) {
                     'Content-Type': 'application/json',
                     'X-CSRF-Token': CSRF,
                 },
-                body: JSON.stringify({ building_code: btnUpgrade.dataset.code }),
+                body: JSON.stringify({ building_code: btnUpgrade.dataset.code, expected_level: <?= $currentLevel ?> }),
             });
             const json = await res.json();
 
@@ -1955,41 +1942,6 @@ if (cdEl) {
 // ---------------------------------------------------------------------------
 // Instant build button
 // ---------------------------------------------------------------------------
-const btnInstant = document.getElementById('btn-instant');
-if (btnInstant) {
-    btnInstant.addEventListener('click', async () => {
-        const queueId = btnInstant.dataset.queueId;
-        const cost    = parseInt(btnInstant.dataset.gemCost, 10);
-
-        if (!confirm('💎 ' + cost.toLocaleString() + ' Gems verwenden um sofort fertig zu bauen?')) return;
-
-        btnInstant.disabled = true;
-        const lbl = btnInstant.querySelector('.action-btn-label');
-        if (lbl) lbl.textContent = '…';
-
-        try {
-            const res  = await fetch('/api/city/instant-build/' + queueId, {
-                method: 'POST',
-                headers: { 'X-CSRF-Token': CSRF },
-            });
-            const json = await res.json();
-
-            if (json.ok) {
-                showToast('💎 Sofort fertiggestellt! ' + json.data.gems_spent + ' Gems verwendet.', 'ok');
-                setTimeout(() => window.location.reload(), 900);
-            } else {
-                showToast(json.error?.message ?? json.error ?? 'Fehler', 'err');
-                btnInstant.disabled = false;
-                if (lbl) lbl.textContent = 'SOFORT UPGRADEN';
-            }
-        } catch (e) {
-            showToast('Netzwerkfehler', 'err');
-            btnInstant.disabled = false;
-            if (lbl) lbl.textContent = 'SOFORT UPGRADEN';
-        }
-    });
-}
-
 // ---------------------------------------------------------------------------
 // Barrack LoK-style UI
 // ---------------------------------------------------------------------------
@@ -2106,7 +2058,7 @@ if (btnInstant) {
             trainBtn.dataset.name = t.name;
             if (!t.unlocked) {
                 trainBtn.disabled = true;
-                trainBtn.textContent = '🔒 Academy Lv.' + t.unlock_academy;
+                trainBtn.textContent = '🔒 Ausbildungsgebäude ' + t.unlock_building + ' / Stadtzentrum ' + t.unlock_castle;
             } else {
                 trainBtn.disabled = false;
                 trainBtn.textContent = 'AUSBILDEN';

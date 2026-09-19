@@ -1,0 +1,405 @@
+[
+  {
+    "code": 60100001,
+    "max_level": 10,
+    "fragments_per_level": 10,
+    "stats": [
+      {
+        "type": "food_production",
+        "base_value": 2.0,
+        "per_level": 0.5
+      }
+    ]
+  },
+  {
+    "code": 60100002,
+    "max_level": 10,
+    "fragments_per_level": 10,
+    "stats": [
+      {
+        "type": "lumber_production",
+        "base_value": 2.0,
+        "per_level": 0.5
+      }
+    ]
+  },
+  {
+    "code": 60100003,
+    "max_level": 10,
+    "fragments_per_level": 10,
+    "stats": [
+      {
+        "type": "stone_production",
+        "base_value": 2.0,
+        "per_level": 0.5
+      }
+    ]
+  },
+  {
+    "code": 60100004,
+    "max_level": 10,
+    "fragments_per_level": 10,
+    "stats": [
+      {
+        "type": "gold_production",
+        "base_value": 2.0,
+        "per_level": 0.5
+      }
+    ]
+  },
+  {
+    "code": 60100005,
+    "max_level": 10,
+    "fragments_per_level": 10,
+    "stats": [
+      {
+        "type": "infantry_defense",
+        "base_value": 1.5,
+        "per_level": 0.4
+      }
+    ]
+  },
+  {
+    "code": 60100006,
+    "max_level": 10,
+    "fragments_per_level": 10,
+    "stats": [
+      {
+        "type": "ranged_attack",
+        "base_value": 1.5,
+        "per_level": 0.4
+      }
+    ]
+  },
+  {
+    "code": 60200001,
+    "max_level": 10,
+    "fragments_per_level": 20,
+    "stats": [
+      {
+        "type": "infantry_defense",
+        "base_value": 3.0,
+        "per_level": 0.8
+      },
+      {
+        "type": "all_hp",
+        "base_value": 1.0,
+        "per_level": 0.3
+      }
+    ]
+  },
+  {
+    "code": 60200002,
+    "max_level": 10,
+    "fragments_per_level": 20,
+    "stats": [
+      {
+        "type": "ranged_attack",
+        "base_value": 3.0,
+        "per_level": 0.8
+      },
+      {
+        "type": "march_speed",
+        "base_value": 1.0,
+        "per_level": 0.3
+      }
+    ]
+  },
+  {
+    "code": 60200003,
+    "max_level": 10,
+    "fragments_per_level": 20,
+    "stats": [
+      {
+        "type": "cavalry_attack",
+        "base_value": 3.0,
+        "per_level": 0.8
+      },
+      {
+        "type": "march_speed",
+        "base_value": 2.0,
+        "per_level": 0.5
+      }
+    ]
+  },
+  {
+    "code": 60200004,
+    "max_level": 10,
+    "fragments_per_level": 20,
+    "stats": [
+      {
+        "type": "construction_speed",
+        "base_value": 4.0,
+        "per_level": 1.0
+      }
+    ]
+  },
+  {
+    "code": 60200005,
+    "max_level": 10,
+    "fragments_per_level": 20,
+    "stats": [
+      {
+        "type": "research_speed",
+        "base_value": 4.0,
+        "per_level": 1.0
+      }
+    ]
+  },
+  {
+    "code": 60200006,
+    "max_level": 10,
+    "fragments_per_level": 20,
+    "stats": [
+      {
+        "type": "training_speed",
+        "base_value": 4.0,
+        "per_level": 1.0
+      }
+    ]
+  },
+  {
+    "code": 60300001,
+    "max_level": 10,
+    "fragments_per_level": 40,
+    "stats": [
+      {
+        "type": "all_defense",
+        "base_value": 5.0,
+        "per_level": 1.2
+      },
+      {
+        "type": "infantry_hp",
+        "base_value": 3.0,
+        "per_level": 0.8
+      }
+    ]
+  },
+  {
+    "code": 60300002,
+    "max_level": 10,
+    "fragments_per_level": 40,
+    "stats": [
+      {
+        "type": "ranged_attack",
+        "base_value": 5.0,
+        "per_level": 1.2
+      },
+      {
+        "type": "vs_monster_attack",
+        "base_value": 3.0,
+        "per_level": 0.8
+      }
+    ]
+  },
+  {
+    "code": 60300003,
+    "max_level": 10,
+    "fragments_per_level": 40,
+    "stats": [
+      {
+        "type": "all_attack",
+        "base_value": 4.0,
+        "per_level": 1.0
+      },
+      {
+        "type": "march_speed",
+        "base_value": 3.0,
+        "per_level": 0.8
+      }
+    ]
+  },
+  {
+    "code": 60300004,
+    "max_level": 10,
+    "fragments_per_level": 40,
+    "stats": [
+      {
+        "type": "research_speed",
+        "base_value": 6.0,
+        "per_level": 1.5
+      },
+      {
+        "type": "construction_speed",
+        "base_value": 2.0,
+        "per_level": 0.5
+      }
+    ]
+  },
+  {
+    "code": 60300005,
+    "max_level": 10,
+    "fragments_per_level": 40,
+    "stats": [
+      {
+        "type": "march_capacity",
+        "base_value": 500,
+        "per_level": 200
+      },
+      {
+        "type": "all_attack",
+        "base_value": 2.0,
+        "per_level": 0.5
+      }
+    ]
+  },
+  {
+    "code": 60300006,
+    "max_level": 10,
+    "fragments_per_level": 40,
+    "stats": [
+      {
+        "type": "food_production",
+        "base_value": 6.0,
+        "per_level": 1.5
+      },
+      {
+        "type": "gathering_speed",
+        "base_value": 4.0,
+        "per_level": 1.0
+      }
+    ]
+  },
+  {
+    "code": 60400001,
+    "max_level": 10,
+    "fragments_per_level": 80,
+    "stats": [
+      {
+        "type": "all_attack",
+        "base_value": 8.0,
+        "per_level": 2.0
+      },
+      {
+        "type": "all_defense",
+        "base_value": 5.0,
+        "per_level": 1.5
+      },
+      {
+        "type": "infantry_hp",
+        "base_value": 4.0,
+        "per_level": 1.0
+      }
+    ]
+  },
+  {
+    "code": 60400002,
+    "max_level": 10,
+    "fragments_per_level": 80,
+    "stats": [
+      {
+        "type": "march_speed",
+        "base_value": 8.0,
+        "per_level": 2.0
+      },
+      {
+        "type": "march_capacity",
+        "base_value": 1000,
+        "per_level": 300
+      },
+      {
+        "type": "gathering_speed",
+        "base_value": 6.0,
+        "per_level": 1.5
+      }
+    ]
+  },
+  {
+    "code": 60400003,
+    "max_level": 10,
+    "fragments_per_level": 80,
+    "stats": [
+      {
+        "type": "research_speed",
+        "base_value": 10.0,
+        "per_level": 2.5
+      },
+      {
+        "type": "construction_speed",
+        "base_value": 6.0,
+        "per_level": 1.5
+      },
+      {
+        "type": "training_speed",
+        "base_value": 4.0,
+        "per_level": 1.0
+      }
+    ]
+  },
+  {
+    "code": 60400004,
+    "max_level": 10,
+    "fragments_per_level": 80,
+    "stats": [
+      {
+        "type": "all_attack",
+        "base_value": 10.0,
+        "per_level": 2.5
+      },
+      {
+        "type": "vs_monster_attack",
+        "base_value": 8.0,
+        "per_level": 2.0
+      },
+      {
+        "type": "all_hp",
+        "base_value": 5.0,
+        "per_level": 1.5
+      }
+    ]
+  },
+  {
+    "code": 60500001,
+    "max_level": 10,
+    "fragments_per_level": 150,
+    "stats": [
+      {
+        "type": "all_attack",
+        "base_value": 15.0,
+        "per_level": 3.0
+      },
+      {
+        "type": "all_defense",
+        "base_value": 10.0,
+        "per_level": 2.5
+      },
+      {
+        "type": "all_hp",
+        "base_value": 8.0,
+        "per_level": 2.0
+      },
+      {
+        "type": "march_capacity",
+        "base_value": 2000,
+        "per_level": 500
+      }
+    ]
+  },
+  {
+    "code": 60500002,
+    "max_level": 10,
+    "fragments_per_level": 150,
+    "stats": [
+      {
+        "type": "resource_protection",
+        "base_value": 20.0,
+        "per_level": 3.0
+      },
+      {
+        "type": "food_production",
+        "base_value": 10.0,
+        "per_level": 2.0
+      },
+      {
+        "type": "lumber_production",
+        "base_value": 10.0,
+        "per_level": 2.0
+      },
+      {
+        "type": "hospital_capacity",
+        "base_value": 2000,
+        "per_level": 500
+      }
+    ]
+  }
+]

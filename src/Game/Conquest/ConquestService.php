@@ -6,7 +6,7 @@ namespace Conquer\Game\Conquest;
 use Conquer\Db\Connection;
 
 /**
- * Conquest Event system — stub implementation.
+ * Conquest queries and contribution ledger. EventService owns scheduling, phases and held-time scoring.
  *
  * Conquest events are scheduled world-wide competitions where alliances
  * race to capture and hold shrines for points. Events progress through
@@ -21,8 +21,7 @@ use Conquer\Db\Connection;
  *   conquest_events        — one record per event, tracks phase + state
  *   conquest_contributions — per-player point accumulation within an event
  *
- * This is a stub: the tables exist and the read/write paths are implemented,
- * but automated event transitions and full scoring logic are Sprint 5 work.
+ * EventService persists automatic transitions, score cursors and final result snapshots.
  */
 final class ConquestService
 {
@@ -102,10 +101,10 @@ final class ConquestService
                  a.name          AS alliance_name,
                  a.tag           AS alliance_tag,
                  SUM(cc.points)  AS total_points
-             FROM   conquest_contributions cc
+             FROM   conquest_score_ticks cc
              JOIN   alliances              a  ON a.id = cc.alliance_id
              WHERE  cc.event_id = ?
-             GROUP  BY cc.alliance_id
+             GROUP  BY cc.alliance_id,a.name,a.tag
              ORDER  BY total_points DESC
              LIMIT  " . self::LEADERBOARD_LIMIT,
             [$eventId],

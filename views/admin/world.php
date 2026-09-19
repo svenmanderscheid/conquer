@@ -1,52 +1,18 @@
 <?php
 declare(strict_types=1);
-
-/**
- * Admin World — Stub (Sprint 5+)
- */
-
-use Conquer\Db\Connection;
-
-$worldInfo = null;
-try {
-    $db = Connection::getInstance();
-    $worldInfo = $db->query(
-        "SELECT id, name, max_players, speed, created_at FROM worlds LIMIT 1"
-    )->fetch() ?: null;
-} catch (\Throwable) {}
+$state=\Conquer\Game\World\WorldSettings::get($selectedWorld);$cfg=$state['settings'];
+$runs=$db->query('SELECT * FROM world_spawn_runs WHERE world_id=? ORDER BY id DESC LIMIT 20',[$selectedWorld])->fetchAll();
+$recipientCount=(int)$db->query('SELECT COUNT(*) FROM cities c JOIN players p ON p.id=c.player_id WHERE c.world_id=? AND p.is_banned=0',[$selectedWorld])->fetchColumn();
 ?>
-
-<div class="admin-card">
-  <div class="admin-card-header">Weltverwaltung</div>
-  <div class="admin-card-body">
-    <?php if ($worldInfo !== null): ?>
-      <table class="admin-table" style="max-width:500px;">
-        <tr>
-          <td style="color:#64748b;padding:8px 12px;font-size:0.8rem;width:140px;">Welt-ID</td>
-          <td style="padding:8px 12px;font-size:0.82rem;"><?= (int) $worldInfo['id'] ?></td>
-        </tr>
-        <tr>
-          <td style="color:#64748b;padding:8px 12px;font-size:0.8rem;">Name</td>
-          <td style="padding:8px 12px;font-size:0.82rem;"><?= htmlspecialchars($worldInfo['name'] ?? '') ?></td>
-        </tr>
-        <tr>
-          <td style="color:#64748b;padding:8px 12px;font-size:0.8rem;">Max. Spieler</td>
-          <td style="padding:8px 12px;font-size:0.82rem;"><?= number_format((int) $worldInfo['max_players']) ?></td>
-        </tr>
-        <tr>
-          <td style="color:#64748b;padding:8px 12px;font-size:0.8rem;">Geschwindigkeit</td>
-          <td style="padding:8px 12px;font-size:0.82rem;"><?= htmlspecialchars($worldInfo['speed'] ?? '1.0') ?>&times;</td>
-        </tr>
-        <tr>
-          <td style="color:#64748b;padding:8px 12px;font-size:0.8rem;">Erstellt am</td>
-          <td style="padding:8px 12px;font-size:0.82rem;"><?= htmlspecialchars($worldInfo['created_at'] ?? '') ?></td>
-        </tr>
-      </table>
-    <?php else: ?>
-      <p style="color:#64748b;font-size:0.85rem;">Keine Welt gefunden.</p>
-    <?php endif ?>
-    <p style="color:#475569;font-size:0.78rem;margin-top:16px;">
-      Erweiterte Weltverwaltung (Spawns, Events, Karten-Reset) wird in einem sp&auml;teren Sprint implementiert.
-    </p>
-  </div>
-</div>
+<section class="card"><div class="split"><div><h2><?= ah($world['name']) ?></h2><p>Welt #<?= $selectedWorld ?> · <?= (int)$world['map_size'] ?> × <?= (int)$world['map_size'] ?> Kartenfelder</p></div><span class="pill <?= ah($world['status']) ?>"><?= ah($world['status']) ?></span></div>
+<?php adminForm('world-save',$selectedWorld); ?>
+<div class="fields"><label>Weltname<input name="name" value="<?= ah($world['name']) ?>" required minlength="2" maxlength="50"></label><label>Weltstatus<select name="status"><?php foreach(['open'=>'Offen','running'=>'Laufend','paused'=>'Pausiert','closed'=>'Geschlossen'] as $key=>$label): ?><option value="<?= $key ?>" <?= $world['status']===$key?'selected':'' ?>><?= $label ?></option><?php endforeach ?></select></label><?php foreach(['speed_factor'=>'Geschwindigkeitsfaktor','gather_factor'=>'Sammelfaktor','haul_factor'=>'Transportfaktor'] as $key=>$label)adminNumber($label,$key,$world[$key],.1,20,'.1'); ?></div>
+<hr><h2>Spawnzeitplan</h2><label class="check"><input type="checkbox" name="settings[enabled]" value="1" <?= $cfg['enabled']?'checked':'' ?>> Automatische Spawns aktivieren</label><div class="fields"><?php adminNumber('Intervall in Minuten','settings[interval_minutes]',$cfg['interval_minutes'],1,10080);adminNumber('Maximale Spawnversuche pro Lauf','settings[batch_limit]',$cfg['batch_limit'],1,500); ?><label>Zeitfenster ab (UTC)<input type="time" name="settings[window_start]" value="<?= ah($cfg['window_start']) ?>" required></label><label>Zeitfenster bis (UTC)<input type="time" name="settings[window_end]" value="<?= ah($cfg['window_end']) ?>" required></label></div><div class="hint">Gleiche Start- und Endzeit bedeutet ganztägig. Fenster über Mitternacht sind möglich. Pausierte oder geschlossene Welten erzeugen keine neuen Objekte. Der nächste Worker-Lauf nach dem Speichern übernimmt die Regeln.</div>
+<h3 class="section-title">ALLIANZGEBIETE</h3><div class="fields"><?php adminNumber('Radius Allianzzentrum (Felder)','settings[alliance_center_radius]',$cfg['alliance_center_radius'],4,40);adminNumber('Radius Außenposten (Felder)','settings[alliance_outpost_radius]',$cfg['alliance_outpost_radius'],2,24); ?></div><div class="hint">Der Radius wird vom Mittelpunkt des Gebäudes gemessen und gilt sofort für alle bestehenden Allianzgebäude dieser Welt.</div>
+<h3 class="section-title">DICHTE, CHANCE & OBERGRENZEN</h3><div class="hint"><strong>Zieldichte</strong> = Anzahl gewünschter Objekte je 100 Kartenfelder (keine belegte Fläche). <strong>Spawnchance</strong> = Erfolgswahrscheinlichkeit je freiem Spawnplatz pro Lauf. <strong>Verteilung</strong> = Anteile der Typen unter neu erzeugten Objekten; jede Gruppe muss 100 % ergeben. Dichte und Chance sind unabhängig. Obergrenzen, Platzierungsregeln und das gemeinsame Laufbudget begrenzen das Ergebnis.</div>
+<div class="hint">Die Monsterstufe folgt der <a href="<?= APP_BASE ?>/admin/lands?world_id=<?= $selectedWorld ?>">Landentwicklung</a>. Die unten gespeicherte minimale und maximale Monsterstufe gilt nur ohne Landentwicklung. Der Verteilungseintrag „Rallybosse“ erzeugt Dämmerhorn sowie Grumwald, Frostgrimm, Sandmaul oder Glutramm. Drachen und Magdar sind noch nicht aktiv; ihre alten Verteilungsanteile werden beim Spawnen ausgelassen.</div>
+<div class="grid"><?php foreach(['resource'=>'Rohstoffvorkommen / Minen','monster'=>'Monster'] as $kind=>$label): ?><section><h3><?= $label ?></h3><div class="fields"><?php adminNumber('Zieldichte (%)','settings['.$kind.'_density_pct]',$cfg[$kind.'_density_pct'],0,100,'.001');adminNumber('Spawnchance (%)','settings['.$kind.'_chance_pct]',$cfg[$kind.'_chance_pct'],0,100,'.001');adminNumber('Maximal gleichzeitig','settings['.$kind.'_limit]',$cfg[$kind.'_limit'],0,25000);adminNumber('Lebensdauer neuer Objekte (Stunden)','settings['.$kind.'_lifetime_hours]',$cfg[$kind.'_lifetime_hours'],1,720);adminNumber('Minimale Stufe','settings['.$kind.'_level_min]',$cfg[$kind.'_level_min'],$kind==='resource'?1:0,$kind==='resource'?10:20);adminNumber('Maximale Stufe','settings['.$kind.'_level_max]',$cfg[$kind.'_level_max'],$kind==='resource'?1:0,$kind==='resource'?10:20); ?></div><h3 class="section-title">TYPVERTEILUNG · SUMME 100 %</h3><div class="fields"><?php foreach($cfg[$kind.'_weights'] as $type=>$weight)adminNumber((['food'=>'Nahrung','lumber'=>'Holz','stone'=>'Stein','gold'=>'Gold','gems'=>'Edelsteine','dragon'=>'Drachen · noch nicht aktiv','Magdar'=>'Magdar · noch nicht aktiv','Deathkar'=>'Rallybosse'][$type]??$type).' (%)','settings['.$kind.'_weights]['.$type.']',$weight,0,100); ?></div></section><?php endforeach ?></div>
+<p class="subtle">Bereits vorhandene Objekte behalten ihren Ablaufzeitpunkt. Niedrigere Zielwerte löschen keine lebenden Objekte. Ziele mit laufenden Märschen oder Koalitionsangriffen bleiben bis zur Rückkehr erhalten. Gibt es einen Monstertyp nicht im Stufenbereich, wird dieser Versuch übersprungen. Konfigurierte Welten verwenden ausschließlich diesen Spawnplan.</p>
+<?php adminSubmit('Welteinstellungen speichern'); ?></section>
+<?php if(class_exists(\Conquer\Game\Conquest\EventService::class)): $events=\Conquer\Game\Conquest\EventService::settings($selectedWorld); ?><section class="card"><h2>Schrein-Events & Weltinvasionen</h2><p>Freischaltungen und wiederkehrende Eventtermine für diese Welt.</p><?php adminForm('world-events',$selectedWorld); ?><div class="fields"><label class="check"><input type="checkbox" name="enabled" value="1" <?= !empty($events['enabled'])?'checked':'' ?>> Conquest-Events aktivieren</label><label class="check"><input type="checkbox" name="invasion_enabled" value="1" <?= !empty($events['invasion_enabled'])?'checked':'' ?>> Weltinvasionen aktivieren</label><label>Nächstes Conquest-Event (UTC)<input type="datetime-local" name="next_start" value="<?= ah(str_replace(' ','T',substr($events['next_start']??gmdate('Y-m-d H:i:s',time()+86400),0,16))) ?>" required></label><label>Nächste Invasion (UTC)<input type="datetime-local" name="invasion_next_start" value="<?= ah(str_replace(' ','T',substr($events['invasion_next_start']??gmdate('Y-m-d H:i:s',time()+86400),0,16))) ?>" required></label><?php adminNumber('Conquest-Intervall (Stunden)','interval_hours',$events['interval_hours']??336,1,8760);adminNumber('Conquest-Dauer (Stunden)','duration_hours',$events['duration_hours']??168,1,8760);adminNumber('Invasionsintervall (Stunden)','invasion_interval_hours',$events['invasion_interval_hours']??72,1,8760); ?></div><?php adminSubmit('Eventzeitplan speichern'); ?></section><?php endif ?>
+<div class="grid"><section class="card"><h2>Geschenk an die gesamte Welt</h2><p><?= an($recipientCount) ?> nicht gesperrte Spieler erhalten die gleichen Belohnungen direkt auf ihr Konto.</p><?php $giftPlayerId=0;require ROOT_DIR.'/views/admin/gift_form.php'; ?></section><section class="card"><h2>Neue Welt anlegen</h2><p>Eine neue Welt startet pausiert und erhält einen eigenen Spawnplan.</p><?php adminForm('world-create',0); ?><div class="fields"><label>Weltname<input name="name" required minlength="2" maxlength="50" placeholder="z. B. Morgenrot"></label><label>Eindeutiges Kürzel<input name="slug" required minlength="2" maxlength="20" pattern="[a-z0-9][a-z0-9-]{1,19}" placeholder="morgenrot"></label><?php echo '<label>Kartengröße<input value="256 × 256 Felder" readonly><input type="hidden" name="map_size" value="256"></label>';  ?></div><input type="hidden" name="status" value="paused"><input type="hidden" name="settings[enabled]" value="1"><?php adminSubmit('Welt erstellen'); ?></section></div><section class="card" style="margin-top:20px"><h2>Spawnprotokoll</h2><p>Nächster Termin: <?= ah($state['next_run_at']??'Erster Worker-Lauf') ?> UTC · Letzter Lauf: <?= ah($state['last_run_at']??'Noch keiner') ?></p><?php require ROOT_DIR.'/views/admin/spawn_runs.php'; ?></section>

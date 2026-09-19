@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Schatztruhe silver">
+<title>Schatztruhe silver</title>
+<!-- Original code-native storybook item illustration. Value, quantity and rarity are rendered by the game UI. -->
+<g stroke="#493b33" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+<path d="M18 51 34 29H96L112 47V102L98 116H18Z" fill="#265374" />
+<path d="M18 51C18 31 30 17 50 17H87C99 17 112 31 112 47L98 61H18Z" fill="#377da8" />
+<path d="M18 61H98V116H18Z" fill="#377da8" />
+<path d="M98 61 112 47V102L98 116Z" fill="#265374" />
+<path d="M32 24C40 18 47 17 54 17L53 61H40V27ZM77 17H87C95 19 99 25 103 33L94 43 91 31 89 61H77ZM18 57H98V70H18ZM17 102H98V116H17Z" fill="#b6ccd7" />
+<path d="M29 69H42V103H29ZM77 69H90V103H77Z" fill="#b6ccd7" />
+<path d="M47 55H70V83H47Z" fill="#b6ccd7" />
+<path d="M53 62H64V73H53Z" fill="#438fe4" />
+<path d="M22 62H43M73 62H93M22 108H94" fill="none" stroke="#f2faf7" stroke-width="3"/>
+<path d="M45 26V48M81 24V48" fill="none" stroke="#f2faf7" stroke-width="3"/>
+<circle cx="35" cy="89" r="3" fill="#67869b" stroke="none"/>
+<circle cx="84" cy="90" r="3" fill="#67869b" stroke="none"/>
+</g>
+</svg>

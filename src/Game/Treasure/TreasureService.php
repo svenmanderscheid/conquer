@@ -1,325 +1,241 @@
 <?php
 declare(strict_types=1);
-
 namespace Conquer\Game\Treasure;
 
 use Conquer\Db\Connection;
+use Conquer\Game\City\ResourceTick;
+use Conquer\Game\World\WorldContext;
 
-/**
- * All business logic around player treasures.
- *
- * DB tables used:
- *   player_treasures (player_id, treasure_code, fragments, equipped_slot)
- */
+/** Account-wide collection and world-specific, atomically replaced equipment. */
 final class TreasureService
 {
-    // Static-only helper — no instantiation.
-    private function __construct() {}
+    public const SLOT_UNLOCK_LEVELS = [1,1,5,10,20,25];
+    // Each catalog key has a real consumer through BuffEngine. Values below are
+    // percentages, except the two capacities, which are flat troop counts.
+    public const ACTIVE_STATS = ['all_attack','all_defense','all_hp','cavalry_attack','construction_speed',
+        'food_production','gathering_speed','gold_production','infantry_defense','infantry_hp','lumber_production',
+        'march_speed','ranged_attack','research_speed','stone_production','training_speed','vs_monster_attack',
+        'march_capacity','hospital_capacity','resource_protection'];
 
-    // -------------------------------------------------------------------------
-    // Read
-    // -------------------------------------------------------------------------
-
-    /**
-     * Returns all treasures the player has fragments for, enriched with
-     * static data and computed level/unlock state.
-     *
-     * @return list<array<string, mixed>>
-     */
-    public static function getPlayerTreasures(int $playerId): array
+    public static function getPlayerTreasures(int $playerId, ?int $worldId = null): array
     {
+        $worldId ??= WorldContext::id();
         $db = Connection::getInstance();
-
-        $rows = $db->query(
-            'SELECT treasure_code, fragments, equipped_slot
-             FROM   player_treasures
-             WHERE  player_id = ?
-             ORDER  BY treasure_code ASC',
-            [$playerId],
-        )->fetchAll();
-
-        $result = [];
-        foreach ($rows as $row) {
-            $code     = (int)  $row['treasure_code'];
-            $frags    = (int)  $row['fragments'];
-            $slot     = $row['equipped_slot'] !== null ? (int) $row['equipped_slot'] : null;
-            $level    = self::levelFromFragments($frags);
-            $unlocked = $level >= 1;
-
-            $definition = TreasureData::get($code);
-
-            if ($definition === null) {
-                // Unknown code in DB — skip gracefully.
-                continue;
-            }
-
-            // Build stat array at current level.
-            $statsAtLevel = [];
-            if ($unlocked && $level > 0) {
-                foreach ($definition['stats'] as $stat) {
-                    $statType           = (string) $stat['type'];
-                    $statsAtLevel[$statType] = TreasureData::getStatValue($definition, $level, $statType);
-                }
-            }
-
-            $result[] = [
-                'treasure_code'  => $code,
-                'name'           => (string) ($definition['name']  ?? ''),
-                'grade'          => (string) ($definition['grade'] ?? 'normal'),
-                'description'    => (string) ($definition['description'] ?? ''),
-                'fragments'      => $frags,
-                'fragments_next' => self::fragmentsForNextLevel($definition, $level),
-                'level'          => $level,
-                'max_level'      => (int) ($definition['max_level'] ?? 10),
-                'equipped_slot'  => $slot,
-                'stats_at_level' => $statsAtLevel,
-                'is_unlocked'    => $unlocked,
+        $rows = $db->query('SELECT t.treasure_code,t.fragments,l.slot AS equipped_slot FROM player_treasures t
+            LEFT JOIN player_treasure_loadouts l ON l.player_id=t.player_id AND l.treasure_code=t.treasure_code AND l.world_id=?
+            WHERE t.player_id=?', [$worldId,$playerId])->fetchAll();
+        $owned = []; foreach ($rows as $row) $owned[(int)$row['treasure_code']] = $row;
+        $items = [];
+        foreach (TreasureData::all() as $code=>$definition) {
+            $row = $owned[$code] ?? [];
+            $fragments = (int)($row['fragments'] ?? 0);
+            $level = self::levelFromFragments($fragments,$code);
+            $max = (int)($definition['max_level'] ?? 10);
+            $preview = self::stats($definition,1);
+            $unsupported = array_diff_key($preview,array_flip(self::ACTIVE_STATS));
+            $items[] = [
+                'treasure_code'=>$code,'name'=>(string)$definition['name'],'grade'=>(string)$definition['grade'],
+                'name_de'=>(string)($definition['name_de'] ?? $definition['name']),
+                'icon'=>(string)($definition['icon'] ?? ''),'icon_framed'=>(bool)($definition['icon_framed'] ?? false),
+                'source_reference'=>$definition['source_reference'] ?? null,
+                'description'=>(string)($definition['description'] ?? ''),'fragments'=>$fragments,
+                'fragments_next'=>self::fragmentsForNextLevel($definition,$level),
+                'fragments_per_level'=>(int)$definition['fragments_per_level'],'level'=>$level,'max_level'=>$max,
+                'equipped_slot'=>isset($row['equipped_slot'])?(int)$row['equipped_slot']:null,
+                'stats_at_level'=>$level>0?self::activeStats($definition,$level):[],
+                'preview_stats'=>self::activeStats($definition,1),
+                'next_level_stats'=>$level<$max?self::activeStats($definition,$level+1):[],
+                'is_unlocked'=>$level>0,'is_usable'=>(bool)self::activeStats($definition,1),
+                'unsupported_stats'=>$unsupported,
+                'effect_note'=>$unsupported?'Zusätzliche Sammlereffekte sind noch nicht aktiv.':'',
             ];
         }
+        return $items;
+    }
 
+    public static function state(int $playerId, ?int $worldId = null): array
+    {
+        $worldId ??= WorldContext::id();
+        $house = self::houseLevel($playerId,$worldId);
+        return ['items'=>self::getPlayerTreasures($playerId,$worldId),'slots'=>TreasureData::getUnlockSlots($house),
+            'house_level'=>$house,'slot_unlock_levels'=>self::SLOT_UNLOCK_LEVELS,'world_id'=>$worldId,
+            'bonuses'=>self::getEquippedStats($playerId,$worldId),'presets'=>self::getPresets($playerId,$worldId)];
+    }
+
+    public static function houseLevel(int $playerId, ?int $worldId = null): int
+    {
+        $level = Connection::getInstance()->query('SELECT b.level FROM city_buildings b JOIN cities c ON c.id=b.city_id
+            WHERE c.player_id=? AND c.world_id=? AND b.building_code=?',[$playerId,$worldId??WorldContext::id(),'treasure_house'])->fetchColumn();
+        return $level===false?0:(int)$level;
+    }
+
+    public static function addFragments(int $playerId, int $treasureCode, int $amount): array
+    {
+        if ($amount<=0 || TreasureData::get($treasureCode)===null) throw new \InvalidArgumentException('Ungültige Schatzfragmente.');
+        return self::atomic($playerId,static function(Connection $db)use($playerId,$treasureCode,$amount):array{
+            $db->execute('INSERT IGNORE INTO player_treasures(player_id,treasure_code,fragments) VALUES(?,?,0)',[$playerId,$treasureCode]);
+            $before=(int)$db->query('SELECT fragments FROM player_treasures WHERE player_id=? AND treasure_code=? FOR UPDATE',[$playerId,$treasureCode])->fetchColumn();
+            if($before>4294967295-$amount)throw new \DomainException('Zu viele Schatzfragmente.');
+            $oldLevel=self::levelFromFragments($before,$treasureCode);
+            $level=self::levelFromFragments($before+$amount,$treasureCode);
+            if($level!==$oldLevel){
+                // An equipped treasure also changes production when fragments level it up.
+                $cities=$db->query('SELECT c.* FROM cities c JOIN player_treasure_loadouts l ON l.player_id=c.player_id AND l.world_id=c.world_id
+                    WHERE c.player_id=? AND l.treasure_code=? ORDER BY c.world_id FOR UPDATE',[$playerId,$treasureCode])->fetchAll();
+                foreach($cities as $city)self::settle($city);
+            }
+            $db->execute('UPDATE player_treasures SET fragments=fragments+? WHERE player_id=? AND treasure_code=?',[$amount,$playerId,$treasureCode]);
+            return ['fragments'=>$before+$amount,'level'=>$level,'newly_unlocked'=>$oldLevel<1&&$level>=1];
+        });
+    }
+
+    /** $treasureHouseLevel is retained for old callers; the authoritative city level is read here. */
+    public static function equipTreasure(int $playerId,int $treasureCode,int $slot,int $treasureHouseLevel,?int $worldId=null): bool
+    {
+        $worldId??=WorldContext::id();
+        WorldContext::assertActionAvailable($worldId);
+        if($slot<1 || $slot>6 || TreasureData::get($treasureCode)===null)return false;
+        return self::atomic($playerId,static function(Connection $db)use($playerId,$treasureCode,$slot,$worldId):bool{
+            $city=WorldContext::city($playerId,$worldId,true);
+            if($slot>TreasureData::getUnlockSlots(self::houseLevel($playerId,$worldId)))return false;
+            $fragments=$db->query('SELECT fragments FROM player_treasures WHERE player_id=? AND treasure_code=? FOR UPDATE',[$playerId,$treasureCode])->fetchColumn();
+            if($fragments===false || self::levelFromFragments((int)$fragments,$treasureCode)<1)return false;
+            if(!self::activeStats(TreasureData::get($treasureCode),1))return false;
+            self::settle($city); // Persist at old bonuses before touching either slot.
+            self::ensureSlots($playerId,$worldId);
+            $db->execute('UPDATE player_treasure_loadouts SET treasure_code=NULL WHERE player_id=? AND world_id=? AND (slot=? OR treasure_code=?)',[$playerId,$worldId,$slot,$treasureCode]);
+            $db->execute('UPDATE player_treasure_loadouts SET treasure_code=? WHERE player_id=? AND world_id=? AND slot=?',[$treasureCode,$playerId,$worldId,$slot]);
+            return true;
+        });
+    }
+
+    public static function unequipTreasure(int $playerId,int $treasureCode,?int $worldId=null): bool
+    {
+        $worldId??=WorldContext::id();
+        WorldContext::assertActionAvailable($worldId);
+        return self::atomic($playerId,static function(Connection $db)use($playerId,$treasureCode,$worldId):bool{
+            $city=WorldContext::city($playerId,$worldId,true);
+            if(!$db->query('SELECT slot FROM player_treasure_loadouts WHERE player_id=? AND world_id=? AND treasure_code=? FOR UPDATE',[$playerId,$worldId,$treasureCode])->fetchColumn())return false;
+            self::settle($city);
+            return $db->execute('UPDATE player_treasure_loadouts SET treasure_code=NULL WHERE player_id=? AND world_id=? AND treasure_code=?',[$playerId,$worldId,$treasureCode])>0;
+        });
+    }
+
+    public static function getEquippedStats(int $playerId,?int $worldId=null): array
+    {
+        $worldId??=WorldContext::id();
+        $slots=TreasureData::getUnlockSlots(self::houseLevel($playerId,$worldId));
+        $rows=Connection::getInstance()->query('SELECT t.treasure_code,t.fragments FROM player_treasure_loadouts l
+            JOIN player_treasures t ON t.player_id=l.player_id AND t.treasure_code=l.treasure_code
+            WHERE l.player_id=? AND l.world_id=? AND l.slot<=?',[$playerId,$worldId,$slots])->fetchAll();
+        $result=[];
+        foreach($rows as $row){
+            $code=(int)$row['treasure_code'];$definition=TreasureData::get($code);$level=self::levelFromFragments((int)$row['fragments'],$code);
+            if(!$definition||$level<1)continue;
+            foreach(self::activeStats($definition,$level)as$key=>$value)$result[$key]=($result[$key]??0)+$value;
+        }
         return $result;
     }
 
-    // -------------------------------------------------------------------------
-    // Mutations
-    // -------------------------------------------------------------------------
-
-    /**
-     * Adds fragments to a player's treasure (creates the row if absent).
-     *
-     * Returns the new state: {fragments, level, newly_unlocked}.
-     *
-     * @return array{fragments: int, level: int, newly_unlocked: bool}
-     */
-    public static function addFragments(int $playerId, int $treasureCode, int $amount): array
+    /** Five world-specific snapshots; unsaved and deliberately empty are distinct. */
+    public static function getPresets(int $playerId,?int $worldId=null): array
     {
-        if ($amount <= 0) {
-            throw new \InvalidArgumentException('amount must be > 0, got ' . $amount);
-        }
-
-        $db = Connection::getInstance();
-
-        // Read before-state to detect level-up / unlock.
-        $before = $db->query(
-            'SELECT fragments FROM player_treasures WHERE player_id = ? AND treasure_code = ?',
-            [$playerId, $treasureCode],
-        )->fetchColumn();
-
-        $fragsBefore = $before !== false ? (int) $before : 0;
-        $levelBefore = self::levelFromFragments($fragsBefore);
-
-        $db->execute(
-            'INSERT INTO player_treasures (player_id, treasure_code, fragments)
-             VALUES (?, ?, ?)
-             ON DUPLICATE KEY UPDATE fragments = fragments + ?',
-            [$playerId, $treasureCode, $amount, $amount],
-        );
-
-        $fragsAfter  = $fragsBefore + $amount;
-        $levelAfter  = self::levelFromFragments($fragsAfter);
-        $newlyUnlocked = ($levelBefore < 1) && ($levelAfter >= 1);
-
-        return [
-            'fragments'      => $fragsAfter,
-            'level'          => $levelAfter,
-            'newly_unlocked' => $newlyUnlocked,
-        ];
+        $rows=Connection::getInstance()->query('SELECT preset,items_json FROM player_treasure_presets WHERE player_id=? AND world_id=?',[$playerId,$worldId??WorldContext::id()])->fetchAll();
+        $saved=[];foreach($rows as$row)$saved[(int)$row['preset']]=self::decodePreset((string)$row['items_json']);
+        $result=[];for($slot=1;$slot<=5;$slot++)$result[]=['slot'=>$slot,'saved'=>isset($saved[$slot]),'items'=>$saved[$slot]??array_fill(0,6,null)];
+        return $result;
     }
 
-    /**
-     * Equips a treasure to the given slot.
-     *
-     * Validation:
-     *   - Treasure must be unlocked (level >= 1).
-     *   - Slot must be within the unlocked range for the player's Treasure House level.
-     *   - Another treasure must not already occupy that slot.
-     *
-     * If the treasure is already equipped in a different slot it is moved.
-     * Returns false on any validation failure (caller decides on error message).
-     */
-    public static function equipTreasure(
-        int $playerId,
-        int $treasureCode,
-        int $slot,
-        int $treasureHouseLevel,
-    ): bool {
-        if ($slot < 1 || $slot > 6) {
-            return false;
-        }
-
-        $maxSlots = TreasureData::getUnlockSlots($treasureHouseLevel);
-        if ($slot > $maxSlots) {
-            return false;
-        }
-
-        $db = Connection::getInstance();
-
-        // Load the player's row for this treasure.
-        $row = $db->query(
-            'SELECT fragments, equipped_slot FROM player_treasures
-             WHERE  player_id = ? AND treasure_code = ?',
-            [$playerId, $treasureCode],
-        )->fetch();
-
-        if ($row === false) {
-            return false; // Player doesn't own this treasure.
-        }
-
-        $level = self::levelFromFragments((int) $row['fragments']);
-        if ($level < 1) {
-            return false; // Locked — needs at least 1 full level.
-        }
-
-        $currentSlot = $row['equipped_slot'] !== null ? (int) $row['equipped_slot'] : null;
-
-        // Check if something else is already in the target slot.
-        $occupant = $db->query(
-            'SELECT treasure_code FROM player_treasures
-             WHERE  player_id = ? AND equipped_slot = ? AND treasure_code != ?',
-            [$playerId, $slot, $treasureCode],
-        )->fetchColumn();
-
-        if ($occupant !== false) {
-            return false; // Slot taken by another treasure.
-        }
-
-        // If already in a different slot, clear that slot first.
-        if ($currentSlot !== null && $currentSlot !== $slot) {
-            $db->execute(
-                'UPDATE player_treasures SET equipped_slot = NULL
-                 WHERE  player_id = ? AND treasure_code = ?',
-                [$playerId, $treasureCode],
-            );
-        }
-
-        $db->execute(
-            'UPDATE player_treasures SET equipped_slot = ?
-             WHERE  player_id = ? AND treasure_code = ?',
-            [$slot, $playerId, $treasureCode],
-        );
-
-        return true;
+    public static function savePreset(int $playerId,int $preset,?int $worldId=null): void
+    {
+        if($preset<1||$preset>5)throw new \DomainException('Wähle einen Speicherplatz von 1 bis 5.');
+        $worldId??=WorldContext::id();WorldContext::assertActionAvailable($worldId);
+        self::atomic($playerId,static function(Connection $db)use($playerId,$preset,$worldId):void{
+            WorldContext::city($playerId,$worldId,true);
+            $items=array_fill(0,6,null);
+            foreach($db->query('SELECT slot,treasure_code FROM player_treasure_loadouts WHERE player_id=? AND world_id=? ORDER BY slot FOR UPDATE',[$playerId,$worldId])->fetchAll()as$row)$items[(int)$row['slot']-1]=$row['treasure_code']===null?null:(int)$row['treasure_code'];
+            self::validatePreset($db,$playerId,$worldId,$items);
+            $db->execute('INSERT INTO player_treasure_presets(player_id,world_id,preset,items_json) VALUES(?,?,?,?) ON DUPLICATE KEY UPDATE items_json=VALUES(items_json),updated_at=UTC_TIMESTAMP()',[$playerId,$worldId,$preset,json_encode($items,JSON_THROW_ON_ERROR)]);
+        });
     }
 
-    /**
-     * Removes a treasure from its equipped slot.
-     */
-    public static function unequipTreasure(int $playerId, int $treasureCode): bool
+    public static function applyPreset(int $playerId,int $preset,?int $worldId=null): void
     {
-        $db = Connection::getInstance();
-
-        $affected = $db->execute(
-            'UPDATE player_treasures SET equipped_slot = NULL
-             WHERE  player_id = ? AND treasure_code = ? AND equipped_slot IS NOT NULL',
-            [$playerId, $treasureCode],
-        );
-
-        return $affected > 0;
+        if($preset<1||$preset>5)throw new \DomainException('Wähle einen Speicherplatz von 1 bis 5.');
+        $worldId??=WorldContext::id();WorldContext::assertActionAvailable($worldId);
+        self::atomic($playerId,static function(Connection $db)use($playerId,$preset,$worldId):void{
+            $city=WorldContext::city($playerId,$worldId,true);
+            $json=$db->query('SELECT items_json FROM player_treasure_presets WHERE player_id=? AND world_id=? AND preset=? FOR UPDATE',[$playerId,$worldId,$preset])->fetchColumn();
+            if($json===false)throw new \DomainException('Dieser Speicherplatz ist noch leer. Speichere zuerst deine Ausrüstung.');
+            $items=self::decodePreset((string)$json);
+            self::validatePreset($db,$playerId,$worldId,$items);
+            self::settle($city); // Earned resources use the old equipment, once for the whole swap.
+            self::ensureSlots($playerId,$worldId);
+            $db->execute('UPDATE player_treasure_loadouts SET treasure_code=NULL WHERE player_id=? AND world_id=?',[$playerId,$worldId]);
+            foreach($items as$index=>$code)if($code!==null)$db->execute('UPDATE player_treasure_loadouts SET treasure_code=? WHERE player_id=? AND world_id=? AND slot=?',[$code,$playerId,$worldId,$index+1]);
+        });
     }
 
-    /**
-     * Returns aggregated stat bonuses from all equipped treasures.
-     *
-     * Example return value:
-     *   ['infantry_attack' => 5.5, 'all_defense' => 3.0, 'march_speed' => 2.0]
-     *
-     * @return array<string, float>
-     */
-    public static function getEquippedStats(int $playerId): array
+    private static function decodePreset(string $json): array
     {
-        $db = Connection::getInstance();
+        $items=json_decode($json,true);
+        if(!is_array($items)||!array_is_list($items)||count($items)!==6)throw new \DomainException('Dieses Preset ist ungültig. Speichere es erneut.');
+        foreach($items as$code)if($code!==null&&(!is_int($code)||$code<=0))throw new \DomainException('Dieses Preset enthält ein ungültiges Relikt.');
+        return $items;
+    }
 
-        $rows = $db->query(
-            'SELECT treasure_code, fragments
-             FROM   player_treasures
-             WHERE  player_id = ? AND equipped_slot IS NOT NULL',
-            [$playerId],
-        )->fetchAll();
-
-        $aggregated = [];
-
-        foreach ($rows as $row) {
-            $code       = (int) $row['treasure_code'];
-            $frags      = (int) $row['fragments'];
-            $level      = self::levelFromFragments($frags);
-            $definition = TreasureData::get($code);
-
-            if ($definition === null || $level < 1) {
-                continue;
-            }
-
-            foreach ($definition['stats'] as $stat) {
-                $statType = (string) $stat['type'];
-                $value    = TreasureData::getStatValue($definition, $level, $statType);
-
-                $aggregated[$statType] = ($aggregated[$statType] ?? 0.0) + $value;
-            }
+    private static function validatePreset(Connection $db,int $playerId,int $worldId,array $items): void
+    {
+        $unlocked=TreasureData::getUnlockSlots(self::houseLevel($playerId,$worldId));$seen=[];
+        foreach($items as$index=>$code){
+            if($code===null)continue;
+            if($index+1>$unlocked)throw new \DomainException('Für dieses Preset muss deine Schatzkammer weiter ausgebaut werden.');
+            $definition=TreasureData::get($code);
+            if(!$definition||!self::activeStats($definition,1)||isset($seen[$code]))throw new \DomainException('Dieses Preset enthält ein ungültiges oder doppeltes Relikt.');
+            $fragments=$db->query('SELECT fragments FROM player_treasures WHERE player_id=? AND treasure_code=? FOR UPDATE',[$playerId,$code])->fetchColumn();
+            if($fragments===false||self::levelFromFragments((int)$fragments,$code)<1)throw new \DomainException('Ein Relikt dieses Presets ist noch nicht freigeschaltet.');
+            $seen[$code]=true;
         }
-
-        return $aggregated;
     }
 
-    /**
-     * Picks a random treasure of the given grade and adds fragments to it.
-     *
-     * @return array{treasure_code: int, name: string, fragments_added: int, new_total: int}
-     */
-    public static function addRandomFragment(int $playerId, string $grade, int $amount = 1): array
+    public static function addRandomFragment(int $playerId,string $grade,int $amount=1): array
     {
-        $codes = TreasureData::getCodesByGrade($grade);
-
-        if (empty($codes)) {
-            throw new \RuntimeException('No treasures found for grade: ' . $grade);
-        }
-
-        $code       = $codes[array_rand($codes)];
-        $definition = TreasureData::get($code);
-        $name       = $definition !== null ? (string) ($definition['name'] ?? '') : (string) $code;
-
-        $state = self::addFragments($playerId, $code, $amount);
-
-        return [
-            'treasure_code'  => $code,
-            'name'           => $name,
-            'fragments_added' => $amount,
-            'new_total'      => $state['fragments'],
-        ];
+        $codes=TreasureData::getCodesByGrade($grade);
+        if(!$codes)throw new \RuntimeException('No treasures found for grade: '.$grade);
+        $code=$codes[array_rand($codes)];$definition=TreasureData::get($code);
+        $state=self::addFragments($playerId,$code,$amount);
+        return ['treasure_code'=>$code,'name'=>(string)($definition['name_de'] ?? $definition['name']),'fragments_added'=>$amount,'new_total'=>$state['fragments']];
     }
 
-    // -------------------------------------------------------------------------
-    // Internal helpers
-    // -------------------------------------------------------------------------
-
-    /**
-     * Computes treasure level from fragment count.
-     *
-     * fragments_per_level is defined per treasure in the JSON (e.g. 10, 20, 40 …).
-     * Since we don't have a specific treasure here we use the simple formula
-     * `fragments // 10` which only holds for normal-grade treasures.
-     *
-     * For server-side internal use (equip checks etc.) we apply the correct
-     * per-treasure threshold in the callers that already have the definition.
-     * This helper is a fast fallback for fragment → level mapping.
-     */
-    private static function levelFromFragments(int $fragments): int
+    private static function ensureSlots(int $playerId,int $worldId): void
     {
-        // fragments // 10  — minimum 0, maximum 10.
-        return min(10, (int) floor($fragments / 10));
+        for($slot=1;$slot<=6;$slot++)Connection::getInstance()->execute('INSERT IGNORE INTO player_treasure_loadouts(player_id,world_id,slot) VALUES(?,?,?)',[$playerId,$worldId,$slot]);
     }
-
-    /**
-     * Returns fragments needed to reach the next level, or 0 at max level.
-     * Uses the treasure definition's fragments_per_level field.
-     *
-     * @param array<string, mixed> $definition
-     */
-    private static function fragmentsForNextLevel(array $definition, int $currentLevel): int
+    private static function settle(array $city): void
     {
-        if ($currentLevel >= (int) ($definition['max_level'] ?? 10)) {
-            return 0; // Already at max.
-        }
-
-        $perLevel = (int) ($definition['fragments_per_level'] ?? 10);
-        return ($currentLevel + 1) * $perLevel;
+        $buildings=[];
+        foreach(Connection::getInstance()->query('SELECT building_code,level FROM city_buildings WHERE city_id=?',[(int)$city['id']])->fetchAll()as$row)$buildings[$row['building_code']]=['level'=>(int)$row['level']];
+        ResourceTick::persist($city,$buildings);
+    }
+    private static function atomic(int $playerId,callable $operation): mixed
+    {
+        $db=Connection::getInstance();$key='conquer-player-'.$playerId;
+        if((int)$db->query('SELECT GET_LOCK(?,5)',[$key])->fetchColumn()!==1)throw new \RuntimeException('Deine Schatzkammer wird gerade aktualisiert.');
+        try{return $db->getPdo()->inTransaction()?$operation($db):$db->transaction($operation);}
+        finally{$db->query('SELECT RELEASE_LOCK(?)',[$key]);}
+    }
+    private static function stats(array $definition,int $level): array
+    {
+        $stats=[];foreach($definition['stats']as$stat)$stats[$stat['type']]=TreasureData::getStatValue($definition,$level,$stat['type']);return $stats;
+    }
+    private static function activeStats(array $definition,int $level): array {return array_intersect_key(self::stats($definition,$level),array_flip(self::ACTIVE_STATS));}
+    private static function levelFromFragments(int $fragments,int $code): int
+    {
+        $definition=TreasureData::get($code);if(!$definition)return 0;
+        return min((int)($definition['max_level']??10),max(0,intdiv($fragments,max(1,(int)($definition['fragments_per_level']??10)))));
+    }
+    private static function fragmentsForNextLevel(array $definition,int $level): int
+    {
+        return $level>=(int)($definition['max_level']??10)?0:($level+1)*(int)$definition['fragments_per_level'];
     }
 }

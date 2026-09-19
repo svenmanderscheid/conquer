@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Produktionsbonus gold">
+<title>Produktionsbonus gold</title>
+<!-- Original code-native storybook item illustration. Value, quantity and rarity are rendered by the game UI. -->
+<g stroke="#493b33" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+<g transform="translate(-2 -1) scale(.85)">
+<ellipse cx="77" cy="86" rx="33" ry="21" fill="#bf7c22" />
+<path d="M45 67V89C46 103 107 105 109 89V67Z" fill="#e4af38" />
+<ellipse cx="77" cy="66" rx="32" ry="17" fill="#ffd55e" />
+<path d="M12 73V99C13 112 68 111 68 99V73Z" fill="#e4af38" />
+<ellipse cx="40" cy="74" rx="28" ry="15" fill="#ffe07a" />
+<path d="M17 87C30 93 45 96 64 88M18 99C31 105 46 105 61 101" fill="none" stroke="#b97924" stroke-width="3"/>
+<ellipse cx="54" cy="53" rx="30" ry="34" fill="#e4af38" />
+<ellipse cx="54" cy="53" rx="23" ry="27" fill="#ffe07a" />
+<path d="M55 27V79C69 77 77 67 77 53S69 28 55 27" fill="#ebbb44" stroke="none"/>
+<polygon points="54,34 59,46 72,48 62,56 65,69 54,62 43,69 46,56 36,48 49,46" fill="#d1922b" stroke-width="2"/>
+<path d="M37 39C42 29 48 27 53 27" fill="none" stroke="#fff6df" stroke-width="4"/>
+</g>
+<g transform="translate(6 4) scale(.98)">
+<path d="M90 56 112 83H100V108H79V83H67Z" fill="#69c92d" />
+<path d="M90 62 74 80H84V102H90Z" fill="#b3ed66" stroke="none"/>
+<path d="M77 79 90 63 100 75" fill="none" stroke="#deffb0" stroke-width="2"/>
+</g>
+</g>
+</svg>

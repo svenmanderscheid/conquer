@@ -39,7 +39,7 @@ final class InventoryHandler
 
         // Resolve the player's city to run the hospital tick.
         // city_id is available directly in the session array once set by the router.
-        $cityId = (int) ($session['city_id'] ?? 0);
+        $cityId = (int) \Conquer\Game\World\WorldContext::city($playerId)['id'];
 
         if ($cityId > 0) {
             HospitalService::processHealed($cityId);
@@ -95,7 +95,7 @@ final class InventoryHandler
         }
 
         $playerId = (int) $session['player_id'];
-        $cityId   = (int) ($session['city_id'] ?? 0);
+        $cityId   = (int) \Conquer\Game\World\WorldContext::city($playerId)['id'];
 
         if ($cityId <= 0) {
             Response::error(400, 'NO_CITY', 'No city associated with this session.');
@@ -112,10 +112,15 @@ final class InventoryHandler
             $context['queue_id'] = (int) $body['queue_id'];
         }
 
+        if (array_key_exists('operation_key',$body)) $context['operation_key']=$body['operation_key'];
+        if (isset($body['batch_id'])) $context['batch_id']=$body['batch_id'];
+        if (isset($body['expected_world_id'])) $context['expected_world_id']=$body['expected_world_id'];
+        if (array_key_exists('target_x',$body)) $context['target_x']=$body['target_x'];
+        if (array_key_exists('target_y',$body)) $context['target_y']=$body['target_y'];
         $result = InventoryService::useItem($playerId, $cityId, $itemCode, $context);
 
         if (!$result['ok']) {
-            Response::error(400, 'USE_FAILED', $result['effect']);
+            Response::error($result['status'] ?? 400, 'USE_FAILED', $result['effect']);
         }
 
         Response::ok([

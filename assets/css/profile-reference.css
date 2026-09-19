@@ -1,0 +1,189 @@
+/* Herrscherprofil: mobile-first character stage inspired by the supplied reference. */
+body.mobile-game #panel-dialog[data-panel="profile"]{
+  width:min(1040px,calc(100vw - 32px));max-height:calc(100dvh - 24px);padding:0;
+  border:3px solid var(--ui-frame);border-radius:18px;background:var(--ui-paper);overflow:hidden!important;
+}
+body.mobile-game #panel-dialog[data-panel="profile"]>.panel-content{
+  position:relative;display:flex;min-height:0;max-width:none;flex:1 1 auto;flex-direction:column;padding:12px 14px 0;background:var(--ui-paper);overflow:hidden;
+}
+body.mobile-game #panel-dialog[data-panel="profile"]>.panel-content>.subtabs{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin:0 0 10px;padding:4px;
+  border:1px solid var(--ui-line);border-radius:12px;background:var(--ui-inset);
+}
+body.mobile-game #panel-dialog[data-panel="profile"]>.panel-content>.subtabs .subtab{
+  min-width:0;min-height:38px;padding:6px 8px;border:1px solid transparent;border-radius:9px;
+  background:var(--ui-card);color:var(--ui-ink);font:700 14px/1 var(--ui-font);
+}
+body.mobile-game #panel-dialog[data-panel="profile"]>.panel-content>.subtabs .subtab.active{
+  border-color:var(--ui-gold);background:var(--ui-gold-soft);color:var(--ui-ink);
+}
+
+body.mobile-game .lok-profile{color:var(--ui-ink);font-family:var(--ui-font)}
+body.mobile-game .lok-profile.is-own{display:flex;min-height:0;flex:1;flex-direction:column}
+body.mobile-game .lok-profile-main{display:grid;grid-template-columns:minmax(420px,1.2fr) minmax(310px,.8fr);gap:14px;min-height:0;flex:1}
+body.mobile-game .lok-profile.is-own .lok-profile-main{flex:1;min-height:0}
+body.mobile-game .lok-profile-stage{
+  position:relative;min-height:0;overflow:hidden;border:2px solid var(--ui-line);border-radius:18px;
+  background:radial-gradient(ellipse at 50% 78%,#c5a36145 0 16%,transparent 17%),radial-gradient(circle at 50% 42%,var(--ui-card-light) 0 28%,var(--ui-paper) 62%,var(--ui-inset) 100%);
+  box-shadow:inset 0 0 44px #75608022;
+}
+body.mobile-game .lok-profile-stage:after{content:"";position:absolute;left:25%;right:25%;bottom:25px;height:22px;border-radius:50%;background:#44354924;filter:blur(7px);pointer-events:none}
+body.mobile-game .lok-profile-hero{position:absolute;inset:34px 112px 28px;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0;text-align:center}
+body.mobile-game .lok-profile-hero>img{width:min(100%,330px);height:min(350px,65%);object-fit:cover;object-position:center 38%;border:3px solid var(--ui-frame);border-radius:45% 45% 20px 20px;background:var(--ui-card-light);box-shadow:0 5px 0 #44354920,0 0 0 5px #fbf6ec99}
+body.mobile-game .lok-profile-hero figcaption{position:relative;z-index:2;width:min(100%,320px);margin-top:-18px;padding:9px 40px 8px;border:2px solid var(--ui-gold);border-radius:13px;background:var(--ui-primary);color:var(--ui-card-light);box-shadow:0 3px var(--ui-primary-dark)}
+body.mobile-game .lok-profile-hero figcaption strong,body.mobile-game .lok-profile-hero figcaption small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.mobile-game .lok-profile-hero figcaption strong{font-size:20px}
+body.mobile-game .lok-profile-hero figcaption small{color:var(--ui-gold-soft);font-size:12px}
+body.mobile-game .lok-profile-crown{position:absolute;top:-12px;z-index:3;color:var(--ui-gold);font-size:42px;line-height:1;filter:drop-shadow(0 2px var(--ui-primary-dark))}
+body.mobile-game .lok-profile-hero .profile-edit{position:absolute;right:calc(50% - 145px);bottom:39px;z-index:4;width:38px;min-height:36px;padding:5px}
+
+body.mobile-game .lok-profile-gear{position:absolute;inset:34px 20px 52px;z-index:2;display:grid;grid-template-columns:92px 1fr 92px;grid-template-rows:repeat(3,1fr);gap:12px 8px;pointer-events:none}
+body.mobile-game .lok-gear-slot{position:relative;align-self:center;width:92px;height:100px;padding:18px 5px 5px;overflow:hidden;pointer-events:auto;border:2px solid var(--ui-gold);border-radius:15px;background:var(--ui-card);color:var(--ui-ink);box-shadow:inset 0 2px #fff,0 3px #c7b69266}
+body.mobile-game .lok-gear-slot:nth-child(odd){grid-column:1}
+body.mobile-game .lok-gear-slot:nth-child(even){grid-column:3}
+body.mobile-game .lok-gear-slot:nth-child(1),body.mobile-game .lok-gear-slot:nth-child(2){grid-row:1}
+body.mobile-game .lok-gear-slot:nth-child(3),body.mobile-game .lok-gear-slot:nth-child(4){grid-row:2}
+body.mobile-game .lok-gear-slot:nth-child(5),body.mobile-game .lok-gear-slot:nth-child(6){grid-row:3}
+body.mobile-game .lok-gear-slot img{display:block;width:58px;height:58px;margin:0 auto;object-fit:contain}
+body.mobile-game .lok-gear-slot small{position:absolute;top:3px;left:6px;font:700 10px/1 var(--ui-font-number);color:var(--ui-muted)}
+body.mobile-game .lok-gear-slot strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9px}
+body.mobile-game .lok-gear-slot.is-empty{border-style:dashed;border-color:var(--ui-line);background:var(--ui-card-light);color:var(--ui-muted)}
+body.mobile-game .lok-gear-slot.is-empty>span{display:block;margin:4px 0;font-size:39px;color:var(--ui-line)}
+body.mobile-game .lok-gear-slot.grade-purple{border-color:var(--ui-purple)}
+body.mobile-game .lok-gear-slot.grade-gold,body.mobile-game .lok-gear-slot.grade-mythic{background:var(--ui-gold-soft)}
+
+body.mobile-game .lok-profile-data{display:flex;min-width:0;flex-direction:column;gap:9px}
+body.mobile-game .lok-profile-identity{position:relative;display:grid;grid-template-columns:76px minmax(0,1fr) 38px;align-items:center;gap:10px;padding:12px;border:2px solid var(--ui-frame);border-radius:16px;background:var(--ui-primary);color:var(--ui-card-light)}
+body.mobile-game .lok-profile-avatar{position:relative;width:76px;height:76px}
+body.mobile-game .lok-profile-avatar img{width:100%;height:100%;object-fit:cover;border:2px solid var(--ui-gold);border-radius:14px;background:var(--ui-card)}
+body.mobile-game .lok-profile-avatar span{position:absolute;right:-5px;bottom:-3px;color:var(--ui-gold);font-size:24px}
+body.mobile-game .lok-profile-identity>div:nth-child(2){min-width:0}
+body.mobile-game .lok-profile-identity small,body.mobile-game .lok-profile-identity strong,body.mobile-game .lok-profile-identity>div>span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.mobile-game .lok-profile-identity strong{font-size:22px}
+body.mobile-game .lok-profile-identity small,body.mobile-game .lok-profile-identity>div>span{color:var(--ui-gold-soft);font-size:12px}
+body.mobile-game .profile-edit-inline{width:38px;min-height:38px;padding:5px}
+body.mobile-game .lok-profile-facts{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+body.mobile-game .lok-profile-facts>div,body.mobile-game .lok-profile-wallet>div{min-width:0;padding:9px 11px;border:1px solid var(--ui-line);border-radius:11px;background:var(--ui-card)}
+body.mobile-game .lok-profile-facts span,body.mobile-game .lok-profile-wallet span{display:block;color:var(--ui-muted);font-size:11px}
+body.mobile-game .lok-profile-facts strong,body.mobile-game .lok-profile-wallet strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:700 18px/1.2 var(--ui-font-number)}
+body.mobile-game .lok-profile-wallet{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+body.mobile-game .lok-profile-wallet>div{background:var(--ui-gold-soft)}
+body.mobile-game .lok-profile-progress{margin-top:auto;padding:11px 12px;border:1px solid var(--ui-line);border-radius:12px;background:var(--ui-card)}
+body.mobile-game .lok-profile-progress>div{display:flex;justify-content:space-between;gap:8px;margin-top:3px;font-size:12px}
+body.mobile-game .lok-profile-progress .progress-track{height:11px;margin:5px 0 8px;border:1px solid var(--ui-line);border-radius:7px;background:var(--ui-inset);overflow:hidden}
+body.mobile-game .lok-profile-progress .progress-track span{display:block;height:100%;border-radius:inherit;background:var(--ui-primary-light)}
+body.mobile-game .lok-profile-progress .ap-progress span{background:var(--ui-green)}
+body.mobile-game .lok-profile-contact{display:flex;gap:7px}
+body.mobile-game .lok-profile-contact .profile-contact{flex:1;min-height:40px}
+body.mobile-game .lok-profile-nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:10px 0 0;padding:9px 14px 12px;border:1px solid var(--ui-line);border-radius:12px 12px 0 0;background:var(--ui-inset)}
+body.mobile-game .lok-profile-nav .profile-nav{min-width:0;min-height:50px;padding:7px 3px;font-size:13px}
+body.mobile-game .lok-profile-nav .profile-nav.active{border-color:var(--ui-gold);background:var(--ui-gold-soft)}
+
+body.mobile-game #game-dialog:has(.lok-profile.is-public){width:min(900px,calc(100vw - 24px));padding:0;overflow:hidden}
+body.mobile-game #game-dialog:has(.lok-profile.is-public)>#dialog-content{padding:12px 14px 0}
+body.mobile-game .lok-profile.is-public .lok-profile-main{grid-template-columns:minmax(330px,1fr) minmax(300px,.8fr);min-height:420px}
+body.mobile-game .lok-profile.is-public .lok-profile-stage{min-height:420px}
+body.mobile-game .lok-profile.is-public .lok-profile-hero{inset-inline:44px}
+
+@media(max-width:780px){
+  body.mobile-game #panel-dialog[data-panel="profile"],body.mobile-game #game-dialog:has(.lok-profile.is-public){width:calc(100vw - 14px);max-height:calc(100dvh - 14px)}
+  body.mobile-game #panel-dialog[data-panel="profile"]>.panel-content{padding:7px 8px 0}
+  body.mobile-game #panel-dialog[data-panel="profile"]>.panel-content>.subtabs{margin-bottom:7px}
+  body.mobile-game #panel-dialog[data-panel="profile"]>.panel-content>.subtabs .subtab{min-height:32px;padding:4px 2px;font-size:10px}
+  body.mobile-game .lok-profile-main,body.mobile-game .lok-profile.is-public .lok-profile-main{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:7px;min-height:0}
+  body.mobile-game .lok-profile-stage,body.mobile-game .lok-profile.is-public .lok-profile-stage{min-height:0}
+  body.mobile-game .lok-profile-gear{inset:20px 8px 38px;grid-template-columns:66px 1fr 66px;gap:5px}
+  body.mobile-game .lok-gear-slot{width:66px;height:76px;padding:14px 3px 3px;border-radius:10px}
+  body.mobile-game .lok-gear-slot img{width:43px;height:43px}
+  body.mobile-game .lok-gear-slot.is-empty>span{font-size:28px}
+  body.mobile-game .lok-profile-hero{inset:25px 70px 18px}
+  body.mobile-game .lok-profile-hero>img{height:220px}
+  body.mobile-game .lok-profile-hero figcaption{padding:6px 28px}
+  body.mobile-game .lok-profile-hero figcaption strong{font-size:14px}
+  body.mobile-game .lok-profile-hero .profile-edit{display:none}
+  body.mobile-game .lok-profile-identity{grid-template-columns:54px minmax(0,1fr) 34px;padding:7px;gap:7px}
+  body.mobile-game .lok-profile-avatar{width:54px;height:54px}
+  body.mobile-game .lok-profile-identity strong{font-size:15px}
+  body.mobile-game .lok-profile-facts>div,body.mobile-game .lok-profile-wallet>div{padding:6px 7px}
+  body.mobile-game .lok-profile-facts strong,body.mobile-game .lok-profile-wallet strong{font-size:13px}
+  body.mobile-game .lok-profile-progress{padding:6px 7px}
+  body.mobile-game .lok-profile-nav{margin:7px 0 0;padding:6px 7px 8px;gap:4px}
+  body.mobile-game .lok-profile-nav .profile-nav{min-height:44px;font-size:9px}
+}
+
+@media(max-width:520px) and (orientation:portrait){
+  body.mobile-game .lok-profile-main,body.mobile-game .lok-profile.is-public .lok-profile-main{display:flex;min-height:0;flex-direction:column}
+  body.mobile-game .lok-profile-stage,body.mobile-game .lok-profile.is-public .lok-profile-stage{flex:1 1 250px;min-height:190px}
+  body.mobile-game .lok-profile-data{gap:6px}
+  body.mobile-game .lok-profile-identity{grid-template-columns:50px minmax(0,1fr) 34px}
+  body.mobile-game .lok-profile-avatar{width:50px;height:50px}
+  body.mobile-game .lok-profile-facts>div:nth-child(n+3){display:none}
+  body.mobile-game .lok-profile-wallet{display:none}
+  body.mobile-game .lok-profile-progress{margin-top:0}
+  body.mobile-game .lok-profile-progress .lord-progress{display:none}
+  body.mobile-game .lok-profile-nav{z-index:5}
+  body.mobile-game #game-dialog:has(.lok-profile.is-public)>#dialog-content{padding:7px 8px 0}
+}
+
+@media(max-width:360px) and (orientation:portrait){
+  body.mobile-game .lok-profile-data{gap:4px}
+  body.mobile-game .lok-profile-identity{grid-template-columns:42px minmax(0,1fr) 34px;padding:5px}
+  body.mobile-game .lok-profile-avatar{width:42px;height:42px}
+  body.mobile-game .lok-profile-facts>div{padding-block:4px}
+  body.mobile-game .lok-profile-progress{padding-block:4px}
+  body.mobile-game .lok-profile-progress .progress-track{height:7px;margin:3px 0 4px}
+  body.mobile-game .lok-profile-nav{margin-top:4px;padding-block:4px}
+  body.mobile-game .lok-profile-nav .profile-nav{min-height:36px;padding-block:4px}
+}
+
+@media(max-height:720px){
+  body.mobile-game #panel-dialog[data-panel="profile"]>.panel-content{padding-top:7px}
+  body.mobile-game #panel-dialog[data-panel="profile"]>.panel-content>.subtabs{margin-bottom:7px;padding:3px}
+  body.mobile-game #panel-dialog[data-panel="profile"]>.panel-content>.subtabs .subtab{min-height:32px;padding-block:4px}
+  body.mobile-game .lok-profile-main{gap:8px}
+  body.mobile-game .lok-profile-gear{inset-block:18px 34px}
+  body.mobile-game .lok-gear-slot{height:78px;padding-top:14px}
+  body.mobile-game .lok-gear-slot img{width:44px;height:44px}
+  body.mobile-game .lok-profile-hero{inset-block:22px 16px}
+  body.mobile-game .lok-profile-hero>img{height:min(270px,63%)}
+  body.mobile-game .lok-profile-data{gap:6px}
+  body.mobile-game .lok-profile-identity{padding-block:7px}
+  body.mobile-game .lok-profile-facts>div,body.mobile-game .lok-profile-wallet>div{padding-block:6px}
+  body.mobile-game .lok-profile-progress{padding-block:6px}
+  body.mobile-game .lok-profile-nav{margin-top:6px;padding-block:5px 7px}
+  body.mobile-game .lok-profile-nav .profile-nav{min-height:40px}
+}
+
+@media(max-width:360px) and (orientation:portrait){
+  body.mobile-game .lok-profile-stage,body.mobile-game .lok-profile.is-public .lok-profile-stage{flex-basis:150px;min-height:145px}
+  body.mobile-game .lok-profile-gear{inset:4px 6px 12px;grid-template-columns:58px 1fr 58px;gap:2px}
+  body.mobile-game .lok-gear-slot{width:58px;height:44px;padding:10px 2px 2px;border-radius:8px}
+  body.mobile-game .lok-gear-slot img{width:28px;height:26px}
+  body.mobile-game .lok-gear-slot strong{display:none}
+  body.mobile-game .lok-gear-slot.is-empty>span{margin:0;font-size:19px}
+  body.mobile-game .lok-profile-hero{inset:7px 60px 5px}
+  body.mobile-game .lok-profile-hero>img{height:92px}
+  body.mobile-game .lok-profile-hero figcaption{margin-top:-12px;padding:4px 18px}
+  body.mobile-game .lok-profile-crown{top:-5px;font-size:32px}
+}
+
+@media(max-height:500px) and (orientation:landscape){
+  body.mobile-game #panel-dialog[data-panel="profile"]>.panel-content>.subtabs{position:absolute;top:-42px;left:150px;right:54px;z-index:3;margin:0}
+  body.mobile-game .lok-profile.is-own{height:100%;min-height:0}
+  body.mobile-game .lok-profile-main,body.mobile-game .lok-profile.is-public .lok-profile-main{min-height:0}
+  body.mobile-game .lok-profile.is-own .lok-profile-main{flex:1;min-height:0}
+  body.mobile-game .lok-profile-stage,body.mobile-game .lok-profile.is-public .lok-profile-stage{min-height:0}
+  body.mobile-game .lok-profile-gear{inset-block:5px 22px}
+  body.mobile-game .lok-gear-slot{height:52px;padding-top:11px}
+  body.mobile-game .lok-gear-slot img{width:32px;height:32px}
+  body.mobile-game .lok-gear-slot strong{display:none}
+  body.mobile-game .lok-gear-slot.is-empty>span{margin:0;font-size:22px}
+  body.mobile-game .lok-profile-hero{inset-block:12px 10px}
+  body.mobile-game .lok-profile-hero>img{height:140px}
+  body.mobile-game .lok-profile-identity{padding-block:5px}
+  body.mobile-game .lok-profile-facts>div:nth-child(n+3){display:none}
+  body.mobile-game .lok-profile-wallet{display:none}
+  body.mobile-game .lok-profile-progress{display:none}
+  body.mobile-game .lok-profile-nav{margin-top:5px;padding-block:4px 6px}
+  body.mobile-game .lok-profile-nav .profile-nav{min-height:38px}
+}

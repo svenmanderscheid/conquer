@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Produktionsbonus stone">
+<title>Produktionsbonus stone</title>
+<!-- Original code-native storybook item illustration. Value, quantity and rarity are rendered by the game UI. -->
+<g stroke="#493b33" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+<g transform="translate(-2 -1) scale(.85)">
+<path d="M14 87 23 68 33 64 35 38 54 21 82 22 104 48 105 79 118 97 90 110 35 108 12 99Z" fill="#869cb2" />
+<polygon points="35,38 54,21 82,22 69,42 47,51" fill="#ccdce7" />
+<polygon points="47,51 69,42 92,55 81,84 51,95 33,72" fill="#adc2d4" />
+<polygon points="82,22 104,48 105,79 81,84 92,55" fill="#657d95" />
+<polygon points="23,68 33,64 33,88 15,94" fill="#bdcdd8" />
+<polygon points="81,84 105,79 118,97 90,110 72,103" fill="#5c7489" />
+<path d="M40 42 53 29 70 28" fill="none" stroke="#edf7f8" stroke-width="3"/>
+</g>
+<g transform="translate(6 4) scale(.98)">
+<path d="M90 56 112 83H100V108H79V83H67Z" fill="#69c92d" />
+<path d="M90 62 74 80H84V102H90Z" fill="#b3ed66" stroke="none"/>
+<path d="M77 79 90 63 100 75" fill="none" stroke="#deffb0" stroke-width="2"/>
+</g>
+</g>
+</svg>

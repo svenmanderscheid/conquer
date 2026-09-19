@@ -1,0 +1,23 @@
+{
+  "tool": "OpenAI built-in imagegen",
+  "mode": "generate",
+  "date": "2026-09-13",
+  "shared_prompt": "Create one premium fantasy world-map march creature as a production transparent PNG cutout. Hand-painted storybook mobile-strategy style matching Conquer: large soft exaggerated forms, immediately readable silhouette, warm dark-brown outlines, restrained colors, two broad toon-shading values, no photorealism or glossy PBR. Slightly elevated three-quarter view, moving toward the right. Center the whole creature with generous clear margin. No human troop formation, text, UI, environment, ground plane, rectangular background, drop shadow, logo or watermark. True transparent alpha.",
+  "assets": [
+    {"id":"ironkeep","name":"Eisenkoloss","source":"asset-workflow/01-source/marches/ironkeep/march-source.png","subject_prompt":"A squat walking fortress golem of iron and gray stone, riveted plates, battlement shoulders and a small blue pennant."},
+    {"id":"rosehall","name":"Rosenhirsch","source":"asset-workflow/01-source/marches/rosehall/march-source.png","subject_prompt":"An elegant ivory stag with a living antler crown of deep-red roses, pale-gold tack and wine-red ribbons."},
+    {"id":"sandspire","name":"Sonnenskarabäus","source":"asset-workflow/01-source/marches/sandspire/march-source.png","subject_prompt":"A giant golden desert scarab with a turquoise-inlaid sun shell and sturdy expressive legs."},
+    {"id":"tidewatch","name":"Leuchtrücken","source":"asset-workflow/01-source/marches/tidewatch/march-source.png","subject_prompt":"A broad sea turtle whose turquoise shell carries a tiny ivory coastal fortress and glowing lighthouse."},
+    {"id":"winterhold","name":"Frostmammut","source":"asset-workflow/01-source/marches/winterhold/march-source.png","subject_prompt":"A shaggy blue-white mammoth with oversized ice tusks, a fur saddle blanket and frost crystals."},
+    {"id":"jadecourt","name":"Jadeglockenlöwe","source":"asset-workflow/01-source/marches/jadecourt/march-source.png","subject_prompt":"A jade temple guardian lion with an asymmetric pagoda mane, gold trim and a hanging ceremonial bell."},
+    {"id":"emberforge","name":"Glutsalamander","source":"asset-workflow/01-source/marches/emberforge/march-source.png","subject_prompt":"A powerful forge salamander construct made of dark iron and copper plates with warm orange seams."},
+    {"id":"ravenloft","name":"Rabenfürst","source":"asset-workflow/01-source/marches/ravenloft/march-source.png","subject_prompt":"A giant black raven in light dark-steel armor with violet cloth ribbons and a proud hooked silhouette."},
+    {"id":"clockwork","name":"Uhrwerkhase","source":"asset-workflow/01-source/marches/clockwork/march-source.png","subject_prompt":"A running mechanical hare of warm copper and ivory enamel with exposed gears and a tiny steam vent."},
+    {"id":"sapphire","name":"Saphirpfau","source":"asset-workflow/01-source/marches/sapphire/march-source.png","subject_prompt":"A royal peacock displaying a huge fan of faceted sapphire feathers with pale-gold details."},
+    {"id":"astral","name":"Sternenwal","source":"asset-workflow/01-source/marches/astral/march-source.png","subject_prompt":"A floating celestial whale with a deep-indigo body, luminous constellations and a curling starlight tail."},
+    {"id":"leviathan","name":"Korallenleviathan","source":"asset-workflow/01-source/marches/leviathan/march-source.png","subject_prompt":"A compact turquoise sea leviathan coiling forward, crowned with warm coral branches and fin crests."},
+    {"id":"yggdrasil","name":"Wurzelkoloss","source":"asset-workflow/01-source/marches/yggdrasil/march-source.png","subject_prompt":"An ancient walking tree colossus with huge root feet, a crooked trunk, moss and an asymmetric leafy crown."},
+    {"id":"tempest","name":"Sturmqualle","source":"asset-workflow/01-source/marches/tempest/march-source.png","subject_prompt":"A floating storm jellyfish with a blue-gray thundercloud bell and long lightning-charged tentacles."},
+    {"id":"eclipse","name":"Finstersonnenwagen","source":"asset-workflow/01-source/marches/eclipse/march-source.png","subject_prompt":"A riderless obsidian crescent chariot carrying a black sun disk with a violet corona and gold edging."}
+  ]
+}

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Spähschutz-Fernrohr">
+<title>Spähschutz-Fernrohr</title>
+<!-- Original code-native storybook item illustration. Value, quantity and rarity are rendered by the game UI. -->
+<g stroke="#493b33" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+<path d="M14 105 30 120 86 69 69 50Z" fill="#603393" />
+<path d="M35 82 48 99 76 75 62 57Z" fill="#8c4ac4" />
+<path d="M52 46 77 26 105 48 90 80 73 91 44 65Z" fill="#e4af38" />
+<path d="M80 19C91 10 110 24 116 41 122 55 112 69 100 69 86 66 73 53 71 39 70 31 73 24 80 19Z" fill="#ffe07a" />
+<ellipse cx="95" cy="41" rx="15" ry="23" fill="#57b6d7" transform="rotate(-34 95 41)"/>
+<path d="M82 23C89 20 98 29 101 36L79 34Z" fill="#d3ffff" stroke="none"/>
+<path d="M50 50 72 71" fill="none" stroke="#fff6df" stroke-width="4"/>
+<circle cx="95" cy="99" r="24" fill="#d6473f" />
+<circle cx="95" cy="99" r="16" fill="#223c51" />
+<path d="M79 91C88 82 103 82 111 91 103 102 87 102 79 91Z" fill="#dbd8c3" stroke-width="2"/>
+<circle cx="95" cy="91" r="5" fill="#374957" stroke-width="2"/>
+<path d="M81 112 108 85" fill="none" stroke="#ff7856" stroke-width="8"/>
+</g>
+</svg>

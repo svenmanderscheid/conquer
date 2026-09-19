@@ -13,6 +13,7 @@ declare(strict_types=1);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Conquer — World Map</title>
+    <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR.'/assets/css/fantasy-fonts.css') ?>">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -678,6 +679,7 @@ declare(strict_types=1);
         .march-badge.return .march-badge-state { color: #8b5a2b; }
         .march-badge.pvp    .march-badge-state { color: #a03020; }
     </style>
+<link rel="stylesheet" href="<?= htmlspecialchars(APP_BASE, ENT_QUOTES) ?>/assets/css/village-theme.css?v=<?= filemtime(__DIR__ . "/../assets/css/village-theme.css") ?>">
 </head>
 <body x-data="mapApp()" x-init="boot()">
 <?php $hudCurrentView = 'map'; require __DIR__ . '/partials/hud.php'; ?>
@@ -1465,7 +1467,7 @@ function mapApp() {
 
         MONSTER_TYPES: {
             202001: 'Orc',        202002: 'Skeleton',   202003: 'Golem',
-            202004: 'Treasure Goblin', 202005: 'Deathkar',
+            202004: 'Treasure Goblin', 202005: 'Dämmerhorn',
             202006: 'Green Dragon',    202007: 'Red Dragon',
             202008: 'Gold Dragon',     202009: 'Magdar',
         },

@@ -38,6 +38,7 @@ $csrf = $session['csrf_token'];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conquer — Allianz</title>
+    <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR.'/assets/css/fantasy-fonts.css') ?>">
     <link rel="stylesheet" href="/assets/css/main.css">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
@@ -517,6 +518,7 @@ $csrf = $session['csrf_token'];
             .tab-btn { padding: 8px 12px; font-size: 0.7rem; }
         }
     </style>
+<link rel="stylesheet" href="<?= htmlspecialchars(APP_BASE, ENT_QUOTES) ?>/assets/css/village-theme.css?v=<?= filemtime(__DIR__ . "/../assets/css/village-theme.css") ?>">
 </head>
 <body>
 <?php $hudCurrentView = 'alliance'; require __DIR__ . '/partials/hud.php'; ?>

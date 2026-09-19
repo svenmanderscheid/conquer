@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Verteidigungsbonus">
+<title>Verteidigungsbonus</title>
+<!-- Original code-native storybook item illustration. Value, quantity and rarity are rendered by the game UI. -->
+<g stroke="#493b33" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+<g transform="translate(0 2) scale(.8)">
+<path d="M47 29C48 17 57 9 64 8 76 13 82 21 83 34L77 46H50Z" fill="#e4af38" />
+<path d="M64 10 63 39 76 39 81 31C76 18 72 14 64 10" fill="#b85a25" stroke="none"/>
+<path d="M28 69C24 38 37 24 64 24S104 40 100 69L93 97 77 111 77 77H68V117H59V77H49V111L32 97Z" fill="#e4af38" />
+<path d="M64 26V116H68V77H77V111L93 97 100 69C102 43 91 29 64 26" fill="#c27a25" stroke="none"/>
+<path d="M31 62 56 68 53 79 39 77 39 93 31 88Z" fill="#302d2b" />
+<path d="M97 62 72 68 75 79 87 77 87 93 96 88Z" fill="#302d2b" />
+<path d="M30 53C33 36 41 30 57 28V56Z" fill="#ffe07a" stroke="none"/>
+<path d="M38 43C42 34 48 31 56 31" fill="none" stroke="#fff6df" stroke-width="4"/>
+<path d="M65 31V62" fill="none" stroke="#fff1a6" stroke-width="4"/>
+<path d="M36 97 46 105" fill="none" stroke="#ffd46a" stroke-width="3"/>
+</g>
+<g transform="translate(45 40) scale(.65)">
+<path d="M16 27 39 30 64 13 89 30 112 27 108 68C102 95 81 111 64 119 42 110 23 91 19 69Z" fill="#68869d" />
+<path d="M25 36 43 39 64 24 85 39 103 36 99 66C93 88 78 102 64 110 49 102 33 86 29 66Z" fill="#b8cbd9" />
+<path d="M36 45 48 48 64 37 80 48 92 45 89 66C84 82 72 92 64 98 54 92 43 82 39 65Z" fill="#438fe4" />
+<path d="M64 37V98C79 87 87 76 89 66L92 45 80 48Z" fill="#24559c" stroke="none"/>
+<path d="M28 42 32 66C35 79 46 93 56 100" fill="none" stroke="#effaff" stroke-width="3"/>
+<path d="M64 43V86" fill="none" stroke="#86c8ff" stroke-width="3"/>
+</g>
+</g>
+</svg>

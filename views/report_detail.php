@@ -24,6 +24,19 @@ if ($row === false) {
 
 $isAttacker = (int)$row['attacker_id'] === $playerId;
 
+if (in_array(json_decode($row['data_json'],true)['battle_kind'] ?? '', ['city','rally'], true)) {
+    $playerReport = \Conquer\Game\March\BattleReportService::get($playerId,$reportId);
+    header('Location: '.APP_BASE.($playerReport ? '/city?combat_report='.$reportId.'#reports' : '/city#reports'));
+    exit;
+}
+
+if ((int)$row['target_type'] === 3 && $isAttacker) {
+    $monsterReport = \Conquer\Game\March\BattleReportService::get($playerId,$reportId);
+    if (!$monsterReport) { header('Location: '.APP_BASE.'/reports'); exit; }
+    require __DIR__.'/monster_report.php';
+    return;
+}
+
 // Mark as read for the correct role
 if ($isAttacker && !(int)$row['attacker_read']) {
     $db->execute('UPDATE battle_reports SET attacker_read = 1 WHERE id = ?', [$reportId]);
@@ -112,6 +125,7 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conquer — Kampfbericht #<?= $reportId ?></title>
+    <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR.'/assets/css/fantasy-fonts.css') ?>">
     <link rel="stylesheet" href="/assets/css/main.css">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -346,6 +360,12 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
             position: relative;
             box-shadow: 0 2px 8px var(--c-shadow, rgba(139,90,43,0.18));
         }
+        .troop-chip-icon > img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: inherit;
+        }
         .troop-chip-tier {
             position: absolute;
             bottom: -2px;
@@ -546,6 +566,7 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
             .troops-info-total { margin-left: 0; text-align: left; }
         }
     </style>
+<link rel="stylesheet" href="<?= htmlspecialchars(APP_BASE, ENT_QUOTES) ?>/assets/css/village-theme.css?v=<?= filemtime(__DIR__ . "/../assets/css/village-theme.css") ?>">
 </head>
 <body>
 <?php if (!$isEmbed): $hudCurrentView = 'reports'; require __DIR__ . '/partials/hud.php'; endif ?>
@@ -707,10 +728,17 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
             <?php
                 $injured = (int)($t['injured'] ?? $t['lost'] ?? 0);
                 $tier    = (int)($t['tier'] ?? 1);
+                $chipDef = TroopData::get((int)($t['code'] ?? 0));
+                $troopPortraitPrefix = [1 => 'infantry', 2 => 'archer', 3 => 'cavalry'][(int)($chipDef['type'] ?? 0)] ?? null;
+                $troopPortraitVersion = $troopPortraitPrefix === 'infantry' && $tier === 10 ? 2 : 1;
             ?>
             <div class="troop-chip">
                 <div class="troop-chip-icon">
-                    <?= $troopEmoji($tier) ?>
+                    <?php if ($troopPortraitPrefix && $tier >= 1 && $tier <= 10): ?>
+                        <img src="<?= htmlspecialchars(APP_BASE, ENT_QUOTES) ?>/assets/art/characters/<?= $troopPortraitPrefix ?>-t<?= $tier ?>-report-v<?= $troopPortraitVersion ?>.png" alt="">
+                    <?php else: ?>
+                        <?= $troopEmoji($tier) ?>
+                    <?php endif ?>
                     <span class="troop-chip-tier">T<?= $tier ?></span>
                 </div>
                 <div class="troop-chip-count"><?= $fmt($t['sent']) ?></div>

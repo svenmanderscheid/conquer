@@ -15,9 +15,9 @@ return [
     'version' => '0.1.0-dev',
     
     // Environment
-    'env' => 'development',  // 'development' | 'staging' | 'production'
-    'debug' => true,
-    'log_level' => 'debug',  // 'debug' | 'info' | 'warning' | 'error'
+    'env' => getenv('CONQUER_ENV') ?: 'production',  // explicitly opt into local development
+    'debug' => false,
+    'log_level' => 'info',
     
     // URLs
     'base_url' => 'http://localhost:8080',
@@ -28,11 +28,22 @@ return [
     'max_players_per_world' => 5000,
     'beginner_shield_days' => 7,
     'inactive_hide_days' => 30,
+
+    // Local-only convenience. Keep false outside a private development database.
+    'local_free_skins' => false,
+    'local_free_skins_database' => null,
     
     // Security
     'session_lifetime_minutes' => 60 * 24 * 7,  // 7 days
     'csrf_token_lifetime_minutes' => 30,
     'rate_limit_per_minute' => 120,
+
+    // Premium checkout stays unavailable until a real provider is configured.
+    // The preview adapter is development-only and also requires a 32+ character secret.
+    'premium_payments' => [
+        'provider' => null,
+        'preview' => ['enabled' => false, 'secret' => ''],
+    ],
     
     // Polling
     'poll_interval_active_ms' => 15000,
@@ -52,12 +63,12 @@ return [
     'oauth' => [
         'google' => [
             'client_id'     => '',   // CHANGE ME
-            'client_secret' => '',   // CHANGE ME
+            'client_secret' => getenv('CONQUER_GOOGLE_CLIENT_SECRET') ?: '',
             'redirect_uri'  => 'http://conquer.local/auth/google/callback',
         ],
         'discord' => [
             'client_id'     => '',   // CHANGE ME
-            'client_secret' => '',   // CHANGE ME
+            'client_secret' => getenv('CONQUER_DISCORD_CLIENT_SECRET') ?: '',
             'redirect_uri'  => 'http://conquer.local/auth/discord/callback',
         ],
     ],

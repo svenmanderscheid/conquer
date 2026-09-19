@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Goldene Doppelpfeile">
+<title>Goldene Doppelpfeile</title>
+<!-- Original code-native storybook item illustration. Value, quantity and rarity are rendered by the game UI. -->
+<g stroke="#493b33" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+<path d="M65 25 116 64 65 104 58 97 94 65 59 33Z" fill="#b85a25" />
+<path d="M60 24 108 61 60 98V77L81 61 60 45Z" fill="#e4af38" />
+<path d="M64 31 99 60H83L64 45Z" fill="#ffe07a" stroke="none"/>
+<path d="M64 78 83 64H99L64 91Z" fill="#ed8a31" stroke="none"/>
+<path d="M65 31 101 59" fill="none" stroke="#fff6df" stroke-width="3"/>
+<path d="M19 25 71 64 19 104 11 98 14 31Z" fill="#b85a25" />
+<path d="M12 24 62 61 12 99Z" fill="#e4af38" />
+<path d="M17 33 52 59H17Z" fill="#ffe07a" stroke="none"/>
+<path d="M17 66H51L17 91Z" fill="#ed8a31" stroke="none"/>
+<path d="M18 31 53 57" fill="none" stroke="#fff6df" stroke-width="4"/>
+</g>
+</svg>

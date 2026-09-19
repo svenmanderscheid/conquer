@@ -1,125 +1,234 @@
 {
-  "version": 1,
+  "version": 3,
   "items": [
     {
-      "code": 10103001,
-      "name": "Speed Up 5m",
-      "category": "speedup",
-      "subcategory": "generic",
-      "duration_seconds": 300,
-      "description": "Reduces any timer by 5 minutes."
+      "code": 10101001,
+      "name": "Small Food Pack",
+      "category": "resource_pack",
+      "subcategory": "food",
+      "resource": "food",
+      "amount": 50000,
+      "description": "Instantly adds 50,000 Food to your stockpile.",
+      "name_de": "50.000 Nahrung",
+      "description_de": "Fügt sofort 50.000 Nahrung hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
     },
     {
-      "code": 10103002,
-      "name": "Speed Up 15m",
-      "category": "speedup",
-      "subcategory": "generic",
-      "duration_seconds": 900,
-      "description": "Reduces any timer by 15 minutes."
+      "code": 10101002,
+      "name": "Medium Food Pack",
+      "category": "resource_pack",
+      "subcategory": "food",
+      "resource": "food",
+      "amount": 200000,
+      "description": "Instantly adds 200,000 Food to your stockpile.",
+      "name_de": "200.000 Nahrung",
+      "description_de": "Fügt sofort 200.000 Nahrung hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
     },
     {
-      "code": 10103003,
-      "name": "Speed Up 1h",
-      "category": "speedup",
-      "subcategory": "generic",
-      "duration_seconds": 3600,
-      "description": "Reduces any timer by 1 hour."
+      "code": 10101003,
+      "name": "Large Food Pack",
+      "category": "resource_pack",
+      "subcategory": "food",
+      "resource": "food",
+      "amount": 500000,
+      "description": "Instantly adds 500,000 Food to your stockpile.",
+      "name_de": "500.000 Nahrung",
+      "description_de": "Fügt sofort 500.000 Nahrung hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
     },
     {
-      "code": 10103004,
-      "name": "Speed Up 3h",
-      "category": "speedup",
-      "subcategory": "generic",
-      "duration_seconds": 10800,
-      "description": "Reduces any timer by 3 hours."
+      "code": 10101011,
+      "name": "Small Lumber Pack",
+      "category": "resource_pack",
+      "subcategory": "lumber",
+      "resource": "lumber",
+      "amount": 50000,
+      "description": "Instantly adds 50,000 Lumber to your stockpile.",
+      "name_de": "50.000 Holz",
+      "description_de": "Fügt sofort 50.000 Holz hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
     },
     {
-      "code": 10103005,
-      "name": "Speed Up 8h",
-      "category": "speedup",
-      "subcategory": "generic",
-      "duration_seconds": 28800,
-      "description": "Reduces any timer by 8 hours."
+      "code": 10101012,
+      "name": "Medium Lumber Pack",
+      "category": "resource_pack",
+      "subcategory": "lumber",
+      "resource": "lumber",
+      "amount": 200000,
+      "description": "Instantly adds 200,000 Lumber to your stockpile.",
+      "name_de": "200.000 Holz",
+      "description_de": "Fügt sofort 200.000 Holz hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
     },
     {
-      "code": 10103006,
-      "name": "Speed Up 24h",
-      "category": "speedup",
-      "subcategory": "generic",
-      "duration_seconds": 86400,
-      "description": "Reduces any timer by 24 hours."
+      "code": 10101021,
+      "name": "Small Stone Pack",
+      "category": "resource_pack",
+      "subcategory": "stone",
+      "resource": "stone",
+      "amount": 50000,
+      "description": "Instantly adds 50,000 Stone to your stockpile.",
+      "name_de": "50.000 Stein",
+      "description_de": "Fügt sofort 50.000 Stein hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
     },
     {
-      "code": 10103011,
-      "name": "Building Speed Up 1h",
-      "category": "speedup",
-      "subcategory": "building",
-      "duration_seconds": 3600,
-      "description": "Reduces a building construction or upgrade timer by 1 hour."
+      "code": 10101022,
+      "name": "Medium Stone Pack",
+      "category": "resource_pack",
+      "subcategory": "stone",
+      "resource": "stone",
+      "amount": 200000,
+      "description": "Instantly adds 200,000 Stone to your stockpile.",
+      "name_de": "200.000 Stein",
+      "description_de": "Fügt sofort 200.000 Stein hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
     },
     {
-      "code": 10103012,
-      "name": "Building Speed Up 3h",
-      "category": "speedup",
-      "subcategory": "building",
-      "duration_seconds": 10800,
-      "description": "Reduces a building construction or upgrade timer by 3 hours."
+      "code": 10101031,
+      "name": "Small Gold Pack",
+      "category": "resource_pack",
+      "subcategory": "gold",
+      "resource": "gold",
+      "amount": 25000,
+      "description": "Instantly adds 25,000 Gold to your stockpile.",
+      "name_de": "25.000 Gold",
+      "description_de": "Fügt sofort 25.000 Gold hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
     },
     {
-      "code": 10103013,
-      "name": "Building Speed Up 8h",
-      "category": "speedup",
-      "subcategory": "building",
-      "duration_seconds": 28800,
-      "description": "Reduces a building construction or upgrade timer by 8 hours."
+      "code": 10101032,
+      "name": "Medium Gold Pack",
+      "category": "resource_pack",
+      "subcategory": "gold",
+      "resource": "gold",
+      "amount": 100000,
+      "description": "Instantly adds 100,000 Gold to your stockpile.",
+      "name_de": "100.000 Gold",
+      "description_de": "Fügt sofort 100.000 Gold hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
     },
     {
-      "code": 10103021,
-      "name": "Research Speed Up 1h",
-      "category": "speedup",
-      "subcategory": "research",
-      "duration_seconds": 3600,
-      "description": "Reduces a research timer by 1 hour."
+      "code": 10101041,
+      "name": "Small GEMS Pack",
+      "category": "resource_pack",
+      "subcategory": "gems",
+      "resource": "gems",
+      "amount": 50,
+      "description": "Instantly adds 50 Gems to your account.",
+      "icon": "gems.svg",
+      "name_de": "50 Edelsteine",
+      "description_de": "Fügt sofort 50 Edelsteine hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
     },
     {
-      "code": 10103022,
-      "name": "Research Speed Up 3h",
-      "category": "speedup",
-      "subcategory": "research",
-      "duration_seconds": 10800,
-      "description": "Reduces a research timer by 3 hours."
+      "code": 10101042,
+      "name": "Medium GEMS Pack",
+      "category": "resource_pack",
+      "subcategory": "gems",
+      "resource": "gems",
+      "amount": 150,
+      "description": "Instantly adds 150 Gems to your account.",
+      "icon": "gems.svg",
+      "name_de": "150 Edelsteine",
+      "description_de": "Fügt sofort 150 Edelsteine hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
     },
     {
-      "code": 10103023,
-      "name": "Research Speed Up 8h",
-      "category": "speedup",
-      "subcategory": "research",
-      "duration_seconds": 28800,
-      "description": "Reduces a research timer by 8 hours."
-    },
-    {
-      "code": 10103031,
-      "name": "Training Speed Up 1h",
-      "category": "speedup",
-      "subcategory": "training",
-      "duration_seconds": 3600,
-      "description": "Reduces a troop training timer by 1 hour."
-    },
-    {
-      "code": 10103032,
-      "name": "Training Speed Up 3h",
-      "category": "speedup",
-      "subcategory": "training",
-      "duration_seconds": 10800,
-      "description": "Reduces a troop training timer by 3 hours."
-    },
-    {
-      "code": 10103041,
-      "name": "Healing Speed Up 1h",
-      "category": "speedup",
-      "subcategory": "healing",
-      "duration_seconds": 3600,
-      "description": "Reduces a hospital healing timer by 1 hour."
+      "code": 10101043,
+      "name": "Large GEMS Pack",
+      "category": "resource_pack",
+      "subcategory": "gems",
+      "resource": "gems",
+      "amount": 500,
+      "description": "Instantly adds 500 Gems to your account.",
+      "icon": "gems.svg",
+      "name_de": "500 Edelsteine",
+      "description_de": "Fügt sofort 500 Edelsteine hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
     },
     {
       "code": 10102001,
@@ -129,7 +238,18 @@
       "boost_type": "resource_production",
       "bonus_pct": 25,
       "duration_seconds": 28800,
-      "description": "Increases all resource production by 25% for 8 hours."
+      "description": "Increases all resource production by 25% for 8 hours.",
+      "icon": "production.svg",
+      "name_de": "Rohstoffproduktion +25 % · 8 Stunden",
+      "description_de": "Erhöht Rohstoffproduktion für 8 Stunden um 25 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
     },
     {
       "code": 10102002,
@@ -139,7 +259,17 @@
       "boost_type": "resource_production",
       "bonus_pct": 25,
       "duration_seconds": 86400,
-      "description": "Increases all resource production by 25% for 24 hours."
+      "description": "Increases all resource production by 25% for 24 hours.",
+      "icon": "production.svg",
+      "name_de": "Rohstoffproduktion +25 % · 1 Tag",
+      "description_de": "Erhöht Rohstoffproduktion für 1 Tag um 25 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum"
+      ]
     },
     {
       "code": 10102011,
@@ -149,7 +279,18 @@
       "boost_type": "gathering_speed",
       "bonus_pct": 50,
       "duration_seconds": 28800,
-      "description": "Increases gathering speed by 50% for 8 hours."
+      "description": "Increases gathering speed by 50% for 8 hours.",
+      "icon": "gathering.svg",
+      "name_de": "Sammelgeschwindigkeit +50 % · 8 Stunden",
+      "description_de": "Erhöht Sammelgeschwindigkeit für 8 Stunden um 50 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
     },
     {
       "code": 10102021,
@@ -159,7 +300,18 @@
       "boost_type": "construction_speed",
       "bonus_pct": 25,
       "duration_seconds": 28800,
-      "description": "Increases construction speed by 25% for 8 hours."
+      "description": "Increases construction speed by 25% for 8 hours.",
+      "icon": "hammer.svg",
+      "name_de": "Baugeschwindigkeit +25 % · 8 Stunden",
+      "description_de": "Erhöht Baugeschwindigkeit für 8 Stunden um 25 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
     },
     {
       "code": 10102031,
@@ -169,7 +321,18 @@
       "boost_type": "research_speed",
       "bonus_pct": 25,
       "duration_seconds": 28800,
-      "description": "Increases research speed by 25% for 8 hours."
+      "description": "Increases research speed by 25% for 8 hours.",
+      "icon": "research.svg",
+      "name_de": "Forschungsgeschwindigkeit +25 % · 8 Stunden",
+      "description_de": "Erhöht Forschungsgeschwindigkeit für 8 Stunden um 25 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
     },
     {
       "code": 10102041,
@@ -179,124 +342,343 @@
       "boost_type": "training_speed",
       "bonus_pct": 25,
       "duration_seconds": 28800,
-      "description": "Increases troop training speed by 25% for 8 hours."
+      "description": "Increases troop training speed by 25% for 8 hours.",
+      "icon": "helmet.svg",
+      "name_de": "Ausbildungsgeschwindigkeit +25 % · 8 Stunden",
+      "description_de": "Erhöht Ausbildungsgeschwindigkeit für 8 Stunden um 25 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
     },
     {
       "code": 10102051,
-      "name": "Anti-Reconnaissance 8h",
+      "name": "Spähschutz 8 Stunden",
       "category": "boost",
       "subcategory": "anti_spy",
       "boost_type": "anti_spy",
+      "price_gems": 50,
       "duration_seconds": 28800,
-      "description": "Prevents enemy scouts from viewing your city details for 8 hours."
+      "description": "Verbirgt Ressourcen, Truppen und Mauerdaten der aktiven Stadt 8 Stunden vor feindlichen Spähern.",
+      "icon": "anti-spy.svg",
+      "name_de": "Spähschutz · 8 Stunden",
+      "description_de": "Verbirgt Ressourcen, Truppen und Mauerwerte deiner aktiven Stadt 8 Stunden vor Spähern.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
     },
     {
-      "code": 10101001,
-      "name": "Small Food Pack",
-      "category": "resource_pack",
-      "subcategory": "food",
-      "resource": "food",
-      "amount": 50000,
-      "description": "Instantly adds 50,000 Food to your stockpile."
+      "code": 10102061,
+      "name": "Stadtschild 8 Stunden",
+      "category": "boost",
+      "subcategory": "city_shield",
+      "boost_type": "city_shield",
+      "price_gems": 100,
+      "duration_seconds": 28800,
+      "description": "Schützt die aktive Stadt 8 Stunden vor feindlichen Angriffen. Während eigener feindlicher Märsche kann kein Schild aktiviert werden.",
+      "icon": "shield.svg",
+      "name_de": "Königsschild · 8 Stunden",
+      "description_de": "Schützt deine aktive Stadt 8 Stunden vor feindlichen Angriffen. Nicht während eigener feindlicher Märsche nutzbar.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
     },
     {
-      "code": 10101002,
-      "name": "Medium Food Pack",
-      "category": "resource_pack",
-      "subcategory": "food",
-      "resource": "food",
-      "amount": 200000,
-      "description": "Instantly adds 200,000 Food to your stockpile."
+      "code": 10103001,
+      "name": "Speed Up 5m",
+      "category": "speedup",
+      "subcategory": "generic",
+      "duration_seconds": 300,
+      "description": "Reduces any timer by 5 minutes.",
+      "icon": "speedup.svg",
+      "name_de": "Universell · 5 Minuten",
+      "description_de": "Verkürzt einen Bau-, Forschungs-, Ausbildungs- oder Heilungsauftrag um 5 Minuten. Überschüssige Zeit verfällt.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
     },
     {
-      "code": 10101003,
-      "name": "Large Food Pack",
-      "category": "resource_pack",
-      "subcategory": "food",
-      "resource": "food",
-      "amount": 500000,
-      "description": "Instantly adds 500,000 Food to your stockpile."
+      "code": 10103002,
+      "name": "Speed Up 15m",
+      "category": "speedup",
+      "subcategory": "generic",
+      "duration_seconds": 900,
+      "description": "Reduces any timer by 15 minutes.",
+      "icon": "speedup.svg",
+      "name_de": "Universell · 15 Minuten",
+      "description_de": "Verkürzt einen Bau-, Forschungs-, Ausbildungs- oder Heilungsauftrag um 15 Minuten. Überschüssige Zeit verfällt.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
     },
     {
-      "code": 10101011,
-      "name": "Small Lumber Pack",
-      "category": "resource_pack",
-      "subcategory": "lumber",
-      "resource": "lumber",
-      "amount": 50000,
-      "description": "Instantly adds 50,000 Lumber to your stockpile."
+      "code": 10103003,
+      "name": "Speed Up 1h",
+      "category": "speedup",
+      "subcategory": "generic",
+      "duration_seconds": 3600,
+      "description": "Reduces any timer by 1 hour.",
+      "icon": "speedup.svg",
+      "name_de": "Universell · 1 Stunde",
+      "description_de": "Verkürzt einen Bau-, Forschungs-, Ausbildungs- oder Heilungsauftrag um 1 Stunde. Überschüssige Zeit verfällt.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
     },
     {
-      "code": 10101012,
-      "name": "Medium Lumber Pack",
-      "category": "resource_pack",
-      "subcategory": "lumber",
-      "resource": "lumber",
-      "amount": 200000,
-      "description": "Instantly adds 200,000 Lumber to your stockpile."
+      "code": 10103004,
+      "name": "Speed Up 3h",
+      "category": "speedup",
+      "subcategory": "generic",
+      "duration_seconds": 10800,
+      "description": "Reduces any timer by 3 hours.",
+      "icon": "speedup.svg",
+      "name_de": "Universell · 3 Stunden",
+      "description_de": "Verkürzt einen Bau-, Forschungs-, Ausbildungs- oder Heilungsauftrag um 3 Stunden. Überschüssige Zeit verfällt.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
     },
     {
-      "code": 10101021,
-      "name": "Small Stone Pack",
-      "category": "resource_pack",
-      "subcategory": "stone",
-      "resource": "stone",
-      "amount": 50000,
-      "description": "Instantly adds 50,000 Stone to your stockpile."
+      "code": 10103005,
+      "name": "Speed Up 8h",
+      "category": "speedup",
+      "subcategory": "generic",
+      "duration_seconds": 28800,
+      "description": "Reduces any timer by 8 hours.",
+      "icon": "speedup.svg",
+      "name_de": "Universell · 8 Stunden",
+      "description_de": "Verkürzt einen Bau-, Forschungs-, Ausbildungs- oder Heilungsauftrag um 8 Stunden. Überschüssige Zeit verfällt.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
     },
     {
-      "code": 10101022,
-      "name": "Medium Stone Pack",
-      "category": "resource_pack",
-      "subcategory": "stone",
-      "resource": "stone",
-      "amount": 200000,
-      "description": "Instantly adds 200,000 Stone to your stockpile."
+      "code": 10103006,
+      "name": "Speed Up 24h",
+      "category": "speedup",
+      "subcategory": "generic",
+      "duration_seconds": 86400,
+      "description": "Reduces any timer by 24 hours.",
+      "icon": "speedup.svg",
+      "name_de": "Universell · 1 Tag",
+      "description_de": "Verkürzt einen Bau-, Forschungs-, Ausbildungs- oder Heilungsauftrag um 1 Tag. Überschüssige Zeit verfällt.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum"
+      ]
     },
     {
-      "code": 10101031,
-      "name": "Small Gold Pack",
-      "category": "resource_pack",
-      "subcategory": "gold",
-      "resource": "gold",
-      "amount": 25000,
-      "description": "Instantly adds 25,000 Gold to your stockpile."
+      "code": 10103011,
+      "name": "Building Speed Up 1h",
+      "category": "speedup",
+      "subcategory": "building",
+      "duration_seconds": 3600,
+      "description": "Reduces a building construction or upgrade timer by 1 hour.",
+      "icon": "speedup.svg",
+      "name_de": "Bauen · 1 Stunde",
+      "description_de": "Verkürzt einen Bauauftrag um 1 Stunde. Überschüssige Zeit verfällt.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
     },
     {
-      "code": 10101032,
-      "name": "Medium Gold Pack",
-      "category": "resource_pack",
-      "subcategory": "gold",
-      "resource": "gold",
-      "amount": 100000,
-      "description": "Instantly adds 100,000 Gold to your stockpile."
+      "code": 10103012,
+      "name": "Building Speed Up 3h",
+      "category": "speedup",
+      "subcategory": "building",
+      "duration_seconds": 10800,
+      "description": "Reduces a building construction or upgrade timer by 3 hours.",
+      "icon": "speedup.svg",
+      "name_de": "Bauen · 3 Stunden",
+      "description_de": "Verkürzt einen Bauauftrag um 3 Stunden. Überschüssige Zeit verfällt.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
     },
     {
-      "code": 10101041,
-      "name": "Small GEMS Pack",
-      "category": "resource_pack",
-      "subcategory": "gems",
-      "resource": "gems",
-      "amount": 50,
-      "description": "Instantly adds 50 Gems to your account."
+      "code": 10103013,
+      "name": "Building Speed Up 8h",
+      "category": "speedup",
+      "subcategory": "building",
+      "duration_seconds": 28800,
+      "description": "Reduces a building construction or upgrade timer by 8 hours.",
+      "icon": "speedup.svg",
+      "name_de": "Bauen · 8 Stunden",
+      "description_de": "Verkürzt einen Bauauftrag um 8 Stunden. Überschüssige Zeit verfällt.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
     },
     {
-      "code": 10101042,
-      "name": "Medium GEMS Pack",
-      "category": "resource_pack",
-      "subcategory": "gems",
-      "resource": "gems",
-      "amount": 150,
-      "description": "Instantly adds 150 Gems to your account."
+      "code": 10103021,
+      "name": "Research Speed Up 1h",
+      "category": "speedup",
+      "subcategory": "research",
+      "duration_seconds": 3600,
+      "description": "Reduces a research timer by 1 hour.",
+      "icon": "speedup.svg",
+      "name_de": "Forschung · 1 Stunde",
+      "description_de": "Verkürzt einen Forschungsauftrag um 1 Stunde. Überschüssige Zeit verfällt.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
     },
     {
-      "code": 10101043,
-      "name": "Large GEMS Pack",
-      "category": "resource_pack",
-      "subcategory": "gems",
-      "resource": "gems",
-      "amount": 500,
-      "description": "Instantly adds 500 Gems to your account."
+      "code": 10103022,
+      "name": "Research Speed Up 3h",
+      "category": "speedup",
+      "subcategory": "research",
+      "duration_seconds": 10800,
+      "description": "Reduces a research timer by 3 hours.",
+      "icon": "speedup.svg",
+      "name_de": "Forschung · 3 Stunden",
+      "description_de": "Verkürzt einen Forschungsauftrag um 3 Stunden. Überschüssige Zeit verfällt.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10103023,
+      "name": "Research Speed Up 8h",
+      "category": "speedup",
+      "subcategory": "research",
+      "duration_seconds": 28800,
+      "description": "Reduces a research timer by 8 hours.",
+      "icon": "speedup.svg",
+      "name_de": "Forschung · 8 Stunden",
+      "description_de": "Verkürzt einen Forschungsauftrag um 8 Stunden. Überschüssige Zeit verfällt.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10103031,
+      "name": "Training Speed Up 1h",
+      "category": "speedup",
+      "subcategory": "training",
+      "duration_seconds": 3600,
+      "description": "Reduces a troop training timer by 1 hour.",
+      "icon": "speedup.svg",
+      "name_de": "Ausbildung · 1 Stunde",
+      "description_de": "Verkürzt einen Ausbildungsauftrag um 1 Stunde. Überschüssige Zeit verfällt.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10103032,
+      "name": "Training Speed Up 3h",
+      "category": "speedup",
+      "subcategory": "training",
+      "duration_seconds": 10800,
+      "description": "Reduces a troop training timer by 3 hours.",
+      "icon": "speedup.svg",
+      "name_de": "Ausbildung · 3 Stunden",
+      "description_de": "Verkürzt einen Ausbildungsauftrag um 3 Stunden. Überschüssige Zeit verfällt.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10103041,
+      "name": "Healing Speed Up 1h",
+      "category": "speedup",
+      "subcategory": "healing",
+      "duration_seconds": 3600,
+      "description": "Reduces a hospital healing timer by 1 hour.",
+      "icon": "speedup.svg",
+      "name_de": "Heilung · 1 Stunde",
+      "description_de": "Verkürzt die laufende Heilung um 1 Stunde. Überschüssige Zeit verfällt.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
     },
     {
       "code": 10104001,
@@ -304,7 +686,18 @@
       "category": "ap_refill",
       "subcategory": "small",
       "ap_amount": 50,
-      "description": "Restores 50 Action Points immediately."
+      "description": "Restores 50 Action Points immediately.",
+      "icon": "energy.svg",
+      "name_de": "Energieflasche · 50 AP",
+      "description_de": "Stellt bis zu 50 Aktionspunkte wieder her, höchstens bis zu deinem Maximum. Nur bei fehlenden Aktionspunkten verwendbar.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
     },
     {
       "code": 10104002,
@@ -312,7 +705,17 @@
       "category": "ap_refill",
       "subcategory": "full",
       "ap_amount": 200,
-      "description": "Fully restores all Action Points immediately."
+      "description": "Fully restores all Action Points immediately.",
+      "icon": "energy.svg",
+      "name_de": "Energieflasche · 200 AP",
+      "description_de": "Stellt bis zu 200 Aktionspunkte wieder her, höchstens bis zu deinem Maximum. Nur bei fehlenden Aktionspunkten verwendbar.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum"
+      ]
     },
     {
       "code": 10105001,
@@ -320,7 +723,14 @@
       "category": "chest",
       "subcategory": "silver",
       "chest_type": "silver",
-      "description": "A silver chest containing a selection of useful items."
+      "description": "A silver chest containing a selection of useful items.",
+      "icon": "chest-silver.svg",
+      "name_de": "Silbertruhe",
+      "description_de": "Enthält zufällige Gegenstände und möglicherweise Reliktfragmente. ",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": []
     },
     {
       "code": 10105002,
@@ -328,7 +738,18 @@
       "category": "chest",
       "subcategory": "gold",
       "chest_type": "gold",
-      "description": "A gold chest containing valuable items and rare treasure fragments."
+      "description": "A gold chest containing valuable items and rare treasure fragments.",
+      "icon": "chest-gold.svg",
+      "name_de": "Goldtruhe",
+      "description_de": "Enthält zufällige Gegenstände und möglicherweise Reliktfragmente. ",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
     },
     {
       "code": 10105003,
@@ -336,7 +757,18 @@
       "category": "chest",
       "subcategory": "platinum",
       "chest_type": "platinum",
-      "description": "A platinum chest containing the finest items, including legendary and mythic fragments."
+      "description": "A platinum chest containing the finest items, including legendary and mythic fragments.",
+      "icon": "chest-platinum.svg",
+      "name_de": "Platintruhe",
+      "description_de": "Enthält zufällige Gegenstände und möglicherweise Reliktfragmente. Auch legendäre und mythische Beute ist möglich.",
+      "rarity": "legendary",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
     },
     {
       "code": 10106001,
@@ -344,7 +776,18 @@
       "category": "vip_point",
       "subcategory": "small",
       "vip_points": 100,
-      "description": "Grants 100 VIP Points, progressing your VIP level."
+      "description": "Grants 100 VIP Points, progressing your VIP level.",
+      "icon": "prestige.svg",
+      "name_de": "Prestigemedaille · 100 Punkte",
+      "description_de": "Gewährt 100 Prestige-Punkte für deine Prestigestufe.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
     },
     {
       "code": 10106002,
@@ -352,7 +795,18 @@
       "category": "vip_point",
       "subcategory": "medium",
       "vip_points": 500,
-      "description": "Grants 500 VIP Points, progressing your VIP level."
+      "description": "Grants 500 VIP Points, progressing your VIP level.",
+      "icon": "prestige.svg",
+      "name_de": "Prestigemedaille · 500 Punkte",
+      "description_de": "Gewährt 500 Prestige-Punkte für deine Prestigestufe.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
     },
     {
       "code": 10106003,
@@ -360,7 +814,2610 @@
       "category": "vip_point",
       "subcategory": "large",
       "vip_points": 2000,
-      "description": "Grants 2,000 VIP Points, significantly advancing your VIP level."
+      "description": "Grants 2,000 VIP Points, significantly advancing your VIP level.",
+      "icon": "prestige.svg",
+      "name_de": "Prestigemedaille · 2.000 Punkte",
+      "description_de": "Gewährt 2.000 Prestige-Punkte für deine Prestigestufe.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10201001,
+      "name": "1.000 Nahrung",
+      "category": "resource_pack",
+      "subcategory": "food",
+      "resource": "food",
+      "amount": 1000,
+      "name_de": "1.000 Nahrung",
+      "description_de": "Fügt sofort 1.000 Nahrung hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10201002,
+      "name": "5.000 Nahrung",
+      "category": "resource_pack",
+      "subcategory": "food",
+      "resource": "food",
+      "amount": 5000,
+      "name_de": "5.000 Nahrung",
+      "description_de": "Fügt sofort 5.000 Nahrung hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10201003,
+      "name": "10.000 Nahrung",
+      "category": "resource_pack",
+      "subcategory": "food",
+      "resource": "food",
+      "amount": 10000,
+      "name_de": "10.000 Nahrung",
+      "description_de": "Fügt sofort 10.000 Nahrung hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10201004,
+      "name": "100.000 Nahrung",
+      "category": "resource_pack",
+      "subcategory": "food",
+      "resource": "food",
+      "amount": 100000,
+      "name_de": "100.000 Nahrung",
+      "description_de": "Fügt sofort 100.000 Nahrung hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10201005,
+      "name": "1.000.000 Nahrung",
+      "category": "resource_pack",
+      "subcategory": "food",
+      "resource": "food",
+      "amount": 1000000,
+      "name_de": "1.000.000 Nahrung",
+      "description_de": "Fügt sofort 1.000.000 Nahrung hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum",
+        "silver"
+      ]
+    },
+    {
+      "code": 10201006,
+      "name": "5.000.000 Nahrung",
+      "category": "resource_pack",
+      "subcategory": "food",
+      "resource": "food",
+      "amount": 5000000,
+      "name_de": "5.000.000 Nahrung",
+      "description_de": "Fügt sofort 5.000.000 Nahrung hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10201007,
+      "name": "10.000.000 Nahrung",
+      "category": "resource_pack",
+      "subcategory": "food",
+      "resource": "food",
+      "amount": 10000000,
+      "name_de": "10.000.000 Nahrung",
+      "description_de": "Fügt sofort 10.000.000 Nahrung hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "legendary",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "platinum"
+      ]
+    },
+    {
+      "code": 10201008,
+      "name": "1.000 Holz",
+      "category": "resource_pack",
+      "subcategory": "lumber",
+      "resource": "lumber",
+      "amount": 1000,
+      "name_de": "1.000 Holz",
+      "description_de": "Fügt sofort 1.000 Holz hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10201009,
+      "name": "5.000 Holz",
+      "category": "resource_pack",
+      "subcategory": "lumber",
+      "resource": "lumber",
+      "amount": 5000,
+      "name_de": "5.000 Holz",
+      "description_de": "Fügt sofort 5.000 Holz hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10201010,
+      "name": "10.000 Holz",
+      "category": "resource_pack",
+      "subcategory": "lumber",
+      "resource": "lumber",
+      "amount": 10000,
+      "name_de": "10.000 Holz",
+      "description_de": "Fügt sofort 10.000 Holz hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10201011,
+      "name": "100.000 Holz",
+      "category": "resource_pack",
+      "subcategory": "lumber",
+      "resource": "lumber",
+      "amount": 100000,
+      "name_de": "100.000 Holz",
+      "description_de": "Fügt sofort 100.000 Holz hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10201012,
+      "name": "500.000 Holz",
+      "category": "resource_pack",
+      "subcategory": "lumber",
+      "resource": "lumber",
+      "amount": 500000,
+      "name_de": "500.000 Holz",
+      "description_de": "Fügt sofort 500.000 Holz hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10201013,
+      "name": "1.000.000 Holz",
+      "category": "resource_pack",
+      "subcategory": "lumber",
+      "resource": "lumber",
+      "amount": 1000000,
+      "name_de": "1.000.000 Holz",
+      "description_de": "Fügt sofort 1.000.000 Holz hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum",
+        "silver"
+      ]
+    },
+    {
+      "code": 10201014,
+      "name": "5.000.000 Holz",
+      "category": "resource_pack",
+      "subcategory": "lumber",
+      "resource": "lumber",
+      "amount": 5000000,
+      "name_de": "5.000.000 Holz",
+      "description_de": "Fügt sofort 5.000.000 Holz hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10201015,
+      "name": "10.000.000 Holz",
+      "category": "resource_pack",
+      "subcategory": "lumber",
+      "resource": "lumber",
+      "amount": 10000000,
+      "name_de": "10.000.000 Holz",
+      "description_de": "Fügt sofort 10.000.000 Holz hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "legendary",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "platinum"
+      ]
+    },
+    {
+      "code": 10201016,
+      "name": "1.000 Stein",
+      "category": "resource_pack",
+      "subcategory": "stone",
+      "resource": "stone",
+      "amount": 1000,
+      "name_de": "1.000 Stein",
+      "description_de": "Fügt sofort 1.000 Stein hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10201017,
+      "name": "5.000 Stein",
+      "category": "resource_pack",
+      "subcategory": "stone",
+      "resource": "stone",
+      "amount": 5000,
+      "name_de": "5.000 Stein",
+      "description_de": "Fügt sofort 5.000 Stein hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10201018,
+      "name": "10.000 Stein",
+      "category": "resource_pack",
+      "subcategory": "stone",
+      "resource": "stone",
+      "amount": 10000,
+      "name_de": "10.000 Stein",
+      "description_de": "Fügt sofort 10.000 Stein hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10201019,
+      "name": "100.000 Stein",
+      "category": "resource_pack",
+      "subcategory": "stone",
+      "resource": "stone",
+      "amount": 100000,
+      "name_de": "100.000 Stein",
+      "description_de": "Fügt sofort 100.000 Stein hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10201020,
+      "name": "500.000 Stein",
+      "category": "resource_pack",
+      "subcategory": "stone",
+      "resource": "stone",
+      "amount": 500000,
+      "name_de": "500.000 Stein",
+      "description_de": "Fügt sofort 500.000 Stein hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10201021,
+      "name": "1.000.000 Stein",
+      "category": "resource_pack",
+      "subcategory": "stone",
+      "resource": "stone",
+      "amount": 1000000,
+      "name_de": "1.000.000 Stein",
+      "description_de": "Fügt sofort 1.000.000 Stein hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum",
+        "silver"
+      ]
+    },
+    {
+      "code": 10201022,
+      "name": "5.000.000 Stein",
+      "category": "resource_pack",
+      "subcategory": "stone",
+      "resource": "stone",
+      "amount": 5000000,
+      "name_de": "5.000.000 Stein",
+      "description_de": "Fügt sofort 5.000.000 Stein hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10201023,
+      "name": "10.000.000 Stein",
+      "category": "resource_pack",
+      "subcategory": "stone",
+      "resource": "stone",
+      "amount": 10000000,
+      "name_de": "10.000.000 Stein",
+      "description_de": "Fügt sofort 10.000.000 Stein hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "legendary",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "platinum"
+      ]
+    },
+    {
+      "code": 10201024,
+      "name": "1.000 Gold",
+      "category": "resource_pack",
+      "subcategory": "gold",
+      "resource": "gold",
+      "amount": 1000,
+      "name_de": "1.000 Gold",
+      "description_de": "Fügt sofort 1.000 Gold hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10201025,
+      "name": "5.000 Gold",
+      "category": "resource_pack",
+      "subcategory": "gold",
+      "resource": "gold",
+      "amount": 5000,
+      "name_de": "5.000 Gold",
+      "description_de": "Fügt sofort 5.000 Gold hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10201026,
+      "name": "10.000 Gold",
+      "category": "resource_pack",
+      "subcategory": "gold",
+      "resource": "gold",
+      "amount": 10000,
+      "name_de": "10.000 Gold",
+      "description_de": "Fügt sofort 10.000 Gold hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10201027,
+      "name": "50.000 Gold",
+      "category": "resource_pack",
+      "subcategory": "gold",
+      "resource": "gold",
+      "amount": 50000,
+      "name_de": "50.000 Gold",
+      "description_de": "Fügt sofort 50.000 Gold hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10201028,
+      "name": "500.000 Gold",
+      "category": "resource_pack",
+      "subcategory": "gold",
+      "resource": "gold",
+      "amount": 500000,
+      "name_de": "500.000 Gold",
+      "description_de": "Fügt sofort 500.000 Gold hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10201029,
+      "name": "1.000.000 Gold",
+      "category": "resource_pack",
+      "subcategory": "gold",
+      "resource": "gold",
+      "amount": 1000000,
+      "name_de": "1.000.000 Gold",
+      "description_de": "Fügt sofort 1.000.000 Gold hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum",
+        "silver"
+      ]
+    },
+    {
+      "code": 10201030,
+      "name": "5.000.000 Gold",
+      "category": "resource_pack",
+      "subcategory": "gold",
+      "resource": "gold",
+      "amount": 5000000,
+      "name_de": "5.000.000 Gold",
+      "description_de": "Fügt sofort 5.000.000 Gold hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10201031,
+      "name": "10.000.000 Gold",
+      "category": "resource_pack",
+      "subcategory": "gold",
+      "resource": "gold",
+      "amount": 10000000,
+      "name_de": "10.000.000 Gold",
+      "description_de": "Fügt sofort 10.000.000 Gold hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "legendary",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "platinum"
+      ]
+    },
+    {
+      "code": 10201032,
+      "name": "10 Edelsteine",
+      "category": "resource_pack",
+      "subcategory": "gems",
+      "resource": "gems",
+      "amount": 10,
+      "icon": "gems.svg",
+      "name_de": "10 Edelsteine",
+      "description_de": "Fügt sofort 10 Edelsteine hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10201033,
+      "name": "100 Edelsteine",
+      "category": "resource_pack",
+      "subcategory": "gems",
+      "resource": "gems",
+      "amount": 100,
+      "icon": "gems.svg",
+      "name_de": "100 Edelsteine",
+      "description_de": "Fügt sofort 100 Edelsteine hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10201034,
+      "name": "1.000 Edelsteine",
+      "category": "resource_pack",
+      "subcategory": "gems",
+      "resource": "gems",
+      "amount": 1000,
+      "icon": "gems.svg",
+      "name_de": "1.000 Edelsteine",
+      "description_de": "Fügt sofort 1.000 Edelsteine hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10201035,
+      "name": "5.000 Edelsteine",
+      "category": "resource_pack",
+      "subcategory": "gems",
+      "resource": "gems",
+      "amount": 5000,
+      "icon": "gems.svg",
+      "name_de": "5.000 Edelsteine",
+      "description_de": "Fügt sofort 5.000 Edelsteine hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10201036,
+      "name": "10.000 Edelsteine",
+      "category": "resource_pack",
+      "subcategory": "gems",
+      "resource": "gems",
+      "amount": 10000,
+      "icon": "gems.svg",
+      "name_de": "10.000 Edelsteine",
+      "description_de": "Fügt sofort 10.000 Edelsteine hinzu. Ungeöffnete Pakete bleiben im Inventar.",
+      "rarity": "legendary",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "platinum"
+      ]
+    },
+    {
+      "code": 10202001,
+      "name": "Nahrungsproduktion",
+      "category": "boost",
+      "subcategory": "food_production",
+      "boost_type": "food_production",
+      "bonus_pct": 25,
+      "duration_seconds": 28800,
+      "icon": "production-food.svg",
+      "name_de": "Nahrungsproduktion +25 % · 8 Stunden",
+      "description_de": "Erhöht Nahrungsproduktion für 8 Stunden um 25 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10202002,
+      "name": "Nahrungsproduktion",
+      "category": "boost",
+      "subcategory": "food_production",
+      "boost_type": "food_production",
+      "bonus_pct": 25,
+      "duration_seconds": 86400,
+      "icon": "production-food.svg",
+      "name_de": "Nahrungsproduktion +25 % · 1 Tag",
+      "description_de": "Erhöht Nahrungsproduktion für 1 Tag um 25 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum",
+        "silver"
+      ]
+    },
+    {
+      "code": 10202003,
+      "name": "Holzproduktion",
+      "category": "boost",
+      "subcategory": "lumber_production",
+      "boost_type": "lumber_production",
+      "bonus_pct": 25,
+      "duration_seconds": 28800,
+      "icon": "production-lumber.svg",
+      "name_de": "Holzproduktion +25 % · 8 Stunden",
+      "description_de": "Erhöht Holzproduktion für 8 Stunden um 25 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10202004,
+      "name": "Holzproduktion",
+      "category": "boost",
+      "subcategory": "lumber_production",
+      "boost_type": "lumber_production",
+      "bonus_pct": 25,
+      "duration_seconds": 86400,
+      "icon": "production-lumber.svg",
+      "name_de": "Holzproduktion +25 % · 1 Tag",
+      "description_de": "Erhöht Holzproduktion für 1 Tag um 25 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum",
+        "silver"
+      ]
+    },
+    {
+      "code": 10202005,
+      "name": "Steinproduktion",
+      "category": "boost",
+      "subcategory": "stone_production",
+      "boost_type": "stone_production",
+      "bonus_pct": 25,
+      "duration_seconds": 28800,
+      "icon": "production-stone.svg",
+      "name_de": "Steinproduktion +25 % · 8 Stunden",
+      "description_de": "Erhöht Steinproduktion für 8 Stunden um 25 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10202006,
+      "name": "Steinproduktion",
+      "category": "boost",
+      "subcategory": "stone_production",
+      "boost_type": "stone_production",
+      "bonus_pct": 25,
+      "duration_seconds": 86400,
+      "icon": "production-stone.svg",
+      "name_de": "Steinproduktion +25 % · 1 Tag",
+      "description_de": "Erhöht Steinproduktion für 1 Tag um 25 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum",
+        "silver"
+      ]
+    },
+    {
+      "code": 10202007,
+      "name": "Goldproduktion",
+      "category": "boost",
+      "subcategory": "gold_production",
+      "boost_type": "gold_production",
+      "bonus_pct": 25,
+      "duration_seconds": 28800,
+      "icon": "production-gold.svg",
+      "name_de": "Goldproduktion +25 % · 8 Stunden",
+      "description_de": "Erhöht Goldproduktion für 8 Stunden um 25 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10202008,
+      "name": "Goldproduktion",
+      "category": "boost",
+      "subcategory": "gold_production",
+      "boost_type": "gold_production",
+      "bonus_pct": 25,
+      "duration_seconds": 86400,
+      "icon": "production-gold.svg",
+      "name_de": "Goldproduktion +25 % · 1 Tag",
+      "description_de": "Erhöht Goldproduktion für 1 Tag um 25 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum",
+        "silver"
+      ]
+    },
+    {
+      "code": 10202009,
+      "name": "Sammelgeschwindigkeit",
+      "category": "boost",
+      "subcategory": "gathering_speed",
+      "boost_type": "gathering_speed",
+      "bonus_pct": 50,
+      "duration_seconds": 86400,
+      "icon": "gathering.svg",
+      "name_de": "Sammelgeschwindigkeit +50 % · 1 Tag",
+      "description_de": "Erhöht Sammelgeschwindigkeit für 1 Tag um 50 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum",
+        "silver"
+      ]
+    },
+    {
+      "code": 10202010,
+      "name": "Baugeschwindigkeit",
+      "category": "boost",
+      "subcategory": "construction_speed",
+      "boost_type": "construction_speed",
+      "bonus_pct": 25,
+      "duration_seconds": 86400,
+      "icon": "hammer.svg",
+      "name_de": "Baugeschwindigkeit +25 % · 1 Tag",
+      "description_de": "Erhöht Baugeschwindigkeit für 1 Tag um 25 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10202011,
+      "name": "Forschungsgeschwindigkeit",
+      "category": "boost",
+      "subcategory": "research_speed",
+      "boost_type": "research_speed",
+      "bonus_pct": 25,
+      "duration_seconds": 86400,
+      "icon": "research.svg",
+      "name_de": "Forschungsgeschwindigkeit +25 % · 1 Tag",
+      "description_de": "Erhöht Forschungsgeschwindigkeit für 1 Tag um 25 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10202012,
+      "name": "Ausbildungsgeschwindigkeit",
+      "category": "boost",
+      "subcategory": "training_speed",
+      "boost_type": "training_speed",
+      "bonus_pct": 25,
+      "duration_seconds": 86400,
+      "icon": "helmet.svg",
+      "name_de": "Ausbildungsgeschwindigkeit +25 % · 1 Tag",
+      "description_de": "Erhöht Ausbildungsgeschwindigkeit für 1 Tag um 25 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10202013,
+      "name": "Truppenangriff",
+      "category": "boost",
+      "subcategory": "troops_atk",
+      "boost_type": "troops_atk",
+      "bonus_pct": 10,
+      "duration_seconds": 3600,
+      "icon": "attack.svg",
+      "name_de": "Truppenangriff +10 % · 1 Stunde",
+      "description_de": "Erhöht Truppenangriff für 1 Stunde um 10 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10202014,
+      "name": "Truppenangriff",
+      "category": "boost",
+      "subcategory": "troops_atk",
+      "boost_type": "troops_atk",
+      "bonus_pct": 20,
+      "duration_seconds": 3600,
+      "icon": "attack.svg",
+      "name_de": "Truppenangriff +20 % · 1 Stunde",
+      "description_de": "Erhöht Truppenangriff für 1 Stunde um 20 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum",
+        "silver"
+      ]
+    },
+    {
+      "code": 10202015,
+      "name": "Truppenverteidigung",
+      "category": "boost",
+      "subcategory": "troops_def",
+      "boost_type": "troops_def",
+      "bonus_pct": 10,
+      "duration_seconds": 3600,
+      "icon": "defense.svg",
+      "name_de": "Truppenverteidigung +10 % · 1 Stunde",
+      "description_de": "Erhöht Truppenverteidigung für 1 Stunde um 10 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10202016,
+      "name": "Truppenverteidigung",
+      "category": "boost",
+      "subcategory": "troops_def",
+      "boost_type": "troops_def",
+      "bonus_pct": 20,
+      "duration_seconds": 3600,
+      "icon": "defense.svg",
+      "name_de": "Truppenverteidigung +20 % · 1 Stunde",
+      "description_de": "Erhöht Truppenverteidigung für 1 Stunde um 20 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum",
+        "silver"
+      ]
+    },
+    {
+      "code": 10202017,
+      "name": "Truppen-Lebenspunkte",
+      "category": "boost",
+      "subcategory": "troops_hp",
+      "boost_type": "troops_hp",
+      "bonus_pct": 10,
+      "duration_seconds": 3600,
+      "icon": "hp.svg",
+      "name_de": "Truppen-Lebenspunkte +10 % · 1 Stunde",
+      "description_de": "Erhöht Truppen-Lebenspunkte für 1 Stunde um 10 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10202018,
+      "name": "Truppen-Lebenspunkte",
+      "category": "boost",
+      "subcategory": "troops_hp",
+      "boost_type": "troops_hp",
+      "bonus_pct": 20,
+      "duration_seconds": 3600,
+      "icon": "hp.svg",
+      "name_de": "Truppen-Lebenspunkte +20 % · 1 Stunde",
+      "description_de": "Erhöht Truppen-Lebenspunkte für 1 Stunde um 20 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum",
+        "silver"
+      ]
+    },
+    {
+      "code": 10202019,
+      "name": "Marschkapazität",
+      "category": "boost",
+      "subcategory": "march_size",
+      "boost_type": "march_size",
+      "bonus_pct": 10,
+      "duration_seconds": 3600,
+      "icon": "army.svg",
+      "name_de": "Marschkapazität +10 % · 1 Stunde",
+      "description_de": "Erhöht Marschkapazität für 1 Stunde um 10 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10202020,
+      "name": "Marschkapazität",
+      "category": "boost",
+      "subcategory": "march_size",
+      "boost_type": "march_size",
+      "bonus_pct": 20,
+      "duration_seconds": 3600,
+      "icon": "army.svg",
+      "name_de": "Marschkapazität +20 % · 1 Stunde",
+      "description_de": "Erhöht Marschkapazität für 1 Stunde um 20 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum",
+        "silver"
+      ]
+    },
+    {
+      "code": 10202021,
+      "name": "Angriff gegen Monster",
+      "category": "boost",
+      "subcategory": "vs_monster_attack",
+      "boost_type": "vs_monster_attack",
+      "bonus_pct": 10,
+      "duration_seconds": 3600,
+      "icon": "attack.svg",
+      "name_de": "Angriff gegen Monster +10 % · 1 Stunde",
+      "description_de": "Erhöht Angriff gegen Monster für 1 Stunde um 10 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10202022,
+      "name": "Angriff gegen Monster",
+      "category": "boost",
+      "subcategory": "vs_monster_attack",
+      "boost_type": "vs_monster_attack",
+      "bonus_pct": 20,
+      "duration_seconds": 3600,
+      "icon": "attack.svg",
+      "name_de": "Angriff gegen Monster +20 % · 1 Stunde",
+      "description_de": "Erhöht Angriff gegen Monster für 1 Stunde um 20 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10202023,
+      "name": "Marschgeschwindigkeit",
+      "category": "boost",
+      "subcategory": "march_speed",
+      "boost_type": "march_speed",
+      "bonus_pct": 25,
+      "duration_seconds": 3600,
+      "icon": "march.svg",
+      "name_de": "Marschgeschwindigkeit +25 % · 1 Stunde",
+      "description_de": "Erhöht Marschgeschwindigkeit für 1 Stunde um 25 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10202024,
+      "name": "Marschgeschwindigkeit",
+      "category": "boost",
+      "subcategory": "march_speed",
+      "boost_type": "march_speed",
+      "bonus_pct": 50,
+      "duration_seconds": 3600,
+      "icon": "march.svg",
+      "name_de": "Marschgeschwindigkeit +50 % · 1 Stunde",
+      "description_de": "Erhöht Marschgeschwindigkeit für 1 Stunde um 50 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum",
+        "silver"
+      ]
+    },
+    {
+      "code": 10202025,
+      "name": "anti_spy",
+      "category": "boost",
+      "subcategory": "anti_spy",
+      "boost_type": "anti_spy",
+      "duration_seconds": 86400,
+      "icon": "anti-spy.svg",
+      "name_de": "Spähschutz · 1 Tag",
+      "description_de": "Verbirgt Ressourcen, Truppen und Mauerwerte deiner aktiven Stadt 1 Tag vor Spähern.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10202026,
+      "name": "city_shield",
+      "category": "boost",
+      "subcategory": "city_shield",
+      "boost_type": "city_shield",
+      "duration_seconds": 86400,
+      "icon": "shield.svg",
+      "name_de": "Königsschild · 1 Tag",
+      "description_de": "Schützt deine aktive Stadt 1 Tag vor feindlichen Angriffen. Nicht während eigener feindlicher Märsche nutzbar.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10203001,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "generic",
+      "duration_seconds": 60,
+      "icon": "speedup.svg",
+      "name_de": "Universell · 1 Minuten",
+      "description_de": "Verkürzt einen Bau-, Forschungs-, Ausbildungs- oder Heilungsauftrag um 1 Minuten. Überschüssige Zeit verfällt.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10203002,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "generic",
+      "duration_seconds": 600,
+      "icon": "speedup.svg",
+      "name_de": "Universell · 10 Minuten",
+      "description_de": "Verkürzt einen Bau-, Forschungs-, Ausbildungs- oder Heilungsauftrag um 10 Minuten. Überschüssige Zeit verfällt.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10203003,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "generic",
+      "duration_seconds": 1800,
+      "icon": "speedup.svg",
+      "name_de": "Universell · 30 Minuten",
+      "description_de": "Verkürzt einen Bau-, Forschungs-, Ausbildungs- oder Heilungsauftrag um 30 Minuten. Überschüssige Zeit verfällt.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10203004,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "generic",
+      "duration_seconds": 259200,
+      "icon": "speedup.svg",
+      "name_de": "Universell · 3 Tage",
+      "description_de": "Verkürzt einen Bau-, Forschungs-, Ausbildungs- oder Heilungsauftrag um 3 Tage. Überschüssige Zeit verfällt.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10203005,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "generic",
+      "duration_seconds": 604800,
+      "icon": "speedup.svg",
+      "name_de": "Universell · 7 Tage",
+      "description_de": "Verkürzt einen Bau-, Forschungs-, Ausbildungs- oder Heilungsauftrag um 7 Tage. Überschüssige Zeit verfällt.",
+      "rarity": "legendary",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "platinum"
+      ]
+    },
+    {
+      "code": 10203006,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "generic",
+      "duration_seconds": 2592000,
+      "icon": "speedup.svg",
+      "name_de": "Universell · 30 Tage",
+      "description_de": "Verkürzt einen Bau-, Forschungs-, Ausbildungs- oder Heilungsauftrag um 30 Tage. Überschüssige Zeit verfällt.",
+      "rarity": "legendary",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "platinum",
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10203007,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "building",
+      "duration_seconds": 60,
+      "icon": "speedup.svg",
+      "name_de": "Bauen · 1 Minuten",
+      "description_de": "Verkürzt einen Bauauftrag um 1 Minuten. Überschüssige Zeit verfällt.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10203008,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "building",
+      "duration_seconds": 300,
+      "icon": "speedup.svg",
+      "name_de": "Bauen · 5 Minuten",
+      "description_de": "Verkürzt einen Bauauftrag um 5 Minuten. Überschüssige Zeit verfällt.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10203009,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "building",
+      "duration_seconds": 600,
+      "icon": "speedup.svg",
+      "name_de": "Bauen · 10 Minuten",
+      "description_de": "Verkürzt einen Bauauftrag um 10 Minuten. Überschüssige Zeit verfällt.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10203010,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "building",
+      "duration_seconds": 1800,
+      "icon": "speedup.svg",
+      "name_de": "Bauen · 30 Minuten",
+      "description_de": "Verkürzt einen Bauauftrag um 30 Minuten. Überschüssige Zeit verfällt.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10203011,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "building",
+      "duration_seconds": 86400,
+      "icon": "speedup.svg",
+      "name_de": "Bauen · 1 Tag",
+      "description_de": "Verkürzt einen Bauauftrag um 1 Tag. Überschüssige Zeit verfällt.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10203012,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "building",
+      "duration_seconds": 259200,
+      "icon": "speedup.svg",
+      "name_de": "Bauen · 3 Tage",
+      "description_de": "Verkürzt einen Bauauftrag um 3 Tage. Überschüssige Zeit verfällt.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10203013,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "building",
+      "duration_seconds": 604800,
+      "icon": "speedup.svg",
+      "name_de": "Bauen · 7 Tage",
+      "description_de": "Verkürzt einen Bauauftrag um 7 Tage. Überschüssige Zeit verfällt.",
+      "rarity": "legendary",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "platinum"
+      ]
+    },
+    {
+      "code": 10203014,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "research",
+      "duration_seconds": 60,
+      "icon": "speedup.svg",
+      "name_de": "Forschung · 1 Minuten",
+      "description_de": "Verkürzt einen Forschungsauftrag um 1 Minuten. Überschüssige Zeit verfällt.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10203015,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "research",
+      "duration_seconds": 300,
+      "icon": "speedup.svg",
+      "name_de": "Forschung · 5 Minuten",
+      "description_de": "Verkürzt einen Forschungsauftrag um 5 Minuten. Überschüssige Zeit verfällt.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10203016,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "research",
+      "duration_seconds": 600,
+      "icon": "speedup.svg",
+      "name_de": "Forschung · 10 Minuten",
+      "description_de": "Verkürzt einen Forschungsauftrag um 10 Minuten. Überschüssige Zeit verfällt.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10203017,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "research",
+      "duration_seconds": 1800,
+      "icon": "speedup.svg",
+      "name_de": "Forschung · 30 Minuten",
+      "description_de": "Verkürzt einen Forschungsauftrag um 30 Minuten. Überschüssige Zeit verfällt.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10203018,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "research",
+      "duration_seconds": 86400,
+      "icon": "speedup.svg",
+      "name_de": "Forschung · 1 Tag",
+      "description_de": "Verkürzt einen Forschungsauftrag um 1 Tag. Überschüssige Zeit verfällt.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum",
+        "silver"
+      ]
+    },
+    {
+      "code": 10203019,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "research",
+      "duration_seconds": 259200,
+      "icon": "speedup.svg",
+      "name_de": "Forschung · 3 Tage",
+      "description_de": "Verkürzt einen Forschungsauftrag um 3 Tage. Überschüssige Zeit verfällt.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum",
+        "silver"
+      ]
+    },
+    {
+      "code": 10203020,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "research",
+      "duration_seconds": 604800,
+      "icon": "speedup.svg",
+      "name_de": "Forschung · 7 Tage",
+      "description_de": "Verkürzt einen Forschungsauftrag um 7 Tage. Überschüssige Zeit verfällt.",
+      "rarity": "legendary",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "platinum",
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10203021,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "training",
+      "duration_seconds": 60,
+      "icon": "speedup.svg",
+      "name_de": "Ausbildung · 1 Minuten",
+      "description_de": "Verkürzt einen Ausbildungsauftrag um 1 Minuten. Überschüssige Zeit verfällt.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10203022,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "training",
+      "duration_seconds": 300,
+      "icon": "speedup.svg",
+      "name_de": "Ausbildung · 5 Minuten",
+      "description_de": "Verkürzt einen Ausbildungsauftrag um 5 Minuten. Überschüssige Zeit verfällt.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10203023,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "training",
+      "duration_seconds": 600,
+      "icon": "speedup.svg",
+      "name_de": "Ausbildung · 10 Minuten",
+      "description_de": "Verkürzt einen Ausbildungsauftrag um 10 Minuten. Überschüssige Zeit verfällt.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10203024,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "training",
+      "duration_seconds": 1800,
+      "icon": "speedup.svg",
+      "name_de": "Ausbildung · 30 Minuten",
+      "description_de": "Verkürzt einen Ausbildungsauftrag um 30 Minuten. Überschüssige Zeit verfällt.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10203025,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "training",
+      "duration_seconds": 28800,
+      "icon": "speedup.svg",
+      "name_de": "Ausbildung · 8 Stunden",
+      "description_de": "Verkürzt einen Ausbildungsauftrag um 8 Stunden. Überschüssige Zeit verfällt.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10203026,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "training",
+      "duration_seconds": 86400,
+      "icon": "speedup.svg",
+      "name_de": "Ausbildung · 1 Tag",
+      "description_de": "Verkürzt einen Ausbildungsauftrag um 1 Tag. Überschüssige Zeit verfällt.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum",
+        "silver"
+      ]
+    },
+    {
+      "code": 10203027,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "training",
+      "duration_seconds": 259200,
+      "icon": "speedup.svg",
+      "name_de": "Ausbildung · 3 Tage",
+      "description_de": "Verkürzt einen Ausbildungsauftrag um 3 Tage. Überschüssige Zeit verfällt.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum",
+        "silver"
+      ]
+    },
+    {
+      "code": 10203028,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "training",
+      "duration_seconds": 604800,
+      "icon": "speedup.svg",
+      "name_de": "Ausbildung · 7 Tage",
+      "description_de": "Verkürzt einen Ausbildungsauftrag um 7 Tage. Überschüssige Zeit verfällt.",
+      "rarity": "legendary",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "platinum",
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10203029,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "healing",
+      "duration_seconds": 60,
+      "icon": "speedup.svg",
+      "name_de": "Heilung · 1 Minuten",
+      "description_de": "Verkürzt die laufende Heilung um 1 Minuten. Überschüssige Zeit verfällt.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10203030,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "healing",
+      "duration_seconds": 300,
+      "icon": "speedup.svg",
+      "name_de": "Heilung · 5 Minuten",
+      "description_de": "Verkürzt die laufende Heilung um 5 Minuten. Überschüssige Zeit verfällt.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10203031,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "healing",
+      "duration_seconds": 600,
+      "icon": "speedup.svg",
+      "name_de": "Heilung · 10 Minuten",
+      "description_de": "Verkürzt die laufende Heilung um 10 Minuten. Überschüssige Zeit verfällt.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10203032,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "healing",
+      "duration_seconds": 1800,
+      "icon": "speedup.svg",
+      "name_de": "Heilung · 30 Minuten",
+      "description_de": "Verkürzt die laufende Heilung um 30 Minuten. Überschüssige Zeit verfällt.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10203033,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "healing",
+      "duration_seconds": 10800,
+      "icon": "speedup.svg",
+      "name_de": "Heilung · 3 Stunden",
+      "description_de": "Verkürzt die laufende Heilung um 3 Stunden. Überschüssige Zeit verfällt.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10203034,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "healing",
+      "duration_seconds": 28800,
+      "icon": "speedup.svg",
+      "name_de": "Heilung · 8 Stunden",
+      "description_de": "Verkürzt die laufende Heilung um 8 Stunden. Überschüssige Zeit verfällt.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10203035,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "healing",
+      "duration_seconds": 86400,
+      "icon": "speedup.svg",
+      "name_de": "Heilung · 1 Tag",
+      "description_de": "Verkürzt die laufende Heilung um 1 Tag. Überschüssige Zeit verfällt.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum",
+        "silver"
+      ]
+    },
+    {
+      "code": 10203036,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "healing",
+      "duration_seconds": 259200,
+      "icon": "speedup.svg",
+      "name_de": "Heilung · 3 Tage",
+      "description_de": "Verkürzt die laufende Heilung um 3 Tage. Überschüssige Zeit verfällt.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum",
+        "silver"
+      ]
+    },
+    {
+      "code": 10203037,
+      "name": "Beschleuniger",
+      "category": "speedup",
+      "subcategory": "healing",
+      "duration_seconds": 604800,
+      "icon": "speedup.svg",
+      "name_de": "Heilung · 7 Tage",
+      "description_de": "Verkürzt die laufende Heilung um 7 Tage. Überschüssige Zeit verfällt.",
+      "rarity": "legendary",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "platinum",
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10204001,
+      "name": "Energieflasche",
+      "category": "ap_refill",
+      "subcategory": "medium",
+      "ap_amount": 100,
+      "icon": "energy.svg",
+      "name_de": "Energieflasche · 100 AP",
+      "description_de": "Stellt bis zu 100 Aktionspunkte wieder her, höchstens bis zu deinem Maximum. Nur bei fehlenden Aktionspunkten verwendbar.",
+      "rarity": "rare",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10205001,
+      "name": "Rohstoffkiste Stufe 1",
+      "category": "resource_box",
+      "subcategory": "resource_box",
+      "box_level": 1,
+      "amount_min": 1000,
+      "amount_max": 50000,
+      "rarity": "normal",
+      "icon": "resource-box.svg",
+      "name_de": "Rohstoffkiste Stufe 1",
+      "description_de": "Enthält 1.000 bis 50.000 Einheiten eines zufälligen Rohstoffs: Nahrung, Holz, Stein oder Gold.",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10205002,
+      "name": "Rohstoffkiste Stufe 2",
+      "category": "resource_box",
+      "subcategory": "resource_box",
+      "box_level": 2,
+      "amount_min": 50000,
+      "amount_max": 100000,
+      "rarity": "rare",
+      "icon": "resource-box.svg",
+      "name_de": "Rohstoffkiste Stufe 2",
+      "description_de": "Enthält 50.000 bis 100.000 Einheiten eines zufälligen Rohstoffs: Nahrung, Holz, Stein oder Gold.",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10205003,
+      "name": "Rohstoffkiste Stufe 3",
+      "category": "resource_box",
+      "subcategory": "resource_box",
+      "box_level": 3,
+      "amount_min": 100000,
+      "amount_max": 500000,
+      "rarity": "epic",
+      "icon": "resource-box.svg",
+      "name_de": "Rohstoffkiste Stufe 3",
+      "description_de": "Enthält 100.000 bis 500.000 Einheiten eines zufälligen Rohstoffs: Nahrung, Holz, Stein oder Gold.",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10205004,
+      "name": "Rohstoffkiste Stufe 4",
+      "category": "resource_box",
+      "subcategory": "resource_box",
+      "box_level": 4,
+      "amount_min": 500000,
+      "amount_max": 1000000,
+      "rarity": "legendary",
+      "icon": "resource-box.svg",
+      "name_de": "Rohstoffkiste Stufe 4",
+      "description_de": "Enthält 500.000 bis 1.000.000 Einheiten eines zufälligen Rohstoffs: Nahrung, Holz, Stein oder Gold.",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "platinum"
+      ]
+    },
+    {
+      "code": 10205005,
+      "name": "Rohstoffkiste Stufe 5",
+      "category": "resource_box",
+      "subcategory": "resource_box",
+      "box_level": 5,
+      "amount_min": 1000000,
+      "amount_max": 5000000,
+      "rarity": "legendary",
+      "icon": "resource-box.svg",
+      "name_de": "Rohstoffkiste Stufe 5",
+      "description_de": "Enthält 1.000.000 bis 5.000.000 Einheiten eines zufälligen Rohstoffs: Nahrung, Holz, Stein oder Gold.",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "platinum"
+      ]
+    },
+    {
+      "code": 10206001,
+      "name": "Prestigemedaille",
+      "category": "vip_point",
+      "subcategory": "points",
+      "vip_points": 10,
+      "icon": "prestige.svg",
+      "name_de": "Prestigemedaille · 10 Punkte",
+      "description_de": "Gewährt 10 Prestige-Punkte für deine Prestigestufe.",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10206002,
+      "name": "Prestigemedaille",
+      "category": "vip_point",
+      "subcategory": "points",
+      "vip_points": 1000,
+      "icon": "prestige.svg",
+      "name_de": "Prestigemedaille · 1.000 Punkte",
+      "description_de": "Gewährt 1.000 Prestige-Punkte für deine Prestigestufe.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10206003,
+      "name": "Prestigemedaille",
+      "category": "vip_point",
+      "subcategory": "points",
+      "vip_points": 5000,
+      "icon": "prestige.svg",
+      "name_de": "Prestigemedaille · 5.000 Punkte",
+      "description_de": "Gewährt 5.000 Prestige-Punkte für deine Prestigestufe.",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10206004,
+      "name": "Prestigemedaille",
+      "category": "vip_point",
+      "subcategory": "points",
+      "vip_points": 10000,
+      "icon": "prestige.svg",
+      "name_de": "Prestigemedaille · 10.000 Punkte",
+      "description_de": "Gewährt 10.000 Prestige-Punkte für deine Prestigestufe.",
+      "rarity": "legendary",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "platinum"
+      ]
+    },
+    {
+      "code": 10207001,
+      "name": "Reliktfragmente · Gewöhnlich",
+      "category": "fragment_pack",
+      "subcategory": "fragments",
+      "fragment_grade": "normal",
+      "fragment_amount": 10,
+      "rarity": "normal",
+      "icon": "fragment.svg",
+      "name_de": "Reliktfragmente · Gewöhnlich",
+      "description_de": "Gewährt 10 Fragmente eines zufälligen Relikts der Seltenheit „Gewöhnlich“. Fragmente erhöhen automatisch dessen Stufe.",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold"
+      ]
+    },
+    {
+      "code": 10207002,
+      "name": "Reliktfragmente · Selten",
+      "category": "fragment_pack",
+      "subcategory": "fragments",
+      "fragment_grade": "rare",
+      "fragment_amount": 10,
+      "rarity": "rare",
+      "icon": "fragment.svg",
+      "name_de": "Reliktfragmente · Selten",
+      "description_de": "Gewährt 10 Fragmente eines zufälligen Relikts der Seltenheit „Selten“. Fragmente erhöhen automatisch dessen Stufe.",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10207003,
+      "name": "Reliktfragmente · Episch",
+      "category": "fragment_pack",
+      "subcategory": "fragments",
+      "fragment_grade": "epic",
+      "fragment_amount": 10,
+      "rarity": "epic",
+      "icon": "fragment.svg",
+      "name_de": "Reliktfragmente · Episch",
+      "description_de": "Gewährt 10 Fragmente eines zufälligen Relikts der Seltenheit „Episch“. Fragmente erhöhen automatisch dessen Stufe.",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10207004,
+      "name": "Reliktfragmente · Legendär",
+      "category": "fragment_pack",
+      "subcategory": "fragments",
+      "fragment_grade": "legendary",
+      "fragment_amount": 5,
+      "rarity": "legendary",
+      "icon": "fragment.svg",
+      "name_de": "Reliktfragmente · Legendär",
+      "description_de": "Gewährt 5 Fragmente eines zufälligen Relikts der Seltenheit „Legendär“. Fragmente erhöhen automatisch dessen Stufe.",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "platinum"
+      ]
+    },
+    {
+      "code": 10207005,
+      "name": "Reliktfragmente · Mythisch",
+      "category": "fragment_pack",
+      "subcategory": "fragments",
+      "fragment_grade": "mythic",
+      "fragment_amount": 3,
+      "rarity": "mythic",
+      "icon": "fragment.svg",
+      "name_de": "Reliktfragmente · Mythisch",
+      "description_de": "Gewährt 3 Fragmente eines zufälligen Relikts der Seltenheit „Mythisch“. Fragmente erhöhen automatisch dessen Stufe.",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "platinum"
+      ]
+    },
+    {
+      "code": 10207021,
+      "name": "Smaragd-Drachenei",
+      "category": "fragment_pack",
+      "subcategory": "dragon_egg",
+      "fragment_grade": "rare",
+      "fragment_amount": 20,
+      "rarity": "rare",
+      "icon": "egg-green.svg",
+      "name_de": "Smaragd-Drachenei",
+      "description_de": "Öffne das Drachenei. Gewährt 20 Fragmente eines zufälligen Relikts der Seltenheit „Selten“. Fragmente erhöhen automatisch dessen Stufe.",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10207022,
+      "name": "Glut-Drachenei",
+      "category": "fragment_pack",
+      "subcategory": "dragon_egg",
+      "fragment_grade": "epic",
+      "fragment_amount": 20,
+      "rarity": "epic",
+      "icon": "egg-red.svg",
+      "name_de": "Glut-Drachenei",
+      "description_de": "Öffne das Drachenei. Gewährt 20 Fragmente eines zufälligen Relikts der Seltenheit „Episch“. Fragmente erhöhen automatisch dessen Stufe.",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10207023,
+      "name": "Goldenes Drachenei",
+      "category": "fragment_pack",
+      "subcategory": "dragon_egg",
+      "fragment_grade": "legendary",
+      "fragment_amount": 10,
+      "rarity": "legendary",
+      "icon": "egg-gold.svg",
+      "name_de": "Goldenes Drachenei",
+      "description_de": "Öffne das Drachenei. Gewährt 10 Fragmente eines zufälligen Relikts der Seltenheit „Legendär“. Fragmente erhöhen automatisch dessen Stufe.",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "platinum"
+      ]
+    },
+    {
+      "code": 10208001,
+      "name": "Advanced-Teleporter",
+      "category": "teleport",
+      "subcategory": "advanced",
+      "teleport_mode": "advanced",
+      "rarity": "legendary",
+      "icon": "teleport.svg",
+      "name_de": "Advanced-Teleporter",
+      "description_de": "Lässt dich auf der gesamten aktuellen Welt einen freien, trockenen 4×4-Platz für deine Stadt wählen. Nur nutzbar, wenn keine Märsche, Rallies oder Verstärkungen an deine Stadt gebunden sind.",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10208002,
+      "name": "Zufallsteleporter",
+      "category": "teleport",
+      "subcategory": "random",
+      "teleport_mode": "random",
+      "rarity": "rare",
+      "icon": "teleport-near.svg",
+      "name_de": "Zufallsteleporter",
+      "description_de": "Versetzt deine Stadt auf einen freien, trockenen 4×4-Platz in deiner aktuellen Welt. Nur nutzbar, wenn keine Märsche, Rallies oder Verstärkungen an deine Stadt gebunden sind.",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10208003,
+      "name": "Allianz-Teleporter",
+      "category": "teleport",
+      "subcategory": "alliance",
+      "teleport_mode": "alliance",
+      "rarity": "epic",
+      "icon": "teleport-alliance.svg",
+      "name_de": "Allianz-Teleporter",
+      "description_de": "Lässt dich einen freien, trockenen 4×4-Platz im Gebiet deiner Allianz wählen: höchstens 12 Felder von einer verbündeten Stadt entfernt.",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10300001,
+      "name": "Energieflasche · 10 AP",
+      "name_de": "Energieflasche · 10 AP",
+      "description_de": "Stellt bis zu 10 Aktionspunkte wieder her, höchstens bis zu deinem Maximum.",
+      "category": "ap_refill",
+      "subcategory": "small",
+      "ap_amount": 10,
+      "icon": "energy.svg",
+      "rarity": "normal",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10300002,
+      "name": "Legendäres Reliktfragment",
+      "name_de": "Legendäres Reliktfragment",
+      "description_de": "Gewährt ein Fragment eines zufälligen legendären Relikts. Fragmente erhöhen automatisch dessen Stufe.",
+      "category": "fragment_pack",
+      "subcategory": "fragments",
+      "fragment_grade": "legendary",
+      "fragment_amount": 1,
+      "icon": "fragment.svg",
+      "rarity": "legendary",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10300003,
+      "name": "Portalsphäre · Fragment",
+      "name_de": "Portalsphäre · Fragment",
+      "description_de": "Gewährt genau ein Fragment der Portalsphäre. Fragmente erhöhen automatisch die Reliktstufe.",
+      "category": "fragment_pack",
+      "subcategory": "fragments",
+      "fragment_grade": "epic",
+      "fragment_amount": 1,
+      "treasure_code": 60300115,
+      "icon": "fragment.svg",
+      "rarity": "epic",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 10300004,
+      "name": "Großes Kriegshorn · 1 Stunde",
+      "name_de": "Großes Kriegshorn · 1 Stunde",
+      "description_de": "Erhöht die Marschkapazität für eine Stunde um 50 %. Gilt für neu entsandte Armeen. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
+      "category": "boost",
+      "subcategory": "march_size",
+      "boost_type": "march_size",
+      "bonus_pct": 50,
+      "duration_seconds": 3600,
+      "icon": "drillmasters-horn.png",
+      "rarity": "legendary",
+      "icon_framed": true,
+      "is_usable": true,
+      "loot_sources": [
+        "silver",
+        "gold",
+        "platinum"
+      ]
+    },
+    {
+      "code": 119000001,
+      "name": "Goldene Säule",
+      "name_de": "Goldene Säule",
+      "category": "material",
+      "subcategory": "building",
+      "source_resource": "golden_pillar",
+      "rarity": "normal",
+      "is_usable": false,
+      "icon": "pouch.svg",
+      "icon_framed": false,
+      "description_de": "Wird beim Gebäudeausbau automatisch verbraucht.",
+      "loot_sources": []
+    },
+    {
+      "code": 119000002,
+      "name": "Allianzabzeichen",
+      "name_de": "Allianzabzeichen",
+      "category": "material",
+      "subcategory": "building",
+      "source_resource": "alliance_badge",
+      "rarity": "normal",
+      "is_usable": false,
+      "icon": "pouch.svg",
+      "icon_framed": false,
+      "description_de": "Wird beim Gebäudeausbau automatisch verbraucht.",
+      "loot_sources": []
+    },
+    {
+      "code": 120601001,
+      "source_item_code": 10601001,
+      "name": "Unzugeordneter Gegenstand 10601001",
+      "name_de": "Unzugeordneter Gegenstand 10601001",
+      "category": "material",
+      "subcategory": "reference",
+      "rarity": "normal",
+      "description_de": "Dieser Gegenstand bleibt im Inventar erhalten. Seine Wirkung ist in den gelieferten Daten nicht definiert.",
+      "is_usable": false,
+      "icon": "pouch.svg",
+      "icon_framed": false,
+      "loot_sources": []
+    },
+    {
+      "code": 120602002,
+      "source_item_code": 10602002,
+      "name": "Unzugeordneter Gegenstand 10602002",
+      "name_de": "Unzugeordneter Gegenstand 10602002",
+      "category": "material",
+      "subcategory": "reference",
+      "rarity": "normal",
+      "description_de": "Dieser Gegenstand bleibt im Inventar erhalten. Seine Wirkung ist in den gelieferten Daten nicht definiert.",
+      "is_usable": false,
+      "icon": "pouch.svg",
+      "icon_framed": false,
+      "loot_sources": []
+    },
+    {
+      "code": 120601002,
+      "source_item_code": 10601002,
+      "name": "Unzugeordneter Gegenstand 10601002",
+      "name_de": "Unzugeordneter Gegenstand 10601002",
+      "category": "material",
+      "subcategory": "reference",
+      "rarity": "normal",
+      "description_de": "Dieser Gegenstand bleibt im Inventar erhalten. Seine Wirkung ist in den gelieferten Daten nicht definiert.",
+      "is_usable": false,
+      "icon": "pouch.svg",
+      "icon_framed": false,
+      "loot_sources": []
+    },
+    {
+      "code": 120602003,
+      "source_item_code": 10602003,
+      "name": "Unzugeordneter Gegenstand 10602003",
+      "name_de": "Unzugeordneter Gegenstand 10602003",
+      "category": "material",
+      "subcategory": "reference",
+      "rarity": "normal",
+      "description_de": "Dieser Gegenstand bleibt im Inventar erhalten. Seine Wirkung ist in den gelieferten Daten nicht definiert.",
+      "is_usable": false,
+      "icon": "pouch.svg",
+      "icon_framed": false,
+      "loot_sources": []
+    },
+    {
+      "code": 120601003,
+      "source_item_code": 10601003,
+      "name": "Unzugeordneter Gegenstand 10601003",
+      "name_de": "Unzugeordneter Gegenstand 10601003",
+      "category": "material",
+      "subcategory": "reference",
+      "rarity": "normal",
+      "description_de": "Dieser Gegenstand bleibt im Inventar erhalten. Seine Wirkung ist in den gelieferten Daten nicht definiert.",
+      "is_usable": false,
+      "icon": "pouch.svg",
+      "icon_framed": false,
+      "loot_sources": []
+    },
+    {
+      "code": 120602004,
+      "source_item_code": 10602004,
+      "name": "Unzugeordneter Gegenstand 10602004",
+      "name_de": "Unzugeordneter Gegenstand 10602004",
+      "category": "material",
+      "subcategory": "reference",
+      "rarity": "normal",
+      "description_de": "Dieser Gegenstand bleibt im Inventar erhalten. Seine Wirkung ist in den gelieferten Daten nicht definiert.",
+      "is_usable": false,
+      "icon": "pouch.svg",
+      "icon_framed": false,
+      "loot_sources": []
+    },
+    {
+      "code": 120104027,
+      "source_item_code": 10104027,
+      "name": "Unzugeordneter Gegenstand 10104027",
+      "name_de": "Unzugeordneter Gegenstand 10104027",
+      "category": "material",
+      "subcategory": "reference",
+      "rarity": "normal",
+      "description_de": "Dieser Gegenstand bleibt im Inventar erhalten. Seine Wirkung ist in den gelieferten Daten nicht definiert.",
+      "is_usable": false,
+      "icon": "pouch.svg",
+      "icon_framed": false,
+      "loot_sources": []
+    },
+    {
+      "code": 120104026,
+      "source_item_code": 10104026,
+      "name": "Unzugeordneter Gegenstand 10104026",
+      "name_de": "Unzugeordneter Gegenstand 10104026",
+      "category": "material",
+      "subcategory": "reference",
+      "rarity": "normal",
+      "description_de": "Dieser Gegenstand bleibt im Inventar erhalten. Seine Wirkung ist in den gelieferten Daten nicht definiert.",
+      "is_usable": false,
+      "icon": "pouch.svg",
+      "icon_framed": false,
+      "loot_sources": []
+    },
+    {
+      "code": 120104103,
+      "source_item_code": 10104103,
+      "name": "Beschleunigerkiste Stufe 3",
+      "name_de": "Beschleunigerkiste Stufe 3",
+      "category": "material",
+      "subcategory": "reference",
+      "rarity": "normal",
+      "description_de": "Dieser Gegenstand bleibt im Inventar erhalten. Seine Wirkung ist in den gelieferten Daten nicht definiert.",
+      "is_usable": false,
+      "icon": "pouch.svg",
+      "icon_framed": false,
+      "loot_sources": []
+    },
+    {
+      "code": 120104107,
+      "source_item_code": 10104107,
+      "name": "Unzugeordneter Gegenstand 10104107",
+      "name_de": "Unzugeordneter Gegenstand 10104107",
+      "category": "material",
+      "subcategory": "reference",
+      "rarity": "normal",
+      "description_de": "Dieser Gegenstand bleibt im Inventar erhalten. Seine Wirkung ist in den gelieferten Daten nicht definiert.",
+      "is_usable": false,
+      "icon": "pouch.svg",
+      "icon_framed": false,
+      "loot_sources": []
+    },
+    {
+      "code": 120604001,
+      "source_item_code": 10604001,
+      "name": "Unzugeordneter Gegenstand 10604001",
+      "name_de": "Unzugeordneter Gegenstand 10604001",
+      "category": "material",
+      "subcategory": "reference",
+      "rarity": "normal",
+      "description_de": "Dieser Gegenstand bleibt im Inventar erhalten. Seine Wirkung ist in den gelieferten Daten nicht definiert.",
+      "is_usable": false,
+      "icon": "pouch.svg",
+      "icon_framed": false,
+      "loot_sources": []
+    },
+    {
+      "code": 120104022,
+      "source_item_code": 10104022,
+      "name": "Unzugeordneter Gegenstand 10104022",
+      "name_de": "Unzugeordneter Gegenstand 10104022",
+      "category": "material",
+      "subcategory": "reference",
+      "rarity": "normal",
+      "description_de": "Dieser Gegenstand bleibt im Inventar erhalten. Seine Wirkung ist in den gelieferten Daten nicht definiert.",
+      "is_usable": false,
+      "icon": "pouch.svg",
+      "icon_framed": false,
+      "loot_sources": []
+    },
+    {
+      "code": 120101007,
+      "source_item_code": 10101007,
+      "name": "Unzugeordneter Gegenstand 10101007",
+      "name_de": "Unzugeordneter Gegenstand 10101007",
+      "category": "material",
+      "subcategory": "reference",
+      "rarity": "normal",
+      "description_de": "Dieser Gegenstand bleibt im Inventar erhalten. Seine Wirkung ist in den gelieferten Daten nicht definiert.",
+      "is_usable": false,
+      "icon": "pouch.svg",
+      "icon_framed": false,
+      "loot_sources": []
+    },
+    {
+      "code": 120603023,
+      "source_item_code": 10603023,
+      "name": "Unzugeordneter Gegenstand 10603023",
+      "name_de": "Unzugeordneter Gegenstand 10603023",
+      "category": "material",
+      "subcategory": "reference",
+      "rarity": "normal",
+      "description_de": "Dieser Gegenstand bleibt im Inventar erhalten. Seine Wirkung ist in den gelieferten Daten nicht definiert.",
+      "is_usable": false,
+      "icon": "pouch.svg",
+      "icon_framed": false,
+      "loot_sources": []
+    },
+    {
+      "code": 120104023,
+      "source_item_code": 10104023,
+      "name": "Unzugeordneter Gegenstand 10104023",
+      "name_de": "Unzugeordneter Gegenstand 10104023",
+      "category": "material",
+      "subcategory": "reference",
+      "rarity": "normal",
+      "description_de": "Dieser Gegenstand bleibt im Inventar erhalten. Seine Wirkung ist in den gelieferten Daten nicht definiert.",
+      "is_usable": false,
+      "icon": "pouch.svg",
+      "icon_framed": false,
+      "loot_sources": []
+    },
+    {
+      "code": 120105012,
+      "source_item_code": 10105012,
+      "name": "Unzugeordneter Gegenstand 10105012",
+      "name_de": "Unzugeordneter Gegenstand 10105012",
+      "category": "material",
+      "subcategory": "reference",
+      "rarity": "normal",
+      "description_de": "Dieser Gegenstand bleibt im Inventar erhalten. Seine Wirkung ist in den gelieferten Daten nicht definiert.",
+      "is_usable": false,
+      "icon": "pouch.svg",
+      "icon_framed": false,
+      "loot_sources": []
+    },
+    {
+      "code": 120105013,
+      "source_item_code": 10105013,
+      "name": "Unzugeordneter Gegenstand 10105013",
+      "name_de": "Unzugeordneter Gegenstand 10105013",
+      "category": "material",
+      "subcategory": "reference",
+      "rarity": "normal",
+      "description_de": "Dieser Gegenstand bleibt im Inventar erhalten. Seine Wirkung ist in den gelieferten Daten nicht definiert.",
+      "is_usable": false,
+      "icon": "pouch.svg",
+      "icon_framed": false,
+      "loot_sources": []
+    },
+    {
+      "code": 120105014,
+      "source_item_code": 10105014,
+      "name": "Unzugeordneter Gegenstand 10105014",
+      "name_de": "Unzugeordneter Gegenstand 10105014",
+      "category": "material",
+      "subcategory": "reference",
+      "rarity": "normal",
+      "description_de": "Dieser Gegenstand bleibt im Inventar erhalten. Seine Wirkung ist in den gelieferten Daten nicht definiert.",
+      "is_usable": false,
+      "icon": "pouch.svg",
+      "icon_framed": false,
+      "loot_sources": []
+    },
+    {
+      "code": 120603024,
+      "source_item_code": 10603024,
+      "name": "Unzugeordneter Gegenstand 10603024",
+      "name_de": "Unzugeordneter Gegenstand 10603024",
+      "category": "material",
+      "subcategory": "reference",
+      "rarity": "normal",
+      "description_de": "Dieser Gegenstand bleibt im Inventar erhalten. Seine Wirkung ist in den gelieferten Daten nicht definiert.",
+      "is_usable": false,
+      "icon": "pouch.svg",
+      "icon_framed": false,
+      "loot_sources": []
+    },
+    {
+      "code": 120603025,
+      "source_item_code": 10603025,
+      "name": "Unzugeordneter Gegenstand 10603025",
+      "name_de": "Unzugeordneter Gegenstand 10603025",
+      "category": "material",
+      "subcategory": "reference",
+      "rarity": "normal",
+      "description_de": "Dieser Gegenstand bleibt im Inventar erhalten. Seine Wirkung ist in den gelieferten Daten nicht definiert.",
+      "is_usable": false,
+      "icon": "pouch.svg",
+      "icon_framed": false,
+      "loot_sources": []
+    },
+    {
+      "code": 120104104,
+      "source_item_code": 10104104,
+      "name": "Beschleunigerkiste Stufe 4",
+      "name_de": "Beschleunigerkiste Stufe 4",
+      "category": "material",
+      "subcategory": "reference",
+      "rarity": "normal",
+      "description_de": "Dieser Gegenstand bleibt im Inventar erhalten. Seine Wirkung ist in den gelieferten Daten nicht definiert.",
+      "is_usable": false,
+      "icon": "pouch.svg",
+      "icon_framed": false,
+      "loot_sources": []
+    },
+    {
+      "code": 120604002,
+      "source_item_code": 10604002,
+      "name": "Unzugeordneter Gegenstand 10604002",
+      "name_de": "Unzugeordneter Gegenstand 10604002",
+      "category": "material",
+      "subcategory": "reference",
+      "rarity": "normal",
+      "description_de": "Dieser Gegenstand bleibt im Inventar erhalten. Seine Wirkung ist in den gelieferten Daten nicht definiert.",
+      "is_usable": false,
+      "icon": "pouch.svg",
+      "icon_framed": false,
+      "loot_sources": []
+    },
+    {
+      "code": 120104136,
+      "source_item_code": 10104136,
+      "name": "Unzugeordneter Gegenstand 10104136",
+      "name_de": "Unzugeordneter Gegenstand 10104136",
+      "category": "material",
+      "subcategory": "reference",
+      "rarity": "normal",
+      "description_de": "Dieser Gegenstand bleibt im Inventar erhalten. Seine Wirkung ist in den gelieferten Daten nicht definiert.",
+      "is_usable": false,
+      "icon": "pouch.svg",
+      "icon_framed": false,
+      "loot_sources": []
+    },
+    {
+      "code": 120603026,
+      "source_item_code": 10603026,
+      "name": "Unzugeordneter Gegenstand 10603026",
+      "name_de": "Unzugeordneter Gegenstand 10603026",
+      "category": "material",
+      "subcategory": "reference",
+      "rarity": "normal",
+      "description_de": "Dieser Gegenstand bleibt im Inventar erhalten. Seine Wirkung ist in den gelieferten Daten nicht definiert.",
+      "is_usable": false,
+      "icon": "pouch.svg",
+      "icon_framed": false,
+      "loot_sources": []
     }
   ]
 }

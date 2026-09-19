@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Heiltrank">
+<title>Heiltrank</title>
+<!-- Original code-native storybook item illustration. Value, quantity and rarity are rendered by the game UI. -->
+<g stroke="#493b33" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+<path d="M48 10H80V35L97 48C105 56 110 76 106 96 102 111 86 118 64 118S25 111 22 96C18 76 23 56 31 48L48 35Z" fill="#9ddcd0" />
+<path d="M65 15V118C88 118 101 110 106 96 110 76 105 56 97 48L80 35V10Z" fill="#539f91" stroke="none"/>
+<path d="M44 10 46 28H82L84 10Z" fill="#aa743f" />
+<path d="M49 14H78" fill="none" stroke="#ebc288" stroke-width="4"/>
+<path d="M27 72C38 65 48 76 62 69S88 68 101 74L102 94C99 106 85 112 64 112S30 106 26 94Z" fill="#5bae53" />
+<path d="M64 71V112C85 112 99 106 102 94L101 74C91 66 77 72 64 71" fill="#397d42" stroke="none"/>
+<path d="M54 58H74V74H90V94H74V110H54V94H38V74H54Z" fill="#fff6df" stroke-width="3"/>
+<path d="M36 54 31 64" fill="none" stroke="#ebfff0" stroke-width="5"/>
+</g>
+</svg>

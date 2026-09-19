@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Produktionsbonus food">
+<title>Produktionsbonus food</title>
+<!-- Original code-native storybook item illustration. Value, quantity and rarity are rendered by the game UI. -->
+<g stroke="#493b33" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+<g transform="translate(-2 -1) scale(.85)">
+<path d="M47 101C27 77 25 34 47 18 65 1 92 20 89 49 87 70 74 95 56 110Z" fill="#e4af38" />
+<ellipse cx="50" cy="28" rx="7" ry="8" fill="#ffd862" stroke-width="2"/>
+<ellipse cx="62" cy="28" rx="7" ry="8" fill="#ffd862" stroke-width="2"/>
+<ellipse cx="74" cy="28" rx="7" ry="8" fill="#ffd862" stroke-width="2"/>
+<ellipse cx="53" cy="41" rx="7" ry="8" fill="#e4af38" stroke-width="2"/>
+<ellipse cx="65" cy="41" rx="7" ry="8" fill="#e4af38" stroke-width="2"/>
+<ellipse cx="77" cy="41" rx="7" ry="8" fill="#e4af38" stroke-width="2"/>
+<ellipse cx="50" cy="54" rx="7" ry="8" fill="#ffd862" stroke-width="2"/>
+<ellipse cx="62" cy="54" rx="7" ry="8" fill="#ffd862" stroke-width="2"/>
+<ellipse cx="74" cy="54" rx="7" ry="8" fill="#ffd862" stroke-width="2"/>
+<ellipse cx="53" cy="67" rx="7" ry="8" fill="#e4af38" stroke-width="2"/>
+<ellipse cx="65" cy="67" rx="7" ry="8" fill="#e4af38" stroke-width="2"/>
+<ellipse cx="77" cy="67" rx="7" ry="8" fill="#e4af38" stroke-width="2"/>
+<ellipse cx="50" cy="80" rx="7" ry="8" fill="#ffd862" stroke-width="2"/>
+<ellipse cx="62" cy="80" rx="7" ry="8" fill="#ffd862" stroke-width="2"/>
+<ellipse cx="74" cy="80" rx="7" ry="8" fill="#ffd862" stroke-width="2"/>
+<path d="M45 112C26 103 19 81 21 57 41 58 50 75 52 98 59 59 78 46 106 40 101 67 81 98 45 112Z" fill="#498047" />
+<path d="M48 109C61 86 75 65 97 49 90 75 72 98 48 109" fill="#74a452" stroke="none"/>
+<path d="M44 103C39 86 34 75 27 67" fill="none" stroke="#a7d578" stroke-width="3"/>
+</g>
+<g transform="translate(6 4) scale(.98)">
+<path d="M90 56 112 83H100V108H79V83H67Z" fill="#69c92d" />
+<path d="M90 62 74 80H84V102H90Z" fill="#b3ed66" stroke="none"/>
+<path d="M77 79 90 63 100 75" fill="none" stroke="#deffb0" stroke-width="2"/>
+</g>
+</g>
+</svg>

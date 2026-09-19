@@ -1,0 +1,26 @@
+.defense-panel{width:100%;min-width:0;color:var(--ink,#49362b)}
+.defense-panel .section-heading{gap:10px;flex-wrap:wrap}
+.defense-panel .section-heading h2,.defense-panel h3{color:#49362b}
+.defense-panel .subtabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.defense-panel .subtab{white-space:normal;min-height:40px}
+.defense-body{display:grid;gap:14px;min-width:0}
+.defense-body .panel{padding:18px;min-width:0;background:#fbf4e4;color:#49362b;border:1px solid #c8af90;border-radius:12px}
+.defense-panel .muted{color:#74604e}
+.defense-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:14px}
+.defense-panel p{line-height:1.5;overflow-wrap:anywhere}
+.defense-panel progress{width:100%;height:17px;accent-color:#7c9860}
+.defense-panel label{display:grid;gap:6px;font-weight:600;min-width:0}
+.defense-panel input,.defense-panel select{box-sizing:border-box;min-width:0;width:100%;max-width:100%;padding:10px;border:1px solid #bda78a;border-radius:9px;background:#fffaf0;color:#49362b;font:inherit}
+.defense-panel form>.button{margin-top:12px}
+.defense-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:12px;margin-bottom:14px}
+.defense-troop-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,215px),1fr));gap:10px;margin:12px 0}
+.defense-troop-grid label{background:#efe4d2;padding:10px;border-radius:10px}
+.defense-panel small{display:block;font-size:.8rem;font-weight:400;line-height:1.4;color:#74604e}
+.defense-entry{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;padding:12px 0;border-bottom:1px solid #d8c6ad}
+.defense-entry>div,.defense-entry>span{min-width:0;overflow-wrap:anywhere}
+.defense-panel details{margin:12px 0}.defense-panel summary{cursor:pointer;font-weight:700;padding:10px 0}
+.defense-promotion-list{display:grid;gap:12px}
+.defense-promotion-list form{display:grid;grid-template-columns:minmax(0,1fr) 90px auto;gap:10px;align-items:end;padding:14px 0;border-top:1px solid #d8c6ad}
+.defense-promotion-list form p{font-size:.85rem;margin:7px 0}
+.defense-panel .button-row{display:flex;gap:8px;flex-wrap:wrap}
+@media(max-width:600px){.defense-body .panel{padding:13px}.defense-promotion-list form{grid-template-columns:minmax(0,1fr) 90px}.defense-promotion-list form>.button{grid-column:1/-1}.defense-panel .subtabs .subtab{flex:1 1 40%;font-size:.85rem}}

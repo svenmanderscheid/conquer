@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Training HUD · Lokale Test-Fixture</title>
+  <link rel="stylesheet" href="../../assets/css/game.css">
+  <link rel="stylesheet" href="../../assets/css/game-theme.css">
+  <link rel="stylesheet" href="../../assets/css/mobile-shell.css">
+  <link rel="stylesheet" href="../../assets/css/window-layout.css">
+  <link rel="stylesheet" href="../../assets/css/training-hud.css">
+  <link rel="stylesheet" href="../../assets/css/game-overlay.css">
+  <style>
+    body { background: #a7bd8c; }
+    .fixture-controls { position: fixed; z-index: 2000; left: 85px; right: 12px; bottom: 16px; padding: 12px; border: 2px solid #59442f; border-radius: 12px; background: #fff3dceF; color: #382b20; font: 12px/1.4 system-ui; }
+    .fixture-controls h1 { margin: 0 0 6px; font-size: 15px; }
+    .fixture-controls p { margin: 6px 0; }
+    .fixture-controls button { margin: 2px; padding: 5px 7px; color: #382b20; border: 1px solid #8e775b; background: #fffaf0; border-radius: 5px; font: inherit; }
+    .fixture-controls output { display: block; margin-top: 6px; }
+  </style>
+</head>
+<body class="mobile-game playfield-mode city-mode">
+  <nav id="hud-left-tools" class="hud-edge-tools hud-left-tools" aria-label="Dorf und Truppen">
+    <button class="hud-edge-button hud-vip"><span class="hud-edge-art"><img src="../../assets/art/items/prestige.svg" alt=""></span><span class="hud-edge-label">VIP 2</span></button>
+    <button class="hud-edge-button" data-city-only><span class="hud-edge-art"><img src="../../assets/art/items/hammer.svg" alt=""></span><span class="hud-edge-label">Bauen</span><small class="hud-edge-status">Bereit</small></button>
+    <button class="hud-edge-button" data-city-only><span class="hud-edge-art"><img src="../../assets/art/items/research.svg" alt=""></span><span class="hud-edge-label">Forschung</span><small class="hud-edge-status">Bereit</small></button>
+  </nav>
+  <section class="fixture-controls">
+    <h1>Lokale Trainings-HUD-Fixture</h1>
+    <p>Nur Beispieldaten. Kein Konto, keine API und keine echten Truppen werden verwendet. CSS und Countdown-Modul stammen aus dem Spiel.</p>
+    <button data-scenario="active">Aktiv · 45 Sek.</button>
+    <button data-scenario="large">50.000 · 24 Std.</button>
+    <button data-scenario="empty">Leer</button>
+    <button data-scenario="cancel">Abgebrochen</button>
+    <button data-scenario="speedup">Beschleunigt · 5 Sek.</button>
+    <button data-scenario="world">Dorf / Welt</button>
+    <output id="fixture-state" aria-live="polite">Aktive Beispielausbildung.</output>
+    <output id="fixture-refresh">Abschlussabfragen: 0</output>
+    <output id="fixture-navigation"></output>
+  </section>
+  <script src="../../assets/js/training-hud.js"></script>
+  <script>
+    (() => {
+      const state = {troop_queue: []};
+      const now = () => Date.now() + 120000;
+      let rowId = 0, refreshes = 0;
+      const hud = window.ConquerTrainingHud({
+        getState: () => state,
+        now,
+        refresh: async () => {
+          document.querySelector('#fixture-refresh').textContent = 'Abschlussabfragen: ' + (++refreshes);
+          await new Promise(resolve => setTimeout(resolve, 600));
+          state.troop_queue = state.troop_queue.filter(row => Date.parse(row.finishes_at) > now());
+          hud.update();
+          document.querySelector('#fixture-state').textContent = 'Beispielserver hat den Abschluss bestätigt.';
+        },
+      });
+      function active(seconds, count = 20) {
+        state.troop_queue = [{id: ++rowId, count, started_at: new Date(now() - 20000).toISOString(), finishes_at: new Date(now() + seconds * 1000).toISOString()}];
+        hud.update();
+      }
+      document.addEventListener('click', event => {
+        const scenario = event.target.closest('[data-scenario]')?.dataset.scenario;
+        if (scenario === 'active') active(45);
+        if (scenario === 'large') active(86401, 50000);
+        if (scenario === 'empty' || scenario === 'cancel') { state.troop_queue = []; hud.update(); }
+        if (scenario === 'speedup') {
+          if (!state.troop_queue.length) active(5);
+          else { state.troop_queue[0].finishes_at = new Date(now() + 5000).toISOString(); hud.update(); }
+        }
+        if (scenario === 'world') { document.body.classList.toggle('world-mode'); document.body.classList.toggle('city-mode'); }
+        if (scenario) document.querySelector('#fixture-state').textContent = 'Testszenario: ' + scenario;
+        if (event.target.closest('#hud-training')) document.querySelector('#fixture-navigation').textContent = 'Icon angeklickt: data-action="tab", data-id="army" (Ausbildungsfenster im Hauptspiel).';
+      });
+      active(45);
+    })();
+  </script>
+</body>
+</html>

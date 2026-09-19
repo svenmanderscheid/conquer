@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><title>Beschleuniger · Forschung</title><defs>
+  <linearGradient id="face" x1="0" y1="0" x2=".35" y2="1"><stop stop-color="#c2f4fa"/><stop offset=".45" stop-color="#7ad9f2"/><stop offset="1" stop-color="#37a2d6"/></linearGradient>
+  <linearGradient id="depth" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#317dac"/><stop offset="1" stop-color="#24559c"/></linearGradient>
+  <linearGradient id="steel" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#f2f5e9"/><stop offset=".5" stop-color="#c3d6d8"/><stop offset="1" stop-color="#7e9fac"/></linearGradient>
+  <g id="arrow" stroke="#493b33" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round">
+   <path d="M13 23H35Q38 23 40 26L68 59Q71 63 68 67L40 101Q38 104 35 104H13Q9 104 11 100L39 66Q41 63 39 60L11 27Q8 23 13 23Z" transform="translate(0 5)" fill="url(#depth)"/>
+   <path d="M13 23H35Q38 23 40 26L68 59Q71 63 68 67L40 101Q38 104 35 104H13Q9 104 11 100L39 66Q41 63 39 60L11 27Q8 23 13 23Z" fill="url(#face)"/>
+   <path d="M16 27H34L63 61H47Z" fill="#e6fbf5" stroke="none"/>
+   <path d="M46 67H64L36 99H16Z" fill="#2994c8" stroke="none"/>
+   <path d="m16 29 17 0 25 29" fill="none" stroke="#fffdf0" stroke-width="2.8"/>
+   <path d="m17 100 17 0 29-33" fill="none" stroke="#8ce2ef" stroke-width="2.4"/>
+   <path d="M46 62h16" stroke="#e1f8f1" stroke-width="2"/>
+  </g>
+ </defs><g transform="translate(9 -3) scale(.94)"><use href="#arrow" x="49"/><use href="#arrow"/></g><g transform="translate(1 70)" stroke="#493b33" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+   <rect x="1" y="4" width="57" height="50" rx="13" fill="#70472f" opacity=".18" stroke="none"/>
+   <rect x="1" y="0" width="57" height="50" rx="13" fill="#e5d5ed"/>
+   <path d="M8 14q0-8 9-8h22" stroke="#fffaf0" stroke-width="2.5" fill="none"/>
+   <g transform="translate(0 1) scale(.98)">
+   <path d="m5 11 19 3 5 4 6-4 17-3v31l-20 3-3 3-5-3-19-3Z" fill="#7758a1"/>
+   <path d="M7 7c9-1 15 2 22 7 8-6 14-8 22-7v29c-10-1-15 2-22 5-7-4-13-5-22-5Z" fill="#fff2d3"/>
+   <path d="M29 14v27c7-3 12-6 22-5V7c-9 0-14 3-22 7Z" fill="#ead8b2" stroke="none"/>
+   <path d="M29 14v25M12 16l10 3m-10 4 10 3m13-7 10-4m-10 11 10-4" stroke="#ba9764" stroke-width="2" fill="none"/>
+   <path d="m37 33 6-3v15l-3-3-3 5Z" fill="#9a66bf" stroke-width="1.8"/></g>
+  </g></svg>

@@ -24,28 +24,17 @@ try {
                 JSON_UNQUOTE(JSON_EXTRACT(data_json, "$.target_name"))   AS target_name_json,
                 (attacker_id = ?) AS is_attacker
          FROM   battle_reports
-         WHERE  attacker_id = ? OR defender_id = ?
+         WHERE  world_id = ? AND ((attacker_id = ? AND COALESCE(JSON_UNQUOTE(JSON_EXTRACT(data_json, "$.hidden_by_attacker")), "false") <> "true") OR defender_id = ?)
          ORDER  BY created_at DESC
          LIMIT  ? OFFSET ?',
-        [$playerId, $playerId, $playerId, $perPage, $offset],
+        [$playerId, \Conquer\Game\World\WorldContext::id(), $playerId, $playerId, $perPage, $offset],
     )->fetchAll();
 
     $total = (int) $db->query(
-        'SELECT COUNT(*) FROM battle_reports WHERE attacker_id = ? OR defender_id = ?',
-        [$playerId, $playerId],
+        'SELECT COUNT(*) FROM battle_reports WHERE world_id = ? AND ((attacker_id = ? AND COALESCE(JSON_UNQUOTE(JSON_EXTRACT(data_json, "$.hidden_by_attacker")), "false") <> "true") OR defender_id = ?)',
+        [\Conquer\Game\World\WorldContext::id(), $playerId, $playerId],
     )->fetchColumn();
 
-    // Mark visible reports as read (attacker_read or defender_read depending on role)
-    $attackerIds = array_column(array_filter($reports, fn($r) => (int)$r['is_attacker'] === 1), 'id');
-    $defenderIds = array_column(array_filter($reports, fn($r) => (int)$r['is_attacker'] === 0), 'id');
-    if ($attackerIds) {
-        $ph = implode(',', array_fill(0, count($attackerIds), '?'));
-        $db->execute("UPDATE battle_reports SET attacker_read = 1 WHERE id IN ($ph)", $attackerIds);
-    }
-    if ($defenderIds) {
-        $ph = implode(',', array_fill(0, count($defenderIds), '?'));
-        $db->execute("UPDATE battle_reports SET defender_read = 1 WHERE id IN ($ph)", $defenderIds);
-    }
 } catch (\Throwable) {
     $reports = [];
     $total   = 0;
@@ -66,6 +55,7 @@ $outcomeLabel = [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conquer — Kampfberichte</title>
+    <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR.'/assets/css/fantasy-fonts.css') ?>">
     <link rel="stylesheet" href="/assets/css/main.css">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -126,7 +116,33 @@ $outcomeLabel = [
             color: var(--c-text, #4a3520);
         }
         tr:hover td { background: rgba(192,136,88,0.08); }
-        tr.unread td { background: rgba(192,136,88,0.12); }
+        tr.unread td { background: var(--ui-card-light, #fffcf6); }
+        tr.unread td:first-child { border-left: 6px solid var(--ui-blue, #2a72c9); }
+        tr.read td { background: var(--ui-paper, #e9dfcf); color: var(--ui-muted, #5f5261); }
+
+        .report-read-status {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 58px;
+            margin-right: 0.45rem;
+            padding: 0.18rem 0.5rem;
+            border: 1px solid var(--ui-line, #c7b692);
+            border-radius: 999px;
+            background: var(--ui-inset, #dfcda9);
+            color: var(--ui-muted, #5f5261);
+            font-size: 0.68rem;
+            font-weight: 700;
+            line-height: 1;
+            white-space: nowrap;
+        }
+        tr.unread .report-read-status {
+            background: var(--ui-blue, #2a72c9);
+            border-color: var(--ui-blue-dark, #24559c);
+            color: var(--ui-card-light, #fffcf6);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
 
         .outcome-badge {
             display: inline-block;
@@ -187,6 +203,7 @@ $outcomeLabel = [
 
         .empty { padding: 3rem; text-align: center; color: var(--c-muted, #8b6f47); font-size: 0.9rem; }
     </style>
+<link rel="stylesheet" href="<?= htmlspecialchars(APP_BASE, ENT_QUOTES) ?>/assets/css/village-theme.css?v=<?= filemtime(__DIR__ . "/../assets/css/village-theme.css") ?>">
 </head>
 <body>
 <?php $hudCurrentView = 'reports'; require __DIR__ . '/partials/hud.php'; ?>
@@ -234,9 +251,9 @@ $outcomeLabel = [
                         $lbl  = htmlspecialchars((string) $lbl);
                     }
                 ?>
-                <tr class="<?= $isRead ? '' : 'unread' ?>">
+                <tr class="<?= $isRead ? 'read' : 'unread' ?>">
                     <td style="color:var(--c-muted,#8b6f47);font-family:monospace;font-size:0.78rem"><?= htmlspecialchars($r['created_at']) ?> UTC</td>
-                    <td style="font-weight:600"><?= $icon ?> <?= $lbl ?> <span style="color:var(--c-muted,#8b6f47);font-size:0.78rem">(<?= (int)$r['target_x'] ?>,<?= (int)$r['target_y'] ?>)</span></td>
+                    <td style="font-weight:600"><span class="report-read-status"><?= $isRead ? '✓ Gelesen' : 'Neu' ?></span><?= $icon ?> <?= $lbl ?> <span style="color:var(--c-muted,#8b6f47);font-size:0.78rem">(<?= (int)$r['target_x'] ?>,<?= (int)$r['target_y'] ?>)</span></td>
                     <td>
                         <span class="outcome-badge" style="color:<?= $oc['color'] ?>;border-color:<?= $oc['color'] ?>33">
                             <?= $oc['label'] ?>

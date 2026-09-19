@@ -1,0 +1,3094 @@
+{
+  "version": 1,
+  "objects": [
+    {
+      "code": 20100101,
+      "name": "Farm",
+      "level": 1,
+      "production": 50000,
+      "gathering": 40000,
+      "asset": 20100101,
+      "drops": [
+        {
+          "source_item_code": 10104097,
+          "item_code": 10205001,
+          "count": 1,
+          "probability": 0.9
+        },
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.1
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.15
+        }
+      ]
+    },
+    {
+      "code": 20100101,
+      "name": "Farm",
+      "level": 2,
+      "production": 100000,
+      "gathering": 45000,
+      "asset": 20100101,
+      "drops": [
+        {
+          "source_item_code": 10104097,
+          "item_code": 10205001,
+          "count": 1,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.2
+        }
+      ]
+    },
+    {
+      "code": 20100101,
+      "name": "Farm",
+      "level": 3,
+      "production": 200000,
+      "gathering": 50000,
+      "asset": 20100101,
+      "drops": [
+        {
+          "source_item_code": 10104097,
+          "item_code": 10205001,
+          "count": 2,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 2,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.3
+        }
+      ]
+    },
+    {
+      "code": 20100101,
+      "name": "Farm",
+      "level": 4,
+      "production": 300000,
+      "gathering": 55000,
+      "asset": 20100101,
+      "drops": [
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.9
+        },
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.1
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.4
+        }
+      ]
+    },
+    {
+      "code": 20100101,
+      "name": "Farm",
+      "level": 5,
+      "production": 600000,
+      "gathering": 60000,
+      "asset": 20100101,
+      "drops": [
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.5
+        }
+      ]
+    },
+    {
+      "code": 20100101,
+      "name": "Farm",
+      "level": 6,
+      "production": 900000,
+      "gathering": 65000,
+      "asset": 20100101,
+      "drops": [
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 2,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 2,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.6
+        }
+      ]
+    },
+    {
+      "code": 20100101,
+      "name": "Farm",
+      "level": 7,
+      "production": 1200000,
+      "gathering": 70000,
+      "asset": 20100101,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.9
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 1,
+          "probability": 0.1
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.7
+        }
+      ]
+    },
+    {
+      "code": 20100101,
+      "name": "Farm",
+      "level": 8,
+      "production": 1800000,
+      "gathering": 75000,
+      "asset": 20100101,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 1,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.8
+        }
+      ]
+    },
+    {
+      "code": 20100101,
+      "name": "Farm",
+      "level": 9,
+      "production": 2400000,
+      "gathering": 80000,
+      "asset": 20100101,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 2,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 2,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.9
+        }
+      ]
+    },
+    {
+      "code": 20100101,
+      "name": "Farm",
+      "level": 10,
+      "production": 3000000,
+      "gathering": 85000,
+      "asset": 20100101,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 3,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 3,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 1.0
+        }
+      ]
+    },
+    {
+      "code": 20100102,
+      "name": "Forest",
+      "level": 1,
+      "production": 50000,
+      "gathering": 40000,
+      "asset": 20100102,
+      "drops": [
+        {
+          "source_item_code": 10104097,
+          "item_code": 10205001,
+          "count": 1,
+          "probability": 0.9
+        },
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.1
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.15
+        }
+      ]
+    },
+    {
+      "code": 20100102,
+      "name": "Forest",
+      "level": 2,
+      "production": 100000,
+      "gathering": 45000,
+      "asset": 20100102,
+      "drops": [
+        {
+          "source_item_code": 10104097,
+          "item_code": 10205001,
+          "count": 1,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.2
+        }
+      ]
+    },
+    {
+      "code": 20100102,
+      "name": "Forest",
+      "level": 3,
+      "production": 200000,
+      "gathering": 50000,
+      "asset": 20100102,
+      "drops": [
+        {
+          "source_item_code": 10104097,
+          "item_code": 10205001,
+          "count": 2,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 2,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.3
+        }
+      ]
+    },
+    {
+      "code": 20100102,
+      "name": "Forest",
+      "level": 4,
+      "production": 300000,
+      "gathering": 55000,
+      "asset": 20100102,
+      "drops": [
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.9
+        },
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.1
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.4
+        }
+      ]
+    },
+    {
+      "code": 20100102,
+      "name": "Forest",
+      "level": 5,
+      "production": 600000,
+      "gathering": 60000,
+      "asset": 20100102,
+      "drops": [
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.5
+        }
+      ]
+    },
+    {
+      "code": 20100102,
+      "name": "Forest",
+      "level": 6,
+      "production": 900000,
+      "gathering": 65000,
+      "asset": 20100102,
+      "drops": [
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 2,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 2,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.6
+        }
+      ]
+    },
+    {
+      "code": 20100102,
+      "name": "Forest",
+      "level": 7,
+      "production": 1200000,
+      "gathering": 70000,
+      "asset": 20100102,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.9
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 1,
+          "probability": 0.1
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.7
+        }
+      ]
+    },
+    {
+      "code": 20100102,
+      "name": "Forest",
+      "level": 8,
+      "production": 1800000,
+      "gathering": 75000,
+      "asset": 20100102,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 1,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.8
+        }
+      ]
+    },
+    {
+      "code": 20100102,
+      "name": "Forest",
+      "level": 9,
+      "production": 2400000,
+      "gathering": 80000,
+      "asset": 20100102,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 2,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 2,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.9
+        }
+      ]
+    },
+    {
+      "code": 20100102,
+      "name": "Forest",
+      "level": 10,
+      "production": 3000000,
+      "gathering": 85000,
+      "asset": 20100102,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 3,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 3,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 1.0
+        }
+      ]
+    },
+    {
+      "code": 20100103,
+      "name": "Quarry",
+      "level": 1,
+      "production": 50000,
+      "gathering": 40000,
+      "asset": 20100103,
+      "drops": [
+        {
+          "source_item_code": 10104097,
+          "item_code": 10205001,
+          "count": 1,
+          "probability": 0.9
+        },
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.1
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.15
+        }
+      ]
+    },
+    {
+      "code": 20100103,
+      "name": "Quarry",
+      "level": 2,
+      "production": 100000,
+      "gathering": 45000,
+      "asset": 20100103,
+      "drops": [
+        {
+          "source_item_code": 10104097,
+          "item_code": 10205001,
+          "count": 1,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.2
+        }
+      ]
+    },
+    {
+      "code": 20100103,
+      "name": "Quarry",
+      "level": 3,
+      "production": 200000,
+      "gathering": 50000,
+      "asset": 20100103,
+      "drops": [
+        {
+          "source_item_code": 10104097,
+          "item_code": 10205001,
+          "count": 2,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 2,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.3
+        }
+      ]
+    },
+    {
+      "code": 20100103,
+      "name": "Quarry",
+      "level": 4,
+      "production": 300000,
+      "gathering": 55000,
+      "asset": 20100103,
+      "drops": [
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.9
+        },
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.1
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.4
+        }
+      ]
+    },
+    {
+      "code": 20100103,
+      "name": "Quarry",
+      "level": 5,
+      "production": 600000,
+      "gathering": 60000,
+      "asset": 20100103,
+      "drops": [
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.5
+        }
+      ]
+    },
+    {
+      "code": 20100103,
+      "name": "Quarry",
+      "level": 6,
+      "production": 900000,
+      "gathering": 65000,
+      "asset": 20100103,
+      "drops": [
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 2,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 2,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.6
+        }
+      ]
+    },
+    {
+      "code": 20100103,
+      "name": "Quarry",
+      "level": 7,
+      "production": 1200000,
+      "gathering": 70000,
+      "asset": 20100103,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.9
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 1,
+          "probability": 0.1
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.7
+        }
+      ]
+    },
+    {
+      "code": 20100103,
+      "name": "Quarry",
+      "level": 8,
+      "production": 1800000,
+      "gathering": 75000,
+      "asset": 20100103,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 1,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.8
+        }
+      ]
+    },
+    {
+      "code": 20100103,
+      "name": "Quarry",
+      "level": 9,
+      "production": 2400000,
+      "gathering": 80000,
+      "asset": 20100103,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 2,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 2,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.9
+        }
+      ]
+    },
+    {
+      "code": 20100103,
+      "name": "Quarry",
+      "level": 10,
+      "production": 3000000,
+      "gathering": 85000,
+      "asset": 20100103,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 3,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 3,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 1.0
+        }
+      ]
+    },
+    {
+      "code": 20100104,
+      "name": "gold mine",
+      "level": 1,
+      "production": 50000,
+      "gathering": 40000,
+      "asset": 20100104,
+      "drops": [
+        {
+          "source_item_code": 10104097,
+          "item_code": 10205001,
+          "count": 1,
+          "probability": 0.9
+        },
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.1
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.15
+        }
+      ]
+    },
+    {
+      "code": 20100104,
+      "name": "gold mine",
+      "level": 2,
+      "production": 100000,
+      "gathering": 45000,
+      "asset": 20100104,
+      "drops": [
+        {
+          "source_item_code": 10104097,
+          "item_code": 10205001,
+          "count": 1,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.2
+        }
+      ]
+    },
+    {
+      "code": 20100104,
+      "name": "gold mine",
+      "level": 3,
+      "production": 200000,
+      "gathering": 50000,
+      "asset": 20100104,
+      "drops": [
+        {
+          "source_item_code": 10104097,
+          "item_code": 10205001,
+          "count": 2,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 2,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.3
+        }
+      ]
+    },
+    {
+      "code": 20100104,
+      "name": "gold mine",
+      "level": 4,
+      "production": 300000,
+      "gathering": 55000,
+      "asset": 20100104,
+      "drops": [
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.9
+        },
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.1
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.4
+        }
+      ]
+    },
+    {
+      "code": 20100104,
+      "name": "gold mine",
+      "level": 5,
+      "production": 600000,
+      "gathering": 60000,
+      "asset": 20100104,
+      "drops": [
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.5
+        }
+      ]
+    },
+    {
+      "code": 20100104,
+      "name": "gold mine",
+      "level": 6,
+      "production": 900000,
+      "gathering": 65000,
+      "asset": 20100104,
+      "drops": [
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 2,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 2,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.6
+        }
+      ]
+    },
+    {
+      "code": 20100104,
+      "name": "gold mine",
+      "level": 7,
+      "production": 1200000,
+      "gathering": 70000,
+      "asset": 20100104,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.9
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 1,
+          "probability": 0.1
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.7
+        }
+      ]
+    },
+    {
+      "code": 20100104,
+      "name": "gold mine",
+      "level": 8,
+      "production": 1800000,
+      "gathering": 75000,
+      "asset": 20100104,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 1,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.8
+        }
+      ]
+    },
+    {
+      "code": 20100104,
+      "name": "gold mine",
+      "level": 9,
+      "production": 2400000,
+      "gathering": 80000,
+      "asset": 20100104,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 2,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 2,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.9
+        }
+      ]
+    },
+    {
+      "code": 20100104,
+      "name": "gold mine",
+      "level": 10,
+      "production": 3000000,
+      "gathering": 85000,
+      "asset": 20100104,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 3,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 3,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 1.0
+        }
+      ]
+    },
+    {
+      "code": 20100105,
+      "name": "Crystal mine",
+      "level": 1,
+      "production": 50,
+      "gathering": 40,
+      "asset": 20100105,
+      "drops": [
+        {
+          "source_item_code": 10104097,
+          "item_code": 10205001,
+          "count": 1,
+          "probability": 0.9
+        },
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.1
+        }
+      ]
+    },
+    {
+      "code": 20100105,
+      "name": "Crystal mine",
+      "level": 2,
+      "production": 100,
+      "gathering": 45,
+      "asset": 20100105,
+      "drops": [
+        {
+          "source_item_code": 10104097,
+          "item_code": 10205001,
+          "count": 1,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.2
+        }
+      ]
+    },
+    {
+      "code": 20100105,
+      "name": "Crystal mine",
+      "level": 3,
+      "production": 200,
+      "gathering": 50,
+      "asset": 20100105,
+      "drops": [
+        {
+          "source_item_code": 10104097,
+          "item_code": 10205001,
+          "count": 2,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 2,
+          "probability": 0.2
+        }
+      ]
+    },
+    {
+      "code": 20100105,
+      "name": "Crystal mine",
+      "level": 4,
+      "production": 300,
+      "gathering": 55,
+      "asset": 20100105,
+      "drops": [
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.9
+        },
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.1
+        }
+      ]
+    },
+    {
+      "code": 20100105,
+      "name": "Crystal mine",
+      "level": 5,
+      "production": 600,
+      "gathering": 60,
+      "asset": 20100105,
+      "drops": [
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.2
+        }
+      ]
+    },
+    {
+      "code": 20100105,
+      "name": "Crystal mine",
+      "level": 6,
+      "production": 900,
+      "gathering": 65,
+      "asset": 20100105,
+      "drops": [
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 2,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 2,
+          "probability": 0.2
+        }
+      ]
+    },
+    {
+      "code": 20100105,
+      "name": "Crystal mine",
+      "level": 7,
+      "production": 1200,
+      "gathering": 70,
+      "asset": 20100105,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.9
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 1,
+          "probability": 0.1
+        }
+      ]
+    },
+    {
+      "code": 20100105,
+      "name": "Crystal mine",
+      "level": 8,
+      "production": 1800,
+      "gathering": 75,
+      "asset": 20100105,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 1,
+          "probability": 0.2
+        }
+      ]
+    },
+    {
+      "code": 20100105,
+      "name": "Crystal mine",
+      "level": 9,
+      "production": 2400,
+      "gathering": 80,
+      "asset": 20100105,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 2,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 2,
+          "probability": 0.2
+        }
+      ]
+    },
+    {
+      "code": 20100105,
+      "name": "Crystal mine",
+      "level": 10,
+      "production": 3000,
+      "gathering": 85,
+      "asset": 20100105,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 3,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 3,
+          "probability": 0.2
+        }
+      ]
+    },
+    {
+      "code": 20100106,
+      "name": "Sealed mine",
+      "level": 1,
+      "production": 1000,
+      "gathering": 250,
+      "asset": 20100106,
+      "drops": [
+        {
+          "source_item_code": 10104097,
+          "item_code": 10205001,
+          "count": 1,
+          "probability": 0.9
+        },
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.1
+        }
+      ]
+    },
+    {
+      "code": 20100106,
+      "name": "Sealed mine",
+      "level": 2,
+      "production": 2000,
+      "gathering": 300,
+      "asset": 20100106,
+      "drops": [
+        {
+          "source_item_code": 10104097,
+          "item_code": 10205001,
+          "count": 1,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.2
+        }
+      ]
+    },
+    {
+      "code": 20100106,
+      "name": "Sealed mine",
+      "level": 3,
+      "production": 3000,
+      "gathering": 350,
+      "asset": 20100106,
+      "drops": [
+        {
+          "source_item_code": 10104097,
+          "item_code": 10205001,
+          "count": 2,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 2,
+          "probability": 0.2
+        }
+      ]
+    },
+    {
+      "code": 20100106,
+      "name": "Sealed mine",
+      "level": 4,
+      "production": 4000,
+      "gathering": 400,
+      "asset": 20100106,
+      "drops": [
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.9
+        },
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.1
+        }
+      ]
+    },
+    {
+      "code": 20100106,
+      "name": "Sealed mine",
+      "level": 5,
+      "production": 5000,
+      "gathering": 450,
+      "asset": 20100106,
+      "drops": [
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.2
+        }
+      ]
+    },
+    {
+      "code": 20100106,
+      "name": "Sealed mine",
+      "level": 6,
+      "production": 6000,
+      "gathering": 500,
+      "asset": 20100106,
+      "drops": [
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 2,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 2,
+          "probability": 0.2
+        }
+      ]
+    },
+    {
+      "code": 20100106,
+      "name": "Sealed mine",
+      "level": 7,
+      "production": 7000,
+      "gathering": 550,
+      "asset": 20100106,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.9
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 1,
+          "probability": 0.1
+        }
+      ]
+    },
+    {
+      "code": 20100106,
+      "name": "Sealed mine",
+      "level": 8,
+      "production": 8000,
+      "gathering": 600,
+      "asset": 20100106,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 1,
+          "probability": 0.2
+        }
+      ]
+    },
+    {
+      "code": 20100106,
+      "name": "Sealed mine",
+      "level": 9,
+      "production": 9000,
+      "gathering": 650,
+      "asset": 20100106,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 2,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 2,
+          "probability": 0.2
+        }
+      ]
+    },
+    {
+      "code": 20100106,
+      "name": "Sealed mine",
+      "level": 10,
+      "production": 10000,
+      "gathering": 700,
+      "asset": 20100106,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 3,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 3,
+          "probability": 0.2
+        }
+      ]
+    },
+    {
+      "code": 20300101,
+      "name": "kingdom",
+      "level": 0,
+      "production": 0,
+      "gathering": 0,
+      "asset": 20300101,
+      "drops": []
+    },
+    {
+      "code": 20400101,
+      "name": "congress",
+      "level": 0,
+      "production": 0,
+      "gathering": 0,
+      "asset": 20400101,
+      "drops": []
+    },
+    {
+      "code": 20400201,
+      "name": "shrine_1",
+      "level": 0,
+      "production": 0,
+      "gathering": 0,
+      "asset": 20400201,
+      "drops": []
+    },
+    {
+      "code": 20400202,
+      "name": "shrine_2",
+      "level": 0,
+      "production": 0,
+      "gathering": 0,
+      "asset": 20400202,
+      "drops": []
+    },
+    {
+      "code": 20400203,
+      "name": "shrine_3",
+      "level": 0,
+      "production": 0,
+      "gathering": 0,
+      "asset": 20400203,
+      "drops": []
+    },
+    {
+      "code": 20500101,
+      "name": "charm normal",
+      "level": 1,
+      "production": 0,
+      "gathering": 0,
+      "asset": 20500101,
+      "drops": []
+    },
+    {
+      "code": 20500102,
+      "name": "charm magic",
+      "level": 2,
+      "production": 0,
+      "gathering": 0,
+      "asset": 20500102,
+      "drops": []
+    },
+    {
+      "code": 20500103,
+      "name": "charm epic",
+      "level": 3,
+      "production": 0,
+      "gathering": 0,
+      "asset": 20500103,
+      "drops": []
+    },
+    {
+      "code": 20500104,
+      "name": "charm legend",
+      "level": 4,
+      "production": 0,
+      "gathering": 0,
+      "asset": 20500104,
+      "drops": []
+    },
+    {
+      "code": 20600101,
+      "name": "alliance center",
+      "level": 0,
+      "production": 0,
+      "gathering": 0,
+      "asset": 20600101,
+      "drops": []
+    },
+    {
+      "code": 20600102,
+      "name": "alliance tower",
+      "level": 0,
+      "production": 0,
+      "gathering": 0,
+      "asset": 20600102,
+      "drops": []
+    },
+    {
+      "code": 20600103,
+      "name": "outpost",
+      "level": 0,
+      "production": 0,
+      "gathering": 0,
+      "asset": 20600103,
+      "drops": []
+    },
+    {
+      "code": 20100201,
+      "name": "monster fortress",
+      "level": 0,
+      "production": 0,
+      "gathering": 0,
+      "asset": 20100201,
+      "drops": []
+    },
+    {
+      "code": 20700101,
+      "name": "gate_1",
+      "level": 0,
+      "production": 0,
+      "gathering": 0,
+      "asset": 20700101,
+      "drops": []
+    },
+    {
+      "code": 20700102,
+      "name": "gate_2",
+      "level": 0,
+      "production": 0,
+      "gathering": 0,
+      "asset": 20700102,
+      "drops": []
+    },
+    {
+      "code": 20700103,
+      "name": "gate_3",
+      "level": 0,
+      "production": 0,
+      "gathering": 0,
+      "asset": 20700103,
+      "drops": []
+    },
+    {
+      "code": 20700104,
+      "name": "gate_4",
+      "level": 0,
+      "production": 0,
+      "gathering": 0,
+      "asset": 20700104,
+      "drops": []
+    },
+    {
+      "code": 20700105,
+      "name": "gate_5",
+      "level": 0,
+      "production": 0,
+      "gathering": 0,
+      "asset": 20700105,
+      "drops": []
+    },
+    {
+      "code": 20700201,
+      "name": "fortress_1",
+      "level": 0,
+      "production": 0,
+      "gathering": 0,
+      "asset": 20700201,
+      "drops": []
+    },
+    {
+      "code": 20700202,
+      "name": "fortress_2",
+      "level": 0,
+      "production": 0,
+      "gathering": 0,
+      "asset": 20700202,
+      "drops": []
+    },
+    {
+      "code": 20700301,
+      "name": "ancient temple",
+      "level": 0,
+      "production": 0,
+      "gathering": 0,
+      "asset": 20700301,
+      "drops": []
+    },
+    {
+      "code": 20700601,
+      "name": "bf_Farm",
+      "level": 1,
+      "production": 50000,
+      "gathering": 40000,
+      "asset": 20100101,
+      "drops": [
+        {
+          "source_item_code": 10104097,
+          "item_code": 10205001,
+          "count": 1,
+          "probability": 0.9
+        },
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.1
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.01
+        }
+      ]
+    },
+    {
+      "code": 20700601,
+      "name": "bf_Farm",
+      "level": 2,
+      "production": 100000,
+      "gathering": 45000,
+      "asset": 20100101,
+      "drops": [
+        {
+          "source_item_code": 10104097,
+          "item_code": 10205001,
+          "count": 1,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.03
+        }
+      ]
+    },
+    {
+      "code": 20700601,
+      "name": "bf_Farm",
+      "level": 3,
+      "production": 200000,
+      "gathering": 50000,
+      "asset": 20100101,
+      "drops": [
+        {
+          "source_item_code": 10104097,
+          "item_code": 10205001,
+          "count": 2,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 2,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.05
+        }
+      ]
+    },
+    {
+      "code": 20700601,
+      "name": "bf_Farm",
+      "level": 4,
+      "production": 300000,
+      "gathering": 55000,
+      "asset": 20100101,
+      "drops": [
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.9
+        },
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.1
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.1
+        }
+      ]
+    },
+    {
+      "code": 20700601,
+      "name": "bf_Farm",
+      "level": 5,
+      "production": 600000,
+      "gathering": 60000,
+      "asset": 20100101,
+      "drops": [
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.3
+        }
+      ]
+    },
+    {
+      "code": 20700601,
+      "name": "bf_Farm",
+      "level": 6,
+      "production": 900000,
+      "gathering": 65000,
+      "asset": 20100101,
+      "drops": [
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 2,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 2,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.5
+        }
+      ]
+    },
+    {
+      "code": 20700601,
+      "name": "bf_Farm",
+      "level": 7,
+      "production": 1200000,
+      "gathering": 70000,
+      "asset": 20100101,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.9
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 1,
+          "probability": 0.1
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.6
+        }
+      ]
+    },
+    {
+      "code": 20700601,
+      "name": "bf_Farm",
+      "level": 8,
+      "production": 1800000,
+      "gathering": 75000,
+      "asset": 20100101,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 1,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.8
+        }
+      ]
+    },
+    {
+      "code": 20700601,
+      "name": "bf_Farm",
+      "level": 9,
+      "production": 2400000,
+      "gathering": 80000,
+      "asset": 20100101,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 2,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 2,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.8
+        }
+      ]
+    },
+    {
+      "code": 20700601,
+      "name": "bf_Farm",
+      "level": 10,
+      "production": 3000000,
+      "gathering": 85000,
+      "asset": 20100101,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 3,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 3,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 1.0
+        }
+      ]
+    },
+    {
+      "code": 20700602,
+      "name": "bf_Forest",
+      "level": 1,
+      "production": 50000,
+      "gathering": 40000,
+      "asset": 20100102,
+      "drops": [
+        {
+          "source_item_code": 10104097,
+          "item_code": 10205001,
+          "count": 1,
+          "probability": 0.9
+        },
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.1
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.01
+        }
+      ]
+    },
+    {
+      "code": 20700602,
+      "name": "bf_Forest",
+      "level": 2,
+      "production": 100000,
+      "gathering": 45000,
+      "asset": 20100102,
+      "drops": [
+        {
+          "source_item_code": 10104097,
+          "item_code": 10205001,
+          "count": 1,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.03
+        }
+      ]
+    },
+    {
+      "code": 20700602,
+      "name": "bf_Forest",
+      "level": 3,
+      "production": 200000,
+      "gathering": 50000,
+      "asset": 20100102,
+      "drops": [
+        {
+          "source_item_code": 10104097,
+          "item_code": 10205001,
+          "count": 2,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 2,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.05
+        }
+      ]
+    },
+    {
+      "code": 20700602,
+      "name": "bf_Forest",
+      "level": 4,
+      "production": 300000,
+      "gathering": 55000,
+      "asset": 20100102,
+      "drops": [
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.9
+        },
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.1
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.1
+        }
+      ]
+    },
+    {
+      "code": 20700602,
+      "name": "bf_Forest",
+      "level": 5,
+      "production": 600000,
+      "gathering": 60000,
+      "asset": 20100102,
+      "drops": [
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.3
+        }
+      ]
+    },
+    {
+      "code": 20700602,
+      "name": "bf_Forest",
+      "level": 6,
+      "production": 900000,
+      "gathering": 65000,
+      "asset": 20100102,
+      "drops": [
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 2,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 2,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.5
+        }
+      ]
+    },
+    {
+      "code": 20700602,
+      "name": "bf_Forest",
+      "level": 7,
+      "production": 1200000,
+      "gathering": 70000,
+      "asset": 20100102,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.9
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 1,
+          "probability": 0.1
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.6
+        }
+      ]
+    },
+    {
+      "code": 20700602,
+      "name": "bf_Forest",
+      "level": 8,
+      "production": 1800000,
+      "gathering": 75000,
+      "asset": 20100102,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 1,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.8
+        }
+      ]
+    },
+    {
+      "code": 20700602,
+      "name": "bf_Forest",
+      "level": 9,
+      "production": 2400000,
+      "gathering": 80000,
+      "asset": 20100102,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 2,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 2,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.8
+        }
+      ]
+    },
+    {
+      "code": 20700602,
+      "name": "bf_Forest",
+      "level": 10,
+      "production": 3000000,
+      "gathering": 85000,
+      "asset": 20100102,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 3,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 3,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 1.0
+        }
+      ]
+    },
+    {
+      "code": 20700603,
+      "name": "bf_Quarry",
+      "level": 1,
+      "production": 50000,
+      "gathering": 40000,
+      "asset": 20100103,
+      "drops": [
+        {
+          "source_item_code": 10104097,
+          "item_code": 10205001,
+          "count": 1,
+          "probability": 0.9
+        },
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.1
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.01
+        }
+      ]
+    },
+    {
+      "code": 20700603,
+      "name": "bf_Quarry",
+      "level": 2,
+      "production": 100000,
+      "gathering": 45000,
+      "asset": 20100103,
+      "drops": [
+        {
+          "source_item_code": 10104097,
+          "item_code": 10205001,
+          "count": 1,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.03
+        }
+      ]
+    },
+    {
+      "code": 20700603,
+      "name": "bf_Quarry",
+      "level": 3,
+      "production": 200000,
+      "gathering": 50000,
+      "asset": 20100103,
+      "drops": [
+        {
+          "source_item_code": 10104097,
+          "item_code": 10205001,
+          "count": 2,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 2,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.05
+        }
+      ]
+    },
+    {
+      "code": 20700603,
+      "name": "bf_Quarry",
+      "level": 4,
+      "production": 300000,
+      "gathering": 55000,
+      "asset": 20100103,
+      "drops": [
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.9
+        },
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.1
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.1
+        }
+      ]
+    },
+    {
+      "code": 20700603,
+      "name": "bf_Quarry",
+      "level": 5,
+      "production": 600000,
+      "gathering": 60000,
+      "asset": 20100103,
+      "drops": [
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.3
+        }
+      ]
+    },
+    {
+      "code": 20700603,
+      "name": "bf_Quarry",
+      "level": 6,
+      "production": 900000,
+      "gathering": 65000,
+      "asset": 20100103,
+      "drops": [
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 2,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 2,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.5
+        }
+      ]
+    },
+    {
+      "code": 20700603,
+      "name": "bf_Quarry",
+      "level": 7,
+      "production": 1200000,
+      "gathering": 70000,
+      "asset": 20100103,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.9
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 1,
+          "probability": 0.1
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.6
+        }
+      ]
+    },
+    {
+      "code": 20700603,
+      "name": "bf_Quarry",
+      "level": 8,
+      "production": 1800000,
+      "gathering": 75000,
+      "asset": 20100103,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 1,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.8
+        }
+      ]
+    },
+    {
+      "code": 20700603,
+      "name": "bf_Quarry",
+      "level": 9,
+      "production": 2400000,
+      "gathering": 80000,
+      "asset": 20100103,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 2,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 2,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.8
+        }
+      ]
+    },
+    {
+      "code": 20700603,
+      "name": "bf_Quarry",
+      "level": 10,
+      "production": 3000000,
+      "gathering": 85000,
+      "asset": 20100103,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 3,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 3,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 1.0
+        }
+      ]
+    },
+    {
+      "code": 20700604,
+      "name": "bf_gold mine",
+      "level": 1,
+      "production": 50000,
+      "gathering": 40000,
+      "asset": 20100104,
+      "drops": [
+        {
+          "source_item_code": 10104097,
+          "item_code": 10205001,
+          "count": 1,
+          "probability": 0.9
+        },
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.1
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.01
+        }
+      ]
+    },
+    {
+      "code": 20700604,
+      "name": "bf_gold mine",
+      "level": 2,
+      "production": 100000,
+      "gathering": 45000,
+      "asset": 20100104,
+      "drops": [
+        {
+          "source_item_code": 10104097,
+          "item_code": 10205001,
+          "count": 1,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.03
+        }
+      ]
+    },
+    {
+      "code": 20700604,
+      "name": "bf_gold mine",
+      "level": 3,
+      "production": 200000,
+      "gathering": 50000,
+      "asset": 20100104,
+      "drops": [
+        {
+          "source_item_code": 10104097,
+          "item_code": 10205001,
+          "count": 2,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 2,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.05
+        }
+      ]
+    },
+    {
+      "code": 20700604,
+      "name": "bf_gold mine",
+      "level": 4,
+      "production": 300000,
+      "gathering": 55000,
+      "asset": 20100104,
+      "drops": [
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.9
+        },
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.1
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.1
+        }
+      ]
+    },
+    {
+      "code": 20700604,
+      "name": "bf_gold mine",
+      "level": 5,
+      "production": 600000,
+      "gathering": 60000,
+      "asset": 20100104,
+      "drops": [
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.3
+        }
+      ]
+    },
+    {
+      "code": 20700604,
+      "name": "bf_gold mine",
+      "level": 6,
+      "production": 900000,
+      "gathering": 65000,
+      "asset": 20100104,
+      "drops": [
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 2,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 2,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.5
+        }
+      ]
+    },
+    {
+      "code": 20700604,
+      "name": "bf_gold mine",
+      "level": 7,
+      "production": 1200000,
+      "gathering": 70000,
+      "asset": 20100104,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.9
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 1,
+          "probability": 0.1
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.6
+        }
+      ]
+    },
+    {
+      "code": 20700604,
+      "name": "bf_gold mine",
+      "level": 8,
+      "production": 1800000,
+      "gathering": 75000,
+      "asset": 20100104,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 1,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.8
+        }
+      ]
+    },
+    {
+      "code": 20700604,
+      "name": "bf_gold mine",
+      "level": 9,
+      "production": 2400000,
+      "gathering": 80000,
+      "asset": 20100104,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 2,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 2,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 0.8
+        }
+      ]
+    },
+    {
+      "code": 20700604,
+      "name": "bf_gold mine",
+      "level": 10,
+      "production": 3000000,
+      "gathering": 85000,
+      "asset": 20100104,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 3,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 3,
+          "probability": 0.2
+        },
+        {
+          "source_item_code": 10603026,
+          "item_code": 120603026,
+          "count": 1,
+          "probability": 1.0
+        }
+      ]
+    },
+    {
+      "code": 20700605,
+      "name": "bf_Crystal mine",
+      "level": 1,
+      "production": 40,
+      "gathering": 100,
+      "asset": 20100105,
+      "drops": [
+        {
+          "source_item_code": 10104097,
+          "item_code": 10205001,
+          "count": 1,
+          "probability": 0.9
+        },
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.1
+        }
+      ]
+    },
+    {
+      "code": 20700605,
+      "name": "bf_Crystal mine",
+      "level": 2,
+      "production": 45,
+      "gathering": 110,
+      "asset": 20100105,
+      "drops": [
+        {
+          "source_item_code": 10104097,
+          "item_code": 10205001,
+          "count": 1,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.2
+        }
+      ]
+    },
+    {
+      "code": 20700605,
+      "name": "bf_Crystal mine",
+      "level": 3,
+      "production": 50,
+      "gathering": 120,
+      "asset": 20100105,
+      "drops": [
+        {
+          "source_item_code": 10104097,
+          "item_code": 10205001,
+          "count": 2,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 2,
+          "probability": 0.2
+        }
+      ]
+    },
+    {
+      "code": 20700605,
+      "name": "bf_Crystal mine",
+      "level": 4,
+      "production": 55,
+      "gathering": 130,
+      "asset": 20100105,
+      "drops": [
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.9
+        },
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.1
+        }
+      ]
+    },
+    {
+      "code": 20700605,
+      "name": "bf_Crystal mine",
+      "level": 5,
+      "production": 60,
+      "gathering": 140,
+      "asset": 20100105,
+      "drops": [
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 1,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.2
+        }
+      ]
+    },
+    {
+      "code": 20700605,
+      "name": "bf_Crystal mine",
+      "level": 6,
+      "production": 65,
+      "gathering": 150,
+      "asset": 20100105,
+      "drops": [
+        {
+          "source_item_code": 10104098,
+          "item_code": 10205002,
+          "count": 2,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 2,
+          "probability": 0.2
+        }
+      ]
+    },
+    {
+      "code": 20700605,
+      "name": "bf_Crystal mine",
+      "level": 7,
+      "production": 70,
+      "gathering": 160,
+      "asset": 20100105,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.9
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 1,
+          "probability": 0.1
+        }
+      ]
+    },
+    {
+      "code": 20700605,
+      "name": "bf_Crystal mine",
+      "level": 8,
+      "production": 75,
+      "gathering": 170,
+      "asset": 20100105,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 1,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 1,
+          "probability": 0.2
+        }
+      ]
+    },
+    {
+      "code": 20700605,
+      "name": "bf_Crystal mine",
+      "level": 9,
+      "production": 80,
+      "gathering": 180,
+      "asset": 20100105,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 2,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 2,
+          "probability": 0.2
+        }
+      ]
+    },
+    {
+      "code": 20700605,
+      "name": "bf_Crystal mine",
+      "level": 10,
+      "production": 85,
+      "gathering": 200,
+      "asset": 20100105,
+      "drops": [
+        {
+          "source_item_code": 10104099,
+          "item_code": 10205003,
+          "count": 3,
+          "probability": 0.8
+        },
+        {
+          "source_item_code": 10104100,
+          "item_code": 10205004,
+          "count": 3,
+          "probability": 0.2
+        }
+      ]
+    }
+  ]
+}

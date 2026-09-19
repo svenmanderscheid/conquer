@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Conquer\Api\Handlers;
 
+use Conquer\Game\World\WorldContext;
+
 use Conquer\Api\Response;
 use Conquer\Auth\Session;
 use Conquer\Db\Connection;
@@ -47,7 +49,7 @@ final class ResearchHandler
         }
 
         $playerId = (int) $session['player_id'];
-        $worldId  = 1;
+        $worldId  = WorldContext::id();
 
         // Lazy tick — apply any completed research before reading state.
         ResearchProcessor::processQueue($playerId, $worldId);
@@ -92,8 +94,8 @@ final class ResearchHandler
         $academyRow = $db->query(
             "SELECT cb.level FROM city_buildings cb
              JOIN cities c ON c.id = cb.city_id
-             WHERE c.player_id = ? AND cb.building_code = 'academy' LIMIT 1",
-            [$playerId],
+             WHERE c.player_id = ? AND c.world_id=? AND cb.building_code = 'academy' LIMIT 1",
+            [$playerId,$worldId],
         )->fetch();
         $academyLevel = $academyRow ? (int) $academyRow['level'] : 0;
 
@@ -122,7 +124,7 @@ final class ResearchHandler
      *  - level_to = current_level + 1 (sequential upgrades only)
      *  - level_to <= max_level
      *  - Academy level satisfies the requirements of this level entry
-     *  - Prerequisite research codes are at level >= 1
+     *  - Each prerequisite meets the exact level required by the requested upgrade
      *  - No active research queue entry
      *  - Player has enough resources
      *
@@ -135,6 +137,8 @@ final class ResearchHandler
         if ($session === null) {
             Response::error(401, 'UNAUTHENTICATED', 'Not logged in.');
         }
+        try{WorldContext::assertActionAvailable();}catch(\DomainException $e){Response::error(409,'WORLD_UNAVAILABLE',$e->getMessage());}
+
 
         // CSRF check.
         $supplied = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
@@ -164,7 +168,7 @@ final class ResearchHandler
         }
 
         $playerId = (int) $session['player_id'];
-        $worldId  = 1;
+        $worldId  = WorldContext::id();
         $db       = Connection::getInstance();
 
         // Apply any finished research before validating current levels.
@@ -201,8 +205,8 @@ final class ResearchHandler
 
         // Academy level check — read from city_buildings.
         $cityRow = $db->query(
-            'SELECT id FROM cities WHERE player_id = ? LIMIT 1',
-            [$playerId],
+            'SELECT id FROM cities WHERE player_id = ? AND world_id=? LIMIT 1',
+            [$playerId,$worldId],
         )->fetch();
 
         if ($cityRow === false) {
@@ -227,9 +231,14 @@ final class ResearchHandler
                 . ' (current: ' . $academyLevel . ').');
         }
 
-        // Prerequisite research codes check.
-        $prerequisites = ResearchData::prerequisites($node);
-        foreach ($prerequisites as $preCode) {
+        // The level definition is authoritative: opening a branch may require
+        // level 2 or higher, while later upgrades specify their own requirements.
+        foreach (($levelEntry['requirements'] ?? []) as $requirement) {
+            if (($requirement['type'] ?? '') !== 'research') {
+                continue;
+            }
+            $preCode = (string) $requirement['code'];
+            $requiredLevel = (int) $requirement['level'];
             $preRow = $db->query(
                 'SELECT level FROM player_research
                  WHERE  player_id = ? AND world_id = ? AND research_code = ?',
@@ -237,11 +246,12 @@ final class ResearchHandler
             )->fetch();
 
             $preLevel = $preRow !== false ? (int) $preRow['level'] : 0;
-            if ($preLevel < 1) {
+            if ($preLevel < $requiredLevel) {
                 $preNode = ResearchData::get($preCode);
                 $preName = $preNode !== null ? $preNode['name'] : $preCode;
                 Response::error(400, 'PREREQUISITE_NOT_MET',
-                    '"' . $node['name'] . '" requires "' . $preName . '" to be researched first.');
+                    '"' . $node['name'] . '" benötigt "' . $preName . '" auf Stufe '
+                    . $requiredLevel . ' (aktuell: ' . $preLevel . ').');
             }
         }
 
@@ -262,10 +272,14 @@ final class ResearchHandler
         // Apply research_speed buff to reduce duration.
         $buffs         = BuffEngine::getBuffs($playerId, $worldId);
         $speedReduction = (float) ($buffs['research_speed'] ?? 0.0);
+        $durationSec = (int)max(1,round($durationSec/(1+max(0,(float)($buffs['talent_research_speed']??0)))));
         if ($speedReduction > 0.0) {
             $durationSec = (int) max(1, (int) round($durationSec * (1.0 - $speedReduction)));
         }
+        $durationSec=max(1,(int)ceil($durationSec / \Conquer\Game\Buff\ActiveBuffService::getMultiplier($playerId,'research_boost')));
 
+        $cityState = \Conquer\Game\City\CityState::loadForPlayer($playerId);
+        if ($cityState) { \Conquer\Game\City\ResourceTick::persist($cityState['city'], $cityState['buildings']); }
         // Load city resources.
         $city = $db->query(
             'SELECT food, lumber, stone, gold FROM cities WHERE id = ?',
@@ -293,21 +307,23 @@ final class ResearchHandler
         $db->transaction(
             function () use ($db, $cityId, $playerId, $worldId, $code, $levelTo, $durationSec,
                              $needFood, $needLumber, $needStone, $needGold): void {
-                $db->execute(
+                $debited=$db->execute(
                     'UPDATE cities SET
                         food   = food   - :food,
                         lumber = lumber - :lumber,
                         stone  = stone  - :stone,
                         gold   = gold   - :gold
-                     WHERE id = :id',
+                     WHERE id = :id AND food>=:min_food AND lumber>=:min_lumber AND stone>=:min_stone AND gold>=:min_gold',
                     [
                         ':food'   => $needFood,
                         ':lumber' => $needLumber,
                         ':stone'  => $needStone,
                         ':gold'   => $needGold,
                         ':id'     => $cityId,
+                        ':min_food'=>$needFood, ':min_lumber'=>$needLumber, ':min_stone'=>$needStone, ':min_gold'=>$needGold,
                     ],
                 );
+                if($debited!==1)throw new \RuntimeException('Deine Ressourcen haben sich verändert. Für diese Forschung fehlen jetzt Rohstoffe.');
 
                 $db->execute(
                     'INSERT INTO research_queue
@@ -369,7 +385,7 @@ final class ResearchHandler
 
         $queueId  = (int) ($params['queue_id'] ?? 0);
         $playerId = (int) $session['player_id'];
-        $worldId  = 1;
+        $worldId  = WorldContext::id();
 
         if ($queueId <= 0) {
             Response::error(400, 'INVALID_INPUT', 'Invalid queue_id.');
@@ -410,6 +426,8 @@ final class ResearchHandler
         if ($session === null) {
             Response::error(401, 'UNAUTHENTICATED', 'Not logged in.');
         }
+        try{WorldContext::assertActionAvailable();}catch(\DomainException $e){Response::error(409,'WORLD_UNAVAILABLE',$e->getMessage());}
+
 
         $supplied = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
         if ($supplied === '' || !hash_equals($session['csrf_token'], $supplied)) {
@@ -418,7 +436,7 @@ final class ResearchHandler
 
         $queueId  = (int) ($params['queue_id'] ?? 0);
         $playerId = (int) $session['player_id'];
-        $worldId  = 1;
+        $worldId  = WorldContext::id();
 
         if ($queueId <= 0) {
             Response::error(400, 'INVALID_INPUT', 'Invalid queue_id.');
@@ -538,9 +556,8 @@ final class ResearchHandler
     // -------------------------------------------------------------------------
 
     /**
-     * Instantly completes the active research queue entry using GEMS.
+     * Rejects the retired crystal completion action.
      *
-     * Cost: 1 GEM per minute remaining (minimum 1).
      */
     public static function instant(array $params): void
     {
@@ -548,74 +565,14 @@ final class ResearchHandler
         if ($session === null) {
             Response::error(401, 'UNAUTHENTICATED', 'Not logged in.');
         }
+        try{WorldContext::assertActionAvailable();}catch(\DomainException $e){Response::error(409,'WORLD_UNAVAILABLE',$e->getMessage());}
+
 
         $supplied = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
         if ($supplied === '' || !hash_equals($session['csrf_token'], $supplied)) {
             Response::error(403, 'CSRF_INVALID', 'CSRF token missing or invalid.');
         }
 
-        $playerId = (int) $session['player_id'];
-        $worldId  = 1;
-        $db       = Connection::getInstance();
-
-        // Load the active queue entry for this player.
-        $entry = $db->query(
-            'SELECT id, research_code, level_to, finishes_at,
-                    TIMESTAMPDIFF(SECOND, UTC_TIMESTAMP(), finishes_at) AS secs_remaining
-             FROM   research_queue
-             WHERE  player_id = ? AND world_id = ? AND is_processed = 0
-             ORDER BY id ASC
-             LIMIT 1',
-            [$playerId, $worldId],
-        )->fetch();
-
-        if ($entry === false) {
-            Response::error(404, 'NO_ACTIVE_RESEARCH', 'No research is currently in progress.');
-        }
-
-        $secsRemaining = max(0, (int) $entry['secs_remaining']);
-        $gemCost       = max(1, (int) ceil($secsRemaining / 60));
-        $playerGems    = (int) $session['gems'];
-
-        if ($playerGems < $gemCost) {
-            Response::error(400, 'NOT_ENOUGH_GEMS',
-                'Need ' . $gemCost . ' GEMS, have ' . $playerGems . '.');
-        }
-
-        $entryId      = (int) $entry['id'];
-        $researchCode = (string) $entry['research_code'];
-        $levelTo      = (int) $entry['level_to'];
-
-        $db->transaction(
-            function () use ($db, $entryId, $playerId, $worldId, $researchCode, $levelTo, $gemCost): void {
-                // Deduct GEMS.
-                $db->execute(
-                    'UPDATE players SET gems = gems - ? WHERE id = ?',
-                    [$gemCost, $playerId],
-                );
-
-                // Apply research immediately.
-                $db->execute(
-                    'INSERT INTO player_research (player_id, world_id, research_code, level)
-                     VALUES (?, ?, ?, ?)
-                     ON DUPLICATE KEY UPDATE level = ?',
-                    [$playerId, $worldId, $researchCode, $levelTo, $levelTo],
-                );
-
-                // Mark queue entry as processed (backdated to now).
-                $db->execute(
-                    'UPDATE research_queue
-                     SET is_processed = 1, finishes_at = UTC_TIMESTAMP()
-                     WHERE id = ?',
-                    [$entryId],
-                );
-            },
-        );
-
-        Response::ok([
-            'gems_spent'    => $gemCost,
-            'research_code' => $researchCode,
-            'level_to'      => $levelTo,
-        ]);
+        Response::error(422, 'CRYSTAL_PURCHASE_DISABLED', \Conquer\Game\CrystalEconomy::RESTRICTION);
     }
 }

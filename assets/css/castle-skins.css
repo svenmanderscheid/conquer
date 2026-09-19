@@ -1,0 +1,69 @@
+/* Animated portraits share a quiet glow; reduced motion keeps their still artwork. */
+.castle-skin-portrait { display:block; position:relative; isolation:isolate; min-width:0; min-height:0; }
+.castle-skin-picker .skin-option.is-locked{background:var(--ui-disabled)!important;color:var(--ui-muted)!important;filter:saturate(.45)}
+.castle-skin-picker .skin-option.is-locked .castle-skin-portrait{opacity:.58}
+.castle-skin-picker .skin-option.is-locked .skin-equip-state{color:var(--ui-muted)}
+.castle-skin-portrait>img,.castle-skin-portrait>picture { position:relative; z-index:1; display:block; width:100%; height:100%; object-fit:contain; }
+.castle-skin-portrait>picture>img { display:block; width:100%; height:100%; object-fit:contain; }
+.castle-skin-effect,.castle-skin-effect:before,.castle-skin-effect:after { position:absolute; pointer-events:none; }
+.castle-skin-effect { inset:5%; z-index:0; color:var(--skin-aura,#ffe396); }
+:is(.castle-skin-portrait,.atlas-marker)[data-rarity=mythic]>.castle-skin-effect { background:radial-gradient(ellipse at 50% 64%,transparent 20%,color-mix(in srgb,var(--skin-aura) 28%,transparent) 45%,transparent 69%); filter:drop-shadow(0 0 7px var(--skin-aura)); animation:castle-aura-breathe 3.8s ease-in-out infinite; }
+:is(.castle-skin-portrait,.atlas-marker)[data-rarity=mythic]>.castle-skin-effect:before { content:""; inset:30% 9% -8%; border:2px dashed color-mix(in srgb,var(--skin-aura) 80%,transparent); border-radius:50%; box-shadow:0 0 12px var(--skin-aura),inset 0 0 12px var(--skin-aura); opacity:.6; animation:castle-aura-orbit 12s linear infinite; }
+:is(.castle-skin-portrait,.atlas-marker)[data-rarity=mythic]>.castle-skin-effect:after { content:"✧"; left:18%; top:12%; font-size:16px; text-shadow:34px 17px 3px currentColor,63px -9px 7px currentColor,-13px 51px 6px currentColor; opacity:.8; animation:castle-aura-sparkle 3s ease-in-out infinite; }
+.castle-skin-portrait[data-rarity=legendary]>.castle-skin-effect { display:none; }
+@keyframes castle-aura-breathe { 0%,100% { opacity:.55; transform:scale(.96); } 50% { opacity:.9; transform:scale(1.04); } }
+@keyframes castle-aura-orbit { from { transform:rotateX(58deg) rotateZ(0deg); } to { transform:rotateX(58deg) rotateZ(360deg); } }
+@keyframes castle-aura-sparkle { 0%,100% { transform:translateY(3px); opacity:.25; } 50% { transform:translateY(-5px); opacity:.9; } }
+@keyframes castle-ornament-drift { 0%,100% { transform:translateY(6px) scale(.65); opacity:.3; } 50% { transform:translateY(-8px) scale(1.15); opacity:1; } }
+@keyframes castle-petal-drift { 0% { transform:translate(-8px,-9px) rotate(0deg); opacity:0; } 25% { opacity:.9; } 75% { opacity:.8; } 100% { transform:translate(13px,26px) rotate(130deg); opacity:0; } }
+body.reduced-motion .castle-skin-effect,body.reduced-motion .castle-skin-effect:before,body.reduced-motion .castle-skin-effect:after { animation:none!important; }
+@media(prefers-reduced-motion:reduce) { .castle-skin-effect,.castle-skin-effect:before,.castle-skin-effect:after { animation:none!important; } }
+
+.village-summary>.castle-skin-portrait { flex:0 0 110px; width:110px; height:110px; }
+body.mobile-game #game-dialog:has(.castle-skin-picker) #dialog-content { display:flex; padding:12px; overflow:hidden; }
+.castle-skin-picker { display:flex; flex-direction:column; flex:1; min-width:0; min-height:0; gap:10px; }
+.skin-picker-intro { display:flex; justify-content:space-between; gap:10px; color:#c5d7e9; font-size:12px; }
+.skin-picker-intro small { color:#ebd7a0; font-size:inherit; }
+.skin-category-tabs { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; }
+.skin-category-tabs button { min-width:0; min-height:38px; border:1px solid #738aa4; border-radius:4px; background:linear-gradient(#3a536d,#253a51); color:#d4e2f0; font-size:13px; font-weight:700; cursor:pointer; }
+.skin-category-tabs button[aria-pressed=true] { border-color:#ffd872; color:#fff3c5; background:linear-gradient(#6a572e,#443c2a); box-shadow:inset 0 -2px #c69b47; }
+.skin-category-tabs button span { opacity:.75; font-size:11px; margin-left:4px; }
+body.mobile-game #game-dialog .castle-skin-picker .skin-options { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); grid-template-rows:repeat(2,minmax(0,1fr)); flex:1; min-height:0; gap:10px; margin:0; }
+body.mobile-game #game-dialog .castle-skin-picker .skin-option { display:grid; grid-template-rows:auto minmax(0,1fr) auto auto auto; justify-items:stretch; align-items:center; gap:3px; min-height:0; min-width:0; padding:8px 10px; margin:0; background:radial-gradient(ellipse at 50% 25%,#394860,#1c2c40 75%); border:2px solid #667c94; border-radius:6px; box-shadow:inset 0 0 0 2px #101d2b; overflow:hidden; }
+body.mobile-game #game-dialog .castle-skin-picker .skin-option[data-rarity=legendary] { border-color:#c3883b; background:radial-gradient(ellipse at 50% 25%,#6d4930,#292936 77%); }
+body.mobile-game #game-dialog .castle-skin-picker .skin-option[data-rarity=mythic] { border-color:#65d8bb; background:radial-gradient(ellipse at 50% 25%,#2a615b,#182c38 77%); }
+body.mobile-game #game-dialog .castle-skin-picker .skin-option[aria-pressed=true] { border-color:#fff2b6; box-shadow:inset 0 0 0 2px #f2ca69,0 0 8px #ffdb7638; }
+.castle-skin-picker .skin-rarity { justify-self:start; color:#c4d7ec; border:1px solid #698098; background:#1b3047; border-radius:3px; padding:2px 7px; text-transform:uppercase; letter-spacing:.7px; font-size:9px; font-weight:800; }
+.castle-skin-picker [data-rarity=legendary]>.skin-rarity { color:#ffe0a2; border-color:#d89949; background:#673b21; }
+.castle-skin-picker [data-rarity=mythic]>.skin-rarity { color:#bfffe7; border-color:#56c5a7; background:#175445; }
+.castle-skin-picker .castle-skin-portrait { align-self:stretch; height:100%; min-height:0; }
+body.mobile-game #game-dialog .castle-skin-picker .skin-option img { height:100%; max-height:190px; width:100%; margin:0; }
+body.mobile-game #game-dialog .castle-skin-picker .skin-option strong { color:#fff1d3; font-size:14px; line-height:1.2; margin:0; }
+.castle-skin-picker .skin-description { display:block; color:#c3d4e6; font-size:11px; line-height:1.3; margin:0; }
+.skin-equip-state { display:block; justify-self:center; color:#ffe098; font-size:11px; font-weight:800; padding:3px 12px; border-radius:3px; }
+[aria-pressed=true]>.skin-equip-state { color:#d9ffdf; background:#27513b; }
+.skin-pagination { display:flex; align-items:center; justify-content:center; gap:20px; flex:0 0 36px; color:#d8e5f2; font-size:12px; }
+.skin-pagination button { width:42px; height:34px; border:1px solid #7995b3; border-radius:4px; background:linear-gradient(#426382,#2b425d); color:#fff2bd; font-size:26px; line-height:1; cursor:pointer; }
+.skin-pagination button:disabled { opacity:.35; cursor:default; }
+body.mobile-game #game-dialog .castle-skin-picker .skin-back { min-height:38px; margin:0; padding:7px; flex:0 0 auto; font-size:12px; }
+.castle-skin-picker button:focus-visible { outline:2px solid #ffe39b; outline-offset:2px; }
+@media(max-width:600px) {
+ body.mobile-game #game-dialog:has(.castle-skin-picker) #dialog-content { padding:8px; }
+ .castle-skin-picker { gap:7px; }.skin-picker-intro { font-size:10px; }
+ body.mobile-game #game-dialog .castle-skin-picker .skin-options { gap:7px; }
+ body.mobile-game #game-dialog .castle-skin-picker .skin-option { padding:7px 5px; }
+ body.mobile-game #game-dialog .castle-skin-picker .skin-option strong { font-size:12px; }
+ .castle-skin-picker .skin-description { font-size:10px; }.skin-category-tabs { gap:5px; }.skin-category-tabs button { font-size:12px; }
+ .village-summary>.castle-skin-portrait { flex-basis:80px; width:80px; height:80px; }
+}
+@media(max-height:680px) { .castle-skin-picker .skin-description { display:none; } body.mobile-game #game-dialog .castle-skin-picker .skin-option { grid-template-rows:auto minmax(0,1fr) auto auto; } }
+@media(max-height:460px) and (min-width:480px) {
+ .castle-skin-picker { gap:5px; }.skin-picker-intro { display:none; }
+ body.mobile-game #game-dialog:has(.castle-skin-picker) #dialog-content { padding:6px; }
+ body.mobile-game #game-dialog .castle-skin-picker .skin-options { grid-template-columns:repeat(4,minmax(0,1fr)); grid-template-rows:minmax(0,1fr); gap:5px; }
+ body.mobile-game #game-dialog .castle-skin-picker .skin-option { gap:1px; padding:4px; }
+ body.mobile-game #game-dialog .castle-skin-picker .skin-option strong { font-size:10px; }
+ .skin-category-tabs button { min-height:28px; font-size:11px; }.skin-pagination { flex-basis:28px; }.skin-pagination button { height:26px; font-size:22px; }
+ body.mobile-game #game-dialog .castle-skin-picker .skin-back { min-height:28px; padding:4px; font-size:10px; }
+ .castle-skin-picker .skin-rarity { font-size:8px; padding:1px 4px; }.skin-equip-state { font-size:9px; padding:1px 4px; }
+}

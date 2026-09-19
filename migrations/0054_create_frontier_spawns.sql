@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS frontier_spawns (
+    player_id INT PRIMARY KEY,
+    refreshed_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (player_id) REFERENCES players(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

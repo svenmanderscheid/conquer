@@ -1,212 +1,145 @@
 <?php
 declare(strict_types=1);
-
 namespace Conquer\Game\Treasure;
 
 use Conquer\Db\Connection;
+use Conquer\Game\Inventory\InventoryService;
+use Conquer\Game\Quest\DailyQuestService;
 
-/**
- * Handles chest inventory and chest opening logic.
- *
- * Chest types: silver | gold | platinum
- *
- * DB table used: player_chests
- *   (player_id, silver_count, gold_count, platinum_count,
- *    free_silver_used_today, last_free_silver_reset)
- *
- * Item drops are stored in player_items (item_code, quantity).
- * Fragment drops are forwarded to TreasureService::addFragments().
- */
+/** Account-wide free chest timers; owned inventory chests are independent. */
 final class ChestService
 {
-    // Static-only helper — no instantiation.
     private function __construct() {}
-
-    // -------------------------------------------------------------------------
-    // Constants
-    // -------------------------------------------------------------------------
-
-    public const FREE_SILVER_PER_DAY      = 5;
-    public const GOLD_CHEST_COST_GEMS     = 50;
+    public const FREE_SILVER_PER_DAY = 10;
+    public const SILVER_COOLDOWN_SECONDS = 600;
+    public const GOLD_COOLDOWN_SECONDS = 86400;
+    public const GOLD_CHEST_COST_GEMS = 50;
     public const PLATINUM_CHEST_COST_GEMS = 200;
-
-    /** Valid chest type identifiers. */
-    private const VALID_TYPES = ['silver', 'gold', 'platinum'];
-
-    /** @var array<string, mixed>|null */
+    private const VALID_TYPES = ['silver','gold','platinum'];
     private static ?array $dropTableCache = null;
 
-    // -------------------------------------------------------------------------
-    // Read
-    // -------------------------------------------------------------------------
-
-    /**
-     * Returns the player's current chest inventory and free-silver status.
-     *
-     * @return array{
-     *     silver_count: int,
-     *     gold_count: int,
-     *     platinum_count: int,
-     *     free_silver_remaining: int,
-     *     free_silver_resets_at: string
-     * }
-     */
+    /** Times are ISO 8601 UTC and apply to the entire player account. */
     public static function getChestStatus(int $playerId): array
     {
-        $db  = Connection::getInstance();
-        $row = self::loadOrCreateRow($db, $playerId);
+        return self::status(self::loadOrCreateRow(Connection::getInstance(),$playerId),time());
+    }
 
-        [$usedToday, $resetDate] = self::resolveFreeSilver($db, $playerId, $row, commit: false);
-
-        $remaining = max(0, self::FREE_SILVER_PER_DAY - $usedToday);
-
-        // Next reset is start of tomorrow in UTC.
-        $tomorrow = (new \DateTimeImmutable('now', new \DateTimeZone('UTC')))
-            ->modify('+1 day')
-            ->setTime(0, 0, 0)
-            ->format('Y-m-d H:i:s');
-
+    private static function status(array $row,int $now): array
+    {
+        $today=gmdate('Y-m-d',$now);
+        $used=substr((string)($row['last_free_silver_reset']??''),0,10)===$today?(int)$row['free_silver_used_today']:0;
+        $remaining=max(0,self::FREE_SILVER_PER_DAY-$used);
+        $tomorrow=strtotime($today.' 00:00:00 UTC')+86400;
+        $silverAt=empty($row['last_free_silver_at'])?0:strtotime($row['last_free_silver_at'].' UTC')+self::SILVER_COOLDOWN_SECONDS;
+        $goldAt=empty($row['last_free_gold_at'])?0:strtotime($row['last_free_gold_at'].' UTC')+self::GOLD_COOLDOWN_SECONDS;
         return [
-            'silver_count'          => (int) $row['silver_count'],
-            'gold_count'            => (int) $row['gold_count'],
-            'platinum_count'        => (int) $row['platinum_count'],
-            'free_silver_remaining' => $remaining,
-            'free_silver_resets_at' => $tomorrow,
+            'server_time'=>gmdate('c',$now),
+            'silver_count'=>(int)$row['silver_count'],'gold_count'=>(int)$row['gold_count'],'platinum_count'=>(int)$row['platinum_count'],
+            'free_silver_limit'=>self::FREE_SILVER_PER_DAY,'free_silver_remaining'=>$remaining,
+            'free_silver_available'=>$remaining>0&&$silverAt<=$now,
+            'free_silver_next_at'=>gmdate('c',max($now,$silverAt,$remaining===0?$tomorrow:0)),
+            'free_silver_resets_at'=>gmdate('c',$tomorrow),
+            'free_gold_available'=>$goldAt<=$now,'free_gold_next_at'=>gmdate('c',max($now,$goldAt)),
         ];
     }
 
-    // -------------------------------------------------------------------------
-    // Mutations
-    // -------------------------------------------------------------------------
-
-    /**
-     * Opens one chest of the given type for the player.
-     *
-     * For silver chests: uses free opens first, then requires silver_count > 0.
-     * For gold / platinum: requires the corresponding count > 0.
-     *
-     * Returns an array of rewards:
-     *   [
-     *     ['type' => 'item',     'item_code' => 10103002, 'quantity' => 1],
-     *     ['type' => 'fragment', 'treasure_code' => 60100001, 'grade' => 'normal',
-     *      'quantity' => 5, 'name' => 'Manure', 'new_total' => 10],
-     *   ]
-     *
-     * @return list<array<string, mixed>>
-     */
-    public static function openChest(int $playerId, string $chestType): array
+    /** Explicit free claim: never silently spends gems or an owned chest. */
+    public static function openFreeChest(int $playerId,string $chestType): array
     {
-        if (!in_array($chestType, self::VALID_TYPES, true)) {
-            throw new \InvalidArgumentException('Invalid chest type: ' . $chestType);
-        }
-
-        $db  = Connection::getInstance();
-        $row = self::loadOrCreateRow($db, $playerId);
-
-        return $db->transaction(function (Connection $db) use ($playerId, $chestType, $row): array {
-            // Re-read inside transaction for row-level lock.
-            $db->execute(
-                'SELECT 1 FROM player_chests WHERE player_id = ? FOR UPDATE',
-                [$playerId],
-            );
-            $row = self::loadOrCreateRow($db, $playerId);
-
-            // Deduct from inventory (or free uses).
-            if ($chestType === 'silver') {
-                [$usedToday, $resetDate] = self::resolveFreeSilver($db, $playerId, $row, commit: true);
-
-                if ($usedToday < self::FREE_SILVER_PER_DAY) {
-                    // Use a free open.
-                    $db->execute(
-                        'UPDATE player_chests
-                         SET free_silver_used_today = free_silver_used_today + 1
-                         WHERE player_id = ?',
-                        [$playerId],
-                    );
-                } elseif ((int) $row['silver_count'] > 0) {
-                    $db->execute(
-                        'UPDATE player_chests SET silver_count = silver_count - 1 WHERE player_id = ?',
-                        [$playerId],
-                    );
-                } else {
-                    throw new \RuntimeException('NO_SILVER_CHEST');
-                }
-            } elseif ($chestType === 'gold') {
-                if ((int) $row['gold_count'] < 1) {
-                    throw new \RuntimeException('NO_GOLD_CHEST');
-                }
-                $db->execute(
-                    'UPDATE player_chests SET gold_count = gold_count - 1 WHERE player_id = ?',
-                    [$playerId],
-                );
-            } else { // platinum
-                if ((int) $row['platinum_count'] < 1) {
-                    throw new \RuntimeException('NO_PLATINUM_CHEST');
-                }
-                $db->execute(
-                    'UPDATE player_chests SET platinum_count = platinum_count - 1 WHERE player_id = ?',
-                    [$playerId],
-                );
-            }
-
-            // Roll the drop table.
-            $drops = self::rollDropTable($chestType);
-
-            // Distribute rewards.
-            $rewards = [];
-            foreach ($drops as $drop) {
-                if (isset($drop['fragment_grade'])) {
-                    $grade    = (string) $drop['fragment_grade'];
-                    $quantity = (int)   $drop['quantity'];
-                    $result   = TreasureService::addRandomFragment($playerId, $grade, $quantity);
-
-                    $rewards[] = [
-                        'type'          => 'fragment',
-                        'grade'         => $grade,
-                        'treasure_code' => $result['treasure_code'],
-                        'name'          => $result['name'],
-                        'quantity'      => $quantity,
-                        'new_total'     => $result['new_total'],
-                    ];
-                } else {
-                    $itemCode = (int) $drop['item_code'];
-                    $quantity = (int) $drop['quantity'];
-
-                    self::addItemToInventory($db, $playerId, $itemCode, $quantity);
-
-                    $rewards[] = [
-                        'type'      => 'item',
-                        'item_code' => $itemCode,
-                        'quantity'  => $quantity,
-                    ];
-                }
-            }
-
-            return $rewards;
+        if(!in_array($chestType,['silver','gold'],true))throw new \DomainException('Diese kostenlose Schatztruhe gibt es nicht.');
+        return self::atomic($playerId,static function(Connection $db)use($playerId,$chestType):array{
+            $row=self::lockedRow($db,$playerId);self::consumeFree($db,$playerId,$chestType,$row,time());
+            return self::grantRewards($playerId,$chestType);
         });
     }
 
-    /**
-     * Adds chests of the given type to a player's inventory.
-     */
-    public static function addChest(int $playerId, string $chestType, int $count = 1): void
+    /** Legacy route: silver prefers an available free claim, otherwise an owned chest. */
+    public static function openChest(int $playerId,string $chestType): array
     {
-        if (!in_array($chestType, self::VALID_TYPES, true)) {
-            throw new \InvalidArgumentException('Invalid chest type: ' . $chestType);
+        self::validType($chestType);
+        return self::atomic($playerId,static function(Connection $db)use($playerId,$chestType):array{
+            $row=self::lockedRow($db,$playerId);$now=time();$status=self::status($row,$now);
+            if($chestType==='silver'&&$status['free_silver_available']&&TreasureService::houseLevel($playerId)>=1)self::consumeFree($db,$playerId,$chestType,$row,$now);
+            else{
+                if((int)$row[$chestType.'_count']<1){
+                    if($chestType==='silver')self::consumeFree($db,$playerId,$chestType,$row,$now);
+                    throw new \DomainException('Keine '.($chestType==='gold'?'goldene':($chestType==='platinum'?'Platin-':'blaue')).' Schatztruhe im Besitz.');
+                }
+                $db->execute('UPDATE player_chests SET '.$chestType.'_count='.$chestType.'_count-1 WHERE player_id=?',[$playerId]);
+            }
+            return self::grantRewards($playerId,$chestType);
+        });
+    }
+
+    /** Legacy URL rejects crystal purchases; free and owned chests remain available. */
+    public static function purchaseAndOpenChest(int $playerId,string $chestType): array
+    {
+        \Conquer\Game\CrystalEconomy::reject();
+    }
+
+    public static function addChest(int $playerId,string $chestType,int $count=1): void
+    {
+        self::validType($chestType);if($count<1)throw new \InvalidArgumentException('count must be >= 1');
+        $db=Connection::getInstance();self::ensureRowExists($db,$playerId);
+        $db->execute('UPDATE player_chests SET '.$chestType.'_count='.$chestType.'_count+? WHERE player_id=?',[$count,$playerId]);
+    }
+
+    private static function validType(string $type): void
+    {
+        if(!in_array($type,self::VALID_TYPES,true))throw new \DomainException('Ungültige Schatztruhe.');
+    }
+
+    private static function consumeFree(Connection $db,int $playerId,string $type,array $row,int $now): void
+    {
+        if(TreasureService::houseLevel($playerId)<1)throw new \DomainException('Baue zuerst eine Schatzkammer in dieser Welt.');
+        $status=self::status($row,$now);
+        if(!$status['free_'.$type.'_available']){
+            if($type==='silver'&&$status['free_silver_remaining']===0)throw new \DomainException('Alle zehn blauen Schatztruhen wurden heute geöffnet. Morgen gibt es neue.');
+            throw new \DomainException($type==='silver'?'Zwischen kostenlosen blauen Schatztruhen liegen zehn Minuten.':'Die goldene Schatztruhe ist alle 24 Stunden kostenlos verfügbar.');
         }
-        if ($count < 1) {
-            throw new \InvalidArgumentException('count must be >= 1');
+        if($type==='silver')$db->execute('UPDATE player_chests SET free_silver_used_today=?,last_free_silver_reset=?,last_free_silver_at=? WHERE player_id=?',[
+            self::FREE_SILVER_PER_DAY-$status['free_silver_remaining']+1,gmdate('Y-m-d',$now),gmdate('Y-m-d H:i:s',$now),$playerId]);
+        else $db->execute('UPDATE player_chests SET last_free_gold_at=? WHERE player_id=?',[gmdate('Y-m-d H:i:s',$now),$playerId]);
+    }
+
+    /** Grants contents only; the caller consumes the owned chest in the same transaction. */
+    public static function grantRewards(int $playerId,string $type): array
+    {
+        self::validType($type);
+        if (!Connection::getInstance()->getPdo()->inTransaction()) {
+            throw new \LogicException('Chest rewards require the enclosing consumption transaction.');
         }
+        $rewards=[];
+        foreach(self::rollDropTable($type)as$drop){
+            $quantity=(int)$drop['quantity'];
+            if ($quantity < 1) throw new \RuntimeException('Ungültige Beutemenge in der Schatztruhe.');
+            if(isset($drop['fragment_grade'])){
+                $result=TreasureService::addRandomFragment($playerId,(string)$drop['fragment_grade'],$quantity);
+                $rewards[]=['type'=>'fragment','quantity'=>$quantity]+$result
+                    +\Conquer\Game\Rewards\RewardPresentation::fragment((int)$result['treasure_code']);
+            }else{
+                $code=(int)$drop['item_code'];$def=InventoryService::getItemDef($code);
+                if(!$def)throw new \RuntimeException('Unbekannter Gegenstand in der Schatztruhe.');
+                InventoryService::addItems($playerId,$code,$quantity);
+                $rewards[]=['type'=>'item','quantity'=>$quantity]+\Conquer\Game\Rewards\RewardPresentation::item($code);
+            }
+        }
+        DailyQuestService::trackProgress($playerId,'open_chest');
+        return $rewards;
+    }
 
-        $column = $chestType . '_count'; // silver_count | gold_count | platinum_count
-        $db     = Connection::getInstance();
+    private static function lockedRow(Connection $db,int $playerId): array
+    {
+        self::ensureRowExists($db,$playerId);
+        return $db->query('SELECT * FROM player_chests WHERE player_id=? FOR UPDATE',[$playerId])->fetch();
+    }
 
-        self::ensureRowExists($db, $playerId);
-
-        $db->execute(
-            "UPDATE player_chests SET {$column} = {$column} + ? WHERE player_id = ?",
-            [$count, $playerId],
-        );
+    private static function atomic(int $playerId,callable $fn): mixed
+    {
+        $db=Connection::getInstance();$key='conquer-player-'.$playerId;
+        if((int)$db->query('SELECT GET_LOCK(?,5)',[$key])->fetchColumn()!==1)throw new \DomainException('Deine Schatzkammer wird gerade aktualisiert.',503);
+        try{return $db->getPdo()->inTransaction()?$fn($db):$db->transaction($fn);}
+        finally{$db->query('SELECT RELEASE_LOCK(?)',[$key]);}
     }
 
     // -------------------------------------------------------------------------
@@ -223,6 +156,7 @@ final class ChestService
     {
         $table  = self::loadDropTable();
         $config = $table['chests'][$chestType] ?? null;
+        $config = \Conquer\Game\Rewards\RewardCatalog::override('chest',$chestType) ?? $config;
 
         if ($config === null) {
             throw new \RuntimeException('No drop table configured for chest type: ' . $chestType);
@@ -318,7 +252,7 @@ final class ChestService
 
         $row = $db->query(
             'SELECT silver_count, gold_count, platinum_count,
-                    free_silver_used_today, last_free_silver_reset
+                    free_silver_used_today, last_free_silver_reset, last_free_silver_at, last_free_gold_at
              FROM   player_chests
              WHERE  player_id = ?',
             [$playerId],
@@ -346,61 +280,4 @@ final class ChestService
         );
     }
 
-    /**
-     * Resolves the free-silver counter, resetting it when the UTC date has changed.
-     *
-     * Returns [used_today, reset_date_string].
-     * When $commit is true the DB row is updated in-place if a reset occurred.
-     *
-     * @param array<string, mixed> $row
-     * @return array{int, string}
-     */
-    private static function resolveFreeSilver(
-        Connection $db,
-        int $playerId,
-        array $row,
-        bool $commit,
-    ): array {
-        $todayUtc  = (new \DateTimeImmutable('now', new \DateTimeZone('UTC')))->format('Y-m-d');
-        $lastReset = isset($row['last_free_silver_reset'])
-            ? (string) $row['last_free_silver_reset']
-            : '';
-
-        // Extract date part (the column may be a full DATETIME string).
-        $lastResetDate = strlen($lastReset) >= 10 ? substr($lastReset, 0, 10) : '';
-
-        if ($lastResetDate !== $todayUtc) {
-            // New day — reset the counter.
-            if ($commit) {
-                $db->execute(
-                    'UPDATE player_chests
-                     SET free_silver_used_today = 0, last_free_silver_reset = ?
-                     WHERE player_id = ?',
-                    [$todayUtc, $playerId],
-                );
-            }
-
-            return [0, $todayUtc];
-        }
-
-        return [(int) $row['free_silver_used_today'], $lastResetDate];
-    }
-
-    /**
-     * Adds an item to player_items (INSERT … ON DUPLICATE KEY UPDATE).
-     * Creates the table row when absent.
-     */
-    private static function addItemToInventory(
-        Connection $db,
-        int $playerId,
-        int $itemCode,
-        int $quantity,
-    ): void {
-        $db->execute(
-            'INSERT INTO player_items (player_id, item_code, quantity)
-             VALUES (?, ?, ?)
-             ON DUPLICATE KEY UPDATE quantity = quantity + ?',
-            [$playerId, $itemCode, $quantity, $quantity],
-        );
-    }
 }

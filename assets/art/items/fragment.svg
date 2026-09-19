@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Reliktfragment">
+<title>Reliktfragment</title>
+
+<!-- Original code-native storybook item illustration. Values and rarity belong to the game UI. -->
+<g stroke="#493b33" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+<path d="M24 29H48C37 16 45 3 58 4 72 4 80 19 69 29H100V50C111 39 125 47 124 60 124 73 110 80 100 69V103H75C86 91 79 77 66 77S47 93 56 103H24V78C38 88 50 79 48 66 46 54 33 49 24 59Z" fill="#b7c6d2" />
+<path d="M28 35H54C42 19 49 9 59 9 51 24 57 32 64 35H94V49L88 54H64V91L60 99H29V76C43 85 53 74 49 62 47 51 36 50 28 54Z" fill="#edf5f4" stroke="none"/>
+<path d="M95 76V98H78L75 103H100V69C112 81 125 71 124 60L120 62C116 75 106 77 95 66Z" fill="#7f98ac" stroke="none"/>
+<path d="M33 39H46M34 92H44" fill="none" stroke="#fff6df" stroke-width="4"/>
+</g>
+</svg>

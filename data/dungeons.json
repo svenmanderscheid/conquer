@@ -1,0 +1,258 @@
+{
+  "version": 1,
+  "explore_duration_factor": 1.25,
+  "difficulties": {
+    "normal": {
+      "name": "Normal",
+      "enemy_factor": 1.0,
+      "reward_factor": 1.0
+    },
+    "hard": {
+      "name": "Schwer",
+      "enemy_factor": 1.55,
+      "reward_factor": 1.6
+    }
+  },
+  "dungeons": [
+    {
+      "dungeon_code": "ember_vault",
+      "name": "Glutgewölbe",
+      "theme": "Feuer und alte Schmieden",
+      "enemy_factor": 3.5,
+      "base_duration": 5400,
+      "reward_grade": "rare",
+      "treasure_code": 60200001,
+      "item_codes": [
+        10203003,
+        10202013
+      ],
+      "army_profile": {"profile_name":"Schildwall der Schmiede","reason":"Infanterie hält der Gluthitze stand; Fernkämpfer nutzen sichere Schusslinien.","mix":[{"type":1,"percent":50},{"type":2,"percent":35},{"type":3,"percent":15}],"type_effects":{"1":{"attack":1.04,"defense":1.12,"hp":1.1},"2":{"attack":1.08,"defense":1.0,"hp":1.0},"3":{"attack":0.92,"defense":0.94,"hp":0.95}}},
+      "encounters": [
+        {
+          "name": "Aschewache",
+          "attack": 150,
+          "defense": 120,
+          "hp": 1100
+        },
+        {
+          "name": "Feuerkoloss",
+          "attack": 180,
+          "defense": 145,
+          "hp": 1400
+        }
+      ],
+      "optional_encounter": {
+        "name": "Glutschatzhüter",
+        "attack": 195,
+        "defense": 155,
+        "hp": 1050
+      },
+      "boss": {
+        "name": "Schmiedefürst",
+        "attack": 235,
+        "defense": 190,
+        "hp": 2400
+      }
+    },
+    {
+      "dungeon_code": "frost_hollow",
+      "name": "Frosthöhle",
+      "theme": "Eis und gefrorene Runen",
+      "enemy_factor": 3.5,
+      "base_duration": 5700,
+      "reward_grade": "rare",
+      "treasure_code": 60200002,
+      "item_codes": [
+        10203003,
+        10202015
+      ],
+      "army_profile": {"profile_name":"Frostbrecher","reason":"Ein starker Infanteriekern hält die eisigen Angriffe aus; Kavallerie durchstößt die vereisten Linien.","mix":[{"type":1,"percent":50},{"type":2,"percent":15},{"type":3,"percent":35}],"type_effects":{"1":{"attack":1.0,"defense":1.06,"hp":1.06},"2":{"attack":0.93,"defense":0.95,"hp":0.94},"3":{"attack":1.12,"defense":1.06,"hp":1.04}}},
+      "encounters": [
+        {
+          "name": "Eiswolf",
+          "attack": 155,
+          "defense": 115,
+          "hp": 1150
+        },
+        {
+          "name": "Runenwächter",
+          "attack": 175,
+          "defense": 160,
+          "hp": 1450
+        }
+      ],
+      "optional_encounter": {
+        "name": "Kristallbrut",
+        "attack": 205,
+        "defense": 170,
+        "hp": 1100
+      },
+      "boss": {
+        "name": "Frostwyrm",
+        "attack": 240,
+        "defense": 205,
+        "hp": 2500
+      }
+    },
+    {
+      "dungeon_code": "thorn_maze",
+      "name": "Dornenlabyrinth",
+      "theme": "Wildnis und lebende Ranken",
+      "enemy_factor": 3.5,
+      "base_duration": 5100,
+      "reward_grade": "normal",
+      "treasure_code": 60100105,
+      "item_codes": [
+        10203002,
+        10202009
+      ],
+      "army_profile": {"profile_name":"Rankenschneider","reason":"Fernkämpfer lichten die Ranken; Infanterie schützt sie in den engen Pfaden.","mix":[{"type":1,"percent":40},{"type":2,"percent":50},{"type":3,"percent":10}],"type_effects":{"1":{"attack":1.02,"defense":1.08,"hp":1.06},"2":{"attack":1.12,"defense":1.02,"hp":1.0},"3":{"attack":0.9,"defense":0.93,"hp":0.94}}},
+      "encounters": [
+        {
+          "name": "Rankenläufer",
+          "attack": 145,
+          "defense": 125,
+          "hp": 1050
+        },
+        {
+          "name": "Moosbestie",
+          "attack": 170,
+          "defense": 170,
+          "hp": 1350
+        }
+      ],
+      "optional_encounter": {
+        "name": "Verwunschener Hain",
+        "attack": 185,
+        "defense": 180,
+        "hp": 1000
+      },
+      "boss": {
+        "name": "Dornenkönigin",
+        "attack": 225,
+        "defense": 215,
+        "hp": 2300
+      }
+    },
+    {
+      "dungeon_code": "sunken_temple",
+      "name": "Versunkener Tempel",
+      "theme": "Wasser und vergessene Götter",
+      "enemy_factor": 3.5,
+      "base_duration": 6000,
+      "reward_grade": "epic",
+      "treasure_code": 60400102,
+      "item_codes": [
+        10103002,
+        10202017
+      ],
+      "army_profile": {"profile_name":"Tempelvorhut","reason":"Schwere Infanterie trägt den Kampf auf nassem Stein; mobile Kräfte sichern die Flanken.","mix":[{"type":1,"percent":55},{"type":2,"percent":15},{"type":3,"percent":30}],"type_effects":{"1":{"attack":1.06,"defense":1.12,"hp":1.1},"2":{"attack":0.94,"defense":0.96,"hp":0.96},"3":{"attack":1.05,"defense":1.01,"hp":1.0}}},
+      "encounters": [
+        {
+          "name": "Tempelwache",
+          "attack": 165,
+          "defense": 145,
+          "hp": 1200
+        },
+        {
+          "name": "Flutrufer",
+          "attack": 195,
+          "defense": 165,
+          "hp": 1500
+        }
+      ],
+      "optional_encounter": {
+        "name": "Perlenkammer",
+        "attack": 215,
+        "defense": 180,
+        "hp": 1150
+      },
+      "boss": {
+        "name": "Leviathanpriester",
+        "attack": 255,
+        "defense": 220,
+        "hp": 2650
+      }
+    },
+    {
+      "dungeon_code": "storm_spire",
+      "name": "Sturmspitze",
+      "theme": "Blitze und schwebende Ruinen",
+      "enemy_factor": 3.5,
+      "base_duration": 5550,
+      "reward_grade": "epic",
+      "treasure_code": 60400002,
+      "item_codes": [
+        10103002,
+        10202023
+      ],
+      "army_profile": {"profile_name":"Sturmvorhut","reason":"Infanterie schützt die Fernkämpfer vor Gewitterschlägen; eine kleine Reitergruppe sichert die Plattformen.","mix":[{"type":1,"percent":45},{"type":2,"percent":40},{"type":3,"percent":15}],"type_effects":{"1":{"attack":0.95,"defense":0.98,"hp":0.98},"2":{"attack":1.08,"defense":1.02,"hp":1.0},"3":{"attack":1.12,"defense":1.06,"hp":1.04}}},
+      "encounters": [
+        {
+          "name": "Windharpyie",
+          "attack": 170,
+          "defense": 130,
+          "hp": 1150
+        },
+        {
+          "name": "Gewittergolem",
+          "attack": 200,
+          "defense": 180,
+          "hp": 1500
+        }
+      ],
+      "optional_encounter": {
+        "name": "Wolkenkammer",
+        "attack": 220,
+        "defense": 190,
+        "hp": 1200
+      },
+      "boss": {
+        "name": "Sturmtitan",
+        "attack": 265,
+        "defense": 225,
+        "hp": 2700
+      }
+    },
+    {
+      "dungeon_code": "shadow_crypt",
+      "name": "Schattenkrypta",
+      "theme": "Nacht und ruhelose Könige",
+      "enemy_factor": 3.5,
+      "base_duration": 6300,
+      "reward_grade": "legendary",
+      "treasure_code": 60400108,
+      "item_codes": [
+        10203003,
+        10202021
+      ],
+      "army_profile": {"profile_name":"Laternenformation","reason":"Fernkämpfer bekämpfen Geister auf Abstand; ein kompakter Schildkern hält die Gruftgänge.","mix":[{"type":1,"percent":45},{"type":2,"percent":45},{"type":3,"percent":10}],"type_effects":{"1":{"attack":1.02,"defense":1.1,"hp":1.08},"2":{"attack":1.12,"defense":1.03,"hp":1.01},"3":{"attack":0.91,"defense":0.94,"hp":0.94}}},
+      "encounters": [
+        {
+          "name": "Grabritter",
+          "attack": 180,
+          "defense": 160,
+          "hp": 1250
+        },
+        {
+          "name": "Seelenweber",
+          "attack": 210,
+          "defense": 185,
+          "hp": 1600
+        }
+      ],
+      "optional_encounter": {
+        "name": "Verbotene Gruft",
+        "attack": 235,
+        "defense": 200,
+        "hp": 1250
+      },
+      "boss": {
+        "name": "Schattenkönig",
+        "attack": 280,
+        "defense": 240,
+        "hp": 2850
+      }
+    }
+  ]
+}

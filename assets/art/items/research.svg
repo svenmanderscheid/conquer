@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Forschungsflasche">
+<title>Forschungsflasche</title>
+<!-- Original code-native storybook item illustration. Value, quantity and rarity are rendered by the game UI. -->
+<g stroke="#493b33" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+<path d="M48 11H80V39L106 80C117 101 101 117 64 118 27 117 11 101 22 80L48 39Z" fill="#a8d9e3" />
+<path d="M69 16 70 43 99 85C105 99 91 111 64 112V117C101 117 117 101 106 80L80 39V11H69Z" fill="#5d9bac" stroke="none"/>
+<path d="M32 78C46 68 55 85 69 77S87 73 96 81L100 88C108 102 92 111 63 111S20 101 27 88Z" fill="#aa52de" />
+<path d="M64 79V111C93 111 108 101 100 88L96 81C82 71 75 83 64 79" fill="#6b339e" stroke="none"/>
+<path d="M44 11 46 26H82L84 11Z" fill="#aa743f" />
+<path d="M49 15H78" fill="none" stroke="#edc088" stroke-width="4"/>
+<path d="M47 46 32 72" fill="none" stroke="#f1ffff" stroke-width="5"/>
+<circle cx="42" cy="90" r="5" fill="#e8acff" stroke="none"/>
+<circle cx="62" cy="101" r="3" fill="#dd8fff" stroke="none"/>
+<circle cx="82" cy="90" r="3" fill="#c270ec" stroke="none"/>
+</g>
+</svg>

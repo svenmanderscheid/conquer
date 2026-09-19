@@ -32,6 +32,70 @@ if ($_scriptDir !== '' && $_scriptDir !== '/' && str_starts_with($_rawPath, $_sc
     $_rawPath = substr($_rawPath, strlen($_scriptDir));
 }
 $_normalizedPath = '/' . ltrim($_rawPath, '/');
+$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+
+// Public discovery endpoints stay available without the game database.
+// Authentication and every private game route continue below the DB guard.
+$_appConfig = \Conquer\Bootstrap::getConfig();
+$_configuredOrigin = rtrim((string) ($_appConfig['base_url'] ?? ''), '/');
+if (!filter_var($_configuredOrigin, FILTER_VALIDATE_URL)) {
+    $_configuredOrigin = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
+}
+// base_url is the canonical public application root and may itself contain a path.
+$_publicRoot = $_configuredOrigin;
+$_landingCspNonce = base64_encode(random_bytes(18));
+$_landingCsp = "default-src 'self'; img-src 'self' data:; style-src 'self'; font-src 'self'; script-src 'self' 'nonce-{$_landingCspNonce}'; connect-src 'self'; manifest-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; object-src 'none'";
+
+if ($_normalizedPath === '/robots.txt' && $method === 'GET') {
+    header('Content-Type: text/plain; charset=utf-8');
+    header('Cache-Control: public, max-age=3600');
+    echo "User-agent: *\nAllow: /\nDisallow: " . APP_BASE . "/api/\nDisallow: " . APP_BASE . "/admin/\nDisallow: " . APP_BASE . "/auth/\nDisallow: " . APP_BASE . "/city\nDisallow: " . APP_BASE . "/game\nSitemap: " . $_publicRoot . "/sitemap.xml\n";
+    exit;
+}
+if ($_normalizedPath === '/sitemap.xml' && $method === 'GET') {
+    header('Content-Type: application/xml; charset=utf-8');
+    header('Cache-Control: public, max-age=3600');
+    $location = htmlspecialchars($_publicRoot . '/', ENT_XML1 | ENT_QUOTES, 'UTF-8');
+    $lastModified = gmdate('Y-m-d', (int) filemtime(ROOT_DIR . '/views/welcome.php'));
+    echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n"
+        . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>' . $location . '</loc><lastmod>'
+        . $lastModified . '</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url></urlset>';
+    exit;
+}
+if ($_normalizedPath === '/' && $method === 'GET') {
+    session_name('conquer_login');
+    session_start(['cookie_httponly' => true, 'cookie_samesite' => 'Lax', 'cookie_secure' => !empty($_SERVER['HTTPS'])]);
+    $_SESSION['login_csrf'] ??= bin2hex(random_bytes(32));
+    $loginError = '';
+    $landingCspNonce = $_landingCspNonce;
+    header('Content-Security-Policy: ' . $_landingCsp);
+    // The page embeds a session-bound CSRF token; never let a shared cache reuse it.
+    header('Cache-Control: private, no-store');
+    require ROOT_DIR . '/views/welcome.php';
+    exit;
+}
+
+header('X-Robots-Tag: noindex, nofollow');
+
+// All game routes need the database, including login and existing sessions.
+if (!\Conquer\Db\Connection::isInitialized()) {
+    http_response_code(503);
+    header('Retry-After: 30');
+    if (str_starts_with($_normalizedPath, '/api/')) {
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['error' => 'DATABASE_UNAVAILABLE', 'message' => 'Die Spieldatenbank ist gerade nicht erreichbar. Bitte versuche es gleich noch einmal.']);
+    } else {
+        header('Content-Type: text/html; charset=utf-8');
+        $localHint = in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1'], true)
+            ? '<p>Öffne XAMPP und klicke bei <strong>MySQL</strong> auf <strong>Start</strong>. Lade danach diese Seite neu.</p>' : '';
+        echo '<!doctype html><html lang="de"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+            . '<title>Conquer – kurz nicht erreichbar</title><body style="margin:0;background:#173e33;color:#fff5dd;font:18px/1.6 system-ui;padding:8vw">'
+            . '<main style="max-width:620px;margin:auto"><h1>Dein Königreich wartet auf dich.</h1>'
+            . '<p>Die Spieldatenbank ist gerade nicht erreichbar.</p>' . $localHint
+            . '<p><a href="" style="color:#ffda79">Erneut versuchen</a></p></main></body></html>';
+    }
+    exit;
+}
 
 // ---------------------------------------------------------------------------
 // Admin Panel — separate session, separate auth, no game session needed
@@ -55,6 +119,12 @@ if (str_starts_with($_normalizedPath, '/admin')) {
             => \Conquer\Admin\AdminController::dashboard(),
         $adminUri === '/admin/players'
             => \Conquer\Admin\AdminController::players(),
+        $adminUri === '/admin/rewards'
+            => \Conquer\Admin\AdminController::rewards(),
+        $adminUri === '/admin/lands'
+            => \Conquer\Admin\AdminController::lands(),
+        $adminUri === '/admin/items'
+            => \Conquer\Admin\AdminController::items(),
         (bool) preg_match('#^/admin/players/(\d+)$#', $adminUri, $m)
             => \Conquer\Admin\AdminController::playerDetail((int) $m[1]),
         $adminUri === '/admin/alliances'
@@ -63,6 +133,8 @@ if (str_starts_with($_normalizedPath, '/admin')) {
             => \Conquer\Admin\AdminController::world(),
         $adminUri === '/admin/chat'
             => \Conquer\Admin\AdminController::chat(),
+        $adminUri === '/admin/bug-reports'
+            => \Conquer\Admin\AdminController::bugReports(),
         $adminUri === '/admin/audit'
             => \Conquer\Admin\AdminController::auditLog(),
         str_starts_with($adminUri, '/admin/action')
@@ -81,12 +153,125 @@ if (str_starts_with($_normalizedPath, '/admin')) {
 // ---------------------------------------------------------------------------
 
 $path   = $_normalizedPath;
-$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+
+if ($path === '/auth/recover') {
+    session_name('conquer_login');
+    session_start(['cookie_httponly'=>true,'cookie_samesite'=>'Lax','cookie_secure'=>!empty($_SERVER['HTTPS'])]);
+    $_SESSION['login_csrf'] ??= bin2hex(random_bytes(32));
+    $recoveryMessage='';$recoveryDone=false;
+    if($method==='POST'){
+        if(!is_string($_POST['csrf']??null)||!hash_equals($_SESSION['login_csrf'],$_POST['csrf'])){$recoveryMessage='Die Sitzung ist abgelaufen. Lade die Seite neu.';}
+        else{try{
+            \Conquer\Auth\AccountService::recover((string)($_POST['username']??''),(string)($_POST['code']??''),$_POST['new_password']??null);
+            $recoveryDone=true;$recoveryMessage='Dein Passwort wurde geändert. Du kannst dich jetzt wieder anmelden.';
+        }catch(\DomainException $e){$recoveryMessage=$e->getMessage();}}
+    }
+    header('Cache-Control: no-store');require ROOT_DIR.'/views/recover.php';exit;
+}
+
+if ($path === '/auth/local') {
+    if ($method !== 'POST') {
+        header('Location: ' . APP_BASE . '/#zugang', true, 303); exit;
+    }
+    session_name('conquer_login');
+    session_start(['cookie_httponly' => true, 'cookie_samesite' => 'Lax', 'cookie_secure' => !empty($_SERVER['HTTPS'])]);
+    $_SESSION['login_csrf'] ??= bin2hex(random_bytes(32));
+    $loginError = \Conquer\Auth\PasswordAuth::submit();
+    $landingCspNonce = $_landingCspNonce;
+    header('Content-Security-Policy: ' . $_landingCsp);
+    require ROOT_DIR . '/views/welcome.php';
+    exit;
+}
 
 // JSON API — all /api/* requests are handled here.
 if (str_starts_with($path, '/api/')) {
+    \Conquer\Security\ApiGuard::beforeSession();
     $router  = new \Conquer\Router();
+    // Provider callbacks authenticate with their adapter signature, never with a player cookie.
+    if ($method==='POST' && preg_match('#^/api/theme-bundles/provider/([a-z0-9_-]{1,24})$#D',$path,$providerMatch)) {
+        \Conquer\Api\Handlers\ThemeBundleHandler::notification(['provider'=>$providerMatch[1]]);
+    }
     $session = \Conquer\Auth\Session::current() ?? [];
+    if (!isset($session['player_id'])) {
+        \Conquer\Security\ApiGuard::limit('api.anonymous', \Conquer\Security\RateLimit::ip(), 60, 60);
+        \Conquer\Api\Response::error(401, 'UNAUTHENTICATED', 'Bitte melde dich an.');
+    }
+    \Conquer\Security\ApiGuard::authenticated($session, $method, $path);
+    // The new client uses the validated kingdom/expedition/market actions.
+    // Retired mutators must not bypass their ownership, reward and alliance rules.
+    if (in_array($method,['POST','DELETE','PUT','PATCH'],true) && (preg_match('#^/api/(alliance|inventory|treasure|quests|trading|shrine|conquest|vip|chat|player)/#', $path)
+        || in_array($path,['/api/troops/promote','/api/world-chat/send'],true))) {
+        \Conquer\Api\Response::error(410, 'ACTION_RETIRED', 'Diese Aktion ist hier nicht verfügbar. Öffne die aktuelle Spielansicht.');
+    }
+
+    // Serialize requests for one player: queue settlement and spending must
+    // not race across tabs or between a poll and an action.
+    if (isset($session['player_id'])) {
+        $requestDb = \Conquer\Db\Connection::getInstance();
+        $lockName = 'conquer-player-' . $session['player_id'];
+        if ((int) $requestDb->query('SELECT GET_LOCK(?, 5)', [$lockName])->fetchColumn() !== 1) {
+            \Conquer\Api\Response::error(409, 'BUSY', 'Bitte versuche es gleich noch einmal.');
+        }
+        register_shutdown_function(static function () use ($requestDb, $lockName): void {
+            \Conquer\Security\ApiOperation::abort();
+            $requestDb->query('SELECT RELEASE_LOCK(?)', [$lockName]);
+        });
+        $fresh=$requestDb->query('SELECT s.active_world_id,p.is_banned FROM sessions s JOIN players p ON p.id=s.player_id WHERE s.id=? AND s.expires_at>UTC_TIMESTAMP()',[$session['id']])->fetch();
+        if(!$fresh||$fresh['is_banned'])\Conquer\Api\Response::error(401,'UNAUTHENTICATED','Bitte melde dich erneut an.');
+        \Conquer\Auth\Session::setActiveWorld((int)$fresh['active_world_id']);
+        $session['active_world_id']=(int)$fresh['active_world_id'];
+    }
+    if(\Conquer\Game\World\WorldContext::id()!==1&&$method==='GET'
+        &&preg_match('#^/api/(map/(?!marches)|alliance/|chat/|player/|world-chat$|conquest/)#',$path)){
+        \Conquer\Api\Response::error(410,'LEGACY_WORLD_API','Verwende die aktuelle Spielansicht für diese Welt.');
+    }
+    // An old browser tab must never spend from the newly selected world.
+    $worldRule='WORLD_CHANGED';
+    try {
+        $expected=$_SERVER['HTTP_X_WORLD_ID']??$_GET['expected_world_id']??null;
+        if($path!=='/api/worlds/action')\Conquer\Game\World\WorldContext::current($expected);
+        if(in_array($method,['POST','PUT','PATCH','DELETE'],true)
+            && !in_array($path,['/api/worlds/action','/api/auth/logout'],true)) {
+            $input=json_decode(file_get_contents('php://input')?:'{}',true);
+            if(is_array($input))\Conquer\Game\World\WorldContext::current($input['expected_world_id']??null);
+            $account=$path==='/api/bug-reports'||($path==='/api/progression/action'&&in_array($input['action']??'',['password.change','recovery.generate','sessions.revoke'],true))
+                ||($path==='/api/kingdom/action'&&($input['action']??'')==='theme_bundle.checkout');
+            $returning=in_array($path,['/api/march/recall','/api/march/recall-reinforce'],true)||preg_match('#^/api/shrines/\d+/recall$#',$path);
+            $worldRule='WORLD_UNAVAILABLE';
+            if(!$account&&!$returning)\Conquer\Game\World\WorldContext::assertActionAvailable();
+        }
+    }catch(\DomainException $e){\Conquer\Api\Response::error(409,$worldRule,$e->getMessage());}
+    if($path==='/api/game/state')\Conquer\Game\Conquest\EventService::tick(\Conquer\Game\World\WorldContext::id());
+    $router->get('/api/worlds/state', [\Conquer\Api\Handlers\WorldHandler::class, 'state']);
+    $router->post('/api/worlds/action', [\Conquer\Api\Handlers\WorldHandler::class, 'action']);
+    $router->get('/api/community/state', [\Conquer\Api\Handlers\CommunityHandler::class, 'state']);
+    $router->get('/api/mailbox/state', [\Conquer\Api\Handlers\MailboxHandler::class, 'state']);
+    $router->get('/api/mailbox/message', [\Conquer\Api\Handlers\MailboxHandler::class, 'message']);
+    $router->get('/api/community/chat', [\Conquer\Api\Handlers\CommunityHandler::class, 'chat']);
+    $router->get('/api/community/shared-report/:id', [\Conquer\Api\Handlers\CommunityHandler::class, 'sharedReport']);
+    $router->post('/api/community/action', [\Conquer\Api\Handlers\CommunityHandler::class, 'action']);
+    $router->get('/api/defense/state', [\Conquer\Api\Handlers\DefenseHandler::class, 'state']);
+    $router->post('/api/defense/action', [\Conquer\Api\Handlers\DefenseHandler::class, 'action']);
+    $router->get('/api/progression/state', [\Conquer\Api\Handlers\ProgressionHandler::class, 'state']);
+    $router->post('/api/progression/action', [\Conquer\Api\Handlers\ProgressionHandler::class, 'action']);
+    $router->post('/api/bug-reports', [\Conquer\Api\Handlers\BugReportHandler::class, 'submit']);
+    $router->get('/api/game/state', [\Conquer\Api\Handlers\GameHandler::class, 'state']);
+    $router->get('/api/map/search', [\Conquer\Api\Handlers\MapSearchHandler::class, 'search']);
+    $router->get('/api/land/state', [\Conquer\Api\Handlers\LandHandler::class, 'state']);
+    $router->get('/api/land/:id', [\Conquer\Api\Handlers\LandHandler::class, 'detail']);
+    $router->post('/api/land/:id/donate', [\Conquer\Api\Handlers\LandHandler::class, 'donate']);
+    $router->get('/api/kingdom/state', static fn(array $p) => \Conquer\Api\Handlers\KingdomHandler::state($p));
+    $router->post('/api/kingdom/action', static fn(array $p) => \Conquer\Api\Handlers\KingdomHandler::action($p));
+    $router->get('/api/theme-bundles/state', [\Conquer\Api\Handlers\ThemeBundleHandler::class, 'state']);
+    $router->get('/api/expeditions/state', static fn(array $p) => \Conquer\Api\Handlers\ExpeditionHandler::state($p));
+    $router->post('/api/expeditions/action', static fn(array $p) => \Conquer\Api\Handlers\ExpeditionHandler::action($p));
+    $router->get('/api/dungeons/state', static fn(array $p) => \Conquer\Api\Handlers\DungeonHandler::state($p));
+    $router->post('/api/dungeons/action', static fn(array $p) => \Conquer\Api\Handlers\DungeonHandler::action($p));
+    $router->get('/api/market/state', [\Conquer\Api\Handlers\MarketHandler::class, 'state']);
+    $router->post('/api/market/action', [\Conquer\Api\Handlers\MarketHandler::class, 'action']);
+    $router->get('/api/city3d/state', [\Conquer\Api\Handlers\City3dHandler::class, 'snapshot']);
+    $router->post('/api/city3d/plot', [\Conquer\Api\Handlers\City3dHandler::class, 'plot']);
+    $router->post('/api/city3d/upgrade', [\Conquer\Api\Handlers\City3dHandler::class, 'upgrade']);
 
     // Auth
     $router->get('/api/auth/me',      [\Conquer\Api\Handlers\AuthHandler::class, 'me']);
@@ -114,6 +299,7 @@ if (str_starts_with($path, '/api/')) {
     $router->post('/api/march/dispatch-player',  [\Conquer\Api\Handlers\MarchHandler::class, 'dispatchPlayer']);
     $router->post('/api/march/dispatch-scout',   [\Conquer\Api\Handlers\MarchHandler::class, 'dispatchScout']);
     $router->post('/api/march/dispatch-gather',  fn() => \Conquer\Api\Handlers\MarchHandler::dispatchGather($session));
+    $router->post('/api/march/dispatch-field-attack', fn() => \Conquer\Api\Handlers\MarchHandler::dispatchGather($session,true));
     $router->post('/api/march/recall',            fn() => \Conquer\Api\Handlers\MarchHandler::recall($session));
     $router->post('/api/march/reinforce',         fn() => \Conquer\Api\Handlers\MarchHandler::dispatchReinforce($session));
     $router->post('/api/march/recall-reinforce',  fn() => \Conquer\Api\Handlers\MarchHandler::recallReinforcement($session));
@@ -124,6 +310,7 @@ if (str_starts_with($path, '/api/')) {
     // Battle reports
     $router->get('/api/battle/reports',      [\Conquer\Api\Handlers\BattleHandler::class, 'reports']);
     $router->get('/api/battle/report/:id',   [\Conquer\Api\Handlers\BattleHandler::class, 'report']);
+    $router->post('/api/battle/report/:id/delete', [\Conquer\Api\Handlers\BattleHandler::class, 'delete']);
 
     // Map
     $router->get('/api/map/info',              [\Conquer\Api\Handlers\MapHandler::class, 'info']);
@@ -184,14 +371,18 @@ if (str_starts_with($path, '/api/')) {
     $router->post('/api/player/skin/equip',           [\Conquer\Api\Handlers\PlayerHandler::class, 'equipSkin']);
 
     // Rally
+    $router->post('/api/rally/start-monster', [\Conquer\Api\Handlers\RallyHandler::class, 'startMonster']);
     $router->post('/api/rally/start',  [\Conquer\Api\Handlers\RallyHandler::class, 'start']);
     $router->post('/api/rally/join',   [\Conquer\Api\Handlers\RallyHandler::class, 'join']);
+    $router->post('/api/rally/:id/launch', [\Conquer\Api\Handlers\RallyHandler::class, 'launch']);
+    $router->post('/api/rally/:id/cancel', [\Conquer\Api\Handlers\RallyHandler::class, 'cancel']);
     $router->get('/api/rally/list',    [\Conquer\Api\Handlers\RallyHandler::class, 'list']);
     $router->get('/api/rally/:id',     [\Conquer\Api\Handlers\RallyHandler::class, 'detail']);
 
     // Shrine System
     $router->get('/api/shrines',                  fn() => \Conquer\Api\Handlers\ShrineHandler::list($session));
     $router->get('/api/shrines/:id',              fn($p) => \Conquer\Api\Handlers\ShrineHandler::detail($session, (int) $p['id']));
+    $router->post('/api/shrines/:id/attack', fn($p) => \Conquer\Api\Handlers\ShrineHandler::attack($session, (int) $p['id']));
     $router->post('/api/shrines/:id/garrison',    fn($p) => \Conquer\Api\Handlers\ShrineHandler::garrison($session, (int) $p['id']));
     $router->post('/api/shrines/:id/recall',      fn($p) => \Conquer\Api\Handlers\ShrineHandler::recall($session, (int) $p['id']));
 
@@ -201,6 +392,9 @@ if (str_starts_with($path, '/api/')) {
 
     // Hospital
     $router->get('/api/hospital/status',        [\Conquer\Api\Handlers\HospitalHandler::class, 'status']);
+    $router->post('/api/hospital/heal',         [\Conquer\Api\Handlers\HospitalHandler::class, 'heal']);
+    $router->post('/api/hospital/finish',       [\Conquer\Api\Handlers\HospitalHandler::class, 'finish']);
+    $router->post('/api/hospital/speedup',      [\Conquer\Api\Handlers\HospitalHandler::class, 'speedup']);
     $router->post('/api/hospital/instant-heal', [\Conquer\Api\Handlers\HospitalHandler::class, 'instantHeal']);
 
     // Inventory
@@ -222,6 +416,7 @@ if (str_starts_with($path, '/api/')) {
     $router->get('/api/notifications/poll',  [\Conquer\Api\Handlers\NotificationHandler::class, 'poll']);
     $router->post('/api/notifications/read', [\Conquer\Api\Handlers\NotificationHandler::class, 'markRead']);
 
+    \Conquer\Security\ApiOperation::begin((int)$session['player_id'],$method,$path);
     if (!$router->dispatch($method, $path)) {
         \Conquer\Api\Response::error(404, 'NOT_FOUND', 'API endpoint not found.');
     }
@@ -272,7 +467,7 @@ if (preg_match('#^/auth/(google|discord)/callback$#', $path, $m)) {
 
 if ($path === '/auth/logout') {
     \Conquer\Auth\Session::destroy();
-    header('Location: /');
+    header('Location: ' . APP_BASE . '/');
     exit;
 }
 
@@ -280,6 +475,14 @@ if ($path === '/auth/logout') {
 // Battle reports view
 // ---------------------------------------------------------------------------
 
+$currentPages = ['/reports'=>'reports','/alliance'=>'alliance','/alliance/battle'=>'expeditions','/research'=>'research','/map'=>'world'];
+if ($method === 'GET' && isset($currentPages[$path])) {
+    header('Location: ' . APP_BASE . '/city#' . $currentPages[$path]); exit;
+}
+if ($method === 'GET' && preg_match('#^/city/building/([a-z_]+)$#',$path,$buildingMatch)) {
+    $buildingTabs=['barrack'=>'army','academy'=>'research','hospital'=>'army','hall_of_alliance'=>'alliance','treasure_house'=>'inventory','trading_post'=>'market'];
+    header('Location: ' . APP_BASE . '/city#' . ($buildingTabs[$buildingMatch[1]] ?? 'city')); exit;
+}
 if ($path === '/reports') {
     $session = \Conquer\Auth\Session::current();
     if ($session === null) {
@@ -351,10 +554,10 @@ if ($path === '/map') {
 // City view (Task 1.7)
 // ---------------------------------------------------------------------------
 
-if ($path === '/city') {
+if ($path === '/city' || $path === '/city/3d') {
     $session = \Conquer\Auth\Session::current();
     if ($session === null) {
-        header('Location: /');
+        header('Location: ' . APP_BASE . '/');
         exit;
     }
 
@@ -365,7 +568,7 @@ if ($path === '/city') {
         exit;
     }
 
-    require ROOT_DIR . '/views/city.php';
+    require ROOT_DIR . ($path === '/city/3d' && ($_GET['embed'] ?? '') === '1' ? '/views/city3d.php' : '/views/game.php');
     exit;
 }
 
@@ -439,56 +642,58 @@ $authError = match ($_GET['auth_error'] ?? '') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#5c4270">
     <title>Conquer — Coming Soon</title>
+    <link rel="stylesheet" href="<?= htmlspecialchars(APP_BASE, ENT_QUOTES) ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR.'/assets/css/fantasy-fonts.css') ?>">
+    <link rel="stylesheet" href="<?= htmlspecialchars(APP_BASE, ENT_QUOTES) ?>/assets/css/village-theme.css?v=<?= filemtime(ROOT_DIR.'/assets/css/village-theme.css') ?>">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: system-ui, -apple-system, sans-serif;
-            background: #0f172a;
-            color: #e2e8f0;
+            font-family: var(--ui-font);
+            background: linear-gradient(160deg, var(--ui-paper), var(--ui-inset));
+            color: var(--ui-ink);
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             padding: 20px;
         }
-        .container { text-align: center; max-width: 600px; }
+        .container { text-align:center; max-width:600px; padding:clamp(24px,6vw,42px); background:var(--ui-card); border:3px solid var(--ui-frame); border-radius:20px; box-shadow:var(--ui-shadow); }
         h1 {
             font-size: 4rem;
-            background: linear-gradient(135deg, #0ea5e9, #8b5cf6);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            color: var(--ui-primary);
         }
         .codename {
-            color: #64748b;
+            color: var(--ui-muted);
             font-size: 0.9rem;
             margin-top: 0.5rem;
         }
         p {
             font-size: 1.1rem;
             line-height: 1.6;
-            color: #cbd5e1;
+            color: var(--ui-ink);
             margin: 2rem 0;
         }
         .status {
             display: inline-block;
             padding: 0.4rem 1rem;
-            background: #1e293b;
-            border: 1px solid #334155;
+            background: var(--ui-inset);
+            border: 1px solid var(--ui-line);
             border-radius: 999px;
             font-size: 0.875rem;
-            color: #94a3b8;
+            color: var(--ui-muted);
             margin-top: 1rem;
         }
         .status::before { content: '●'; color: #22c55e; margin-right: 0.5rem; }
         footer {
             margin-top: 3rem;
             font-size: 0.85rem;
-            color: #475569;
+            color: var(--ui-muted);
         }
-        a { color: #0ea5e9; text-decoration: none; }
-        a:hover { color: #38bdf8; }
+        a { color: var(--ui-primary-dark); text-decoration: none; }
+        a:hover { color: var(--ui-primary); }
+        button { font-family:var(--ui-font); }
+        @media(max-width:360px){body{padding:12px}.container{padding:22px 16px}h1{font-size:3rem}}
     </style>
 </head>
 <body>
@@ -503,20 +708,20 @@ $authError = match ($_GET['auth_error'] ?? '') {
         </p>
 
         <?php if ($session !== null): ?>
-            <div class="status" style="background:#14532d;border-color:#16a34a;color:#86efac">
+            <div class="status" style="background:var(--ui-green-soft);border-color:var(--ui-green-dark);color:var(--ui-green-dark)">
                 Logged in as <strong><?= htmlspecialchars($session['username']) ?></strong>
             </div>
             <form method="post" action="/auth/logout" style="margin-top:1.5rem">
-                <button type="submit" style="background:#1e293b;border:1px solid #334155;color:#94a3b8;padding:.4rem 1rem;border-radius:6px;cursor:pointer">
+                <button type="submit" style="background:var(--ui-card);border:1px solid var(--ui-line);color:var(--ui-ink);padding:.4rem 1rem;border-radius:8px;cursor:pointer">
                     Log out
                 </button>
             </form>
         <?php else: ?>
             <?php if ($authError !== ''): ?>
-                <div style="color:#f87171;margin-bottom:1rem;font-size:.9rem"><?= htmlspecialchars($authError) ?></div>
+                <div style="color:var(--ui-red);margin-bottom:1rem;font-size:.9rem"><?= htmlspecialchars($authError) ?></div>
             <?php endif ?>
             <div style="margin-top:1.5rem">
-                <a href="/auth/google" style="display:inline-flex;align-items:center;gap:.5rem;padding:.6rem 1.2rem;background:#1e293b;border:1px solid #334155;border-radius:8px;color:#e2e8f0;font-size:.95rem;text-decoration:none">
+                <a href="/auth/google" style="display:inline-flex;align-items:center;gap:.5rem;padding:.6rem 1.2rem;background:var(--ui-card);border:1px solid var(--ui-line);border-radius:9px;color:var(--ui-ink);font-size:.95rem;text-decoration:none">
                     <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
                     Continue with Google
                 </a>

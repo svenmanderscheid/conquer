@@ -1,5 +1,13 @@
 # CLAUDE.md — Project Orientation for Claude Code
 
+> September 2026 update: the "Sprint 1 / no code" status below is historical.
+> Read `docs/MVP_STATUS.md` for the implemented MVP and current entry points.
+> The user changed the visual direction to bold 2D cartoon fantasy/chibi, matching
+> their second reference image. This supersedes the pixel-art rules below.
+> Preserve the plain PHP/JavaScript architecture and existing server-side state.
+> For every new visual element, follow the binding 3D rules in `AGENTS.md` and
+> `docs/ART_DIRECTION.md`, using `assets/art/village2.png` as the reference.
+
 This file is read **first** by Claude Code when entering this repository. It explains the project, current state, conventions, and how to contribute usefully.
 
 ## Project at a glance

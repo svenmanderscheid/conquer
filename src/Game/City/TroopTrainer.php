@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Conquer\Game\City;
 
+use Conquer\Game\World\WorldContext;
+
 use Conquer\Db\Connection;
 
 /**
@@ -20,7 +22,7 @@ final class TroopTrainer
      *
      * Validates:
      *  - troop code is valid
-     *  - troop is unlocked (barrack + academy levels)
+     *  - troop is unlocked (own school + town center levels)
      *  - count >= 1
      *  - resources are sufficient
      *  - barrack slot is not already busy
@@ -36,9 +38,12 @@ final class TroopTrainer
         array  $buildings,
         int    $troopCode,
         int    $count,
-        int    $barrackSlot = 1,
+        ?int   $barrackSlot = null,
     ): void {
-        if ($count < 1) {
+        WorldContext::assertActionAvailable();
+        $owned=WorldContext::city((int)($city['player_id']??Connection::getInstance()->query('SELECT player_id FROM cities WHERE id=?',[$city['id']])->fetchColumn()));
+        if((int)$owned['id']!==(int)$city['id'])throw new \DomainException('Diese Stadt gehört nicht zur aktiven Welt.',403);
+        if ($count < 1 || $count > 50000) {
             throw new \RuntimeException('Count must be at least 1.');
         }
 
@@ -47,16 +52,26 @@ final class TroopTrainer
             throw new \RuntimeException('Unknown troop code.');
         }
 
-        $barrackLevel = (int) ($buildings['barrack']['level'] ?? 1);
-        $academyLevel = (int) ($buildings['academy']['level'] ?? 1);
+        // Derive the queue from the troop; a client cannot borrow another building.
+        $slot=TroopData::slotFor($troopCode);
+        if($barrackSlot!==null && $barrackSlot!==$slot)throw new \DomainException('Der Ausbildungsplatz passt nicht zur Truppenart.');
+        $barrackSlot=$slot;
+        $building=TroopData::buildingFor($troopCode);
 
-        if (!TroopData::isUnlocked($troopCode, $barrackLevel, $academyLevel)) {
-            throw new \RuntimeException(
-                $troop['name'] . ' requires Academy level ' . $troop['unlock_academy'] . '.'
-            );
+        $barrackLevel = (int) ($buildings[$building]['level'] ?? 0);
+        $castleLevel = (int) ($buildings['castle']['level'] ?? 0);
+
+        if (!TroopData::isUnlocked($troopCode, $barrackLevel, $castleLevel)) {
+            throw new \DomainException('Benötigt '.CityState::BUILDING_NAMES[$building].' Stufe '.$troop['unlock_building'].' und Stadtzentrum Stufe '.$troop['unlock_castle'].'.');
         }
 
-        $cost = TroopData::trainingCost($troopCode, $count);
+        $db = Connection::getInstance();
+        $ownerId = (int)$db->query('SELECT player_id FROM cities WHERE id=?',[(int)$city['id']])->fetchColumn();
+        $trainingBuffs=\Conquer\Game\Research\BuffEngine::getBuffs($ownerId);
+        $boost=\Conquer\Game\Buff\ActiveBuffService::getMultiplier($ownerId,'training_boost');
+        $training=\Conquer\Game\Research\ResearchEffects::training($troopCode,$trainingBuffs,$boost);
+        if ($count > $training['max_count']) { throw new \RuntimeException('TRAINING_LIMIT: Maximal '.$training['max_count'].' Truppen je Ausbildungsauftrag.'); }
+        $cost = array_map(static fn($amount)=>(int)ceil($amount*$count),$training['cost']);
 
         if ($city['food']   < $cost['food'] ||
             $city['lumber'] < $cost['lumber'] ||
@@ -67,6 +82,7 @@ final class TroopTrainer
 
         $db     = Connection::getInstance();
         $cityId = (int) $city['id'];
+        ResourceTick::persist($city, $buildings);
 
         // Check that the requested barrack slot is free.
         $busy = $db->query(
@@ -76,46 +92,72 @@ final class TroopTrainer
             [$cityId, $barrackSlot],
         )->fetch();
 
-        if ($busy !== false) {
+        if ($busy !== false || \Conquer\Game\Defense\DefenseService::hasPromotion($cityId,$barrackSlot)) {
             throw new \RuntimeException('Barrack slot ' . $barrackSlot . ' is already training troops.');
         }
 
         $durationSec = TroopData::trainingSeconds($troopCode, $count);
+        $durationSec=max(1,(int)ceil($durationSec / ($training['speed_multiplier']*(1+BuildingPlotService::trainingBonus($cityId)))));
 
-        $db->transaction(function () use ($db, $cityId, $troopCode, $count, $barrackSlot, $durationSec, $cost): void {
+        $enqueue=function () use ($db, $cityId, $troopCode, $count, $barrackSlot, $durationSec, $cost): void {
+            $db->query('SELECT id FROM cities WHERE id=? FOR UPDATE',[$cityId])->fetchColumn();
+            if($db->query('SELECT id FROM troop_queue WHERE city_id=? AND barrack_slot=? AND is_processed=0 LIMIT 1 FOR UPDATE',[$cityId,$barrackSlot])->fetchColumn()!==false || \Conquer\Game\Defense\DefenseService::hasPromotion($cityId,$barrackSlot))throw new \DomainException('Dieses Ausbildungsgebäude ist bereits beschäftigt.');
             // Deduct resources.
-            $db->execute(
+            $debited=$db->execute(
                 'UPDATE cities SET
                     food   = food   - :food,
                     lumber = lumber - :lumber,
                     stone  = stone  - :stone,
                     gold   = gold   - :gold
-                 WHERE id = :id',
+                 WHERE id = :id AND food>=:min_food AND lumber>=:min_lumber AND stone>=:min_stone AND gold>=:min_gold',
                 [
                     ':food'   => $cost['food'],
                     ':lumber' => $cost['lumber'],
                     ':stone'  => $cost['stone'],
                     ':gold'   => $cost['gold'],
                     ':id'     => $cityId,
+                    ':min_food'=>$cost['food'], ':min_lumber'=>$cost['lumber'], ':min_stone'=>$cost['stone'], ':min_gold'=>$cost['gold'],
                 ],
             );
+            if($debited!==1)throw new \RuntimeException('Deine Ressourcen haben sich verändert. Für die Ausbildung fehlen jetzt Rohstoffe.');
 
             // Enqueue training batch.
             $db->execute(
                 'INSERT INTO troop_queue
-                    (city_id, troop_code, count, barrack_slot, started_at, finishes_at)
+                    (city_id, troop_code, count, barrack_slot, started_at, finishes_at, cost_json)
                  VALUES
                     (:city_id, :code, :count, :slot,
                      UTC_TIMESTAMP(),
-                     DATE_ADD(UTC_TIMESTAMP(), INTERVAL :dur SECOND))',
+                     DATE_ADD(UTC_TIMESTAMP(), INTERVAL :dur SECOND), :cost)',
                 [
                     ':city_id' => $cityId,
                     ':code'    => $troopCode,
                     ':count'   => $count,
                     ':slot'    => $barrackSlot,
                     ':dur'     => $durationSec,
+                    ':cost'    => json_encode($cost,JSON_THROW_ON_ERROR),
                 ],
             );
+        };
+        if($db->getPdo()->inTransaction())$enqueue();else $db->transaction($enqueue);
+    }
+
+    /** Cancel a running batch under the same city lock used to enqueue it. */
+    public static function cancel(int $playerId,int $queueId): array
+    {
+        $db=Connection::getInstance();$city=WorldContext::city($playerId);$cityId=(int)$city['id'];
+        WorldContext::assertActionAvailable();
+        return $db->transaction(function()use($db,$cityId,$queueId):array{
+            $db->query('SELECT id FROM cities WHERE id=? FOR UPDATE',[$cityId])->fetchColumn();
+            $entry=$db->query('SELECT *,TIMESTAMPDIFF(SECOND,UTC_TIMESTAMP(),finishes_at) AS remaining_seconds,TIMESTAMPDIFF(SECOND,started_at,finishes_at) AS total_seconds FROM troop_queue WHERE id=? AND city_id=? AND is_processed=0 AND finishes_at>UTC_TIMESTAMP() FOR UPDATE',[$queueId,$cityId])->fetch();
+            if(!$entry)throw new \DomainException('Dieser Ausbildungsauftrag ist beendet oder gehört nicht zu deiner Stadt.',404);
+            $count=(int)$entry['count'];$remaining=min($count,(int)ceil($count*(int)$entry['remaining_seconds']/max(1,(int)$entry['total_seconds'])));
+            $paid=json_decode($entry['cost_json']??'null',true);
+            if(!is_array($paid))$paid=TroopData::trainingCost((int)$entry['troop_code'],$count);
+            $refund=[];foreach(['food','lumber','stone','gold']as$r)$refund[$r]=min((int)$paid[$r],(int)round((int)$paid[$r]*$remaining/$count));
+            $db->execute('DELETE FROM troop_queue WHERE id=?',[$queueId]);
+            $db->execute('UPDATE cities SET food=food+?,lumber=lumber+?,stone=stone+?,gold=gold+? WHERE id=?',[$refund['food'],$refund['lumber'],$refund['stone'],$refund['gold'],$cityId]);
+            return ['cancelled'=>true,'remaining_count'=>$remaining,'refunded_food'=>$refund['food'],'refunded_lumber'=>$refund['lumber'],'refunded_stone'=>$refund['stone'],'refunded_gold'=>$refund['gold']];
         });
     }
 
@@ -139,6 +181,8 @@ final class TroopTrainer
         }
 
         foreach ($finished as $entry) {
+            $db->transaction(static function (Connection $db) use ($entry, $cityId): void {
+            if ($db->execute('UPDATE troop_queue SET is_processed = 1 WHERE id = ? AND is_processed = 0', [(int) $entry['id']]) !== 1) { return; }
             $code  = (int) $entry['troop_code'];
             $count = (int) $entry['count'];
 
@@ -153,6 +197,7 @@ final class TroopTrainer
                 'UPDATE troop_queue SET is_processed = 1 WHERE id = ?',
                 [(int) $entry['id']],
             );
+            });
         }
 
         // Update city power to include new troops.

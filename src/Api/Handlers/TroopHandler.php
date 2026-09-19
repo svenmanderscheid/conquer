@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Conquer\Api\Handlers;
 
+use Conquer\Game\World\WorldContext;
+
 use Conquer\Api\Response;
 use Conquer\Auth\Session;
 use Conquer\Db\Connection;
@@ -62,29 +64,40 @@ final class TroopHandler
     {
         $session = Session::current();
         if ($session === null) {
-            Response::error(401, 'UNAUTHENTICATED', 'Not logged in.');
+            Response::error(401, 'UNAUTHENTICATED', 'Bitte melde dich an.');
         }
+        try{WorldContext::assertActionAvailable();}catch(\DomainException $e){Response::error(409,'WORLD_UNAVAILABLE',$e->getMessage());}
+
 
         // CSRF check
         $csrf = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
-        if ($csrf === '' || $csrf !== ($session['csrf_token'] ?? '')) {
-            Response::error(403, 'CSRF_INVALID', 'Invalid CSRF token.');
+        if ($csrf === '' || !hash_equals((string) ($session['csrf_token'] ?? ''), $csrf)) {
+            Response::error(403, 'CSRF_INVALID', 'Die Sitzung ist abgelaufen. Bitte lade die Seite neu.');
         }
 
         $body = (string) file_get_contents('php://input');
-        $data = json_decode($body, true);
+        $data = json_decode($body);
+        if (!$data instanceof \stdClass) {
+            Response::error(400, 'INVALID_INPUT', 'Der Trainingsauftrag muss ein gültiges JSON-Objekt sein.');
+        }
 
-        $troopCode   = (int) ($data['troop_code']   ?? 0);
-        $count       = (int) ($data['count']        ?? 0);
-        $barrackSlot = (int) ($data['barrack_slot'] ?? 1);
+        $troopCode = $data->troop_code ?? null;
+        $count = $data->count ?? null;
+        $barrackSlot = property_exists($data, 'barrack_slot') ? $data->barrack_slot : null;
 
-        if ($troopCode === 0 || $count <= 0) {
-            Response::error(400, 'INVALID_INPUT', 'troop_code and count are required.');
+        if (!is_int($troopCode) || $troopCode <= 0 || TroopData::get($troopCode) === null) {
+            Response::error(400, 'INVALID_INPUT', 'Wähle einen gültigen Truppentyp.');
+        }
+        if (!is_int($count) || $count < 1 || $count > 50000) {
+            Response::error(400, 'INVALID_INPUT', 'Wähle eine ganze Truppenanzahl von 1 bis 50.000.');
+        }
+        if (property_exists($data,'barrack_slot') && (!is_int($barrackSlot) || $barrackSlot !== TroopData::slotFor($troopCode))) {
+            Response::error(400, 'INVALID_INPUT', 'Der Ausbildungsplatz passt nicht zur Truppenart.');
         }
 
         $state = CityState::loadForPlayer((int) $session['player_id']);
         if ($state === null) {
-            Response::error(404, 'NO_CITY', 'No city found.');
+            Response::error(404, 'NO_CITY', 'Keine Stadt vorhanden.');
         }
 
         // Apply current resource tick so the check uses up-to-date resources.
@@ -92,14 +105,31 @@ final class TroopHandler
         $buildings = $state['buildings'];
 
         try {
-            TroopTrainer::train($city, $buildings, $troopCode, $count, $barrackSlot);
-        } catch (\RuntimeException $e) {
-            Response::error(400, 'TRAIN_FAILED', $e->getMessage());
+            $start=static function()use($city,$buildings,$troopCode,$count,$barrackSlot):array{
+                TroopTrainer::train($city,$buildings,$troopCode,$count,$barrackSlot);
+                return ['message'=>$count.' Truppen werden ausgebildet.'];
+            };
+            if(property_exists($data,'operation_key')){
+                \Conquer\Game\Operation::run((int)$session['player_id'],['action'=>'troops.train','operation_key'=>$data->operation_key,'world_id'=>(int)$city['world_id'],'troop_code'=>$troopCode,'count'=>$count,'barrack_slot'=>TroopData::slotFor($troopCode)],$start);
+            }else $start();
+        } catch (\RuntimeException|\DomainException $e) {
+            $reason = $e->getMessage();
+            $message = match (true) {
+                $e instanceof \DomainException => $reason,
+                str_starts_with($reason, 'Not enough resources') => 'Es fehlen Ressourcen für diese Truppenanzahl.',
+                str_starts_with($reason, 'Barrack slot ') => 'Dieses Ausbildungsgebäude bildet bereits Truppen aus.',
+                str_starts_with($reason, 'TRAINING_LIMIT: ') => substr($reason,16),
+                default => null,
+            };
+            if ($message === null) {
+                // An unexpected storage failure may have happened after commit.
+                Response::error(500, 'TRAIN_UNCONFIRMED', 'Der Trainingsauftrag konnte nicht bestätigt werden. Bitte prüfe den aktuellen Stand.');
+            }
+            Response::error(400, 'TRAIN_FAILED', $message);
         }
 
-        $troop = TroopData::get($troopCode);
         Response::ok([
-            'message' => 'Training started: ' . $count . '× ' . ($troop['name'] ?? 'troops'),
+            'message' => $count . ' Truppen werden ausgebildet.',
         ]);
     }
 
@@ -131,73 +161,9 @@ final class TroopHandler
             Response::error(400, 'INVALID_INPUT', 'Invalid queue_id.');
         }
 
-        $db = Connection::getInstance();
-
-        // Load the queue entry — verify ownership via city.
-        $entry = $db->query(
-            'SELECT tq.id, tq.city_id, tq.troop_code, tq.count,
-                    tq.started_at, tq.finishes_at, tq.is_processed,
-                    TIMESTAMPDIFF(SECOND, tq.started_at, UTC_TIMESTAMP())  AS secs_elapsed,
-                    TIMESTAMPDIFF(SECOND, tq.started_at, tq.finishes_at)   AS total_secs
-             FROM   troop_queue tq
-             JOIN   cities c ON c.id = tq.city_id
-             WHERE  tq.id = ? AND c.player_id = ? AND tq.is_processed = 0',
-            [$queueId, $playerId],
-        )->fetch();
-
-        if ($entry === false) {
-            Response::error(404, 'NOT_FOUND', 'Troop queue entry not found or already completed.');
-        }
-
-        $troopCode  = (int) $entry['troop_code'];
-        $totalCount = (int) $entry['count'];
-        $totalSecs  = max(1, (int) $entry['total_secs']);
-        $elapsed    = min($totalSecs, max(0, (int) $entry['secs_elapsed']));
-        $cityId     = (int) $entry['city_id'];
-
-        // Estimate remaining troops.
-        $trainedFraction  = $elapsed / $totalSecs;
-        $remainingCount   = max(0, (int) ceil($totalCount * (1.0 - $trainedFraction)));
-
-        // Compute refund from troop definition costs.
-        $troopDef   = TroopData::get($troopCode);
-        $refundFood   = (int) round((float) ($troopDef['need_food']   ?? 0) * $remainingCount);
-        $refundLumber = (int) round((float) ($troopDef['need_lumber'] ?? 0) * $remainingCount);
-        $refundStone  = (int) round((float) ($troopDef['need_stone']  ?? 0) * $remainingCount);
-        $refundGold   = (int) round((float) ($troopDef['need_gold']   ?? 0) * $remainingCount);
-
-        $db->transaction(function () use (
-            $db, $queueId, $cityId,
-            $refundFood, $refundLumber, $refundStone, $refundGold
-        ): void {
-            // Refund proportional resources.
-            $db->execute(
-                'UPDATE cities
-                 SET food   = food   + :food,
-                     lumber = lumber + :lumber,
-                     stone  = stone  + :stone,
-                     gold   = gold   + :gold
-                 WHERE id = :city_id',
-                [
-                    ':food'    => $refundFood,
-                    ':lumber'  => $refundLumber,
-                    ':stone'   => $refundStone,
-                    ':gold'    => $refundGold,
-                    ':city_id' => $cityId,
-                ],
-            );
-
-            $db->execute('DELETE FROM troop_queue WHERE id = ?', [$queueId]);
-        });
-
-        Response::ok([
-            'cancelled'       => true,
-            'remaining_count' => $remainingCount,
-            'refunded_food'   => $refundFood,
-            'refunded_lumber' => $refundLumber,
-            'refunded_stone'  => $refundStone,
-            'refunded_gold'   => $refundGold,
-        ]);
+        try{$result=TroopTrainer::cancel($playerId,$queueId);}
+        catch(\DomainException $e){Response::error($e->getCode()===404?404:400,'NOT_FOUND',$e->getMessage());}
+        Response::ok($result);
     }
 
     /**
@@ -215,6 +181,8 @@ final class TroopHandler
         if ($session === null) {
             Response::error(401, 'UNAUTHENTICATED', 'Not logged in.');
         }
+        try{WorldContext::assertActionAvailable();}catch(\DomainException $e){Response::error(409,'WORLD_UNAVAILABLE',$e->getMessage());}
+
 
         $supplied = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
         if ($supplied === '' || !hash_equals($session['csrf_token'], $supplied)) {
@@ -268,74 +236,21 @@ final class TroopHandler
                     TIMESTAMPDIFF(SECOND, UTC_TIMESTAMP(), tq.finishes_at) AS secs_remaining
              FROM   troop_queue tq
              JOIN   cities c ON c.id = tq.city_id
-             WHERE  tq.id = ? AND c.player_id = ? AND tq.is_processed = 0',
-            [$queueId, $playerId],
+             WHERE  tq.id = ? AND c.player_id = ? AND c.world_id = ? AND tq.is_processed = 0',
+            [$queueId, $playerId,WorldContext::id()],
         )->fetch();
 
         if ($entry === false) {
             Response::error(404, 'NOT_FOUND', 'Troop queue entry not found or already completed.');
         }
 
-        $invRow = $db->query(
-            'SELECT id, quantity FROM player_inventory WHERE player_id = ? AND item_code = ? LIMIT 1',
-            [$playerId, $itemCode],
-        )->fetch();
-
-        if ($invRow === false || (int) $invRow['quantity'] < 1) {
-            Response::error(400, 'NOT_ENOUGH_ITEMS', 'You do not have this speedup item.');
-        }
-
-        $cityId    = (int) $entry['city_id'];
-        $troopCode = (int) $entry['troop_code'];
-        $count     = (int) $entry['count'];
-        $secsLeft  = max(0, (int) $entry['secs_remaining']);
-        $newSecs   = max(0, $secsLeft - $durationSeconds);
-        $isInstant = ($newSecs === 0);
-        $entryId   = (int) $entry['id'];
-
-        $db->transaction(function () use (
-            $db, $entryId, $cityId, $troopCode, $count,
-            $itemCode, $invRow, $durationSeconds, $isInstant
-        ): void {
-            // Deduct item.
-            if ((int) $invRow['quantity'] === 1) {
-                $db->execute('DELETE FROM player_inventory WHERE id = ?', [(int) $invRow['id']]);
-            } else {
-                $db->execute(
-                    'UPDATE player_inventory SET quantity = quantity - 1 WHERE id = ?',
-                    [(int) $invRow['id']],
-                );
-            }
-
-            if ($isInstant) {
-                // Add troops immediately.
-                $db->execute(
-                    'INSERT INTO city_troops (city_id, troop_code, count)
-                     VALUES (?, ?, ?)
-                     ON DUPLICATE KEY UPDATE count = count + ?',
-                    [$cityId, $troopCode, $count, $count],
-                );
-                $db->execute(
-                    'UPDATE troop_queue SET is_processed = 1, finishes_at = UTC_TIMESTAMP() WHERE id = ?',
-                    [$entryId],
-                );
-            } else {
-                $db->execute(
-                    'UPDATE troop_queue
-                     SET finishes_at = DATE_SUB(finishes_at, INTERVAL ? SECOND)
-                     WHERE id = ?',
-                    [$durationSeconds, $entryId],
-                );
-            }
-        });
-
-        Response::ok([
-            'speedup_applied'    => true,
-            'item_code'          => $itemCode,
-            'duration_seconds'   => $durationSeconds,
-            'instantly_finished' => $isInstant,
-            'secs_remaining'     => $isInstant ? 0 : $newSecs,
-        ]);
+        $operation=['action'=>'inventory.use','item_code'=>$itemCode,'queue_type'=>'training','queue_id'=>$queueId,'expected_world_id'=>WorldContext::id()];
+        if(array_key_exists('operation_key',$body))$operation['operation_key']=$body['operation_key'];
+        try{\Conquer\Game\Kingdom\KingdomService::action($playerId,$operation);}
+        catch(\DomainException $e){Response::error(400,'SPEEDUP_FAILED',$e->getMessage());}
+        TroopTrainer::processQueue($db,(int)$entry['city_id']);
+        $remaining=max(0,(int)$db->query('SELECT TIMESTAMPDIFF(SECOND,UTC_TIMESTAMP(),finishes_at) FROM troop_queue WHERE id=?',[$queueId])->fetchColumn());
+        Response::ok(['speedup_applied'=>true,'item_code'=>$itemCode,'duration_seconds'=>$durationSeconds,'instantly_finished'=>$remaining===0,'secs_remaining'=>$remaining]);
     }
 
     /**
@@ -354,272 +269,22 @@ final class TroopHandler
      */
     public static function promote(array $params): void
     {
-        $session = Session::current();
-        if ($session === null) {
-            Response::error(401, 'UNAUTHENTICATED', 'Not logged in.');
-        }
-
-        $supplied = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
-        if ($supplied === '' || !hash_equals($session['csrf_token'], $supplied)) {
-            Response::error(403, 'CSRF_INVALID', 'CSRF token missing or invalid.');
-        }
-
-        $body      = json_decode(file_get_contents('php://input') ?: '', true) ?? [];
-        $troopCode = (int) ($body['troop_code'] ?? 0);
-        $count     = (int) ($body['count']      ?? 0);
-        $playerId  = (int) $session['player_id'];
-
-        if ($troopCode === 0 || $count <= 0) {
-            Response::error(400, 'INVALID_INPUT', 'troop_code and count are required.');
-        }
-
-        // Source troop definition.
-        $sourceDef = TroopData::get($troopCode);
-        if ($sourceDef === null) {
-            Response::error(400, 'UNKNOWN_TROOP', 'Source troop code ' . $troopCode . ' not found.');
-        }
-
-        $sourceTier = (int) ($sourceDef['tier'] ?? 0);
-        if ($sourceTier >= 5) {
-            Response::error(400, 'MAX_TIER', 'Cannot promote Tier 5 troops — already at maximum tier.');
-        }
-
-        // Promoted troop code: same type, next tier.
-        // Code pattern: 5TYYYY01 where T=type (1/2/3), Y=tier (01/02/03/04/05).
-        // E.g. 50100101 → type 1, tier 1 → promoted: 50100201 (tier 2).
-        $promotedCode = $troopCode + 100;
-        $promotedDef  = TroopData::get($promotedCode);
-        if ($promotedDef === null) {
-            Response::error(400, 'UNKNOWN_PROMOTED_TROOP', 'Promoted troop code ' . $promotedCode . ' not found.');
-        }
-
-        $db = Connection::getInstance();
-
-        // Get city.
-        $cityRow = $db->query(
-            'SELECT id, food, lumber, stone, gold FROM cities WHERE player_id = ? LIMIT 1',
-            [$playerId],
-        )->fetch();
-
-        if ($cityRow === false) {
-            Response::error(404, 'NO_CITY', 'No city found.');
-        }
-
-        $cityId = (int) $cityRow['id'];
-
-        // Verify enough source troops.
-        $troopRow = $db->query(
-            'SELECT count FROM city_troops WHERE city_id = ? AND troop_code = ?',
-            [$cityId, $troopCode],
-        )->fetch();
-
-        $availableTroops = $troopRow !== false ? (int) $troopRow['count'] : 0;
-        if ($availableTroops < $count) {
-            Response::error(400, 'NOT_ENOUGH_TROOPS',
-                'Not enough troops. Have ' . $availableTroops . ', need ' . $count . '.');
-        }
-
-        // Promotion cost: 70% of promoted troop training cost.
-        $costFood   = (int) round($count * (float) ($promotedDef['need_food']   ?? 0) * 0.7);
-        $costLumber = (int) round($count * (float) ($promotedDef['need_lumber'] ?? 0) * 0.7);
-        $costStone  = (int) round($count * (float) ($promotedDef['need_stone']  ?? 0) * 0.7);
-        $costGold   = (int) round($count * (float) ($promotedDef['need_gold']   ?? 0) * 0.7);
-
-        // Check resources.
-        if ((int) $cityRow['food']   < $costFood   ||
-            (int) $cityRow['lumber'] < $costLumber  ||
-            (int) $cityRow['stone']  < $costStone   ||
-            (int) $cityRow['gold']   < $costGold) {
-            Response::error(400, 'NOT_ENOUGH_RESOURCES', 'Not enough resources for promotion.');
-        }
-
-        // Promotion time: 50% of promoted troop training time × count.
-        $timePerTroop    = (int) ($promotedDef['time'] ?? 60);
-        $totalDurationSec = (int) max(1, (int) round($count * $timePerTroop * 0.5));
-
-        $db->transaction(function () use (
-            $db, $cityId, $playerId, $troopCode, $count, $promotedCode,
-            $costFood, $costLumber, $costStone, $costGold, $totalDurationSec
-        ): void {
-            // Deduct resources.
-            $db->execute(
-                'UPDATE cities
-                 SET food   = food   - :food,
-                     lumber = lumber - :lumber,
-                     stone  = stone  - :stone,
-                     gold   = gold   - :gold
-                 WHERE id = :city_id',
-                [
-                    ':food'    => $costFood,
-                    ':lumber'  => $costLumber,
-                    ':stone'   => $costStone,
-                    ':gold'    => $costGold,
-                    ':city_id' => $cityId,
-                ],
-            );
-
-            // Deduct source troops.
-            $db->execute(
-                'UPDATE city_troops SET count = count - ? WHERE city_id = ? AND troop_code = ?',
-                [$count, $cityId, $troopCode],
-            );
-            // Clean up zero-count rows.
-            $db->execute(
-                'DELETE FROM city_troops WHERE city_id = ? AND troop_code = ? AND count <= 0',
-                [$cityId, $troopCode],
-            );
-
-            // Enqueue promoted troops (they appear after timer finishes).
-            $db->execute(
-                'INSERT INTO troop_queue
-                    (city_id, troop_code, count, barrack_slot, started_at, finishes_at)
-                 VALUES
-                    (:city_id, :troop_code, :count, 1,
-                     UTC_TIMESTAMP(),
-                     DATE_ADD(UTC_TIMESTAMP(), INTERVAL :dur SECOND))',
-                [
-                    ':city_id'    => $cityId,
-                    ':troop_code' => $promotedCode,
-                    ':count'      => $count,
-                    ':dur'        => $totalDurationSec,
-                ],
-            );
-        });
-
-        Response::ok([
-            'promoted'         => true,
-            'source_code'      => $troopCode,
-            'promoted_code'    => $promotedCode,
-            'count'            => $count,
-            'duration_seconds' => $totalDurationSec,
-            'cost_food'        => $costFood,
-            'cost_lumber'      => $costLumber,
-            'cost_stone'       => $costStone,
-            'cost_gold'        => $costGold,
-        ]);
+        $session=Session::current();if(!$session)Response::error(401,'UNAUTHENTICATED','Bitte melde dich an.');
+        $csrf=$_SERVER['HTTP_X_CSRF_TOKEN']??'';if($csrf===''||!hash_equals($session['csrf_token'],$csrf))Response::error(403,'CSRF_INVALID','Bitte lade das Spiel neu.');
+        $body=json_decode(file_get_contents('php://input')?:'',true)??[];
+        if(!is_array($body))Response::error(400,'INVALID_JSON','Ungültige Anfrage.');$body['action']='promotion.start';
+        try{$result=\Conquer\Game\Defense\DefenseService::action((int)$session['player_id'],$body);}catch(\RuntimeException|\DomainException $e){Response::error(422,'PROMOTION_FAILED',$e->getMessage());}
+        Response::ok($result);
     }
 
     /**
      * POST /api/troops/heal
      *
-     * Uses a healing speedup item to reduce the hospital healing timer.
-     * Reduces finishes_at of the earliest unfinished hospital_wounded entry
-     * for the given troop count.
-     *
-     * Body: {"item_code": 10103041, "count": 100}
+     * Compatibility route for the authenticated hospital speedup command.
+     * Body: item_code, quantity, batch_id, operation_key, expected_world_id.
      */
     public static function heal(array $params): void
     {
-        $session = Session::current();
-        if ($session === null) {
-            Response::error(401, 'UNAUTHENTICATED', 'Not logged in.');
-        }
-
-        $supplied = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
-        if ($supplied === '' || !hash_equals($session['csrf_token'], $supplied)) {
-            Response::error(403, 'CSRF_INVALID', 'CSRF token missing or invalid.');
-        }
-
-        $body     = json_decode(file_get_contents('php://input') ?: '', true) ?? [];
-        $itemCode = (int) ($body['item_code'] ?? 0);
-        $playerId = (int) $session['player_id'];
-
-        if ($itemCode <= 0) {
-            Response::error(400, 'MISSING_FIELD', 'item_code is required.');
-        }
-
-        // Load item definition.
-        $itemsJson = file_get_contents(ROOT_DIR . '/data/items.json') ?: '{}';
-        $itemsData = json_decode($itemsJson, true) ?? [];
-        $itemDef   = null;
-        foreach ($itemsData['items'] ?? [] as $item) {
-            if ((int) $item['code'] === $itemCode) {
-                $itemDef = $item;
-                break;
-            }
-        }
-
-        if ($itemDef === null) {
-            Response::error(400, 'UNKNOWN_ITEM', 'Item code ' . $itemCode . ' not found.');
-        }
-
-        $cat    = $itemDef['category']    ?? '';
-        $subcat = $itemDef['subcategory'] ?? '';
-        if ($cat !== 'speedup' || !in_array($subcat, ['generic', 'healing'], true)) {
-            Response::error(400, 'WRONG_ITEM_TYPE', 'This item cannot be used for healing speedups.');
-        }
-
-        $durationSeconds = (int) ($itemDef['duration_seconds'] ?? 0);
-        if ($durationSeconds <= 0) {
-            Response::error(400, 'ITEM_NO_DURATION', 'Item has no valid duration.');
-        }
-
-        $db = Connection::getInstance();
-
-        // Get city.
-        $cityRow = $db->query(
-            'SELECT id FROM cities WHERE player_id = ? LIMIT 1',
-            [$playerId],
-        )->fetch();
-
-        if ($cityRow === false) {
-            Response::error(404, 'NO_CITY', 'No city found.');
-        }
-
-        $cityId = (int) $cityRow['id'];
-
-        // Find active hospital healing entries (healing not yet complete).
-        $woundedRows = $db->query(
-            'SELECT id, healing_ends_at
-             FROM   hospital_wounded
-             WHERE  city_id = ? AND healing_ends_at > UTC_TIMESTAMP()
-             ORDER  BY healing_ends_at ASC
-             LIMIT  10',
-            [$cityId],
-        )->fetchAll();
-
-        if (empty($woundedRows)) {
-            Response::error(400, 'NO_WOUNDED', 'No wounded troops currently being healed.');
-        }
-
-        // Check item inventory.
-        $invRow = $db->query(
-            'SELECT id, quantity FROM player_inventory WHERE player_id = ? AND item_code = ? LIMIT 1',
-            [$playerId, $itemCode],
-        )->fetch();
-
-        if ($invRow === false || (int) $invRow['quantity'] < 1) {
-            Response::error(400, 'NOT_ENOUGH_ITEMS', 'You do not have this healing speedup item.');
-        }
-
-        $db->transaction(function () use ($db, $invRow, $woundedRows, $durationSeconds, $cityId): void {
-            // Deduct item.
-            if ((int) $invRow['quantity'] === 1) {
-                $db->execute('DELETE FROM player_inventory WHERE id = ?', [(int) $invRow['id']]);
-            } else {
-                $db->execute(
-                    'UPDATE player_inventory SET quantity = quantity - 1 WHERE id = ?',
-                    [(int) $invRow['id']],
-                );
-            }
-
-            // Apply speedup to the earliest healing entry.
-            foreach ($woundedRows as $row) {
-                $entryId = (int) $row['id'];
-                $db->execute(
-                    'UPDATE hospital_wounded
-                     SET healing_ends_at = GREATEST(UTC_TIMESTAMP(), DATE_SUB(healing_ends_at, INTERVAL ? SECOND))
-                     WHERE id = ?',
-                    [$durationSeconds, $entryId],
-                );
-                break; // apply to the earliest entry only
-            }
-        });
-
-        Response::ok([
-            'heal_speedup_applied' => true,
-            'item_code'            => $itemCode,
-            'duration_seconds'     => $durationSeconds,
-        ]);
+        HospitalHandler::speedup($params);
     }
 }

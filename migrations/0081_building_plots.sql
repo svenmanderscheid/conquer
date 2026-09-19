@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS city_building_plots (
+ city_id INT NOT NULL,
+ plot_id TINYINT UNSIGNED NOT NULL,
+ building_code VARCHAR(32) NOT NULL,
+ level TINYINT UNSIGNED NOT NULL DEFAULT 0,
+ level_to TINYINT UNSIGNED NULL,
+ started_at DATETIME NULL,
+ finishes_at DATETIME NULL,
+ PRIMARY KEY(city_id,plot_id),
+ CONSTRAINT fk_building_plot_city FOREIGN KEY(city_id) REFERENCES cities(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

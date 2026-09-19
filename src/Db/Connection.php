@@ -19,6 +19,7 @@ final class Connection
     private static ?self $instance = null;
 
     private readonly \PDO $pdo;
+    private int $savepointSerial = 0;
 
     private function __construct(string $rootDir)
     {
@@ -50,6 +51,7 @@ final class Connection
         ], $cfg['options'] ?? []);
 
         $this->pdo = new \PDO($dsn, $cfg['username'] ?? '', $cfg['password'] ?? '', $options);
+        $this->pdo->exec("SET time_zone = '+00:00'");
     }
 
     // -------------------------------------------------------------------------
@@ -60,6 +62,11 @@ final class Connection
     {
         self::$instance = new self($rootDir);
         return self::$instance;
+    }
+
+    public static function isInitialized(): bool
+    {
+        return self::$instance !== null;
     }
 
     public static function getInstance(): self
@@ -138,13 +145,21 @@ final class Connection
      */
     public function transaction(callable $fn): mixed
     {
-        $this->pdo->beginTransaction();
+        // API receipts and the game mutation share one outer transaction.
+        $nested = $this->pdo->inTransaction();
+        $savepoint = 'conquer_' . ++$this->savepointSerial;
+        if ($nested) $this->pdo->exec('SAVEPOINT ' . $savepoint);
+        else $this->pdo->beginTransaction();
         try {
             $result = $fn($this);
-            $this->pdo->commit();
+            if ($nested) $this->pdo->exec('RELEASE SAVEPOINT ' . $savepoint);
+            else $this->pdo->commit();
             return $result;
         } catch (\Throwable $e) {
-            $this->pdo->rollBack();
+            if ($this->pdo->inTransaction()) {
+                if ($nested) $this->pdo->exec('ROLLBACK TO SAVEPOINT ' . $savepoint);
+                else $this->pdo->rollBack();
+            }
             throw $e;
         }
     }

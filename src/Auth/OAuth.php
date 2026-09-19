@@ -5,6 +5,7 @@ namespace Conquer\Auth;
 
 use Conquer\Db\Connection;
 use Conquer\Game\City\CityState;
+use Conquer\Game\Map\WorldPlacement;
 use Conquer\Logger;
 
 /**
@@ -90,8 +91,7 @@ final class OAuth
 
         $playerId = $this->findOrCreatePlayer($provider, $user);
 
-        // Award daily VIP login points (+10, max once per UTC day).
-        \Conquer\Game\Vip\VipService::dailyLogin($playerId);
+        // VIP daily points are claimed from the same panel for all login methods.
 
         // Inactivity system: restore hidden city on login.
         try {
@@ -288,57 +288,47 @@ final class OAuth
             }
         }
 
-        // 3. Brand new player — create account + default city in world 1
-        $username = $this->uniqueUsername($db, $user['display_name']);
-
-        $playerId = $db->transaction(
-            static function (Connection $db) use ($username, $user, $provider): int {
-                $db->execute(
-                    'INSERT INTO players (username, email, password_hash) VALUES (?, ?, NULL)',
-                    [$username, $user['email'] ?: null],
-                );
-                $playerId = $db->lastInsertId();
-
-                $db->execute(
-                    'INSERT INTO oauth_accounts (player_id, provider, provider_user_id) VALUES (?, ?, ?)',
-                    [$playerId, $provider, $user['provider_user_id']],
-                );
-
-                // Create default city in world 1 (Sprint 1 — single world).
-                self::createDefaultCity($db, $playerId, $username);
-
-                return $playerId;
-            },
-        );
-
-        Logger::getInstance()->info(
-            "New player registered via {$provider}: {$username} (id={$playerId})",
-        );
-
-        return $playerId;
+        // Closed alpha: a social login may resume/link an invited account,
+        // but it must never create a new player around the invite gate.
+        throw new \DomainException('Erstelle dein Alpha-Konto zuerst mit deinem persönlichen Key. Danach kannst du diesen Anmeldedienst verknüpfen.');
     }
 
     /**
-     * Creates a default city with all 13 buildings at level 1 in world 1.
-     * Sprint 1 convenience — production will use an explicit world-join flow.
+     * Creates a default city with all canonical buildings in the explicit or first open world.
      */
-    private static function createDefaultCity(Connection $db, int $playerId, string $username): void
+    public static function createDefaultCity(Connection $db, int $playerId, string $username,?int $worldId=null): void
     {
-        // Pick random map coordinates (avoid edges — 50 tile buffer).
-        $coord = self::randomCoord($db);
+        $worldId??=(int)($db->query("SELECT id FROM worlds WHERE status IN ('open','running') ORDER BY id LIMIT 1")->fetchColumn()?:0);
+        if($worldId<1)throw new \DomainException('Momentan ist keine Welt für neue Königreiche geöffnet.');
+        if (!$db->getPdo()->inTransaction()) {
+            $db->transaction(static function (Connection $db) use ($playerId, $username,$worldId): void {
+                self::createDefaultCity($db, $playerId, $username,$worldId);
+            });
+            return;
+        }
+
+        // Reserve a dry, unoccupied 4×4 footprint until the city is inserted.
+        \Conquer\Game\World\WorldContext::assertActionAvailable($worldId);
+        if($db->query('SELECT id FROM cities WHERE player_id=? AND world_id=?',[$playerId,$worldId])->fetchColumn())return;
+        \Conquer\Game\World\WorldService::initializeWorld($worldId);
+        $coord = self::randomCoord($db,$worldId);
 
         $cityName = $username . "'s City";
+        $initialPower = array_sum(array_map(
+            static fn(string $code): int => \Conquer\Game\City\BuildingData::getTotalPower($code, 1),
+            CityState::BUILDING_CODES,
+        ));
         $db->execute(
             'INSERT INTO cities
                  (player_id, world_id, name, coord_x, coord_y,
                   food, lumber, stone, gold,
-                  wall_hp_current, wall_hp_max, castle_level)
-             VALUES (?, 1, ?, ?, ?, 10000, 10000, 10000, 5000, 5000, 5000, 1)',
-            [$playerId, $cityName, $coord['x'], $coord['y']],
+                  wall_hp_current, wall_hp_max, castle_level, power)
+             VALUES (?, ?, ?, ?, ?, 10000, 10000, 10000, 5000, 5000, 5000, 1, ?)',
+            [$playerId,$worldId, $cityName, $coord['x'], $coord['y'], $initialPower],
         );
         $cityId = $db->lastInsertId();
 
-        // Insert all 13 buildings at level 1.
+        // Insert all canonical buildings at level 1.
         foreach (CityState::BUILDING_CODES as $code) {
             $db->execute(
                 'INSERT INTO city_buildings (city_id, building_code, level) VALUES (?, ?, 1)',
@@ -348,33 +338,33 @@ final class OAuth
     }
 
     /**
-     * Finds a random unoccupied map coordinate within the active world bounds.
-     * Uses a 10-tile buffer from each edge. Retries up to 20 times before giving up.
+     * Finds a dry, unoccupied city footprint within the active world bounds.
+     * The caller keeps the world placement lock until its transaction commits.
      *
      * @return array{x: int, y: int}
      */
-    private static function randomCoord(Connection $db): array
+    private static function randomCoord(Connection $db,int $worldId, ?int $ignoreCityId = null): array
     {
-        $world = $db->query('SELECT map_size FROM worlds WHERE id = 1')->fetch();
-        $size  = (int) ($world['map_size'] ?? 256);
-        $min   = 10;
-        $max   = $size - 10 - 1;
+        $size = WorldPlacement::lockWorld($db, $worldId);
+        $min = $size > 22 ? 10 : 1;
+        $max = min($size - $min - 1, $size - 3);
+        if ($max < $min) {
+            throw new \RuntimeException('The world has no space for a city.');
+        }
 
-        for ($i = 0; $i < 20; $i++) {
+        for ($i = 0; $i < 64; $i++) {
             $x = random_int($min, $max);
             $y = random_int($min, $max);
-
-            $taken = $db->query(
-                'SELECT 1 FROM cities WHERE world_id = 1 AND coord_x = ? AND coord_y = ?',
-                [$x, $y],
-            )->fetch();
-
-            if ($taken === false) {
+            if (WorldPlacement::canPlace($db, $worldId, 'city', $x, $y, $ignoreCityId)) {
                 return ['x' => $x, 'y' => $y];
             }
         }
 
-        throw new \RuntimeException('Could not find a free map coordinate after 20 attempts.');
+        $coord = WorldPlacement::findNear($db, $worldId, 'city', intdiv($size, 2), intdiv($size, 2), $ignoreCityId, $size);
+        if ($coord !== null) {
+            return ['x' => $coord[0], 'y' => $coord[1]];
+        }
+        throw new \RuntimeException('Could not find a dry, unoccupied city footprint.');
     }
 
     /**
@@ -412,38 +402,31 @@ final class OAuth
     private function restoreHiddenCityOnLogin(int $playerId): void
     {
         $db = Connection::getInstance();
-
-        // Check if the player is currently hidden
-        $player = $db->query(
-            'SELECT is_hidden FROM players WHERE id = ?',
-            [$playerId],
-        )->fetch();
-
-        if ($player === false || (int) $player['is_hidden'] === 0) {
-            return; // Not hidden — nothing to do
-        }
-
-        // Player was hidden — mark them visible again
-        $db->execute(
-            'UPDATE players SET is_hidden = 0 WHERE id = ?',
-            [$playerId],
-        );
-
-        // Assign new random coordinates for the city (fresh start)
-        try {
-            $coord = self::randomCoord($db);
+        $restored = $db->transaction(static function (Connection $db) use ($playerId): bool {
+            $player = $db->query('SELECT is_hidden FROM players WHERE id = ? FOR UPDATE', [$playerId])->fetch();
+            if ($player === false || (int) $player['is_hidden'] === 0) {
+                return false;
+            }
+            $cities = $db->query('SELECT id,world_id FROM cities WHERE player_id = ? ORDER BY world_id FOR UPDATE', [$playerId])->fetchAll();
+            if (!$cities) {
+                return false;
+            }
+            // Do not reveal the city unless a valid destination has been reserved.
+            foreach ($cities as $city) {
+            WorldPlacement::lockWorld($db, (int) $city['world_id']);
+            $coord = self::randomCoord($db, (int) $city['world_id'], (int) $city['id']);
             $db->execute(
                 'UPDATE cities
                  SET coord_x = ?, coord_y = ?, is_hidden = 0
-                 WHERE player_id = ? AND world_id = 1',
-                [$coord['x'], $coord['y'], $playerId],
+                 WHERE id = ?',
+                [$coord['x'], $coord['y'], (int) $city['id']],
             );
-        } catch (\Throwable) {
-            // If coord assignment fails, just un-hide without moving
-            $db->execute(
-                'UPDATE cities SET is_hidden = 0 WHERE player_id = ? AND world_id = 1',
-                [$playerId],
-            );
+            }
+            $db->execute('UPDATE players SET is_hidden = 0 WHERE id = ?', [$playerId]);
+            return true;
+        });
+        if (!$restored) {
+            return;
         }
 
         // Send welcome-back notification

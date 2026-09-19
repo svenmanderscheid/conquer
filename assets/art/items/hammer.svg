@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Bauhammer">
+<title>Bauhammer</title>
+<!-- Original code-native storybook item illustration. Value, quantity and rarity are rendered by the game UI. -->
+<g stroke="#493b33" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+<path d="M26 110 15 99 68 42 79 53Z" fill="#aa743f" />
+<path d="M21 99 68 49 71 55 29 107Z" fill="#70472f" stroke="none"/>
+<path d="M26 96 64 55" fill="none" stroke="#edc088" stroke-width="4"/>
+<path d="M58 16 98 33 98 53 78 68 39 47 39 29Z" fill="#9cb6ca" />
+<polygon points="58,16 98,33 79,44 39,29" fill="#eef7f7" />
+<polygon points="79,44 98,33 98,53 78,68" fill="#66819a" />
+<path d="M37 27 48 32 48 51 36 46Z" fill="#e4af38" />
+<path d="M83 25 96 31 80 42 67 36Z" fill="#e4af38" />
+<path d="M55 23 76 33" fill="none" stroke="#fff" stroke-width="3"/>
+</g>
+</svg>

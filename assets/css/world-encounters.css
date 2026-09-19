@@ -1,0 +1,32 @@
+/* Transparent model renders keep their own painted colours over every biome. */
+.atlas-creatures{mix-blend-mode:normal}
+.atlas-marker--monsters img{mix-blend-mode:multiply}
+.atlas-marker--monsters img[data-life-kind]{mix-blend-mode:normal}
+.map-overlay-shell .atlas-marker--nodes img[data-life-kind]{width:calc(var(--tile-size,44px)*1.85);height:calc(var(--tile-size,44px)*1.85);margin-left:calc(var(--tile-size,44px)*-.925);bottom:calc(var(--tile-size,44px)*-.03)}
+.map-overlay-shell .atlas-marker--monsters img[data-life-kind]{width:calc(var(--tile-size,44px)*1.45);height:calc(var(--tile-size,44px)*1.45);margin-left:calc(var(--tile-size,44px)*-.725);bottom:calc(var(--tile-size,44px)*.02)}
+.atlas-target-portrait img[data-life-kind],.atlas-nearby-row img[data-life-kind]{mix-blend-mode:normal}
+
+/* Feet and the four-tile hit area stay fixed throughout every idle cycle. */
+.map-overlay-shell .is-regional-boss > img{transform-origin:50% 96%;animation:boss-breathe 5.4s ease-in-out infinite;animation-delay:var(--boss-phase,0s);transition:filter .18s}
+.map-overlay-shell .is-regional-boss[data-boss="grumwald"] > img{animation-name:boss-ponder;animation-duration:6.2s}
+.map-overlay-shell .is-regional-boss[data-boss="sandmaul"] > img{animation-name:boss-prowl;animation-duration:4.8s}
+.map-overlay-shell .is-regional-boss[data-boss="glutramm"] > img{animation-name:boss-heave;animation-duration:4.2s}
+.atlas-boss-effects{position:absolute;inset:0;--boss-colour:var(--ui-green)}
+.is-regional-boss[data-biome="ice"] .atlas-boss-effects{--boss-colour:var(--ui-blue-light)}
+.is-regional-boss[data-biome="sand"] .atlas-boss-effects{--boss-colour:var(--ui-gold)}
+.is-regional-boss[data-biome="lava"] .atlas-boss-effects{--boss-colour:var(--ui-orange)}
+.is-regional-boss[data-biome="arcane"] .atlas-boss-effects{--boss-colour:#68d9d1}
+.boss-shadow{position:absolute;left:2%;bottom:8%;width:96%;height:38%;border-radius:50%;background:radial-gradient(ellipse,#493b3348,transparent 70%);transform:scaleX(1.12)}
+.boss-mote{position:absolute;left:calc(8% + var(--mote)*25%);bottom:12%;width:calc(var(--tile-size)*.09);height:calc(var(--tile-size)*.13);background:var(--boss-colour);border:1px solid var(--ui-card);border-radius:70% 15%;opacity:0;animation:boss-mote 3.8s ease-out infinite;animation-delay:calc(var(--boss-phase) - var(--mote)*.95s)}
+.is-regional-boss[data-biome="ice"] .boss-mote{border-radius:1px;box-shadow:0 0 4px var(--ui-card)}
+.is-regional-boss[data-biome="sand"] .boss-mote{width:calc(var(--tile-size)*.16);height:calc(var(--tile-size)*.08);border:0;border-radius:50%}
+.is-regional-boss[data-biome="lava"] .boss-mote{border-radius:50%;box-shadow:0 0 5px var(--ui-orange)}
+@keyframes boss-breathe{0%,100%{transform:scale(1,1) rotate(-.6deg)}50%{transform:scale(1.025,1.045) rotate(.6deg)}}
+@keyframes boss-ponder{0%,100%{transform:rotate(-1deg) scaleY(1)}45%{transform:rotate(1.2deg) scaleY(1.035)}70%{transform:rotate(.4deg) scaleY(1.01)}}
+@keyframes boss-prowl{0%,100%{transform:skewX(-1deg) scale(1,1)}50%{transform:skewX(1deg) scale(1.035,.98)}}
+@keyframes boss-heave{0%,100%{transform:scale(1,1) rotate(-.7deg)}45%{transform:scale(1.04,1.055) rotate(.8deg)}70%{transform:scale(1.01,.99)}}
+@keyframes boss-mote{0%{opacity:0;transform:translate(0,0) rotate(0)}25%{opacity:.8}100%{opacity:0;transform:translate(calc(var(--tile-size)*.3),calc(var(--tile-size)*-1.7)) rotate(110deg)}}
+.atlas-marker[hidden] > img,.atlas-marker[hidden] .boss-mote,.encounters-paused .is-regional-boss > img,.encounters-paused .boss-mote{animation-play-state:paused}
+.encounters-paused .is-regional-boss > img,.reduced-motion .is-regional-boss > img{animation:none;transform:none}
+.encounters-paused .boss-mote,.reduced-motion .boss-mote{animation:none;opacity:0}
+@media(prefers-reduced-motion:reduce){.map-overlay-shell .is-regional-boss > img{animation:none;transform:none}.boss-mote{animation:none;opacity:0}}

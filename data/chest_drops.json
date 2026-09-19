@@ -1,38 +1,2104 @@
 {
-  "version": 1,
+  "version": 2,
   "chests": {
     "silver": {
       "rolls": 3,
       "drop_table": [
-        { "weight": 40, "item_code": 10103002, "quantity": 1 },
-        { "weight": 30, "item_code": 10103003, "quantity": 1 },
-        { "weight": 15, "item_code": 10101001, "quantity": 1 },
-        { "weight": 10, "item_code": 10103011, "quantity": 1 },
-        { "weight": 4, "fragment_grade": "normal", "quantity": 5 },
-        { "weight": 1, "fragment_grade": "rare", "quantity": 3 }
+        {
+          "weight": 1800,
+          "item_code": 10103002,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10103003,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10101001,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10103011,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "fragment_grade": "normal",
+          "quantity": 5
+        },
+        {
+          "weight": 300,
+          "fragment_grade": "rare",
+          "quantity": 3
+        },
+        {
+          "weight": 1800,
+          "item_code": 10201001,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10201002,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10201003,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10201004,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10201008,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10201009,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10201010,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10201011,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10201012,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10201016,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10201017,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10201018,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10201019,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10201020,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10201024,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10201025,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10201026,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10201027,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10201028,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10201032,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10201033,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10202001,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10202003,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10202005,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10202007,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10202013,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10202015,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10202017,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10202019,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10202021,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10202023,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10203001,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10203002,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10203003,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10203007,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10203008,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10203009,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10203010,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10203014,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10203015,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10203016,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10203017,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10203021,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10203022,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10203023,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10203024,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10203025,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10203029,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10203030,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10203031,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10203032,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10203033,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10203034,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10204001,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10205001,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10205002,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10206001,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10207001,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10207002,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10207021,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10208002,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10101002,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10101003,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10101011,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10101012,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10101021,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10101022,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10101031,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10101032,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10101041,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10101042,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10101043,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10102001,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10102011,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10102021,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10102031,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10102041,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10102051,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10102061,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10103001,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10103004,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10103005,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10103012,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10103013,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10103021,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10103022,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10103023,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10103031,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10103032,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10103041,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10104001,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10106001,
+          "quantity": 1
+        },
+        {
+          "weight": 300,
+          "item_code": 10106002,
+          "quantity": 1
+        },
+        {
+          "weight": 1,
+          "item_code": 10105002,
+          "quantity": 1
+        },
+        {
+          "weight": 1,
+          "item_code": 10105003,
+          "quantity": 1
+        },
+        {
+          "weight": 15,
+          "item_code": 10201005,
+          "quantity": 1
+        },
+        {
+          "weight": 15,
+          "item_code": 10201013,
+          "quantity": 1
+        },
+        {
+          "weight": 15,
+          "item_code": 10201021,
+          "quantity": 1
+        },
+        {
+          "weight": 15,
+          "item_code": 10201029,
+          "quantity": 1
+        },
+        {
+          "weight": 15,
+          "item_code": 10202002,
+          "quantity": 1
+        },
+        {
+          "weight": 15,
+          "item_code": 10202004,
+          "quantity": 1
+        },
+        {
+          "weight": 15,
+          "item_code": 10202006,
+          "quantity": 1
+        },
+        {
+          "weight": 15,
+          "item_code": 10202008,
+          "quantity": 1
+        },
+        {
+          "weight": 15,
+          "item_code": 10202009,
+          "quantity": 1
+        },
+        {
+          "weight": 15,
+          "item_code": 10202014,
+          "quantity": 1
+        },
+        {
+          "weight": 15,
+          "item_code": 10202016,
+          "quantity": 1
+        },
+        {
+          "weight": 15,
+          "item_code": 10202018,
+          "quantity": 1
+        },
+        {
+          "weight": 15,
+          "item_code": 10202020,
+          "quantity": 1
+        },
+        {
+          "weight": 15,
+          "item_code": 10202024,
+          "quantity": 1
+        },
+        {
+          "weight": 1,
+          "item_code": 10203006,
+          "quantity": 1
+        },
+        {
+          "weight": 15,
+          "item_code": 10203018,
+          "quantity": 1
+        },
+        {
+          "weight": 15,
+          "item_code": 10203019,
+          "quantity": 1
+        },
+        {
+          "weight": 1,
+          "item_code": 10203020,
+          "quantity": 1
+        },
+        {
+          "weight": 15,
+          "item_code": 10203026,
+          "quantity": 1
+        },
+        {
+          "weight": 15,
+          "item_code": 10203027,
+          "quantity": 1
+        },
+        {
+          "weight": 1,
+          "item_code": 10203028,
+          "quantity": 1
+        },
+        {
+          "weight": 15,
+          "item_code": 10203035,
+          "quantity": 1
+        },
+        {
+          "weight": 15,
+          "item_code": 10203036,
+          "quantity": 1
+        },
+        {
+          "weight": 1,
+          "item_code": 10203037,
+          "quantity": 1
+        },
+        {
+          "weight": 1800,
+          "item_code": 10300001,
+          "quantity": 1
+        },
+        {
+          "weight": 1,
+          "item_code": 10300002,
+          "quantity": 1
+        },
+        {
+          "weight": 15,
+          "item_code": 10300003,
+          "quantity": 1
+        },
+        {
+          "weight": 1,
+          "item_code": 10300004,
+          "quantity": 1
+        }
       ]
     },
     "gold": {
       "rolls": 4,
       "drop_table": [
-        { "weight": 30, "item_code": 10103003, "quantity": 1 },
-        { "weight": 25, "item_code": 10103004, "quantity": 1 },
-        { "weight": 15, "item_code": 10102001, "quantity": 1 },
-        { "weight": 15, "fragment_grade": "rare", "quantity": 5 },
-        { "weight": 10, "fragment_grade": "epic", "quantity": 3 },
-        { "weight": 5, "item_code": 10101042, "quantity": 1 }
+        {
+          "weight": 180,
+          "item_code": 10103003,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10103004,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10102001,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "fragment_grade": "rare",
+          "quantity": 5
+        },
+        {
+          "weight": 70,
+          "fragment_grade": "epic",
+          "quantity": 3
+        },
+        {
+          "weight": 180,
+          "item_code": 10101042,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10201001,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10201002,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10201003,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10201004,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10201005,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10201006,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10201008,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10201009,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10201010,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10201011,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10201012,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10201013,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10201014,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10201016,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10201017,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10201018,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10201019,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10201020,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10201021,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10201022,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10201024,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10201025,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10201026,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10201027,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10201028,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10201029,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10201030,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10201032,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10201033,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10201034,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10201035,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10202001,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10202002,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10202003,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10202004,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10202005,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10202006,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10202007,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10202008,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10202009,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10202010,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10202011,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10202012,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10202013,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10202014,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10202015,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10202016,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10202017,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10202018,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10202019,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10202020,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10202021,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10202022,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10202023,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10202024,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10202025,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10202026,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10203001,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10203002,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10203003,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10203004,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10203007,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10203008,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10203009,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10203010,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10203011,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10203012,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10203014,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10203015,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10203016,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10203017,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10203018,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10203019,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10203021,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10203022,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10203023,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10203024,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10203025,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10203026,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10203027,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10203029,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10203030,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10203031,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10203032,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10203033,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10203034,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10203035,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10203036,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10204001,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10205001,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10205002,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10205003,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10206001,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10206002,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10206003,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10207001,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10207002,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10207003,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10207021,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10207022,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10208001,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10208003,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10208002,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10101001,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10101002,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10101003,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10101011,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10101012,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10101021,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10101022,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10101031,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10101032,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10101041,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10101043,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10102002,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10102011,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10102021,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10102031,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10102041,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10102051,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10102061,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10103001,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10103002,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10103005,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10103006,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10103011,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10103012,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10103013,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10103021,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10103022,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10103023,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10103031,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10103032,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10103041,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10104001,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10104002,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10106001,
+          "quantity": 1
+        },
+        {
+          "weight": 180,
+          "item_code": 10106002,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10106003,
+          "quantity": 1
+        },
+        {
+          "weight": 3,
+          "item_code": 10105002,
+          "quantity": 1
+        },
+        {
+          "weight": 3,
+          "item_code": 10105003,
+          "quantity": 1
+        },
+        {
+          "weight": 5,
+          "item_code": 10203006,
+          "quantity": 1
+        },
+        {
+          "weight": 5,
+          "item_code": 10203020,
+          "quantity": 1
+        },
+        {
+          "weight": 5,
+          "item_code": 10203028,
+          "quantity": 1
+        },
+        {
+          "weight": 5,
+          "item_code": 10203037,
+          "quantity": 1
+        },
+        {
+          "weight": 100,
+          "item_code": 10300001,
+          "quantity": 1
+        },
+        {
+          "weight": 5,
+          "item_code": 10300002,
+          "quantity": 1
+        },
+        {
+          "weight": 70,
+          "item_code": 10300003,
+          "quantity": 1
+        },
+        {
+          "weight": 5,
+          "item_code": 10300004,
+          "quantity": 1
+        }
       ]
     },
     "platinum": {
       "rolls": 5,
       "drop_table": [
-        { "weight": 25, "item_code": 10103005, "quantity": 1 },
-        { "weight": 20, "item_code": 10103006, "quantity": 1 },
-        { "weight": 20, "fragment_grade": "epic", "quantity": 5 },
-        { "weight": 15, "fragment_grade": "legendary", "quantity": 3 },
-        { "weight": 12, "item_code": 10102001, "quantity": 2 },
-        { "weight": 7, "item_code": 10101043, "quantity": 1 },
-        { "weight": 1, "fragment_grade": "mythic", "quantity": 1 }
+        {
+          "weight": 50,
+          "item_code": 10103005,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10103006,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "fragment_grade": "epic",
+          "quantity": 5
+        },
+        {
+          "weight": 35,
+          "fragment_grade": "legendary",
+          "quantity": 3
+        },
+        {
+          "weight": 50,
+          "item_code": 10102001,
+          "quantity": 2
+        },
+        {
+          "weight": 50,
+          "item_code": 10101043,
+          "quantity": 1
+        },
+        {
+          "weight": 8,
+          "fragment_grade": "mythic",
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10201004,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10201005,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10201006,
+          "quantity": 1
+        },
+        {
+          "weight": 35,
+          "item_code": 10201007,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10201011,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10201012,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10201013,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10201014,
+          "quantity": 1
+        },
+        {
+          "weight": 35,
+          "item_code": 10201015,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10201019,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10201020,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10201021,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10201022,
+          "quantity": 1
+        },
+        {
+          "weight": 35,
+          "item_code": 10201023,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10201027,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10201028,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10201029,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10201030,
+          "quantity": 1
+        },
+        {
+          "weight": 35,
+          "item_code": 10201031,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10201033,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10201034,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10201035,
+          "quantity": 1
+        },
+        {
+          "weight": 35,
+          "item_code": 10201036,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10202001,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10202002,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10202003,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10202004,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10202005,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10202006,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10202007,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10202008,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10202009,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10202010,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10202011,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10202012,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10202013,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10202014,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10202015,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10202016,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10202017,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10202018,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10202019,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10202020,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10202021,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10202022,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10202023,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10202024,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10202025,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10202026,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10203004,
+          "quantity": 1
+        },
+        {
+          "weight": 35,
+          "item_code": 10203005,
+          "quantity": 1
+        },
+        {
+          "weight": 35,
+          "item_code": 10203006,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10203011,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10203012,
+          "quantity": 1
+        },
+        {
+          "weight": 35,
+          "item_code": 10203013,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10203018,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10203019,
+          "quantity": 1
+        },
+        {
+          "weight": 35,
+          "item_code": 10203020,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10203025,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10203026,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10203027,
+          "quantity": 1
+        },
+        {
+          "weight": 35,
+          "item_code": 10203028,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10203033,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10203034,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10203035,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10203036,
+          "quantity": 1
+        },
+        {
+          "weight": 35,
+          "item_code": 10203037,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10204001,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10205002,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10205003,
+          "quantity": 1
+        },
+        {
+          "weight": 35,
+          "item_code": 10205004,
+          "quantity": 1
+        },
+        {
+          "weight": 35,
+          "item_code": 10205005,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10206002,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10206003,
+          "quantity": 1
+        },
+        {
+          "weight": 35,
+          "item_code": 10206004,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10207002,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10207003,
+          "quantity": 1
+        },
+        {
+          "weight": 35,
+          "item_code": 10207004,
+          "quantity": 1
+        },
+        {
+          "weight": 8,
+          "item_code": 10207005,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10207021,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10207022,
+          "quantity": 1
+        },
+        {
+          "weight": 35,
+          "item_code": 10207023,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10208001,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10208003,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10208002,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10101001,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10101002,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10101003,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10101011,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10101012,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10101021,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10101022,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10101032,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10101042,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10102002,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10102011,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10102021,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10102031,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10102041,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10102051,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10102061,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10103003,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10103004,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10103011,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10103012,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10103013,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10103021,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10103022,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10103023,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10103031,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10103032,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10103041,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10104002,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10106001,
+          "quantity": 1
+        },
+        {
+          "weight": 50,
+          "item_code": 10106002,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10106003,
+          "quantity": 1
+        },
+        {
+          "weight": 15,
+          "item_code": 10103001,
+          "quantity": 1
+        },
+        {
+          "weight": 15,
+          "item_code": 10104001,
+          "quantity": 1
+        },
+        {
+          "weight": 8,
+          "item_code": 10105002,
+          "quantity": 1
+        },
+        {
+          "weight": 8,
+          "item_code": 10105003,
+          "quantity": 1
+        },
+        {
+          "weight": 15,
+          "item_code": 10203003,
+          "quantity": 1
+        },
+        {
+          "weight": 15,
+          "item_code": 10206001,
+          "quantity": 1
+        },
+        {
+          "weight": 15,
+          "item_code": 10300001,
+          "quantity": 1
+        },
+        {
+          "weight": 35,
+          "item_code": 10300002,
+          "quantity": 1
+        },
+        {
+          "weight": 160,
+          "item_code": 10300003,
+          "quantity": 1
+        },
+        {
+          "weight": 35,
+          "item_code": 10300004,
+          "quantity": 1
+        }
       ]
     }
   }

@@ -1,0 +1,31 @@
+{
+  "files": {
+    "academy.json": "3ef47ce0bbf87a5070235693f956e78c0f72b36e55d1ceca7c00f2fe8d9e1a7c",
+    "barrack.json": "d68a8708534642ddb420efc1a7da364106d5472f17ed1e7c79c77c366d89d352",
+    "castle.json": "6f6d9a6709350d484ffe309ec7b96a35843c828cf5740eb0728911a17e7c0129",
+    "farm.json": "4ec56bcbfc5271d6e5854d9e372f6920ce19b59a836d919cd76338edbeb7eb88",
+    "gold_mine.json": "30125b204ddbfd0442dbf5c1e0d137659f2044a9723ca1da4863a8625841fc5a",
+    "hall_of_alliance.json": "b05a30b01891164c32e399c42180f626bf93391f1ecc2c226a077d1c9ed4f9d9",
+    "hospital.json": "f46066f304c1620e01a7495af4b0683138deb5ca5bead3fb45645e8121bf7d71",
+    "lumber_camp.json": "71f7d4b0782745d1d1f09edb710876f0865c0d3667270bf3c27a5a5cccdc5413",
+    "quarry.json": "7356e740e4f888cfee18647ff07a9d752ee06f1e9cea07d15cde438abf605512",
+    "storage.json": "b6f975f0fb1f883be52bd8d266c326e5f492e32c7641683a4966c2c4905d5166",
+    "trading_post.json": "aaa8df68b6388e269442e7f186c307fbc3f7e9dc5174781b2007843d1b7f5cd5",
+    "treasure_house.json": "c4d91817fd80ad6e31a07baf7082b93c2c3914d6e18e0c3065c47657e6446a5f",
+    "wall.json": "abea928a0c8a0dbabbe534bfad7e760c668826e81108bf7f1f054ce16d9f3ee9",
+    "watch_tower.json": "14ebda61394781522b0aab7feafe3042b86eb47ba7cff01778962c551dd07600",
+    "battle.json": "30994667a00cd7d1fb12dd3ecb95cd040a0c007f6d83e21747184b17c865b0c6",
+    "production.json": "d2960eb89d17751db19323c2e3361a0263e15f7b5ab93e661d611af273b9bd99",
+    "advanced.json": "330842174b825fa5a4d8d0acca132490d5419b165baa1676b93da1c3632eaea5",
+    "field_monster.json": "712704e0fc994475314df2f25c80d497c51dd7e4a344ae11e6f3aae3e0b2845c",
+    "field_object.json": "f03144457addb259f5c7d439e15c85ccfe67ede7a9e217d02ea45b594fa44a3d",
+    "enum.py": "18b31ddd879a0e74974e2ad0daa6559a0b1aa19efe0100ded36db6d954bf1328"
+  },
+  "building_levels": 420,
+  "research_nodes": 117,
+  "research_levels": 951,
+  "monsters": 167,
+  "field_objects": 131,
+  "mapped_items": 59,
+  "unresolved_items": 24
+}

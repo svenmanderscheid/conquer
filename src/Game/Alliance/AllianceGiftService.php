@@ -39,6 +39,8 @@ final class AllianceGiftService
      */
     public static function triggerMonsterKill(int $playerId, int $monsterCode): void
     {
+        // Source gifts are created atomically with the kill receipt, using its exact count.
+        if (isset(\Conquer\Game\Map\MonsterData::definition($monsterCode)['source_code'])) return;
         // 20% chance
         if (random_int(1, 100) > 20) {
             return;
@@ -70,6 +72,18 @@ final class AllianceGiftService
                 (?, \'monster_kill\', ?, DATE_ADD(UTC_TIMESTAMP(), INTERVAL 24 HOUR), ?)',
             [$allianceId, $giftJson, $playerId],
         );
+    }
+
+    public static function createSourceGift(int $playerId, int $worldId, array $definition): void
+    {
+        $gift = $definition['alliance_gift'] ?? null;
+        if (!$gift || (int)$gift['count'] <= 0) return;
+        $db = Connection::getInstance();
+        if (!$db->getPdo()->inTransaction()) throw new \LogicException('Source gifts require the kill transaction.');
+        $alliance = $db->query('SELECT alliance_id FROM alliance_members WHERE player_id=? AND world_id=?',[$playerId,$worldId])->fetchColumn();
+        if ($alliance === false) return;
+        $db->execute("INSERT INTO alliance_gifts(alliance_id,trigger_type,gift_json,expires_at,created_by) VALUES(?,'monster_kill',?,DATE_ADD(UTC_TIMESTAMP(),INTERVAL 24 HOUR),?)",
+            [$alliance,json_encode(['item_code'=>(int)$gift['item_code'],'quantity'=>(int)$gift['count']],JSON_THROW_ON_ERROR),$playerId]);
     }
 
     // -------------------------------------------------------------------------

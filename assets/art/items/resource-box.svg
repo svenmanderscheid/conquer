@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Rohstoffkiste">
+<title>Rohstoffkiste</title>
+<!-- Original code-native storybook item illustration. Value, quantity and rarity are rendered by the game UI. -->
+<g stroke="#493b33" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+<g transform="translate(4 -1) scale(.9)">
+<path d="M18 51 34 29H96L112 47V102L98 116H18Z" fill="#265374" />
+<path d="M18 51C18 31 30 17 50 17H87C99 17 112 31 112 47L98 61H18Z" fill="#377da8" />
+<path d="M18 61H98V116H18Z" fill="#377da8" />
+<path d="M98 61 112 47V102L98 116Z" fill="#265374" />
+<path d="M32 24C40 18 47 17 54 17L53 61H40V27ZM77 17H87C95 19 99 25 103 33L94 43 91 31 89 61H77ZM18 57H98V70H18ZM17 102H98V116H17Z" fill="#b6ccd7" />
+<path d="M29 69H42V103H29ZM77 69H90V103H77Z" fill="#b6ccd7" />
+<path d="M47 55H70V83H47Z" fill="#b6ccd7" />
+<path d="M53 62H64V73H53Z" fill="#438fe4" />
+<path d="M22 62H43M73 62H93M22 108H94" fill="none" stroke="#f2faf7" stroke-width="3"/>
+<path d="M45 26V48M81 24V48" fill="none" stroke="#f2faf7" stroke-width="3"/>
+<circle cx="35" cy="89" r="3" fill="#67869b" stroke="none"/>
+<circle cx="84" cy="90" r="3" fill="#67869b" stroke="none"/>
+</g>
+<g transform="translate(7 66) scale(.42)">
+<path d="M32 40 64 17C75 9 99 17 105 36 112 55 108 66 91 80L61 101Z" fill="#70472f" />
+<path d="M49 37 68 23C78 20 91 21 98 34L65 62Z" fill="#b98448" stroke="none"/>
+<path d="M77 23 67 35M92 32 73 53" fill="none" stroke="#dca762" stroke-width="4"/>
+<ellipse cx="48" cy="72" rx="30" ry="34" fill="#dba25d" />
+<ellipse cx="48" cy="72" rx="22" ry="26" fill="#f0c786" />
+<path d="M53 90C30 94 29 58 47 56 63 54 67 83 50 83 38 84 38 66 47 65 54 65 56 75 49 76" fill="none" stroke="#aa743f" stroke-width="4"/>
+<path d="M61 26C57 10 39 10 37 12 38 25 47 29 61 26Z" fill="#74a452" />
+</g>
+<g transform="translate(30 56) scale(.43)">
+<path d="M47 101C27 77 25 34 47 18 65 1 92 20 89 49 87 70 74 95 56 110Z" fill="#e4af38" />
+<ellipse cx="50" cy="28" rx="7" ry="8" fill="#ffd862" stroke-width="2"/>
+<ellipse cx="62" cy="28" rx="7" ry="8" fill="#ffd862" stroke-width="2"/>
+<ellipse cx="74" cy="28" rx="7" ry="8" fill="#ffd862" stroke-width="2"/>
+<ellipse cx="53" cy="41" rx="7" ry="8" fill="#e4af38" stroke-width="2"/>
+<ellipse cx="65" cy="41" rx="7" ry="8" fill="#e4af38" stroke-width="2"/>
+<ellipse cx="77" cy="41" rx="7" ry="8" fill="#e4af38" stroke-width="2"/>
+<ellipse cx="50" cy="54" rx="7" ry="8" fill="#ffd862" stroke-width="2"/>
+<ellipse cx="62" cy="54" rx="7" ry="8" fill="#ffd862" stroke-width="2"/>
+<ellipse cx="74" cy="54" rx="7" ry="8" fill="#ffd862" stroke-width="2"/>
+<ellipse cx="53" cy="67" rx="7" ry="8" fill="#e4af38" stroke-width="2"/>
+<ellipse cx="65" cy="67" rx="7" ry="8" fill="#e4af38" stroke-width="2"/>
+<ellipse cx="77" cy="67" rx="7" ry="8" fill="#e4af38" stroke-width="2"/>
+<ellipse cx="50" cy="80" rx="7" ry="8" fill="#ffd862" stroke-width="2"/>
+<ellipse cx="62" cy="80" rx="7" ry="8" fill="#ffd862" stroke-width="2"/>
+<ellipse cx="74" cy="80" rx="7" ry="8" fill="#ffd862" stroke-width="2"/>
+<path d="M45 112C26 103 19 81 21 57 41 58 50 75 52 98 59 59 78 46 106 40 101 67 81 98 45 112Z" fill="#498047" />
+<path d="M48 109C61 86 75 65 97 49 90 75 72 98 48 109" fill="#74a452" stroke="none"/>
+<path d="M44 103C39 86 34 75 27 67" fill="none" stroke="#a7d578" stroke-width="3"/>
+</g>
+<g transform="translate(68 67) scale(.41)">
+<path d="M14 87 23 68 33 64 35 38 54 21 82 22 104 48 105 79 118 97 90 110 35 108 12 99Z" fill="#869cb2" />
+<polygon points="35,38 54,21 82,22 69,42 47,51" fill="#ccdce7" />
+<polygon points="47,51 69,42 92,55 81,84 51,95 33,72" fill="#adc2d4" />
+<polygon points="82,22 104,48 105,79 81,84 92,55" fill="#657d95" />
+<polygon points="23,68 33,64 33,88 15,94" fill="#bdcdd8" />
+<polygon points="81,84 105,79 118,97 90,110 72,103" fill="#5c7489" />
+<path d="M40 42 53 29 70 28" fill="none" stroke="#edf7f8" stroke-width="3"/>
+</g>
+<g transform="translate(48 80) scale(.43)">
+<ellipse cx="77" cy="86" rx="33" ry="21" fill="#bf7c22" />
+<path d="M45 67V89C46 103 107 105 109 89V67Z" fill="#e4af38" />
+<ellipse cx="77" cy="66" rx="32" ry="17" fill="#ffd55e" />
+<path d="M12 73V99C13 112 68 111 68 99V73Z" fill="#e4af38" />
+<ellipse cx="40" cy="74" rx="28" ry="15" fill="#ffe07a" />
+<path d="M17 87C30 93 45 96 64 88M18 99C31 105 46 105 61 101" fill="none" stroke="#b97924" stroke-width="3"/>
+<ellipse cx="54" cy="53" rx="30" ry="34" fill="#e4af38" />
+<ellipse cx="54" cy="53" rx="23" ry="27" fill="#ffe07a" />
+<path d="M55 27V79C69 77 77 67 77 53S69 28 55 27" fill="#ebbb44" stroke="none"/>
+<polygon points="54,34 59,46 72,48 62,56 65,69 54,62 43,69 46,56 36,48 49,46" fill="#d1922b" stroke-width="2"/>
+<path d="M37 39C42 29 48 27 53 27" fill="none" stroke="#fff6df" stroke-width="4"/>
+</g>
+</g>
+</svg>

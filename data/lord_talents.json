@@ -1,0 +1,637 @@
+{
+  "version": 1,
+  "branches": [
+    {
+      "code": "attack",
+      "name": "Angriff",
+      "scope": "Spielerstädte, besetzte Schreine & PvP-Rallys",
+      "icon": "assets/art/items/shadow-blade.png",
+      "nodes": [
+        {
+          "code": "attack_0",
+          "name": "Waffenschule",
+          "label": "PvP-Angriff",
+          "bonus": 0.01,
+          "stat": "talent_pvp_attack",
+          "description": "Angriff deiner angreifenden Truppen im PvP. Gilt nicht gegen Monster.",
+          "icon": "assets/art/items/shadow-blade.png",
+          "tier": 0,
+          "column": 0,
+          "max_level": 5,
+          "required_points": 0,
+          "required_level": 1,
+          "parents": []
+        },
+        {
+          "code": "attack_1",
+          "name": "Marschdisziplin",
+          "label": "PvP-Marschtempo",
+          "bonus": 0.02,
+          "stat": "talent_pvp_march",
+          "description": "Marschtempo von Angriffen auf Spieler und besetzte Schreine; keine Sammel- oder Jagdmärsche.",
+          "icon": "assets/art/items/cavalry-spurs.png",
+          "tier": 0,
+          "column": 2,
+          "max_level": 5,
+          "required_points": 0,
+          "required_level": 1,
+          "parents": []
+        },
+        {
+          "code": "attack_2",
+          "name": "Rekrutenausbildung",
+          "label": "Ausbildungstempo",
+          "bonus": 0.02,
+          "stat": "training_speed",
+          "description": "Ausbildung neuer Truppen in deiner Stadt.",
+          "icon": "assets/art/items/drillmasters-horn.png",
+          "tier": 1,
+          "column": 0,
+          "max_level": 5,
+          "required_points": 5,
+          "required_level": 1,
+          "parents": [
+            "attack_0"
+          ]
+        },
+        {
+          "code": "attack_3",
+          "name": "Schlachtordnung",
+          "label": "LP beim PvP-Angriff",
+          "bonus": 0.01,
+          "stat": "talent_pvp_attacker_hp",
+          "description": "Lebenspunkte deiner eigenen Truppen, während sie im PvP angreifen.",
+          "icon": "assets/art/items/titan-gauntlet.png",
+          "tier": 1,
+          "column": 2,
+          "max_level": 5,
+          "required_points": 5,
+          "required_level": 1,
+          "parents": [
+            "attack_1"
+          ]
+        },
+        {
+          "code": "attack_4",
+          "name": "Rammböcke",
+          "label": "Schaden an Mauern",
+          "bonus": 0.03,
+          "stat": "talent_wall_damage",
+          "description": "Schaden an der Stadtmauer nach einem erfolgreichen Stadtangriff; keine zusätzliche Truppenstärke.",
+          "icon": "assets/art/items/builders-hammer.png",
+          "tier": 2,
+          "column": 0,
+          "max_level": 5,
+          "required_points": 15,
+          "required_level": 1,
+          "parents": [
+            "attack_2"
+          ]
+        },
+        {
+          "code": "attack_5",
+          "name": "Große Heere",
+          "label": "Marschkapazität",
+          "bonus": 0.01,
+          "stat": "march_size",
+          "description": "Maximale Truppenzahl je eigener Armee. Kein zusätzlicher Marschplatz.",
+          "icon": "assets/art/items/warlord-banner.png",
+          "tier": 2,
+          "column": 2,
+          "max_level": 5,
+          "required_points": 15,
+          "required_level": 1,
+          "parents": [
+            "attack_3"
+          ]
+        },
+        {
+          "code": "attack_6",
+          "name": "Entschlossener Angriff",
+          "label": "PvP-Angriff",
+          "bonus": 0.01,
+          "stat": "talent_pvp_attack",
+          "description": "Zusätzlicher Angriff deiner angreifenden Truppen im PvP.",
+          "icon": "assets/art/items/blood-moon-totem.png",
+          "tier": 3,
+          "column": 0,
+          "max_level": 5,
+          "required_points": 25,
+          "required_level": 1,
+          "parents": [
+            "attack_4"
+          ]
+        },
+        {
+          "code": "attack_7",
+          "name": "Rally-Taktik",
+          "label": "Eigener PvP-Rally-Angriff",
+          "bonus": 0.01,
+          "stat": "talent_pvp_rally_attack",
+          "description": "Angriff deiner eigenen Truppen in einer PvP-Rally. Wirkt nicht mehrfach auf die gesamte Rally.",
+          "icon": "assets/art/items/phoenix-bow.png",
+          "tier": 3,
+          "column": 2,
+          "max_level": 5,
+          "required_points": 25,
+          "required_level": 1,
+          "parents": [
+            "attack_5"
+          ]
+        },
+        {
+          "code": "attack_8",
+          "name": "Eroberer",
+          "label": "PvP-Angriff",
+          "bonus": 0.02,
+          "stat": "talent_pvp_attack",
+          "description": "Abschlusstalent: zusätzlicher Angriff beim Angriff auf Spieler und besetzte Schreine.",
+          "icon": "assets/art/items/titan-gauntlet.png",
+          "tier": 4,
+          "column": 1,
+          "max_level": 5,
+          "required_points": 35,
+          "required_level": 40,
+          "parents": [
+            "attack_6",
+            "attack_7"
+          ]
+        }
+      ]
+    },
+    {
+      "code": "defense",
+      "name": "Verteidigung",
+      "scope": "Eigene Stadt & verteidigende Verstärkungen",
+      "icon": "assets/art/items/iron-shield.png",
+      "nodes": [
+        {
+          "code": "defense_0",
+          "name": "Schutzwall",
+          "label": "Verteidigung im Stadt-PvP",
+          "bonus": 0.01,
+          "stat": "talent_city_defense",
+          "description": "Verteidigung deiner eigenen Truppen bei der Verteidigung deiner Stadt oder als Verstärkung einer verbündeten Stadt.",
+          "icon": "assets/art/items/iron-shield.png",
+          "tier": 0,
+          "column": 0,
+          "max_level": 5,
+          "required_points": 0,
+          "required_level": 1,
+          "parents": []
+        },
+        {
+          "code": "defense_1",
+          "name": "Vorratsverstecke",
+          "label": "Geschützte Ressourcen",
+          "bonus": 0.02,
+          "stat": "resource_protection",
+          "description": "Erhöht die geschützte Ressourcenmenge. Der Schutz kann den vorhandenen Bestand nicht übersteigen.",
+          "icon": "assets/art/items/stone-amulet.png",
+          "tier": 0,
+          "column": 2,
+          "max_level": 5,
+          "required_points": 0,
+          "required_level": 1,
+          "parents": []
+        },
+        {
+          "code": "defense_2",
+          "name": "Standhafte Wachen",
+          "label": "LP im Stadt-PvP",
+          "bonus": 0.01,
+          "stat": "talent_city_defender_hp",
+          "description": "Lebenspunkte deiner eigenen verteidigenden Truppen in Städten.",
+          "icon": "assets/art/items/serpent-scale.png",
+          "tier": 1,
+          "column": 0,
+          "max_level": 5,
+          "required_points": 5,
+          "required_level": 1,
+          "parents": [
+            "defense_0"
+          ]
+        },
+        {
+          "code": "defense_3",
+          "name": "Heilkundige",
+          "label": "Heiltempo",
+          "bonus": 0.02,
+          "stat": "healing_speed",
+          "description": "Heilgeschwindigkeit für verwundete Truppen im Hospital.",
+          "icon": "assets/art/items/harvest-idol.png",
+          "tier": 1,
+          "column": 2,
+          "max_level": 5,
+          "required_points": 5,
+          "required_level": 1,
+          "parents": [
+            "defense_1"
+          ]
+        },
+        {
+          "code": "defense_4",
+          "name": "Ausgebaute Lazarette",
+          "label": "Hospitalkapazität",
+          "bonus": 0.03,
+          "stat": "hospital_capacity",
+          "description": "Zusätzlicher Platz für Verwundete; überschüssige Truppen werden nicht rückwirkend gerettet.",
+          "icon": "assets/art/items/stone-amulet.png",
+          "tier": 2,
+          "column": 0,
+          "max_level": 5,
+          "required_points": 15,
+          "required_level": 1,
+          "parents": [
+            "defense_2"
+          ]
+        },
+        {
+          "code": "defense_5",
+          "name": "Wiederaufbau",
+          "label": "Mauerregeneration",
+          "bonus": 0.03,
+          "stat": "talent_wall_recovery",
+          "description": "Beschleunigt die natürliche Regeneration der Stadtmauer außerhalb laufender Gefechte.",
+          "icon": "assets/art/items/builders-hammer.png",
+          "tier": 2,
+          "column": 2,
+          "max_level": 5,
+          "required_points": 15,
+          "required_level": 1,
+          "parents": [
+            "defense_3"
+          ]
+        },
+        {
+          "code": "defense_6",
+          "name": "Verbundene Schilde",
+          "label": "Verteidigung im Stadt-PvP",
+          "bonus": 0.01,
+          "stat": "talent_city_defense",
+          "description": "Zusätzliche Verteidigung deiner eigenen Truppen bei der Stadtverteidigung.",
+          "icon": "assets/art/items/dragon-shield.png",
+          "tier": 3,
+          "column": 0,
+          "max_level": 5,
+          "required_points": 25,
+          "required_level": 1,
+          "parents": [
+            "defense_4"
+          ]
+        },
+        {
+          "code": "defense_7",
+          "name": "Heimvorteil",
+          "label": "Angriff bei Stadtverteidigung",
+          "bonus": 0.01,
+          "stat": "talent_city_defender_attack",
+          "description": "Angriff deiner eigenen Truppen, während sie eine Stadt gegen Spieler verteidigen.",
+          "icon": "assets/art/items/warlord-banner.png",
+          "tier": 3,
+          "column": 2,
+          "max_level": 5,
+          "required_points": 25,
+          "required_level": 1,
+          "parents": [
+            "defense_5"
+          ]
+        },
+        {
+          "code": "defense_8",
+          "name": "Bastion",
+          "label": "Eingehender Stadt-PvP-Schaden",
+          "bonus": -0.01,
+          "stat": "talent_city_damage_taken",
+          "description": "Abschlusstalent: weniger eingehender Schaden für deine eigenen Truppen bei der Stadtverteidigung. Talentmaximum: 5 % Reduktion.",
+          "icon": "assets/art/items/dragon-shield.png",
+          "tier": 4,
+          "column": 1,
+          "max_level": 5,
+          "required_points": 35,
+          "required_level": 40,
+          "parents": [
+            "defense_6",
+            "defense_7"
+          ]
+        }
+      ]
+    },
+    {
+      "code": "gather",
+      "name": "Sammler",
+      "scope": "Sammeln, Produktion & Ausbau des Dorfes",
+      "icon": "assets/art/items/woodcutter.png",
+      "nodes": [
+        {
+          "code": "gather_0",
+          "name": "Erntemeister",
+          "label": "Sammeltempo",
+          "bonus": 0.02,
+          "stat": "gathering_speed",
+          "description": "Sammelgeschwindigkeit an Rohstofffeldern. Erzeugt keine zusätzlichen Ressourcen im Feld.",
+          "icon": "assets/art/items/woodcutter.png",
+          "tier": 0,
+          "column": 0,
+          "max_level": 5,
+          "required_points": 0,
+          "required_level": 1,
+          "parents": []
+        },
+        {
+          "code": "gather_1",
+          "name": "Vorratswirtschaft",
+          "label": "Dorfproduktion",
+          "bonus": 0.02,
+          "stat": "resource_production",
+          "description": "Produktion von Nahrung, Holz, Stein und Gold in deiner Stadt.",
+          "icon": "assets/art/items/harvest-idol.png",
+          "tier": 0,
+          "column": 2,
+          "max_level": 5,
+          "required_points": 0,
+          "required_level": 1,
+          "parents": []
+        },
+        {
+          "code": "gather_2",
+          "name": "Traglast",
+          "label": "Tragfähigkeit",
+          "bonus": 0.03,
+          "stat": "talent_carry",
+          "description": "Ressourcen, die deine Sammeltruppen pro Reise transportieren können.",
+          "icon": "assets/art/items/stone-amulet.png",
+          "tier": 1,
+          "column": 0,
+          "max_level": 5,
+          "required_points": 5,
+          "required_level": 1,
+          "parents": [
+            "gather_0"
+          ]
+        },
+        {
+          "code": "gather_3",
+          "name": "Bauleitung",
+          "label": "Bautempo",
+          "bonus": 0.02,
+          "stat": "talent_construction_speed",
+          "description": "Geschwindigkeit neuer Bauaufträge in deiner Stadt.",
+          "icon": "assets/art/items/builders-hammer.png",
+          "tier": 1,
+          "column": 2,
+          "max_level": 5,
+          "required_points": 5,
+          "required_level": 1,
+          "parents": [
+            "gather_1"
+          ]
+        },
+        {
+          "code": "gather_4",
+          "name": "Pfadkenntnis",
+          "label": "Tempo von Sammelmärschen",
+          "bonus": 0.02,
+          "stat": "talent_gather_march",
+          "description": "Tempo auf Hin- und Rückwegen von Sammelaufträgen.",
+          "icon": "assets/art/items/cavalry-spurs.png",
+          "tier": 2,
+          "column": 0,
+          "max_level": 5,
+          "required_points": 15,
+          "required_level": 1,
+          "parents": [
+            "gather_2"
+          ]
+        },
+        {
+          "code": "gather_5",
+          "name": "Gelehrtenrat",
+          "label": "Forschungstempo",
+          "bonus": 0.02,
+          "stat": "talent_research_speed",
+          "description": "Geschwindigkeit neuer Forschungsaufträge deiner Stadt.",
+          "icon": "assets/art/items/archmage-staff.png",
+          "tier": 2,
+          "column": 2,
+          "max_level": 5,
+          "required_points": 15,
+          "required_level": 1,
+          "parents": [
+            "gather_3"
+          ]
+        },
+        {
+          "code": "gather_6",
+          "name": "Feldarbeit",
+          "label": "Sammeltempo",
+          "bonus": 0.02,
+          "stat": "gathering_speed",
+          "description": "Zusätzliche Sammelgeschwindigkeit an Rohstofffeldern.",
+          "icon": "assets/art/items/woodcutter.png",
+          "tier": 3,
+          "column": 0,
+          "max_level": 5,
+          "required_points": 25,
+          "required_level": 1,
+          "parents": [
+            "gather_4"
+          ]
+        },
+        {
+          "code": "gather_7",
+          "name": "Planvolle Entwicklung",
+          "label": "Dorfproduktion",
+          "bonus": 0.02,
+          "stat": "resource_production",
+          "description": "Zusätzliche Produktion von Nahrung, Holz, Stein und Gold.",
+          "icon": "assets/art/items/harvest-idol.png",
+          "tier": 3,
+          "column": 2,
+          "max_level": 5,
+          "required_points": 25,
+          "required_level": 1,
+          "parents": [
+            "gather_5"
+          ]
+        },
+        {
+          "code": "gather_8",
+          "name": "Karawanenmeister",
+          "label": "Sammeltempo",
+          "bonus": 0.02,
+          "stat": "gathering_speed",
+          "description": "Abschlusstalent: mehr Sammeltempo. Bei Rang 5 zusätzlich ein Marschplatz ausschließlich zum Sammeln; keine Angriffe oder Rallys.",
+          "icon": "assets/art/items/drillmasters-horn.png",
+          "tier": 4,
+          "column": 1,
+          "max_level": 5,
+          "required_points": 35,
+          "required_level": 40,
+          "parents": [
+            "gather_6",
+            "gather_7"
+          ]
+        }
+      ]
+    },
+    {
+      "code": "hunter",
+      "name": "Jäger",
+      "scope": "Monster & gemeinsame Bosskämpfe",
+      "icon": "assets/art/items/hunters-bow.png",
+      "nodes": [
+        {
+          "code": "hunter_0",
+          "name": "Bestienkunde",
+          "label": "Angriff gegen Monster",
+          "bonus": 0.02,
+          "stat": "vs_monster_attack",
+          "description": "Angriff deiner eigenen Truppen gegen Solo-Monster und PvE-Bosse.",
+          "icon": "assets/art/items/hunters-bow.png",
+          "tier": 0,
+          "column": 0,
+          "max_level": 5,
+          "required_points": 0,
+          "required_level": 1,
+          "parents": []
+        },
+        {
+          "code": "hunter_1",
+          "name": "Fährtenleser",
+          "label": "Jagdmarschtempo",
+          "bonus": 0.03,
+          "stat": "talent_hunt_march",
+          "description": "Tempo auf Hin- und Rückwegen von Monsterangriffen und PvE-Rallys.",
+          "icon": "assets/art/items/feather-cap.png",
+          "tier": 0,
+          "column": 2,
+          "max_level": 5,
+          "required_points": 0,
+          "required_level": 1,
+          "parents": []
+        },
+        {
+          "code": "hunter_2",
+          "name": "Rüstzeug",
+          "label": "LP gegen Monster",
+          "bonus": 0.01,
+          "stat": "talent_monster_hp",
+          "description": "Lebenspunkte deiner eigenen Truppen beim Kampf gegen Monster auf der Weltkarte.",
+          "icon": "assets/art/items/serpent-scale.png",
+          "tier": 1,
+          "column": 0,
+          "max_level": 5,
+          "required_points": 5,
+          "required_level": 1,
+          "parents": [
+            "hunter_0"
+          ]
+        },
+        {
+          "code": "hunter_3",
+          "name": "Großwildjagd",
+          "label": "Eigener PvE-Rally-Angriff",
+          "bonus": 0.02,
+          "stat": "talent_boss_attack",
+          "description": "Zusätzlicher Angriff deiner eigenen Truppen in PvE-Rallys und kooperativen Bosskämpfen.",
+          "icon": "assets/art/items/phoenix-bow.png",
+          "tier": 1,
+          "column": 2,
+          "max_level": 5,
+          "required_points": 5,
+          "required_level": 1,
+          "parents": [
+            "hunter_1"
+          ]
+        },
+        {
+          "code": "hunter_4",
+          "name": "Fellhändler",
+          "label": "Gewöhnliche Monsterbeute",
+          "bonus": 0.02,
+          "stat": "talent_monster_loot",
+          "description": "Mehr gewöhnliche Ressourcen aus deiner eigenen PvE-Beute. Keine Edelsteine, Fragmente, Jagd-XP oder Eventpunkte.",
+          "icon": "assets/art/items/oracles-eye.png",
+          "tier": 2,
+          "column": 0,
+          "max_level": 5,
+          "required_points": 15,
+          "required_level": 1,
+          "parents": [
+            "hunter_2"
+          ]
+        },
+        {
+          "code": "hunter_5",
+          "name": "Jagdausdauer",
+          "label": "AP-Regeneration",
+          "bonus": 0.02,
+          "stat": "talent_ap_regen",
+          "description": "Schnellere zeitbasierte Regeneration von Aktionspunkten. Der Bonus verkürzt das Regenerationsintervall; jeder Rang wirkt auch bei kleinen AP-Mengen.",
+          "icon": "assets/art/items/blood-moon-totem.png",
+          "tier": 2,
+          "column": 2,
+          "max_level": 5,
+          "required_points": 15,
+          "required_level": 1,
+          "parents": [
+            "hunter_3"
+          ]
+        },
+        {
+          "code": "hunter_6",
+          "name": "Monsterbrecher",
+          "label": "Angriff gegen Monster",
+          "bonus": 0.02,
+          "stat": "vs_monster_attack",
+          "description": "Zusätzlicher Angriff deiner eigenen Truppen gegen Monster und PvE-Bosse.",
+          "icon": "assets/art/items/shadow-blade.png",
+          "tier": 3,
+          "column": 0,
+          "max_level": 5,
+          "required_points": 25,
+          "required_level": 1,
+          "parents": [
+            "hunter_4"
+          ]
+        },
+        {
+          "code": "hunter_7",
+          "name": "Rudeljäger",
+          "label": "Eigene Feldzugskapazität",
+          "bonus": 0.02,
+          "stat": "talent_expedition_capacity",
+          "description": "Mehr Platz für deine eigenen Truppen je Armee in gemeinsamen Feldzügen. Kein zusätzlicher Marschplatz.",
+          "icon": "assets/art/items/warlord-banner.png",
+          "tier": 3,
+          "column": 2,
+          "max_level": 5,
+          "required_points": 25,
+          "required_level": 1,
+          "parents": [
+            "hunter_5"
+          ]
+        },
+        {
+          "code": "hunter_8",
+          "name": "Meisterjäger",
+          "label": "Angriff gegen Monster",
+          "bonus": 0.02,
+          "stat": "vs_monster_attack",
+          "description": "Abschlusstalent: zusätzlicher Angriff gegen Monster und PvE-Bosse. Kein XP-Multiplikator.",
+          "icon": "assets/art/items/hunters-bow.png",
+          "tier": 4,
+          "column": 1,
+          "max_level": 5,
+          "required_points": 35,
+          "required_level": 40,
+          "parents": [
+            "hunter_6",
+            "hunter_7"
+          ]
+        }
+      ]
+    }
+  ]
+}

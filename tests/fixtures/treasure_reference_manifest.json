@@ -1,0 +1,618 @@
+[
+  {
+    "treasure_code": 60100006,
+    "source_reference": "LOK/Treasures/acher hat.png",
+    "icon": "treasures/acher-hat.png",
+    "sha256": "b602a2dff2354e5b6db9c9ab73bed5dc80e2e6315d04adce1fc58cec459dc004",
+    "grade": "normal",
+    "existing_code": true
+  },
+  {
+    "treasure_code": 60300101,
+    "source_reference": "LOK/Treasures/amulet of life.png",
+    "icon": "treasures/amulet-of-life.png",
+    "sha256": "997fe90403e4aa0f5e90f890e289504f864f8cff7ff08ac3b6b52be8dc3c53c2",
+    "grade": "epic",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60500101,
+    "source_reference": "LOK/Treasures/Ancient Bracelet.png",
+    "icon": "treasures/ancient-bracelet.png",
+    "sha256": "92199d10e81cd53c7c05acf5547e7cffc7bd61ec5f8b2c9c563d4c77dae76136",
+    "grade": "mythic",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60100002,
+    "source_reference": "LOK/Treasures/axe.png",
+    "icon": "treasures/axe.png",
+    "sha256": "2283cab6b4b7178c496edc4f20b3f076406ec117c38c641de97abf97a41df66d",
+    "grade": "normal",
+    "existing_code": true
+  },
+  {
+    "treasure_code": 60200101,
+    "source_reference": "LOK/Treasures/black horse.png",
+    "icon": "treasures/black-horse.png",
+    "sha256": "63b0b31382b9a35df6ace8c6aa55edef016092eb1a445efd20ec21eac3fd228e",
+    "grade": "rare",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60200102,
+    "source_reference": "LOK/Treasures/blessed branches.png",
+    "icon": "treasures/blessed-branches.png",
+    "sha256": "67e818d286d66ddc0bcb500c72e2f8e67a1f1e81d455b2c4ae5ad177210629e6",
+    "grade": "rare",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60400101,
+    "source_reference": "LOK/Treasures/blessing of goddess.png",
+    "icon": "treasures/blessing-of-goddess.png",
+    "sha256": "dd612c2c4aa9a4f02a2226d81926d9c4652798994eee4af91aa99aac34192436",
+    "grade": "legendary",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60300102,
+    "source_reference": "LOK/Treasures/bone armor.png",
+    "icon": "treasures/bone-armor.png",
+    "sha256": "c2c2318f7ed115b198e6943acfb33ca34a2787e8cb029f064ce32188fc48654c",
+    "grade": "epic",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60300001,
+    "source_reference": "LOK/Treasures/celestial shield.png",
+    "icon": "treasures/celestial-shield.png",
+    "sha256": "920a5f67b280045ed977bc812c29a7ca175b897639c1f6e3f58e5fdc85ddee97",
+    "grade": "legendary",
+    "existing_code": true
+  },
+  {
+    "treasure_code": 60100003,
+    "source_reference": "LOK/Treasures/chisel.png",
+    "icon": "treasures/chisel.png",
+    "sha256": "45d4137638d0f00999141ba2ccb0c3ca9af2e8fa1e20f7df800cb77ccbffc66d",
+    "grade": "normal",
+    "existing_code": true
+  },
+  {
+    "treasure_code": 60300004,
+    "source_reference": "LOK/Treasures/corrupted staff.png",
+    "icon": "treasures/corrupted-staff.png",
+    "sha256": "995858e4e2603a8e64b741bc5a6805c12bc5bc4124bbe2cd540fede2e77f19cf",
+    "grade": "epic",
+    "existing_code": true
+  },
+  {
+    "treasure_code": 60400102,
+    "source_reference": "LOK/Treasures/crystal flask.png",
+    "icon": "treasures/crystal-flask.png",
+    "sha256": "5ea33833856c2f994807acd8329306ad4ebfa33a2fb60587b7f8c17732f5cbbe",
+    "grade": "legendary",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60300003,
+    "source_reference": "LOK/Treasures/cursed sword.png",
+    "icon": "treasures/cursed-sword.png",
+    "sha256": "806ccc441c58495c2ea3599bfb7cdafa75a1e9f6af1b84128cf86f49cb983012",
+    "grade": "epic",
+    "existing_code": true
+  },
+  {
+    "treasure_code": 60400004,
+    "source_reference": "LOK/Treasures/dark crystal.png",
+    "icon": "treasures/dark-crystal.png",
+    "sha256": "0713ba44d09392c3279b8c6361fb548884a57ccff9e93a52968053ef56a7c4ad",
+    "grade": "epic",
+    "existing_code": true
+  },
+  {
+    "treasure_code": 60500102,
+    "source_reference": "LOK/Treasures/Demonbane.png",
+    "icon": "treasures/demonbane.png",
+    "sha256": "a6378106e8592b676ddcfff7643eba61460ca56344804e3b77e908aca3509d12",
+    "grade": "mythic",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60300103,
+    "source_reference": "LOK/Treasures/dragon fang.png",
+    "icon": "treasures/dragon-fang.png",
+    "sha256": "c75727915397f70a8a75aa492ad2755f8ffe6fa97233bf31f6f62e0f8c0d5eea",
+    "grade": "epic",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60500002,
+    "source_reference": "LOK/Treasures/dragon scale mail.png",
+    "icon": "treasures/dragon-scale-mail.png",
+    "sha256": "f69ba0a0fbaf88d71e93a62a3b3e22356d27dfa301ce00f5669f553331b3cdf3",
+    "grade": "epic",
+    "existing_code": true
+  },
+  {
+    "treasure_code": 60400103,
+    "source_reference": "LOK/Treasures/Dragon Slayer.png",
+    "icon": "treasures/dragon-slayer.png",
+    "sha256": "2c45b8e5d9fc88206000323e0b986d508156c99ed41bb2a9303f3781db285b83",
+    "grade": "legendary",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60300104,
+    "source_reference": "LOK/Treasures/dragon soul.png",
+    "icon": "treasures/dragon-soul.png",
+    "sha256": "224e2766405ede691e95f87da93bf7a9ede0883e8db7026105e3d8329949f42a",
+    "grade": "epic",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60300002,
+    "source_reference": "LOK/Treasures/Dragon Tooth Bow.png",
+    "icon": "treasures/dragon-tooth-bow.png",
+    "sha256": "845ea39256065db29b37886c52e527e7988131bd6c6721d61116c46efc908e90",
+    "grade": "legendary",
+    "existing_code": true
+  },
+  {
+    "treasure_code": 60300105,
+    "source_reference": "LOK/Treasures/Flame flower.png",
+    "icon": "treasures/flame-flower.png",
+    "sha256": "baee0f9fb5acb412f0658886f4ca136a88be9ad222e1d53f5652a58d769ebef0",
+    "grade": "epic",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60400104,
+    "source_reference": "LOK/Treasures/force of nature.png",
+    "icon": "treasures/force-of-nature.png",
+    "sha256": "e913318d6c8b1141346f2e12a665679b4be38cfa73d43a7d42f55f8ac6d7ed12",
+    "grade": "legendary",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60300106,
+    "source_reference": "LOK/Treasures/fragment of golem.png",
+    "icon": "treasures/fragment-of-golem.png",
+    "sha256": "54adb51c40c3efb73d30fd5b65baaee72b44d1ad6578f8ce951296321f09e9d8",
+    "grade": "epic",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60300107,
+    "source_reference": "LOK/Treasures/gem of vital.png",
+    "icon": "treasures/gem-of-vital.png",
+    "sha256": "490070cb582a7f30b0bde53428a87c4beeb45072698817f650341381fc768b5e",
+    "grade": "epic",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60300108,
+    "source_reference": "LOK/Treasures/gift of dwarf.png",
+    "icon": "treasures/gift-of-dwarf.png",
+    "sha256": "2af3ef5e1d2c2c73744e6944957d71452ca68355c7e8c2cc762a89f74fd0b847",
+    "grade": "epic",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60300109,
+    "source_reference": "LOK/Treasures/golden axe.png",
+    "icon": "treasures/golden-axe.png",
+    "sha256": "657ec9703ffd7f96ca67eac3fa9bf5477f67fc54645b269df8add84c1f39a51d",
+    "grade": "epic",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60300006,
+    "source_reference": "LOK/Treasures/golden grain.png",
+    "icon": "treasures/golden-grain.png",
+    "sha256": "636d0e937365be763a562eba5874c1273836cdfc5e1bc03a9812aa4dfe0114f4",
+    "grade": "epic",
+    "existing_code": true
+  },
+  {
+    "treasure_code": 60300110,
+    "source_reference": "LOK/Treasures/golden hammer.png",
+    "icon": "treasures/golden-hammer.png",
+    "sha256": "3728d3ea19723d53f23ffdf666d58316536d45e59780a8e9eeb0e058267e3318",
+    "grade": "epic",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60300111,
+    "source_reference": "LOK/Treasures/golden pick.png",
+    "icon": "treasures/golden-pick.png",
+    "sha256": "668cfb8887dde9afb39a6428e5ac57e049198cff2c87859146bdd6988be95f4b",
+    "grade": "epic",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60300112,
+    "source_reference": "LOK/Treasures/hammer of destruction.png",
+    "icon": "treasures/hammer-of-destruction.png",
+    "sha256": "adcbb6f0e1322f20fa475f2cc6a26b43fccb6a51156933f4b1504f30c3b881f9",
+    "grade": "epic",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60100101,
+    "source_reference": "LOK/Treasures/hammer.png",
+    "icon": "treasures/hammer.png",
+    "sha256": "bd36b213247b213f3263485da3cf4a606be4ef176a1f6f77e26a2a5ac221b49d",
+    "grade": "normal",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60400001,
+    "source_reference": "LOK/Treasures/hand of vampire.png",
+    "icon": "treasures/hand-of-vampire.png",
+    "sha256": "f5455eda8a0090009ec0b887e48bd3eb537aee95cb57d8bffe9b007f0344cac7",
+    "grade": "epic",
+    "existing_code": true
+  },
+  {
+    "treasure_code": 60200103,
+    "source_reference": "LOK/Treasures/healing potion.png",
+    "icon": "treasures/healing-potion.png",
+    "sha256": "1e413b74fd02b836fbbe4489c6ffbf66d596911249f0a19f48946008aeedb2da",
+    "grade": "rare",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60400105,
+    "source_reference": "LOK/Treasures/heart of star.png",
+    "icon": "treasures/heart-of-star.png",
+    "sha256": "75fbfa63a2dd0942bf052fbc25aafd9dc7696fc8887d4f7ec9f87bd0198db965",
+    "grade": "legendary",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60400106,
+    "source_reference": "LOK/Treasures/heartseeker.png",
+    "icon": "treasures/heartseeker.png",
+    "sha256": "c29cdba16f12f379661d46f4750de6b99cbf95577cd00fe92802bf7afbc0d07f",
+    "grade": "legendary",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60400107,
+    "source_reference": "LOK/Treasures/heavenly berry.png",
+    "icon": "treasures/heavenly-berry.png",
+    "sha256": "491760072c0782e0f877b892a07d971c43e155cf95948c9140c0307f33cddfc6",
+    "grade": "legendary",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60400108,
+    "source_reference": "LOK/Treasures/heroic spirit.png",
+    "icon": "treasures/heroic-spirit.png",
+    "sha256": "153350e2df9e60c7aa806baaf33bf6f660425e6270d2cc6cf64481779052c368",
+    "grade": "legendary",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60400109,
+    "source_reference": "LOK/Treasures/jewel of harmony.png",
+    "icon": "treasures/jewel-of-harmony.png",
+    "sha256": "153b21daaceeb23fe2806dd0181cccb9fce962b330b480e6902981ac15446b69",
+    "grade": "legendary",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60200001,
+    "source_reference": "LOK/Treasures/kite shield.png",
+    "icon": "treasures/kite-shield.png",
+    "sha256": "c70c636da32715fc55bfde50f1311e05a91a527f5fe2ade8a125d59ca06fe29a",
+    "grade": "rare",
+    "existing_code": true
+  },
+  {
+    "treasure_code": 60200002,
+    "source_reference": "LOK/Treasures/long bow.png",
+    "icon": "treasures/long-bow.png",
+    "sha256": "febf9d15f4eee3f0fae982d8c635506bc2287659971ea5f623a9a760106c3381",
+    "grade": "rare",
+    "existing_code": true
+  },
+  {
+    "treasure_code": 60200104,
+    "source_reference": "LOK/Treasures/magic chisel.png",
+    "icon": "treasures/magic-chisel.png",
+    "sha256": "3afda8576bb97b2772c1ed59abc6a2a4ccab618aa4cb61c6c6ddf397471a33f1",
+    "grade": "rare",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60200105,
+    "source_reference": "LOK/Treasures/magic pick.png",
+    "icon": "treasures/magic-pick.png",
+    "sha256": "fedebdf8e77aef377ad6844232c5d8ebafd19639ea57c7fac1db42c40a98a930",
+    "grade": "rare",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60200106,
+    "source_reference": "LOK/Treasures/magic plow.png",
+    "icon": "treasures/magic-plow.png",
+    "sha256": "46d7ab74014102a350a9231f35b174e354d25070c9dc75f2cadcbfd5a71f52e6",
+    "grade": "rare",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60200107,
+    "source_reference": "LOK/Treasures/magic saw.png",
+    "icon": "treasures/magic-saw.png",
+    "sha256": "0c6b10abe162a23eb0d5c51a9b9a93ca555ebbf7c425815372999d2bedd3b584",
+    "grade": "rare",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60100001,
+    "source_reference": "LOK/Treasures/manure.png",
+    "icon": "treasures/manure.png",
+    "sha256": "9844dd6978a835a40206d5e95d0595d69411a2e1f58a49066aa61a221e399100",
+    "grade": "normal",
+    "existing_code": true
+  },
+  {
+    "treasure_code": 60300113,
+    "source_reference": "LOK/Treasures/mark of warrior.png",
+    "icon": "treasures/mark-of-warrior.png",
+    "sha256": "beb804abd788c3bb794395b2c5acf8bc5b50b2735e9f89fc4e63c6d35da2d2ed",
+    "grade": "epic",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60400003,
+    "source_reference": "LOK/Treasures/Mirror of Truth.png",
+    "icon": "treasures/mirror-of-truth.png",
+    "sha256": "2b803be23c53c8376f3639f37ce45bde093bdbd6aa89ab0d898328e8e8804a7e",
+    "grade": "mythic",
+    "existing_code": true
+  },
+  {
+    "treasure_code": 60300114,
+    "source_reference": "LOK/Treasures/obsidian plate.png",
+    "icon": "treasures/obsidian-plate.png",
+    "sha256": "39fbf9771d61ff61fe7c987e415fb11f5cba1d0f472953a936498133c056350b",
+    "grade": "epic",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60300115,
+    "source_reference": "LOK/Treasures/orb of portal.png",
+    "icon": "treasures/orb-of-portal.png",
+    "sha256": "c9492b5cc7d29f5dfc8e9204d51afc5c2cc4ce954ffa51a7e792d82514aab7ac",
+    "grade": "epic",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60500103,
+    "source_reference": "LOK/Treasures/Orichalcum Dagger.png",
+    "icon": "treasures/orichalcum-dagger.png",
+    "sha256": "cb09b5cfa9d911e31b8e9ae61f702ae34d0a818a98990328cde37d748b784812",
+    "grade": "mythic",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60300116,
+    "source_reference": "LOK/Treasures/pendant of goddess.png",
+    "icon": "treasures/pendant-of-goddess.png",
+    "sha256": "e33420354ddd16a2b52136ed1457446ea5509284b47be0d01443b7f2609667c9",
+    "grade": "epic",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60400110,
+    "source_reference": "LOK/Treasures/perdition's blade.png",
+    "icon": "treasures/perdition-s-blade.png",
+    "sha256": "31f2c5ff63af41c63e7351e1a7dd2ffd4bb7827717130fac1530bd942fe13c1a",
+    "grade": "legendary",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60100102,
+    "source_reference": "LOK/Treasures/pick.png",
+    "icon": "treasures/pick.png",
+    "sha256": "a1e4dfc8244ca7f63c3c770badcd2ff2bfcddbb7530849ba664031790a259f6f",
+    "grade": "normal",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60100103,
+    "source_reference": "LOK/Treasures/plow.png",
+    "icon": "treasures/plow.png",
+    "sha256": "89c1546f64f803a2c991127f237d5be737e77eee4ff2cea44cc4c653b26066f2",
+    "grade": "normal",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60200108,
+    "source_reference": "LOK/Treasures/potion of strength.png",
+    "icon": "treasures/potion-of-strength.png",
+    "sha256": "415798ee1b7b69fabfeec96bb0220ee8cfd6cc1d04b8b18ec26ebd4ee1679588",
+    "grade": "rare",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60200109,
+    "source_reference": "LOK/Treasures/potion of swiftness.png",
+    "icon": "treasures/potion-of-swiftness.png",
+    "sha256": "38662527df9a11a1d566f402e73bfb45bd1887f06c1fb308a07eda492263a1d2",
+    "grade": "rare",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60200110,
+    "source_reference": "LOK/Treasures/potion of toughness.png",
+    "icon": "treasures/potion-of-toughness.png",
+    "sha256": "3ca9f4953ecdb2702971ba577f1ca097af6182717d4dae9c2e2aa2e177a8821c",
+    "grade": "rare",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60200003,
+    "source_reference": "LOK/Treasures/saddle.png",
+    "icon": "treasures/saddle.png",
+    "sha256": "d17d4ae6f72e6b61e56034bdf0a2dc53d3b09f9d9643869d8a046c28efc69ebf",
+    "grade": "normal",
+    "existing_code": true
+  },
+  {
+    "treasure_code": 60300117,
+    "source_reference": "LOK/Treasures/sage's hat.png",
+    "icon": "treasures/sage-s-hat.png",
+    "sha256": "a9de63dd9ccb0966bf8014c055b652eb042b4e9b76b9e484402d5e9818134f03",
+    "grade": "epic",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60500104,
+    "source_reference": "LOK/Treasures/Scepter of Judgement.png",
+    "icon": "treasures/scepter-of-judgement.png",
+    "sha256": "dadd3232edfc50da6ed6906985f857551ba8b4ce8bd69b070a0165ca0990f82a",
+    "grade": "mythic",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60300118,
+    "source_reference": "LOK/Treasures/scroll of drain.png",
+    "icon": "treasures/scroll-of-drain.png",
+    "sha256": "8dbe2f25a860c4e56e3684f1d2b49eba296b2e0808b020bfeb8fced87b25c2c1",
+    "grade": "epic",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60400111,
+    "source_reference": "LOK/Treasures/sergeant's whip.png",
+    "icon": "treasures/sergeant-s-whip.png",
+    "sha256": "3504687e26d5de51bb5d5bac1fb347445ec17ffafefcd8240fce3e81b1031e5b",
+    "grade": "legendary",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60300119,
+    "source_reference": "LOK/Treasures/shining arrow.png",
+    "icon": "treasures/shining-arrow.png",
+    "sha256": "2e7d3c8dfd025b968070d200b958b56a8328643d38419f2a30bb9584931e3046",
+    "grade": "epic",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60100104,
+    "source_reference": "LOK/Treasures/shot sword.png",
+    "icon": "treasures/shot-sword.png",
+    "sha256": "2810c941cbbe230f05ebd49f2c73e9e8b91d907385280a1e905d5abdd72d6c42",
+    "grade": "normal",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60100105,
+    "source_reference": "LOK/Treasures/shovel.png",
+    "icon": "treasures/shovel.png",
+    "sha256": "e9bc80d204cf677229e86671fa797ca9341fcc92795de7c781dab5fe273d1ca8",
+    "grade": "normal",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60200111,
+    "source_reference": "LOK/Treasures/silver apple.png",
+    "icon": "treasures/silver-apple.png",
+    "sha256": "414139d1037c2a2efef955352d0da8d510efdca66c2960d69b52c7e2fbb0985c",
+    "grade": "rare",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60100106,
+    "source_reference": "LOK/Treasures/spear.png",
+    "icon": "treasures/spear.png",
+    "sha256": "329b2da36fc8f910ce4f4ae8f1e6763bb2e369230cdfe871549e5f2d5dc05488",
+    "grade": "normal",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60200004,
+    "source_reference": "LOK/Treasures/steel hammer.png",
+    "icon": "treasures/steel-hammer.png",
+    "sha256": "6d5fe5905d2c57155166a475027cf98c5db3a50a82c4517ee1c748b1d1e5e55f",
+    "grade": "rare",
+    "existing_code": true
+  },
+  {
+    "treasure_code": 60500105,
+    "source_reference": "LOK/Treasures/Stormbreaker.png",
+    "icon": "treasures/stormbreaker.png",
+    "sha256": "568ffcf5621f1a5b335d0c4a21884eabbf8506d0c13bfe81aae55d85241e4198",
+    "grade": "mythic",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60400112,
+    "source_reference": "LOK/Treasures/touch of master.png",
+    "icon": "treasures/touch-of-master.png",
+    "sha256": "bac22519d9095cc7dadb2531ba2d4e1a31297a2bc26dde203c13804a707ad6f5",
+    "grade": "legendary",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60300005,
+    "source_reference": "LOK/Treasures/war flag.png",
+    "icon": "treasures/war-flag.png",
+    "sha256": "4bc419f088109caff336204541ce4a7a661c39ba7e92562b27aea19962b41d18",
+    "grade": "rare",
+    "existing_code": true
+  },
+  {
+    "treasure_code": 60200006,
+    "source_reference": "LOK/Treasures/war horn.png",
+    "icon": "treasures/war-horn.png",
+    "sha256": "59fd06c3bdb7dc6fc5e87471550c5bb91562e173153721ddba4f61bbf2908559",
+    "grade": "legendary",
+    "existing_code": true
+  },
+  {
+    "treasure_code": 60300120,
+    "source_reference": "LOK/Treasures/war pike.png",
+    "icon": "treasures/war-pike.png",
+    "sha256": "42d399930b207d0c1e67d00114c60d5d79194d50bc8da301053cf3e4d9057b5b",
+    "grade": "epic",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60100107,
+    "source_reference": "LOK/Treasures/water bucket.png",
+    "icon": "treasures/water-bucket.png",
+    "sha256": "153783937a237f14a39280e400e77767d41472665c4b0b1e3575e299e1c11fb8",
+    "grade": "normal",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60400113,
+    "source_reference": "LOK/Treasures/wing of valor.png",
+    "icon": "treasures/wing-of-valor.png",
+    "sha256": "f2df118acd5109b48f14cd74255851c237586fa6ab1c449d59baadc66384ceee",
+    "grade": "legendary",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60100108,
+    "source_reference": "LOK/Treasures/wooden bow.png",
+    "icon": "treasures/wooden-bow.png",
+    "sha256": "b15c7f2ca4b4cf34e3402c49e9e53611e843cd63d5175fcd68d1d7c764770ba8",
+    "grade": "normal",
+    "existing_code": false
+  },
+  {
+    "treasure_code": 60100109,
+    "source_reference": "LOK/Treasures/wooden shield.png",
+    "icon": "treasures/wooden-shield.png",
+    "sha256": "5b74f479c189dba1c0a2797cf69f7cb124bc9aa04b68be4a4e388177d6a4eaba",
+    "grade": "normal",
+    "existing_code": false
+  }
+]

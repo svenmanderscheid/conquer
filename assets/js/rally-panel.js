@@ -1,0 +1,24 @@
+window.ConquerRallies = function({api,esc,fmt,date,duration,openDialog,action,toast,marchPanel,getState}) {
+    let rallies=[],current=null,participants=[],page=0,memberPage=0;
+    const labels={gathering:'Truppen sammeln',marching:'Auf dem Marsch',returning:'Rückkehr',complete:'Abgeschlossen',completed:'Abgeschlossen',cancelled:'Abgebrochen'};
+    const button=(name,act,id='',cls='secondary')=>`<button class="button ${cls}" data-action="${act}" data-id="${id}">${name}</button>`;
+    function pager(index,total,act){return `<nav class="panel-pagination"><button class="button secondary" data-action="${act}" data-id="${Math.max(0,index-1)}" aria-label="Vorherige Rallyseite" ${index===0?'disabled':''}>‹</button><span class="panel-page-status">Seite ${index+1} / ${total}</span><button class="button secondary" data-action="${act}" data-id="${Math.min(total-1,index+1)}" aria-label="Nächste Rallyseite" ${index+1===total?'disabled':''}>›</button></nav>`;}
+    async function list(){try{const result=await api('rally/list');rallies=result.rallies||[];page=0;renderList();}catch(e){toast(e.message);}}
+    function renderList(){const size=innerHeight<540?1:5,total=Math.max(1,Math.ceil(rallies.length/size));page=Math.min(page,total-1);openDialog(`<h2>Allianz-Rallies</h2><div class="window-list">${rallies.length?rallies.slice(page*size,(page+1)*size).map(r=>`<div class="report"><span><strong>${esc(r.leader_username||r.leader_name)} → ${esc(r.target_username||r.target_name)}</strong><small>${esc(labels[r.status]||r.status)} · X ${r.target_x} / Y ${r.target_y}</small></span>${button('Öffnen','rally-detail',r.id)}</div>`).join(''):'<div class="empty"><h3>Keine aktive Rally</h3><p>Wähle auf der Weltkarte ein Rally-Monster oder ein fremdes Dorf und starte eine Rally für deine Allianz.</p></div>'}${pager(page,total,'rally-list-page')}</div>`);}
+    async function detail(id){try{const result=await api('rally/'+Number(id));current=result.rally;participants=result.participants||[];if(!participants.some(p=>Number(p.player_id)===Number(current.leader_player_id)))participants.unshift({player_id:current.leader_player_id,username:current.leader_name||current.leader_username,troops:current.troops||{}});memberPage=0;renderDetail();}catch(e){toast(e.message);}}
+    function renderDetail(){
+        const r=current;if(!r)return;const self=Number(getState().player.id||getState().city.player_id),leader=Number(r.leader_player_id)===self,joined=participants.some(p=>Number(p.player_id)===self),gathering=r.status==='gathering';
+        const size=innerHeight<540?1:5,total=Math.max(1,Math.ceil(participants.length/size));memberPage=Math.min(memberPage,total-1);
+        openDialog(`<h2>Rally · ${esc(r.target_name||r.target_username||'Königreich')}</h2><div class="rally-detail"><div class="detail-row"><span>${esc(labels[r.status]||r.status)}</span><strong>X ${r.target_x} / Y ${r.target_y}</strong></div>${gathering?`<small class="muted">Start in ${duration(Math.max(0,(date(r.launch_at)-Date.now())/1000))}</small>`:''}${r.capacity?`<p class="muted">Allianzhalle: ${fmt(participants.reduce((sum,p)=>sum+Object.values(p.troops||{}).reduce((n,v)=>n+Number(v),0),0))} / ${fmt(r.capacity)} Truppen · Nur der Anführer zahlt AP.</p>`:""}${r.result?.reason?`<p class="muted">${esc(r.result.reason)}</p>`:""}<div class="window-list">${participants.slice(memberPage*size,(memberPage+1)*size).map(p=>`<div class="list-row"><strong>${esc(p.username||p.display_name)}</strong><span>${fmt(Object.values(p.troops||{}).reduce((n,x)=>n+Number(x),0))} Truppen</span></div>`).join('')}${total>1?pager(memberPage,total,'rally-member-page'):''}</div><div class="button-row">${button('Rallies','rally-list')}${gathering&&!joined&&!leader?button('Beitreten','rally-join',r.id,'gold'):''}${gathering&&leader?button('Jetzt starten','rally-launch',r.id,'gold')+button('Abbrechen','rally-cancel',r.id,'danger'):''}</div></div>`);
+    }
+    function onClick(act,b){
+        if(act==='rally-list'){list();return true;}
+        if(act==='rally-detail'){detail(b.dataset.id);return true;}
+        if(act==='rally-list-page'){page=Number(b.dataset.id);renderList();return true;}
+        if(act==='rally-member-page'){memberPage=Number(b.dataset.id);renderDetail();return true;}
+        if(act==='rally-join'&&current){marchPanel.open(current.target_player_id,'rally-join',{rally_id:Number(current.id),target:{id:Number(current.target_player_id),coord_x:Number(current.target_x),coord_y:Number(current.target_y),display_name:current.target_name||current.target_username,castle_level:current.target_castle_level}});return true;}
+        if(act==='rally-launch'||act==='rally-cancel'){action('rally/'+Number(b.dataset.id)+'/'+(act==='rally-launch'?'launch':'cancel'),{},act==='rally-launch'?'Rally aktualisiert.':'Rally abgebrochen.').then(result=>{if(result)list();});return true;}
+        return false;
+    }
+    return {onClick,list};
+};

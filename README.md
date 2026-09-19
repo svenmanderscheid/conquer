@@ -6,7 +6,11 @@ A browser-based 4X strategy MMO inspired by League of Kingdoms (sunsetting May 2
 
 ## Status
 
-🚧 **Pre-development** — Sprint 0 in progress (asset foundation + project skeleton).
+**Spielsysteme und Backoffice (11. September 2026):** Welten- und Spielerverwaltung unter `/admin`, konfigurierbare Spawns, Geschenke, Weltenauswahl, Gemeinschaft, Verteidigung, zusätzliche Feldzüge, Ereignisse, Meisterschaft und Kontowiederherstellung sind integriert. [Aktueller Umfang, Hintergrundbetrieb und Prüfungen](docs/FEATURE_PACK_STATUS.md). Dieser Stand ergänzt und ersetzt die älteren Umfangsangaben unten.
+
+**PvE-MVP (10. September 2026):** The current development direction is cooperative city building with two-alliance boss expeditions, a unified game interface, persistent profiles, inventory, quests, market trading and voluntary arena duels. See [the PvE MVP scope and verification status](docs/PVE_MVP_STATUS.md) for current setup, tests and gameplay. This supersedes the historical scope and roadmap below.
+
+**Playable local MVP (September 2026):** password accounts, illustrated cartoon city, building upgrades, troops, research, monster battles, gathering and saved progress. See [the current MVP status](docs/MVP_STATUS.md) for setup, scope and verified checks. The historical roadmap below has not yet been fully reconciled with implementation.
 
 ## What this is
 

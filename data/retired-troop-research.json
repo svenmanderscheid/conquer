@@ -1,0 +1,413 @@
+{
+  "description": "Retired 2026-09-13. Historical costs used only to refund unfinished troop-unlock research once.",
+  "nodes": [
+    {
+      "code": "warrior",
+      "name": "Warrior",
+      "row": "infantry",
+      "category": "unlock",
+      "stat": "",
+      "type": "unlock",
+      "max_level": 1,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 1,
+          "time": 72000,
+          "power": 2850,
+          "resources": {
+            "food": 180000,
+            "lumber": 180000,
+            "stone": 180000,
+            "gold": 360000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 10
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "troops_storage"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "knight",
+      "name": "Knight",
+      "row": "infantry",
+      "category": "unlock",
+      "stat": "",
+      "type": "unlock",
+      "max_level": 1,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 1,
+          "time": 345600,
+          "power": 10720,
+          "resources": {
+            "food": 1440000,
+            "lumber": 1440000,
+            "stone": 1440000,
+            "gold": 2880000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 16
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "march_limit"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "guardian",
+      "name": "Guardian",
+      "row": "infantry",
+      "category": "unlock",
+      "stat": "",
+      "type": "unlock",
+      "max_level": 1,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 1,
+          "time": 4140000,
+          "power": 27100,
+          "resources": {
+            "food": 5865000,
+            "lumber": 5865000,
+            "stone": 5865000,
+            "gold": 11730000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 23
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "healing_time_reduced"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "crusader",
+      "name": "Crusader",
+      "row": "infantry",
+      "category": "unlock",
+      "stat": "",
+      "type": "unlock",
+      "max_level": 1,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 1,
+          "time": 11340000,
+          "power": 50850,
+          "resources": {
+            "food": 20700000,
+            "lumber": 20700000,
+            "stone": 20700000,
+            "gold": 41400000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 30
+            },
+            {
+              "type": "research",
+              "level": 5,
+              "code": "advanced_infantry_spd"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "longbow_man",
+      "name": "Longbow Man",
+      "row": "ranged",
+      "category": "unlock",
+      "stat": "",
+      "type": "unlock",
+      "max_level": 1,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 1,
+          "time": 72000,
+          "power": 2850,
+          "resources": {
+            "food": 180000,
+            "lumber": 180000,
+            "stone": 180000,
+            "gold": 360000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 10
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "troops_storage"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "ranger",
+      "name": "Ranger",
+      "row": "ranged",
+      "category": "unlock",
+      "stat": "",
+      "type": "unlock",
+      "max_level": 1,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 1,
+          "time": 345600,
+          "power": 10720,
+          "resources": {
+            "food": 1440000,
+            "lumber": 1440000,
+            "stone": 1440000,
+            "gold": 2880000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 16
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "march_limit"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "crossbow_man",
+      "name": "Crossbowman",
+      "row": "ranged",
+      "category": "unlock",
+      "stat": "",
+      "type": "unlock",
+      "max_level": 1,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 1,
+          "time": 4140000,
+          "power": 27100,
+          "resources": {
+            "food": 5865000,
+            "lumber": 5865000,
+            "stone": 5865000,
+            "gold": 11730000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 23
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "healing_time_reduced"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "sniper",
+      "name": "Sniper",
+      "row": "ranged",
+      "category": "unlock",
+      "stat": "",
+      "type": "unlock",
+      "max_level": 1,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 1,
+          "time": 11340000,
+          "power": 50850,
+          "resources": {
+            "food": 20700000,
+            "lumber": 20700000,
+            "stone": 20700000,
+            "gold": 41400000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 30
+            },
+            {
+              "type": "research",
+              "level": 5,
+              "code": "advanced_ranged_spd"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "horseman",
+      "name": "Horseman",
+      "row": "cavalry",
+      "category": "unlock",
+      "stat": "",
+      "type": "unlock",
+      "max_level": 1,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 1,
+          "time": 72000,
+          "power": 2850,
+          "resources": {
+            "food": 180000,
+            "lumber": 180000,
+            "stone": 180000,
+            "gold": 360000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 10
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "troops_storage"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "heavy_cavalry",
+      "name": "Heavy Cavalry",
+      "row": "cavalry",
+      "category": "unlock",
+      "stat": "",
+      "type": "unlock",
+      "max_level": 1,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 1,
+          "time": 345600,
+          "power": 10720,
+          "resources": {
+            "food": 1440000,
+            "lumber": 1440000,
+            "stone": 1440000,
+            "gold": 2880000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 16
+            },
+            {
+              "type": "research",
+              "level": 1,
+              "code": "march_limit"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "iron_cavalry",
+      "name": "Iron Cavalry",
+      "row": "cavalry",
+      "category": "unlock",
+      "stat": "",
+      "type": "unlock",
+      "max_level": 1,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 1,
+          "time": 4140000,
+          "power": 27100,
+          "resources": {
+            "food": 5865000,
+            "lumber": 5865000,
+            "stone": 5865000,
+            "gold": 11730000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 23
+            },
+            {
+              "type": "research",
+              "level": 3,
+              "code": "healing_time_reduced"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "dragoon",
+      "name": "Dragoon",
+      "row": "cavalry",
+      "category": "unlock",
+      "stat": "",
+      "type": "unlock",
+      "max_level": 1,
+      "levels": [
+        {
+          "level": 1,
+          "ability_value": 1,
+          "time": 11340000,
+          "power": 50850,
+          "resources": {
+            "food": 20700000,
+            "lumber": 20700000,
+            "stone": 20700000,
+            "gold": 41400000
+          },
+          "requirements": [
+            {
+              "type": "academy",
+              "level": 30
+            },
+            {
+              "type": "research",
+              "level": 5,
+              "code": "advanced_cavalry_spd"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

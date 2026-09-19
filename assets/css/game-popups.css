@@ -1,0 +1,200 @@
+/* Feature windows float above the mounted city or world. */
+body.mobile-game #panel-dialog .page-heading h2{font-family:var(--ui-font)!important}
+body.mobile-game #playfield-content { width:100%; height:100%; margin:0; padding:0; }
+body.mobile-game #panel-dialog {
+  --popup-border:#b8c7da;
+  position:fixed; inset:0; z-index:95; width:min(1000px,calc(100vw - 96px));
+  max-width:none; height:fit-content; max-height:82dvh; margin:auto; padding:0;
+  overflow:hidden; border:3px solid var(--popup-border); border-radius:9px;
+  color:#ecf0f5; background:#26384e;
+  box-shadow:inset 0 0 0 1px #07172b,0 20px 70px #05111eb3;
+}
+body.mobile-game #panel-dialog[open] { display:flex; flex-direction:column; }
+body.mobile-game #panel-dialog::backdrop { background:#0917248c; backdrop-filter:blur(1.5px); }
+body.mobile-game #panel-dialog[data-panel="research"] { width:min(1180px,calc(100vw - 80px)); }
+body.mobile-game #panel-dialog[data-panel="profile"],
+body.mobile-game #panel-dialog[data-panel="settings"],
+body.mobile-game #panel-dialog[data-panel="help"] { width:min(800px,calc(100vw - 96px)); }
+body.mobile-game #panel-dialog .page-heading {
+  display:flex!important; flex:none; min-height:64px; max-width:none;
+  align-items:center; gap:12px; margin:0; padding:10px 14px;
+  border:0; border-bottom:2px solid #08182d;
+  background:linear-gradient(145deg,#354a64,#17263d 70%); box-shadow:inset 0 1px #f2f5ff3d;
+}
+body.mobile-game #panel-dialog .page-heading:after { display:none; }
+body.mobile-game #panel-dialog #page-title {
+  min-width:0; margin:0; padding:0; color:#fff4db; font:800 23px/1.2 'Segoe UI',system-ui,sans-serif;
+  letter-spacing:.3px; text-shadow:0 2px #0c1725; outline:none;
+}
+body.mobile-game #panel-dialog .panel-emblem { display:grid; flex:none; place-items:center; width:38px; height:38px; }
+body.mobile-game #panel-dialog .panel-emblem .nav-emblem { width:36px; height:38px; margin:0; border-color:#c0b07d; }
+body.mobile-game #panel-dialog .panel-close { width:38px; height:38px; min-width:38px; margin-left:auto; }
+body.mobile-game #panel-dialog #content {
+  flex:1 1 auto; min-height:0; width:100%; height:auto; max-width:none;
+  padding:22px!important; margin:0!important; overflow:auto; overscroll-behavior:contain;
+  scrollbar-width:thin; scrollbar-color:#8197b0 #1a2a3e; scroll-padding:18px;
+  background:radial-gradient(ellipse at top,#3c4d64aa,transparent 65%),#26384e;
+}
+body.mobile-game #panel-dialog .card-grid { grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr)); }
+body.mobile-game #panel-dialog .inventory-shell { padding-top:0; }
+body.mobile-game #panel-dialog .inventory-heading { margin-bottom:15px; }
+body.mobile-game #panel-dialog .inventory-heading h2,
+body.mobile-game #panel-dialog .rt-intro-copy h2 { display:none; }
+body.mobile-game #panel-dialog .rt-academy { min-width:0; }
+body.mobile-game #panel-dialog .rt-scroll { max-width:100%; }
+body.mobile-game #panel-dialog .inventory-tabs { padding-bottom:10px; }
+body.mobile-game #panel-dialog .inventory-tab.active { background:linear-gradient(#626ac2,#37458c); border-color:#939ddd; color:#fff4de; }
+body.mobile-game #panel-dialog .inventory-tab { border-radius:4px; }
+body.mobile-game #panel-dialog .game-card { min-width:0; }
+body.mobile-game #game-dialog::backdrop { background:#08162599; backdrop-filter:blur(1.5px); }
+/* Avoid a second heavy backdrop when inspecting an item within a feature window. */
+body.mobile-game:has(#panel-dialog[open]) #game-dialog::backdrop { background:#08162570; }
+body.mobile-game dialog>#toast { position:absolute; z-index:110; left:14px; right:14px; bottom:14px; width:auto; max-width:none; margin:0; transform:translateY(10px); }
+body.mobile-game dialog>#toast.visible { transform:translateY(0); }
+body.mobile-game #game-dialog.march-dialog>#toast { bottom:80px; }
+@media(max-width:700px) {
+  body.mobile-game #panel-dialog,
+  body.mobile-game #panel-dialog[data-panel] { width:calc(100vw - 24px); max-height:calc(100dvh - 160px); border-width:2px; border-radius:7px; }
+  body.mobile-game #panel-dialog .page-heading { min-height:54px; padding:8px 10px; gap:9px; }
+  body.mobile-game #panel-dialog #page-title { font-size:19px; }
+  body.mobile-game #panel-dialog .panel-emblem { width:31px; height:33px; }
+  body.mobile-game #panel-dialog .panel-emblem .nav-emblem { width:30px; height:32px; }
+  body.mobile-game #panel-dialog .panel-close { width:34px; height:34px; min-width:34px; }
+  body.mobile-game #panel-dialog #content { padding:14px!important; }
+  body.mobile-game #panel-dialog .card-grid { grid-template-columns:1fr; }
+  body.mobile-game #panel-dialog .inventory-heading p { font-size:11px; }
+  body.mobile-game #panel-dialog .inventory-tabs { gap:3px; }
+  body.mobile-game #panel-dialog .inventory-tab { padding:7px 8px; font-size:11px; }
+  body.mobile-game #panel-dialog .loot-grid { gap:17px 11px; }
+}
+@media(max-width:360px) {
+  body.mobile-game #panel-dialog #content { padding:11px!important; }
+  body.mobile-game #panel-dialog #page-title { font-size:18px; }
+}
+@media(max-height:540px) {
+  body.mobile-game #panel-dialog,
+  body.mobile-game #panel-dialog[data-panel] { width:calc(100vw - 64px); max-height:calc(100dvh - 28px); }
+  body.mobile-game #panel-dialog .page-heading { min-height:48px; padding:6px 10px; }
+  body.mobile-game #panel-dialog #page-title { font-size:19px; }
+  body.mobile-game #panel-dialog #content { padding:14px!important; }
+}
+
+/* Compact game windows keep the useful controls above the fold. */
+body.mobile-game #panel-dialog .page-heading { min-height:50px; padding:6px 12px; }
+body.mobile-game #panel-dialog #page-title { font-size:21px; }
+body.mobile-game #panel-dialog #content { padding:14px!important; }
+body.mobile-game #panel-dialog .subtabs { gap:5px; margin-bottom:12px; padding-bottom:8px; }
+body.mobile-game #panel-dialog .subtab { min-height:34px; padding:7px 10px; font-size:12px; }
+body.mobile-game #panel-dialog .panel { padding:15px; }
+body.mobile-game #panel-dialog .section-heading { margin:17px 0 10px; }
+body.mobile-game #panel-dialog .section-heading h2 { font-size:15px; }
+body.mobile-game #panel-dialog .button { padding:8px 12px; min-height:35px; font-size:12px; }
+body.mobile-game #panel-dialog .detail-row { padding:7px 0; font-size:12px; }
+body.mobile-game #panel-dialog .notice { padding:10px 12px; margin-bottom:12px; font-size:12px; }
+body.mobile-game #panel-dialog .army-tier-tabs { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:5px; margin-bottom:12px; padding-bottom:10px; }
+body.mobile-game #panel-dialog .army-tier-tabs>button { padding:7px 2px; min-height:34px; font-size:12px; }
+.army-roster { display:grid; gap:10px; }
+.army-unit { display:grid; grid-template-columns:60px minmax(0,1fr) auto; align-items:center; gap:12px; min-width:0; padding:12px; border:1px solid #6a7d91; border-radius:5px; background:#1c2c40; }
+.army-unit-portrait { width:60px; height:67px; object-fit:cover; border:2px solid #b4a271; border-radius:4px; }
+.army-unit-copy { min-width:0; }
+.army-unit-copy h3 { margin:0 0 5px; font-size:15px; color:#ecdfbd; }
+.army-unit-copy>span { display:block; color:#aebfd4; font-size:12px; }
+.army-unit-stats { display:flex; gap:14px; margin-top:6px; color:#c7d7e9; font-size:12px; }
+.army-unit.unit-locked .army-unit-portrait { filter:saturate(.25); }
+.panel-pagination { display:grid; grid-template-columns:40px minmax(0,1fr) 40px; align-items:center; gap:10px; margin-top:12px; }
+body.mobile-game #panel-dialog .panel-pagination .button { min-height:36px; padding:6px; font-size:18px; }
+.panel-page-status { min-width:0; text-align:center; color:#d8e3f1; font-size:12px; }
+.panel-page-status small { display:block; color:#abbcd1; font-size:10px; margin-top:3px; }
+.quest-page-summary { display:flex; justify-content:space-between; align-items:center; gap:10px; margin:0 0 12px; color:#b6c7db; font-size:11px; }
+body.mobile-game #panel-dialog .profile-layout { gap:16px; }
+body.mobile-game #panel-dialog .profile-bio { padding:9px 0; font-size:12px; margin:7px 0; }
+body.mobile-game #panel-dialog .profile-wallet { margin:10px 0; }
+body.mobile-game #panel-dialog .profile-wallet>div { padding:7px; }
+body.mobile-game #panel-dialog .profile-wallet strong { margin-top:3px; font-size:17px; }
+body.mobile-game #panel-dialog .setting-row { padding:11px 0; gap:12px; }
+body.mobile-game #panel-dialog .setting-row small { font-size:11px; }
+body.mobile-game #panel-dialog .empty { padding:22px 15px; }
+body.mobile-game #panel-dialog .empty-icon { font-size:32px; margin-bottom:8px; }
+body.mobile-game #panel-dialog .empty h3 { font-size:18px; }
+body.mobile-game #panel-dialog .empty p { font-size:12px; margin-bottom:12px; }
+
+body.mobile-game #game-dialog:has(.research-requirements),
+body.mobile-game #game-dialog[data-building] { padding:22px; }
+body.mobile-game #game-dialog:has(.research-requirements) .card-icon,
+body.mobile-game #game-dialog[data-building] .card-icon { float:left; font-size:30px; margin:0 10px 8px 0; line-height:1; }
+body.mobile-game #game-dialog:has(.research-requirements) h2,
+body.mobile-game #game-dialog[data-building] h2 { margin:0 32px 12px 0; padding:0; font-size:23px; }
+body.mobile-game #game-dialog:has(.research-requirements) .muted,
+body.mobile-game #game-dialog[data-building] .muted { font-size:12px; line-height:1.45; margin-bottom:10px; }
+body.mobile-game #game-dialog:has(.research-requirements) .detail-row,
+body.mobile-game #game-dialog[data-building] .detail-row { padding:9px 0; font-size:12px; clear:both; }
+body.mobile-game #game-dialog:has(.research-requirements) .research-requirements { margin:13px 0; }
+body.mobile-game #game-dialog:has(.research-requirements) .research-requirement-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; }
+body.mobile-game #game-dialog:has(.research-requirements) .research-requirement { gap:8px; padding:8px; }
+body.mobile-game #game-dialog:has(.research-requirements) .research-requirement>.rt-node-art { width:34px; height:36px; }
+body.mobile-game #game-dialog:has(.research-requirements) .research-requirement-copy { gap:3px; }
+body.mobile-game #game-dialog:has(.research-requirements) .research-requirement-copy>strong { font-size:11px; line-height:1.25; }
+body.mobile-game #game-dialog:has(.research-requirements) .research-requirement-copy>span,
+body.mobile-game #game-dialog:has(.research-requirements) .research-requirement-copy>small { font-size:10px; }
+body.mobile-game #game-dialog:has(.research-requirements) .costs { gap:5px; margin:10px 0; }
+body.mobile-game #game-dialog:has(.research-requirements) .costs>span { padding:5px; font-size:11px; }
+body.mobile-game #game-dialog:has(.research-requirements) .research-cost-icon { width:20px; height:20px; margin-right:2px; }
+@media(max-width:700px) {
+  body.mobile-game #panel-dialog,body.mobile-game #panel-dialog[data-panel] { max-height:calc(100dvh - 64px); }
+  body.mobile-game #panel-dialog .page-heading { min-height:44px; padding:5px 9px; }
+  body.mobile-game #panel-dialog #page-title { font-size:18px; }
+  body.mobile-game #panel-dialog #content { padding:10px!important; }
+  body.mobile-game #panel-dialog .subtabs { margin-bottom:9px; padding-bottom:6px; }
+  body.mobile-game #panel-dialog .subtab { padding:6px 8px; font-size:11px; }
+  body.mobile-game #panel-dialog .panel { padding:11px; }
+  body.mobile-game #panel-dialog .panel h2 { font-size:18px; margin-bottom:10px; }
+  body.mobile-game #panel-dialog .panel p { font-size:12px; }
+  body.mobile-game #panel-dialog .army-tier-tabs>button { font-size:10px; min-height:32px; }
+  .army-roster { gap:8px; }
+  .army-unit { grid-template-columns:42px minmax(0,1fr) 77px; padding:9px 7px; gap:8px; }
+  .army-unit-portrait { width:42px; height:51px; }
+  .army-unit-copy h3 { font-size:12px; margin-bottom:3px; }
+  .army-unit-copy>span { font-size:10px; }
+  .army-unit-stats { font-size:10px; gap:7px; margin-top:4px; }
+  body.mobile-game #panel-dialog .army-unit>.button { font-size:10px; padding:7px 4px; min-height:34px; }
+  body.mobile-game #panel-dialog .profile-banner { padding:8px 10px; gap:10px; min-height:70px; }
+  body.mobile-game #panel-dialog .profile-banner .portrait { width:44px; height:52px; }
+  body.mobile-game #panel-dialog .profile-banner h2 { font-size:19px; }
+  body.mobile-game #panel-dialog .profile-banner .badge { position:static; margin-left:54px; margin-top:-22px; font-size:8px; }
+  body.mobile-game #panel-dialog .profile-crown { display:none; }
+  body.mobile-game #panel-dialog .profile-layout { gap:6px; }
+  body.mobile-game #panel-dialog .profile-data .detail-row { padding:4px 0; font-size:11px; }
+  body.mobile-game #panel-dialog .profile-wallet { gap:4px; margin:7px 0; }
+  body.mobile-game #panel-dialog .profile-wallet>div { padding:5px; }
+  body.mobile-game #panel-dialog .profile-wallet small { font-size:9px; }
+  body.mobile-game #panel-dialog .profile-wallet strong { font-size:14px; }
+  body.mobile-game #panel-dialog .stats-grid { margin-bottom:10px; gap:3px; }
+  body.mobile-game #panel-dialog .stat-box { padding:8px; }
+  body.mobile-game #panel-dialog .stat-box strong { font-size:15px; }
+  body.mobile-game #panel-dialog .stat-box small { font-size:10px; }
+  body.mobile-game #panel-dialog .quick-grid { gap:6px; }
+  body.mobile-game #game-dialog:has(.research-requirements),body.mobile-game #game-dialog[data-building] { padding:18px 13px; }
+  body.mobile-game #game-dialog:has(.research-requirements) h2,body.mobile-game #game-dialog[data-building] h2 { font-size:21px; }
+  body.mobile-game #game-dialog:has(.research-requirements) .research-requirement { flex-direction:row; align-items:flex-start; gap:5px; }
+  body.mobile-game #game-dialog:has(.research-requirements) .research-requirement>.rt-node-art { width:26px; height:28px; }
+  body.mobile-game #game-dialog:has(.research-requirements) .research-requirement-grid { gap:6px; }
+  body.mobile-game #game-dialog:has(.research-requirements) .button { padding:9px; min-height:38px; font-size:12px; }
+}
+@media(max-height:540px) {
+  body.mobile-game #panel-dialog,body.mobile-game #panel-dialog[data-panel] { max-height:calc(100dvh - 24px); }
+  body.mobile-game #panel-dialog .page-heading { min-height:36px; padding:3px 9px; }
+  body.mobile-game #panel-dialog .panel-emblem { width:25px; height:25px; }
+  body.mobile-game #panel-dialog .panel-emblem .nav-emblem { width:24px; height:26px; }
+  body.mobile-game #panel-dialog .panel-close { width:28px; height:28px; min-width:28px; }
+}
+@media(min-width:480px) and (max-height:540px) {
+  body.mobile-game #panel-dialog[data-panel="quests"] #content { padding:6px!important; }
+  body.mobile-game #panel-dialog[data-panel="quests"] .subtabs { margin-bottom:5px; padding-bottom:3px; }
+  body.mobile-game #panel-dialog .quest-page .quest-row { grid-template-columns:24px minmax(0,1fr) 115px; padding:8px; gap:8px; }
+  body.mobile-game #panel-dialog .quest-page .quest-row>.button { grid-column:auto; min-width:0; padding:8px; }
+  body.mobile-game #panel-dialog .quest-page-summary { font-size:10px; margin-bottom:5px; }
+  body.mobile-game #panel-dialog .quest-page .quest-row { margin-bottom:8px; }
+  body.mobile-game #panel-dialog .quest-page .quest-progress { margin-top:5px; }
+  body.mobile-game #panel-dialog .quest-page .quest-rewards { margin-top:4px; }
+  body.mobile-game #panel-dialog .quest-page .panel-pagination { margin-top:6px; }
+}

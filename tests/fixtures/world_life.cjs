@@ -1,0 +1,22 @@
+'use strict';
+// Read-only populated world for visual QA. It never requests game APIs.
+const fs=require('fs'),path=require('path');
+module.exports=function worldLifeFixture(root,base=''){
+ const terrain=JSON.parse(fs.readFileSync(path.join(root,'data/world_terrain.json'),'utf8'));
+ const definitions=[['Orc','orc'],['Skeleton','skeleton'],['Golem','golem'],['Treasure Goblin','orc'],['Green Dragon','orc'],['Red Dragon','orc'],['Gold Dragon','orc'],['Deathkar','orc'],['Magdar','orc'],['Frostgrimm','monsters/frostgrimm'],['Sandmaul','monsters/sandmaul'],['Glutramm','monsters/glutramm'],['Dämmerhorn','monsters/daemmerhorn']];
+ const locations=[[74,70],[74,73],[67,74],[70,75],[79,69],[81,72],[79,75],[64,73],[63,68],[196,64],[68,192],[196,192],[82,76]];
+ const monsters=definitions.map(([name,art],i)=>({id:i+1,coord_x:locations[i][0],coord_y:locations[i][1],hp_current:1000,definition:{name,art:art.startsWith('monsters/')?art:undefined,type:i>=4?'rally':'solo',level:name==='Dämmerhorn'?5:i+1,hp:1000}})).filter(monster=>monster.id<=4||monster.id>=10);
+ const nodes=[[66,70],[72,66],[189,66],[62,194],[189,193]].map(([x,y],i)=>({id:i+1,coord_x:x,coord_y:y,object_type:1,level:i+1,resource_amount:12000,resource_max:12000}));
+ const state={city:{id:1,coord_x:70,coord_y:70,castle_level:4,city_skin:'default',name:'Sonnenhain'},player:{name:'Vorschau'},players:[],nodes,monsters,marches:[],congress:{id:1,coord_x:128,coord_y:128,name:'Kongress',state:'neutral',can_attack:true}};
+ return `<!doctype html><html lang="de"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lebendige Welt – Vorschau</title>
+${['world-atlas','map-overlay','castle-skins','world-zones','world-shrines','world-encounters','village-theme'].map(name=>`<link rel="stylesheet" href="${base}/assets/css/${name}.css?v=${fs.statSync(path.join(root,'assets/css',name+'.css')).mtimeMs}">`).join('')}
+<style>*{box-sizing:border-box}body{margin:0;font-family:var(--ui-font,Arial);background:var(--ui-paper);color:var(--ui-ink)}#map{height:100dvh}.atlas-shell{height:100%!important;min-height:0!important}.preview-note{position:fixed;left:12px;bottom:12px;z-index:20;max-width:calc(100vw - 24px);padding:7px 12px;border:1px solid var(--ui-line);border-radius:12px;background:var(--ui-paper);font-size:12px}.preview-note a{color:var(--ui-blue-dark)}.preview-note button{font:inherit;color:var(--ui-ink);border:1px solid var(--ui-line);background:var(--ui-card);border-radius:7px;padding:4px 7px;margin-left:8px}@media(max-width:500px){.preview-note{font-size:10px;max-width:205px}}@media(max-height:450px){.preview-note{font-size:10px}}</style>
+<body class="mobile-game playfield-mode world-mode"><div id="map"></div><aside class="preview-note">Bewegte Vorschau · <a href="${base}/city#world">Zum Spiel</a><button id="preview-motion" aria-pressed="false">Bewegung pausieren</button><span id="preview-status" role="status"></span></aside>
+<script>window.CONQUER_WORLD_LIFE_VERSION=${Math.floor(Math.max(0,...fs.readdirSync(path.join(root,'assets/art/map')).filter(name=>name.startsWith('life-')).map(name=>fs.statSync(path.join(root,'assets/art/map',name)).mtimeMs)))};window.ConquerTerrainData=${JSON.stringify(terrain)};window.fixtureState=${JSON.stringify(state)};window.fixtureActions=[];</script>
+${['castle-skins','world-landscape','world-encounters','world-map'].map(name=>`<script src="${base}/assets/js/${name}.js?v=${fs.statSync(path.join(root,'assets/js',name+'.js')).mtimeMs}"></script>`).join('')}
+<script>
+window.fixtureOptions={host:document.querySelector('#map'),base:${JSON.stringify(base)},esc:s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;'),monsterArt:m=>m.definition.art||(/Skeleton/.test(m.definition.name)?'skeleton':/Golem/.test(m.definition.name)?'golem':'orc'),now:()=>Date.now(),state:fixtureState};ConquerWorld.render(fixtureOptions);
+document.querySelector('#preview-motion').onclick=e=>{const paused=document.body.classList.toggle('reduced-motion');e.currentTarget.setAttribute('aria-pressed',String(paused));e.currentTarget.textContent=paused?'Bewegung fortsetzen':'Bewegung pausieren';ConquerWorld.render(fixtureOptions);};
+document.addEventListener('click',e=>{const b=e.target.closest('[data-action]');if(b){fixtureActions.push(b.dataset.action);document.querySelector('#preview-status').textContent=' · Aktion nur im Spiel verfügbar';}});
+</script></body></html>`;
+};

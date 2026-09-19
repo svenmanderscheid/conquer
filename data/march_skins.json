@@ -1,0 +1,202 @@
+{
+  "entries": [
+    {
+      "id": "default",
+      "castle_skin": "default",
+      "name": "Grenzlandzug",
+      "rarity": "common",
+      "description": "Grenzlandwachen mit blauen Bannern und heller Reiseausrüstung.",
+      "effect_color": "#b8d9ec",
+      "price_gems": 0,
+      "bonus_pct": 5,
+      "unlock_castle_level": 2
+    },
+    {
+      "id": "ironkeep",
+      "castle_skin": "ironkeep",
+      "name": "Eisenkoloss",
+      "rarity": "legendary",
+      "description": "Ein gepanzerter Festungsgolem stampft für die Eisenwacht über die Weltkarte.",
+      "effect_color": "#91a9bc",
+      "price_gems": 1200,
+      "bonus_pct": 5,
+      "unlock_castle_level": null
+    },
+    {
+      "id": "rosehall",
+      "castle_skin": "rosehall",
+      "name": "Rosenhirsch",
+      "rarity": "legendary",
+      "description": "Ein elfenbeinfarbener Hirsch trägt ein lebendes Geweih aus Rosenblüten.",
+      "effect_color": "#d97798",
+      "price_gems": 1200,
+      "bonus_pct": 5,
+      "unlock_castle_level": null
+    },
+    {
+      "id": "sandspire",
+      "castle_skin": "sandspire",
+      "name": "Sonnenskarabäus",
+      "rarity": "legendary",
+      "description": "Ein goldener Riesenskarabäus zieht mit Türkissteinen und Sonnenpanzer durch die Dünen.",
+      "effect_color": "#e6b55a",
+      "price_gems": 1200,
+      "bonus_pct": 5,
+      "unlock_castle_level": null
+    },
+    {
+      "id": "tidewatch",
+      "castle_skin": "tidewatch",
+      "name": "Leuchtrücken",
+      "rarity": "legendary",
+      "description": "Eine große Meeresschildkröte trägt einen kleinen Leuchtturm auf ihrem Panzer.",
+      "effect_color": "#55b8cf",
+      "price_gems": 1200,
+      "bonus_pct": 5,
+      "unlock_castle_level": null
+    },
+    {
+      "id": "winterhold",
+      "castle_skin": "winterhold",
+      "name": "Frostmammut",
+      "rarity": "legendary",
+      "description": "Ein zottiges Mammut mit Eisstoßzähnen bahnt der Winterfeste den Weg.",
+      "effect_color": "#a0d9f3",
+      "price_gems": 1200,
+      "bonus_pct": 5,
+      "unlock_castle_level": null
+    },
+    {
+      "id": "jadecourt",
+      "castle_skin": "jadecourt",
+      "name": "Jadeglockenlöwe",
+      "rarity": "legendary",
+      "description": "Ein jadegrüner Tempellöwe trägt Pagodendetails und eine klingende Hofglocke.",
+      "effect_color": "#70b89b",
+      "price_gems": 1200,
+      "bonus_pct": 5,
+      "unlock_castle_level": null
+    },
+    {
+      "id": "emberforge",
+      "castle_skin": "emberforge",
+      "name": "Glutsalamander",
+      "rarity": "legendary",
+      "description": "Ein geschmiedeter Salamander glüht zwischen Kupferplatten und dunklem Eisen.",
+      "effect_color": "#d58955",
+      "price_gems": 1200,
+      "bonus_pct": 5,
+      "unlock_castle_level": null
+    },
+    {
+      "id": "ravenloft",
+      "castle_skin": "ravenloft",
+      "name": "Rabenfürst",
+      "rarity": "legendary",
+      "description": "Ein riesiger gepanzerter Rabe gleitet mit violetten Bändern aus dem Rabenhorst.",
+      "effect_color": "#afa0c9",
+      "price_gems": 1200,
+      "bonus_pct": 5,
+      "unlock_castle_level": null
+    },
+    {
+      "id": "clockwork",
+      "castle_skin": "clockwork",
+      "name": "Uhrwerkhase",
+      "rarity": "legendary",
+      "description": "Ein kupferner Maschinenhase sprintet mit Zahnrädern und kleinen Dampfstößen.",
+      "effect_color": "#ceac69",
+      "price_gems": 1200,
+      "bonus_pct": 5,
+      "unlock_castle_level": null
+    },
+    {
+      "id": "sapphire",
+      "castle_skin": "sapphire",
+      "name": "Saphirpfau",
+      "rarity": "legendary",
+      "description": "Ein königlicher Pfau entfaltet einen Fächer aus großen geschliffenen Saphiren.",
+      "effect_color": "#648fd6",
+      "price_gems": 1200,
+      "bonus_pct": 5,
+      "unlock_castle_level": null
+    },
+    {
+      "id": "phoenix",
+      "castle_skin": "phoenix",
+      "name": "Phönixgarde",
+      "rarity": "mythic",
+      "description": "Ein rotgoldener Phönix mit Obsidianrüstung, Sonnenkranz und vielschichtigen Flammenfedern. Beim Angriff entfaltet sich seine Feuerkrone.",
+      "effect_color": "#ff8a42",
+      "price_gems": 2400,
+      "bonus_pct": 5,
+      "unlock_castle_level": null
+    },
+    {
+      "id": "dragon",
+      "castle_skin": "dragon",
+      "name": "Drachenmarsch",
+      "rarity": "mythic",
+      "description": "Ein smaragdgrüner Drache in gealterter Bronze begleitet die Drachenfestung. Bei Angriffen stößt er herab und speit bernsteinfarbenes Feuer.",
+      "effect_color": "#d99a42",
+      "price_gems": 2400,
+      "bonus_pct": 5,
+      "unlock_castle_level": null
+    },
+    {
+      "id": "astral",
+      "castle_skin": "astral",
+      "name": "Sternenwal",
+      "rarity": "mythic",
+      "description": "Ein schwebender Himmelswal zieht einen Schweif aus Sternenlicht hinter sich her.",
+      "effect_color": "#9bafff",
+      "price_gems": 2400,
+      "bonus_pct": 5,
+      "unlock_castle_level": null
+    },
+    {
+      "id": "leviathan",
+      "castle_skin": "leviathan",
+      "name": "Korallenleviathan",
+      "rarity": "mythic",
+      "description": "Ein türkisfarbener Meeresleviathan windet sich zwischen lebenden Korallen.",
+      "effect_color": "#55f4df",
+      "price_gems": 2400,
+      "bonus_pct": 5,
+      "unlock_castle_level": null
+    },
+    {
+      "id": "yggdrasil",
+      "castle_skin": "yggdrasil",
+      "name": "Wurzelkoloss",
+      "rarity": "mythic",
+      "description": "Ein uralter Baumkoloss schreitet auf mächtigen Wurzeln durch die Welt.",
+      "effect_color": "#7cff9b",
+      "price_gems": 2400,
+      "bonus_pct": 5,
+      "unlock_castle_level": null
+    },
+    {
+      "id": "tempest",
+      "castle_skin": "tempest",
+      "name": "Sturmqualle",
+      "rarity": "mythic",
+      "description": "Eine schwebende Gewitterqualle lädt ihre langen Tentakel mit Blitzen auf.",
+      "effect_color": "#8edbff",
+      "price_gems": 2400,
+      "bonus_pct": 5,
+      "unlock_castle_level": null
+    },
+    {
+      "id": "eclipse",
+      "castle_skin": "eclipse",
+      "name": "Finstersonnenwagen",
+      "rarity": "mythic",
+      "description": "Ein reiterloser Obsidianwagen trägt eine schwarze Sonne mit violetter Korona.",
+      "effect_color": "#cb91ff",
+      "price_gems": 2400,
+      "bonus_pct": 5,
+      "unlock_castle_level": null
+    }
+  ]
+}

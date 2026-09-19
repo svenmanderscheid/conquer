@@ -1,0 +1,165 @@
+{
+  "currency": "EUR",
+  "steps": [
+    {
+      "step": 1,
+      "title": "Rahmenpaket",
+      "price_cents": 599,
+      "resources": {
+        "food": 100000,
+        "lumber": 100000,
+        "stone": 50000,
+        "gold": 25000
+      },
+      "gems": 500,
+      "cosmetic_type": "name_frame"
+    },
+    {
+      "step": 2,
+      "title": "Marschpaket",
+      "price_cents": 999,
+      "resources": {
+        "food": 250000,
+        "lumber": 250000,
+        "stone": 100000,
+        "gold": 50000
+      },
+      "gems": 750,
+      "cosmetic_type": "march_skin"
+    },
+    {
+      "step": 3,
+      "title": "Burgpaket",
+      "price_cents": 999,
+      "resources": {
+        "food": 500000,
+        "lumber": 500000,
+        "stone": 200000,
+        "gold": 100000
+      },
+      "gems": 1000,
+      "cosmetic_type": "castle_skin"
+    }
+  ],
+  "themes": [
+    {
+      "id": "ironkeep",
+      "title": "Eisenwacht",
+      "frame_name": "Rahmen der Eisenwacht",
+      "march_name": "Eisenkoloss",
+      "castle_name": "Eisenwacht"
+    },
+    {
+      "id": "rosehall",
+      "title": "Rosenpalast",
+      "frame_name": "Rahmen des Rosenpalasts",
+      "march_name": "Rosenhirsch",
+      "castle_name": "Rosenpalast"
+    },
+    {
+      "id": "sandspire",
+      "title": "Dünenkrone",
+      "frame_name": "Rahmen der Dünenkrone",
+      "march_name": "Sonnenskarabäus",
+      "castle_name": "Dünenkrone"
+    },
+    {
+      "id": "tidewatch",
+      "title": "Gezeitenwacht",
+      "frame_name": "Rahmen der Gezeitenwacht",
+      "march_name": "Leuchtrücken",
+      "castle_name": "Gezeitenwacht"
+    },
+    {
+      "id": "winterhold",
+      "title": "Winterfeste",
+      "frame_name": "Rahmen der Winterfeste",
+      "march_name": "Frostmammut",
+      "castle_name": "Winterfeste"
+    },
+    {
+      "id": "jadecourt",
+      "title": "Jadehof",
+      "frame_name": "Rahmen des Jadehofs",
+      "march_name": "Jadeglockenlöwe",
+      "castle_name": "Jadehof"
+    },
+    {
+      "id": "emberforge",
+      "title": "Glutschmiede",
+      "frame_name": "Rahmen der Glutschmiede",
+      "march_name": "Glutsalamander",
+      "castle_name": "Glutschmiede"
+    },
+    {
+      "id": "ravenloft",
+      "title": "Rabenhorst",
+      "frame_name": "Rahmen des Rabenhorsts",
+      "march_name": "Rabenfürst",
+      "castle_name": "Rabenhorst"
+    },
+    {
+      "id": "clockwork",
+      "title": "Uhrwerkzitadelle",
+      "frame_name": "Rahmen der Uhrwerkzitadelle",
+      "march_name": "Uhrwerkhase",
+      "castle_name": "Uhrwerkzitadelle"
+    },
+    {
+      "id": "sapphire",
+      "title": "Saphirresidenz",
+      "frame_name": "Rahmen der Saphirresidenz",
+      "march_name": "Saphirpfau",
+      "castle_name": "Saphirresidenz"
+    },
+    {
+      "id": "phoenix",
+      "title": "Phönixthron",
+      "frame_name": "Rahmen des Phönixthrons",
+      "march_name": "Phönixgarde",
+      "castle_name": "Phönixthron"
+    },
+    {
+      "id": "dragon",
+      "title": "Drachenfestung",
+      "frame_name": "Rahmen der Drachenfestung",
+      "march_name": "Drachenmarsch",
+      "castle_name": "Drachenfestung"
+    },
+    {
+      "id": "astral",
+      "title": "Sternenwarte der Ewigkeit",
+      "frame_name": "Astraler Namensrahmen",
+      "march_name": "Sternenwal",
+      "castle_name": "Sternenwarte der Ewigkeit"
+    },
+    {
+      "id": "leviathan",
+      "title": "Thron der Gezeiten",
+      "frame_name": "Rahmen des Leviathans",
+      "march_name": "Korallenleviathan",
+      "castle_name": "Thron der Gezeiten"
+    },
+    {
+      "id": "yggdrasil",
+      "title": "Herz des Weltenbaums",
+      "frame_name": "Rahmen des Weltenbaums",
+      "march_name": "Wurzelkoloss",
+      "castle_name": "Herz des Weltenbaums"
+    },
+    {
+      "id": "tempest",
+      "title": "Sturmkrone",
+      "frame_name": "Rahmen der Sturmkrone",
+      "march_name": "Sturmqualle",
+      "castle_name": "Sturmkrone"
+    },
+    {
+      "id": "eclipse",
+      "title": "Zitadelle der Finstersonne",
+      "frame_name": "Rahmen der Finstersonne",
+      "march_name": "Finstersonnenwagen",
+      "castle_name": "Zitadelle der Finstersonne"
+    }
+  ]
+}

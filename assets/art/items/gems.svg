@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Facettierter Rubin">
+<title>Facettierter Rubin</title>
+<!-- Original code-native storybook item illustration. Value, quantity and rarity are rendered by the game UI. -->
+<g stroke="#493b33" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+<path d="M35 22H93L119 53 64 111 9 53Z" fill="#ed643f" />
+<polygon points="35,22 64,29 47,53 9,53" fill="#ffb27e" />
+<polygon points="64,29 93,22 119,53 82,53" fill="#f58a58" />
+<polygon points="47,53 82,53 64,111" fill="#bd362d" />
+<polygon points="9,53 47,53 64,111" fill="#de4b32" />
+<polygon points="82,53 119,53 64,111" fill="#8f2926" />
+<polygon points="35,22 93,22 64,29" fill="#ffe4b8" />
+<polygon points="64,29 82,53 47,53" fill="#ffb076" />
+<path d="M37 27 20 48H43" fill="none" stroke="#fff3d1" stroke-width="4"/>
+<path d="M66 34 76 48" fill="none" stroke="#ffddb1" stroke-width="3"/>
+</g>
+</svg>

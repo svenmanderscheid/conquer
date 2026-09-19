@@ -1,0 +1,246 @@
+/* One stable frame for every full game window, including nested details. */
+body.mobile-game .inventory-category-tabs button{font-family:var(--ui-font)!important}
+body.mobile-game .loot-tile[class*="rarity-"] :is(.loot-value,.loot-count){font-family:var(--ui-font-number)!important}
+body.mobile-game { --game-window-width:min(1000px,calc(100dvw - 32px)); --game-window-height:min(680px,calc(100dvh - 40px)); }
+body.mobile-game :is(#panel-dialog,#game-dialog),
+body.mobile-game #panel-dialog[data-panel],body.mobile-game #game-dialog.march-dialog {
+  position:fixed; inset:0; margin:auto; box-sizing:border-box;
+  width:var(--game-window-width)!important; min-width:0!important; max-width:none!important;
+  height:var(--game-window-height)!important; min-height:0!important; max-height:none!important;
+  padding:0!important; overflow:hidden;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog)[open] { display:flex; flex-direction:column; }
+body.mobile-game #game-dialog .popup-heading,body.mobile-game #panel-dialog .page-heading { flex:0 0 48px; box-sizing:border-box; min-height:48px; }
+body.mobile-game #game-dialog #dialog-content { flex:1; min-height:0; overflow:auto; overscroll-behavior:contain; padding:16px; }
+body.mobile-game #game-dialog.march-dialog #dialog-content { padding:0; overflow:hidden; display:flex; }
+body.mobile-game #game-dialog.march-dialog .march-command { width:100%; height:100%!important; max-height:none; flex:1; }
+body.mobile-game #panel-dialog #content { display:flex; flex-direction:column; min-height:0; padding:12px!important; }
+body.mobile-game #panel-dialog #content>.subtabs { flex-shrink:0; }
+body.mobile-game #panel-dialog .panel-pagination { margin-top:auto; padding-top:10px; flex-shrink:0; }
+body.mobile-game #panel-dialog .quest-page { display:flex; flex-direction:column; flex:1; gap:10px; min-height:0; }
+body.mobile-game #panel-dialog .quest-page .quest-row { margin:0; }
+.window-list { display:flex; flex-direction:column; gap:8px; flex:1; min-height:0; }
+.window-list>.list-row,.window-list>.report { margin:0; padding:12px; border:1px solid #70829a; border-radius:4px; background:#243449; }
+.window-list h3 { margin:0 0 4px; font-size:14px; }
+.window-list p { margin:3px 0; font-size:12px; }
+.window-list .member-identity img { width:40px; height:44px; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .window-list>:is(.list-row,.report) { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:8px; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .window-list>:is(.list-row,.report)>:first-child { min-width:0; overflow-wrap:anywhere; }
+body.mobile-game #panel-dialog .window-list .member-identity { min-width:0; text-align:left; }
+body.mobile-game #panel-dialog .window-list .member-identity>span { min-width:0; }
+.alliance-full-description { white-space:pre-wrap; overflow-wrap:anywhere; }
+.alliance-overview { display:flex; flex-direction:column; gap:10px; min-height:0; flex:1; overflow:auto; padding:1px; }
+.alliance-hero { display:grid; grid-template-columns:120px minmax(0,1fr); gap:18px; align-items:center; padding:16px; background:var(--ui-inset); border:1px solid var(--ui-line); border-radius:var(--ui-radius); }
+.alliance-crest { position:relative; display:grid; place-items:center; width:104px; height:112px; margin:auto; color:var(--ui-card-light); background:var(--ui-primary); border:3px solid var(--ui-gold-soft); border-radius:12px 12px 22px 22px; box-shadow:0 0 0 2px var(--ui-frame),0 5px var(--ui-primary-dark); }
+.alliance-crest::after { content:''; position:absolute; left:20px; right:20px; bottom:-14px; height:26px; background:var(--ui-primary); border:3px solid var(--ui-gold-soft); border-top:0; transform:rotate(45deg); box-shadow:3px 3px 0 1px var(--ui-frame); z-index:0; }
+.alliance-crest>span { position:relative; z-index:1; font-size:48px; line-height:1; }
+.alliance-crest>strong { position:absolute; z-index:2; left:6px; right:6px; bottom:7px; overflow:hidden; font:700 13px/1 var(--ui-font-number); letter-spacing:.08em; text-align:center; text-overflow:ellipsis; }
+.alliance-summary { min-width:0; }
+.alliance-summary h2 { margin:0 0 10px; color:var(--ui-ink); font-size:clamp(18px,3vw,25px); overflow-wrap:anywhere; }
+.alliance-summary dl { display:grid; gap:5px; margin:0; padding:10px 12px; background:var(--ui-card); border:1px solid var(--ui-line); border-radius:10px; }
+.alliance-summary dl>div { display:grid; grid-template-columns:minmax(105px,1fr) minmax(0,1fr); gap:10px; align-items:baseline; }
+.alliance-summary :is(dt,dd) { margin:0; min-width:0; }
+.alliance-summary dt { color:var(--ui-muted); font-weight:700; }
+.alliance-summary dd { color:var(--ui-ink); font-family:var(--ui-font-number); font-weight:700; text-align:right; overflow-wrap:anywhere; }
+.alliance-member-progress { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:10px; align-items:center; padding:0 4px; color:var(--ui-muted); font-size:12px; }
+.alliance-member-progress .progress-track { height:15px; margin:0; }
+.alliance-member-progress>span { white-space:nowrap; }
+.alliance-announcement { display:flex; gap:12px; align-items:center; justify-content:space-between; width:100%; min-height:58px; padding:11px 14px; border:1px solid var(--ui-line); border-radius:var(--ui-radius); background:var(--ui-card); color:var(--ui-ink); font:700 14px/1.35 var(--ui-font); text-align:left; cursor:pointer; }
+.alliance-announcement>span { overflow:hidden; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; }
+.alliance-announcement>strong { flex:none; color:var(--ui-gold); font-size:22px; }
+.alliance-actions { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-top:0; }
+.alliance-action { position:relative; display:grid; grid-template-columns:48px minmax(0,1fr) 16px; gap:8px; align-items:center; min-width:0; min-height:62px; padding:7px 10px; border:1px solid var(--ui-line); border-radius:11px; background:var(--ui-gold-soft); color:var(--ui-ink); font:700 15px/1.15 var(--ui-font); text-align:left; cursor:pointer; box-shadow:0 3px #c7b69266; }
+.alliance-action-icon { display:grid; place-items:center; width:44px; height:44px; border:1px solid var(--ui-line); border-radius:10px; background:var(--ui-card); font-size:25px; }
+.alliance-action strong { min-width:0; overflow-wrap:anywhere; }
+.alliance-action-arrow { color:var(--ui-primary); font-size:25px; }
+.treasury-view { display:flex; flex-direction:column; gap:15px; }
+.treasury-view .treasury { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; }
+.treasury-view .treasury>span { padding:10px; background:#1b293b; border:1px solid #75869f; }
+.quest-reward-icons { display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; }
+.quest-reward-icons>.quest-reward-item { display:flex; align-items:center; gap:4px; min-width:38px; padding:2px 5px; border:1px solid #75869f; border-radius:5px; background:#14253c; font-size:11px; }
+.quest-reward-art { position:relative; display:grid; place-items:center; width:30px; height:30px; flex:none; overflow:hidden; border:1px solid #75869f; border-radius:5px; background:#26364b; }
+.quest-reward-art>img { width:100%; height:100%; object-fit:contain; }
+.quest-reward-art .loot-specialty { position:absolute; right:0; bottom:0; width:13px; height:13px; }
+.quest-reward-art .loot-specialty img { width:100%; height:100%; object-fit:contain; }
+.quest-reward-value { display:block; min-width:0; color:inherit; font:700 11px/1.2 var(--ui-font-number,serif); white-space:nowrap; text-align:center; }
+.quest-reward-item>small { color:inherit; font-size:10px; white-space:nowrap; }
+body.mobile-game #panel-dialog .inventory-shell.inventory-paged { width:100%; max-width:none; flex:1; min-height:0; display:flex; flex-direction:column; }
+.inventory-category-tabs { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:4px; margin-bottom:10px; }
+.inventory-category-tabs button { display:flex; flex-direction:column; align-items:center; gap:3px; min-width:0; padding:6px 2px; background:#26364b; border:1px solid #71839c; border-radius:3px; color:#c7d7ea; font:600 11px/1.2 system-ui; cursor:pointer; }
+.inventory-category-tabs img { width:26px; height:26px; object-fit:contain; }
+.inventory-category-tabs button.active { background:linear-gradient(#656fc1,#3c458a); color:white; border-color:#b7c8f0; box-shadow:inset 0 0 0 1px #8597eb; }
+body.mobile-game #panel-dialog .inventory-paged #inventory-body { display:flex; flex-direction:column; flex:1; min-height:0; gap:12px; }
+body.mobile-game #panel-dialog .inventory-paged .inventory-page-grid { display:grid; grid-template-columns:repeat(4,minmax(0,115px)); align-content:start; justify-content:center; gap:18px 24px; }
+body.mobile-game #panel-dialog .inventory-paged .inventory-pager { margin-top:auto; width:100%; flex-shrink:0; }
+body.mobile-game .loot-tile[class*="rarity-"] { --rarity-light:#dce7ee; --rarity-main:#829aaf; --rarity-dark:#415669; background:linear-gradient(145deg,#81939b,#a8b3b6 48%,#667d86); border:3px solid var(--rarity-main)!important; border-top-color:var(--rarity-light)!important; border-left-color:var(--rarity-light)!important; border-radius:7px; box-shadow:0 0 0 2px #142231,inset 0 0 0 2px var(--rarity-dark),inset 0 0 0 4px var(--rarity-main)!important; }
+body.mobile-game .loot-tile.rarity-blue { --rarity-light:#51cafa; --rarity-main:#158beb; --rarity-dark:#174976; }
+body.mobile-game .loot-tile.rarity-purple { --rarity-light:#e484fc; --rarity-main:#b453e5; --rarity-dark:#633078; }
+body.mobile-game .loot-tile.rarity-gold { --rarity-light:#ffe387; --rarity-main:#ffa534; --rarity-dark:#995221; }
+body.mobile-game .loot-tile.rarity-gold:after { content:''; position:absolute; inset:3px; border:3px solid transparent; border-image:linear-gradient(45deg,#4ef0d9 10%,transparent 12%,transparent 88%,#4ef0d9 90%) 1; pointer-events:none; }
+body.mobile-game .loot-tile[class*="rarity-"] .loot-value { position:absolute; z-index:3; top:5px!important; bottom:auto!important; left:3px; right:3px; height:auto!important; padding:0!important; background:none!important; color:white!important; font:bold 14px/1.1 system-ui!important; text-align:center; text-shadow:-1px -1px #172333,1px -1px #172333,-1px 1px #172333,1px 2px #172333; }
+body.mobile-game .loot-tile[class*="rarity-"] .loot-count { top:auto!important; bottom:5px!important; right:6px!important; background:none!important; color:white; font:bold 13px/1 system-ui; text-shadow:1px 2px #182333,-1px -1px #182333; }
+body.mobile-game .loot-tile[class*="rarity-"] .loot-art { top:22%!important; bottom:20%!important; }
+body.mobile-game .loot-card:focus-visible .loot-tile,body.mobile-game .loot-card:hover .loot-tile { outline:3px solid #8afff1; outline-offset:3px; }
+.village-summary { display:flex; align-items:center; gap:20px; padding:20px; background:#26364b; border:1px solid #75869f; }
+.village-summary>img { width:90px; height:100px; object-fit:contain; }
+.village-actions,.skin-options { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:22px; }
+.village-actions .button { min-height:65px; }
+.skin-option { padding:16px 8px; border:2px solid #75869f; border-radius:5px; color:#fff; background:#25354b; text-align:center; cursor:pointer; }
+.skin-option[aria-pressed=true] { border-color:#9ff5e7; background:#334f62; }
+.skin-option img { display:block; width:100%; height:120px; object-fit:contain; margin-bottom:14px; }
+
+
+.rally-detail { display:flex; flex-direction:column; gap:12px; height:100%; }
+.battle-report { display:grid; grid-template-columns:minmax(0,1fr); gap:12px; }
+.battle-report h3 { margin:0 0 8px; font-size:14px; }
+.battle-report p { margin:0 0 8px; }
+.battle-report .battle-unit { margin:0 0 6px; padding:9px; }
+.battle-report .battle-unit small { display:block; margin-top:5px; line-height:1.4; }
+.battle-report .panel-pagination { margin-top:8px; font-size:11px; text-align:center; }
+body.mobile-game #game-dialog:has(.rally-detail) #dialog-content { display:flex; flex-direction:column; }
+body.mobile-game #game-dialog:has(.rally-detail) .rally-detail>.button-row { margin-top:auto; }
+body.mobile-game #game-dialog .march-target>.march-pvp-note { display:block; color:#85392e; font-size:11px; line-height:1.4; }
+body.mobile-game #game-dialog .march-target>.march-pvp-note { grid-column:1/-1; margin:6px 0; }
+body.mobile-game #game-dialog .march-target>label[for="rally-minutes"] { grid-column:1/-1; margin:0; font-size:11px; }
+body.mobile-game #game-dialog .march-target>#rally-minutes { grid-column:1/-1; min-height:32px; height:32px; padding:4px 7px; margin:0; font-size:12px; }
+@media(max-width:700px) {
+ body.mobile-game { --game-window-width:calc(100dvw - 16px); --game-window-height:calc(100dvh - 32px); }
+ .inventory-category-tabs { grid-template-columns:repeat(7,minmax(0,1fr)); gap:3px; }
+ .inventory-category-tabs button { font-size:9px; min-height:50px; overflow-wrap:anywhere; }
+ .inventory-category-tabs img { width:22px; height:22px; }
+ body.mobile-game #panel-dialog .inventory-paged .inventory-page-grid { grid-template-columns:repeat(3,minmax(0,104px)); gap:16px 12px; }
+ .village-actions { grid-template-columns:repeat(2,minmax(0,1fr)); }
+ .skin-options { gap:6px; }.skin-option { font-size:11px; }.skin-option img { height:85px; }
+ .alliance-hero { grid-template-columns:82px minmax(0,1fr); gap:10px; padding:10px; }
+ .alliance-crest { width:68px; height:76px; border-width:2px; }
+ .alliance-crest::after { left:14px;right:14px;bottom:-9px;height:19px;border-width:2px; }
+ .alliance-crest>span { font-size:32px; }.alliance-crest>strong { font-size:10px; }
+ .alliance-summary h2 { margin-bottom:6px; font-size:17px; }
+ .alliance-summary dl { gap:2px; padding:6px 8px; font-size:11px; }
+ .alliance-summary dl>div { grid-template-columns:minmax(65px,.8fr) minmax(0,1.2fr); gap:5px; }
+ .alliance-actions { grid-template-columns:repeat(2,minmax(0,1fr)); }
+ .alliance-action { min-height:52px; grid-template-columns:38px minmax(0,1fr) 12px; padding:5px 7px; font-size:13px; }
+ .alliance-action-icon { width:36px;height:36px;font-size:20px; }
+ .alliance-member-progress { grid-template-columns:1fr;gap:3px; }.alliance-member-progress>span { text-align:right; }
+ body.mobile-game #panel-dialog .treasury-view .inline-pair { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:8px; }
+ body.mobile-game #panel-dialog .treasury-view label { margin-top:6px; }
+ body.mobile-game #panel-dialog .treasury-view :is(input,select) { min-width:0; width:100%; }
+}
+@media(max-width:360px) {
+ .alliance-action { grid-template-columns:38px minmax(0,1fr);font-size:12px; }
+ .alliance-action-arrow { display:none; }
+}
+@media(max-width:700px) and (max-height:700px) {
+ body.mobile-game #game-dialog.march-dialog .march-detail-tabs { display:flex; gap:4px; margin-left:auto; }
+ body.mobile-game #game-dialog.march-dialog .march-command-heading>span { display:none; }
+ body.mobile-game #game-dialog.march-dialog .march-command[data-view="troops"] .march-target,
+ body.mobile-game #game-dialog.march-dialog .march-command[data-view="target"] .march-formation { display:none; }
+}
+@media(max-height:540px) {
+ body.mobile-game { --game-window-height:calc(100dvh - 16px); }
+ body.mobile-game #game-dialog .popup-heading,body.mobile-game #panel-dialog .page-heading { flex-basis:36px; min-height:36px; padding-top:3px; padding-bottom:3px; }
+ body.mobile-game #panel-dialog #content { padding:7px!important; }
+ .inventory-category-tabs { margin-bottom:6px; }.inventory-category-tabs button { flex-direction:row; justify-content:center; min-height:32px; padding:3px; font-size:9px; }.inventory-category-tabs img { width:20px; height:20px; }
+ body.mobile-game #panel-dialog .inventory-paged .inventory-page-grid { grid-template-columns:repeat(4,minmax(0,75px)); gap:8px 20px; }
+ body.mobile-game .loot-tile[class*="rarity-"] .loot-value { font-size:10px!important; }
+ body.mobile-game #panel-dialog .inventory-paged .loot-subtitle { display:none; }
+ .alliance-overview { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.3fr); grid-template-rows:auto auto 1fr; gap:6px; overflow:auto; }
+ .alliance-hero { grid-row:1/3; min-height:112px; padding:5px; grid-template-columns:58px minmax(0,1fr); gap:5px; }
+ .alliance-crest { width:50px;height:58px; }.alliance-crest::after { left:11px;right:11px;bottom:-7px;height:15px; }
+ .alliance-crest>span { font-size:25px; }.alliance-crest>strong { font-size:8px; }
+ .alliance-summary h2 { margin-bottom:3px; font-size:13px; }
+ .alliance-summary dl { padding:4px 5px;font-size:9px; }.alliance-summary dl>div { grid-template-columns:minmax(58px,1fr) minmax(0,1fr); }
+ .alliance-member-progress { grid-column:2; padding:0;font-size:9px; }
+ .alliance-member-progress .progress-track { height:10px; }.alliance-member-progress>span { display:none; }
+ .alliance-announcement { grid-column:2; min-height:38px;padding:5px 7px;font-size:10px; }.alliance-announcement>strong { font-size:16px; }
+ .alliance-actions { grid-column:1/-1;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin-top:0; }
+ .alliance-action { display:flex;justify-content:center;min-height:44px;padding:4px;font-size:10px;text-align:center; }
+ .alliance-action-icon { width:27px;height:27px;font-size:15px; }.alliance-action-arrow { display:none; }
+ body.mobile-game #panel-dialog .window-list>.list-row { padding:8px; }
+ body.mobile-game #panel-dialog .window-list h3 { font-size:12px; }
+ body.mobile-game #panel-dialog .window-list small { font-size:10px; }
+ body.mobile-game #panel-dialog[data-panel="quests"] .quest-page { gap:5px; }
+ body.mobile-game #panel-dialog[data-panel="quests"] .panel-pagination { padding-top:5px; margin-top:auto; }
+ body.mobile-game #panel-dialog[data-panel="quests"] .empty { padding:10px 12px; min-height:0; }
+ body.mobile-game #panel-dialog[data-panel="quests"] .empty-icon { font-size:24px; margin-bottom:5px; }
+ body.mobile-game #panel-dialog[data-panel="quests"] .empty h3 { margin:4px 0; font-size:13px; }
+ body.mobile-game #panel-dialog[data-panel="quests"] .empty p { margin:5px auto 8px; font-size:11px; }
+ .treasury-view { display:grid; grid-template-columns:1fr 1fr; gap:10px; }.treasury-view>.subtabs { grid-column:1/-1; margin:0!important; }
+  .village-summary { padding:8px; }.village-summary>img { height:55px; }.village-actions { margin-top:10px; }.village-actions .button { min-height:38px; }
+ body.mobile-game #panel-dialog .treasury-view { gap:6px 10px; }
+ body.mobile-game #panel-dialog .treasury-view label { margin:0 0 4px; font-size:10px; }
+ body.mobile-game #panel-dialog .treasury-view :is(input,select) { min-height:30px; height:30px; padding:4px 6px; font-size:11px; }
+ body.mobile-game #panel-dialog .treasury-view p { margin:5px 0; font-size:10px; line-height:1.3; }
+ body.mobile-game #panel-dialog .treasury-view .treasury { margin:0; }
+ body.mobile-game #panel-dialog .treasury-view form>.button { min-height:30px; padding:5px; }
+ body.mobile-game #game-dialog:has(.research-detail) #dialog-content { padding:9px; }
+ .research-detail { display:grid; grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr); align-content:start; gap:7px 12px; }
+ body.mobile-game #game-dialog .research-detail .research-requirements { margin:0; padding:0; }
+ body.mobile-game #game-dialog .research-detail .research-detail-summary>p { margin:0 0 6px; }
+ body.mobile-game #game-dialog .research-detail .detail-row { padding:4px 0; font-size:10px; }
+ body.mobile-game #game-dialog .research-detail .costs { display:grid; grid-template-columns:1fr 1fr; gap:4px; margin:7px 0 0; }
+ body.mobile-game #game-dialog .research-detail .costs>span { min-width:0; padding:4px; font-size:10px; }
+ body.mobile-game #game-dialog .research-detail .research-requirement-grid { grid-template-columns:1fr 1fr; gap:4px; }
+ body.mobile-game #game-dialog .research-detail .research-requirement { padding:5px; gap:4px; min-height:55px; }
+ body.mobile-game #game-dialog .research-detail .research-requirement-copy>strong { font-size:9px; }
+ body.mobile-game #game-dialog .research-detail .research-requirement-copy>span { font-size:8px; }
+ body.mobile-game #game-dialog .research-detail .research-requirement-copy>small { font-size:8px; }
+ body.mobile-game #game-dialog .research-detail .research-requirements-heading { margin-bottom:5px; }
+ body.mobile-game #game-dialog .research-detail>.button { grid-column:1/-1; min-height:31px; padding:5px; }
+ body.mobile-game #game-dialog .research-detail-note { grid-column:1/-1; margin:0; font-size:10px; }
+ .rally-detail { gap:6px; }.rally-detail .detail-row { padding:5px 0; }.rally-detail>.button-row { gap:5px; }
+ body.mobile-game #game-dialog:has(.battle-report) #dialog-content { padding:8px; }
+ .battle-report { grid-template-columns:1fr 1fr; gap:6px 12px; }
+ .battle-report .detail-row { padding:3px 0; font-size:10px; }.battle-report p { margin-bottom:4px; font-size:10px; }
+ .battle-report .battle-unit { padding:6px; font-size:11px; }.battle-report .battle-unit small { margin-top:2px; font-size:10px; }
+ .battle-report h3 { font-size:12px; margin-bottom:4px; }
+ .battle-report .panel-pagination { margin-top:3px; grid-template-columns:28px 1fr 28px; gap:5px; }
+ body.mobile-game #game-dialog .battle-report .panel-pagination .button { min-height:24px; padding:1px; }
+ .battle-report-loot { grid-column:1/-1; }.battle-report-loot .costs { margin:3px 0; gap:4px; }.battle-report-loot .costs>span { padding:3px; font-size:10px; }
+ .battle-report-note { grid-column:1/-1; }
+ body.mobile-game #game-dialog:has(.skin-options) #dialog-content { padding:9px; }
+ body.mobile-game #game-dialog:has(.skin-options) #dialog-content>p { font-size:11px; margin:5px 0; line-height:1.3; }
+ .skin-options { margin-top:7px; gap:8px; }
+ .skin-option { padding:7px; }.skin-option img { height:55px; margin-bottom:4px; }.skin-option p { margin:4px 0; font-size:10px; }
+ body.mobile-game #game-dialog.march-dialog .march-target { padding:6px; gap:4px 6px; grid-template-columns:50px minmax(0,1fr); }
+ body.mobile-game #game-dialog.march-dialog .march-target-art,
+ body.mobile-game #game-dialog.march-dialog .march-target-art img,
+ body.mobile-game #game-dialog.march-dialog .march-target-art.resource-target img { width:48px; height:48px; }
+ body.mobile-game #game-dialog.march-dialog .march-target>.march-pvp-note { font-size:9px; line-height:1.25; margin:3px 0; }
+ body.mobile-game #game-dialog.march-dialog .march-target>label[for="rally-minutes"] { grid-column:1; grid-row:auto; font-size:9px; }
+ body.mobile-game #game-dialog.march-dialog .march-target>#rally-minutes { grid-column:2; grid-row:auto; height:28px; min-height:28px; font-size:10px; }
+}
+
+/* Building prerequisites use the same actionable icon cards as research. */
+body.mobile-game #game-dialog .building-requirements { margin:16px 0; }
+body.mobile-game #game-dialog .building-requirements .research-requirement-grid { grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr)); }
+body.mobile-game #game-dialog .building-requirement-icon { flex:0 0 54px; width:54px; height:58px; object-fit:contain; border-radius:5px; background:#142638; }
+body.mobile-game #game-dialog .building-requirement-arrow { margin-left:auto; color:#b9d8fa; font-size:27px; }
+body.mobile-game #game-dialog .building-requirements .requirement-missing { border-color:#c39969; }
+body.mobile-game #game-dialog .building-requirements button:hover { background:#30465e; border-color:#d5e7fa; }
+body.mobile-game #game-dialog .building-requirements button:focus-visible { outline:2px solid #ffe194; outline-offset:2px; }
+
+/* The current building remains unmistakable when following prerequisites. */
+body.mobile-game #game-dialog[data-building] .popup-heading:before { width:calc(100% - 48px); }
+body.mobile-game #game-dialog .building-identity { display:flex; align-items:center; gap:18px; padding:16px 20px; margin:0 0 12px; border:1px solid #92b5d5; border-left:4px solid #efd184; border-radius:6px; background:linear-gradient(110deg,#213e57,#18293d); box-shadow:inset 0 1px #d9edff22; }
+body.mobile-game #game-dialog .building-identity>img { flex:0 0 88px; width:88px; height:88px; object-fit:contain; filter:drop-shadow(0 3px 3px #09152177); }
+body.mobile-game #game-dialog .building-identity-copy { min-width:0; }
+body.mobile-game #game-dialog .building-menu-label { color:#b8cde4; font-size:10px; text-transform:uppercase; letter-spacing:1.1px; }
+body.mobile-game #game-dialog .building-identity h3 { margin:3px 0 10px; color:#fff1c5; font-size:27px; line-height:1.15; font-weight:850; overflow-wrap:anywhere; }
+body.mobile-game #game-dialog .building-level-change { display:flex; flex-wrap:wrap; align-items:center; gap:9px; font-size:12px; color:#bdd2e8; }
+body.mobile-game #game-dialog .building-level-change strong { padding:4px 9px; border:1px solid #d2b774; border-radius:4px; color:#fff1b9; background:#76602c45; font-size:12px; }
+body.mobile-game #game-dialog .building-level-arrow { color:#e8cc87; }
+body.mobile-game #game-dialog .building-description { margin:0 0 12px; }
+@media(max-width:480px) {
+ body.mobile-game #game-dialog .building-identity { gap:12px; padding:12px; }
+ body.mobile-game #game-dialog .building-identity>img { flex-basis:64px; width:64px; height:72px; }
+ body.mobile-game #game-dialog .building-identity h3 { font-size:23px; }
+ body.mobile-game #game-dialog .building-menu-label { font-size:9px; letter-spacing:.5px; }
+}
+
+.skin-description { display:block; margin:8px 0; font-size:11px; line-height:1.4; color:#bcd0e6; }
+body.mobile-game #game-dialog .skin-option img { height:150px; }
+@media(max-width:700px){.skin-description{font-size:10px}.skin-options{gap:6px}body.mobile-game #game-dialog .skin-option{padding:9px 5px}body.mobile-game #game-dialog .skin-option img{height:92px}}
+@media(max-height:540px){.skin-description{display:none}body.mobile-game #game-dialog .skin-option img{height:65px}}
+
+.skin-option strong { display:block; overflow-wrap:anywhere; hyphens:auto; line-height:1.3; }

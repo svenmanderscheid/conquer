@@ -57,6 +57,7 @@ final class NotificationService
     {
         try {
             $db       = Connection::getInstance();
+            $data['world_id'] ??= \Conquer\Game\World\WorldContext::id();
             $dataJson = $data !== [] ? json_encode($data, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR) : null;
 
             $db->execute(

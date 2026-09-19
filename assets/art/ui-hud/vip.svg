@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>VIP</title>
+  <path fill="#F1E2BD" stroke="#70472F" stroke-width="4" stroke-linejoin="round" d="M9 20 22 31 32 13l10 18 13-11-5 28H14Z"/>
+  <path fill="#C5A361" d="m16 27 8 7 8-14 8 14 8-7-3 15H19Z"/>
+  <path fill="none" stroke="#70472F" stroke-width="4" stroke-linecap="round" d="M15 49h34"/>
+  <circle cx="9" cy="19" r="4" fill="#ED8A31" stroke="#70472F" stroke-width="3"/>
+  <circle cx="32" cy="12" r="4" fill="#80658F" stroke="#70472F" stroke-width="3"/>
+  <circle cx="55" cy="19" r="4" fill="#ED8A31" stroke="#70472F" stroke-width="3"/>
+</svg>

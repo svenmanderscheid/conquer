@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Königsschild">
+<title>Königsschild</title>
+<!-- Original code-native storybook item illustration. Value, quantity and rarity are rendered by the game UI. -->
+<g stroke="#493b33" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+<g transform="translate(3 6) scale(.70)">
+<path d="M57 53C34 51 19 33 16 20L12 41 3 32 7 56 1 50C7 78 24 94 55 96Z" fill="#aabeca" />
+<path d="M55 61C38 58 26 47 22 37L21 55 12 48C16 66 27 75 41 79L28 78C37 88 46 90 56 88Z" fill="#eff5ed" />
+<path d="M14 64C25 74 32 78 45 80" fill="none" stroke="#748fa7" stroke-width="3"/>
+</g>
+<g transform="translate(125 6) scale(-.70 .70)">
+<path d="M57 53C34 51 19 33 16 20L12 41 3 32 7 56 1 50C7 78 24 94 55 96Z" fill="#aabeca" />
+<path d="M55 61C38 58 26 47 22 37L21 55 12 48C16 66 27 75 41 79L28 78C37 88 46 90 56 88Z" fill="#eff5ed" />
+<path d="M14 64C25 74 32 78 45 80" fill="none" stroke="#748fa7" stroke-width="3"/>
+</g>
+<path d="M31 39 49 36 64 21 79 36 97 39 94 74C90 91 77 105 64 113 48 105 36 93 33 75Z" fill="#e4af38" />
+<path d="M40 45 53 43 64 32 75 43 88 45 85 72C82 85 72 96 64 102 53 95 45 85 43 73Z" fill="#ffdc73" />
+<path d="M64 32V102C77 92 82 83 85 72L88 45 75 43Z" fill="#c89134" stroke="none"/>
+<polygon points="64,45 71,59 87,61 75,73 78,89 64,81 50,89 53,73 41,61 57,59" fill="#e4af38" />
+<path d="M43 50 46 68" fill="none" stroke="#fff8cb" stroke-width="4"/>
+</g>
+</svg>

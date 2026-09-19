@@ -1,0 +1,138 @@
+/* Illustrated name frames shared by the player HUD, skin preview and world map. */
+.name-frame {
+  --name-frame-accent:var(--ui-blue,#2a72c9);
+  --name-frame-edge:var(--ui-frame,#70472f);
+  --name-frame-fill:var(--ui-card,#fff6df);
+  position:relative;
+  isolation:isolate;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  min-width:0;
+  max-width:100%;
+  padding:4px 24px;
+  color:var(--ui-ink,#493b33);
+  border:2px solid var(--name-frame-edge);
+  border-radius:12px 15px 12px 15px;
+  background:
+    radial-gradient(circle at 50% 0,color-mix(in srgb,var(--name-frame-accent),transparent 72%),transparent 58%),
+    linear-gradient(180deg,var(--ui-card-light,#fffaf0),var(--name-frame-fill));
+  box-shadow:inset 0 2px 0 #fff9,inset 0 -2px 0 color-mix(in srgb,var(--name-frame-edge),transparent 75%),0 2px 0 #493b3338;
+  font-family:var(--ui-font,"Trebuchet MS","Segoe UI",Arial,sans-serif);
+  font-weight:800;
+  line-height:1.2;
+  text-shadow:none;
+}
+.name-frame::after {
+  content:"";
+  position:absolute;
+  z-index:-1;
+  inset:2px;
+  border:1px solid color-mix(in srgb,var(--name-frame-accent),transparent 42%);
+  border-radius:8px 11px 8px 11px;
+  pointer-events:none;
+}
+.name-frame-label { min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.name-frame-ornament {
+  position:absolute;
+  z-index:1;
+  left:3px;
+  top:50%;
+  display:grid;
+  place-items:center;
+  width:18px;
+  height:18px;
+  translate:0 -50%;
+  color:var(--name-frame-accent);
+  filter:drop-shadow(0 1px 0 #fff8);
+  pointer-events:none;
+}
+.name-frame-ornament:last-child { left:auto;right:3px;transform:scaleX(-1); }
+.name-frame-ornament svg { display:block;width:100%;height:100%;overflow:visible; }
+
+.name-frame--default { --name-frame-accent:#2a72c9;--name-frame-edge:#70472f;--name-frame-fill:#f6ecd8; }
+.name-frame--ironkeep { --name-frame-accent:#71879a;--name-frame-edge:#596271;--name-frame-fill:#eef1ee; }
+.name-frame--rosehall { --name-frame-accent:#d45d87;--name-frame-edge:#8d5360;--name-frame-fill:#fff0e8; }
+.name-frame--sandspire { --name-frame-accent:#d3942d;--name-frame-edge:#8d6239;--name-frame-fill:#fff0c4; }
+.name-frame--tidewatch { --name-frame-accent:#299ab8;--name-frame-edge:#47777b;--name-frame-fill:#e5f5ed; }
+.name-frame--winterhold { --name-frame-accent:#4fa7d1;--name-frame-edge:#5e7482;--name-frame-fill:#eef8f4; }
+.name-frame--jadecourt { --name-frame-accent:#3f936a;--name-frame-edge:#557053;--name-frame-fill:#e9efd3; }
+.name-frame--emberforge { --name-frame-accent:#c26532;--name-frame-edge:#75472f;--name-frame-fill:#f6dfc4; }
+.name-frame--ravenloft { --name-frame-accent:#77649b;--name-frame-edge:#5d4b68;--name-frame-fill:#eee7ed; }
+.name-frame--clockwork { --name-frame-accent:#a97931;--name-frame-edge:#74583b;--name-frame-fill:#f5e6c6; }
+.name-frame--sapphire { --name-frame-accent:#356bc4;--name-frame-edge:#445f88;--name-frame-fill:#e8f0f2; }
+.name-frame--phoenix { --name-frame-accent:#df5d2b;--name-frame-edge:#8b412a;--name-frame-fill:#fff0c4; }
+.name-frame--astral { --name-frame-accent:#6f7fe0;--name-frame-edge:#625684;--name-frame-fill:#f2eafa; }
+.name-frame--leviathan { --name-frame-accent:#20a995;--name-frame-edge:#427a74;--name-frame-fill:#e2f4e9; }
+.name-frame--yggdrasil { --name-frame-accent:#459b56;--name-frame-edge:#557044;--name-frame-fill:#e9efd3; }
+.name-frame--tempest { --name-frame-accent:#429fc9;--name-frame-edge:#526f83;--name-frame-fill:#e9f3ed; }
+.name-frame--eclipse { --name-frame-accent:#8849be;--name-frame-edge:#594267;--name-frame-fill:#efe6f2; }
+.name-frame--dragon { --name-frame-accent:#b87325;--name-frame-edge:#765033;--name-frame-fill:#f3e2bd; }
+
+.name-frame--phoenix::after,.name-frame--astral::after,.name-frame--leviathan::after,
+.name-frame--yggdrasil::after,.name-frame--tempest::after,.name-frame--eclipse::after,.name-frame--dragon::after {
+  animation:name-frame-lustre 2.8s ease-in-out infinite;
+}
+.name-frame--phoenix .name-frame-ornament,.name-frame--astral .name-frame-ornament,
+.name-frame--leviathan .name-frame-ornament,.name-frame--yggdrasil .name-frame-ornament,
+.name-frame--tempest .name-frame-ornament,.name-frame--eclipse .name-frame-ornament,
+.name-frame--dragon .name-frame-ornament { animation:name-frame-breathe 2.4s ease-in-out infinite; }
+@keyframes name-frame-lustre { 50% { border-color:var(--name-frame-accent);box-shadow:inset 0 0 7px color-mix(in srgb,var(--name-frame-accent),transparent 58%); } }
+@keyframes name-frame-breathe { 50% { scale:1.08;filter:drop-shadow(0 0 3px color-mix(in srgb,var(--name-frame-accent),transparent 22%)); } }
+
+/* The HUD keeps the power line readable inside the same illustrated plaque. */
+#player-hud-name.name-frame { min-width:132px;max-width:min(235px,34vw);padding:5px 24px 4px;flex-direction:column;gap:1px; }
+#player-hud-name.name-frame small { display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ui-muted,#786345);font-size:9px;font-weight:700; }
+#account-button .name-frame-ornament { width:19px;height:19px; }
+
+/* City labels stay compact and never enlarge a target's touch area. */
+.map-overlay-shell .atlas-marker-name.name-frame {
+  position:absolute;
+  display:inline-flex;
+  width:max-content;
+  max-width:180px;
+  padding:4px 23px;
+  color:var(--ui-ink,#493b33);
+  font-size:10px;
+  line-height:1.2;
+  pointer-events:none;
+}
+.map-overlay-shell .atlas-marker--home .atlas-marker-name.name-frame { display:inline-flex;opacity:1!important; }
+.map-overlay-shell .atlas-marker-name.name-frame .name-frame-ornament { width:16px;height:16px; }
+
+/* Read-only collection preview; ownership and equip actions arrive with server support. */
+body.mobile-game #game-dialog:has(.name-frame-picker) #dialog-content { display:flex;padding:12px;overflow:hidden; }
+.skin-collection-tabs { grid-template-columns:repeat(4,minmax(0,1fr)); }
+.name-frame-picker { display:flex;flex:1;min-height:0;flex-direction:column;gap:8px; }
+.name-frame-intro { display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 9px;border:1px solid var(--ui-line);border-radius:10px;background:var(--ui-inset);color:var(--ui-muted);font-size:11px; }
+.name-frame-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:9px;flex:1;min-height:0; }
+.name-frame-card { display:flex;min-width:0;min-height:0;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:9px;border:1px solid var(--ui-line);border-radius:12px;background:var(--ui-card);overflow:hidden; }
+.name-frame-card[data-rarity="mythic"] { border-color:var(--ui-purple);background:linear-gradient(180deg,var(--ui-card-light),color-mix(in srgb,var(--ui-purple),var(--ui-card) 88%)); }
+.name-frame-card[data-rarity="legendary"] { border-color:var(--ui-gold);background:linear-gradient(180deg,var(--ui-card-light),var(--ui-gold-soft)); }
+.name-frame-card .name-frame { width:min(100%,230px);font-size:13px; }
+.name-frame-card>strong { color:var(--ui-ink);font-size:12px;text-align:center; }
+.name-frame-card>small { color:var(--ui-muted);font-size:9px;text-align:center; }
+
+@media(max-width:420px) {
+  #player-hud-name.name-frame { min-width:105px;max-width:42vw;padding-inline:21px;font-size:11px; }
+  #player-hud-name.name-frame small { font-size:8px; }
+  .name-frame-card { padding:3px 4px;gap:2px; }
+  .name-frame-card .name-frame { padding-inline:20px;font-size:11px; }
+  .name-frame-card .button { min-height:26px;padding:2px 5px;font-size:10px;line-height:1.1; }
+  body.mobile-game #game-dialog:has(.name-frame-picker) #dialog-content { padding:8px; }
+  .skin-collection-tabs button { gap:2px;padding-inline:2px;font-size:10px; }
+  .skin-collection-tabs button>span { font-size:14px; }
+  .skin-collection-tabs button>small { min-width:19px;padding-inline:3px;font-size:9px; }
+}
+@media(min-width:421px) and (max-height:540px) {
+  .name-frame-grid { grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:minmax(0,1fr);gap:5px; }
+  .name-frame-card { padding:2px 3px;gap:1px; }
+  .name-frame-card .name-frame { padding-inline:19px;font-size:10px; }
+  .name-frame-card>strong,.name-frame-card>small { display:none; }
+  .name-frame-card .button { min-height:26px;padding:2px 4px;font-size:9px;line-height:1.1; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .name-frame::after,.name-frame-ornament { animation:none!important; }
+}
+body.reduced-motion .name-frame::after,body.reduced-motion .name-frame-ornament { animation:none!important; }

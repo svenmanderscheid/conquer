@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "name": "Krieg der vier Schreine",
+  "schedule": {"timezone": "UTC", "iso_weekday": 6, "starts_at": "16:00", "duration_seconds": 14400},
+  "shrines": [
+    {"code": "SHRINE_FOREST", "name": "Waldschrein", "element": "forest", "coord_x": 100, "coord_y": 100},
+    {"code": "SHRINE_ICE", "name": "Eisschrein", "element": "ice", "coord_x": 156, "coord_y": 100},
+    {"code": "SHRINE_SAND", "name": "Sandschrein", "element": "sand", "coord_x": 100, "coord_y": 156},
+    {"code": "SHRINE_LAVA", "name": "Lavaschrein", "element": "lava", "coord_x": 156, "coord_y": 156}
+  ]
+}

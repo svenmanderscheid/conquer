@@ -1,0 +1,1 @@
+ALTER TABLE kingdom_profiles ADD COLUMN IF NOT EXISTS city_skin VARCHAR(20) NOT NULL DEFAULT 'default';

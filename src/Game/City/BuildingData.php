@@ -6,13 +6,37 @@ namespace Conquer\Game\City;
 /**
  * Building cost, build time, and production data.
  *
- * Sprint 1.5: formula-based placeholders.
- * These will be replaced by data/buildings/<code>.json files (SPEC §4.2)
- * once real balance data is available. The public interface stays the same.
+ * Upgrade values come from the supplied balance tables. Production and storage
+ * retain their existing curves: those values are absent from the source files.
  */
 final class BuildingData
 {
     private function __construct() {}
+
+    public static function level(string $code, int $level): ?array
+    {
+        static $data = null;
+        $data ??= json_decode((string)file_get_contents(ROOT_DIR.'/data/buildings.json'), true, 512, JSON_THROW_ON_ERROR);
+        $code = $data['aliases'][$code] ?? $code;
+        return $data['buildings'][$code][$level] ?? null;
+    }
+
+    /** Inventory materials are separate from the four spendable city resources. */
+    public static function getItemCosts(string $code, int $toLevel): array
+    {
+        return self::level($code, $toLevel)['items'] ?? [];
+    }
+
+    public static function itemRequirements(string $code, int $toLevel, array $owned): array
+    {
+        $out = [];
+        foreach (self::getItemCosts($code, $toLevel) as $itemCode => $quantity) {
+            $def = \Conquer\Game\Inventory\InventoryService::getItemDef((int)$itemCode);
+            $have = (int)($owned[$itemCode] ?? 0);
+            $out[] = ['item_code'=>(int)$itemCode, 'name'=>$def['name_de'] ?? $def['name'], 'count'=>$quantity, 'owned'=>$have, 'met'=>$have >= $quantity];
+        }
+        return $out;
+    }
 
     // -------------------------------------------------------------------------
     // Upgrade costs
@@ -20,11 +44,17 @@ final class BuildingData
 
     /**
      * Returns resource costs to upgrade a building to the given level.
-     * Level 1 costs nothing (buildings start at L1 by default).
+     * Level 1 values are retained for reference; starter buildings are granted separately.
      *
      * @return array{lumber: int, stone: int, gold: int, food: int}
      */
     public static function getCost(string $code, int $toLevel): array
+    {
+        return self::level($code, $toLevel)['resources'] ?? ['food'=>0, 'lumber'=>0, 'stone'=>0, 'gold'=>0];
+    }
+
+    /** Only for refunds of jobs paid before cost snapshots were introduced. */
+    public static function legacyCost(string $code, int $toLevel): array
     {
         if ($toLevel <= 1) {
             return ['lumber' => 0, 'stone' => 0, 'gold' => 0, 'food' => 0];
@@ -49,19 +79,16 @@ final class BuildingData
      */
     public static function getBuildTime(string $code, int $toLevel, array $vipBonuses = []): int
     {
-        if ($toLevel <= 1) {
-            return 0;
-        }
+        $row = self::level($code, $toLevel);
+        if ($row === null) return 0;
+        $base = (int)$row['time'];
 
-        // Exponential: L2=42s, L10≈9min, L20≈3.2h, L30≈2.8days
-        $base = max(10, (int) round(30 * pow(1.4, $toLevel - 1)));
-
-        $speedBonus = (int) ($vipBonuses['construction_speed'] ?? 0);
+        $speedBonus = (float) ($vipBonuses['construction_speed'] ?? 0);
         if ($speedBonus > 0) {
             $base = (int) round($base * (1 - $speedBonus / 100));
         }
 
-        return max(1, $base);
+        return max(1, (int)round($base / (1+max(0,(float)($vipBonuses['talent_construction_speed']??0)))));
     }
 
     // -------------------------------------------------------------------------
@@ -97,7 +124,8 @@ final class BuildingData
             $rate = $rate * (1 + $productionBonus / 100);
         }
 
-        return $rate;
+        $resource = self::getProducedResource($code);
+        return $rate * (1 + (float) ($vipBonuses[$resource . '_prod_pct'] ?? 0));
     }
 
     /**
@@ -147,44 +175,19 @@ final class BuildingData
 
     /**
      * Power contribution of a single building level.
-     * Scales as base_power × 1.5^(level−1), matching Wall data from SPEC §4.7.1.
+     * Difference between the cumulative source power at consecutive levels.
      */
     public static function getPowerAtLevel(string $code, int $level): int
     {
-        if ($level <= 0) {
-            return 0;
-        }
-
-        $base = match ($code) {
-            'castle'           => 1000,
-            'wall'             => 600,
-            'barrack'          => 500,
-            'academy'          => 450,
-            'storage'          => 400,
-            'treasure_house'   => 400,
-            'hospital'         => 400,
-            'hall_of_alliance' => 400,
-            'trading_post'     => 350,
-            'farm'             => 300,
-            'lumber_camp'      => 300,
-            'quarry'           => 300,
-            'gold_mine'        => 300,
-            default            => 300,
-        };
-
-        return (int) round($base * pow(1.5, $level - 1));
+        return max(0, self::getTotalPower($code, $level) - self::getTotalPower($code, $level - 1));
     }
 
     /**
-     * Total power for a building at the given level (sum of L1…level).
+     * Cumulative power at this level, exactly as recorded in the source.
      */
     public static function getTotalPower(string $code, int $level): int
     {
-        $total = 0;
-        for ($l = 1; $l <= $level; $l++) {
-            $total += self::getPowerAtLevel($code, $l);
-        }
-        return $total;
+        return (int)(self::level($code, $level)['power'] ?? 0);
     }
 
     /**
@@ -211,30 +214,14 @@ final class BuildingData
      *
      * @return array<string, int>  e.g. ['wall' => 4, 'trading_post' => 4]
      */
+    public static function getUpgradeRequirements(string $code, int $toLevel): array
+    {
+        return self::level($code, $toLevel)['requirements'] ?? [];
+    }
+
     public static function getCastleRequirements(int $toLevel): array
     {
-        if ($toLevel <= 1) {
-            return [];
-        }
-
-        // Wall is always a prerequisite at (toLevel − 1).
-        $reqs = ['wall' => $toLevel - 1];
-
-        // Secondary prerequisite varies by level range (SPEC §4.4).
-        $secondary = match (true) {
-            $toLevel >= 5  && $toLevel <= 14 => 'trading_post',
-            $toLevel >= 15 && $toLevel <= 19 => 'academy',
-            $toLevel >= 20 && $toLevel <= 24 => 'hospital',
-            $toLevel >= 25 && $toLevel <= 29 => 'storage',
-            $toLevel === 30                  => 'treasure_house',
-            default                          => null,
-        };
-
-        if ($secondary !== null) {
-            $reqs[$secondary] = $toLevel - 1;
-        }
-
-        return $reqs;
+        return self::getUpgradeRequirements('castle', $toLevel);
     }
 
     // -------------------------------------------------------------------------
@@ -255,7 +242,7 @@ final class BuildingData
             'gold_mine'        => ['lumber' => 1500, 'stone' => 1500, 'gold' =>  500],
             'storage'          => ['lumber' => 2500, 'stone' => 2500, 'gold' =>    0],
             'treasure_house'   => ['lumber' => 2000, 'stone' => 2000, 'gold' => 1000],
-            'barrack'          => ['lumber' => 2500, 'stone' => 2000, 'gold' =>  500],
+            'barrack', 'archery_range', 'stable' => ['lumber' => 2500, 'stone' => 2000, 'gold' =>  500],
             'hospital'         => ['lumber' => 2000, 'stone' => 2500, 'gold' =>  500],
             'academy'          => ['lumber' => 2500, 'stone' => 2500, 'gold' => 1000],
             'trading_post'     => ['lumber' => 2000, 'stone' => 2000, 'gold' =>  500],
