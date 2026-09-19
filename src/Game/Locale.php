@@ -5,12 +5,12 @@ namespace Conquer\Game;
 /** Explicit translation keys, shared with the browser; no automatic translation of player data. */
 final class Locale
 {
-    public const SUPPORTED=['de'=>'Deutsch','fr'=>'Français','lb'=>'Lëtzebuergesch'];
+    public const SUPPORTED=['de'=>'Deutsch','fr'=>'Français','en'=>'English'];
     private static array $catalogs=[];
 
     public static function normalize(mixed $locale):string
     {
-        if(!is_string($locale))return 'de';$locale=strtolower(str_replace('_','-',trim($locale)));$locale=explode('-',$locale)[0];if($locale==='lu')$locale='lb';return isset(self::SUPPORTED[$locale])?$locale:'de';
+        if(!is_string($locale))return 'de';$locale=strtolower(str_replace('_','-',trim($locale)));$locale=explode('-',$locale)[0];return isset(self::SUPPORTED[$locale])?$locale:'de';
     }
 
     public static function current():string{return self::normalize($_COOKIE['conquer_locale']??'de');}

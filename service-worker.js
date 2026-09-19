@@ -1,6 +1,6 @@
 'use strict';
 // Never put authenticated documents, API responses, admin screens, or auth requests in CacheStorage.
-const BUILD='conquer-public-v2';
+const BUILD='conquer-public-v3';
 const ROOT=new URL(self.registration.scope),PREFIX=ROOT.pathname,CACHE=BUILD+':'+PREFIX;
 const OFFLINE=new URL('offline.html',ROOT).href;
 const PRELOAD=['offline.html','assets/icons/conquer.svg','assets/icons/conquer-192.png','assets/icons/conquer-512.png'];
@@ -9,7 +9,7 @@ const STATIC=new Set([
     'assets/fonts/almendra-400-latin.woff2','assets/fonts/almendra-400-latin-ext.woff2',
     'assets/fonts/almendra-700-latin.woff2','assets/fonts/almendra-700-latin-ext.woff2',
     'assets/fonts/lora-latin.woff2','assets/fonts/lora-latin-ext.woff2',
-    'data/i18n/de.json','data/i18n/fr.json','data/i18n/lb.json',
+    'data/i18n/de.json','data/i18n/fr.json','data/i18n/en.json',
     'assets/css/game.css','assets/css/game-theme.css','assets/css/admin-backoffice.css',
     'assets/css/community-panel.css','assets/css/progression-panel.css','assets/css/defense-panel.css',
     'assets/js/game.js','assets/js/community-panel.js','assets/js/progression-panel.js','assets/js/defense-panel.js',
