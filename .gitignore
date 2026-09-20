@@ -45,6 +45,9 @@ desktop.ini
 
 # Composer (if added later)
 vendor/
+# Three.js is a browser runtime dependency, not a Composer vendor directory.
+!assets/city3d/vendor/
+!assets/city3d/vendor/**
 composer.phar
 composer.lock
 
