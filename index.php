@@ -38,6 +38,12 @@ $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 // Authentication and every private game route continue below the DB guard.
 $_appConfig = \Conquer\Bootstrap::getConfig();
 $_configuredOrigin = rtrim((string) ($_appConfig['base_url'] ?? ''), '/');
+$_requestHost = strtolower((string) parse_url('http://' . ($_SERVER['HTTP_HOST'] ?? ''), PHP_URL_HOST));
+if (in_array($_requestHost, ['unionofkingdoms.com', 'www.unionofkingdoms.com', 'play.unionofkingdoms.com'], true)) {
+    // The public website and game login share one deployment, but each keeps
+    // its own canonical host for links, metadata, robots and the sitemap.
+    $_configuredOrigin = 'https://' . $_requestHost;
+}
 if (!filter_var($_configuredOrigin, FILTER_VALIDATE_URL)) {
     $_configuredOrigin = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
 }
@@ -63,6 +69,10 @@ if ($_normalizedPath === '/sitemap.xml' && $method === 'GET') {
     exit;
 }
 if (($_normalizedPath === '/' && $method === 'GET') || $_normalizedPath === '/alpha/waitlist') {
+    if ($_normalizedPath === '/' && $_requestHost === 'play.unionofkingdoms.com' && !isset($_GET['zugang'])) {
+        header('Location: ' . APP_BASE . '/?zugang=login#zugang', true, 302);
+        exit;
+    }
     session_name('conquer_login');
     session_start(['cookie_httponly' => true, 'cookie_samesite' => 'Lax', 'cookie_secure' => !empty($_SERVER['HTTPS'])]);
     $_SESSION['login_csrf'] ??= bin2hex(random_bytes(32));

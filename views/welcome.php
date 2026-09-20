@@ -3,6 +3,10 @@ declare(strict_types=1);
 $base = htmlspecialchars(APP_BASE, ENT_QUOTES);
 $config = \Conquer\Bootstrap::getConfig();
 $configuredRoot = rtrim((string) ($config['base_url'] ?? ''), '/');
+$requestHost = strtolower((string) parse_url('http://' . ($_SERVER['HTTP_HOST'] ?? ''), PHP_URL_HOST));
+if (in_array($requestHost, ['unionofkingdoms.com', 'www.unionofkingdoms.com', 'play.unionofkingdoms.com'], true)) {
+    $configuredRoot = 'https://' . $requestHost;
+}
 if (!filter_var($configuredRoot, FILTER_VALIDATE_URL)) {
     $scheme = !empty($_SERVER['HTTPS']) ? 'https' : 'http';
     $configuredRoot = $scheme . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
