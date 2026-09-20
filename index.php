@@ -69,10 +69,6 @@ if ($_normalizedPath === '/sitemap.xml' && $method === 'GET') {
     exit;
 }
 if (($_normalizedPath === '/' && $method === 'GET') || $_normalizedPath === '/alpha/waitlist') {
-    if ($_normalizedPath === '/' && $_requestHost === 'play.unionofkingdoms.com' && !isset($_GET['zugang'])) {
-        header('Location: ' . APP_BASE . '/?zugang=login#zugang', true, 302);
-        exit;
-    }
     session_name('conquer_login');
     session_start(['cookie_httponly' => true, 'cookie_samesite' => 'Lax', 'cookie_secure' => !empty($_SERVER['HTTPS'])]);
     $_SESSION['login_csrf'] ??= bin2hex(random_bytes(32));
@@ -84,6 +80,14 @@ if (($_normalizedPath === '/' && $method === 'GET') || $_normalizedPath === '/al
     header('Content-Security-Policy: ' . $_landingCsp);
     // The page embeds a session-bound CSRF token; never let a shared cache reuse it.
     header('Cache-Control: private, no-store');
+    if ($_normalizedPath === '/' && $_requestHost === 'play.unionofkingdoms.com') {
+        if (\Conquer\Auth\Session::current() !== null) {
+            header('Location: ' . APP_BASE . '/city');
+            exit;
+        }
+        require ROOT_DIR . '/views/play_login.php';
+        exit;
+    }
     if ($_normalizedPath === '/alpha/waitlist') {
         header('X-Robots-Tag: noindex, nofollow');
         if ($method !== 'POST') {
@@ -207,7 +211,7 @@ if ($path === '/auth/recover') {
 
 if ($path === '/auth/local') {
     if ($method !== 'POST') {
-        header('Location: ' . APP_BASE . '/#zugang', true, 303); exit;
+        header('Location: ' . APP_BASE . '/', true, 303); exit;
     }
     session_name('conquer_login');
     session_start(['cookie_httponly' => true, 'cookie_samesite' => 'Lax', 'cookie_secure' => !empty($_SERVER['HTTPS'])]);
@@ -215,7 +219,7 @@ if ($path === '/auth/local') {
     $loginError = \Conquer\Auth\PasswordAuth::submit();
     $landingCspNonce = $_landingCspNonce;
     header('Content-Security-Policy: ' . $_landingCsp);
-    require ROOT_DIR . '/views/welcome.php';
+    require ROOT_DIR . ($_requestHost === 'play.unionofkingdoms.com' ? '/views/play_login.php' : '/views/welcome.php');
     exit;
 }
 

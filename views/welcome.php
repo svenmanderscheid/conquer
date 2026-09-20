@@ -15,7 +15,7 @@ $publicRoot = $configuredRoot;
 $canonical = $publicRoot . '/';
 $socialImage = $publicRoot . '/assets/marketing/conquer-social.jpg';
 $postedMode = ($_POST['mode'] ?? 'register') === 'login' ? 'login' : 'register';
-$accessMode = $accessMode ?? (!empty($loginError) ? $postedMode : ($_GET['zugang'] ?? 'waitlist'));
+$accessMode = 'waitlist';
 if (!is_string($accessMode) || !in_array($accessMode, ['waitlist', 'register', 'login'], true)) $accessMode = 'waitlist';
 if ($accessMode !== 'waitlist') $postedMode = $accessMode;
 $waitlistError = $waitlistError ?? '';
@@ -77,7 +77,7 @@ $structuredData = [
   </a>
   <div class="lp-header-actions">
     <div class="lp-language lp-language-header" data-locale-controls data-locale-compact="true" data-locale-install="false"></div>
-    <a class="lp-sign-in" href="<?= $base ?>/?zugang=login#zugang" data-auth-target="login"><span data-i18n="login.login">Anmelden</span> <span aria-hidden="true">→</span></a>
+    <a class="lp-sign-in" href="https://play.unionofkingdoms.com/"><span data-i18n="login.login">Anmelden</span> <span aria-hidden="true">→</span></a>
   </div>
 </header>
 
@@ -133,7 +133,7 @@ $structuredData = [
       <div class="lp-auth-body">
         <div class="auth-switch" role="group" aria-label="Anmeldung auswählen">
           <a href="<?= $base ?>/?zugang=waitlist#zugang" class="<?= $accessMode === 'waitlist' ? 'active' : '' ?>" data-auth-target="waitlist"<?= $accessMode === 'waitlist' ? ' aria-current="true"' : '' ?> data-i18n="waitlist.tab"><?= $wt('tab') ?></a>
-          <a href="<?= $base ?>/?zugang=login#zugang" class="<?= $accessMode === 'login' ? 'active' : '' ?>" data-auth-target="login"<?= $accessMode === 'login' ? ' aria-current="true"' : '' ?>>Anmelden</a>
+          <a href="https://play.unionofkingdoms.com/" data-i18n="login.login">Anmelden</a>
         </div>
         <div data-access-panel="waitlist"<?= $accessMode !== 'waitlist' ? ' hidden' : '' ?>>
           <?php if ($waitlistSuccess): ?>
@@ -180,7 +180,7 @@ $structuredData = [
           <p data-i18n="landing.alpha_notice">Neue Konten benötigen einen Alpha-Key. Das Spiel wird weiterentwickelt; Änderungen und Spielstandsresets sind möglich.</p>
         </details>
         </div>
-        <div class="lp-auth-footer lp-key-link"><a href="<?= $base ?>/?zugang=register#zugang" data-auth-target="register"<?= $accessMode === 'register' ? ' aria-current="true"' : '' ?> data-i18n="waitlist.redeem"><?= $wt('redeem') ?></a></div>
+        <div class="lp-auth-footer lp-key-link"><a href="https://play.unionofkingdoms.com/?mode=register" data-i18n="waitlist.redeem"><?= $wt('redeem') ?></a></div>
       </div>
     </div>
     <div class="lp-access-character lp-access-character-right" aria-hidden="true"><img src="<?= $base ?>/assets/art/archer.png" alt=""></div>

@@ -454,6 +454,7 @@
   "login.username_short": "Player name",
   "login.password_short": "Password",
   "login.note_short": "No download · No blockchain",
+  "login.back_website": "Back to website",
   "landing.footer_navigation": "Footer navigation",
   "ui.attack": "Attack",
   "ui.legendary": "Legendary",

@@ -454,6 +454,7 @@
   "login.username_short": "Nom de joueur",
   "login.password_short": "Mot de passe",
   "login.note_short": "Sans téléchargement · Sans blockchain",
+  "login.back_website": "Retour au site",
   "landing.footer_navigation": "Navigation de pied de page",
   "ui.attack": "Attaque",
   "ui.legendary": "Légendaire",
