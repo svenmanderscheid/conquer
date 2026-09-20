@@ -1,0 +1,18 @@
+{
+  "generator": "built-in image_gen",
+  "reference": "Approved Runensteine concept",
+  "jobs": [
+    {
+      "grade": "normal",
+      "prompt": "Create one isolated production sprite for the approved Runensteine concept. Reference image shows the approved trio; extract/recreate ONLY the cyan turquoise elongated rounded diamond main floating rune stone with a bright white spiral on its face and two tiny matching floating crystal shards beside it. Match the corresponding design closely: chunky silhouette, thick dark brown outline, broad colored facets, simple two-tone cartoon fantasy mobile game art. Entire sprite fully visible and centered, nearly fills square frame with small safe margins. IMPORTANT: transparent background with true alpha. NO stone pedestal, NO ground, NO shadow, NO glow outside the silhouette, NO ring, NO text, NO labels, NO presentation board, NO other color variants. Pedestal and animated glow will be added separately in the game. This is a single reusable collectible sprite, legible at 64 pixels."
+    },
+    {
+      "grade": "epic",
+      "prompt": "Create one isolated production sprite for the approved Runensteine concept. Reference image shows the approved trio; extract/recreate ONLY the vivid pink magenta broad hexagonal crystal main floating rune stone with a bright white crescent moon on its face and two tiny matching floating crystal shards beside it. Match the corresponding design closely: chunky silhouette, thick dark brown outline, broad colored facets, simple two-tone cartoon fantasy mobile game art. Entire sprite fully visible and centered, nearly fills square frame with small safe margins. IMPORTANT: transparent background with true alpha. NO stone pedestal, NO ground, NO shadow, NO glow outside the silhouette, NO ring, NO text, NO labels, NO presentation board, NO other color variants. Pedestal and animated glow will be added separately in the game. This is a single reusable collectible sprite, legible at 64 pixels."
+    },
+    {
+      "grade": "legendary",
+      "prompt": "Create one isolated production sprite for the approved Runensteine concept. Reference image shows the approved trio; extract/recreate ONLY the golden orange broad eight-point sunburst crystal main floating rune stone with a bright ivory four-point star on its face and two tiny matching floating crystal shards beside it. Match the corresponding design closely: chunky silhouette, thick dark brown outline, broad colored facets, simple two-tone cartoon fantasy mobile game art. Entire sprite fully visible and centered, nearly fills square frame with small safe margins. IMPORTANT: transparent background with true alpha. NO stone pedestal, NO ground, NO shadow, NO glow outside the silhouette, NO ring, NO text, NO labels, NO presentation board, NO other color variants. Pedestal and animated glow will be added separately in the game. This is a single reusable collectible sprite, legible at 64 pixels."
+    }
+  ]
+}

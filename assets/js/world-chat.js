@@ -1,7 +1,7 @@
 /* Compact two-message preview with a full, touch-first chat window. */
 window.ConquerWorldChat = function (ctx) {
     'use strict';
-    const {api, esc, date, getState, navigate, openSharedReport} = ctx, base = ctx.base || '';
+    const {api, esc, date, getState, navigate, openSharedReport, openSharedLocation} = ctx, base = ctx.base || '';
     const root = document.querySelector('#world-chat');
     if (!root) return {update() {}, open() {}, syncBadge() {}};
     const names = {world: 'Weltchat', alliance: 'Allianzchat', private: 'Privatchat'};
@@ -34,6 +34,9 @@ window.ConquerWorldChat = function (ctx) {
     const draft = () => {const key=activeKey();if(!drafts.has(key))drafts.set(key,{text:'',receipt:null});return drafts.get(key);};
     const canRead = () => visible && !document.hidden;
     const reportLink = message => Number(message.shared_report_id)>0?`<button type="button" class="world-chat-report" data-chat-report="${Number(message.shared_report_id)}" aria-label="Geteilten Kampfbericht ansehen"><span aria-hidden="true">⚔</span> Bericht ansehen</button>`:'';
+    const sharedLocation=message=>{const match=String(message?.message||'').match(/· Welt (\d+) · X (\d+) \/ Y (\d+)$/);if(!match)return null;const location={world:Number(match[1]),x:Number(match[2]),y:Number(match[3])};return location.world>0&&location.x>=0&&location.x<=255&&location.y>=0&&location.y<=255?location:null;};
+    const monsterIcon=(message,location)=>{const monster=(getState()?.monsters||[]).find(entry=>Number(entry.coord_x)===location.x&&Number(entry.coord_y)===location.y),definition=monster?.definition||{},name=String(definition.name||message?.message||''),art=/^(?:monsters\/)?[a-z0-9-]+$/.test(definition.art||'')?definition.art:/skeleton|skelett/i.test(name)?'skeleton':/golem/i.test(name)?'golem':'orc';return `${base}/assets/art/${art}.png`;};
+    const locationLink=message=>{const location=sharedLocation(message);return location?`<button type="button" class="world-chat-location" data-chat-location data-world="${location.world}" data-x="${location.x}" data-y="${location.y}" aria-label="Geteiltes Ziel bei X ${location.x}, Y ${location.y} auf der Weltkarte zeigen"><img src="${esc(monsterIcon(message,location))}" alt=""><span><b>Monsterziel</b><small>Auf Weltkarte zeigen</small></span><strong>X ${location.x} / Y ${location.y}</strong></button>`:'';};
     const schedule = () => {clearTimeout(timer);if(canRead())timer=setTimeout(load,10000);};
     const totalUnread = () => Object.entries(unread).reduce((sum,[key,count])=>sum+(muted(key)?0:Number(count)||0),0);
 
@@ -46,7 +49,7 @@ window.ConquerWorldChat = function (ctx) {
         const tag=channel==='world'&&message.alliance_tag?`[${esc(message.alliance_tag)}] `:'';
         const avatar=['knight','archer','rider'].includes(message.avatar)?message.avatar:'knight',own=Number(message.player_id)===Number(data?.player_id);
         if(compact)return `<span class="world-chat-preview-message"><img src="${base}/assets/art/${avatar}.png" alt=""><span class="world-chat-preview-copy"><strong>${tag}${esc(message.username)}</strong><span>${esc(message.message)}</span></span></span>`;
-        return `<article class="world-chat-message ${own?'mine':''}"><img class="world-chat-avatar" src="${base}/assets/art/${avatar}.png" alt="Profilbild von ${esc(message.username)}"><div class="world-chat-message-content"><header><strong>${tag}${esc(message.username)}</strong><time title="${esc(new Date(date(message.created_at)).toLocaleString('de-DE'))}">${esc(new Date(date(message.created_at)).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}))}</time></header><div class="world-chat-bubble"><p>${esc(message.message)}</p>${reportLink(message)}</div></div></article>`;
+        return `<article class="world-chat-message ${own?'mine':''}"><img class="world-chat-avatar" src="${base}/assets/art/${avatar}.png" alt="Profilbild von ${esc(message.username)}"><div class="world-chat-message-content"><header><strong>${tag}${esc(message.username)}</strong><time title="${esc(new Date(date(message.created_at)).toLocaleString('de-DE'))}">${esc(new Date(date(message.created_at)).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}))}</time></header><div class="world-chat-bubble"><p>${esc(message.message)}</p>${locationLink(message)}${reportLink(message)}</div></div></article>`;
     }
     function drawPreview() {
         root.querySelector('[data-chat-preview-channel]').textContent=names[channel];
@@ -98,6 +101,7 @@ window.ConquerWorldChat = function (ctx) {
 
     input.addEventListener('input',()=>{const d=draft();d.text=input.value;d.receipt=null;});
     root.addEventListener('click',event=>{
+        const location=event.target.closest('[data-chat-location]');if(location){event.stopPropagation();if(!openSharedLocation||location.disabled)return;location.disabled=true;close();Promise.resolve(openSharedLocation({world:Number(location.dataset.world),x:Number(location.dataset.x),y:Number(location.dataset.y)})).catch(problem=>{error=problem.message||'Das Ziel konnte nicht geöffnet werden.';draw();});return;}
         const report=event.target.closest('[data-chat-report]');if(report){event.stopPropagation();if(!openSharedReport||report.disabled)return;report.disabled=true;Promise.resolve(openSharedReport(Number(report.dataset.chatReport))).catch(problem=>{error=problem.message||'Der Bericht konnte nicht geöffnet werden.';draw();}).finally(()=>{if(report.isConnected)report.disabled=false;});return;}
         if(event.target.closest('[data-chat-open]')){if(suppressPreviewClick){suppressPreviewClick=false;return;}open();return;}if(event.target.closest('[data-chat-close]')){close();return;}
         const tab=event.target.closest('[data-chat-channel]');if(tab){select(tab.dataset.chatChannel);return;}

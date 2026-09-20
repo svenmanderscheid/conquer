@@ -33,7 +33,7 @@ if ($myMember !== null) {
 $csrf = $session['csrf_token'];
 ?>
 <!DOCTYPE html>
-<html lang="de">
+<html lang="<?= htmlspecialchars(\Conquer\Game\Locale::current(),ENT_QUOTES) ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -519,8 +519,9 @@ $csrf = $session['csrf_token'];
         }
     </style>
 <link rel="stylesheet" href="<?= htmlspecialchars(APP_BASE, ENT_QUOTES) ?>/assets/css/village-theme.css?v=<?= filemtime(__DIR__ . "/../assets/css/village-theme.css") ?>">
+<?php require ROOT_DIR.'/views/partials/localization-head.php'; ?>
 </head>
-<body>
+<body data-i18n-scope>
 <?php $hudCurrentView = 'alliance'; require __DIR__ . '/partials/hud.php'; ?>
 
 <div class="page-wrap">

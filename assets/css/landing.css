@@ -8,10 +8,10 @@ body.landing-page { display:flex; flex-direction:column; text-rendering:optimize
 .skip-link { position:fixed; z-index:10; left:16px; top:12px; transform:translateY(-160%); padding:12px 16px; border-radius:9px; background:var(--ui-card-light); color:var(--ui-primary-dark); }
 .skip-link:focus { transform:none; }
 
-.lp-header { display:flex; align-items:center; justify-content:space-between; gap:16px; min-height:80px; padding:12px max(32px,env(safe-area-inset-right)) 12px max(32px,env(safe-area-inset-left)); border-bottom:1px solid var(--ui-gold); background:var(--ui-primary-dark); color:var(--ui-card-light); }
-.lp-brand { display:flex; align-items:center; gap:12px; color:inherit; font-size:23px; font-weight:700; letter-spacing:2px; line-height:1; }
-.lp-brand img { display:block; }
-.lp-brand small { display:block; margin-top:7px; color:var(--ui-gold-soft); font-size:10px; letter-spacing:.7px; font-weight:400; }
+.lp-header { display:flex; align-items:center; justify-content:space-between; gap:16px; min-height:86px; padding:8px max(32px,env(safe-area-inset-right)) 8px max(32px,env(safe-area-inset-left)); border-bottom:2px solid var(--ui-gold); background:linear-gradient(180deg,var(--ui-primary),var(--ui-primary-dark)); color:var(--ui-card-light); box-shadow:0 5px 18px #2d203a55; }
+.lp-brand { display:flex; align-items:center; color:inherit; }
+.lp-brand img { display:block; width:auto; height:70px; object-fit:contain; }
+.lp-header-actions { display:flex; align-items:center; gap:12px; }
 .lp-sign-in { display:inline-flex; align-items:center; justify-content:center; gap:16px; min-height:44px; padding:8px 18px; border:1px solid var(--ui-frame); border-radius:9px; color:var(--ui-card-light); font-size:16px; }
 .lp-sign-in:hover { border-color:var(--ui-gold); background:var(--ui-primary); }
 body.landing-page :is(.lp-header,.lp-hero) a:focus-visible { outline-color:var(--ui-gold-soft); }
@@ -19,7 +19,8 @@ body.landing-page :is(.lp-header,.lp-hero) a:focus-visible { outline-color:var(-
 .lp-main { display:grid; grid-template-columns:minmax(0,1.65fr) minmax(350px,1fr); flex:1; }
 .lp-hero { position:relative; isolation:isolate; display:flex; align-items:flex-end; min-height:660px; padding:clamp(30px,4.5vw,80px); overflow:hidden; background:var(--ui-primary-dark); color:var(--ui-card-light); }
 .lp-hero-picture { position:absolute; inset:0; z-index:-2; }
-.lp-hero-picture img { display:block; width:100%; height:100%; object-fit:cover; object-position:52% 38%; }
+.lp-hero-picture img { position:absolute; inset:0; display:block; width:100%; height:100%; object-fit:cover; object-position:50% 50%; opacity:0; transform:scale(1.025); transition:opacity .7s ease,transform 7s ease; }
+.lp-hero-picture img.is-active { opacity:1; transform:scale(1); }
 .lp-hero::after { content:""; position:absolute; inset:0; z-index:-1; background:linear-gradient(180deg,transparent 15%,color-mix(in srgb,var(--ui-primary-dark) 15%,transparent) 35%,color-mix(in srgb,var(--ui-primary-dark) 94%,transparent) 75%,var(--ui-primary-dark)); }
 .lp-hero-content { max-width:720px; }
 .lp-kicker { display:flex; align-items:center; flex-wrap:wrap; gap:10px; margin:0 0 20px; color:var(--ui-gold-soft); font-size:16px; }
@@ -31,15 +32,38 @@ body.landing-page :is(.lp-header,.lp-hero) a:focus-visible { outline-color:var(-
 .lp-button:hover { background:var(--ui-green-dark); }
 .lp-button>span,.lp-sign-in>span { font-family:var(--ui-font-number); }
 .lp-mobile-start { display:none; }
+.lp-hero-controls { position:absolute; z-index:2; right:clamp(22px,3vw,48px); bottom:24px; display:flex; gap:10px; }
+.lp-hero-controls button { width:44px; min-height:44px; padding:0; border:0; background:transparent; }
+.lp-hero-controls button::before { content:""; display:block; width:12px; height:12px; margin:auto; border:2px solid var(--ui-card-light); border-radius:50%; background:#33254199; box-shadow:0 2px 6px #0008; }
+.lp-hero-controls button.is-active::before { border-color:var(--ui-gold-soft); background:var(--ui-gold); transform:scale(1.18); }
 
-.lp-access { display:flex; flex-direction:column; justify-content:center; align-items:center; gap:22px; padding:40px clamp(20px,3vw,56px); background:var(--ui-paper); }
-.lp-auth-card { width:100%; max-width:400px; border:2px solid var(--ui-frame); border-radius:var(--ui-radius-window); background:var(--ui-card); box-shadow:var(--ui-shadow); }
+.lp-access { position:relative; isolation:isolate; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:22px; padding:40px clamp(20px,3vw,56px); overflow:hidden; background:radial-gradient(circle at 50% 45%,var(--ui-card-light),var(--ui-paper) 68%); }
+.lp-access::before { content:""; position:absolute; inset:auto -12% -80px; z-index:-2; height:260px; background:url('../art/village2.png') center 72%/cover no-repeat; opacity:.12; mask-image:linear-gradient(transparent,#000 40%); }
+.lp-auth-card { position:relative; z-index:2; width:100%; max-width:400px; border:3px solid var(--ui-frame); border-radius:var(--ui-radius-window); background:var(--ui-card); box-shadow:0 16px 36px #4430523d,0 0 0 3px #c5a36155; }
+.lp-access-character { position:absolute; z-index:1; bottom:8px; width:clamp(110px,11vw,165px); pointer-events:none; filter:drop-shadow(0 10px 10px #4430523d); }
+.lp-access-character img { display:block; width:100%; height:auto; }
+.lp-access-character-left { left:max(-30px,calc(50% - 320px)); transform:rotate(-4deg); }
+.lp-access-character-right { right:max(-34px,calc(50% - 324px)); transform:rotate(4deg); }
+.lp-gameplay { grid-column:1/-1; padding:clamp(52px,7vw,96px) max(24px,calc((100vw - 1380px)/2)); border-block:2px solid var(--ui-gold); background:linear-gradient(180deg,var(--ui-paper),var(--ui-card)); color:var(--ui-ink); }
+.lp-gameplay-heading { max-width:780px; margin:0 auto clamp(30px,4vw,48px); text-align:center; }
+.lp-section-kicker { margin:0 0 8px; color:var(--ui-primary); font-size:14px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; }
+.lp-gameplay-heading h2 { margin:0; color:var(--ui-primary-dark); font-size:clamp(34px,4vw,54px); line-height:1.08; }
+.lp-gameplay-heading>p:last-child { margin:18px auto 0; color:var(--ui-muted); font-size:18px; line-height:1.55; }
+.lp-gameplay-heading strong { color:var(--ui-ink); }
+.lp-gameplay-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:clamp(18px,2vw,28px); }
+.lp-gameplay-card { overflow:hidden; border:2px solid var(--ui-frame); border-radius:18px; background:var(--ui-card-light); box-shadow:0 10px 26px #44305229; }
+.lp-gameplay-card img { display:block; width:100%; height:auto; aspect-ratio:3/2; object-fit:cover; border-bottom:3px solid var(--ui-gold); }
+.lp-gameplay-card>div { position:relative; min-height:165px; padding:24px 22px 22px; }
+.lp-gameplay-card>div>span { position:absolute; top:-24px; right:18px; display:grid; place-items:center; width:48px; height:48px; border:2px solid var(--ui-gold); border-radius:50%; background:var(--ui-primary); color:var(--ui-card-light); font-family:var(--ui-font-number); font-size:20px; box-shadow:0 4px 10px #4430523d; }
+.lp-gameplay-card h3 { margin:0 54px 9px 0; color:var(--ui-primary); font-size:24px; }
+.lp-gameplay-card p { margin:0; color:var(--ui-muted); font-size:16px; line-height:1.5; }
 .lp-auth-heading { padding:22px 26px 24px; border-bottom:1px solid var(--ui-gold); border-radius:14px 14px 0 0; background:var(--ui-primary); color:var(--ui-card-light); }
 .lp-auth-badge { margin:0 0 8px; color:var(--ui-gold-soft); font-size:13px; letter-spacing:1px; }
 .lp-auth-heading h2 { margin:0; font-size:29px; line-height:1.15; font-weight:400; }
 .lp-auth-body { padding:0 26px 12px; }
 body.landing-page .lp-auth-body .auth-switch { margin:22px 0 18px; }
-body.landing-page .lp-auth-body .auth-switch button { padding:8px 6px; font-size:15px; }
+body.landing-page .lp-auth-body .auth-switch a { display:flex; align-items:center; justify-content:center; min-height:44px; padding:8px 6px; border-radius:7px; color:var(--ui-muted); text-align:center; font-size:15px; }
+body.landing-page .lp-auth-body .auth-switch a.active { background:var(--ui-primary); color:var(--ui-card-light); }
 .lp-auth-card form>label { display:block; margin-top:15px; color:var(--ui-ink); font-size:15px; }
 .lp-auth-card input:not([type=hidden]) { display:block; width:100%; min-height:46px; margin-top:6px; padding:10px 12px; border:1px solid var(--ui-line); border-radius:9px; background:var(--ui-card-light); color:var(--ui-ink); font-size:16px; }
 .lp-auth-card input::placeholder { color:var(--ui-muted); opacity:1; }
@@ -50,10 +74,21 @@ body.landing-page .lp-auth-body .auth-switch button { padding:8px 6px; font-size
 .lp-alpha-note summary { display:list-item; min-height:44px; padding:12px 0; }
 .lp-alpha-note p { margin:0 0 12px; font-size:14px; line-height:1.5; }
 .lp-auth-card .form-error { padding:10px 12px; border:1px solid var(--ui-red); border-radius:9px; background:var(--ui-red-soft); color:var(--ui-red-dark); font-size:15px; }
+.lp-waitlist-intro { margin:0 0 18px; color:var(--ui-muted); font-size:16px; line-height:1.4; }
+.lp-name-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; font-size:15px; }
+.lp-name-fields label { min-width:0; }
+.lp-auth-card form>label.lp-consent { display:flex; align-items:flex-start; gap:10px; min-height:44px; margin-top:18px; font-size:14px; line-height:1.4; cursor:pointer; }
+body.landing-page .lp-auth-card .lp-consent input { flex:none; width:20px; min-height:20px; height:20px; margin:1px 0 0; padding:0; accent-color:var(--ui-primary); }
+.lp-waitlist-success { padding:16px; border:1px solid var(--ui-green); border-radius:9px; background:var(--ui-card-light); color:var(--ui-green-dark); line-height:1.5; }
+.lp-key-link { margin-top:0; }
+.lp-key-link [aria-current] { font-weight:700; }
+.lp-alpha-note a { display:inline-flex; align-items:center; min-height:44px; overflow-wrap:anywhere; color:var(--ui-primary); text-decoration:underline; }
 
 body.landing-page .lp-language .locale-tools { margin:0; padding:0; border:0; background:transparent; box-shadow:none; }
 .lp-language .locale-tools>label { align-items:center; gap:12px; font-size:14px; }
 .lp-language .locale-tools select { width:auto; min-width:0; min-height:44px; font-size:14px; }
+.lp-language-header .locale-tools>label>span { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+.lp-language-header .locale-tools select { border-color:var(--ui-gold); background:var(--ui-card); color:var(--ui-ink); }
 .lp-footer { display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:54px; padding:6px max(32px,env(safe-area-inset-right)) max(6px,env(safe-area-inset-bottom)) max(32px,env(safe-area-inset-left)); border-top:1px solid var(--ui-line); background:var(--ui-paper); color:var(--ui-muted); font-size:13px; }
 .lp-footer small { font-size:inherit; }
 .lp-footer a { display:inline-flex; align-items:center; min-height:44px; color:var(--ui-primary); }
@@ -73,25 +108,33 @@ body.landing-page .lp-language .locale-tools { margin:0; padding:0; border:0; ba
   .lp-header { min-height:70px; padding:10px max(20px,env(safe-area-inset-right)) 10px max(20px,env(safe-area-inset-left)); }
   .lp-main { grid-template-columns:1fr; }
   .lp-hero { min-height:510px; padding:34px max(24px,env(safe-area-inset-right)) 36px max(24px,env(safe-area-inset-left)); }
-  .lp-hero-picture img { object-position:center 35%; }
+  .lp-hero-picture img { object-position:center center; }
   .lp-hero::after { background:linear-gradient(180deg,transparent 12%,color-mix(in srgb,var(--ui-primary-dark) 35%,transparent) 32%,color-mix(in srgb,var(--ui-primary-dark) 96%,transparent) 66%,var(--ui-primary-dark)); }
   .lp-hero h1 { font-size:clamp(43px,10vw,66px); letter-spacing:-.8px; }
   .lp-kicker { margin-bottom:14px; font-size:14px; }
   .lp-lead { max-width:340px; margin-top:18px; font-size:19px; }
   .lp-mobile-start { display:inline-flex; margin-top:24px; }
+  .lp-hero-controls { right:16px; bottom:10px; }
   .lp-access { padding:32px max(20px,env(safe-area-inset-right)) 24px max(20px,env(safe-area-inset-left)); }
+  .lp-access-character { width:112px; opacity:.78; }
+  .lp-access-character-left { left:-35px; }
+  .lp-access-character-right { right:-38px; }
+  .lp-gameplay { padding:52px max(20px,env(safe-area-inset-right)) 56px max(20px,env(safe-area-inset-left)); }
+  .lp-gameplay-grid { grid-template-columns:1fr; max-width:620px; margin:auto; }
+  .lp-gameplay-card>div { min-height:0; }
   .lp-footer { padding-inline:max(20px,env(safe-area-inset-left)) max(20px,env(safe-area-inset-right)); }
 }
 @media(max-width:380px) {
   .lp-header { gap:8px; padding-inline:max(14px,env(safe-area-inset-left)) max(14px,env(safe-area-inset-right)); }
-  .lp-brand { gap:7px; font-size:18px; letter-spacing:1px; }
-  .lp-brand img { width:34px; height:34px; }
-  .lp-brand small { font-size:8px; letter-spacing:.3px; }
+  .lp-brand img { width:auto; height:54px; }
+  .lp-header-actions { gap:6px; }
+  .lp-language-header .locale-tools select { width:60px; padding-inline:6px; }
   .lp-sign-in { gap:8px; padding-inline:10px; font-size:15px; }
   .lp-hero { min-height:480px; padding-inline:max(20px,env(safe-area-inset-left)) max(20px,env(safe-area-inset-right)); }
   .lp-access { padding-inline:max(14px,env(safe-area-inset-left)) max(14px,env(safe-area-inset-right)); }
   .lp-auth-heading { padding-inline:20px; }
   .lp-auth-body { padding-inline:20px; }
+  .lp-access-character { display:none; }
 }
 @media(max-height:520px) and (orientation:landscape) {
   .lp-header { min-height:64px; padding-block:8px; }
@@ -104,8 +147,12 @@ body.landing-page .lp-language .locale-tools { margin:0; padding:0; border:0; ba
   .lp-access { padding:24px max(18px,env(safe-area-inset-right)) 20px 18px; gap:16px; }
   .lp-auth-heading { padding:18px 20px; }
   .lp-auth-body { padding-inline:20px; }
+  .lp-gameplay-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .lp-gameplay-card h3 { font-size:20px; }
+  .lp-gameplay-card p { font-size:14px; }
 }
 @media(prefers-reduced-motion:reduce) {
   html { scroll-behavior:auto; }
   .lp-button { transition:none; }
+  .lp-hero-picture img { transform:none; transition:none; }
 }

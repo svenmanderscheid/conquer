@@ -25,7 +25,9 @@ final class ApiGuard
     public static function beforeSession(): void
     {
         self::limit('api.ip', RateLimit::ip(), 2400, 60);
-        if ((int)($_SERVER['CONTENT_LENGTH'] ?? 0) > 65536) {
+        $path=(string)(parse_url($_SERVER['REQUEST_URI']??'',PHP_URL_PATH)??'');
+        $limit=$path==='/api/bug-reports'?1300000:65536;
+        if ((int)($_SERVER['CONTENT_LENGTH'] ?? 0) > $limit) {
             Response::error(413, 'REQUEST_TOO_LARGE', 'Die Anfrage ist zu groß.');
         }
     }

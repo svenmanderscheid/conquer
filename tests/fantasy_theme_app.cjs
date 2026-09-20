@@ -16,7 +16,7 @@ async function startFixture() {
   });
   const child = spawn(process.env.PHP_BINARY || 'C:/xampp/php/php.exe', [
     path.join(root, 'tools/preview-feature-fixture.php'), '--port=' + port,
-    '--chat', '--hud', '--talents', '--training', '--hospital', '--inventory-overview', '--mailbox',
+    '--chat', '--hud', '--talents', '--training', '--hospital', '--inventory-overview', '--mailbox', '--appearance',
   ], { cwd: root, stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true });
   let log = '';
   const ready = new Promise((resolve, reject) => {
@@ -57,11 +57,11 @@ async function actualFonts(page, selector) {
     await page.evaluate(() => document.fonts.ready);
     await page.screenshot({ path: path.join(output, 'welcome-desktop.png') });
     for (const route of ['', '/auth/recover']) {
-      await page.goto(fixture.base + route, { waitUntil: 'networkidle' });
+      await page.goto(fixture.base + (route || '/?zugang=login'), { waitUntil: 'networkidle' });
       for (const [width, height] of [[390, 844], [320, 568], [844, 390]]) {
         await page.setViewportSize({ width, height });
         await page.evaluate(() => document.fonts.ready);
-        const submit = page.locator('form button');
+        const submit = page.locator(route ? 'form button' : '#auth-submit');
         await submit.scrollIntoViewIfNeeded();
         const geometry = await submit.evaluate(element => {
           const rect = element.getBoundingClientRect();
@@ -70,14 +70,14 @@ async function actualFonts(page, selector) {
             height: rect.height };
         });
         assert(geometry.overflow <= 2 && geometry.visible && geometry.height >= 44, 'Authentication remains touch-accessible: ' + route + ' ' + width);
-        assert.equal(await page.locator('.locale-install .button').evaluate(element => getComputedStyle(element).backgroundColor), 'rgb(92, 66, 112)', 'Installation action shares violet accent');
+        if (await page.locator('.locale-install .button').count()) assert.equal(await page.locator('.locale-install .button').evaluate(element => getComputedStyle(element).backgroundColor), 'rgb(92, 66, 112)', 'Installation action shares violet accent');
         report.push({ auth: route || 'welcome', width, height, ...geometry });
         await page.screenshot({ path: path.join(output, `${route ? 'recovery' : 'welcome'}-${width}x${height}.png`), fullPage: true });
       }
     }
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto(fixture.base, { waitUntil: 'networkidle' });
-    await page.locator('[data-mode="login"]').click();
+    await page.locator('[data-auth-target="login"]').first().click();
     await page.locator('[name="username"]').fill('PreviewPlayer');
     await page.locator('[name="password"]').fill('PreviewFixture!2026');
     await Promise.all([page.waitForURL('**/city'), page.locator('#auth-submit').click()]);

@@ -104,8 +104,10 @@ window.ConquerOverlay = function (ctx) {
             if(!healingButton.hidden){
                 job('hud-healing',healing?{...healing,started_at:healing.started_at,finishes_at:healing.ends_at}:null,{label:'Heilung'});
                 const count=Number(healing?.count||hospital.waiting||hospital.used||0),stateNode=healingButton.querySelector('.hud-job-state'),timeNode=healingButton.querySelector('.hud-job-time');
+                healingButton.dataset.action=healing?'army-hospital':'hospital-quick-heal';
+                healingButton.classList.toggle('is-quick-heal',!healing);
                 if(healing){stateNode.textContent='In Behandlung';healingButton.setAttribute('aria-label',`${fmt(count)} Truppen in Behandlung. Restzeit ${timeNode.textContent}. Hospital öffnen und Heilung beschleunigen.`);}
-                else{stateNode.textContent='Verwundet';timeNode.textContent=`${fmt(count)} verwundet`;healingButton.setAttribute('aria-label',`${fmt(count)} verwundete Truppen. Hospital öffnen und jetzt heilen.`);}
+                else{stateNode.textContent='Antippen & heilen';timeNode.textContent=`${fmt(count)} verwundet`;healingButton.setAttribute('aria-label',`${fmt(count)} verwundete Truppen. Antippen, um sofort alle zu heilen.`);}
                 healingButton.title=healingButton.getAttribute('aria-label');
             }
         }

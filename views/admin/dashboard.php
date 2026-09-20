@@ -6,6 +6,7 @@ $runs=$db->query('SELECT * FROM world_spawn_runs WHERE world_id=? ORDER BY id DE
 ?>
 <div class="quick-actions">
 <?php foreach([
+    ['/world-create','hud/city.svg','Welt erstellen','Name, Tempo, Minen, Monster und Spawnregeln in einem Schritt festlegen.','Neue Welt vorbereiten'],
     ['/rewards','items/chest-gold.svg','Beute festlegen','Monster, Dungeons, Truhen und Feldzüge. Bestimme Gegenstände, Mengen und Chancen.','Beuteverwaltung öffnen'],
     ['/items','hud/inventory.svg','Gegenstände entdecken','Finde Items über ihre Bilder, Seltenheit und Wirkung.','Bildkatalog öffnen'],
     ['/players?world_id='.$selectedWorld,'knight.png','Spielern helfen','Konten suchen, Fortschritt prüfen und Geschenke mit persönlicher Nachricht senden.','Spieler suchen'],

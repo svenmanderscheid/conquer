@@ -16,7 +16,7 @@ const output=path.join(__dirname,'../artifacts/combat-reports-compact');fs.mkdir
   page.on('pageerror',e=>{if(!errors.includes(e.stack))console.error(e.stack);errors.push(e.stack);});
   page.on('response',r=>{if(r.status()>=400&&new URL(r.url()).origin===base)failed.push(r.status()+' '+r.url());});
   page.setDefaultTimeout(20000);
-  await page.goto(base);await page.locator('[data-mode="login"]').click();
+  await page.goto(base+'/?zugang=login');
   await page.locator('[name="username"]').fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');
   await Promise.all([page.waitForURL(url=>url.pathname==='/city'),page.locator('#auth-submit').click()]);
   await page.locator('#navigation [data-id="reports"]').click();
@@ -73,7 +73,7 @@ const output=path.join(__dirname,'../artifacts/combat-reports-compact');fs.mkdir
   const shared=[];await page.route('**/api/community/action',async route=>{const payload=route.request().postDataJSON();if(payload.action==='chat.send'){shared.push(payload);await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,data:{message:'Bericht geteilt.'}})});return;}await route.continue();});
   await page.locator('[data-combat="share"]').click();await page.locator('#report-share-dialog[open]').waitFor();await page.waitForFunction(()=>!document.querySelector('[data-share-channel="private"]')?.disabled);await page.locator('[data-share-channel="private"]').click();await page.locator('.cr-share-player select').selectOption('2');await page.screenshot({path:path.join(output,'390x844-share-private.png')});await page.locator('.report-share-form button[type="submit"]').click();await page.waitForFunction(()=>!document.querySelector('#report-share-dialog').open);await page.waitForFunction(()=>!history.state?.conquerReportShare);assert.equal(shared[0].channel,'private');assert.equal(shared[0].player_id,2);assert(Number(shared[0].report_id)>0);assert.match(shared[0].message,/Spieler-Kampfbericht/);assert(Array.from(shared[0].message).length<=200);await page.unroute('**/api/community/action');
   await page.locator('.dialog-close').click();await page.waitForFunction(()=>!history.state?.conquerCombat);
-  await page.locator('.panel-close').click();await page.locator('#world-chat:not([hidden])').waitFor();await page.locator('.world-chat-report').waitFor();await page.locator('.world-chat-report').last().click();await page.locator('.combat-report').waitFor();assert.equal(await page.locator('[data-combat="share"]').count(),0,'A received shared report cannot be shared onward');await page.locator('.dialog-close').click();await page.locator('#navigation [data-id="reports"]').click();await page.locator('.mail-card .mail-open').first().waitFor();
+  await page.locator('.panel-close').click();await page.locator('#world-chat:not([hidden])').waitFor();await page.locator('[data-chat-open]').click();await page.locator('.world-chat-report').waitFor();await page.locator('.world-chat-report').last().click();await page.locator('.combat-report').waitFor();assert.equal(await page.locator('[data-combat="share"]').count(),0,'A received shared report cannot be shared onward');await page.locator('.dialog-close').click();if(await page.locator('[data-chat-close]').first().isVisible())await page.locator('[data-chat-close]').first().click();await page.locator('#navigation [data-id="reports"]').click();await page.locator('.mail-card .mail-open').first().waitFor();
   await page.locator('.mail-card .mail-open').last().click();
   assert.match(await page.locator('.cr-notice').innerText(),/Älterer Bericht/);
   assert.equal(await page.locator('.cr-compare').first().locator('td').filter({hasText:'—'}).count(),6);
@@ -81,7 +81,7 @@ const output=path.join(__dirname,'../artifacts/combat-reports-compact');fs.mkdir
   await page.locator('.dialog-close').click();await page.waitForFunction(()=>!history.state?.conquerCombat);
   assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);
   const other=await browser.newContext({viewport:{width:390,height:844}});await other.addInitScript(worldEntry);const def=await other.newPage();
-  await def.goto(base);await def.locator('[data-mode="login"]').click();await def.locator('[name="username"]').fill('Elara');await def.locator('[name="password"]').fill('PreviewFixture!2026');
+  await def.goto(base+'/?zugang=login');await def.locator('[name="username"]').fill('Elara');await def.locator('[name="password"]').fill('PreviewFixture!2026');
   await Promise.all([def.waitForURL(url=>url.pathname==='/city'),def.locator('#auth-submit').click()]);await def.locator('#navigation [data-id="reports"]').click();
   const defenseMail=def.locator('.mail-card').filter({hasText:'Verteidigung: Niederlage'});await defenseMail.waitFor();assert.equal(await defenseMail.count(),1);
   await defenseMail.locator('.mail-open').click();assert.match(await def.locator('.cr-result').innerText(),/Niederlage[\s\S]*Verteidigung/);

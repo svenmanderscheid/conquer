@@ -2092,7 +2092,7 @@ Alliance Tree `Rally Size` research can extend this cap further.
 
 ### 14.10 Drop Economy Overview
 
-The drop economy is the **engine that converts player time into progression**. The values below are calibrated for the post-balance-fix curve (Castle L26-30 with ×1.30/×1.50 multipliers, World Speed Factor 2.0). They are **deliberately nerfed** from the LoK source data — the original LoK drops assumed Castle L30 = 160d build time. With our compressed build curve, original drops would let a hardcore alliance complete Castle L30 from a single mega-rally, which would trivialize endgame.
+The drop economy is the **engine that converts player time into progression**. The values below are calibrated for Conquer's late-game construction curve: levels 1–20 retain their source durations, then Castle and Academy rise from four days at L21 to thirty days at L30. The supplied source table would put Castle L30 at more than 160 days; that would make the endgame inaccessible. The Conquer curve still makes the final levels a long-term goal, so build and research speedups remain meaningful.
 
 **Key principle: Solo players can max Train + Recover SPs. Build + Research SPs are gated behind rare Treasure Goblin spawns and Rally-only Dragons.** This keeps alliance content meaningful without making solo play unviable.
 
@@ -2259,7 +2259,7 @@ The Treasure Goblin is a **newly designed monster** (not in the LoK source data)
 
 **F2P value analysis:**
 
-A diligent F2P player kills ~3-5 Goblins per day (Lv 3 average): **3-15 hours of Build SP per day**. Over 12 months (~365 days) = **~1,100 to 5,500 hours of Build SP**. Cumulative Castle L1→L30 build time at Speed 1.0 ≈ 142 days = ~3,400 hours. With 2 parallel build queues (VIP 4) and the 12-month real time available, F2P Castle L30 + T5 is feasible. ✓
+A diligent F2P player kills ~3-5 Goblins per day (Lv 3 average): **3-15 hours of Build SP per day**. Over 12 months (~365 days) = **~1,100 to 5,500 hours of Build SP**. Cumulative Castle L1→L30 build time at Speed 1.0 is about 155 days before construction bonuses and speedups; the final Castle upgrade alone is 30 days. With two build queues (VIP 4), event rewards and the 12-month real time available, F2P Castle L30 + T5 remains feasible. ✓
 
 ### 14.14 Charm drops by Monster
 

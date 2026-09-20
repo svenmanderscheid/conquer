@@ -33,6 +33,9 @@ final class AdminService
                 if($receipt){if((int)$receipt['admin_id']!==$adminId||$receipt['action']!==$action||!hash_equals($receipt['payload_hash'],$hash))throw new \InvalidArgumentException('Diese Vorgangs-ID gehört zu einer anderen Änderung.');$result=json_decode($receipt['result_json'],true,512,JSON_THROW_ON_ERROR);$result['duplicate']=true;return $result;}
                 $db->execute('INSERT INTO admin_operations(operation_id,admin_id,action,payload_hash) VALUES(?,?,?,?)',[$op,$adminId,$action,$hash]);
                 $result=match($action) {
+                    'alpha-waitlist-update'=>AlphaWaitlistAdmin::update($db,$input),
+                    'alpha-key-create'=>AlphaKeyAdmin::create($db,$input),
+                    'alpha-key-revoke'=>AlphaKeyAdmin::revoke($db,$input),
                     'world-save','world-create'=>self::world($db,$adminId,$action,$input),
                     'world-events'=>self::events($input),
                     'gift'=>self::gift($db,$op,$input),
@@ -43,7 +46,9 @@ final class AdminService
                 };
                 $result['duplicate']=false;$result['operation_id']=$op;
                 $db->execute('INSERT INTO admin_audit_log(admin_id,action,target_type,target_id,details,ip) VALUES(?,?,?,?,?,?)',[$adminId,'admin.'.$action,$result['target_type'],$result['target_id'],json_encode(['operation_id'=>$op,'reason'=>$reason,'before'=>$result['before']??null,'after'=>$result['after']??null,'result'=>$result['message']],JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR),$_SERVER['REMOTE_ADDR']??null]);
-                $db->execute('UPDATE admin_operations SET result_json=? WHERE operation_id=?',[json_encode($result,JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR),$op]);
+                // Invitation secrets may travel to the one-time response, never to durable receipts.
+                $receiptResult=$result;unset($receiptResult['issued_keys']);
+                $db->execute('UPDATE admin_operations SET result_json=? WHERE operation_id=?',[json_encode($receiptResult,JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR),$op]);
                 return $result;
             });
         } finally {foreach(array_reverse($acquired) as $lock)$db->query('SELECT RELEASE_LOCK(?)',[$lock]);}

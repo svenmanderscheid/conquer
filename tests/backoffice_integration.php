@@ -94,8 +94,10 @@ try {
     $settings['resource_limit']=100;$settings['monster_limit']=100;$settings['resource_chance_pct']=100;$settings['monster_chance_pct']=100;$settings['batch_limit']=10;
     adminAction('world-save',['name'=>'Test Realm','status'=>'running','settings'=>$settings]);$mixed=WorldSpawnService::tick(1,false,'game')[1];
     verifyAdmin($mixed['resources_spawned']>0&&$mixed['monsters_spawned']>0&&$mixed['resources_spawned']+$mixed['monsters_spawned']<=10,'bounded pass replenishes both populations without starvation');
-    $new=adminAction('world-create',['player_id'=>0,'name'=>'Third Realm','slug'=>'test-three','status'=>'paused','settings'=>$settings]);
+    $new=adminAction('world-create',['player_id'=>0,'name'=>'Third Realm','slug'=>'test-three','status'=>'paused','map_size'=>256,'speed_factor'=>1.5,'gather_factor'=>2,'haul_factor'=>.8,'settings'=>$settings]);
+    $createdWorld=$db->query('SELECT map_size,speed_factor,gather_factor,haul_factor FROM worlds WHERE id=?',[$new['world_id']])->fetch();
     verifyAdmin((int)$new['world_id']>2&&WorldSpawnService::tick((int)$new['world_id'])[$new['world_id']]['status']==='paused','new world has independent persisted settings and starts paused');
+    verifyAdmin((int)$createdWorld['map_size']===256&&(float)$createdWorld['speed_factor']===1.5&&(float)$createdWorld['gather_factor']===2.0&&(float)$createdWorld['haul_factor']===.8,'world creation stores map size and all speed factors');
     adminAction('world-events',['enabled'=>1,'invasion_enabled'=>1,'next_start'=>'2027-01-01T18:00','invasion_next_start'=>'2027-01-02T19:00','interval_hours'=>336,'duration_hours'=>168,'invasion_interval_hours'=>72]);
     $events=\Conquer\Game\Conquest\EventService::settings(1);verifyAdmin((int)$events['enabled']===1&&$events['next_start']==='2027-01-01 18:00:00','backoffice event form persists validated UTC schedule');
     // Render all pages with synthetic data; warnings are fatal in this test.
@@ -103,7 +105,7 @@ try {
     $_SERVER['REQUEST_METHOD']='POST';$_SERVER['REQUEST_URI']='/conquer/admin/action/ban';$_POST=['world_id'=>1,'player_id'=>1,'csrf_token'=>'forged'];
     ob_start();\Conquer\Admin\AdminController::handleAction();ob_end_clean();verifyAdmin(http_response_code()===403&&!(int)$db->query('SELECT is_banned FROM players WHERE id=1')->fetchColumn(),'controller blocks invalid CSRF before mutation');
     $_POST['csrf_token']=str_repeat('a',64);$_SESSION['admin']['role']='moderator';ob_start();\Conquer\Admin\AdminController::handleAction();ob_end_clean();verifyAdmin(http_response_code()===403,'controller blocks moderator mutations');$_SESSION['admin']['role']='superadmin';
-    foreach(['dashboard','players','world','alliances','chat','bugReports','auditLog'] as $method){ob_start();\Conquer\Admin\AdminController::$method();$html=ob_get_clean();verifyAdmin(!str_contains($html,'Ansicht konnte nicht geladen')&&str_contains($html,'CONQUER'),'render '.$method);if($method==='world')file_put_contents(sys_get_temp_dir().'/conquer-backoffice-world.html',$html);}
+    foreach(['dashboard','players','worldCreate','world','alliances','chat','bugReports','auditLog'] as $method){ob_start();\Conquer\Admin\AdminController::$method();$html=ob_get_clean();verifyAdmin(!str_contains($html,'Ansicht konnte nicht geladen')&&str_contains($html,'CONQUER'),'render '.$method);if($method==='world')file_put_contents(sys_get_temp_dir().'/conquer-backoffice-world.html',$html);if($method==='worldCreate'){verifyAdmin(str_contains($html,'Maximal gleichzeitig')&&str_contains($html,'Welt jetzt erstellen'),'world creation page exposes population and submit controls');file_put_contents(sys_get_temp_dir().'/conquer-backoffice-world-create.html',$html);}}
     ob_start();\Conquer\Admin\AdminController::playerDetail(1);$html=ob_get_clean();verifyAdmin(!str_contains($html,'Ansicht konnte nicht geladen')&&str_contains($html,'Aster'),'render player detail');file_put_contents(sys_get_temp_dir().'/conquer-backoffice-player.html',$html);
     echo "ALL BACKOFFICE CHECKS PASSED\n";
 }catch(Throwable $e){$failed=true;fwrite(STDERR,'FAIL '.$e->getMessage().' at '.$e->getFile().':'.$e->getLine()."\n");}

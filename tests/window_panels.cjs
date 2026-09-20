@@ -267,18 +267,22 @@ async function main() {
                     frameOutsideViewport: frame.top < -tolerance || frame.left < -tolerance || frame.bottom > innerHeight + tolerance || frame.right > innerWidth + tolerance,
                     overflow: selectors.flatMap(selector => {
                         const node = document.querySelector(selector);
-                        const scrollList = node?.matches('.inventory-scroll-board,.inventory-scroll-list,.inventory-inspector,.quest-list') && getComputedStyle(node).overflowY === 'auto';
+                        const scrollList = node?.matches('.inventory-scroll-board,.inventory-scroll-list,.inventory-inspector,.quest-list,.alliance-overview') && getComputedStyle(node).overflowY === 'auto';
                         return node && (node.scrollWidth > node.clientWidth + tolerance || (!scrollList && node.scrollHeight > node.clientHeight + tolerance))
                             ? [{selector, size: [node.clientWidth, node.clientHeight], scroll: [node.scrollWidth, node.scrollHeight]}] : [];
                     }),
                     clippedControls: [...host.querySelectorAll('button,input,select')].filter(node => {
                         const rect = node.getBoundingClientRect();
-                        const scrollList = node.closest('.inventory-scroll-board,.inventory-scroll-list,.inventory-inspector,.quest-list');
+                        const scrollList = node.closest('.inventory-scroll-board,.inventory-scroll-list,.inventory-inspector,.quest-list,.alliance-overview');
                         return rect.width && rect.height && ((!scrollList && (rect.top < bounds.top - tolerance || rect.bottom > bounds.bottom + tolerance)) || rect.left < bounds.left - tolerance || rect.right > bounds.right + tolerance);
                     }).map(node => ({text: node.textContent.trim(), action: node.dataset.action, bounds: node.getBoundingClientRect().toJSON()})),
                     brokenImages: [...host.querySelectorAll('img')].filter(image => !image.complete || !image.naturalWidth).map(image => image.src),
                 };
             }, tolerance);
+            for (const control of await page.locator('.alliance-overview button').all()) {
+                await control.scrollIntoViewIfNeeded();
+                assert(await control.evaluate(el=>{const r=el.getBoundingClientRect(),b=el.closest('.alliance-overview').getBoundingClientRect();return r.top>=b.top-2&&r.bottom<=b.bottom+2;}),'All alliance actions remain reachable by scrolling');
+            }
             report.push({label, ...metrics});
             if (screenshot || hasFailure(metrics)) {
                 await page.screenshot({path: path.join(output, `${metrics.viewport.join('x')}-${label.replace(/[^a-z0-9-]/gi, '-')}.png`)});
@@ -343,14 +347,14 @@ async function main() {
                 panels.onClick('inventory-category', {dataset:{id:'boost'}});
                 panels.onClick('inventory-item', {dataset:{id:'99900001'}});
             });
-            assert.equal(await page.locator('.inventory-dialog button[type="submit"]').isDisabled(), true, 'Unsupported boost must stay disabled.');
+            assert.equal(await page.locator('.inventory-dialog button[type="submit"],.inventory-dialog [data-action="teleport-select"]').isDisabled(), true, 'Unsupported boost must stay disabled.');
             await check('inventory-unsupported-boost', true);
             assert.equal(await page.locator('#game-dialog').evaluate(dialog => dialog.open), false);
             await page.evaluate(() => { K.inventory = K.inventory.filter(item => item.item_code!==99900001); });
             await page.locator('[data-action="inventory-category"][data-id="resource_pack"]').click();
             await page.locator('[data-action="inventory-scope"][data-id="all"]').click();
             await page.locator('[data-action="inventory-item"][data-id="1"]').click();
-            assert.equal(await page.locator('.inventory-dialog button[type="submit"]').isDisabled(),true,'Unowned catalogue item must not be usable');
+            assert.equal(await page.locator('.inventory-dialog button[type="submit"],.inventory-dialog [data-action="teleport-select"]').isDisabled(),true,'Unowned catalogue item must not be usable');
             assert.equal(await page.locator('.inventory-dialog .inventory-owned').innerText(),'0 vorhanden');
             await check('inventory-full-catalogue', true);
             assert.equal(await page.locator('#game-dialog').evaluate(dialog => dialog.open), false);
@@ -397,7 +401,7 @@ async function main() {
                     ids.forEach(id=>seen.add(id));
                     const longest=realItems.filter(i=>ids.includes(i.code)).sort((a,b)=>(b.description_de||'').length-(a.description_de||'').length)[0];
                     if(longest){await page.locator(`[data-action="inventory-item"][data-id="${longest.code}"]`).click();}
-                    assert.equal(await page.locator('.inventory-dialog button[type="submit"]').isDisabled(),true,'Full catalogue zero-owned items must remain unusable');
+                    assert.equal(await page.locator('.inventory-dialog button[type="submit"],.inventory-dialog [data-action="teleport-select"]').isDisabled(),true,'Full catalogue zero-owned items must remain unusable');
                     await check('real-catalogue-'+category+'-'+(++n),n===1);let effectPage=1;while(await page.locator('[aria-label="Weitere Effektinformation"]').count()&&!await page.locator('[aria-label="Weitere Effektinformation"]').isDisabled()){await page.locator('[aria-label="Weitere Effektinformation"]').click();await check('real-effect-'+category+'-'+n+'-'+(++effectPage));}
                     assert.equal(await page.locator('#game-dialog').evaluate(dialog => dialog.open), false);
                     const next=page.locator('.inventory-pager button').last();if(!await next.count()||!await next.isVisible()||await next.isDisabled())break;await next.click();

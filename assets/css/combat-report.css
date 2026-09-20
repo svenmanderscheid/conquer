@@ -11,6 +11,13 @@ body.mobile-game #game-dialog.combat-report-dialog #dialog-content { padding:0; 
 .cr-banner>div { display:flex; align-items:center; flex-wrap:wrap; gap:5px 12px; }
 .cr-banner strong { font-size:14px; white-space:nowrap; }
 .cr-banner time { text-align:right; font-size:12px; }
+.cr-luck { margin:0 0 8px; padding:8px 12px; border:1px solid var(--ui-line); border-radius:10px; background:var(--ui-card); color:var(--ui-ink); }
+.cr-luck-heading,.cr-luck-scale { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.cr-luck-heading span { font-family:var(--ui-font-number); font-weight:700; }
+.cr-luck-track { position:relative; height:12px; margin:6px 5px 3px; border:1px solid var(--ui-line); border-radius:999px; background:linear-gradient(90deg,var(--ui-red-soft),var(--ui-inset) 50%,var(--ui-green-soft)); }
+.cr-luck-zero { position:absolute; left:50%; top:-2px; bottom:-2px; width:2px; transform:translateX(-50%); background:var(--ui-muted); }
+.cr-luck-marker { position:absolute; top:50%; width:18px; height:18px; transform:translate(-50%,-50%); border:3px solid var(--ui-card-light); border-radius:50%; background:var(--ui-gold); box-shadow:0 0 0 1px var(--ui-primary-dark); }
+.cr-luck-scale { color:var(--ui-muted); font:11px/1.2 var(--ui-font-number); }
 .cr-versus { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); background:linear-gradient(100deg,var(--ui-red-soft) 50%,var(--ui-paper) 50%); }
 .cr-identity { min-width:0; padding:8px 12px; display:grid; grid-template-columns:auto minmax(0,1fr); align-items:center; gap:4px 8px; }
 .cr-identity.defender { background:linear-gradient(145deg,transparent,color-mix(in srgb,var(--ui-blue-light) 24%,var(--ui-card))); }

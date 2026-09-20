@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="<?= htmlspecialchars(\Conquer\Game\Locale::current(),ENT_QUOTES) ?>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -92,8 +92,9 @@
     }
   </style>
   <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/village-theme.css?v=<?= filemtime(ROOT_DIR.'/assets/css/village-theme.css') ?>">
+<?php require ROOT_DIR.'/views/partials/localization-head.php'; ?>
 </head>
-<body class="admin-village">
+<body class="admin-village" data-i18n-scope>
 <div class="login-box">
   <h1>&#9876; Conquer Admin</h1>
 
@@ -131,7 +132,7 @@
     <button type="submit">Anmelden</button>
   </form>
 
-  <div class="admin-hint">Conquer Admin Panel &mdash; Nur autorisierte Zugiffe</div>
+  <div class="admin-hint">Conquer Admin Panel &mdash; Nur autorisierte Zugriffe</div>
 </div>
 </body>
 </html>

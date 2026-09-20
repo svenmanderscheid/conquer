@@ -31,7 +31,7 @@ verify($researched['food']===(int)round(BuildingData::getStorageCaps($buildings)
 $reward=$city;$reward['food']=BuildingData::getStorageCaps($buildings)['food']+2000;
 verify(ResourceTick::apply($reward,$buildings)['food']===$reward['food'],'earned rewards above capacity remain available without further production');
 $monster=MonsterData::get(20209901);
-verify($monster['name']==='Ork-Späher' && $monster['resource_reward']['gold']===75,'starter monster definition and reward resolve canonically');
+verify($monster['name']==='Ork-Späher' && $monster['resource_reward']['gold']===0&&$monster['drops'][0]['item_code']===10203022&&$monster['drops'][0]['count']===1,'starter monster definition and reward resolve canonically');
 $battle=BattleEngine::resolveMonster([50100101=>10],['hp_current'=>10],$monster);
 verify($battle['monster_killed'] && $battle['attacker_survivors'][50100101]===10,'ten starter soldiers can defeat a scout without losses');
 $strong=['stats'=>['hp'=>30,'attack'=>200,'defense'=>5],'level'=>5,'amount'=>100,'required_power'=>1000];

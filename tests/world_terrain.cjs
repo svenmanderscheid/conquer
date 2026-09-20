@@ -5,4 +5,10 @@ vm.runInNewContext(fs.readFileSync(path.join(root,'assets/js/world-landscape.js'
 const php=`require 'src/Game/Map/WorldTerrain.php';for($y=0;$y<256;$y+=.5)for($x=0;$x<256;$x+=.5)echo \\Conquer\\Game\\Map\\WorldTerrain::isWater($x,$y)?'1':'0';`;
 const server=execFileSync('php',['-r',php],{cwd:root,maxBuffer:1024*1024}).toString();let index=0,count=0;
 for(let y=0;y<256;y+=.5)for(let x=0;x<256;x+=.5){const client=context.window.ConquerLandscape.waterAt(x,y);assert.equal(client,server[index++]==='1',`Water disagreement at ${x},${y}`);if(client)count++;}
+const bridges=context.window.ConquerLandscape.bridgePoints;
+assert(Array.isArray(bridges)&&bridges.length>=6,'Expected several fixed bridge crossings.');
+for(const bridge of bridges){
+    assert(bridge.x>=0&&bridge.x<=256&&bridge.y>=0&&bridge.y<=256,'Bridge must remain inside the world.');
+    assert(context.window.ConquerLandscape.waterAt(bridge.x,bridge.y),`Bridge ${bridge.index} must cross water.`);
+}
 assert(count>1000);console.log(`PASS ${index} half-tile samples: server and canvas use identical lakes, rivers and shores.`);

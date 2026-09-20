@@ -24,9 +24,7 @@ final class CombatReport
             $def = TroopData::get((int)$code);
             if (!$def || $count <= 0) continue;
             $type = ResearchEffects::troopType((int)$code);
-            $strength = $count * ($def['attack'] * BuffEngine::effectiveMultiplier($buffs, $type, 'atk')
-                + .6 * $def['defense'] * BuffEngine::effectiveMultiplier($buffs, $type, 'def')
-                + .2 * $def['hp'] * BuffEngine::effectiveMultiplier($buffs, $type, 'hp')) * $scoreFactor;
+            $strength = PvpRules::strength((int)$code, (int)$count, $buffs) * $scoreFactor;
             $troops[] = ['code'=>(int)$code, 'name'=>$def['name'], 'type'=>$type, 'tier'=>(int)$def['tier'],
                 'sent'=>(int)$count, 'unit_power'=>(int)$def['power'], 'strength'=>$strength];
         }

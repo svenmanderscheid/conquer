@@ -11,7 +11,7 @@ const output=path.resolve('artifacts/monster-report-review');fs.mkdirSync(output
   const context=await browser.newContext({viewport:{width:1280,height:800},hasTouch:true,permissions:['clipboard-read','clipboard-write']});
   await context.addInitScript(()=>{if(location.pathname.endsWith('/city')&&!location.hash)history.replaceState(null,'','#world');});
   const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.stack||e.message));page.setDefaultTimeout(20000);
-  await page.goto(base);await page.locator('[data-mode="login"]').click();await page.locator('[name="username"]').fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');
+  await page.goto(base+'/?zugang=login');await page.locator('[name="username"]').fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');
   await Promise.all([page.waitForURL(url=>url.pathname==='/city'),page.locator('#auth-submit').click()]);
   await page.locator('#navigation [data-id="reports"]').click();await page.locator('[data-action="mailbox-tab"][data-id="reports"]').click();
   const open=async()=>{await page.locator('[data-action="mailbox-open"]').first().click();await page.locator('.monster-report').waitFor();};

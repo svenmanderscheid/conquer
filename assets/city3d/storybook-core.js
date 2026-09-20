@@ -128,10 +128,16 @@ export function buildStorybookCore(root,code){
   roundedBox(3.42,1.64,2.34,0,.99,0,'cream',.12);
   roundedBox(3.57,.19,2.43,0,.23,0,'stone',.12);
   for(const side of [-1,1]){
-   cylinder(.32,2.43,side*1.34,1.46,-.87);pointedRoof(.45,.54,side*1.34,2.68,-.87,'red');
-   flag(side*1.34,3.02,-.87,'red');window(side*1.34,2.1,-.535,.15,.32);
+   cylinder(.44,2.85,side*1.5,1.64,-.72);cylinder(.49,.15,side*1.5,2.97,-.72,'trim');pointedRoof(.64,.87,side*1.5,3.04,-.72,'red',side*.07);
+   flag(side*1.5,3.85,-.72,'red');window(side*1.5,2.42,-.271,.2,.4);
+   cylinder(.47,.19,side*1.5,.28,-.72,'stone');
   }
-  hipRoof(3.97,2.96,1.14,0,1.82,0);
+  hipRoof(4.13,3.12,1.14,0,1.82,0);
+  roundedBox(3.7,.16,2.64,0,1.8,0,'wood',.1);
+  for(const side of [-1,1]){
+   roundedBox(.28,1.52,.32,side*1.57,.98,1.09,'stone',.07);
+   roundedBox(.36,.16,.4,side*1.57,1.68,1.1,'trim',.06);
+  }
   // Broad front porch and red heraldry give the entrance the same silhouette
   // as the artwork while keeping the full training court clickable.
   roundedBox(1.39,1.77,.3,0,1.12,1.22,'trim',.11);door(0,1.403,.87,1.34);
@@ -139,33 +145,28 @@ export function buildStorybookCore(root,code){
   const canopyGeo=new T.ExtrudeGeometry(canopyShape,{depth:.82,bevelEnabled:true,bevelThickness:.035,bevelSize:.025,bevelSegments:2,curveSegments:10});
   add(canopyGeo,'red',0,2.02,.77);
   const shield=new T.Shape();shield.moveTo(-.35,.4);shield.lineTo(.35,.4);shield.lineTo(.32,-.15);shield.quadraticCurveTo(.14,-.41,0,-.46);shield.quadraticCurveTo(-.14,-.41,-.32,-.15);shield.closePath();
-  const crest=add(new T.ExtrudeGeometry(shield,{depth:.06,bevelEnabled:false,curveSegments:8}),'redDark',0,2.42,1.635);crest.scale.set(1.55,1.55,1);
+  const crestEdge=add(new T.ExtrudeGeometry(shield,{depth:.055,bevelEnabled:false,curveSegments:8}),'gold',0,2.42,1.635);crestEdge.scale.set(1.72,1.72,1);
+  const crest=add(new T.ExtrudeGeometry(shield,{depth:.045,bevelEnabled:false,curveSegments:8}),'redDark',0,2.42,1.703);crest.scale.set(1.5,1.5,1);
   for(const side of [-1,1]){
-   const sword=new T.Group();sword.position.set(side*.015,2.46,1.711);sword.rotation.z=side*.75;root.add(sword);
+   const sword=new T.Group();sword.position.set(side*.015,2.46,1.764);sword.rotation.z=side*.75;root.add(sword);
    const blade=new T.Shape();blade.moveTo(-.067,-.35);blade.lineTo(.067,-.35);blade.lineTo(.067,.37);blade.lineTo(0,.56);blade.lineTo(-.067,.37);blade.closePath();
    add(new T.ExtrudeGeometry(blade,{depth:.015,bevelEnabled:false}),'trim',0,0,0,false,sword);
    const guard=new T.Mesh(new T.BoxGeometry(.37,.075,.04),paints.gold);guard.position.set(0,-.29,.016);sword.add(guard);
    const handle=new T.Mesh(new T.BoxGeometry(.075,.21,.045),paints.gold);handle.position.set(0,-.44,.016);sword.add(handle);
   }
-  // The narrow upper gallery and two large shields make this a fortified
-  // training house, not merely a red-roofed cottage.  They sit on the façade
-  // and leave the established practice court and path clear.
-  roundedBox(2.12,.12,.31,0,1.56,1.36,'wood',.04);
-  for(const x of [-.91,-.45,0,.45,.91]){
-   stamp('box','timber',x,1.78,1.49,.05,.37,.05);
-   stamp('ball','gold',x,1.99,1.49,.038,.038,.038);
-  }
+  // Side banners frame the gate without a balcony cutting across the door.
   for(const side of [-1,1]){
-   const guardShield=add(new T.ExtrudeGeometry(shield,{depth:.04,bevelEnabled:false,curveSegments:8}),'red',side*.85,1.78,1.54);
-   guardShield.scale.setScalar(.58);
-   const boss=cylinder(.052,.055,side*.85,1.76,1.578,'gold',false);boss.rotation.x=Math.PI/2;
+   roundedBox(.49,.82,.06,side*1.21,1.28,1.226,'redDark',.04);
+   const guardShield=add(new T.ExtrudeGeometry(shield,{depth:.04,bevelEnabled:false,curveSegments:8}),'red',side*1.21,1.44,1.31);
+   guardShield.scale.setScalar(.55);
+   const boss=cylinder(.062,.055,side*1.21,1.44,1.351,'gold',false);boss.rotation.x=Math.PI/2;
   }
-  for(const side of [-1,1]){window(side*1.19,.79,1.183,.29,.57);shrub(side*1.79,-1.21,.37);}
+  for(const side of [-1,1]){shrub(side*1.79,-1.21,.37);}
   for(const [x,y,z] of [[-1.4,.45,1.194],[1.45,1.53,1.19],[-.97,1.42,1.194]])stamp('box','patch',x,y,z,.22,.115,.04);
-  const court=add(new T.CylinderGeometry(1,1,.07,40),'timber',0,.115,2.62,false);court.scale.set(2.49,1,1.65);court.castShadow=false;
+  const court=add(new T.CylinderGeometry(1,1,.06,32),'timber',0,.08,2.62,false);court.scale.set(2.49,1,1.65);court.castShadow=false;
   for(const side of [-1,1]){
-   for(let i=0;i<7;i++){
-    const z=.17+i*.43;stamp('cylinder','wood',side*2.4,.56,z,.075,.84,.075);stamp('cone','wheat',side*2.4,1.035,z,.075,.18,.075);
+   for(let i=0;i<5;i++){
+    const z=.25+i*.65;stamp('cylinder','wood',side*2.4,.56,z,.095,.84,.095);stamp('cone','wheat',side*2.4,1.035,z,.095,.18,.095);
    }
    stamp('box','timber',side*2.4,.54,1.47,.1,.09,2.83);
   }
@@ -179,14 +180,10 @@ export function buildStorybookCore(root,code){
    stamp('ball','gold',x,1.2,z+.14,.11,.11,.055);
   }
   trainingShield(1.41,3.51);trainingShield(2.04,2.71);
-  for(const [x,z] of [[-1.46,3.54],[-.64,3.82]]){
+  for(const [x,z] of [[-1.48,3.42],[-1.25,2.28]]){
    stamp('cylinder','wood',x,.5,z,.067,.79,.067);stamp('cylinder','timber',x,.85,z,.15,.34,.15);
    stamp('cylinder','timber',x,1.13,z,.17,.19,.17);stamp('box','wood',x,.82,z,.66,.11,.13);
   }
-  for(let i=0;i<3;i++){
-   const x=.67+i*.2;stamp('cylinder','wood',x,.61,2.85,.027,.96,.027);stamp('cone','stone',x,1.2,2.85,.072,.23,.072);
-  }
-  stamp('box','timber',.87,.3,2.85,.81,.14,.46);stamp('box','wood',.87,.77,2.85,.73,.06,.08);
   // A compact armour rack gives the court a robust, functional anchor.  Its
   // repeated shafts and caps stay in the existing instanced batches.
   for(const x of [-1.81,-1.55,-1.29]){

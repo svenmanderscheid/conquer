@@ -18,6 +18,8 @@ final class GameHandler
         $session = Session::current();
         if (!$session) { Response::error(401, 'UNAUTHENTICATED', 'Bitte melde dich an.'); }
         $pid = (int) $session['player_id'];
+        $returnSince = isset($_GET['return_since']) ? filter_var($_GET['return_since'], FILTER_VALIDATE_INT, ['options'=>['min_range'=>1,'max_range'=>time()]]) : null;
+        if ($returnSince === false) { Response::error(400, 'INVALID_TIME', 'Ungültiger Zeitpunkt für die Rückkehrübersicht.'); }
         \Conquer\Game\Dungeon\DungeonService::tick($pid);
         MarchTick::runForPlayer($pid);
         \Conquer\Game\Rally\RallyService::tick();
@@ -52,6 +54,18 @@ final class GameHandler
             $building['requirements'] = BuildingData::getUpgradeRequirements($code, $next);
         }
         unset($building);
+        // Public map identities only; never include garrisons or resource stocks.
+        $players=$db->query("SELECT p.id,p.username,COALESCE(k.display_name,p.username) AS display_name,
+            c.coord_x,c.coord_y,c.castle_level,COALESCE(k.city_skin,'default') AS city_skin,
+            COALESCE(k.name_frame,'default') AS name_frame,am.alliance_id,a.tag AS alliance_tag
+            FROM cities c JOIN players p ON p.id=c.player_id
+            LEFT JOIN kingdom_profiles k ON k.player_id=p.id
+            LEFT JOIN alliance_members am ON am.player_id=p.id AND am.world_id=c.world_id
+            LEFT JOIN alliances a ON a.id=am.alliance_id AND a.world_id=c.world_id
+            WHERE c.world_id=? AND c.player_id<>? AND c.is_hidden=0
+            AND c.coord_x BETWEEN ? AND ? AND c.coord_y BETWEEN ? AND ?
+            ORDER BY POW(c.coord_x-?,2)+POW(c.coord_y-?,2),p.id LIMIT 80",
+            [$worldId,$pid,max(0,$mapX-$mapRadius),min($mapMax,$mapX+$mapRadius),max(0,$mapY-$mapRadius),min($mapMax,$mapY+$mapRadius),$mapX,$mapY])->fetchAll();
         $monsters = $db->query('SELECT id,monster_code,coord_x,coord_y,hp_current FROM field_monsters WHERE world_id = ? AND hp_current > 0 AND coord_x BETWEEN ? AND ? AND coord_y BETWEEN ? AND ? ORDER BY POW(coord_x - ?,2)+POW(coord_y - ?,2) LIMIT 80', [$worldId,max(0,$mapX-$mapRadius),min($mapMax,$mapX+$mapRadius),max(0,$mapY-$mapRadius),min($mapMax,$mapY+$mapRadius),$mapX,$mapY])->fetchAll();
         foreach ($monsters as &$monster) {
             $monster = \Conquer\Game\Map\MonsterData::mapData($monster);
@@ -97,12 +111,14 @@ final class GameHandler
         $openTarget=static fn(array $row):bool=>\Conquer\Game\World\LandAccessPolicy::isOpen($worldId,(int)($row['coord_x']??$row['x']),(int)($row['coord_y']??$row['y']));
         $monsters=array_values(array_filter($monsters,static fn(array $row):bool=>$openTarget($row)&&\Conquer\Game\Map\MonsterData::isActive((int)$row['monster_code'])));
         $nodes=array_values(array_filter($nodes,$openTarget));
+        $players=array_values(array_filter($players,$openTarget));
         $charms=array_values(array_filter(\Conquer\Game\Charm\CharmQueryService::inBounds($worldId,$pid,$mapX,$mapY,$mapRadius),$openTarget));
         $land=\Conquer\Game\World\LandProgressService::at($worldId,(int)$city['coord_x'],(int)$city['coord_y']);
         $zoneBounds=\Conquer\Game\World\LandGeometry::zoneBounds((int)$world['map_size']);
         $zones=array_map(static fn(array $zone):array=>$zone+['bounds'=>$zoneBounds[$zone['key']]??null],\Conquer\Game\World\LandUnlockService::status($worldId));
         $landState=['parcel_size'=>8,'map_size'=>(int)$world['map_size'],'zones'=>$zones,'current'=>$land?array_intersect_key($land,array_flip(['id','level','zone','open'])):null];
         Response::ok($state + [
+            'return_summary'=>$returnSince === null ? null : \Conquer\Game\City\ReturnSummary::since($city, $returnSince),
             'active_effects'=>\Conquer\Game\Buff\ActiveEffectService::forPlayer($pid,$worldId),
             'building_plots'=>\Conquer\Game\City\BuildingPlotService::snapshot($state),
             'plot_queue'=>\Conquer\Game\City\BuildingPlotService::queue((int)$city['id']),
@@ -112,7 +128,7 @@ final class GameHandler
                 'name_frame'=>(string)($db->query("SELECT COALESCE(name_frame,'default') FROM kingdom_profiles WHERE player_id=?",[$pid])->fetchColumn()?:'default')],
             'active_rally_count'=>count($rallyMarches),
             'map_center'=>['x'=>$mapX,'y'=>$mapY,'radius'=>$mapRadius],
-            'server_time' => time(), 'monsters' => $monsters, 'nodes' => $nodes, 'charms'=>$charms,'land_progression'=>$landState,
+            'server_time' => time(), 'monsters' => $monsters, 'nodes' => $nodes, 'players'=>$players, 'charms'=>$charms,'land_progression'=>$landState,
             'training_promotions'=>$db->query("SELECT id,source_code,target_code,count,started_at,finishes_at FROM defense_promotions WHERE city_id=? AND state='training'",[$city['id']])->fetchAll(),
             'troop_defs' => $troopDefs, 'army_limits'=>\Conquer\Game\Research\ResearchEffects::limits($buffs), 'building_progression'=>\Conquer\Game\City\BuildingProgression::forPlayer($pid,$worldId), 'research' => $research,
             // Locked and advanced technologies must remain visible in the full tree.

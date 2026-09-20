@@ -44,10 +44,11 @@ try {
  $db->execute("UPDATE players SET username='Renamed' WHERE id=1");
  mrCheck(BattleReportService::get(1,$id)['details']===$snapshot,'viewing an old fight never replaces its historical values');
  $before=(int)$db->query('SELECT food FROM cities WHERE id=1')->fetchColumn();
+ $itemBefore=(int)$db->query('SELECT COALESCE(SUM(quantity),0) FROM player_inventory WHERE player_id=1 AND item_code=10203022')->fetchColumn();
  $db->execute('UPDATE marches SET return_time=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 1 SECOND) WHERE id=?',[$march]);MarchTick::runForPlayer(1);
  $after=(int)$db->query('SELECT food FROM cities WHERE id=1')->fetchColumn();
- mrCheck(BattleReportService::get(1,$id)['reward_delivery']==='delivered'&&$after>$before,'real homecoming changes the report status and pays out');
- MarchTick::runForPlayer(1);mrCheck((int)$db->query('SELECT food FROM cities WHERE id=1')->fetchColumn()===$after,'repeated homecoming cannot duplicate rewards');
+ mrCheck(BattleReportService::get(1,$id)['reward_delivery']==='delivered'&&$after===$before&&(int)$db->query('SELECT COALESCE(SUM(quantity),0) FROM player_inventory WHERE player_id=1 AND item_code=10203022')->fetchColumn()===$itemBefore+1,'real homecoming changes the report status and delivers the guaranteed item');
+ MarchTick::runForPlayer(1);mrCheck((int)$db->query('SELECT food FROM cities WHERE id=1')->fetchColumn()===$after&&(int)$db->query('SELECT COALESCE(SUM(quantity),0) FROM player_inventory WHERE player_id=1 AND item_code=10203022')->fetchColumn()===$itemBefore+1,'repeated homecoming cannot duplicate resources or items');
  mrCheck(BattleReportService::delete(1,$id)&&BattleReportService::delete(1,$id),'report deletion is idempotent');
  mrCheck(BattleReportService::get(1,$id)===null&&BattleReportService::list(1)===[],'hidden reports disappear from list and direct access');
  mrCheck((int)$db->query('SELECT COUNT(*) FROM battle_reports WHERE id=?',[$id])->fetchColumn()===1&&(int)$db->query('SELECT food FROM cities WHERE id=1')->fetchColumn()===$after,'deleting mail keeps the battle record and payout intact');
@@ -57,8 +58,9 @@ try {
  $db->execute('UPDATE marches SET departure_time=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 61 SECOND),arrival_time=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 1 SECOND) WHERE id=?',[$march]);MarchTick::runForPlayer(1);
  $pending=BattleReportService::list(1)[0];BattleReportService::delete(1,(int)$pending['id']);
  $before=(int)$db->query('SELECT food FROM cities WHERE id=1')->fetchColumn();
+ $itemBefore=(int)$db->query('SELECT COALESCE(SUM(quantity),0) FROM player_inventory WHERE player_id=1 AND item_code=10203022')->fetchColumn();
  $db->execute('UPDATE marches SET return_time=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 1 SECOND) WHERE id=?',[$march]);MarchTick::runForPlayer(1);
- mrCheck((int)$db->query('SELECT food FROM cities WHERE id=1')->fetchColumn()>$before&&BattleReportService::list(1)===[],'deleting a returning report does not cancel its eventual payout');
+ mrCheck((int)$db->query('SELECT food FROM cities WHERE id=1')->fetchColumn()===$before&&(int)$db->query('SELECT COALESCE(SUM(quantity),0) FROM player_inventory WHERE player_id=1 AND item_code=10203022')->fetchColumn()===$itemBefore+1&&BattleReportService::list(1)===[],'deleting a returning report does not cancel its eventual payout');
  $definition=\Conquer\Game\Map\MonsterData::get(20209901);
  $maximum=(int)round($definition['stats']['hp']*$definition['amount']);
  $db->execute("INSERT INTO field_monsters(world_id,monster_code,coord_x,coord_y,hp_current,monster_type) VALUES(1,20209901,79,65,?,'solo')",[$maximum]);

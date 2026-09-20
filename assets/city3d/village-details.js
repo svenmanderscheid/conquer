@@ -42,10 +42,6 @@ export function enrichVillage({scene,buildings}){
    for(const x of [-3.5,-2.5]){box('dark',x,1.4,.46,.36,.7,.06);box('glow',x,1.4,.5,.23,.55,.035);}
    box('timber',.7,.71,2.8,1.15,.13,.75);for(const side of [-1,1])box('wood',.7+side*.45,.43,2.8,.08,.57,.08);box('trim',.47,.84,2.8,.41,.08,.54,0,-.13);box('trim',.9,.84,2.8,.41,.08,.54,0,.13);
    add('cyl','gold',-3.2,3.6,-.45,.08,.68,.08);add('cyl','blueDark',-3.1,4,-.4,.12,.83,.12,0,-.9);planter(2.7,2.2);lamp(-2.2,2.7);
-  }else if(code==='barrack'){
-   box('cream',3.25,.67,-.3,1.65,1.08,2.8);roof(3.25,1.22,-.3,2.1,3,'red');box('stone',3.83,1.9,-1.25,.5,1.7,.55);box('dark',3.83,2.8,-1.25,.35,.07,.38);
-   add('cyl','dark',3.25,.43,1.47,.23,.45,.23);box('dark',3.25,.69,1.47,.83,.2,.38);box('gold',3.58,.63,1.47,.25,.12,.22);
-   for(let i=0;i<5;i++){add('cyl','wood',-3.1+i*.24,1.06,1.95,.025,1.65,.025);add('cone','trim',-3.1+i*.24,1.99,1.95,.074,.25,.074);}box('timber',-2.65,.8,1.95,1.3,.09,.11);barrel(3.4,2.7);
   }else if(code==='hospital'){
    for(const side of [-1,1]){fence(side*3.6,0,4.6,Math.PI/2);for(let i=0;i<3;i++)planter(side*3.15,-1.4+i*1.1,.6);}
    box('trim',3,.67,2.7,1.4,.15,.67);for(const x of [2.5,3.5])box('stone',x,.38,2.7,.13,.6,.6);lamp(-3,3);
@@ -74,16 +70,16 @@ export function enrichVillage({scene,buildings}){
   flush();
  }
  for(const [code,root] of buildings)decorate(root,code);
- // Small residential courts fill the large lawns; these are decorative homes,
- // not extra production buildings or invented upgrade targets.
+ // Keep the eastern dwelling; the military lawn stays open between its three
+ // training buildings and their entrance paths.
  const homes=new T.Group();homes.name='village-residential-courts';scene.add(homes);
- for(const [x,z,color] of [[-16,12,'orange'],[17,16,'red']]){
+ for(const [x,z,color] of [[17,16,'red']]){
   const lot=new T.Group();lot.position.set(x,.12,z);homes.add(lot);
   const tiles=new T.Mesh(new T.CylinderGeometry(3.9,4,.09,8),M.stone);tiles.position.y=.04;tiles.scale.z=.76;tiles.receiveShadow=true;lot.add(tiles);
   // Reuse the same detailed dwelling vocabulary as the market's merchant home.
   decorate(lot,'home-'+color);lot.scale.setScalar(.9);lot.rotation.y=.18;
  }
- return {parts,batches:batchCount,homes:2};
+ return {parts,batches:batchCount,homes:1};
 }
 
 // Cosmetics never mutate shared terrain pigments or saved gameplay values.

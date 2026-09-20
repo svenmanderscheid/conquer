@@ -89,7 +89,7 @@ window.ConquerWorld = (() => {
     // legacy whole-image gait from being layered over them.
     image.style.animation=kind==='motion'?'none':'';image.src=source;
   }
-  document.addEventListener('visibilitychange',()=>{if(view){view.clockFrame=undefined;view.clockCorrection=0;for(const actor of view.partyNodes.values()){actor.classList.remove('is-moving');if(actor.travel)actor.travel.observed=false;if(document.hidden&&actor.classList.contains('has-motion-animation'))setMarchSkinSource(actor,window.ConquerMarchSkins.image(context.base,actor.dataset.marchSkin),'still');}}syncMotion();});
+  document.addEventListener('visibilitychange',()=>{if(view){view.clockFrame=undefined;view.clockCorrection=0;for(const actor of view.partyNodes.values()){actor.classList.remove('is-moving');if(actor.travel)actor.travel.observed=false;if(document.hidden&&actor.classList.contains('has-motion-animation'))setMarchSkinSource(actor,window.ConquerMarchSkins.image(context.base,actor.dataset.marchSkin),'still');}}syncMotion();setVisible(sceneVisible);});
   new MutationObserver(syncMotion).observe(document.body,{attributes:true,attributeFilter:['class']});
   const shrineElements={forest:{label:'Wald',color:'#79bd71',aliases:'Wald Smaragdwald forest SHRINE_FOREST'},ice:{label:'Eis',color:'#c0edf8',aliases:'Eis Frost Frostlande ice SHRINE_ICE'},sand:{label:'Sand',color:'#f3c878',aliases:'Sand Wüste Sonnendünen sand SHRINE_SAND'},lava:{label:'Lava',color:'#ff8a65',aliases:'Lava Feuer Aschenlande lava SHRINE_LAVA'}};
   const shrineElement = shrine => String(shrine.element||shrine.shrine_code||shrine.art_key||'').replace(/^SHRINE_/i,'').toLowerCase();
@@ -194,7 +194,7 @@ window.ConquerWorld = (() => {
     const targets=[{key:'home',kind:'home',id:city.id,x:number(city.coord_x),y:number(city.coord_y),name:city.name&&!/^(Deine Stadt|.*['’]s City)$/.test(city.name)?city.name:state.player?.name||'Deine Stadt',level:number(city.castle_level)||1,art:castleArt(city.city_skin),data:city}];
     for(const m of state.monsters||[])if(['solo','rally'].includes(m.definition?.type)){const sourceArt=context.monsterArt(m),artKey=monsterVisualKey(m);targets.push({key:`monsters:${m.id}`,kind:'monsters',id:m.id,x:number(m.coord_x),y:number(m.coord_y),name:monsterName(m)+(m.definition?.type==='rally'?' · Rally':''),level:number(m.definition?.level)||1,art:`${context.base}/assets/art/${sourceArt}.png`,artKey,data:m});}
     for(const n of state.nodes||[]){const r=resources[n.object_type]||resources[1];targets.push({key:`nodes:${n.id}`,kind:'nodes',id:n.id,x:number(n.coord_x),y:number(n.coord_y),name:r.name,level:number(n.level)||1,art:asset(r.art),resource:r,data:n});}
-    for(const charm of state.charms||[]){const x=number(charm.x??charm.coord_x),y=number(charm.y??charm.coord_y);targets.push({key:`charms:${charm.id}`,kind:'charms',id:Number(charm.id),x,y,name:charmName(charm),level:{normal:1,epic:2,legendary:3}[charm.grade]||1,art:asset('crystal'),data:{...charm,coord_x:x,coord_y:y}});}
+    for(const charm of state.charms||[]){const x=number(charm.x??charm.coord_x),y=number(charm.y??charm.coord_y);targets.push({key:`charms:${charm.id}`,kind:'charms',id:Number(charm.id),x,y,name:charmName(charm),level:{normal:1,epic:2,legendary:3}[charm.grade]||1,art:`${context.base}/assets/art/map/runes-v1/${['normal','epic','legendary'].includes(charm.grade)?charm.grade:'normal'}.webp`,data:{...charm,coord_x:x,coord_y:y}});}
     for(const p of state.players||[])targets.push({key:`players:${p.id}`,kind:'players',id:p.id,x:number(p.coord_x),y:number(p.coord_y),name:p.display_name||p.username||'Siedlung',level:number(p.castle_level)||1,art:castleArt(p.city_skin),data:p});
     if(state.congress){const g=state.congress;targets.push({key:"congress",kind:"congress",id:g.id,x:number(g.coord_x),y:number(g.coord_y),name:g.name||"Kongress",level:1,art:`${context.base}/assets/art/map/congress.${motionPreference.matches||document.body.classList.contains("reduced-motion")?"png":"webp"}?v=zones1`,data:g});}
     for(const g of state.shrines||[]){const element=shrineElement(g);if(!shrineElements[element]||!Number.isFinite(Number(g.coord_x))||!Number.isFinite(Number(g.coord_y)))continue;targets.push({key:`shrine:${g.id}`,kind:'shrine',id:g.id,element,x:number(g.coord_x),y:number(g.coord_y),name:g.name||`${shrineElements[element].label}schrein`,art:`${context.base}/assets/art/map/shrine-${element}.${motionPreference.matches||document.body.classList.contains('reduced-motion')?'png':'webp'}?v=shrines1`,data:g});}
@@ -364,6 +364,11 @@ window.ConquerWorld = (() => {
       if(!button){button=document.createElement('button');button.className=`atlas-marker atlas-marker--${target.kind}`;button.dataset.atlasTarget=target.key;button.innerHTML='<span class="atlas-marker-ground"></span><span class="castle-skin-effect" aria-hidden="true"></span><img alt="" draggable="false"><span class="atlas-marker-level"></span><span class="atlas-marker-name"></span>';(target.kind==='monsters'?view.creatures:view.markers).append(button);view.markerNodes.set(target.key,button);}
       const img=button.querySelector('img'),kind=lifeKind(target);if(kind)img.dataset.lifeKind=kind;else delete img.dataset.lifeKind;const src=targetImage(target);if(img.getAttribute('src')!==src)img.src=src;if(isVillage(target)){const skin=window.ConquerCastleSkins.get(target.data.city_skin);button.dataset.skin=skin.id;button.dataset.rarity=skin.rarity;button.style.setProperty('--skin-aura',skin.effectColor);}
       if(target.kind==='charms')button.dataset.grade=['normal','epic','legendary'].includes(target.data.grade)?target.data.grade:'normal';else delete button.dataset.grade;
+      if(target.kind==='charms'&&!button.querySelector('.charm-rune-effects')){
+        const fx=document.createElement('span');fx.className='charm-rune-effects';fx.setAttribute('aria-hidden','true');
+        fx.innerHTML='<i class="charm-rune-base"></i><i class="charm-rune-ring"></i><i class="charm-rune-spark"></i><i class="charm-rune-spark"></i><i class="charm-rune-spark"></i>';
+        button.insertBefore(fx,img);button.style.setProperty('--rune-delay',`${-(Number(target.id)%19)/5}s`);
+      }
       if((target.kind==='shrine'||target.kind==='congress')&&!button.querySelector('.atlas-landmark-effects')){
         const fx=document.createElement('span');fx.className='atlas-landmark-effects';fx.setAttribute('aria-hidden','true');
         fx.innerHTML='<i class="landmark-halo"></i><i class="landmark-orbit"></i><i class="landmark-beacon"></i>'+Array.from({length:6},(_,n)=>`<i class="landmark-spark" style="--spark:${n}"></i>`).join('');button.insertBefore(fx,img);
@@ -373,6 +378,7 @@ window.ConquerWorld = (() => {
       updateMonsterHealth(button,target);
       if(target.kind==='shrine'){button.dataset.shrine=target.element;button.classList.toggle('is-event-active',!!target.data.event?.active);button.title=shrineStatus(target,true);}
       button.classList.toggle('is-regional-boss',isRegionalBoss(target));
+      if(target.kind==='monsters')button.dataset.monsterType=target.data.definition?.type==='rally'?'rally':'solo';
       if(isRegionalBoss(target)){
         button.dataset.boss=target.artKey;button.dataset.biome=target.data.definition.biome||'arcane';
         button.style.setProperty('--boss-phase',`${-(number(target.id)%17)*.37}s`);
@@ -625,15 +631,16 @@ window.ConquerWorld = (() => {
     c.clearRect(0,0,w,h);window.ConquerLandscape.ground(c,project,s,{left,top,right,bottom});
     const biome=window.ConquerLandscape.biomeAt(memory.x,memory.y);view.el.querySelector('.atlas-biome-label').textContent=Math.hypot(memory.x-128,memory.y-128)<22?'Weltensee · Kongress':biome.name;
     window.ConquerLandscape.water(c,project,s,{left,top,right,bottom});
+    window.ConquerLandscape.bridges?.(c,project,s,{left,top,right,bottom});
     const occupied=(x,y,pad=.45)=>view.targets.some(t=>Math.abs(targetCenter(t)[0]-x)<footprint(t)/2+pad&&Math.abs(targetCenter(t)[1]-y)<footprint(t)/2+pad)||window.ConquerLandscape.waterAt(x,y);
     const decorations=[],clusterSpan=9;
     // Vegetation forms a few readable groves with broad clearings between
     // them. This keeps the illustrated world alive without filling every tile.
     for(let gy=Math.floor(top/clusterSpan)-1;gy<=Math.ceil(bottom/clusterSpan)+1;gy++)for(let gx=Math.floor(left/clusterSpan)-1;gx<=Math.ceil(right/clusterSpan)+1;gx++){
       const v=hash(gx,gy,13),wx=gx*clusterSpan+1+hash(gx,gy,14)*(clusterSpan-2),wy=gy*clusterSpan+1+hash(gx,gy,15)*(clusterSpan-2),weights=window.ConquerLandscape.biomeAt(wx,wy).weights;
-      const treeDensity=.86+weights.forest*.14;
-      if(v<.62*treeDensity){
-        const count=5+Math.floor(hash(gx,gy,16)*4);
+      const treeDensity=.84+weights.forest*.2;
+      if(v<.68*treeDensity){
+        const count=6+Math.floor(hash(gx,gy,16)*5)+(weights.forest>.55?2:0);
         for(let k=0;k<count;k++){
           const angle=hash(gx+k*3,gy-k,17)*Math.PI*2,radius=.55+hash(gx-k,gy+k*5,18)*3.05;
           const tx=wx+Math.cos(angle)*radius,ty=wy+Math.sin(angle)*radius*.72;
@@ -911,7 +918,7 @@ window.ConquerWorld = (() => {
     window.ConquerLandscape.ambience?.(c,project,scale(),{left,top,right,bottom},view.ambienceTime);
   }
   function animate(time){
-    if(!view?.el.isConnected||!sceneVisible){frameId=0;return;}frameId=requestAnimationFrame(animate);
+    if(!view?.el.isConnected||!sceneVisible||document.hidden){frameId=0;view&&(view.lastAmbience=null);return;}frameId=requestAnimationFrame(animate);
     if(document.hidden){view.lastAmbience=null;return;}
     syncMotion();
     if(view.cameraDirty){paint();updateSidebar();}
@@ -935,6 +942,6 @@ window.ConquerWorld = (() => {
     if(target){select(target.key,true);return true;}
     focus(x,y);return false;
   }
-  function setVisible(visible){sceneVisible=Boolean(visible);if(!sceneVisible&&frameId){cancelAnimationFrame(frameId);frameId=0;}else if(sceneVisible&&view?.el.isConnected&&!frameId){view.lastAnimation=performance.now();frameId=requestAnimationFrame(animate);}}
+  function setVisible(visible){sceneVisible=Boolean(visible);if((!sceneVisible||document.hidden)&&frameId){cancelAnimationFrame(frameId);frameId=0;}else if(sceneVisible&&!document.hidden&&view?.el.isConnected&&!frameId){view.lastAnimation=performance.now();frameId=requestAnimationFrame(animate);}}
   return {render,getCenter,focus,locate,followMarch,setVisible};
 })();

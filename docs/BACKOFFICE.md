@@ -65,6 +65,29 @@ the two historical audit schemas without removing existing entries. Event
 settings additionally use the event-service migration 0068. Playable multiworld
 sessions and memberships require 0072; city-specific scout protection uses 0073.
 
+## Alpha invitations
+
+`/admin/alpha-keys` (Community → Alpha-Keys) manages registration invitations
+globally, independently of the selected world. Superadmins can create 1–50 keys
+per operation, choose a label, 1–65,535 registrations per key and an optional
+future expiry in UTC. Moderators can view metadata only. The list supports label
+or ID search, availability filters and pagination. Revoking a key stops future
+registrations; existing accounts and their login access remain unchanged.
+
+Full keys appear once after creation with a copy button and a manual selection
+fallback for browsers without clipboard access. The redirect temporarily carries
+the output in the issuing admin's session (valid for five minutes); rendering
+consumes it and responses are marked no-store. Only hashes are stored in the key
+table; neither audit entries nor durable operation receipts contain plaintext
+keys. Replayed submissions create no additional keys and cannot recover the
+secret. If the output was lost, revoke those invitations and create replacements.
+
+Creation and revocation use the existing authenticated POST/CSRF, reason,
+operation receipt and audit transaction. No new migration is needed beyond the
+existing `0100_alpha_access_keys.sql`. The CLI creator remains available.
+`php tests/alpha_keys_admin.php --browser` verifies isolated service and HTTP/UI
+flows, including permissions, limits, rollback, copying and mobile layouts.
+
 ## World management
 
 Select the world in the header. `/admin/world` controls its name, status, speed,

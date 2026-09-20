@@ -8,11 +8,12 @@ $city3dImportMapJson = \Conquer\Game\City\City3dImportMap::json(['imports' => $c
 header('Cache-Control: no-store');
 ?>
 <!doctype html>
-<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#173c39"><title>Conquer · Deine 3D-Stadt</title><link rel="icon" href="data:,"><link rel="stylesheet" href="<?= $base ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(__DIR__ . '/../assets/css/fantasy-fonts.css') ?>"><link rel="stylesheet" href="<?= $base ?>/assets/city3d/style.css"><link rel="stylesheet" href="<?= $base ?>/assets/city3d/play.css?v=commands2"><link rel="stylesheet" href="<?= $base ?>/assets/city3d/hud.css?v=<?= filemtime(__DIR__ . '/../assets/city3d/hud.css') ?>">
+<html lang="<?= htmlspecialchars(\Conquer\Game\Locale::current(),ENT_QUOTES) ?>"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#173c39"><title>Conquer · Deine 3D-Stadt</title><link rel="icon" href="data:,"><link rel="stylesheet" href="<?= $base ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(__DIR__ . '/../assets/css/fantasy-fonts.css') ?>"><link rel="stylesheet" href="<?= $base ?>/assets/city3d/style.css"><link rel="stylesheet" href="<?= $base ?>/assets/city3d/play.css?v=commands2"><link rel="stylesheet" href="<?= $base ?>/assets/city3d/hud.css?v=<?= filemtime(__DIR__ . '/../assets/city3d/hud.css') ?>">
 <?php if ($embedded): ?><link rel="stylesheet" href="<?= $base ?>/assets/css/embedded-city-hud.css?v=<?= filemtime(__DIR__ . '/../assets/css/embedded-city-hud.css') ?>"><?php endif; ?>
 <link rel="stylesheet" href="<?= $base ?>/assets/css/village-theme.css?v=<?= filemtime(__DIR__ . '/../assets/css/village-theme.css') ?>">
+<?php require ROOT_DIR.'/views/partials/localization-head.php'; ?>
 </head>
-<body class="play-city<?= $embedded ? ' embedded' : '' ?>">
+<body class="play-city<?= $embedded ? ' embedded' : '' ?>" data-i18n-scope>
 <main id="world" aria-label="Deine Stadt in 3D. Tippe auf die Festung, um sie auszubauen."></main>
 <header class="realm-hud"><button id="profile-open" aria-label="Spielerprofil öffnen"><span class="portrait" aria-hidden="true">♜</span><span class="profile-caption"><strong><?= htmlspecialchars($session['username'], ENT_QUOTES) ?></strong><small id="hud-power">Deine Stadt wird geladen …</small></span></button><span class="realm-marker">CONQUER<small>DEINE STADT</small></span></header>
 <div id="resource-bar" aria-label="Deine Ressourcen"><span>Ressourcen werden geladen …</span></div>
@@ -49,6 +50,7 @@ foreach ($menu as $key=>[$label,$path]): ?>
 <p id="upgrade-benefit"></p><p id="upgrade-duration"></p><div id="upgrade-costs" aria-label="Ausbaukosten"></div><div id="upgrade-requirements"></div><p id="upgrade-reason"></p><p id="action-message" role="status"></p><button id="start-upgrade" class="primary" disabled>Spielstand laden …</button><div id="prerequisite-actions"></div></section>
 <script>window.CONQUER_PLAY = {world: <?= \Conquer\Game\World\WorldContext::id() ?>, base: <?= json_encode(APP_BASE, JSON_HEX_TAG | JSON_HEX_AMP) ?>, embedded: <?= $embedded ? 'true' : 'false' ?>, assetVersion: <?= json_encode($city3dImportMap['version'], JSON_HEX_TAG | JSON_HEX_AMP) ?>};window.CONQUER_EMBED=<?= $embedded ? 'true' : 'false' ?>;</script>
 <script type="importmap"><?= $city3dImportMapJson ?></script>
+<script src="<?= $base ?>/assets/js/app-polling.js?v=<?= filemtime(__DIR__.'/../assets/js/app-polling.js') ?>"></script>
 <script type="module" src="<?= $base ?>/assets/city3d/scene.js?v=city3d-<?= $city3dImportMap['version'] ?>"></script><script type="module" src="<?= $base ?>/assets/city3d/play.js?v=city3d-<?= $city3dImportMap['version'] ?>"></script>
 <script type="module" src="<?= $base ?>/assets/city3d/hud.js?v=city3d-<?= $city3dImportMap['version'] ?>"></script>
 </body></html>

@@ -7,14 +7,22 @@
     const supported={de:'Deutsch',fr:'Français',en:'English'};
     const catalogs=window.CONQUER_I18N?.catalogs||{};
     const normalize=value=>{const code=typeof value==='string'?value.toLowerCase().replace('_','-').split('-')[0]:'';return Object.hasOwn(supported,code)?code:'de';};
-    let locale=normalize(window.CONQUER_I18N?.locale),observer=null,scheduled=false,installPrompt=null;
-    try{const saved=localStorage.getItem('conquer.locale');if(saved)locale=normalize(saved);}catch{}
-    const sourceNodes=new WeakMap(),sourceAttributes=new WeakMap(),dictionary=new Map();
-    for(const [key,value]of Object.entries(catalogs.de||{}))if(typeof value==='string')dictionary.set(value.replace(/\s+/g,' ').trim(),key);
-    const protectedContent='[data-user-content],[translate="no"],[data-i18n-ignore],script,style,code,pre,input,textarea,[contenteditable="true"],.community-message,.community-letter,.community-mail-card strong,.community-mail-card span,.community-gift-message,.community-card>h3,.community-card>strong,.profile-banner,.profile-bio,.profile-head,.member-identity,#player-hud-name,.player-name,.alliance-name,.world-player-name,.ranking-player,.ranking-name,.sidebar-bottom small,td';
+    let locale=normalize(window.CONQUER_I18N?.locale),observer=null,scheduled=false,installPrompt=null,savedLocale='';
+    try{savedLocale=localStorage.getItem('conquer.locale')||'';if(savedLocale)locale=normalize(savedLocale);}catch{}
+    if(!savedLocale&&!/(?:^|;\s*)conquer_locale=/.test(document.cookie||''))locale=normalize(navigator.languages?.[0]||navigator.language||locale);
+    const sourceNodes=new WeakMap(),sourceAttributes=new WeakMap(),dictionary=new Map(),templates=[];
+    for(const [key,value]of Object.entries(catalogs.de||{}))if(typeof value==='string'){
+        const normalized=value.replace(/\s+/g,' ').trim();dictionary.set(normalized,key);
+        const names=[...normalized.matchAll(/\{([a-zA-Z0-9_]+)\}/g)].map(match=>match[1]);
+        if(names.length){const pattern=normalized.replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/\\\{[a-zA-Z0-9_]+\\\}/g,'(.+?)');templates.push({key,names,pattern:new RegExp('^'+pattern+'$','u')});}
+    }
+    const protectedContent='[data-user-content],[translate="no"],[data-i18n-ignore],script,style,code,pre,input,textarea,[contenteditable="true"],.community-message,.community-letter,.community-mail-card strong,.community-mail-card span,.community-gift-message,.community-card>h3,.community-card>strong,.profile-banner,.profile-bio,.profile-head,.member-identity,#player-hud-name,.player-name,.vs-player-name,.target-player-name,.player-card-name,.alliance-name,.alliance-title,.alliance-desc,.alliance-tag-badge,.member-username,.world-player-name,.ranking-player,.ranking-name,.chat-message-text,.chat-msg-text,.chat-msg-name,.mail-message-body,.sidebar-bottom small,td';
     const authoredSelectors=[
-        '.landing-page main','.landing-page>header','.landing-page>footer',
         '[data-i18n]','[data-i18n-attrs]','[data-i18n-scope]','[data-locale-controls]',
+        '#content','#panel-content','#dialog-content','#game-dialog','#panel-dialog','#toast',
+        '.topbar','#hud-left-tools','#hud-right-tools','#hud-bottom-nav','#navigation',
+        '.active-effects-drawer','.world-chat-shell','.world-search-panel','.encounter-card',
+        '.landing-page main','.landing-page>header','.landing-page>footer',
         '#navigation','.game-quick-actions','.subtabs','.subtab','#page-title','.section-heading h2',
         '.button[data-action]','button[data-action^="community-"]:not(.community-mail-card)',
         'button[data-action^="progress-"]','button[data-action^="defense-"]',
@@ -33,7 +41,18 @@
         for(const [name,replacement]of Object.entries(parameters))if(['string','number','boolean'].includes(typeof replacement))value=value.split('{'+name+'}').join(String(replacement));
         return value;
     }
-    function textTranslation(value){const trimmed=value.replace(/\s+/g,' ').trim(),key=dictionary.get(trimmed);if(!key)return value;return value.match(/^\s*/)[0]+t(key)+value.match(/\s*$/)[0];}
+    function has(key){return Object.hasOwn(catalogs[locale]||{},key)||Object.hasOwn(catalogs.de||{},key);}
+    function localeTag(){return locale==='fr'?'fr-FR':locale==='en'?'en-US':'de-DE';}
+    function formatNumber(value,options={}){return new Intl.NumberFormat(localeTag(),options).format(Number(value)||0);}
+    function formatDate(value,options={}){const date=value instanceof Date?value:new Date(value);return new Intl.DateTimeFormat(localeTag(),options).format(date);}
+    function formatDuration(value){
+        const seconds=Math.max(0,Math.ceil(Number(value)||0)),parts=[];
+        if(seconds>=3600)parts.push(Math.floor(seconds/3600)+' '+t('time.hour_short'));
+        if(seconds>=60)parts.push(Math.floor(seconds%3600/60)+' '+t('time.minute_short'));
+        if(seconds<60||seconds%60)parts.push(seconds%60+' '+t('time.second_short'));
+        return parts.join(' ');
+    }
+    function textTranslation(value){const trimmed=value.replace(/\s+/g,' ').trim(),key=dictionary.get(trimmed);let translated=key?t(key):null;if(translated===null){for(const template of templates){const match=trimmed.match(template.pattern);if(!match)continue;const parameters={};template.names.forEach((name,index)=>parameters[name]=match[index+1]);translated=t(template.key,parameters);break;}}if(translated===null)return value;return value.match(/^\s*/)[0]+translated+value.match(/\s*$/)[0];}
     function guarded(element){return !element||Boolean(element.closest(protectedContent));}
     function translateText(node){
         if(guarded(node.parentElement)||node.parentElement.closest('[data-i18n]'))return;
@@ -99,7 +118,7 @@
     window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();installPrompt=event;});
     window.addEventListener('appinstalled',()=>{installPrompt=null;document.dispatchEvent(new CustomEvent('conquer:installed'));});
     window.addEventListener('storage',event=>{if(event.key==='conquer.locale'){locale=normalize(event.newValue);apply();}});
-    window.ConquerLocale={t,apply,mount,setLocale,normalize,get locale(){return locale;},get supported(){return{...supported};}};
+    window.ConquerLocale={t,has,apply,mount,setLocale,normalize,formatNumber,formatDate,formatDuration,get locale(){return locale;},get supported(){return{...supported};}};
     window.ConquerPWA={register,install:installApp};
     const start=()=>{observe();register();};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();

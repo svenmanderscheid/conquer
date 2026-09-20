@@ -25,6 +25,10 @@ LimitRequestBody 65536
 # Relative rules protect both domain-root and /conquer installations.
 RewriteRule ^(?:src|config|migrations|cron|tests|docs|data|vendor|node_modules|logs|sessions|cache|tmp|tools|bin|artifacts|asset-workflow|views|\.git|\.github|\.claude|\.codex[^/]*)(?:/|$) - [F,L,NC]
 
+# Local documents and exports at the project root are not public game assets.
+# Intentional downloadable assets belong below assets/.
+RewriteRule ^[^/]+\.(?:pdf|zip|7z|tar|gz|log|sqlite3?|db)$ - [F,L,NC]
+
 # Don't rewrite if the request is for a real file or directory
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
@@ -82,6 +86,10 @@ RedirectMatch 403 ^/(src|config|migrations|cron|tests|docs|data|vendor|node_modu
     ExpiresByType font/woff2 "access plus 30 days"
     ExpiresByType font/woff "access plus 30 days"
     ExpiresByType font/ttf "access plus 30 days"
+
+    # Versioned, local village music
+    ExpiresByType audio/wav "access plus 30 days"
+    ExpiresByType audio/x-wav "access plus 30 days"
     
     # CSS / JS — short cache during dev, long after launch
     ExpiresByType text/css "access plus 1 day"

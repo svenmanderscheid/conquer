@@ -106,7 +106,8 @@
         "lumber": 0,
         "stone": 0,
         "gold": 0
-      }
+      },
+      "source_amount": 100
     },
     {
       "code": 20200102,
@@ -202,7 +203,7 @@
       "name": "Orc",
       "type": "solo",
       "level": 2,
-      "amount": 320,
+      "amount": 220,
       "action_point_cost": 10,
       "stats": {
         "hp": 150,
@@ -1092,7 +1093,7 @@
       "name": "Skeleton",
       "type": "solo",
       "level": 2,
-      "amount": 480,
+      "amount": 320,
       "action_point_cost": 10,
       "stats": {
         "hp": 109,
@@ -1982,7 +1983,7 @@
       "name": "Golem",
       "type": "solo",
       "level": 2,
-      "amount": 400,
+      "amount": 270,
       "action_point_cost": 10,
       "stats": {
         "hp": 134,
@@ -2875,7 +2876,7 @@
       "name": "Treasure Goblin",
       "type": "solo",
       "level": 2,
-      "amount": 290,
+      "amount": 190,
       "action_point_cost": 25,
       "stats": {
         "hp": 134,
@@ -5325,7 +5326,7 @@
       "name": "Frostgrimm",
       "type": "rally",
       "level": 2,
-      "amount": 1280,
+      "amount": 780,
       "action_point_cost": 25,
       "stats": {
         "hp": 184,
@@ -6013,7 +6014,7 @@
       "name": "Sandmaul",
       "type": "rally",
       "level": 2,
-      "amount": 1280,
+      "amount": 780,
       "action_point_cost": 25,
       "stats": {
         "hp": 184,
@@ -6701,7 +6702,7 @@
       "name": "Glutramm",
       "type": "rally",
       "level": 2,
-      "amount": 1280,
+      "amount": 780,
       "action_point_cost": 25,
       "stats": {
         "hp": 184,
@@ -7389,7 +7390,7 @@
       "name": "Grumwald",
       "type": "rally",
       "level": 2,
-      "amount": 1280,
+      "amount": 780,
       "action_point_cost": 25,
       "stats": {
         "hp": 184,

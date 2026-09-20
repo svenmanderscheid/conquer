@@ -78,7 +78,7 @@ window.ConquerVillage = function({base,esc,fmt,getState,getKingdom,openDialog,na
         return `<nav class="skin-collection-tabs" aria-label="Skin-Sammlung"><button type="button" data-action="skin-collection-tab" data-id="castle" aria-label="Burg-Skins ${castleOwned.known?castleOwned.owned.size:skins.length}/${skins.length}" aria-pressed="${collectionTab==='castle'}"><span aria-hidden="true">♜</span> Burg <small>${castleOwned.known?castleOwned.owned.size:skins.length}/${skins.length}</small></button><button type="button" data-action="skin-collection-tab" data-id="march" aria-label="Marsch-Skins ${owned}/${skins.length}" aria-pressed="${collectionTab==='march'}"><span aria-hidden="true">⚑</span> Marsch <small>${owned}/${skins.length}</small></button>${frameTab}<button type="button" data-action="skin-collection-tab" data-id="bundles" aria-label="Pakete ${bundleOwned}/${bundles.length}" aria-pressed="${collectionTab==='bundles'}"><span aria-hidden="true">🎁</span> Pakete <small>${bundleOwned}/${bundles.length}</small></button></nav>`;
     }
     function open(detail={kind:'home'}) {
-        const state=getState(),own=detail.kind==='home',city=own?state.city:state.players.find(p=>Number(p.id)===Number(detail.id));
+        const state=getState(),own=detail.kind==='home',city=own?state.city:(state.players||[]).find(p=>Number(p.id)===Number(detail.id));
         if(!city)return;
         selected={kind:own?'home':'players',id:Number(city.id),x:Number(city.coord_x),y:Number(city.coord_y)};
         const name=own?getKingdom()?.profile?.display_name||state.player.name:city.display_name||city.username;

@@ -129,7 +129,9 @@ final class BattleEngine
 
         // ── Power threshold, monster damage and outcome ───────────────────────
         $requiredPower=\Conquer\Game\Map\MonsterPower::currentRequired($monsterDef,$hpCurrent);
-        $armyPower=max(0.0,$armyPowerOverride??ArmyPower::effective($attackerTroops,$buffs));
+        $baseArmyPower=max(0.0,$armyPowerOverride??ArmyPower::effective($attackerTroops,$buffs));
+        $luckPercent=BattleLuck::roll();
+        $armyPower=$baseArmyPower*BattleLuck::factor($luckPercent);
         $powerRatio=$requiredPower>0?$armyPower/$requiredPower:1.0;
         $monsterKilled=$powerRatio>=1.0;
         $monsterLossRatio=min(1.0,$powerRatio);
@@ -173,7 +175,7 @@ final class BattleEngine
         }
 
         $report = [
-            'report_version'      => 3,
+            'report_version'      => 4,
             'combat_snapshot'     => MonsterReport::army($attackerTroops, $buffs),
             'monster_snapshot'    => [
                 'code'=>(int)($monster['monster_code'] ?? $monsterDef['code'] ?? 0),
@@ -191,6 +193,8 @@ final class BattleEngine
             'monster_atk_pool'    => round($monsterAtkPool),
             'attacker_damage'     => round($attackerDamage),
             'army_power'          => round($armyPower),
+            'army_power_before_luck' => round($baseArmyPower),
+            'luck_percent'        => $luckPercent,
             'required_power'      => $requiredPower,
             'power_ratio'         => round($powerRatio,4),
             'attacker_injury_ratio' => round($attackerLossRatio, 4),

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1); ?>
 <!doctype html>
-<html lang="de">
+<html lang="<?= htmlspecialchars(\Conquer\Game\Locale::current(),ENT_QUOTES) ?>">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -8,8 +8,9 @@
   <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR.'/assets/css/fantasy-fonts.css') ?>">
   <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/combat-report.css?v=<?= filemtime(ROOT_DIR.'/assets/css/combat-report.css') ?>">
   <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/village-theme.css?v=<?= filemtime(ROOT_DIR.'/assets/css/village-theme.css') ?>">
+<?php require ROOT_DIR.'/views/partials/localization-head.php'; ?>
 </head>
-<body class="mobile-game mr-direct">
+<body class="mobile-game mr-direct" data-i18n-scope>
 <main><a class="button" href="<?= APP_BASE ?>/city#reports">‹ Zur Post</a><div id="monster-report-root"></div><p id="report-error" role="alert"></p></main>
 <script src="<?= APP_BASE ?>/assets/js/monster-report.js?v=<?= filemtime(ROOT_DIR.'/assets/js/monster-report.js') ?>"></script>
 <script>

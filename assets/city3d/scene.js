@@ -10,9 +10,10 @@ import { enrichVillage } from './village-details.js?v=fantasy-village1';
 import {placeVillageBuilding,villageOverview,villageBuildings,villageBoundary,villageTerrace,villageRoads,villageLandmarks,villageBuildingHeightScale,villageElevationAt} from './village-layout.js?v=finished-village5';
 import { storybookMaterials as storyM,addStorybookOutline,createVillageGroundMaterial } from './storybook-style.js?v=fantasy-village1';
 const start=performance.now(), host=document.querySelector('#world'), loading=document.querySelector('#loading');
+const mobileGraphics=matchMedia('(pointer: coarse)').matches;
 let renderer;
 try{
- renderer=new T.WebGLRenderer({antialias:true,alpha:false,powerPreference:'default'});
+ renderer=new T.WebGLRenderer({antialias:true,alpha:false,powerPreference:mobileGraphics?'low-power':'default'});
 }catch(primaryError){
  try{renderer=new T.WebGLRenderer({antialias:false,alpha:false,powerPreference:'low-power'});}
  catch(fallbackError){loading.textContent='Chrome hat die 3D-Grafik vorübergehend blockiert. Bitte diesen Tab schließen, erneut öffnen und die Seite neu laden.';throw new AggregateError([primaryError,fallbackError],'WebGL context creation failed');}
@@ -20,7 +21,7 @@ try{
 // Large desktop displays otherwise allocate a very large colour, depth and
 // shadow buffer at once. The restrained cap keeps integrated GPUs stable while
 // preserving the illustrated look; smaller screens may retain a little more AA.
-const pixelRatioLimit=innerWidth>=1600?1.2:1.45;
+const pixelRatioLimit=mobileGraphics?1.2:innerWidth>=1600?1.2:1.45;
 renderer.setPixelRatio(Math.min(devicePixelRatio,pixelRatioLimit));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;host.appendChild(renderer.domElement);
 const scene=new T.Scene();scene.background=new T.Color('#d4ddcc');scene.fog=new T.Fog('#d4ddcc',180,320);
 const camera=new T.OrthographicCamera(-10,10,10,-10,.1,400),target=new T.Vector3(0,.7,0),offset=new T.Vector3(42,54,66);let zoom=1;
@@ -109,7 +110,7 @@ motionPreference.addEventListener('change',()=>{paused=motionPreference.matches|
 window.addEventListener('message',event=>{
  if(window.parent===window||event.source!==window.parent||event.origin!==location.origin)return;
  if(event.data?.type==='conquer:preferences'&&appReduced!==Boolean(event.data.reduced_motion)){appReduced=Boolean(event.data.reduced_motion);paused=motionPreference.matches||appReduced;pauseUI();}
- if(event.data?.type==='conquer:visibility')appVisible=event.data.visible!==false;
+ if(event.data?.type==='conquer:visibility'){appVisible=event.data.visible!==false;syncFrames();}
 });
 document.querySelector('#cityMode').onclick=()=>{cityMode=!cityMode;testCity.root.visible=cityMode;overview=true;selection.visible=false;target.set(0,.7,0);setZoom(1);document.querySelector('#cityMode').textContent=cityMode?'Kleine Szene':'Große Stadt';document.querySelector('#name').textContent=cityMode?'Die Stadt lebt.':'Festung & Wassermühle';document.querySelector('#description').textContent=cityMode?'22 Gebäude und 60 marschierende Einheiten. Erkunde die Viertel und prüfe, ob die Bewegung flüssig bleibt.':'Zwei Gebäude zum direkten Vergleich mit der großen Stadt.';};
 document.querySelector('#metricsToggle').onclick=()=>{const m=document.querySelector('#metrics');m.hidden=!m.hidden;document.querySelector('#metricsToggle').setAttribute('aria-expanded',String(!m.hidden));};
@@ -122,14 +123,20 @@ function bindGestures(surface){surface.addEventListener('pointerdown',pointerDow
 bindGestures(canvas);document.querySelectorAll('.building-name').forEach(label=>{bindGestures(label);label.addEventListener('click',e=>{if(!suppressLabelClick)return;suppressLabelClick=false;e.preventDefault();e.stopImmediatePropagation();},true);});
 canvas.addEventListener('wheel',e=>{e.preventDefault();setZoom(zoom*Math.exp(-e.deltaY*.001));},{passive:false});
 let graphicsSuspended=false;
-canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();graphicsSuspended=true;loading.textContent='Die Grafikverbindung wird wiederhergestellt …';loading.classList.remove('hidden');});
-canvas.addEventListener('webglcontextrestored',()=>{graphicsSuspended=false;loading.classList.add('hidden');resize();});
+canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();graphicsSuspended=true;syncFrames();loading.textContent='Die Grafikverbindung wird wiederhergestellt …';loading.classList.remove('hidden');});
+canvas.addEventListener('webglcontextrestored',()=>{graphicsSuspended=false;loading.classList.add('hidden');resize();syncFrames();});
 window.addEventListener('resize',resize);new ResizeObserver(resize).observe(host);resize();
 let prev=performance.now(),clock=0,frames=0,measure=prev,fps=0,firstFrame=null,cityLife=null,villageLandscape=null,farmRoot=null;
-function frame(now){requestAnimationFrame(frame);const dt=Math.min((now-prev)/1000,.08);prev=now;if(document.hidden||!appVisible||graphicsSuspended)return;if(!paused){clock+=dt;if(cityMode)testCity.animate(clock);cityLife?.animate(clock);keep.userData.animateCastle(clock);villageLandscape?.update?.(clock);farmRoot?.userData.animateFarm?.(clock,{reducedMotion:motionPreference.matches||appReduced});wheel.rotation.z=clock*.55;for(const {mesh:f,original} of flags){const a=f.geometry.attributes.position;for(let i=0;i<a.count;i++){const x=original[i*3];a.setZ(i,Math.sin(clock*2.7+x*6+original[i*3+1]*1.5)*.09*x/.65);}a.needsUpdate=true;f.geometry.computeVertexNormals();}smoke.forEach((p,i)=>{const phase=(clock*.2+i/8)%1;p.position.set(.7+phase*.65,3.8+phase*1.5,-.5+phase*.2);p.scale.setScalar(.6+phase*1.3);p.material.opacity=.25*(1-phase);});ripples.forEach((r,i)=>{r.position.z=-4+(i*.58+clock*.6)%9.8;});}renderer.render(scene,camera);positionLabels();frames++;if(firstFrame===null){firstFrame=now-start;loading.classList.add('hidden');}if(now-measure>1000){fps=Math.round(frames*1000/(now-measure));frames=0;measure=now;const people=cityLife?.peopleCount??0;document.querySelector('#metrics').textContent=`${window.CONQUER_PLAY?Object.keys(villageBuildings).length:(cityMode?22:2)} Gebäude · ${window.CONQUER_PLAY?people:(cityMode?60:0)} Personen · ${fps} Bilder/s · ${renderer.info.render.triangles.toLocaleString('de-DE')} Dreiecke · ${renderer.info.render.calls} Zeichenaufrufe · erster Frame ${Math.round(firstFrame)} ms`;}}
-requestAnimationFrame(frame);
+let sceneFrame=0;
+function syncFrames(){
+ if(document.hidden||!appVisible||graphicsSuspended){cancelAnimationFrame(sceneFrame);sceneFrame=0;return;}
+ if(!sceneFrame){prev=performance.now();measure=prev;frames=0;sceneFrame=requestAnimationFrame(frame);}
+}
+document.addEventListener('visibilitychange',syncFrames);
+function frame(now){sceneFrame=0;if(document.hidden||!appVisible||graphicsSuspended)return;sceneFrame=requestAnimationFrame(frame);const interval=paused?100:mobileGraphics?1000/30:1000/60;if(now-prev<interval-1)return;const dt=Math.min((now-prev)/1000,.08);prev=now;if(!paused){clock+=dt;if(cityMode)testCity.animate(clock);cityLife?.animate(clock);keep.userData.animateCastle(clock);villageLandscape?.update?.(clock);farmRoot?.userData.animateFarm?.(clock,{reducedMotion:motionPreference.matches||appReduced});wheel.rotation.z=clock*.55;for(const {mesh:f,original} of flags){const a=f.geometry.attributes.position;for(let i=0;i<a.count;i++){const x=original[i*3];a.setZ(i,Math.sin(clock*2.7+x*6+original[i*3+1]*1.5)*.09*x/.65);}a.needsUpdate=true;f.geometry.computeVertexNormals();}smoke.forEach((p,i)=>{const phase=(clock*.2+i/8)%1;p.position.set(.7+phase*.65,3.8+phase*1.5,-.5+phase*.2);p.scale.setScalar(.6+phase*1.3);p.material.opacity=.25*(1-phase);});ripples.forEach((r,i)=>{r.position.z=-4+(i*.58+clock*.6)%9.8;});}renderer.render(scene,camera);positionLabels();frames++;if(firstFrame===null){firstFrame=now-start;loading.classList.add('hidden');}if(now-measure>1000){fps=Math.round(frames*1000/(now-measure));frames=0;measure=now;const people=cityLife?.peopleCount??0;document.querySelector('#metrics').textContent=`${window.CONQUER_PLAY?Object.keys(villageBuildings).length:(cityMode?22:2)} Gebäude · ${window.CONQUER_PLAY?people:(cityMode?60:0)} Personen · ${fps} Bilder/s · ${renderer.info.render.triangles.toLocaleString('de-DE')} Dreiecke · ${renderer.info.render.calls} Zeichenaufrufe · erster Frame ${Math.round(firstFrame)} ms`;}}
+syncFrames();
 // Read-only diagnostics for the bounded feasibility test.
-window.conquer3D={getState:()=>({selected,paused,zoom,skin:keep.userData.castleSkin,skinEffect:keep.userData.castleEffectState(),assetVersion:window.CONQUER_PLAY?.assetVersion??null,layout:window.CONQUER_PLAY?villageBuildings:null,boundary:window.CONQUER_PLAY?villageBoundary:null,terrace:window.CONQUER_PLAY?villageTerrace:null,roadSurfaces:window.CONQUER_PLAY?Object.fromEntries(villageRoads.map(road=>[road.id,road.surface??'earth'])):null,landmarks:window.CONQUER_PLAY?villageLandmarks:null,buildingHeightScale:villageBuildingHeightScale,pixelRatio:renderer.getPixelRatio(),shadowMapSize:sun.shadow.mapSize.x,graphicsSuspended,viewport:{width:host.clientWidth,height:host.clientHeight,worldWidth:(camera.right-camera.left)/zoom,worldHeight:(camera.top-camera.bottom)/zoom,target:{x:target.x,y:target.y,z:target.z}},ready:firstFrame!==null,fps,cityMode,buildings:window.CONQUER_PLAY?Object.keys(villageBuildings).length:(cityMode?22:2),units:cityMode?60:0,firstFrameMs:firstFrame,triangles:renderer.info.render.triangles,drawCalls:renderer.info.render.calls,wheelAngle:wheel.rotation.z,farmLife:farmRoot?.userData.farmLife?.getState?.()??null})};
+window.conquer3D={getState:()=>({framePending:Boolean(sceneFrame),frameLimit:paused?10:mobileGraphics?30:60,selected,paused,zoom,skin:keep.userData.castleSkin,skinEffect:keep.userData.castleEffectState(),assetVersion:window.CONQUER_PLAY?.assetVersion??null,layout:window.CONQUER_PLAY?villageBuildings:null,boundary:window.CONQUER_PLAY?villageBoundary:null,terrace:window.CONQUER_PLAY?villageTerrace:null,roadSurfaces:window.CONQUER_PLAY?Object.fromEntries(villageRoads.map(road=>[road.id,road.surface??'earth'])):null,landmarks:window.CONQUER_PLAY?villageLandmarks:null,buildingHeightScale:villageBuildingHeightScale,pixelRatio:renderer.getPixelRatio(),shadowMapSize:sun.shadow.mapSize.x,graphicsSuspended,viewport:{width:host.clientWidth,height:host.clientHeight,worldWidth:(camera.right-camera.left)/zoom,worldHeight:(camera.top-camera.bottom)/zoom,target:{x:target.x,y:target.y,z:target.z}},ready:firstFrame!==null,fps,cityMode,buildings:window.CONQUER_PLAY?Object.keys(villageBuildings).length:(cityMode?22:2),units:cityMode?60:0,firstFrameMs:firstFrame,triangles:renderer.info.render.triangles,drawCalls:renderer.info.render.calls,wheelAngle:wheel.rotation.z,farmLife:farmRoot?.userData.farmLife?.getState?.()??null})};
 
 
 
@@ -184,8 +191,8 @@ function positionLabels(){
       const half=Math.max(command.offsetWidth,dialog.hidden?0:dialog.offsetWidth)/2;
       const compactLandscape=w>h&&h<500;
       const rightInset=window.CONQUER_PLAY.embedded&&w<=600&&h>w?72:8;
-      // Leave the parent HUD's lower-left quest card free in short landscape.
-      const minX=compactLandscape?Math.min(w-half-8,w*.52+half):half+8;
+      // The app's quest card and chat occupy the left/centre in short landscape.
+      const minX=compactLandscape?w-half-8:half+8;
       const cx=Math.max(minX,Math.min(w-half-rightInset,x));
       const actionsHeight=command.querySelector('.building-command-shell')?.offsetHeight??command.querySelector('.quick-actions').offsetHeight;
       const detailsOpen=!dialog.hidden;
@@ -194,9 +201,9 @@ function positionLabels(){
       const dialogSpace=Math.min(240,Math.max(95,h-top-actionsHeight-22));
       const actionY=detailsOpen
         ?Math.max(top,Math.min(y,h-8-actionsHeight-6-dialogSpace))
-        :compactLandscape?Math.min(Math.max(y,185),h-105):y;
+        :compactLandscape?Math.max(top,Math.min(Math.max(y,185),h-64-actionsHeight)):y;
       command.style.left=cx+'px';command.style.top=actionY+'px';
-      command.style.visibility=detailsOpen||(y>=top&&y<h-145&&x>=0&&x<=w)?'visible':'hidden';
+      command.style.visibility=detailsOpen||(y>=top&&y<(compactLandscape?h:h-145)&&x>=0&&x<=w)?'visible':'hidden';
       dialog.style.maxHeight=Math.max(95,h-(detailsOpen?8:110)-actionY-actionsHeight-6)+'px';
       placed.push({l:cx-half,r:cx+half,t:actionY,b:Math.min(h-8,actionY+command.offsetHeight)});
     }

@@ -60,8 +60,8 @@ try{
  $db->execute("UPDATE marches SET state='returned'");
  $db->execute('UPDATE player_lord_progress SET last_respec_at=NULL');applyPlan(fullBranch('gather'));
  $buffs=BuffEngine::getBuffs(1);ck(ResearchEffects::limits($buffs)['gather_march_slots']===1,'gather capstone grants exactly one reserved slot');
- ck(ResearchEffects::carryCapacity([50100101=>100],TalentEffects::gather($buffs))===230,'gather carry talent changes actual load');
- ck(ResearchEffects::carryCapacity([50100101=>100],$buffs)===200,'gather carry cannot increase city plunder');
+ ck(ResearchEffects::carryCapacity([50100101=>100],TalentEffects::gather($buffs))===12420,'gather carry talent changes actual load');
+ ck(ResearchEffects::carryCapacity([50100101=>100],$buffs)===10800,'gather carry cannot increase city plunder');
  $city=CityState::loadForPlayer(1);ck(BuildingData::getBuildTime('castle',20,$city['vip']['bonuses'])<BuildingData::getBuildTime('castle',20,[]),'construction talent changes build timer');
  for($i=0;$i<3;$i++)$db->execute("INSERT INTO marches(player_id,world_id,march_type,origin_city_id,target_x,target_y,target_type,target_id,troops_json,departure_time,arrival_time,state) VALUES(1,1,5,1,45,45,3,999,'{}',UTC_TIMESTAMP(),DATE_ADD(UTC_TIMESTAMP(),INTERVAL 1 HOUR),'marching')");
  MarchDispatcher::assertSlotAvailable(1,1,true);ck(true,'reserved slot permits gather after three combat marches');reject(fn()=>MarchDispatcher::assertSlotAvailable(1,1),'reserved slot rejects fourth combat march');

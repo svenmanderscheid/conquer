@@ -21,7 +21,8 @@ const output=path.resolve(__dirname,'../artifacts/hospital');fs.mkdirSync(output
   await page.goto(base);await page.locator('[data-mode="login"]').click();await page.locator('[name="username"]').fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');
   await Promise.all([page.waitForURL('**/city'),page.locator('#auth-submit').click()]);await page.locator('#city-frame').waitFor();
   await page.locator('#navigation [data-id="world"]').click();await page.waitForFunction(()=>document.body.classList.contains('world-mode'));assert.equal(await page.locator('#hud-healing').isVisible(),true);
-  await page.locator('#hud-healing').click();
+  await page.locator('#hud-menu').click();await page.locator('#game-dialog [data-id="army"]').click();
+  await page.locator('[data-action="panel-tab"][data-group="army"][data-id="hospital"]').click();
   await page.locator('.hospital-unit').first().waitFor();
   const panel=page.locator('#panel-dialog'),heal=page.locator('[data-action="hospital-heal"]'),select=page.locator('[data-action="hospital-select"]');
   const before=await api('game/state'),kingdom=await api('kingdom/state');assert.equal(kingdom.hospital.waiting,950);assert.equal(kingdom.hospital.active,null);

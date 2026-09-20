@@ -91,6 +91,23 @@ window.ConquerLandscape = (() => {
                 if(h>.86){island(x-1.25,y+.52,.55+hash(gx,gy,224)*.28,'#687257',.18,turn,gx);island(x-.35,y+.02,.32,'#a38d62',.14,turn-.18,gy);}
             }
         }
+        // Tiny flower drifts and leafy undergrowth fill the large quiet areas
+        // without becoming a repeated texture. They fade out when zoomed away.
+        if(s>2.15)for(let gy=Math.floor(bounds.top/8)-1;gy<=Math.ceil(bounds.bottom/8)+1;gy++)for(let gx=Math.floor(bounds.left/8)-1;gx<=Math.ceil(bounds.right/8)+1;gx++){
+            const x=gx*8+1+hash(gx,gy,401)*6,y=gy*8+1+hash(gx,gy,402)*6,biome=biomeAt(x,y);
+            if(waterAt(x,y)||biome.weights.forest<.16||hash(gx,gy,403)>.58)continue;
+            const count=3+Math.floor(hash(gx,gy,404)*5),colours=['#f2d56f','#e9a8bd','#f5eee0','#91bddd'];
+            c.save();c.lineCap='round';
+            for(let i=0;i<count;i++){
+                const px=x+(hash(gx+i,gy,405)-.5)*1.65,py=y+(hash(gx,gy+i,406)-.5)*.78;
+                if(waterAt(px,py))continue;
+                const [sx,sy]=project(px,py),sway=(hash(gx+i,gy-i,407)-.5)*s*.08;
+                c.globalAlpha=.35+biome.weights.forest*.4;c.strokeStyle=biome.treeDark;c.lineWidth=Math.max(.45,s*.025);c.beginPath();c.moveTo(sx,sy);c.quadraticCurveTo(sx+sway,sy-s*.13,sx+sway*.6,sy-s*.23);c.stroke();
+                c.fillStyle=colours[Math.floor(hash(gx-i,gy+i,408)*colours.length)];
+                for(let petal=0;petal<4;petal++){const a=petal*Math.PI/2;c.beginPath();c.ellipse(sx+sway*.6+Math.cos(a)*s*.035,sy-s*.23+Math.sin(a)*s*.025,Math.max(.45,s*.026),Math.max(.35,s*.018),a,0,Math.PI*2);c.fill();}
+            }
+            c.restore();
+        }
     }
     function ground(c,project,s,bounds){
         const left=Math.max(-.5,bounds.left),top=Math.max(-.5,bounds.top),right=Math.min(255.5,bounds.right),bottom=Math.min(255.5,bounds.bottom);
@@ -112,7 +129,7 @@ window.ConquerLandscape = (() => {
         function strokePath(points,width){
             const parts=[];for(let i=0;i<points.length-1;i+=12){const part=points.slice(i,i+13),mid=part[Math.floor(part.length/2)];parts.push({points:part,biome:biomeAt(...mid)});}
             // Draw all banks before the inner water, so colour segments never leave end-cap seams.
-            for(const [factor,key] of [[1.6,'shore'],[1.22,'bank'],[1,'waterDeep'],[.68,'water'],[.11,'waterLight']])for(const part of parts){
+            for(const [factor,key] of [[1.78,'roadEdge'],[1.6,'shore'],[1.22,'bank'],[1,'waterDeep'],[.68,'water'],[.11,'waterLight']])for(const part of parts){
                 c.beginPath();part.points.forEach(([x,y],i)=>{const [px,py]=project(x,y);i?c.lineTo(px,py):c.moveTo(px,py);});
                 c.strokeStyle=part.biome[key];c.lineWidth=s*width*factor;c.stroke();
             }
@@ -137,6 +154,29 @@ window.ConquerLandscape = (() => {
         c.globalAlpha=.46;c.strokeStyle='#e8f7eb';c.lineCap='round';c.lineWidth=Math.max(.55,s*.045);
         for(const side of rivers.sides)for(let y=Math.ceil((bounds.top-2)/7)*7+2;y<bounds.bottom+2;y+=7){const x=riverX(y,side),[a,b]=project(x-.23,y),[d,e]=project(x+.25,y+.34);c.beginPath();c.moveTo(a,b);c.quadraticCurveTo((a+d)/2,(b+e)/2+s*.08,d,e);c.stroke();}
         for(const stream of streams)for(let x=Math.ceil((Math.max(stream.from,bounds.left)-1)/8)*8+3;x<Math.min(stream.to,bounds.right)+1;x+=8){const y=stream.y(x),[a,b]=project(x-.18,y-.06),[d,e]=project(x+.2,y+.06);c.beginPath();c.moveTo(a,b);c.quadraticCurveTo((a+d)/2,(b+e)/2-s*.06,d,e);c.stroke();}
+        c.restore();
+    }
+    const bridges=[
+        {kind:'river',side:64,y:46},{kind:'river',side:64,y:116},{kind:'river',side:64,y:205},
+        {kind:'river',side:192,y:76},{kind:'river',side:192,y:177},{kind:'stream',stream:0,x:82},
+        {kind:'stream',stream:1,x:164},{kind:'stream',stream:2,x:205}
+    ].map((bridge,index)=>bridge.kind==='river'?{...bridge,index,x:riverX(bridge.y,bridge.side),angle:0}:{...bridge,index,y:streams[bridge.stream].y(bridge.x),angle:Math.PI/2});
+    function bridgesLayer(c,project,s,bounds){
+        c.save();c.lineCap='round';c.lineJoin='round';
+        for(const bridge of bridges){
+            if(bridge.x<bounds.left-4||bridge.x>bounds.right+4||bridge.y<bounds.top-4||bridge.y>bounds.bottom+4)continue;
+            const [x,y]=project(bridge.x,bridge.y),length=s*(bridge.kind==='river'?2.55:1.75),width=s*.7;
+            c.save();c.translate(x,y);c.rotate(bridge.angle);
+            c.fillStyle='#493b333b';c.beginPath();c.ellipse(s*.08,s*.17,length*.56,width*.62,0,0,Math.PI*2);c.fill();
+            c.strokeStyle='#5d4634';c.lineWidth=Math.max(1,s*.13);c.beginPath();c.moveTo(-length*.53,-width*.47);c.lineTo(length*.53,-width*.47);c.moveTo(-length*.53,width*.47);c.lineTo(length*.53,width*.47);c.stroke();
+            const planks=7;for(let i=0;i<planks;i++){
+                const px=-length*.48+i*length*(.96/(planks-1)),jitter=(hash(bridge.index,i,511)-.5)*s*.06;
+                c.strokeStyle=i%2?'#b98755':'#c99b64';c.lineWidth=Math.max(2,s*.18);c.beginPath();c.moveTo(px+jitter,-width*.39);c.lineTo(px-jitter,width*.39);c.stroke();
+                c.strokeStyle='#73513a';c.lineWidth=Math.max(.5,s*.025);c.stroke();
+            }
+            c.strokeStyle='#e2bd7a99';c.lineWidth=Math.max(.6,s*.03);c.beginPath();c.moveTo(-length*.48,-width*.3);c.lineTo(length*.48,-width*.3);c.stroke();
+            c.restore();
+        }
         c.restore();
     }
     // Optional overlay pass. The map can call this on a throttled animation layer;
@@ -337,5 +377,5 @@ window.ConquerLandscape = (() => {
     function settlement(c,x,y,s,skin,worldPoint={x:50,y:50}){
         objectGround(c,x,y,s,{kind:'village',point:worldPoint});
     }
-    return {ground,biomeAt,scenery,water,waterAt,ambience,settlement,objectGround,lakes,riverX};
+    return {ground,biomeAt,scenery,water,waterAt,bridges:bridgesLayer,bridgePoints:bridges,ambience,settlement,objectGround,lakes,riverX};
 })();

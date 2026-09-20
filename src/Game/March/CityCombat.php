@@ -54,7 +54,13 @@ final class CityCombat
             unset($troop);$defenseSnapshots[]=$snapshot;
         }
         $defenseScore*=1+$wallBefore['defense_buff']/100;
-        $wins=$attackScore>$defenseScore*1.1;$result['outcome']=$wins?'attacker_wins':'defender_wins';
+        $attackScoreBeforeLuck=$attackScore;
+        $luckPercent=BattleLuck::roll();
+        $luckFactor=BattleLuck::factor($luckPercent);
+        $attackScore*=$luckFactor;
+        foreach($attackSnapshots as &$snapshot)foreach($snapshot['troops'] as &$troop)$troop['strength']*=$luckFactor;
+        unset($troop,$snapshot);
+        $wins=PvpRules::attackerWins($attackScore,$defenseScore*1.1);$result['outcome']=$wins?'attacker_wins':'defender_wins';
         $result['attacker_score']=(int)round($attackScore);$result['defender_score']=(int)round($defenseScore*1.1);
         $wallBonus=0.0;$troopTotal=max(1,array_sum(array_map(static fn($a)=>array_sum($a['troops']),$armies)));
         foreach($armies as $army)$wallBonus+=(BuffEngine::getBuffs((int)$army['player_id'],$world)['talent_wall_damage']??0)*array_sum($army['troops'])/$troopTotal;
@@ -81,7 +87,8 @@ final class CityCombat
             $settled=$army+$loss+['loot'=>$loot];$result['armies'][]=$settled;
             $attackSnapshots[$index]=CombatReport::settle($attackSnapshots[$index],$loss);
         }
-        $combat=['version'=>1,'outcome'=>$result['outcome'],
+        $combat=['version'=>2,'outcome'=>$result['outcome'],'luck_percent'=>$luckPercent,
+            'attacker_score_before_luck'=>(int)round($attackScoreBeforeLuck),
             'attacker'=>CombatReport::side($attackSnapshots,$result['attacker_score']),
             'defender'=>CombatReport::side($defenseSnapshots,$result['defender_score']),
             'wall_defense_pct'=>$wallBefore['defense_buff'],'defender_advantage_pct'=>10];
@@ -113,7 +120,7 @@ final class CityCombat
 
     private static function losses(array $troops,float $rate): array
     {
-        $result=['survivors'=>[],'wounded'=>[],'dead'=>[]];foreach($troops as $code=>$count){$lost=min((int)$count,(int)ceil($count*$rate));$wounded=(int)floor($lost*.3);$result['survivors'][$code]=$count-$lost;$result['wounded'][$code]=$wounded;$result['dead'][$code]=$lost-$wounded;}return $result;
+        return PvpRules::losses($troops,$rate);
     }
 
     private static function report(int $playerId,int $cityId,int $defenderId,int $targetId,int $x,int $y,?int $marchId,string $outcome,array $data): void

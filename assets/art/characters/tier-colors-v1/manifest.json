@@ -1,0 +1,846 @@
+{
+  "generator": "built-in image_gen",
+  "derivatives": "sharp; resize and alpha-preserving WebP encoding only",
+  "records": [
+    {
+      "id": "infantry-t1",
+      "tier": 1,
+      "type": "infantry",
+      "color": "#8A8D8F",
+      "source": "infantry-t1.png",
+      "transparentFraction": 0.6288152235017005,
+      "files": {
+        "thumb": {
+          "file": "infantry-t1-thumb.webp",
+          "bytes": 13374,
+          "width": 192,
+          "height": 192
+        },
+        "report": {
+          "file": "infantry-t1-report.webp",
+          "bytes": 45992,
+          "width": 512,
+          "height": 512
+        },
+        "ui": {
+          "file": "infantry-t1-ui.webp",
+          "bytes": 76216,
+          "width": 768,
+          "height": 768
+        }
+      }
+    },
+    {
+      "id": "archer-t1",
+      "tier": 1,
+      "type": "archer",
+      "color": "#8A8D8F",
+      "source": "archer-t1.png",
+      "transparentFraction": 0.6485199514663126,
+      "files": {
+        "thumb": {
+          "file": "archer-t1-thumb.webp",
+          "bytes": 12826,
+          "width": 192,
+          "height": 192
+        },
+        "report": {
+          "file": "archer-t1-report.webp",
+          "bytes": 45518,
+          "width": 512,
+          "height": 512
+        },
+        "ui": {
+          "file": "archer-t1-ui.webp",
+          "bytes": 76506,
+          "width": 768,
+          "height": 768
+        }
+      }
+    },
+    {
+      "id": "cavalry-t1",
+      "tier": 1,
+      "type": "cavalry",
+      "color": "#8A8D8F",
+      "source": "cavalry-t1.png",
+      "transparentFraction": 0.6432551401702749,
+      "files": {
+        "thumb": {
+          "file": "cavalry-t1-thumb.webp",
+          "bytes": 12606,
+          "width": 192,
+          "height": 192
+        },
+        "report": {
+          "file": "cavalry-t1-report.webp",
+          "bytes": 46684,
+          "width": 512,
+          "height": 512
+        },
+        "ui": {
+          "file": "cavalry-t1-ui.webp",
+          "bytes": 80012,
+          "width": 768,
+          "height": 768
+        }
+      }
+    },
+    {
+      "id": "infantry-t2",
+      "tier": 2,
+      "type": "infantry",
+      "color": "#8B5E3C",
+      "source": "infantry-t2.png",
+      "transparentFraction": 0.6219485207145746,
+      "files": {
+        "thumb": {
+          "file": "infantry-t2-thumb.webp",
+          "bytes": 13512,
+          "width": 192,
+          "height": 192
+        },
+        "report": {
+          "file": "infantry-t2-report.webp",
+          "bytes": 46850,
+          "width": 512,
+          "height": 512
+        },
+        "ui": {
+          "file": "infantry-t2-ui.webp",
+          "bytes": 78100,
+          "width": 768,
+          "height": 768
+        }
+      }
+    },
+    {
+      "id": "archer-t2",
+      "tier": 2,
+      "type": "archer",
+      "color": "#8B5E3C",
+      "source": "archer-t2.png",
+      "transparentFraction": 0.6511488595346565,
+      "files": {
+        "thumb": {
+          "file": "archer-t2-thumb.webp",
+          "bytes": 13338,
+          "width": 192,
+          "height": 192
+        },
+        "report": {
+          "file": "archer-t2-report.webp",
+          "bytes": 48864,
+          "width": 512,
+          "height": 512
+        },
+        "ui": {
+          "file": "archer-t2-ui.webp",
+          "bytes": 83174,
+          "width": 768,
+          "height": 768
+        }
+      }
+    },
+    {
+      "id": "cavalry-t2",
+      "tier": 2,
+      "type": "cavalry",
+      "color": "#8B5E3C",
+      "source": "cavalry-t2.png",
+      "transparentFraction": 0.6343865499619717,
+      "files": {
+        "thumb": {
+          "file": "cavalry-t2-thumb.webp",
+          "bytes": 12994,
+          "width": 192,
+          "height": 192
+        },
+        "report": {
+          "file": "cavalry-t2-report.webp",
+          "bytes": 48632,
+          "width": 512,
+          "height": 512
+        },
+        "ui": {
+          "file": "cavalry-t2-ui.webp",
+          "bytes": 83490,
+          "width": 768,
+          "height": 768
+        }
+      }
+    },
+    {
+      "id": "infantry-t3",
+      "tier": 3,
+      "type": "infantry",
+      "color": "#4F854B",
+      "source": "infantry-t3.png",
+      "transparentFraction": 0.6045369331695194,
+      "files": {
+        "thumb": {
+          "file": "infantry-t3-thumb.webp",
+          "bytes": 14254,
+          "width": 192,
+          "height": 192
+        },
+        "report": {
+          "file": "infantry-t3-report.webp",
+          "bytes": 52686,
+          "width": 512,
+          "height": 512
+        },
+        "ui": {
+          "file": "infantry-t3-ui.webp",
+          "bytes": 90556,
+          "width": 768,
+          "height": 768
+        }
+      }
+    },
+    {
+      "id": "archer-t3",
+      "tier": 3,
+      "type": "archer",
+      "color": "#4F854B",
+      "source": "archer-t3.png",
+      "transparentFraction": 0.6323694003749405,
+      "files": {
+        "thumb": {
+          "file": "archer-t3-thumb.webp",
+          "bytes": 14466,
+          "width": 192,
+          "height": 192
+        },
+        "report": {
+          "file": "archer-t3-report.webp",
+          "bytes": 54646,
+          "width": 512,
+          "height": 512
+        },
+        "ui": {
+          "file": "archer-t3-ui.webp",
+          "bytes": 95074,
+          "width": 768,
+          "height": 768
+        }
+      }
+    },
+    {
+      "id": "cavalry-t3",
+      "tier": 3,
+      "type": "cavalry",
+      "color": "#4F854B",
+      "source": "cavalry-t3.png",
+      "transparentFraction": 0.6382288002157053,
+      "files": {
+        "thumb": {
+          "file": "cavalry-t3-thumb.webp",
+          "bytes": 12902,
+          "width": 192,
+          "height": 192
+        },
+        "report": {
+          "file": "cavalry-t3-report.webp",
+          "bytes": 48310,
+          "width": 512,
+          "height": 512
+        },
+        "ui": {
+          "file": "cavalry-t3-ui.webp",
+          "bytes": 83126,
+          "width": 768,
+          "height": 768
+        }
+      }
+    },
+    {
+      "id": "infantry-t4",
+      "tier": 4,
+      "type": "infantry",
+      "color": "#367BC4",
+      "source": "infantry-t4.png",
+      "transparentFraction": 0.5519536844140218,
+      "files": {
+        "thumb": {
+          "file": "infantry-t4-thumb.webp",
+          "bytes": 16910,
+          "width": 192,
+          "height": 192
+        },
+        "report": {
+          "file": "infantry-t4-report.webp",
+          "bytes": 65518,
+          "width": 512,
+          "height": 512
+        },
+        "ui": {
+          "file": "infantry-t4-ui.webp",
+          "bytes": 116728,
+          "width": 768,
+          "height": 768
+        }
+      }
+    },
+    {
+      "id": "archer-t4",
+      "tier": 4,
+      "type": "archer",
+      "color": "#367BC4",
+      "source": "archer-t4.png",
+      "transparentFraction": 0.6392284720791395,
+      "files": {
+        "thumb": {
+          "file": "archer-t4-thumb.webp",
+          "bytes": 16030,
+          "width": 192,
+          "height": 192
+        },
+        "report": {
+          "file": "archer-t4-report.webp",
+          "bytes": 61488,
+          "width": 512,
+          "height": 512
+        },
+        "ui": {
+          "file": "archer-t4-ui.webp",
+          "bytes": 106148,
+          "width": 768,
+          "height": 768
+        }
+      }
+    },
+    {
+      "id": "cavalry-t4",
+      "tier": 4,
+      "type": "cavalry",
+      "color": "#367BC4",
+      "source": "cavalry-t4.png",
+      "transparentFraction": 0.6396812496661402,
+      "files": {
+        "thumb": {
+          "file": "cavalry-t4-thumb.webp",
+          "bytes": 13854,
+          "width": 192,
+          "height": 192
+        },
+        "report": {
+          "file": "cavalry-t4-report.webp",
+          "bytes": 54650,
+          "width": 512,
+          "height": 512
+        },
+        "ui": {
+          "file": "cavalry-t4-ui.webp",
+          "bytes": 95596,
+          "width": 768,
+          "height": 768
+        }
+      }
+    },
+    {
+      "id": "infantry-t5",
+      "tier": 5,
+      "type": "infantry",
+      "color": "#9656B7",
+      "source": "infantry-t5.png",
+      "transparentFraction": 0.5307742496737712,
+      "files": {
+        "thumb": {
+          "file": "infantry-t5-thumb.webp",
+          "bytes": 16750,
+          "width": 192,
+          "height": 192
+        },
+        "report": {
+          "file": "infantry-t5-report.webp",
+          "bytes": 68456,
+          "width": 512,
+          "height": 512
+        },
+        "ui": {
+          "file": "infantry-t5-ui.webp",
+          "bytes": 120530,
+          "width": 768,
+          "height": 768
+        }
+      }
+    },
+    {
+      "id": "archer-t5",
+      "tier": 5,
+      "type": "archer",
+      "color": "#9656B7",
+      "source": "archer-t5.png",
+      "transparentFraction": 0.6328507945229174,
+      "files": {
+        "thumb": {
+          "file": "archer-t5-thumb.webp",
+          "bytes": 14840,
+          "width": 192,
+          "height": 192
+        },
+        "report": {
+          "file": "archer-t5-report.webp",
+          "bytes": 57002,
+          "width": 512,
+          "height": 512
+        },
+        "ui": {
+          "file": "archer-t5-ui.webp",
+          "bytes": 97406,
+          "width": 768,
+          "height": 768
+        }
+      }
+    },
+    {
+      "id": "cavalry-t5",
+      "tier": 5,
+      "type": "cavalry",
+      "color": "#9656B7",
+      "source": "cavalry-t5.png",
+      "transparentFraction": 0.6344806666514045,
+      "files": {
+        "thumb": {
+          "file": "cavalry-t5-thumb.webp",
+          "bytes": 14496,
+          "width": 192,
+          "height": 192
+        },
+        "report": {
+          "file": "cavalry-t5-report.webp",
+          "bytes": 58202,
+          "width": 512,
+          "height": 512
+        },
+        "ui": {
+          "file": "cavalry-t5-ui.webp",
+          "bytes": 100686,
+          "width": 768,
+          "height": 768
+        }
+      }
+    },
+    {
+      "id": "infantry-t6",
+      "tier": 6,
+      "type": "infantry",
+      "color": "#BF4545",
+      "source": "infantry-t6.png",
+      "transparentFraction": 0.5435009882252391,
+      "files": {
+        "thumb": {
+          "file": "infantry-t6-thumb.webp",
+          "bytes": 16072,
+          "width": 192,
+          "height": 192
+        },
+        "report": {
+          "file": "infantry-t6-report.webp",
+          "bytes": 67772,
+          "width": 512,
+          "height": 512
+        },
+        "ui": {
+          "file": "infantry-t6-ui.webp",
+          "bytes": 119196,
+          "width": 768,
+          "height": 768
+        }
+      }
+    },
+    {
+      "id": "archer-t6",
+      "tier": 6,
+      "type": "archer",
+      "color": "#BF4545",
+      "source": "archer-t6.png",
+      "transparentFraction": 0.6044091125304926,
+      "files": {
+        "thumb": {
+          "file": "archer-t6-thumb.webp",
+          "bytes": 16134,
+          "width": 192,
+          "height": 192
+        },
+        "report": {
+          "file": "archer-t6-report.webp",
+          "bytes": 62324,
+          "width": 512,
+          "height": 512
+        },
+        "ui": {
+          "file": "archer-t6-ui.webp",
+          "bytes": 107114,
+          "width": 768,
+          "height": 768
+        }
+      }
+    },
+    {
+      "id": "cavalry-t6",
+      "tier": 6,
+      "type": "cavalry",
+      "color": "#BF4545",
+      "source": "cavalry-t6.png",
+      "transparentFraction": 0.5998431812458506,
+      "files": {
+        "thumb": {
+          "file": "cavalry-t6-thumb.webp",
+          "bytes": 15422,
+          "width": 192,
+          "height": 192
+        },
+        "report": {
+          "file": "cavalry-t6-report.webp",
+          "bytes": 63556,
+          "width": 512,
+          "height": 512
+        },
+        "ui": {
+          "file": "cavalry-t6-ui.webp",
+          "bytes": 113066,
+          "width": 768,
+          "height": 768
+        }
+      }
+    },
+    {
+      "id": "infantry-t7",
+      "tier": 7,
+      "type": "infantry",
+      "color": "#E58132",
+      "source": "infantry-t7.png",
+      "transparentFraction": 0.4642674541944247,
+      "files": {
+        "thumb": {
+          "file": "infantry-t7-thumb.webp",
+          "bytes": 17950,
+          "width": 192,
+          "height": 192
+        },
+        "report": {
+          "file": "infantry-t7-report.webp",
+          "bytes": 75922,
+          "width": 512,
+          "height": 512
+        },
+        "ui": {
+          "file": "infantry-t7-ui.webp",
+          "bytes": 134350,
+          "width": 768,
+          "height": 768
+        }
+      }
+    },
+    {
+      "id": "archer-t7",
+      "tier": 7,
+      "type": "archer",
+      "color": "#E58132",
+      "source": "archer-t7.png",
+      "transparentFraction": 0.5958311393969918,
+      "files": {
+        "thumb": {
+          "file": "archer-t7-thumb.webp",
+          "bytes": 16546,
+          "width": 192,
+          "height": 192
+        },
+        "report": {
+          "file": "archer-t7-report.webp",
+          "bytes": 67474,
+          "width": 512,
+          "height": 512
+        },
+        "ui": {
+          "file": "archer-t7-ui.webp",
+          "bytes": 118912,
+          "width": 768,
+          "height": 768
+        }
+      }
+    },
+    {
+      "id": "cavalry-t7",
+      "tier": 7,
+      "type": "cavalry",
+      "color": "#E58132",
+      "source": "cavalry-t7.png",
+      "transparentFraction": 0.5586664936954536,
+      "files": {
+        "thumb": {
+          "file": "cavalry-t7-thumb.webp",
+          "bytes": 17280,
+          "width": 192,
+          "height": 192
+        },
+        "report": {
+          "file": "cavalry-t7-report.webp",
+          "bytes": 72368,
+          "width": 512,
+          "height": 512
+        },
+        "ui": {
+          "file": "cavalry-t7-ui.webp",
+          "bytes": 128714,
+          "width": 768,
+          "height": 768
+        }
+      }
+    },
+    {
+      "id": "infantry-t8",
+      "tier": 8,
+      "type": "infantry",
+      "color": "#F0D34A",
+      "source": "infantry-t8.png",
+      "transparentFraction": 0.47485430990845245,
+      "files": {
+        "thumb": {
+          "file": "infantry-t8-thumb.webp",
+          "bytes": 17558,
+          "width": 192,
+          "height": 192
+        },
+        "report": {
+          "file": "infantry-t8-report.webp",
+          "bytes": 75974,
+          "width": 512,
+          "height": 512
+        },
+        "ui": {
+          "file": "infantry-t8-ui.webp",
+          "bytes": 136654,
+          "width": 768,
+          "height": 768
+        }
+      }
+    },
+    {
+      "id": "archer-t8",
+      "tier": 8,
+      "type": "archer",
+      "color": "#F0D34A",
+      "source": "archer-t8.png",
+      "transparentFraction": 0.5916849176733336,
+      "files": {
+        "thumb": {
+          "file": "archer-t8-thumb.webp",
+          "bytes": 17542,
+          "width": 192,
+          "height": 192
+        },
+        "report": {
+          "file": "archer-t8-report.webp",
+          "bytes": 71632,
+          "width": 512,
+          "height": 512
+        },
+        "ui": {
+          "file": "archer-t8-ui.webp",
+          "bytes": 126892,
+          "width": 768,
+          "height": 768
+        }
+      }
+    },
+    {
+      "id": "cavalry-t8",
+      "tier": 8,
+      "type": "cavalry",
+      "color": "#F0D34A",
+      "source": "cavalry-t8.png",
+      "transparentFraction": 0.6159651157762465,
+      "files": {
+        "thumb": {
+          "file": "cavalry-t8-thumb.webp",
+          "bytes": 15338,
+          "width": 192,
+          "height": 192
+        },
+        "report": {
+          "file": "cavalry-t8-report.webp",
+          "bytes": 64294,
+          "width": 512,
+          "height": 512
+        },
+        "ui": {
+          "file": "cavalry-t8-ui.webp",
+          "bytes": 115968,
+          "width": 768,
+          "height": 768
+        }
+      }
+    },
+    {
+      "id": "infantry-t9",
+      "tier": 9,
+      "type": "infantry",
+      "color": "#C6A04A",
+      "source": "infantry-t9.png",
+      "transparentFraction": 0.436041350294687,
+      "files": {
+        "thumb": {
+          "file": "infantry-t9-thumb.webp",
+          "bytes": 18752,
+          "width": 192,
+          "height": 192
+        },
+        "report": {
+          "file": "infantry-t9-report.webp",
+          "bytes": 81782,
+          "width": 512,
+          "height": 512
+        },
+        "ui": {
+          "file": "infantry-t9-ui.webp",
+          "bytes": 148172,
+          "width": 768,
+          "height": 768
+        }
+      }
+    },
+    {
+      "id": "archer-t9",
+      "tier": 9,
+      "type": "archer",
+      "color": "#C6A04A",
+      "source": "archer-t9.png",
+      "transparentFraction": 0.6033534793922606,
+      "files": {
+        "thumb": {
+          "file": "archer-t9-thumb.webp",
+          "bytes": 17380,
+          "width": 192,
+          "height": 192
+        },
+        "report": {
+          "file": "archer-t9-report.webp",
+          "bytes": 71506,
+          "width": 512,
+          "height": 512
+        },
+        "ui": {
+          "file": "archer-t9-ui.webp",
+          "bytes": 127968,
+          "width": 768,
+          "height": 768
+        }
+      }
+    },
+    {
+      "id": "cavalry-t9",
+      "tier": 9,
+      "type": "cavalry",
+      "color": "#C6A04A",
+      "source": "cavalry-t9.png",
+      "transparentFraction": 0.5830484395707262,
+      "files": {
+        "thumb": {
+          "file": "cavalry-t9-thumb.webp",
+          "bytes": 16172,
+          "width": 192,
+          "height": 192
+        },
+        "report": {
+          "file": "cavalry-t9-report.webp",
+          "bytes": 69946,
+          "width": 512,
+          "height": 512
+        },
+        "ui": {
+          "file": "cavalry-t9-ui.webp",
+          "bytes": 126462,
+          "width": 768,
+          "height": 768
+        }
+      }
+    },
+    {
+      "id": "infantry-t10",
+      "tier": 10,
+      "type": "infantry",
+      "color": "#F1F3F5",
+      "source": "infantry-t10.png",
+      "transparentFraction": 0.6457072614841439,
+      "files": {
+        "thumb": {
+          "file": "infantry-t10-thumb.webp",
+          "bytes": 14768,
+          "width": 192,
+          "height": 192
+        },
+        "report": {
+          "file": "infantry-t10-report.webp",
+          "bytes": 61584,
+          "width": 512,
+          "height": 512
+        },
+        "ui": {
+          "file": "infantry-t10-ui.webp",
+          "bytes": 111816,
+          "width": 768,
+          "height": 768
+        }
+      }
+    },
+    {
+      "id": "archer-t10",
+      "tier": 10,
+      "type": "archer",
+      "color": "#F1F3F5",
+      "source": "archer-t10.png",
+      "transparentFraction": 0.6156516054526632,
+      "files": {
+        "thumb": {
+          "file": "archer-t10-thumb.webp",
+          "bytes": 17178,
+          "width": 192,
+          "height": 192
+        },
+        "report": {
+          "file": "archer-t10-report.webp",
+          "bytes": 73964,
+          "width": 512,
+          "height": 512
+        },
+        "ui": {
+          "file": "archer-t10-ui.webp",
+          "bytes": 132536,
+          "width": 768,
+          "height": 768
+        }
+      }
+    },
+    {
+      "id": "cavalry-t10",
+      "tier": 10,
+      "type": "cavalry",
+      "color": "#F1F3F5",
+      "source": "cavalry-t10.png",
+      "transparentFraction": 0.6550686924648144,
+      "files": {
+        "thumb": {
+          "file": "cavalry-t10-thumb.webp",
+          "bytes": 15786,
+          "width": 192,
+          "height": 192
+        },
+        "report": {
+          "file": "cavalry-t10-report.webp",
+          "bytes": 67912,
+          "width": 512,
+          "height": 512
+        },
+        "ui": {
+          "file": "cavalry-t10-ui.webp",
+          "bytes": 125712,
+          "width": 768,
+          "height": 768
+        }
+      }
+    }
+  ]
+}

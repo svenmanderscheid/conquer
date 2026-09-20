@@ -1,18 +1,19 @@
 # Installation und Sprachen
 
-Conquer hat ein öffentliches Web-App-Manifest, ein eigenes Symbol, eine Installationshilfe und eine Offline-Seite. Die Spielhandlungen benötigen weiterhin eine Verbindung zum Server. Die Sprachwahl bietet Deutsch, Französisch und Luxemburgisch. Der technische Sprachcode für Luxemburgisch lautet `lb`; `lu` wird ebenfalls akzeptiert.
+Conquer hat ein öffentliches Web-App-Manifest, ein eigenes Symbol, eine Installationshilfe und eine Offline-Seite. Die Spielhandlungen benötigen weiterhin eine Verbindung zum Server. Die aktive Sprachwahl bietet Deutsch, Französisch und Englisch (`de`, `fr`, `en`). Regionale Sprachangaben wie `fr-LU` oder `en-US` werden auf ihre Basissprache normalisiert.
 
 ## Tatsächlich übersetzte Inhalte
 
-Die drei gleich aufgebauten Kataloge in `data/i18n/` enthalten jeweils **290 explizite Schlüssel**. Die Browserübersetzung verarbeitet ausschließlich bekannte, redaktionell geschriebene Texte in begrenzten Oberflächenbereichen:
+Die drei gleich aufgebauten aktiven Kataloge in `data/i18n/` enthalten jeweils **607 explizite Schlüssel**. Die Browserübersetzung verarbeitet ausschließlich bekannte, redaktionell geschriebene Texte:
 
 - Navigation, Spielmenü, Bereichstitel, bekannte Schaltflächen und Formularbeschriftungen.
 - Welt-/Allianzchat-Bedienelemente, Briefe und Geschenkeüberschrift, Allianz-Hilfe, Forschung, Ränge, Diplomatie und Ressourcenlieferungen.
 - Konto-/Wiederherstellungsaktionen, Meisterschaft, Ereignisaktionen und Bedienelemente der Weltenauswahl.
 - Anmeldung und ausgewählte Backoffice-Navigation, Formularfelder und Tabellenüberschriften.
-- Explizit mit `data-i18n` versehene Texte, einige Hilfstexte und die Offline-Seite.
+- Explizit mit `data-i18n` versehene Texte, die Hauptbereiche und Dialoge der Spiel-App, Start-/Anmeldeseite, Kontowiederherstellung sowie die Offline-Seite.
+- Häufige dynamische Muster wie Stufe, Truppenanzahl, Welt, Koordinaten und Auswahlmengen mit benannten Platzhaltern.
 
-**Das Spiel ist damit noch nicht vollständig in drei Sprachen redigiert.** Längere Spielhilfe-, Forschungs-, Gegenstands-, Ereignis- und Kampfbeschreibungen, zusammengesetzte Laufzeitmeldungen, nicht markierte Backoffice-Texte sowie Inhalte der 3D-Renderer können weiterhin deutsch erscheinen. Datums- und Zahlenformate der bestehenden Spielmodule bleiben unverändert. Die Spracheinstellungen weisen sichtbar auf diese Grenze hin.
+Längere Fachtexte und neue Kataloginhalte müssen weiterhin beim Hinzufügen in allen drei Sprachdateien gepflegt werden. Die gemeinsame Laufzeitübersetzung erfasst keine Spielernamen, Nachrichten oder anderen Nutzereingaben. Zahlen und kurze Zeitangaben verwenden die aktive Sprache; ältere, vollständig serverseitig zusammengesetzte Datums- und Laufzeitmeldungen werden schrittweise auf semantische Werte umgestellt.
 
 Spielernamen, Allianz-/Weltnamen, private und öffentliche Nachrichten, Geschenktexte, Profile, Tabellenwerte und Eingabewerte bleiben unverändert. Ein Spieler darf beispielsweise „Forschung“ heißen: Sein Name wird auch bei französischer Oberfläche nicht zu „Recherche“. Neue Anzeigen mit Spielerinhalten müssen `data-user-content`, `translate="no"` oder `data-i18n-ignore` verwenden, wenn sie innerhalb eines übersetzten Bereichs liegen.
 
@@ -38,7 +39,7 @@ Neue Autoreninhalte sollen semantisch markiert werden:
 <span data-user-content>Vom Spieler gewählter Name</span>
 ```
 
-`data-i18n` gehört auf ein reines Textelement, da dessen Textinhalt ersetzt wird. Für variable Werte stehen `data-i18n-params='{"count":3}'`, `ConquerLocale.t(key, parameters)` sowie PHP `Locale::t()` und HTML-sicheres `Locale::html()` zur Verfügung. Serverseitig übersetzte Elemente benötigen ebenfalls `data-i18n`, wenn sie unmittelbar auf einen späteren Sprachwechsel reagieren sollen. Neue Schlüssel in allen drei Dateien ergänzen; unbekannte Schlüssel erhalten die deutsche Rückfallebene.
+`data-i18n` gehört auf ein reines Textelement, da dessen Textinhalt ersetzt wird. Für variable Werte stehen `data-i18n-params='{"count":3}'`, `ConquerLocale.t(key, parameters)` sowie PHP `Locale::t()` und HTML-sicheres `Locale::html()` zur Verfügung. Serverseitig übersetzte Elemente benötigen ebenfalls `data-i18n`, wenn sie unmittelbar auf einen späteren Sprachwechsel reagieren sollen. Neue Schlüssel in allen drei aktiven Dateien ergänzen; unbekannte Schlüssel erhalten die deutsche Rückfallebene. Katalogschlüssel mit Platzhaltern wie `Stufe {level}` werden auch auf dynamisch erzeugte, vollständig redaktionelle Beschriftungen angewendet.
 
 ## PWA-Verhalten
 
@@ -65,6 +66,6 @@ Für Änderungen an der Offline-Vorladung `BUILD` in `service-worker.js` erhöhe
 ## Prüfungen
 
 - `php tests/localization.php`: Katalogparität, Sprachvalidierung, HTML-sichere Parameter und Bootstrap.
-- `node tests/localization_pwa.cjs`: Browserprüfung für Deutsch/Französisch/Luxemburgisch, Speicherung, dynamische Beschriftungen und unveränderte Spielernamen/Nachrichten/Eingaben. Prüft außerdem beide Installationspfade, Manifest und PNG-Größen, echte Service-Worker-Caches, Headerbereinigung, Cachegrenzen und eine französische Offline-Seite nach Navigation auf eine verschachtelte Spieladresse.
+- `node tests/localization_pwa.cjs`: Browserprüfung für Deutsch/Französisch/Englisch, Speicherung, dynamische Beschriftungen und Platzhalter sowie unveränderte Spielernamen/Nachrichten/Eingaben. Prüft außerdem beide Installationspfade, Manifest und PNG-Größen, echte Service-Worker-Caches, Headerbereinigung, Cachegrenzen und eine französische Offline-Seite nach Navigation auf eine verschachtelte Spieladresse.
 
 Der Browsertest nutzt einen eigenen lokalen HTTP-Server und berührt keine echten Spielkonten. Falls Playwright nicht im Projekt installiert ist, kann sein vorhandener Modulpfad über `PLAYWRIGHT_MODULE` angegeben werden.

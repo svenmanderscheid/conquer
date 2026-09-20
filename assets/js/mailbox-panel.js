@@ -101,6 +101,10 @@ window.ConquerMailbox=function(ctx){
     }
     function showDetail(){
         const m=detail;if(!m)return;
+        if(m.source==='battle'&&m.metadata?.scout&&!m.metadata.defender&&ctx.openScoutReport){
+            const saved=Boolean(Number(m.starred));
+            ctx.openScoutReport({id:Number(m.source_id),created_at:m.created_at,target_x:m.metadata.x,target_y:m.metadata.y,details:m.metadata.details||{}},{footer:btn('‹ Zur Post','back')+btn(star(saved),'detail-star',`data-id="${Number(m.id)}" data-starred="${!saved}" aria-pressed="${saved}" aria-label="${saved?'Favorit entfernen':'Als Favorit speichern'}"`,'mail-star')});return;
+        }
         if(m.source==='battle'&&ctx.openMonsterReport?.(m))return;
         if(m.source==='battle'&&['city','rally'].includes(m.metadata?.details?.battle_kind)&&ctx.openPlayerReport){
             ctx.openPlayerReport({id:Number(m.source_id),created_at:m.created_at,target_x:m.metadata.x,target_y:m.metadata.y,outcome:m.metadata.details.outcome,details:m.metadata.details});return;
@@ -136,7 +140,7 @@ window.ConquerMailbox=function(ctx){
         else if(act==='mailbox-open')open(id);
         else if(act==='mailbox-compose')compose();
         else if(act==='mailbox-reply')compose(true);
-        else if(act==='mailbox-star'||act==='mailbox-detail-star')execute({action:'mailbox.star',mail_id:id,starred:b.dataset.starred==='true'}).then(result=>{if(result&&act==='mailbox-detail-star'&&detail?.id==id&&document.querySelector('.mail-detail')){detail.starred=b.dataset.starred==='true'?1:0;showDetail();}});
+        else if(act==='mailbox-star'||act==='mailbox-detail-star')execute({action:'mailbox.star',mail_id:id,starred:b.dataset.starred==='true'}).then(result=>{if(result&&act==='mailbox-detail-star'&&detail?.id==id&&document.querySelector('.mail-detail')){const scroll=document.querySelector('.mail-detail-scroll')?.scrollTop||0;detail.starred=b.dataset.starred==='true'?1:0;showDetail();const body=document.querySelector('.mail-detail-scroll');if(body)body.scrollTop=scroll;document.querySelector('[data-action="mailbox-detail-star"]')?.focus({preventScroll:true});}});
         else if(act==='mailbox-claim')execute({action:'mailbox.claim',mail_id:id}).then(async result=>{if(result&&detail?.id==id&&document.querySelector('.mail-detail')){detail=await api('mailbox/message?'+new URLSearchParams({id,world_id:world()}));showDetail();}}).catch(e=>toast(e.message));
         else if(act==='mailbox-read-all'&&data?.snapshot)execute({action:'mailbox.read_all',category,snapshot:data.snapshot});
         else if(act==='mailbox-claim-all'&&data?.snapshot)execute({action:'mailbox.claim_all',category,snapshot:data.snapshot});

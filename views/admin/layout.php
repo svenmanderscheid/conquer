@@ -4,34 +4,38 @@ $descriptions=[
     'rewards'=>'Lege fest, welche Belohnungen deine Spieler erhalten.',
     'items'=>'Alle Gegenstände mit Bild, Seltenheit und Beschreibung.',
     'players'=>'Spieler finden, Fortschritt verwalten und Geschenke zustellen.',
+    'alpha_keys'=>'Einladungen erstellen und den Zugang zur geschlossenen Alpha verwalten.',
     'world'=>'Population, Spieltempo und Ereignisse deiner Welt steuern.',
+    'world_create'=>'Eine neue Welt mit allen Regeln in einem Schritt vorbereiten.',
     'lands'=>'Landstufen, Beiträge und die Freigabe der drei Kartenbereiche einstellen.',
     'alliances'=>'Allianzen und ihre Mitglieder im Blick behalten.',
     'chat'=>'Unterhaltungen in deiner Welt nachvollziehen.',
     'bug_reports'=>'Meldungen deiner Spieler prüfen, priorisieren und abschließen.',
     'audit'=>'Nachsehen, wer welche Einstellung geändert hat.'
 ];
-$globalPage=$activePage==='items'||($activePage==='rewards'&&($_GET['scope']??'global')!=='world');
+$globalPage=in_array($activePage,['items','alpha_keys','world_create'],true)||($activePage==='rewards'&&($_GET['scope']??'global')!=='world');
 $newBugCount=(int)$db->query("SELECT COUNT(*) FROM bug_reports WHERE world_id=? AND status='new'",[$selectedWorld])->fetchColumn();
 ?>
 <!doctype html>
-<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="<?= htmlspecialchars(\Conquer\Game\Locale::current(),ENT_QUOTES) ?>"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title><?= ah($pageTitle) ?> · Conquer Verwaltung</title>
 <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR.'/assets/css/fantasy-fonts.css') ?>">
 <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/admin-backoffice.css?v=<?= filemtime(ROOT_DIR.'/assets/css/admin-backoffice.css') ?>">
 <link rel="icon" href="<?= APP_BASE ?>/assets/icons/conquer.svg">
 <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/village-theme.css?v=<?= filemtime(ROOT_DIR.'/assets/css/village-theme.css') ?>">
+<?php require ROOT_DIR.'/views/partials/localization-head.php'; ?>
 <script src="<?= APP_BASE ?>/assets/js/admin-backoffice.js?v=<?= filemtime(ROOT_DIR.'/assets/js/admin-backoffice.js') ?>" defer></script>
-</head><body class="admin-village">
+</head><body class="admin-village" data-i18n-scope>
 <a class="skip-link" href="#main">Zum Inhalt</a>
 <aside class="sidebar">
     <a class="brand" href="<?= APP_BASE ?>/admin"><?= adminIcon('hud/city.svg','brand-mark') ?><span>CONQUER<small>Deine Verwaltung</small></span></a>
+    <div data-locale-controls data-locale-compact="true" data-locale-install="false"></div>
     <button type="button" class="secondary mobile-menu" aria-expanded="false" aria-controls="admin-nav">☰ Menü</button>
     <nav id="admin-nav" aria-label="Verwaltung">
     <?php foreach([
         'Start'=>['dashboard'=>['','Übersicht','hud/city.svg']],
-        'Spielinhalte'=>['rewards'=>['/rewards','Beute & Drops','items/chest-gold.svg'],'items'=>['/items','Gegenstände','hud/inventory.svg'],'world'=>['/world','Welten & Spawns','hud/world.svg'],'lands'=>['/lands','Länder & Entwicklung','hud/world.svg']],
-        'Gemeinschaft'=>['players'=>['/players','Spieler & Geschenke','knight.png'],'alliances'=>['/alliances','Allianzen','hud/alliance.svg'],'chat'=>['/chat','Chatprotokoll','hud/reports.svg'],'bug_reports'=>['/bug-reports','Bugmeldungen'.($newBugCount?' · '.$newBugCount:''),'hud/quest.svg']],
+        'Spielinhalte'=>['rewards'=>['/rewards','Beute & Drops','items/chest-gold.svg'],'items'=>['/items','Gegenstände','hud/inventory.svg'],'world_create'=>['/world-create','Welt erstellen','hud/city.svg'],'world'=>['/world','Welten & Spawns','hud/world.svg'],'lands'=>['/lands','Länder & Entwicklung','hud/world.svg']],
+        'Gemeinschaft'=>['alpha_keys'=>['/alpha-keys','Alpha-Keys','items/scroll.svg'],'players'=>['/players','Spieler & Geschenke','knight.png'],'alliances'=>['/alliances','Allianzen','hud/alliance.svg'],'chat'=>['/chat','Chatprotokoll','hud/reports.svg'],'bug_reports'=>['/bug-reports','Bugmeldungen'.($newBugCount?' · '.$newBugCount:''),'hud/quest.svg']],
         'Verlauf'=>['audit'=>['/audit','Änderungsprotokoll','hud/quest.svg']]
     ] as $group=>$links): ?><div class="nav-caption"><?= ah($group) ?></div>
         <?php foreach($links as $key=>[$path,$label,$icon]): ?><a <?= $activePage===$key?'class="active" aria-current="page"':'' ?> href="<?= APP_BASE ?>/admin<?= $path ?>?world_id=<?= $selectedWorld ?>"><?= adminIcon($icon) ?><span><?= ah($label) ?></span></a><?php endforeach ?>
@@ -41,7 +45,8 @@ $newBugCount=(int)$db->query("SELECT COUNT(*) FROM bug_reports WHERE world_id=? 
 </aside>
 <div class="shell">
 <header class="topbar"><span><?= $globalPage?'🌐 Spielinhalte · alle Welten':'Verwaltung deiner Welt' ?></span>
-<?php if(!$globalPage): ?><form method="get" class="world-picker"><?php if($activePage==='rewards'): ?><input type="hidden" name="scope" value="world"><?php foreach(['type','source'] as $queryKey)if(is_string($_GET[$queryKey]??null)): ?><input type="hidden" name="<?= $queryKey ?>" value="<?= ah($_GET[$queryKey]) ?>"><?php endif;endif ?><label for="world-picker">Aktive Welt</label><select id="world-picker" name="world_id" aria-label="Aktive Verwaltungswelt"><?php foreach($worlds as $w): ?><option value="<?= (int)$w['id'] ?>" <?= (int)$w['id']===$selectedWorld?'selected':'' ?>><?= ah($w['name']) ?></option><?php endforeach ?></select><button class="secondary" type="submit">Wechseln</button></form><?php else: ?><span class="pill">Für alle Welten</span><?php endif ?>
+<?php if($activePage==='rewards'): ?><span class="pill"><?= $globalPage?'Grundbeute · alle Welten':'Weltregel · '.ah($world['name']??'Welt '.$selectedWorld) ?></span>
+<?php elseif(!$globalPage): ?><form method="get" class="world-picker"><label for="world-picker">Aktive Welt</label><select id="world-picker" name="world_id" aria-label="Aktive Verwaltungswelt"><?php foreach($worlds as $w): ?><option value="<?= (int)$w['id'] ?>" <?= (int)$w['id']===$selectedWorld?'selected':'' ?>><?= ah($w['name']) ?></option><?php endforeach ?></select><button class="secondary" type="submit">Wechseln</button></form><?php else: ?><span class="pill">Für alle Welten</span><?php endif ?>
 </header>
 <main id="main">
 <div class="page-heading"><div><h1><?= ah($pageTitle) ?></h1><p><?= ah($descriptions[$activePage]??'Dein Spielerprofil und die zugehörige Stadt verwalten.') ?></p></div><a class="button secondary" href="<?= APP_BASE ?>/city#city">Spiel öffnen ↗</a></div>

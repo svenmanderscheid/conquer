@@ -1,0 +1,27 @@
+'use strict';
+const fs=require('fs'),vm=require('vm'),assert=require('assert/strict');
+const listeners=new Map(),timers=new Map();let next=1;
+const on=(type,fn)=>{if(!listeners.has(type))listeners.set(type,new Set());listeners.get(type).add(fn);};
+const off=(type,fn)=>listeners.get(type)?.delete(fn);
+const document={hidden:false,addEventListener:on,removeEventListener:off};
+const window={addEventListener:on,removeEventListener:off};
+const navigator={onLine:true};
+const emit=type=>{for(const fn of listeners.get(type)||[])fn();};
+vm.runInNewContext(fs.readFileSync(require('path').join(__dirname,'../assets/js/app-polling.js'),'utf8'),{window,document,navigator,setTimeout:(fn,ms)=>{const id=next++;timers.set(id,{fn,ms});return id;},clearTimeout:id=>timers.delete(id)});
+(async()=>{
+ let calls=0,resolve,fail=false;const failures=[];
+ const poll=window.ConquerPolling({delay:()=>15000,refresh:()=>{calls++;if(fail)throw Error('offline');return new Promise(r=>resolve=r);},onError:e=>failures.push(e.message)});
+ assert.equal(timers.size,1);assert.equal([...timers.values()][0].ms,15000);
+ poll.resume();assert.equal(calls,1);assert.equal(timers.size,0);
+ emit('pageshow');emit('online');assert.equal(calls,1,'resume events never overlap an active request');
+ document.hidden=true;emit('visibilitychange');resolve();await new Promise(setImmediate);
+ assert.equal(timers.size,0,'no timers are scheduled while hidden');
+ document.hidden=false;emit('visibilitychange');assert.equal(calls,2,'visible app refreshes immediately');
+ resolve();await new Promise(setImmediate);assert.equal(timers.size,1);
+ navigator.onLine=false;emit('offline');assert.equal(timers.size,0);
+ emit('pageshow');assert.equal(calls,2,'offline restore does not request');
+ navigator.onLine=true;emit('online');assert.equal(calls,3);resolve();await new Promise(setImmediate);
+ fail=true;poll.resume();await new Promise(setImmediate);assert.deepEqual(failures,['offline']);assert.equal(timers.size,1,'request failure keeps one bounded retry');
+ poll.stop();assert.equal(timers.size,0);emit('online');assert.equal(calls,4,'stopped lifecycle removes its listeners');
+ console.log('PASS adaptive polling: hidden, offline, resume, request deduplication, failure and cleanup');
+})().catch(error=>{console.error(error);process.exitCode=1;});

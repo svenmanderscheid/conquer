@@ -34,20 +34,20 @@ try{
  ck(ResearchEffects::limits(BuffEngine::getBuffs(1,2))['march_capacity']===5000,'Building bonuses stay within their world');
  ck(ResearchEffects::limits($buffs+[])['march_capacity']===50000&&ResearchEffects::limits(array_replace($buffs,['march_size'=>.15,'march_capacity_flat'=>100]))['march_capacity']===57600,'Research and flat talents apply on the castle base');
  $previous=0;for($level=1;$level<=30;$level++){$current=BuildingProgression::atLevels(['castle'=>$level])['base_march_capacity'];ck($current>$previous,'Castle capacity grows at level '.$level);$previous=$current;}
- ck(ResearchEffects::carryCapacity([50100101=>100,50200101=>100,50300101=>100],[])===450,'Mixed T1 army uses 2, 1.5 and 1 carry');
- ck(ResearchEffects::carryCapacity([50100101=>10000],[])===20000,'Large armies have no artificial 5000 haul ceiling');
- ck(ResearchEffects::carryCapacity([50100101=>100,50200101=>100],['troops_storage'=>.1,'infantry_storage'=>.2])===425,'Carry buffs respect each troop type');
+ ck(ResearchEffects::carryCapacity([50100101=>100,50200101=>100,50300101=>100],[])===32400,'Mixed T1 army uses current 108 carry per troop');
+ ck(ResearchEffects::carryCapacity([50100101=>10000],[])===1080000,'Large armies have no artificial 5000 haul ceiling');
+ ck(ResearchEffects::carryCapacity([50100101=>100,50200101=>100],['troops_storage'=>.1,'infantry_storage'=>.2])===25920,'Carry buffs respect each troop type');
  ck(GatherService::troopSpeed(50300101,[])>GatherService::troopSpeed(50100101,[]),'Cavalry travels faster than infantry');
  ck(GatherService::troopSpeed(50100101,['gathering_speed'=>1])===GatherService::troopSpeed(50100101,[]),'Gather speed never shortens travel');
- ck(GatherService::rate('food',1,['gathering_speed'=>.2,'food_gathering_speed'=>.3],2)===30.0,'Resource, general and world gathering bonuses combine');
+ ck(abs(GatherService::rate('food',1,['gathering_speed'=>.2,'food_gathering_speed'=>.3],2)-40000/1200)<.000001,'Resource, general and world gathering bonuses combine');
  $protected=DefenseService::protectedResources(['food'=>20000,'lumber'=>9000,'gold'=>0],$buffs+['resource_protect'=>.1]);
  ck($protected['food']===12000&&$protected['lumber']===9000&&$protected['gold']===0,'Warehouse protects a fixed amount plus a bounded share');
  $db->execute("UPDATE city_buildings SET level=2 WHERE city_id=1 AND building_code='storage'");ck(BuffEngine::getBuffs(1)['storage_protection_flat']===12000,'Warehouse upgrade raises protection');
  $db->execute("UPDATE city_buildings SET level=1 WHERE city_id=1 AND building_code='castle'");
  node();rejects(fn()=>GatherService::dispatch(1,1,90,90,0,[50100101=>5001]),'Server enforces castle capacity before dispatch');
  $id=GatherService::dispatch(1,1,90,90,0,[50100101=>100])['march_id'];ck(stock()===24900,'Gather dispatch reserves exactly the selected troops');
- rejects(fn()=>GatherService::dispatch(1,1,90,90,0,[50100101=>10]),'Reserved resource field rejects a second march');
  reach($id);$r=row($id);ck($r['state']==='arrived'&&$r['gathering_finishes_at']!==null,'Arrival starts gathering instead of instantly taking resources');
+ rejects(fn()=>GatherService::dispatch(1,1,90,90,0,[50100101=>10]),'Occupied resource field rejects another gathering march');
  ck((int)$db->query('SELECT resource_amount FROM field_objects WHERE world_id=1')->fetchColumn()===10000,'Resource node stays reserved until harvest settlement');
  ck(count(MarchDispatcher::listActive(1))===1,'Gathering remains in the active march read model');
  // Five seconds of work at ten resources per second; return still takes twenty seconds.
@@ -57,17 +57,17 @@ try{
  ck(stock()===24900,'Recalled troops stay away until homecoming');rejects(fn()=>DefenseService::recallMarch(1,$id),'Repeated recall cannot repeat a harvest');
  $before=(int)$db->query('SELECT food FROM cities WHERE id=1')->fetchColumn();home($id);home($id);
  ck(stock()===25000&&(int)$db->query('SELECT food FROM cities WHERE id=1')->fetchColumn()===$before+$loot['food'],'Return credits troops and resources exactly once');
- $id=GatherService::dispatch(1,1,90,90,100)['march_id'];reach($id,1000);
+ $remainingNode=(int)$db->query('SELECT resource_amount FROM field_objects WHERE world_id=1')->fetchColumn();$id=GatherService::dispatch(1,1,90,90,100)['march_id'];reach($id,1000);
  ck(row($id)['state']==='complete'&&stock()===25000,'Offline tick completes travel, work and return in order');
- ck(json_decode(row($id)['haul_json'],true)['loot']['food']===200,'Legacy count-only request carries its real selected troop load');
+ ck(json_decode(row($id)['haul_json'],true)['loot']['food']===$remainingNode,'Legacy count-only request carries its real selected troop load');
  $db->execute('DELETE FROM field_objects');node(45);$id=GatherService::dispatch(1,1,90,90,0,[50100101=>100])['march_id'];reach($id,1000);
  ck(json_decode(row($id)['haul_json'],true)['loot']['food']===45,'Depleted node returns its remaining amount without overdraw');
  $db->execute('DELETE FROM field_objects');node();$id=GatherService::dispatch(1,1,90,90,0,[50100101=>100])['march_id'];$db->execute('DELETE FROM field_objects');node();reach($id,1000);
  ck(row($id)['state']==='complete'&&empty(json_decode(row($id)['haul_json'],true)['loot']),'Replacement node at the same tile is never harvested');
  ck(stock()===25000,'Vanished node safely returns the army');
  $db->execute('DELETE FROM field_objects');node(10000,2);rejects(fn()=>GatherService::dispatch(1,1,90,90,0,[50100101=>100]),'Gather targets cannot cross worlds');
- $db->execute('DELETE FROM field_objects');node(10000,1,5);$before=(int)$db->query('SELECT gems FROM players WHERE id=1')->fetchColumn();$id=GatherService::dispatch(1,1,90,90,0,[50100101=>1])['march_id'];reach($id,1000);
- ck((int)$db->query('SELECT gems FROM players WHERE id=1')->fetchColumn()===$before+2,'Gem node yields gems to the player on return');
+ $db->execute('DELETE FROM field_objects');node(10000,1,5);$before=(int)$db->query('SELECT gems FROM players WHERE id=1')->fetchColumn();$id=GatherService::dispatch(1,1,90,90,0,[50100101=>1])['march_id'];reach($id,50000);
+ ck((int)$db->query('SELECT gems FROM players WHERE id=1')->fetchColumn()===$before+108,'Gem node yields gems to the player on return');
  $db->execute('DELETE FROM field_objects');node();$id=GatherService::dispatch(1,1,90,90,0,[50100101=>10])['march_id'];$db->execute('UPDATE marches SET haul_json=NULL WHERE id=?',[$id]);reach($id,1000);ck(row($id)['state']==='complete','Pre-migration gather marches receive a snapshot on arrival');
 
  $city=CityState::loadForPlayer(1);TroopTrainer::train($city['city'],$city['buildings'],50100101,600);
@@ -95,7 +95,7 @@ try{
  ck(count(array_filter($state['monsters'],fn($m)=>($m['definition']['art']??'')==='monsters/frostgrimm'&&($m['definition']['biome']??'')==='ice'))===1,'HTTP state preserves regional boss artwork and biome');
  ck($state['army_limits']['march_capacity']===5000&&(int)$state['active_rally_count']===1,'Game state includes castle capacity and occupied rally slots');
  ck(count(array_filter($state['marches'],fn($m)=>$m['march_type']==='rally'))===1,'Real rally appears once in the shared march list');
- ck($state['troop_defs'][0]['gather_carry']==2&&$state['troop_defs'][0]['training']['max_count']===500,'UI receives real troop carry and barrack capacity');
+ ck($state['troop_defs'][0]['gather_carry']==108&&$state['troop_defs'][0]['training']['max_count']===500,'UI receives real troop carry and barrack capacity');
  ck(count(array_filter($state['nodes'],fn($n)=>isset($n['gather_rate'])&&$n['gather_rate']>0))>0,'Resource previews receive effective work rates');
  $gather=$http('/api/march/dispatch-gather',['target_x'=>90,'target_y'=>90,'troops'=>[50100101=>10]]);ck($gather['status']===200,'Gather API accepts the selected army');
  $db->execute('UPDATE sessions SET active_world_id=2 WHERE token=?',[$token]);$other=$http('/api/game/state?map_x=90&map_y=90');

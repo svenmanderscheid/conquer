@@ -44,7 +44,8 @@ try{
     reject(fn()=>action('monster','../../config/database.php',$f),'Arbitrary source paths are rejected');
     ck((int)$db->query('SELECT revision FROM reward_overrides')->fetchColumn()===1,'Rejected requests do not change the saved revision');
     action('monster','20209901',[],1,null,1,'reward-reset');
-    ck(R::override('monster','20209901')===null&&\Conquer\Game\Map\MonsterData::get(20209901)['drops']===[],'Reset restores shipped default and clears runtime cache');
+    $resetDrops=array_map(static fn(array $drop):array=>array_intersect_key($drop,array_flip(['item_code','count','probability'])),\Conquer\Game\Map\MonsterData::get(20209901)['drops']);
+    ck(R::override('monster','20209901')===null&&$resetDrops===R::defaults('monster','20209901')['drops'],'Reset restores shipped default and clears runtime cache');
     reject(fn()=>action('monster','20209901',$f,0),'Reset tombstone prevents an old form from overwriting it');
     $rallyKey=(string)array_key_first(array_filter(R::sources('monster'),fn($s)=>$s['definition']['type']==='rally'));
     $rallyForm=formConfig('monster',R::defaults('monster',$rallyKey));$rallyForm['rows']=[['target'=>'10103001','quantity'=>13,'chance'=>100]];action('monster',$rallyKey,$rallyForm);

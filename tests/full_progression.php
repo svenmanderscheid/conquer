@@ -30,7 +30,7 @@ try{
  \Conquer\Game\Treasure\TreasureService::addFragments(1,60500002,1000);$db->execute('INSERT INTO player_treasure_loadouts(player_id,world_id,slot,treasure_code) VALUES(1,1,1,60500002)');
  $buffs=BuffEngine::getBuffs(1);ok(($buffs['hospital_capacity_flat']??0)>=2000&&($buffs['resource_protection']??0)>=.2,'relic flat hospital and fractional protection are distinct');
  \Conquer\Game\Treasure\TreasureService::addFragments(1,60400002,1000);$db->execute('INSERT INTO player_treasure_loadouts(player_id,world_id,slot,treasure_code) VALUES(1,1,2,60400002)');
- $buffs=BuffEngine::getBuffs(1);ok(ResearchEffects::limits($buffs)['march_capacity']>50000,'flat relic march capacity applies to real march limit');
+ $baseCapacity=ResearchEffects::limits($buffs)['march_capacity'];$buffs=BuffEngine::getBuffs(1);ok(ResearchEffects::limits($buffs)['march_capacity']===$baseCapacity+(int)$buffs['march_capacity_flat'],'flat relic march capacity applies to real march limit');
  $settings=['enabled'=>1,'next_start'=>gmdate('Y-m-d H:i:s',time()-600),'interval_hours'=>2,'duration_hours'=>1,'invasion_enabled'=>1,'invasion_interval_hours'=>2,'invasion_next_start'=>gmdate('Y-m-d H:i:s',time()-60)];
  denies(fn()=>EventService::saveSettings(1,array_replace($settings,['duration_hours'=>3])),'overlapping event schedule rejected');
  denies(fn()=>EventService::saveSettings(1,array_replace($settings,['next_start'=>'2026-02-30 18:00:00'])),'invalid calendar date rejected');

@@ -7,7 +7,7 @@ window.ConquerMonsterReport = (() => {
     const types = {infantry:['Infanterie','knight'],cavalry:['Kavallerie','rider'],ranged:['Bogenschützen','archer']};
     const troopArt = (type,tier) => {
         const level=Number(tier),prefix=type===types.infantry?'infantry':type===types.ranged?'archer':type===types.cavalry?'cavalry':null;
-        return prefix&&level>=1&&level<=10?`characters/${prefix}-t${level}-report-v${prefix==='infantry'&&level===10?2:1}`:type[1];
+        return prefix&&level>=1&&level<=10?`characters/tier-colors-v1/${prefix}-t${level}-report.webp`:type[1]+'.png';
     };
     const isMonster = r => Boolean(r?.details && !r.details.battle_kind && (r.target_type == null || Number(r.target_type)===3) && (r.details.monster_name != null || r.details.monster_snapshot != null));
     const sum = (rows,key) => rows.reduce((total,row)=>total+(Number(row[key])||0),0);
@@ -16,6 +16,11 @@ window.ConquerMonsterReport = (() => {
     const section = (title,body,cls='') => `<section class="cr-section ${cls}"><h3>${title}</h3>${body}</section>`;
     const fold = (title,body,key) => `<details class="cr-section cr-fold mr-report-block" data-mr-fold="${key}" open><summary>${title}<span class="cr-chevron" aria-hidden="true">⌄</span></summary>${body}</details>`;
     const button = (label,action,extra='',classes='') => `<button type="button" class="cr-button ${classes}" data-monster="${action}" ${extra}>${label}</button>`;
+    const luck = value => {
+        if(value==null||!Number.isFinite(Number(value)))return '';
+        const amount=Math.max(-10,Math.min(10,Number(value))),position=(amount+10)*5;
+        return `<div class="cr-luck" role="img" aria-label="Kampfglück ${percent(amount)}"><div class="cr-luck-heading"><strong>Glück</strong><span class="${amount>0?'cr-positive':amount<0?'cr-negative':''}">${percent(amount)}</span></div><div class="cr-luck-track"><span class="cr-luck-zero" aria-hidden="true"></span><span class="cr-luck-marker" style="left:${position}%" aria-hidden="true"></span></div><div class="cr-luck-scale" aria-hidden="true"><span>−10 %</span><span>0 %</span><span>+10 %</span></div></div>`;
+    };
     const row = (label,left,right,cls='') => `<tr><td class="${cls}">${left}</td><th scope="row">${label}</th><td class="${cls}">${right}</td></tr>`;
     function asset(base,file) {
         return /^[a-zA-Z0-9_/-]+\.(svg|png|webp)$/.test(file||'')&&!file.includes('..')?`${base}/assets/art/items/${file}`:'';
@@ -58,7 +63,7 @@ window.ConquerMonsterReport = (() => {
     }
     function troopCard(base,troop) {
         const type=types[troop.type]||types[({1:'infantry',2:'ranged',3:'cavalry'})[String(troop.code)[2]]]||types.infantry;
-        return `<article class="mr-troop-card"><img src="${base}/assets/art/${troopArt(type,troop.tier)}.png" alt=""><div><strong>${esc(troop.name||type[0])}</strong><small>Tier ${number(troop.tier)}</small><b>${number(troop.sent)}</b></div></article>`;
+        return `<article class="mr-troop-card"><img class="troop-tier-frame" data-troop-tier="${Number(troop.tier)||0}" src="${base}/assets/art/${troopArt(type,troop.tier)}" alt=""><div><strong>${esc(troop.name||type[0])}</strong><small>Tier ${number(troop.tier)}</small><b>${number(troop.sent)}</b></div></article>`;
     }
     function troopOverview(v,base) {
         const player=v.troops.length?v.troops.map(troop=>troopCard(base,troop)).join(''):'<p class="cr-note">Keine Truppenaufstellung gespeichert.</p>';
@@ -93,7 +98,7 @@ window.ConquerMonsterReport = (() => {
         const experience=section('Erfahrung',`<div class="mr-experience"><span>Hunter-XP</span><strong>${d.lord_xp>0?'+'+number(d.lord_xp):'Keine XP'}</strong><small>${d.lord_xp>0?'Bereits gutgeschrieben':'In diesem Gefecht wurde keine Erfahrung vergeben.'}</small></div>`,'mr-xp');
         return `<h2>Monster-Kampfbericht</h2><article class="combat-report monster-report" data-monster-report="${Number(r.id)}"><div class="cr-scroll">
             <div class="cr-banner"><div><small>${d.type==='monster_rally'?'Gemeinsamer Monsterangriff':'Monsterangriff'} · #${Number(r.id)}</small><strong>X:${number(r.target_x)} Y:${number(r.target_y)}</strong></div><time>${esc(stamp)}</time></div>
-            ${!m?'<p class="cr-notice">Älterer Bericht: Monster-Truppenwerte wurden damals nicht gespeichert.</p>':''}${overview}${loot}${section('Truppenübersicht',troopOverview(v,base),'mr-troops')}${section('Kampfstärke',power(v))}${experience}${fold('Hunter-Meisterschaft',talents,'talents')}${fold('Relikte im Kampf',equipment,'equipment')}${fold('Aktive Kampfboni',bonuses,'bonuses')}
+            ${luck(d.luck_percent)}${!m?'<p class="cr-notice">Älterer Bericht: Monster-Truppenwerte wurden damals nicht gespeichert.</p>':''}${overview}${loot}${section('Truppenübersicht',troopOverview(v,base),'mr-troops')}${section('Kampfstärke',power(v))}${experience}${fold('Hunter-Meisterschaft',talents,'talents')}${fold('Relikte im Kampf',equipment,'equipment')}${fold('Aktive Kampfboni',bonuses,'bonuses')}
             ${r.can_delete?`<details class="cr-rules mr-delete"><summary>Bericht löschen</summary><p>Der Bericht verschwindet aus deiner Post. Truppen und Belohnungen bleiben erhalten.</p><button type="button" class="cr-button" data-action="monster-report-delete" data-id="${Number(r.id)}">Löschen</button></details>`:''}</div>
             <footer class="cr-footer">${button('‹','previous',`data-id="${previous||''}" aria-label="Neuerer Kampfbericht" ${previous?'':'disabled'}`,'cr-report-arrow')}${button('<span class="cr-wide-label">Kampfdetails</span><span class="cr-short-label">Details</span>','details','','cr-primary')}${canShare?button('↗ <span class="cr-action-label">Teilen</span>','share','aria-label="Bericht teilen"','cr-share-button'):''}${button('⧉ <span class="cr-action-label">Kopieren</span>','copy','aria-label="Berichtszusammenfassung kopieren"','cr-copy-button')}${button('›','next',`data-id="${next||''}" aria-label="Älterer Kampfbericht" ${next?'':'disabled'}`,'cr-report-arrow')}</footer></article>`;
     }
@@ -103,7 +108,7 @@ window.ConquerMonsterReport = (() => {
             <details class="cr-rules"><summary>Kampfwertung & Rückkehr</summary><p>Die Kampfwerte enthalten die damals aktiven Boni. Truppenmacht verloren, leicht Verwundete und Abschüsse je Einheit werden in Monsterberichten nicht separat erfasst.</p><p>Einsatzfähige Truppen und Beute kehren mit dem Rückmarsch zurück. Verwundete werden im Hospital versorgt. Die Monster-HP zeigen den Stand nach und vor diesem Gefecht.</p></details>
             <section class="cr-detail-side"><h3 class="cr-ribbon attacker">Angreifer${v.rally?' · dein Anteil':''}</h3><details class="cr-army" open><summary><img class="cr-avatar" src="${v.avatar}" alt=""><span><strong>${esc(v.name)}</strong><small>${number(sum(troops,'sent'))} Truppen</small></span><b class="cr-chevron" aria-hidden="true">⌄</b></summary><div class="cr-troop-list">${troops.map(t=>{
                 const type=types[t.type]||types[({1:'infantry',2:'ranged',3:'cavalry'})[String(t.code)[2]]]||types.infantry;
-                return `<article class="cr-troop"><div class="cr-troop-name"><img src="${base}/assets/art/${troopArt(type,t.tier)}.png" alt=""><span><strong>${esc(t.name||type[0])}</strong><small>Tier ${number(t.tier)} · ${number(t.sent)} Truppen</small></span></div><dl>${[['dead','Gefallen'],['injured','Verwundet'],['survived','Einsatzfähig']].map(([key,label])=>`<div><dt>${label}</dt><dd class="${key==='survived'?'':'cr-negative'}">${number(key==='dead'?fallen(t):t[key])}</dd></div>`).join('')}</dl></article>`;
+                return `<article class="cr-troop"><div class="cr-troop-name"><img class="troop-tier-frame" data-troop-tier="${Number(t.tier)||0}" src="${base}/assets/art/${troopArt(type,t.tier)}" alt=""><span><strong>${esc(t.name||type[0])}</strong><small>Tier ${number(t.tier)} · ${number(t.sent)} Truppen</small></span></div><dl>${[['dead','Gefallen'],['injured','Verwundet'],['survived','Einsatzfähig']].map(([key,label])=>`<div><dt>${label}</dt><dd class="${key==='survived'?'':'cr-negative'}">${number(key==='dead'?fallen(t):t[key])}</dd></div>`).join('')}</dl></article>`;
             }).join('')||'<p class="cr-note">Keine Truppenaufstellung gespeichert.</p>'}</div></details></section>
             <section class="cr-detail-side"><h3 class="cr-ribbon defender">Monster</h3>${section(esc(v.enemy),hp(d)+power(v))}</section></div>`;
     }

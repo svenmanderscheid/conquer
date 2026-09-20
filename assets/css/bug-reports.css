@@ -69,11 +69,29 @@
 .bug-diagnostics small { display: block; margin-top: 3px; }
 .bug-report-success { max-width: 620px; margin: 0 auto; text-align: center; }
 .bug-report-success .bug-report-seal { margin: 0 auto 14px; background: var(--ui-green); }
+.bug-report-context,
+.bug-no-screenshot { margin: 0; padding: 11px 13px; border: 1px solid var(--ui-line); border-radius: 10px; background: var(--ui-card); color: var(--ui-muted); }
+.bug-screenshot-preview { margin: 0; padding: 12px; border: 1px solid var(--ui-line); border-radius: 12px; background: var(--ui-card); }
+.bug-screenshot-preview img { display: block; max-width: 100%; max-height: 260px; margin: 0 auto 10px; border: 2px solid var(--ui-frame); border-radius: 9px; }
+.bug-screenshot-preview figcaption { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: var(--ui-muted); }
+.bug-capture-consent { max-width: 560px; }
+.bug-capture-consent .button-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.bug-capture-consent .button { min-height: 44px; }
+.panel-report-button,
+.dialog-report-button { display: grid; place-items: center; width: 44px; min-width: 44px; height: 44px; border: 1px solid var(--ui-line); border-radius: 11px; background: var(--ui-card); color: var(--ui-primary); cursor: pointer; }
+.panel-report-button svg,
+.dialog-report-button svg,
+.hud-report-button svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.dialog-report-button { position: absolute; z-index: 3; top: 10px; right: 60px; }
+.hud-report-button .hud-edge-art { display: grid; place-items: center; color: var(--ui-card-light); }
+.panel-report-button:focus-visible,
+.dialog-report-button:focus-visible { outline: 3px solid var(--ui-primary-dark); outline-offset: 2px; }
 @media (max-width: 539px) {
   .bug-report-fields { grid-template-columns: 1fr; }
   .bug-report-intro { align-items: flex-start; padding: 13px; }
   .bug-report-intro > span { flex-basis: 42px; width: 42px; height: 42px; }
   .bug-report-panel textarea { min-height: 88px; }
+  .bug-screenshot-preview figcaption { align-items: stretch; flex-direction: column; }
 }
 @media (max-height: 520px) and (orientation: landscape) {
   .bug-report-intro { padding: 10px; margin-bottom: 10px; }

@@ -180,7 +180,7 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
 ?>
 <?php if (!$isModal): ?>
 <!DOCTYPE html>
-<html lang="de">
+<html lang="<?= htmlspecialchars(\Conquer\Game\Locale::current(),ENT_QUOTES) ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1291,8 +1291,9 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
     </style>
 <?php if (!$isModal): ?>
 <link rel="stylesheet" href="<?= htmlspecialchars(APP_BASE, ENT_QUOTES) ?>/assets/css/village-theme.css?v=<?= filemtime(__DIR__ . "/../assets/css/village-theme.css") ?>">
+<?php require ROOT_DIR.'/views/partials/localization-head.php'; ?>
 </head>
-<body>
+<body data-i18n-scope>
 <?php $hudCurrentView = 'city'; require __DIR__ . '/partials/hud.php'; ?>
 <div class="page-wrap">
 <?php endif ?>
@@ -1510,6 +1511,7 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
                             'attack'        => (int)$t['attack'],
                             'defense'       => (int)$t['defense'],
                             'speed'         => (int)$t['speed'],
+                            'march_speed'   => (int)($t['march_speed'] ?? $t['speed']),
                             'need_food'     => (int)$t['need_food'],
                             'need_lumber'   => (int)$t['need_lumber'],
                             'need_stone'    => (int)$t['need_stone'],
@@ -1951,8 +1953,8 @@ if (cdEl) {
     const BRK_QUEUE  = <?= json_encode($queueData) ?>;
     const ROMAN      = ['', 'I', 'II', 'III', 'IV', 'V'];
     const TYPE_COLOR = { 1: '#0ea5e9', 2: '#22c55e', 3: '#8b5cf6' };
-    const STAT_ICONS = { hp: '❤️', attack: '⚔️', defense: '🛡️', speed: '⚡' };
-    const STAT_LABELS= { hp: 'HP', attack: 'Angriff', defense: 'Verteidigung', speed: 'Geschw.' };
+    const STAT_ICONS = { hp: '❤️', attack: '⚔️', defense: '🛡️', march_speed: '⚡' };
+    const STAT_LABELS= { hp: 'HP', attack: 'Angriff', defense: 'Verteidigung', march_speed: 'Marschtempo' };
     const RES_ICONS  = { need_food: '🌾', need_lumber: '🪵', need_stone: '🪨', need_gold: '💰' };
     const RES_LABELS = { need_food: 'Nahrung', need_lumber: 'Holz', need_stone: 'Stein', need_gold: 'Gold' };
 
@@ -2022,7 +2024,7 @@ if (cdEl) {
         nameEl.textContent = t.name + ' (Tier ' + (ROMAN[t.tier] || t.tier) + ')';
 
         let html = '';
-        ['hp','attack','defense','speed'].forEach(k => {
+        ['hp','attack','defense','march_speed'].forEach(k => {
             html += '<div class="brk-stat-row">' +
                 '<span class="brk-stat-icon">' + (STAT_ICONS[k]||'') + '</span>' +
                 '<span class="brk-stat-label">' + (STAT_LABELS[k]||k) + '</span>' +

@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "buildings": {
     "academy": {
       "1": {
@@ -330,7 +330,7 @@
           "gold": 6274653
         },
         "items": {},
-        "time": 275507,
+        "time": 345600,
         "power": 475370,
         "requirements": {
           "castle": 21,
@@ -346,7 +346,7 @@
           "gold": 8659021
         },
         "items": {},
-        "time": 330608,
+        "time": 432000,
         "power": 577715,
         "requirements": {
           "castle": 22,
@@ -362,7 +362,7 @@
           "gold": 11949449
         },
         "items": {},
-        "time": 396730,
+        "time": 518400,
         "power": 700680,
         "requirements": {
           "castle": 23,
@@ -378,7 +378,7 @@
           "gold": 16490240
         },
         "items": {},
-        "time": 476076,
+        "time": 691200,
         "power": 848237,
         "requirements": {
           "castle": 24,
@@ -394,7 +394,7 @@
           "gold": 22756531
         },
         "items": {},
-        "time": 571291,
+        "time": 864000,
         "power": 1025137,
         "requirements": {
           "castle": 25,
@@ -410,7 +410,7 @@
           "gold": 31404013
         },
         "items": {},
-        "time": 856937,
+        "time": 1123200,
         "power": 1237052,
         "requirements": {
           "castle": 26,
@@ -426,7 +426,7 @@
           "gold": 43337538
         },
         "items": {},
-        "time": 1285406,
+        "time": 1468800,
         "power": 1490728,
         "requirements": {
           "castle": 27,
@@ -442,7 +442,7 @@
           "gold": 59805802
         },
         "items": {},
-        "time": 1928109,
+        "time": 1814400,
         "power": 1794196,
         "requirements": {
           "castle": 28,
@@ -458,7 +458,7 @@
           "gold": 82532007
         },
         "items": {},
-        "time": 2892164,
+        "time": 2160000,
         "power": 2156995,
         "requirements": {
           "castle": 29,
@@ -476,7 +476,7 @@
         "items": {
           "119000001": 1
         },
-        "time": 11568656,
+        "time": 2592000,
         "power": 2590517,
         "requirements": {
           "castle": 30,
@@ -814,7 +814,7 @@
           "gold": 257817
         },
         "items": {},
-        "time": 52642,
+        "time": 64800,
         "power": 189442,
         "requirements": {
           "castle": 21,
@@ -830,7 +830,7 @@
           "gold": 340318
         },
         "items": {},
-        "time": 63170,
+        "time": 86400,
         "power": 225652,
         "requirements": {
           "castle": 22,
@@ -846,7 +846,7 @@
           "gold": 449220
         },
         "items": {},
-        "time": 75804,
+        "time": 115200,
         "power": 268191,
         "requirements": {
           "castle": 23,
@@ -862,7 +862,7 @@
           "gold": 592970
         },
         "items": {},
-        "time": 90965,
+        "time": 151200,
         "power": 318112,
         "requirements": {
           "castle": 24,
@@ -878,7 +878,7 @@
           "gold": 782720
         },
         "items": {},
-        "time": 109158,
+        "time": 194400,
         "power": 376662,
         "requirements": {
           "castle": 25,
@@ -894,7 +894,7 @@
           "gold": 1033190
         },
         "items": {},
-        "time": 130990,
+        "time": 259200,
         "power": 445244,
         "requirements": {
           "castle": 26,
@@ -910,7 +910,7 @@
           "gold": 1363811
         },
         "items": {},
-        "time": 157188,
+        "time": 345600,
         "power": 525525,
         "requirements": {
           "castle": 27,
@@ -926,7 +926,7 @@
           "gold": 1800231
         },
         "items": {},
-        "time": 188626,
+        "time": 432000,
         "power": 619449,
         "requirements": {
           "castle": 28,
@@ -942,7 +942,7 @@
           "gold": 2376305
         },
         "items": {},
-        "time": 226351,
+        "time": 604800,
         "power": 729306,
         "requirements": {
           "castle": 29,
@@ -960,7 +960,7 @@
         "items": {
           "119000001": 1
         },
-        "time": 271621,
+        "time": 864000,
         "power": 857637,
         "requirements": {
           "castle": 30,
@@ -1295,7 +1295,7 @@
           "gold": 3333528
         },
         "items": {},
-        "time": 330602,
+        "time": 345600,
         "power": 540165,
         "requirements": {
           "wall": 20,
@@ -1311,7 +1311,7 @@
           "gold": 4733610
         },
         "items": {},
-        "time": 396722,
+        "time": 432000,
         "power": 665165,
         "requirements": {
           "wall": 21,
@@ -1327,7 +1327,7 @@
           "gold": 6721726
         },
         "items": {},
-        "time": 476066,
+        "time": 518400,
         "power": 817433,
         "requirements": {
           "wall": 22,
@@ -1343,7 +1343,7 @@
           "gold": 9544851
         },
         "items": {},
-        "time": 571279,
+        "time": 691200,
         "power": 1002810,
         "requirements": {
           "wall": 23,
@@ -1359,7 +1359,7 @@
           "gold": 13553688
         },
         "items": {},
-        "time": 685535,
+        "time": 864000,
         "power": 1228260,
         "requirements": {
           "wall": 24,
@@ -1375,7 +1375,7 @@
           "gold": 19246237
         },
         "items": {},
-        "time": 1028303,
+        "time": 1123200,
         "power": 1502230,
         "requirements": {
           "wall": 25,
@@ -1391,7 +1391,7 @@
           "gold": 27329657
         },
         "items": {},
-        "time": 1542455,
+        "time": 1468800,
         "power": 1834940,
         "requirements": {
           "wall": 26,
@@ -1407,7 +1407,7 @@
           "gold": 38808113
         },
         "items": {},
-        "time": 2313683,
+        "time": 1814400,
         "power": 2238629,
         "requirements": {
           "wall": 27,
@@ -1423,7 +1423,7 @@
           "gold": 55107520
         },
         "items": {},
-        "time": 3470525,
+        "time": 2160000,
         "power": 2728248,
         "requirements": {
           "wall": 28,
@@ -1441,7 +1441,7 @@
         "items": {
           "119000001": 1
         },
-        "time": 13882100,
+        "time": 2592000,
         "power": 3321651,
         "requirements": {
           "wall": 29,
@@ -1759,7 +1759,7 @@
           "gold": 257817
         },
         "items": {},
-        "time": 52642,
+        "time": 57600,
         "power": 160063,
         "requirements": {
           "castle": 21
@@ -1774,7 +1774,7 @@
           "gold": 340318
         },
         "items": {},
-        "time": 63170,
+        "time": 79200,
         "power": 190645,
         "requirements": {
           "castle": 22
@@ -1789,7 +1789,7 @@
           "gold": 449220
         },
         "items": {},
-        "time": 75804,
+        "time": 108000,
         "power": 226566,
         "requirements": {
           "castle": 23
@@ -1804,7 +1804,7 @@
           "gold": 592970
         },
         "items": {},
-        "time": 90965,
+        "time": 151200,
         "power": 268746,
         "requirements": {
           "castle": 24
@@ -1819,7 +1819,7 @@
           "gold": 782720
         },
         "items": {},
-        "time": 109158,
+        "time": 194400,
         "power": 318196,
         "requirements": {
           "castle": 25
@@ -1834,7 +1834,7 @@
           "gold": 1033190
         },
         "items": {},
-        "time": 130990,
+        "time": 259200,
         "power": 376172,
         "requirements": {
           "castle": 26
@@ -1849,7 +1849,7 @@
           "gold": 1363811
         },
         "items": {},
-        "time": 157188,
+        "time": 345600,
         "power": 444034,
         "requirements": {
           "castle": 27
@@ -1864,7 +1864,7 @@
           "gold": 1800231
         },
         "items": {},
-        "time": 188626,
+        "time": 432000,
         "power": 523407,
         "requirements": {
           "castle": 28
@@ -1879,7 +1879,7 @@
           "gold": 2376305
         },
         "items": {},
-        "time": 226351,
+        "time": 604800,
         "power": 616247,
         "requirements": {
           "castle": 29
@@ -1896,7 +1896,7 @@
         "items": {
           "119000001": 1
         },
-        "time": 271621,
+        "time": 864000,
         "power": 724696,
         "requirements": {
           "castle": 30
@@ -2213,7 +2213,7 @@
           "gold": 0
         },
         "items": {},
-        "time": 52642,
+        "time": 57600,
         "power": 195967,
         "requirements": {
           "castle": 21
@@ -2228,7 +2228,7 @@
           "gold": 0
         },
         "items": {},
-        "time": 63170,
+        "time": 79200,
         "power": 233443,
         "requirements": {
           "castle": 22
@@ -2243,7 +2243,7 @@
           "gold": 0
         },
         "items": {},
-        "time": 75804,
+        "time": 108000,
         "power": 277469,
         "requirements": {
           "castle": 23
@@ -2258,7 +2258,7 @@
           "gold": 0
         },
         "items": {},
-        "time": 90965,
+        "time": 151200,
         "power": 329153,
         "requirements": {
           "castle": 24
@@ -2273,7 +2273,7 @@
           "gold": 0
         },
         "items": {},
-        "time": 109158,
+        "time": 194400,
         "power": 389753,
         "requirements": {
           "castle": 25
@@ -2288,7 +2288,7 @@
           "gold": 0
         },
         "items": {},
-        "time": 130990,
+        "time": 259200,
         "power": 460731,
         "requirements": {
           "castle": 26
@@ -2303,7 +2303,7 @@
           "gold": 0
         },
         "items": {},
-        "time": 157188,
+        "time": 345600,
         "power": 543817,
         "requirements": {
           "castle": 27
@@ -2318,7 +2318,7 @@
           "gold": 0
         },
         "items": {},
-        "time": 188626,
+        "time": 432000,
         "power": 641075,
         "requirements": {
           "castle": 28
@@ -2333,7 +2333,7 @@
           "gold": 0
         },
         "items": {},
-        "time": 226351,
+        "time": 604800,
         "power": 754756,
         "requirements": {
           "castle": 29
@@ -2350,7 +2350,7 @@
         "items": {
           "119000001": 1
         },
-        "time": 271621,
+        "time": 864000,
         "power": 887633,
         "requirements": {
           "castle": 30
@@ -2723,7 +2723,7 @@
         "items": {
           "119000002": 600
         },
-        "time": 220400,
+        "time": 345600,
         "power": 383214,
         "requirements": {
           "castle": 21,
@@ -2741,7 +2741,7 @@
         "items": {
           "119000002": 700
         },
-        "time": 264480,
+        "time": 432000,
         "power": 462623,
         "requirements": {
           "castle": 22,
@@ -2759,7 +2759,7 @@
         "items": {
           "119000002": 800
         },
-        "time": 317376,
+        "time": 518400,
         "power": 557341,
         "requirements": {
           "castle": 23,
@@ -2777,7 +2777,7 @@
         "items": {
           "119000002": 900
         },
-        "time": 380851,
+        "time": 691200,
         "power": 670164,
         "requirements": {
           "castle": 24,
@@ -2795,7 +2795,7 @@
         "items": {
           "119000002": 1000
         },
-        "time": 457021,
+        "time": 864000,
         "power": 804464,
         "requirements": {
           "castle": 25,
@@ -2813,7 +2813,7 @@
         "items": {
           "119000002": 1500
         },
-        "time": 685532,
+        "time": 1036800,
         "power": 964165,
         "requirements": {
           "castle": 26,
@@ -2831,7 +2831,7 @@
         "items": {
           "119000002": 2000
         },
-        "time": 1028298,
+        "time": 1296000,
         "power": 1153980,
         "requirements": {
           "castle": 27,
@@ -2849,7 +2849,7 @@
         "items": {
           "119000002": 2500
         },
-        "time": 1542447,
+        "time": 1555200,
         "power": 1379398,
         "requirements": {
           "castle": 28,
@@ -2867,7 +2867,7 @@
         "items": {
           "119000002": 3000
         },
-        "time": 2313671,
+        "time": 1900800,
         "power": 1646933,
         "requirements": {
           "castle": 29,
@@ -2886,7 +2886,7 @@
           "119000002": 5000,
           "119000001": 1
         },
-        "time": 3470507,
+        "time": 2246400,
         "power": 1964229,
         "requirements": {
           "castle": 30,
@@ -3224,7 +3224,7 @@
           "gold": 1085144
         },
         "items": {},
-        "time": 220400,
+        "time": 345600,
         "power": 358022,
         "requirements": {
           "castle": 21,
@@ -3240,7 +3240,7 @@
           "gold": 1486647
         },
         "items": {},
-        "time": 264480,
+        "time": 432000,
         "power": 433678,
         "requirements": {
           "castle": 22,
@@ -3256,7 +3256,7 @@
           "gold": 2036706
         },
         "items": {},
-        "time": 317376,
+        "time": 518400,
         "power": 524223,
         "requirements": {
           "castle": 23,
@@ -3272,7 +3272,7 @@
           "gold": 2790287
         },
         "items": {},
-        "time": 380851,
+        "time": 691200,
         "power": 632490,
         "requirements": {
           "castle": 24,
@@ -3288,7 +3288,7 @@
           "gold": 3822693
         },
         "items": {},
-        "time": 457021,
+        "time": 864000,
         "power": 761790,
         "requirements": {
           "castle": 25,
@@ -3304,7 +3304,7 @@
           "gold": 5237089
         },
         "items": {},
-        "time": 548425,
+        "time": 1036800,
         "power": 916137,
         "requirements": {
           "castle": 26,
@@ -3320,7 +3320,7 @@
           "gold": 7174812
         },
         "items": {},
-        "time": 658110,
+        "time": 1296000,
         "power": 1100237,
         "requirements": {
           "castle": 27,
@@ -3336,7 +3336,7 @@
           "gold": 9829492
         },
         "items": {},
-        "time": 789732,
+        "time": 1555200,
         "power": 1319676,
         "requirements": {
           "castle": 28,
@@ -3352,7 +3352,7 @@
           "gold": 13466404
         },
         "items": {},
-        "time": 947678,
+        "time": 1900800,
         "power": 1581072,
         "requirements": {
           "castle": 29,
@@ -3370,7 +3370,7 @@
         "items": {
           "119000001": 1
         },
-        "time": 1137214,
+        "time": 2246400,
         "power": 1892288,
         "requirements": {
           "castle": 30,
@@ -3688,7 +3688,7 @@
           "gold": 257817
         },
         "items": {},
-        "time": 52642,
+        "time": 57600,
         "power": 160063,
         "requirements": {
           "castle": 21
@@ -3703,7 +3703,7 @@
           "gold": 340318
         },
         "items": {},
-        "time": 63170,
+        "time": 79200,
         "power": 190645,
         "requirements": {
           "castle": 22
@@ -3718,7 +3718,7 @@
           "gold": 449220
         },
         "items": {},
-        "time": 75804,
+        "time": 108000,
         "power": 226566,
         "requirements": {
           "castle": 23
@@ -3733,7 +3733,7 @@
           "gold": 592970
         },
         "items": {},
-        "time": 90965,
+        "time": 151200,
         "power": 268746,
         "requirements": {
           "castle": 24
@@ -3748,7 +3748,7 @@
           "gold": 782720
         },
         "items": {},
-        "time": 109158,
+        "time": 194400,
         "power": 318196,
         "requirements": {
           "castle": 25
@@ -3763,7 +3763,7 @@
           "gold": 1033190
         },
         "items": {},
-        "time": 130990,
+        "time": 259200,
         "power": 376172,
         "requirements": {
           "castle": 26
@@ -3778,7 +3778,7 @@
           "gold": 1363811
         },
         "items": {},
-        "time": 157188,
+        "time": 345600,
         "power": 444034,
         "requirements": {
           "castle": 27
@@ -3793,7 +3793,7 @@
           "gold": 1800231
         },
         "items": {},
-        "time": 188626,
+        "time": 432000,
         "power": 523407,
         "requirements": {
           "castle": 28
@@ -3808,7 +3808,7 @@
           "gold": 2376305
         },
         "items": {},
-        "time": 226351,
+        "time": 604800,
         "power": 616247,
         "requirements": {
           "castle": 29
@@ -3825,7 +3825,7 @@
         "items": {
           "119000001": 1
         },
-        "time": 271621,
+        "time": 864000,
         "power": 724696,
         "requirements": {
           "castle": 30
@@ -4142,7 +4142,7 @@
           "gold": 257817
         },
         "items": {},
-        "time": 52642,
+        "time": 57600,
         "power": 160063,
         "requirements": {
           "castle": 21
@@ -4157,7 +4157,7 @@
           "gold": 340318
         },
         "items": {},
-        "time": 63170,
+        "time": 79200,
         "power": 190645,
         "requirements": {
           "castle": 22
@@ -4172,7 +4172,7 @@
           "gold": 449220
         },
         "items": {},
-        "time": 75804,
+        "time": 108000,
         "power": 226566,
         "requirements": {
           "castle": 23
@@ -4187,7 +4187,7 @@
           "gold": 592970
         },
         "items": {},
-        "time": 90965,
+        "time": 151200,
         "power": 268746,
         "requirements": {
           "castle": 24
@@ -4202,7 +4202,7 @@
           "gold": 782720
         },
         "items": {},
-        "time": 109158,
+        "time": 194400,
         "power": 318196,
         "requirements": {
           "castle": 25
@@ -4217,7 +4217,7 @@
           "gold": 1033190
         },
         "items": {},
-        "time": 130990,
+        "time": 259200,
         "power": 376172,
         "requirements": {
           "castle": 26
@@ -4232,7 +4232,7 @@
           "gold": 1363811
         },
         "items": {},
-        "time": 157188,
+        "time": 345600,
         "power": 444034,
         "requirements": {
           "castle": 27
@@ -4247,7 +4247,7 @@
           "gold": 1800231
         },
         "items": {},
-        "time": 188626,
+        "time": 432000,
         "power": 523407,
         "requirements": {
           "castle": 28
@@ -4262,7 +4262,7 @@
           "gold": 2376305
         },
         "items": {},
-        "time": 226351,
+        "time": 604800,
         "power": 616247,
         "requirements": {
           "castle": 29
@@ -4279,7 +4279,7 @@
         "items": {
           "119000001": 1
         },
-        "time": 271621,
+        "time": 864000,
         "power": 724696,
         "requirements": {
           "castle": 30
@@ -4616,7 +4616,7 @@
           "gold": 348488
         },
         "items": {},
-        "time": 165310,
+        "time": 172800,
         "power": 254378,
         "requirements": {
           "castle": 21,
@@ -4632,7 +4632,7 @@
           "gold": 466974
         },
         "items": {},
-        "time": 198372,
+        "time": 259200,
         "power": 305034,
         "requirements": {
           "castle": 22,
@@ -4648,7 +4648,7 @@
           "gold": 625745
         },
         "items": {},
-        "time": 238046,
+        "time": 345600,
         "power": 365030,
         "requirements": {
           "castle": 23,
@@ -4664,7 +4664,7 @@
           "gold": 838498
         },
         "items": {},
-        "time": 285655,
+        "time": 432000,
         "power": 435967,
         "requirements": {
           "castle": 24,
@@ -4680,7 +4680,7 @@
           "gold": 1123587
         },
         "items": {},
-        "time": 342786,
+        "time": 604800,
         "power": 519767,
         "requirements": {
           "castle": 25,
@@ -4696,7 +4696,7 @@
           "gold": 1505607
         },
         "items": {},
-        "time": 411343,
+        "time": 777600,
         "power": 618688,
         "requirements": {
           "castle": 26,
@@ -4712,7 +4712,7 @@
           "gold": 2017513
         },
         "items": {},
-        "time": 493612,
+        "time": 1036800,
         "power": 735394,
         "requirements": {
           "castle": 27,
@@ -4728,7 +4728,7 @@
           "gold": 2703467
         },
         "items": {},
-        "time": 592334,
+        "time": 1382400,
         "power": 872973,
         "requirements": {
           "castle": 28,
@@ -4744,7 +4744,7 @@
           "gold": 3622646
         },
         "items": {},
-        "time": 710801,
+        "time": 1814400,
         "power": 1035013,
         "requirements": {
           "castle": 29,
@@ -4762,7 +4762,7 @@
         "items": {
           "119000001": 1
         },
-        "time": 852961,
+        "time": 2246400,
         "power": 1225785,
         "requirements": {
           "castle": 30,
@@ -5100,7 +5100,7 @@
           "gold": 1010732
         },
         "items": {},
-        "time": 165310,
+        "time": 345600,
         "power": 324603,
         "requirements": {
           "castle": 21,
@@ -5116,7 +5116,7 @@
           "gold": 1364488
         },
         "items": {},
-        "time": 198372,
+        "time": 432000,
         "power": 390597,
         "requirements": {
           "castle": 22,
@@ -5132,7 +5132,7 @@
           "gold": 1842059
         },
         "items": {},
-        "time": 238046,
+        "time": 518400,
         "power": 468961,
         "requirements": {
           "castle": 23,
@@ -5148,7 +5148,7 @@
           "gold": 2486780
         },
         "items": {},
-        "time": 285655,
+        "time": 691200,
         "power": 561993,
         "requirements": {
           "castle": 24,
@@ -5164,7 +5164,7 @@
           "gold": 3357153
         },
         "items": {},
-        "time": 342786,
+        "time": 864000,
         "power": 672293,
         "requirements": {
           "castle": 25,
@@ -5180,7 +5180,7 @@
           "gold": 4532157
         },
         "items": {},
-        "time": 514179,
+        "time": 1036800,
         "power": 803032,
         "requirements": {
           "castle": 26,
@@ -5196,7 +5196,7 @@
           "gold": 6118412
         },
         "items": {},
-        "time": 771269,
+        "time": 1296000,
         "power": 957825,
         "requirements": {
           "castle": 27,
@@ -5212,7 +5212,7 @@
           "gold": 8259856
         },
         "items": {},
-        "time": 1156904,
+        "time": 1555200,
         "power": 1140964,
         "requirements": {
           "castle": 28,
@@ -5228,7 +5228,7 @@
           "gold": 11150806
         },
         "items": {},
-        "time": 1735356,
+        "time": 1900800,
         "power": 1357501,
         "requirements": {
           "castle": 29,
@@ -5246,7 +5246,7 @@
         "items": {
           "119000001": 1
         },
-        "time": 6941424,
+        "time": 2246400,
         "power": 1613397,
         "requirements": {
           "castle": 30,
@@ -5584,7 +5584,7 @@
           "gold": 2342888
         },
         "items": {},
-        "time": 303056,
+        "time": 345600,
         "power": 403998,
         "requirements": {
           "castle": 21,
@@ -5600,7 +5600,7 @@
           "gold": 3186328
         },
         "items": {},
-        "time": 363667,
+        "time": 432000,
         "power": 487722,
         "requirements": {
           "castle": 22,
@@ -5616,7 +5616,7 @@
           "gold": 4333406
         },
         "items": {},
-        "time": 436400,
+        "time": 518400,
         "power": 587571,
         "requirements": {
           "castle": 23,
@@ -5632,7 +5632,7 @@
           "gold": 5893432
         },
         "items": {},
-        "time": 523680,
+        "time": 691200,
         "power": 706518,
         "requirements": {
           "castle": 24,
@@ -5648,7 +5648,7 @@
           "gold": 8015068
         },
         "items": {},
-        "time": 628416,
+        "time": 864000,
         "power": 848068,
         "requirements": {
           "castle": 25,
@@ -5664,7 +5664,7 @@
           "gold": 10900492
         },
         "items": {},
-        "time": 942624,
+        "time": 1036800,
         "power": 1016438,
         "requirements": {
           "castle": 26,
@@ -5680,7 +5680,7 @@
           "gold": 14824669
         },
         "items": {},
-        "time": 1413936,
+        "time": 1296000,
         "power": 1216490,
         "requirements": {
           "castle": 27,
@@ -5696,7 +5696,7 @@
           "gold": 20161550
         },
         "items": {},
-        "time": 2120904,
+        "time": 1555200,
         "power": 1454078,
         "requirements": {
           "castle": 28,
@@ -5712,7 +5712,7 @@
           "gold": 27419708
         },
         "items": {},
-        "time": 3181356,
+        "time": 1900800,
         "power": 1736045,
         "requirements": {
           "castle": 29,
@@ -5730,7 +5730,7 @@
         "items": {
           "119000001": 1
         },
-        "time": 12725424,
+        "time": 2246400,
         "power": 2070539,
         "requirements": {
           "castle": 30,
@@ -6068,7 +6068,7 @@
           "gold": 1356158
         },
         "items": {},
-        "time": 165310,
+        "time": 345600,
         "power": 364357,
         "requirements": {
           "castle": 21,
@@ -6084,7 +6084,7 @@
           "gold": 1857936
         },
         "items": {},
-        "time": 198372,
+        "time": 432000,
         "power": 441327,
         "requirements": {
           "castle": 22,
@@ -6100,7 +6100,7 @@
           "gold": 2545372
         },
         "items": {},
-        "time": 238046,
+        "time": 518400,
         "power": 533455,
         "requirements": {
           "castle": 23,
@@ -6116,7 +6116,7 @@
           "gold": 3487160
         },
         "items": {},
-        "time": 285655,
+        "time": 691200,
         "power": 643633,
         "requirements": {
           "castle": 24,
@@ -6132,7 +6132,7 @@
           "gold": 4777409
         },
         "items": {},
-        "time": 342786,
+        "time": 864000,
         "power": 775233,
         "requirements": {
           "castle": 25,
@@ -6148,7 +6148,7 @@
           "gold": 6545050
         },
         "items": {},
-        "time": 514179,
+        "time": 1036800,
         "power": 932334,
         "requirements": {
           "castle": 26,
@@ -6164,7 +6164,7 @@
           "gold": 8966719
         },
         "items": {},
-        "time": 771269,
+        "time": 1296000,
         "power": 1119707,
         "requirements": {
           "castle": 27,
@@ -6180,7 +6180,7 @@
           "gold": 12284405
         },
         "items": {},
-        "time": 1156904,
+        "time": 1555200,
         "power": 1343061,
         "requirements": {
           "castle": 28,
@@ -6196,7 +6196,7 @@
           "gold": 16829635
         },
         "items": {},
-        "time": 1735356,
+        "time": 1900800,
         "power": 1609088,
         "requirements": {
           "castle": 29,
@@ -6214,7 +6214,7 @@
         "items": {
           "119000001": 1
         },
-        "time": 6941424,
+        "time": 2246400,
         "power": 1925781,
         "requirements": {
           "castle": 30,
@@ -6552,7 +6552,7 @@
           "gold": 522542
         },
         "items": {},
-        "time": 165310,
+        "time": 172800,
         "power": 220306,
         "requirements": {
           "castle": 21,
@@ -6568,7 +6568,7 @@
           "gold": 700206
         },
         "items": {},
-        "time": 198372,
+        "time": 259200,
         "power": 264208,
         "requirements": {
           "castle": 22,
@@ -6584,7 +6584,7 @@
           "gold": 938276
         },
         "items": {},
-        "time": 238046,
+        "time": 345600,
         "power": 316147,
         "requirements": {
           "castle": 23,
@@ -6600,7 +6600,7 @@
           "gold": 1257290
         },
         "items": {},
-        "time": 285655,
+        "time": 432000,
         "power": 377580,
         "requirements": {
           "castle": 24,
@@ -6616,7 +6616,7 @@
           "gold": 1684769
         },
         "items": {},
-        "time": 342786,
+        "time": 604800,
         "power": 450130,
         "requirements": {
           "castle": 25,
@@ -6632,7 +6632,7 @@
           "gold": 2257590
         },
         "items": {},
-        "time": 411343,
+        "time": 777600,
         "power": 535794,
         "requirements": {
           "castle": 26,
@@ -6648,7 +6648,7 @@
           "gold": 3025171
         },
         "items": {},
-        "time": 493612,
+        "time": 1036800,
         "power": 636859,
         "requirements": {
           "castle": 27,
@@ -6664,7 +6664,7 @@
           "gold": 4053729
         },
         "items": {},
-        "time": 592334,
+        "time": 1382400,
         "power": 755971,
         "requirements": {
           "castle": 28,
@@ -6680,7 +6680,7 @@
           "gold": 5431997
         },
         "items": {},
-        "time": 710801,
+        "time": 1814400,
         "power": 896308,
         "requirements": {
           "castle": 29,
@@ -6698,7 +6698,7 @@
         "items": {
           "119000001": 1
         },
-        "time": 852961,
+        "time": 2246400,
         "power": 1061556,
         "requirements": {
           "castle": 30,

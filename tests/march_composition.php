@@ -27,6 +27,11 @@ function composition(int $id): array {
 }
 function request(string $route, array|string|null $payload = null): array {
     global $url, $sessionToken, $csrfToken;
+    // This suite checks composition, not throttling (covered by security_guard).
+    // Keep sequential writes within the actual server's 10-per-10-second budget.
+    static $lastWrite=0.0;
+    if($payload!==null){$wait=1.05-(microtime(true)-$lastWrite);if($wait>0)usleep((int)ceil($wait*1000000));$lastWrite=microtime(true);}
+    if(is_array($payload))$payload+=['operation_key'=>bin2hex(random_bytes(16))];
     $h = curl_init($url . $route);
     curl_setopt_array($h, [CURLOPT_RETURNTRANSFER=>true,CURLOPT_TIMEOUT=>15,
         CURLOPT_COOKIE=>'conquer_session='.$sessionToken,CURLOPT_HTTPHEADER=>['Content-Type: application/json','X-CSRF-Token: '.$csrfToken]]);
@@ -147,11 +152,11 @@ try {
     rejected(fn()=>MarchDispatcher::assertSlotAvailable($player),'four researched slots still enforce the actual limit');
     $db->execute('UPDATE cities SET food=1000000,lumber=1000000,stone=1000000,gold=1000000,last_resource_update=UTC_TIMESTAMP() WHERE id=?',[$player]);
     $trainingCity=$db->query('SELECT * FROM cities WHERE id=?',[$player])->fetch();
-    $trainingBuildings=['barrack'=>['level'=>4],'castle'=>['level'=>6],'academy'=>['level'=>1]];
-    rejected(fn()=>\Conquer\Game\City\TroopTrainer::train($trainingCity,$trainingBuildings,50100201,10),'school 4 cannot bypass the town center 7 requirement');
-    $trainingBuildings['castle']['level']=7;
+    $trainingBuildings=['barrack'=>['level'=>4],'castle'=>['level'=>3],'academy'=>['level'=>1]];
+    rejected(fn()=>\Conquer\Game\City\TroopTrainer::train($trainingCity,$trainingBuildings,50100201,10),'school 4 cannot bypass the town center 4 requirement');
+    $trainingBuildings['castle']['level']=4;
     \Conquer\Game\City\TroopTrainer::train($trainingCity,$trainingBuildings,50100201,10);
-    verify((int)$db->query('SELECT count FROM troop_queue WHERE city_id=? AND troop_code=50100201 AND is_processed=0',[$player])->fetchColumn()===10,'school 4 and town center 7 enable real tier-two training without research');
+    verify((int)$db->query('SELECT count FROM troop_queue WHERE city_id=? AND troop_code=50100201 AND is_processed=0',[$player])->fetchColumn()===10,'school 4 and town center 4 enable real tier-two training without research');
     $r=request('/api/game/state?map_x=50&map_y=50&map_radius=60');
     verify($r['status']===200&&$r['json']['data']['map_center']===['x'=>50,'y'=>50,'radius'=>60],'world snapshot supports an explicit larger map viewport');
     $snapshot=$r['json']['data'];

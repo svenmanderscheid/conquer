@@ -62,15 +62,29 @@ if ($_normalizedPath === '/sitemap.xml' && $method === 'GET') {
         . $lastModified . '</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url></urlset>';
     exit;
 }
-if ($_normalizedPath === '/' && $method === 'GET') {
+if (($_normalizedPath === '/' && $method === 'GET') || $_normalizedPath === '/alpha/waitlist') {
     session_name('conquer_login');
     session_start(['cookie_httponly' => true, 'cookie_samesite' => 'Lax', 'cookie_secure' => !empty($_SERVER['HTTPS'])]);
     $_SESSION['login_csrf'] ??= bin2hex(random_bytes(32));
     $loginError = '';
+    $waitlistError = '';
+    $waitlistSuccess = !empty($_SESSION['alpha_waitlist_success']);
+    unset($_SESSION['alpha_waitlist_success']);
     $landingCspNonce = $_landingCspNonce;
     header('Content-Security-Policy: ' . $_landingCsp);
     // The page embeds a session-bound CSRF token; never let a shared cache reuse it.
     header('Cache-Control: private, no-store');
+    if ($_normalizedPath === '/alpha/waitlist') {
+        header('X-Robots-Tag: noindex, nofollow');
+        if ($method !== 'POST') {
+            http_response_code(405);
+            header('Allow: POST');
+            exit;
+        }
+        $accessMode = 'waitlist';
+        $waitlistSuccess = false;
+        $waitlistError = \Conquer\Auth\AlphaWaitlist::submit();
+    }
     require ROOT_DIR . '/views/welcome.php';
     exit;
 }
@@ -123,6 +137,10 @@ if (str_starts_with($_normalizedPath, '/admin')) {
             => \Conquer\Admin\AdminController::dashboard(),
         $adminUri === '/admin/players'
             => \Conquer\Admin\AdminController::players(),
+        $adminUri === '/admin/alpha-keys'
+            => \Conquer\Admin\AdminController::alphaKeys(),
+        $adminUri === '/admin/alpha-waitlist'
+            => \Conquer\Admin\AdminController::alphaWaitlist(),
         $adminUri === '/admin/rewards'
             => \Conquer\Admin\AdminController::rewards(),
         $adminUri === '/admin/lands'
@@ -135,10 +153,14 @@ if (str_starts_with($_normalizedPath, '/admin')) {
             => \Conquer\Admin\AdminController::alliances(),
         $adminUri === '/admin/world'
             => \Conquer\Admin\AdminController::world(),
+        $adminUri === '/admin/world-create'
+            => \Conquer\Admin\AdminController::worldCreate(),
         $adminUri === '/admin/chat'
             => \Conquer\Admin\AdminController::chat(),
         $adminUri === '/admin/bug-reports'
             => \Conquer\Admin\AdminController::bugReports(),
+        (bool) preg_match('#^/admin/bug-reports/(\d+)/screenshot$#', $adminUri, $m)
+            => \Conquer\Admin\AdminController::bugReportScreenshot((int) $m[1]),
         $adminUri === '/admin/audit'
             => \Conquer\Admin\AdminController::auditLog(),
         str_starts_with($adminUri, '/admin/action')
@@ -260,6 +282,7 @@ if (str_starts_with($path, '/api/')) {
     $router->post('/api/progression/action', [\Conquer\Api\Handlers\ProgressionHandler::class, 'action']);
     $router->post('/api/bug-reports', [\Conquer\Api\Handlers\BugReportHandler::class, 'submit']);
     $router->get('/api/game/state', [\Conquer\Api\Handlers\GameHandler::class, 'state']);
+    $router->post('/api/march/preview', [\Conquer\Api\Handlers\BattlePreviewHandler::class, 'calculate']);
     $router->get('/api/map/search', [\Conquer\Api\Handlers\MapSearchHandler::class, 'search']);
     $router->get('/api/land/state', [\Conquer\Api\Handlers\LandHandler::class, 'state']);
     $router->get('/api/land/:id', [\Conquer\Api\Handlers\LandHandler::class, 'detail']);

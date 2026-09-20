@@ -22,7 +22,8 @@ namespace Conquer\Db {
         public function query(string $sql, array $params = []): object {
             return new class($sql) {
                 public function __construct(private string $sql) {}
-                public function fetchColumn(): int { return 1; }
+                public function fetchColumn(): int|false { return str_contains($this->sql,'FROM cities WHERE player_id=')?false:1; }
+                public function fetchAll(): array { return [['id'=>9,'world_id'=>1]]; }
                 public function fetch(): array {
                     return ['id'=>9, 'is_hidden'=>1, 'wall_hp_current'=>0, 'wall_hp_max'=>5000];
                 }
@@ -50,7 +51,14 @@ namespace Conquer\Game\Map {
         }
     }
 }
-namespace Conquer\Game\City { final class CityState { public const BUILDING_CODES = ['castle', 'wall']; } }
+namespace Conquer\Game\World {
+    final class WorldContext { public static function assertActionAvailable(int $world):void {} }
+    final class WorldService { public static function initializeWorld(int $world):void {} }
+}
+namespace Conquer\Game\City {
+    final class CityState { public const BUILDING_CODES = ['castle', 'wall']; }
+    final class BuildingData { public static function getTotalPower(string $code,int $level):int { return 1; } }
+}
 namespace Conquer\Game\Notification { final class NotificationService { public static function push(int $player, string $kind, array $data): void {} } }
 namespace Conquer { final class Logger { public static function getInstance(): self { return new self; } public function error(string $message): void {} public function info(string $message): void {} } }
 namespace {
@@ -82,7 +90,7 @@ namespace {
     WorldPlacement::$near = [23, 31];
     $db = new Connection;
     OAuth::createDefaultCity($db, 7, 'Fixture');
-    check(array_slice(writes($db)[0][1], 2) === [23, 31], 'creation uses checked search destination after random candidates fail');
+    check(array_slice(writes($db)[0][1], 3, 2) === [23, 31], 'creation uses checked search destination after random candidates fail');
 
     WorldPlacement::$near = null;
     $db = Connection::$instance = new Connection;

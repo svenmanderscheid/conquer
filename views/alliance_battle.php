@@ -8,7 +8,7 @@ declare(strict_types=1);
  */
 ?>
 <!DOCTYPE html>
-<html lang="de">
+<html lang="<?= htmlspecialchars(\Conquer\Game\Locale::current(),ENT_QUOTES) ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -165,8 +165,9 @@ declare(strict_types=1);
         #page-toast.err { border-color: #ef4444; color: #ef4444; }
     </style>
 <link rel="stylesheet" href="<?= htmlspecialchars(APP_BASE, ENT_QUOTES) ?>/assets/css/village-theme.css?v=<?= filemtime(__DIR__ . "/../assets/css/village-theme.css") ?>">
+<?php require ROOT_DIR.'/views/partials/localization-head.php'; ?>
 </head>
-<body x-data="battleApp()" x-init="boot()">
+<body data-i18n-scope x-data="battleApp()" x-init="boot()">
 <?php $hudCurrentView = 'other'; require __DIR__ . '/partials/hud.php'; ?>
 
 <div id="page-wrap">

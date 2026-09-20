@@ -11,7 +11,7 @@ const root=path.resolve(__dirname,'..');
   browser=await chromium.launch({headless:true,executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe'});
   const page=await browser.newPage({viewport:{width:390,height:844},hasTouch:true});page.setDefaultTimeout(15000);page.on('pageerror',e=>errors.push(e.message));
   const base='http://127.0.0.1:'+port;
-  await page.goto(base,{waitUntil:'domcontentloaded',timeout:30000});await page.locator('[data-mode=login]').click();await page.locator('[name=username]').fill('PreviewPlayer');await page.locator('[name=password]').fill('PreviewFixture!2026');
+  await page.goto(base+'/?zugang=login',{waitUntil:'domcontentloaded',timeout:30000});await page.locator('[name=username]').fill('PreviewPlayer');await page.locator('[name=password]').fill('PreviewFixture!2026');
   await Promise.all([page.waitForURL('**/city',{waitUntil:'domcontentloaded',timeout:30000}),page.locator('#auth-submit').click()]);
   await page.goto(base+'/city#defense',{waitUntil:'domcontentloaded',timeout:30000});
   await page.locator('[data-action=defense-tab][data-id=support]').click();

@@ -50,7 +50,7 @@ $outcomeLabel = [
 ];
 ?>
 <!DOCTYPE html>
-<html lang="de">
+<html lang="<?= htmlspecialchars(\Conquer\Game\Locale::current(),ENT_QUOTES) ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -204,8 +204,9 @@ $outcomeLabel = [
         .empty { padding: 3rem; text-align: center; color: var(--c-muted, #8b6f47); font-size: 0.9rem; }
     </style>
 <link rel="stylesheet" href="<?= htmlspecialchars(APP_BASE, ENT_QUOTES) ?>/assets/css/village-theme.css?v=<?= filemtime(__DIR__ . "/../assets/css/village-theme.css") ?>">
+<?php require ROOT_DIR.'/views/partials/localization-head.php'; ?>
 </head>
-<body>
+<body data-i18n-scope>
 <?php $hudCurrentView = 'reports'; require __DIR__ . '/partials/hud.php'; ?>
 <div id="game">
 

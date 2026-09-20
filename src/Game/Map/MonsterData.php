@@ -36,6 +36,7 @@ final class MonsterData
             }
         }
         $definition=$definitions[$code] ?? ['name'=>'Unbekanntes Monster','level'=>1,'type'=>'solo','stats'=>['hp'=>100,'attack'=>50,'defense'=>30],'amount'=>10];
+        $definition=\Conquer\Game\Rewards\MonsterRewardRules::apply($definition);
         $definition['spawn_code']=$code;
         $definition['required_power']=MonsterPower::required($definition);
         return $definition;

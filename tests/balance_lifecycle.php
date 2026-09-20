@@ -32,7 +32,7 @@ try{
  $paid=json_decode($queue['cost_json'],true,32,JSON_THROW_ON_ERROR);$cost=BuildingData::getCost('academy',30);
  checkBalance($paid['resources']===$cost&&$paid['items']==[119000001=>1]&&balanceOwned(119000001)===0,'source resource and item costs are charged and snapshotted');
  foreach($cost as $key=>$amount)checkBalance((int)$before[$key]-(int)balanceStock()[$key]===$amount,'exact debit '.$key);
- checkBalance(strtotime($job['finishes_at'])-strtotime($job['started_at'])===BuildingData::getBuildTime('academy',30),'queue uses source seconds');
+ checkBalance(strtotime($job['finishes_at'])-strtotime($job['started_at'])===BuildingData::getBuildTime('academy',30,\Conquer\Game\Vip\VipService::status(1)['bonuses']),'queue uses source seconds with current VIP bonus');
  rejectBalance(fn()=>balanceStart('academy'),'repeated upgrade cannot charge twice');
  BuildingUpgrader::cancel(1,(int)$queue['id']);
  checkBalance(balanceStock()===$before&&balanceOwned(119000001)===1,'cancellation refunds resources and material exactly');

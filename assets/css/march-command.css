@@ -7,8 +7,6 @@ body.mobile-game #game-dialog.march-dialog .march-toolbar h3 { text-transform:up
 body.mobile-game #game-dialog.march-dialog .march-unit-name strong { font-weight:700; color:#f0f5ff; }
 body.mobile-game #game-dialog.march-dialog .march-unit-name small { color:#a5c5ee; font-weight:600; }
 body.mobile-game #game-dialog.march-dialog .march-portrait { border:2px solid #8db3ee; border-radius:6px; box-shadow:0 0 0 1px #040c17,inset 0 0 0 1px #fff; }
-body.mobile-game #game-dialog.march-dialog [data-type="2"] .march-portrait { border-color:#b49aee; }
-body.mobile-game #game-dialog.march-dialog [data-type="3"] .march-portrait { border-color:#f4cb66; }
 body.mobile-game #game-dialog.march-dialog .march-portrait span { top:0; bottom:auto; right:0; background:#214260; border:0; border-radius:0 0 0 4px; color:#ffeb90; font-weight:900; }
 body.mobile-game #game-dialog.march-dialog .march-range { height:13px; min-height:13px; border:2px solid #48698c; border-radius:4px; background:linear-gradient(to right,#52cfff var(--fill,0%),#09121b var(--fill,0%)); box-shadow:inset 0 3px #b8dcff55,inset 0 -2px #0b4d8180; }
 body.mobile-game #game-dialog.march-dialog .march-range::-webkit-slider-thumb { width:26px; height:27px; border:2px solid #203818; border-radius:7px; background:linear-gradient(#c9f175,#93c837); box-shadow:inset 0 2px #efffb4,0 2px #071017; }
@@ -23,8 +21,6 @@ body.mobile-game #game-dialog.march-dialog .march-target-art img { position:rela
 body.mobile-game #game-dialog.march-dialog .march-rewards h4 { color:#72e7ef; }
 body.mobile-game #game-dialog.march-dialog .march-target>.march-pvp-note { color:#f1c6a3; }
 body.mobile-game #game-dialog.march-dialog .march-selected-card { border:2px solid #8bb5f1; background:#cedde9; box-shadow:0 0 0 2px #080f1b,inset 0 0 0 1px #e1f3ff; border-radius:6px; }
-body.mobile-game #game-dialog.march-dialog .march-selected-card[data-type="2"] { border-color:#b497ed; }
-body.mobile-game #game-dialog.march-dialog .march-selected-card[data-type="3"] { border-color:#edc45f; }
 body.mobile-game #game-dialog.march-dialog .march-card-name { display:none; }
 body.mobile-game #game-dialog.march-dialog .march-forecast { padding:7px 9px; border-radius:4px; background:#101e30; border-left:3px solid #6fbcd1; }
 body.mobile-game #game-dialog.march-dialog .march-forecast.caution { color:#f4cd99; border-left-color:#e4a04a; background:#302b28; }
@@ -153,4 +149,140 @@ body.mobile-game #game-dialog.march-dialog .march-command .march-rally-setting {
  body.mobile-game #game-dialog.march-dialog .march-summary { grid-column:1; grid-row:3; display:grid; grid-template-columns:1fr 1fr; gap:3px; margin:0; padding:0; }
  body.mobile-game #game-dialog.march-dialog .march-summary>div { padding:3px; }
  body.mobile-game #game-dialog.march-dialog .march-forecast { grid-column:1; grid-row:4; margin:0; line-height:1.2; }
+}
+
+/* One continuous, compact roster. Only the list scrolls; the frame and dispatch stay put. */
+body.mobile-game #game-dialog.march-dialog { --game-window-width:min(1380px,calc(100dvw - 32px)); --game-window-height:min(790px,calc(100dvh - 40px)); }
+body.mobile-game #game-dialog.march-dialog .march-command { max-height:none; overflow:hidden; }
+body.mobile-game #game-dialog.march-dialog .march-command .march-layout { min-height:0; overflow:hidden; }
+body.mobile-game #game-dialog.march-dialog .march-command .march-formation { display:flex; flex-direction:column; flex:1 1 0; min-width:0; min-height:0; padding:10px; overflow:hidden; }
+body.mobile-game #game-dialog.march-dialog .march-toolbar { flex:none; align-items:center; gap:8px; margin:0; padding:2px 2px 9px; border-color:var(--ui-line); }
+body.mobile-game #game-dialog.march-dialog .march-toolbar h3 { display:block; font-size:14px; }
+body.mobile-game #game-dialog.march-dialog #march-available { font-size:12px; }
+body.mobile-game #game-dialog.march-dialog .march-command .march-unit-list { display:flex; flex-direction:column; flex:1 1 0; min-height:0; max-height:none; gap:0; overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:var(--ui-line) var(--ui-card); scrollbar-gutter:stable; padding:0 5px 0 0; }
+body.mobile-game #game-dialog.march-dialog .march-command .march-unit-row { grid-template-columns:48px minmax(0,1fr) 110px; grid-template-rows:auto 24px; align-content:center; align-items:center; flex:0 0 auto; min-height:82px; gap:3px 9px; padding:9px 0; border-bottom:1px solid var(--ui-line); box-sizing:border-box; }
+body.mobile-game #game-dialog.march-dialog .march-portrait { width:48px; height:60px; border-radius:7px; }
+body.mobile-game #game-dialog.march-dialog .march-portrait span { background:var(--ui-gold-soft); color:var(--ui-ink); font:700 10px var(--ui-font-number); }
+body.mobile-game #game-dialog.march-dialog .march-unit-name strong { font-size:14px; line-height:1.15; }
+body.mobile-game #game-dialog.march-dialog .march-unit-name small { font-size:13px; line-height:1.2; margin-top:3px; }
+body.mobile-game #game-dialog.march-dialog .march-unit-amount { gap:4px; }
+body.mobile-game #game-dialog.march-dialog .march-unit-amount .number-control { width:70px; height:40px; padding:3px; font:700 15px var(--ui-font-number); box-shadow:none; }
+body.mobile-game #game-dialog.march-dialog .march-row-max { width:36px; min-height:40px; font-size:11px; }
+body.mobile-game #game-dialog.march-dialog .march-range { grid-column:2; grid-row:2; height:12px; min-height:12px; width:100%; margin:4px 0; border:1px solid var(--ui-line); border-radius:6px; box-shadow:none; }
+body.mobile-game #game-dialog.march-dialog .march-range::-webkit-slider-thumb { width:24px; height:28px; border:2px solid var(--ui-green-dark); border-radius:8px; background:var(--ui-green-soft); box-shadow:inset 0 2px var(--ui-card-light),0 2px var(--ui-green-dark); }
+body.mobile-game #game-dialog.march-dialog .march-range::-moz-range-thumb { width:20px; height:24px; border:2px solid var(--ui-green-dark); border-radius:8px; background:var(--ui-green-soft); }
+body.mobile-game #game-dialog.march-dialog .march-command .march-army { display:flex; flex-direction:column; gap:0; min-height:0; padding:12px; overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; }
+body.mobile-game #game-dialog.march-dialog .march-command .march-selected-cards { flex:1 0 auto; min-height:110px; max-height:none; align-content:start; }
+body.mobile-game #game-dialog.march-dialog .march-selected-card { height:clamp(100px,13vw,150px); }
+body.mobile-game #game-dialog.march-dialog .march-command .march-summary { display:grid; grid-template-columns:1fr 1fr; flex:none; gap:8px; margin-top:12px; padding:8px; border-radius:9px; }
+body.mobile-game #game-dialog.march-dialog .march-summary>div { display:flex; flex-direction:column; gap:4px; padding:4px; }
+body.mobile-game #game-dialog.march-dialog .march-summary span { font-size:12px; }
+body.mobile-game #game-dialog.march-dialog .march-summary strong { font-size:16px; }
+body.mobile-game #game-dialog.march-dialog .march-forecast { flex:none; font-size:12px; line-height:1.35; padding:6px 8px; margin:8px 0 0; min-height:0; }
+body.mobile-game #game-dialog.march-dialog .march-command .march-target { min-height:0; overflow:auto; }
+body.mobile-game #game-dialog.march-dialog .march-command .march-footer { flex:none; min-height:60px; padding:8px; gap:6px; }
+body.mobile-game #game-dialog.march-dialog .march-footer .button { min-width:0; min-height:44px; height:auto; padding:8px 12px; font-size:15px; }
+body.mobile-game #game-dialog.march-dialog #march-confirm { flex:1; min-width:0; max-width:none; }
+body.mobile-game #game-dialog.march-dialog .march-command .march-toolbar:has(.march-saved-formation) { flex-direction:row; flex-wrap:nowrap; }
+body.mobile-game #game-dialog.march-dialog .march-saved-formation { display:flex; align-items:center; gap:6px; min-width:0; flex:1; margin:0; font-size:12px; }
+body.mobile-game #game-dialog.march-dialog .march-toolbar:has(.march-saved-formation) #march-available { max-width:80px; font-size:10px; text-align:right; }
+body.mobile-game #game-dialog.march-dialog .march-saved-formation select { flex:1; width:100%; min-width:0; max-width:none; min-height:36px; padding:4px 8px; font:inherit; color:var(--ui-ink); background:var(--ui-card-light); border:1px solid var(--ui-line); border-radius:8px; }
+body.mobile-game #game-dialog.march-dialog .march-unit-list:focus-visible { outline:2px solid var(--ui-primary); outline-offset:-2px; }
+@media(max-width:999px), (max-height:600px) {
+ body.mobile-game #game-dialog.march-dialog .march-command { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(210px,1fr); grid-template-rows:46px minmax(0,1fr) auto; gap:7px; padding:0 8px 8px; box-sizing:border-box; }
+ body.mobile-game #game-dialog.march-dialog .march-command-heading { grid-column:1/-1; min-height:46px; margin:0 -8px; padding-left:12px; gap:8px; }
+ body.mobile-game #game-dialog.march-dialog .march-command-heading h2 { min-width:0; font-size:18px; }
+ body.mobile-game #game-dialog.march-dialog .march-command-heading>span { display:none; }
+ body.mobile-game #game-dialog.march-dialog .march-detail-tabs { display:flex; gap:4px; margin-left:auto; }
+ body.mobile-game #game-dialog.march-dialog .march-detail-tabs button { min-height:36px; padding:4px 12px; font-size:13px; }
+ body.mobile-game #game-dialog.march-dialog .march-command .march-layout { display:contents; }
+ body.mobile-game #game-dialog.march-dialog .march-command .march-formation,
+ body.mobile-game #game-dialog.march-dialog .march-command .march-target { grid-column:1; grid-row:2/4; }
+ body.mobile-game #game-dialog.march-dialog .march-command[data-view="troops"] .march-target,
+ body.mobile-game #game-dialog.march-dialog .march-command[data-view="target"] .march-formation { display:none; }
+ body.mobile-game #game-dialog.march-dialog .march-command .march-army { grid-column:2; grid-row:2; padding:8px; }
+ body.mobile-game #game-dialog.march-dialog .march-command .march-footer { grid-column:2; grid-row:3; flex-wrap:wrap; }
+ body.mobile-game #game-dialog.march-dialog .march-footer .march-presets { flex:1 0 100%; justify-content:space-between; }
+ body.mobile-game #game-dialog.march-dialog .march-capacity { flex-wrap:wrap; gap:3px; }
+ body.mobile-game #game-dialog.march-dialog .march-command .march-selected-cards { min-height:80px; }
+ body.mobile-game #game-dialog.march-dialog .march-selected-card { height:90px; }
+}
+@media(max-width:599px) and (min-height:501px), (max-width:499px) {
+ body.mobile-game #game-dialog.march-dialog { --game-window-width:calc(100dvw - 12px); --game-window-height:calc(100dvh - 20px); }
+ body.mobile-game #game-dialog.march-dialog .march-command { display:flex; flex-direction:column; gap:6px; padding:0 6px 6px; }
+ body.mobile-game #game-dialog.march-dialog .march-command-heading { flex:none; min-height:46px; margin:0 -6px; padding-left:10px; }
+ body.mobile-game #game-dialog.march-dialog .march-command-heading h2 { font-size:16px; }
+ body.mobile-game #game-dialog.march-dialog .march-detail-tabs button { padding:4px 8px; }
+ body.mobile-game #game-dialog.march-dialog .march-command .march-formation,
+ body.mobile-game #game-dialog.march-dialog .march-command .march-target { flex:1 1 0; min-height:100px; padding:7px; }
+ body.mobile-game #game-dialog.march-dialog .march-command .march-army { flex:0 1 auto; max-height:38%; padding:7px; }
+ body.mobile-game #game-dialog.march-dialog .march-army>h3,
+ body.mobile-game #game-dialog.march-dialog .march-command .march-selected-cards { display:none; }
+ body.mobile-game #game-dialog.march-dialog .march-command .march-summary { gap:3px; margin:4px 0 0; padding:3px; }
+ body.mobile-game #game-dialog.march-dialog .march-summary>div { flex-direction:row; justify-content:space-between; align-items:baseline; gap:3px; padding:2px; }
+ body.mobile-game #game-dialog.march-dialog .march-summary span { font-size:10px; }
+ body.mobile-game #game-dialog.march-dialog .march-summary strong { font-size:11px; }
+ body.mobile-game #game-dialog.march-dialog .march-capacity-track { margin:4px 0; }
+ body.mobile-game #game-dialog.march-dialog .march-forecast { font-size:11px; padding:4px 6px; margin-top:5px; }
+ body.mobile-game #game-dialog.march-dialog .march-command .march-footer { padding:5px; min-height:54px; }
+ body.mobile-game #game-dialog.march-dialog .march-footer .march-presets { flex:0 1 auto; gap:4px; }
+ body.mobile-game #game-dialog.march-dialog .march-footer .button { font-size:13px; padding:6px 8px; }
+ body.mobile-game #game-dialog.march-dialog .march-footer:has(.march-saved-formation:not([hidden])) .march-presets { flex-basis:100%; }
+ body.mobile-game #game-dialog.march-dialog .march-toolbar h3 { font-size:12px; }
+ body.mobile-game #game-dialog.march-dialog #march-available { font-size:11px; }
+ body.mobile-game #game-dialog.march-dialog .march-command .march-unit-row { grid-template-columns:40px minmax(0,1fr) 97px; min-height:72px; gap:2px 6px; padding:7px 0; }
+ body.mobile-game #game-dialog.march-dialog .march-portrait { width:40px; height:52px; }
+ body.mobile-game #game-dialog.march-dialog .march-unit-name strong,
+ body.mobile-game #game-dialog.march-dialog .march-unit-name small { font-size:12px; }
+ body.mobile-game #game-dialog.march-dialog .march-unit-amount .number-control { width:61px; font-size:13px; }
+ body.mobile-game #game-dialog.march-dialog .march-row-max { width:32px; }
+}
+@media(max-height:500px) and (min-width:500px) {
+ body.mobile-game #game-dialog.march-dialog { --game-window-width:calc(100dvw - 20px); --game-window-height:calc(100dvh - 20px); }
+ body.mobile-game #game-dialog.march-dialog .march-command { grid-template-columns:minmax(0,1.4fr) minmax(190px,1fr); grid-template-rows:40px minmax(0,1fr) auto; gap:5px; padding:0 6px 6px; }
+ body.mobile-game #game-dialog.march-dialog .march-command-heading { min-height:40px; margin:0 -6px; }
+ body.mobile-game #game-dialog.march-dialog .march-command-heading h2 { font-size:16px; }
+ body.mobile-game #game-dialog.march-dialog .march-command .march-formation { padding:6px; }
+ body.mobile-game #game-dialog.march-dialog .march-toolbar { padding-bottom:5px; }
+ body.mobile-game #game-dialog.march-dialog .march-toolbar h3 { font-size:12px; }
+ body.mobile-game #game-dialog.march-dialog #march-available { font-size:10px; }
+ body.mobile-game #game-dialog.march-dialog .march-command .march-unit-row { grid-template-columns:36px minmax(0,1fr) 97px; min-height:66px; padding:5px 0; gap:2px 6px; }
+ body.mobile-game #game-dialog.march-dialog .march-portrait { width:36px; height:48px; }
+ body.mobile-game #game-dialog.march-dialog .march-unit-name strong,
+ body.mobile-game #game-dialog.march-dialog .march-unit-name small { font-size:12px; }
+ body.mobile-game #game-dialog.march-dialog .march-unit-amount .number-control { width:61px; font-size:13px; }
+ body.mobile-game #game-dialog.march-dialog .march-row-max { width:32px; }
+ body.mobile-game #game-dialog.march-dialog .march-army>h3,
+ body.mobile-game #game-dialog.march-dialog .march-command .march-selected-cards { display:none; }
+ body.mobile-game #game-dialog.march-dialog .march-command .march-summary { margin:4px 0 0; padding:3px; gap:3px; }
+ body.mobile-game #game-dialog.march-dialog .march-summary span { font-size:10px; }
+ body.mobile-game #game-dialog.march-dialog .march-summary strong { font-size:12px; }
+ body.mobile-game #game-dialog.march-dialog .march-summary>div { padding:2px; gap:2px; }
+ body.mobile-game #game-dialog.march-dialog .march-capacity { font-size:11px; }
+ body.mobile-game #game-dialog.march-dialog .march-capacity strong { font-size:12px; }
+ body.mobile-game #game-dialog.march-dialog .march-capacity-track { margin:4px 0; }
+ body.mobile-game #game-dialog.march-dialog .march-forecast { font-size:11px; }
+ body.mobile-game #game-dialog.march-dialog .march-command .march-footer { padding:4px; min-height:0; gap:4px; }
+ body.mobile-game #game-dialog.march-dialog .march-footer .button { font-size:13px; padding:5px 8px; min-height:36px; }
+}
+/* Keep the army overview compact instead of growing portraits with the window. */
+@media(min-width:600px) and (min-height:501px) {
+ body.mobile-game #game-dialog.march-dialog .march-command .march-army { padding:9px; }
+ body.mobile-game #game-dialog.march-dialog .march-command .march-army>h3 { margin:3px 0 6px; padding:0 0 6px; font-size:16px; }
+ body.mobile-game #game-dialog.march-dialog .march-command .march-capacity-track { margin:5px 0 8px; }
+ body.mobile-game #game-dialog.march-dialog .march-command .march-selected-cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(58px,1fr)); align-content:start; gap:6px; flex:0 0 auto; min-height:0; overflow:visible; }
+ body.mobile-game #game-dialog.march-dialog .march-command .march-selected-card { width:100%; min-width:0; max-width:82px; height:76px; }
+ body.mobile-game #game-dialog.march-dialog .march-command .march-selected-card>img { width:100%; height:calc(100% - 20px); object-fit:contain; }
+ body.mobile-game #game-dialog.march-dialog .march-command .march-selected-card>strong { padding:2px 0; font-size:12px; line-height:16px; }
+ body.mobile-game #game-dialog.march-dialog .march-command .march-selected-card .march-card-name { display:none; }
+ body.mobile-game #game-dialog.march-dialog .march-command .march-selected-cards:has(.march-selected-card:nth-child(13)) { grid-template-columns:repeat(auto-fill,minmax(48px,1fr)); gap:4px; }
+ body.mobile-game #game-dialog.march-dialog .march-command .march-selected-cards:has(.march-selected-card:nth-child(13)) .march-selected-card { height:44px; }
+ body.mobile-game #game-dialog.march-dialog .march-command .march-summary { margin:8px 0 0; padding:5px; gap:4px; }
+ body.mobile-game #game-dialog.march-dialog .march-command .march-summary>div { padding:3px 5px; gap:1px; }
+ body.mobile-game #game-dialog.march-dialog .march-command .march-summary span { font-size:11px; }
+ body.mobile-game #game-dialog.march-dialog .march-command .march-summary strong { font-size:14px; }
+ body.mobile-game #game-dialog.march-dialog .march-command .march-forecast { margin-top:6px; padding:4px 6px; font-size:11px; }
+ body.mobile-game #game-dialog.march-dialog .march-command .march-preflight { margin-top:6px; padding-top:5px; font-size:11px; }
+ body.mobile-game #game-dialog.march-dialog .march-command .march-preflight>div { margin-bottom:4px; }
+ body.mobile-game #game-dialog.march-dialog .march-command .march-preflight p { margin:4px 0; font-size:11px; }
 }

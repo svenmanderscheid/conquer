@@ -107,10 +107,10 @@ This project is designed to be co-developed with Claude (Anthropic's AI assistan
 
 ### Running tests
 
-```bash
-# (placeholder — testing setup is Sprint 2)
-php tests/run.php
-```
+The current release checks and outstanding host/device requirements are recorded in
+[the final alpha review](docs/ALPHA_FINAL_REVIEW_2026-09-20.md).
+Use the isolated fixtures listed there; run database suites sequentially because
+game locks are server-wide. Browser checks require Playwright and Chrome.
 
 ## Roadmap
 

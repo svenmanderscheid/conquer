@@ -1,6 +1,6 @@
 # Truppenausbildung
 
-Stand: 13. September 2026.
+Stand: 20. September 2026.
 
 ## Gebäude und Ablauf
 
@@ -37,7 +37,47 @@ Seit dem Import der Gebäudetabellen benötigt der Ausbau eines Ausbildungsgebä
 
 Die zwölf bisherigen Truppenfreischaltungen sind aus dem Militärforschungsbaum entfernt. Ihre Nachfolger hängen direkt an den weiterhin vorhandenen Vorstufen. Militär bietet damit 43 Forschungen; insgesamt bleiben 117 Technologien mit 951 Forschungsstufen. Abgeschlossene alte Forschungen bleiben als historische Einträge gespeichert. Noch offene Truppenfreischaltungen werden beim nächsten Forschungs-/Spielstandabruf einmalig mit voller Rohstofferstattung beendet und geben den Forschungsplatz frei; die archivierten Kosten stehen in `data/retired-troop-research.json`. Andere Forschungen und ihre Boni bleiben bestehen.
 
-Die bestehenden Conquer-Kosten und Ausbildungszeiten bleiben unverändert. Die Wirtschaft von T6–T10 ist eine Conquer-Fortschreibung: Kosten steigen pro Stufe gegenüber T5 um Faktor 1,35, Ausbildungszeiten um 1,30. Die Screenshots enthalten dafür keine vollständige Kostentabelle.
+### Rohstoffkosten ab 20. September 2026
+
+Die neue Conquer-Kostenkurve ersetzt die starken Sprünge bei T2–T5 und die frühere exponentielle Fortschreibung. T1 bleibt unverändert. Die folgenden Kosten gelten je Einheit ohne Forschungsrabatte; Stein wird für die Ausbildung weiterhin nicht benötigt.
+
+| Stufe | Faktor gegenüber T1 | Infanterie: Nahrung / Holz | Bogenschützen: Nahrung / Holz / Gold | Kavallerie: Nahrung / Gold |
+|---|---:|---:|---:|---:|
+| T1 | 1 | 50 / 30 | 40 / 20 / 10 | 60 / 20 |
+| T2 | 1,6 | 80 / 48 | 64 / 32 / 16 | 96 / 32 |
+| T3 | 2,5 | 125 / 75 | 100 / 50 / 25 | 150 / 50 |
+| T4 | 4 | 200 / 120 | 160 / 80 / 40 | 240 / 80 |
+| T5 | 6 | 300 / 180 | 240 / 120 / 60 | 360 / 120 |
+| T6 | 8,5 | 425 / 255 | 340 / 170 / 85 | 510 / 170 |
+| T7 | 11,5 | 575 / 345 | 460 / 230 / 115 | 690 / 230 |
+| T8 | 15 | 750 / 450 | 600 / 300 / 150 | 900 / 300 |
+| T9 | 19 | 950 / 570 | 760 / 380 / 190 | 1.140 / 380 |
+| T10 | 24 | 1.200 / 720 | 960 / 480 / 240 | 1.440 / 480 |
+
+Beispiel: 2.000 T4-Infanteristen kosten 400.000 Nahrung und 240.000 Holz statt 3,6 Mio. Nahrung und 2 Mio. Holz. Die drei Rollen behalten ihre bisherigen Rohstoffprofile. Forschungsrabatte wirken weiterhin auf den Gesamtauftrag; erst dessen Endbetrag wird aufgerundet.
+
+Neue Beförderungen kosten weiterhin 70 % der Zieltruppen-Ausbildung, neue Heilungen den bestehenden tierabhängigen Anteil. Beide nutzen dadurch ebenfalls die günstigeren Grundkosten. Bereits bezahlte Aufträge werden nicht erneut berechnet oder rückwirkend erstattet. Ein Abbruch verwendet weiterhin den gespeicherten tatsächlichen Kostenbeleg. Der Kataloggenerator verwendet feste T1-Ausgangskosten und dieselben Stufenfaktoren; wiederholtes Generieren senkt die Kosten nicht erneut.
+
+### Ausbildungszeiten ab 20. September 2026
+
+Die neue Conquer-Staffel gilt gleichermaßen für Infanterie, Bogenschützen und Kavallerie. Die frühere Kurve (T4: 120 Sekunden, T10: 1.114 Sekunden je Einheit) blockierte schon mittlere Aufträge mehrere Tage. Die neue Kurve hält 2.000 T4 ohne Boni unter acht Stunden und lässt höhere Stufen gleichmäßig ansteigen.
+
+| Stufe | Sekunden je Einheit | 2.000 Einheiten ohne Boni |
+|---|---:|---:|
+| T1 | 3 | 1 Std. 40 Min. |
+| T2 | 5 | 2 Std. 46 Min. 40 Sek. |
+| T3 | 9 | 5 Std. |
+| T4 | 14 | 7 Std. 46 Min. 40 Sek. |
+| T5 | 20 | 11 Std. 6 Min. 40 Sek. |
+| T6 | 27 | 15 Std. |
+| T7 | 35 | 19 Std. 26 Min. 40 Sek. |
+| T8 | 44 | 24 Std. 26 Min. 40 Sek. |
+| T9 | 54 | 30 Std. |
+| T10 | 65 | 36 Std. 6 Min. 40 Sek. |
+
+Anzeige und Server verwenden dieselben Sekunden aus `data/troops.json`: `ceil(Sekunden × Anzahl / Ausbildungstempo)`. Forschungs-, VIP-, Relikt-, aktive Ausbildungs- und zusätzliche Kasernenboni wirken weiterhin. Beförderungen verwenden weiterhin die halbe Ausbildungszeit der Zielstufe. Gebäudegrenzen, Kapazitäten und Kampfwerte ändern sich nicht.
+
+Die Staffel gilt für neu gestartete Ausbildungen und Beförderungen. Bereits gespeicherte Aufträge behalten ihre Endzeit und bereits angewendete Beschleuniger. Es gibt keine nachträgliche Neuberechnung beim Laden oder Neustarten. `tools/update-training-catalog.py` enthält dieselbe neue Staffel, damit ein erneuter Katalogimport die alten Zeiten nicht wiederherstellt.
 
 Angriff, Verteidigung, Lebenspunkte, Stärke und Traglast fließen in die vorhandenen Spielberechnungen ein. **Tödlichkeit ist zunächst ein angezeigter Katalogwert; die bestehende Kampfformel wurde nicht um einen neuen Tödlichkeitsfaktor erweitert.** Das angezeigte Tempo 11 ist vom Feld `march_speed` getrennt: Die etablierte Weltkarten-Geschwindigkeit von T1–T5 bleibt erhalten, T6–T10 führen diese mit acht zusätzlichen Geschwindigkeitspunkten je Stufe fort. Forschung und aktive Boni werden weiterhin serverseitig angewendet. Die veränderten Kampf- und Traglastwerte sind keine vollständige Neubalancierung der Monster und Weltkarte.
 
@@ -57,6 +97,8 @@ Die Figur rendert höchstens 30 Bilder pro Sekunde mit begrenzter Pixeldichte; u
 
 ## Prüfung
 
+- `php tests/training_costs.php`: alle 30 Kostenprofile, tatsächlicher T4-Großauftrag und Rabatt, Ablehnung bei Rohstoffmangel, Beförderung/Heilung sowie Abbruch mit altem Kostenbeleg in einer isolierten Datenbank.
+- `php tests/training_durations.php`: Staffel aller 30 Einheiten, T4-Großauftrag, Anzeige/Server mit Boni, Beförderungsquote, alte Endzeiten, Beschleuniger und einmaliger Abschluss in einer isolierten Datenbank.
 - `php tests/training_unlocks.php`: alle 30 Stufen an beiden Gebäudegrenzen, echte Ausbildung ohne Forschung, Beförderung ab Stufe 13, Gebäudeausbau und einmalige Erstattung alter Forschungsaufträge.
 - `php tests/training_buildings.php`: drei parallele Queues, Freischaltungen, T10-Werte, ungültige Plätze/T11, wiederholte Aufträge, genau eine Gutschrift, Beschleuniger, Beförderung und Abbrucherstattung in einer isolierten Datenbank.
 - `php tests/research_effects.php`, `php tests/research_combat.php`, `php tests/defense_lifecycle.php`: Forschungswirkung, Kampfwerte, Beförderung und bestehende Welt-/Verteidigungsabläufe mit dem erweiterten Katalog.

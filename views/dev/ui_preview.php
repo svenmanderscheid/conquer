@@ -18,7 +18,7 @@ if (file_exists(ROOT_DIR . '/config/app.php')) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="de">
+<html lang="<?= htmlspecialchars(\Conquer\Game\Locale::current(),ENT_QUOTES) ?>">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -44,8 +44,9 @@ body { padding: 32px; max-width: 1100px; margin: 0 auto; }
 code { background: var(--c-stone); padding: 2px 6px; border-radius: 4px; font-size: 0.78rem; color: var(--c-wood-dark); }
 </style>
 <link rel="stylesheet" href="<?= htmlspecialchars(APP_BASE, ENT_QUOTES) ?>/assets/css/village-theme.css?v=<?= filemtime(__DIR__ . "/../../assets/css/village-theme.css") ?>">
+<?php require ROOT_DIR.'/views/partials/localization-head.php'; ?>
 </head>
-<body x-data="{
+<body data-i18n-scope x-data="{
     modal1: false,
     modal2: false,
     toast: false,

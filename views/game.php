@@ -5,7 +5,7 @@ $base = htmlspecialchars(APP_BASE, ENT_QUOTES);
 $trainingImportMap = \Conquer\Game\City\City3dImportMap::build(ROOT_DIR, APP_BASE);
 ?>
 <!doctype html>
-<html lang="de">
+<html lang="<?= htmlspecialchars(\Conquer\Game\Locale::current(), ENT_QUOTES) ?>">
 <head>
   <meta charset="utf-8">
   <script type="importmap"><?= \Conquer\Game\City\City3dImportMap::json(['imports' => $trainingImportMap['imports']]) ?></script>
@@ -37,7 +37,7 @@ $trainingImportMap = \Conquer\Game\City\City3dImportMap::build(ROOT_DIR, APP_BAS
   <link rel="stylesheet" href="<?= $base ?>/assets/css/inventory-reference.css?v=<?= filemtime(__DIR__ . '/../assets/css/inventory-reference.css') ?>">
   <link rel="stylesheet" href="<?= $base ?>/assets/css/world-zones.css?v=<?= filemtime(__DIR__ . '/../assets/css/world-zones.css') ?>">
   <link rel="stylesheet" href="<?= $base ?>/assets/css/world-shrines.css?v=<?= filemtime(__DIR__ . '/../assets/css/world-shrines.css') ?>">
-<link rel="stylesheet" href="<?= $base ?>/assets/css/mailbox-panel.css?v=<?= filemtime(ROOT_DIR.'/assets/css/mailbox-panel.css') ?>"><link rel="stylesheet" href="<?= $base ?>/assets/css/community-panel.css?v=features1"><link rel="stylesheet" href="<?= $base ?>/assets/css/defense-panel.css?v=features1"><link rel="stylesheet" href="<?= $base ?>/assets/css/progression-panel.css?v=features1"><link rel="stylesheet" href="<?= $base ?>/assets/css/lord-talents.css?v=<?= filemtime(ROOT_DIR.'/assets/css/lord-talents.css') ?>"><link rel="manifest" href="<?= htmlspecialchars(APP_BASE,ENT_QUOTES) ?>/manifest.php"><link rel="apple-touch-icon" href="<?= htmlspecialchars(APP_BASE,ENT_QUOTES) ?>/assets/icons/conquer-192.png"><link rel="stylesheet" href="<?= htmlspecialchars(APP_BASE,ENT_QUOTES) ?>/assets/css/localization.css?v=1"><script><?= \Conquer\Game\Locale::bootstrap() ?></script><script src="<?= htmlspecialchars(APP_BASE,ENT_QUOTES) ?>/assets/js/localization.js?v=1" defer></script>
+<link rel="stylesheet" href="<?= $base ?>/assets/css/mailbox-panel.css?v=<?= filemtime(ROOT_DIR.'/assets/css/mailbox-panel.css') ?>"><link rel="stylesheet" href="<?= $base ?>/assets/css/community-panel.css?v=features1"><link rel="stylesheet" href="<?= $base ?>/assets/css/defense-panel.css?v=features1"><link rel="stylesheet" href="<?= $base ?>/assets/css/progression-panel.css?v=features1"><link rel="stylesheet" href="<?= $base ?>/assets/css/lord-talents.css?v=<?= filemtime(ROOT_DIR.'/assets/css/lord-talents.css') ?>"><link rel="manifest" href="<?= htmlspecialchars(APP_BASE,ENT_QUOTES) ?>/manifest.php"><link rel="apple-touch-icon" href="<?= htmlspecialchars(APP_BASE,ENT_QUOTES) ?>/assets/icons/conquer-192.png"><link rel="stylesheet" href="<?= htmlspecialchars(APP_BASE,ENT_QUOTES) ?>/assets/css/localization.css?v=<?= filemtime(ROOT_DIR.'/assets/css/localization.css') ?>"><script><?= \Conquer\Game\Locale::bootstrap() ?></script><script src="<?= htmlspecialchars(APP_BASE,ENT_QUOTES) ?>/assets/js/localization.js?v=<?= filemtime(ROOT_DIR.'/assets/js/localization.js') ?>" defer></script>
   <link rel="stylesheet" href="<?= $base ?>/assets/css/world-chat.css?v=<?= filemtime(__DIR__ . '/../assets/css/world-chat.css') ?>">
   <link rel="stylesheet" href="<?= $base ?>/assets/css/trading-panel.css?v=<?= filemtime(__DIR__ . '/../assets/css/trading-panel.css') ?>">
   <link rel="stylesheet" href="<?= $base ?>/assets/css/treasure-panel.css?v=<?= filemtime(__DIR__ . '/../assets/css/treasure-panel.css') ?>">
@@ -53,6 +53,7 @@ $trainingImportMap = \Conquer\Game\City\City3dImportMap::build(ROOT_DIR, APP_BAS
   <link rel="stylesheet" href="<?= $base ?>/assets/css/land-panel.css?v=<?= filemtime(__DIR__ . '/../assets/css/land-panel.css') ?>">
   <link rel="stylesheet" href="<?= $base ?>/assets/css/hospital-panel.css?v=<?= filemtime(__DIR__ . '/../assets/css/hospital-panel.css') ?>">
   <link rel="stylesheet" href="<?= $base ?>/assets/css/combat-report.css?v=<?= filemtime(__DIR__ . '/../assets/css/combat-report.css') ?>">
+  <link rel="stylesheet" href="<?= $base ?>/assets/css/scout-report.css?v=<?= filemtime(__DIR__ . '/../assets/css/scout-report.css') ?>">
   <link rel="stylesheet" href="<?= $base ?>/assets/css/village-theme.css?v=<?= filemtime(__DIR__ . '/../assets/css/village-theme.css') ?>">
 </head>
 <body class="mobile-game">
@@ -85,24 +86,25 @@ $trainingImportMap = \Conquer\Game\City\City3dImportMap::build(ROOT_DIR, APP_BAS
   <small class="scene-transition-label"></small>
 </div>
 <nav id="hud-left-tools" class="hud-edge-tools hud-left-tools" aria-label="Dorf und Truppen">
-  <button id="hud-healing" class="hud-edge-button hud-job hud-healing" data-job-state="loading" data-action="army-hospital" aria-label="Hospital wird geladen" hidden><span class="hud-edge-art"><img src="<?= $base ?>/assets/art/items/healing.svg" alt=""></span><span class="hud-job-copy"><span class="hud-edge-label">Heilung</span><small class="hud-job-state">Lädt …</small><strong class="hud-job-time">Bitte warten</strong></span><span class="hud-job-track" aria-hidden="true"><span class="hud-job-progress"></span></span></button>
+  <button id="hud-healing" class="hud-edge-button hud-job hud-healing" data-job-state="loading" data-action="army-hospital" aria-label="Hospital wird geladen" hidden><span class="hud-edge-art"><img src="<?= $base ?>/assets/art/items/healing.svg" alt=""><span class="hud-heal-now" aria-hidden="true">✚</span></span><span class="hud-job-copy"><span class="hud-edge-label">Heilung</span><small class="hud-job-state">Lädt …</small><strong class="hud-job-time">Bitte warten</strong></span><span class="hud-job-track" aria-hidden="true"><span class="hud-job-progress"></span></span></button>
   <button id="hud-build" class="hud-edge-button hud-job" data-job-state="loading" data-city-only data-action="buildings" aria-label="Erste Bauschleife öffnen"><span class="hud-edge-art"><img src="<?= $base ?>/assets/art/items/hammer.svg" alt=""></span><span class="hud-job-copy"><span class="hud-edge-label">Bauen I</span><small id="hud-build-status" class="hud-job-state">Lädt …</small><strong class="hud-job-time">Bitte warten</strong></span><span class="hud-job-track" aria-hidden="true"><span class="hud-job-progress"></span></span></button>
   <button id="hud-build-second" class="hud-edge-button hud-job hud-build-second is-locked" data-job-state="loading" data-city-only data-action="vip-open" aria-label="Zweite Bauschleife wird mit VIP 4 freigeschaltet"><span class="hud-edge-art"><img src="<?= $base ?>/assets/art/items/hammer.svg" alt=""></span><span class="hud-job-copy"><span class="hud-edge-label">Bauen II</span><small id="hud-build-second-status" class="hud-job-state">Lädt …</small><strong class="hud-job-time">Bitte warten</strong></span><span class="hud-job-track" aria-hidden="true"><span class="hud-job-progress"></span></span></button>
   <button id="hud-research" class="hud-edge-button hud-job" data-job-state="loading" data-city-only data-action="tab" data-id="research" aria-label="Forschung öffnen"><span class="hud-edge-art"><img src="<?= $base ?>/assets/art/items/research.svg" alt=""></span><span class="hud-job-copy"><span class="hud-edge-label">Forschung</span><small id="hud-research-status" class="hud-job-state">Lädt …</small><strong class="hud-job-time">Bitte warten</strong></span><span class="hud-job-track" aria-hidden="true"><span class="hud-job-progress"></span></span></button>
   <button id="hud-marches" class="hud-edge-button" data-world-only data-action="hud-marches" aria-label="Truppenmärsche öffnen"><span class="hud-edge-art"><img src="<?= $base ?>/assets/art/items/army.svg" alt=""></span><span class="hud-edge-label">Truppen</span><small id="hud-march-status" class="hud-edge-status">0 unterwegs</small></button>
 </nav>
-<nav class="hud-edge-tools hud-right-tools" aria-label="Ereignisse">
+<nav class="hud-edge-tools hud-right-tools" aria-label="Spielmenü und Ereignisse">
+  <button id="hud-report" class="hud-edge-button hud-report-button" data-action="bug-report-open" aria-label="Bug oder Idee melden" aria-haspopup="dialog"><span class="hud-edge-art" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 8h12v7a6 6 0 0 1-12 0V8Zm3 0V5h6v3M2 11h4m12 0h4M2 17h4m12 0h4M7 4 5 2m12 2 2-2m-7 8v10"/></svg></span><span class="hud-edge-label">Melden</span></button>
+  <button id="hud-menu" class="hud-edge-button" data-action="menu-more" aria-label="Spielmenü öffnen" aria-haspopup="dialog"><span class="hud-edge-art"><img src="<?= $base ?>/assets/art/hud/menu.svg" alt=""></span><span class="hud-edge-label">Menü</span></button>
   <button class="hud-edge-button" data-action="tab" data-id="events" aria-label="Weltereignisse öffnen"><span class="hud-edge-art"><img src="<?= $base ?>/assets/art/hud/expeditions.svg" alt=""></span><span class="hud-edge-label">Events</span></button>
 </nav>
-<button id="hud-menu" class="hud-main-button hud-menu" data-action="menu-more" aria-label="Spielmenü öffnen" aria-haspopup="dialog"><img src="<?= $base ?>/assets/art/hud/menu.svg" alt=""><span>Menü</span></button>
 <aside id="world-chat" class="world-chat" aria-label="Welt- und Allianzchat" hidden></aside>
 <nav id="navigation" class="game-dock" aria-label="Spielbereiche"></nav>
 <span class="save-state" id="save-state" role="status">Verbinde mit deinem Königreich …</span>
 <dialog id="panel-dialog" class="game-panel" aria-labelledby="page-title">
-  <div class="page-heading"><span class="panel-emblem" id="panel-emblem" aria-hidden="true"></span><h1 id="page-title" tabindex="-1">Dein Königreich</h1><button type="button" id="inventory-overview-button" aria-label="Übersicht: Rohstoffe und Beschleuniger" title="Inventarübersicht" aria-haspopup="dialog" aria-controls="game-dialog"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 27V19m7 8V15m7 12V20m7 7V10M5 13l8-7 7 6L28 3m-7 0h7v7"/></svg></button><button class="panel-back panel-close" data-action="return-playfield" aria-label="Bereich schließen">×</button></div>
+  <div class="page-heading"><span class="panel-emblem" id="panel-emblem" aria-hidden="true"></span><h1 id="page-title" tabindex="-1">Dein Königreich</h1><button type="button" class="panel-report-button" data-action="bug-report-open" aria-label="Bug oder Idee in diesem Bereich melden" title="Bug oder Idee melden"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12v7a6 6 0 0 1-12 0V8Zm3 0V5h6v3M2 11h4m12 0h4M2 17h4m12 0h4M7 4 5 2m12 2 2-2m-7 8v10"/></svg></button><button type="button" id="inventory-overview-button" aria-label="Übersicht: Rohstoffe und Beschleuniger" title="Inventarübersicht" aria-haspopup="dialog" aria-controls="game-dialog"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 27V19m7 8V15m7 12V20m7 7V10M5 13l8-7 7 6L28 3m-7 0h7v7"/></svg></button><button class="panel-back panel-close" data-action="return-playfield" aria-label="Bereich schließen">×</button></div>
   <section id="panel-content" class="panel-content" aria-label="Spielbereich"></section>
 </dialog>
-<dialog id="game-dialog" aria-label="Spielfenster"><button class="dialog-close" aria-label="Fenster schließen">×</button><div id="dialog-content"></div></dialog>
+<dialog id="game-dialog" aria-label="Spielfenster"><button type="button" class="dialog-report-button" data-action="bug-report-open" aria-label="Bug oder Idee in diesem Fenster melden" title="Bug oder Idee melden"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12v7a6 6 0 0 1-12 0V8Zm3 0V5h6v3M2 11h4m12 0h4M2 17h4m12 0h4M7 4 5 2m12 2 2-2m-7 8v10"/></svg></button><button class="dialog-close" aria-label="Fenster schließen">×</button><div id="dialog-content"></div></dialog>
 <div id="toast" role="status" aria-live="polite"></div>
 <script>window.CONQUER_ITEM_ART_VERSION = <?= max(filemtime(__DIR__ . '/../data/items.json'), ...array_map('filemtime', array_merge(glob(__DIR__ . '/../assets/art/items/*.svg'), glob(__DIR__ . '/../assets/art/items/backpack/*.svg'), glob(__DIR__ . '/../assets/art/items/reference/*.png')))) ?>;window.CONQUER_WORLD = <?= \Conquer\Game\World\WorldContext::id() ?>;window.CONQUER_BASE = <?= json_encode(APP_BASE, JSON_HEX_TAG | JSON_HEX_AMP) ?>;</script>
 <script src="<?= $base ?>/assets/js/browser-compat.js?v=<?= filemtime(__DIR__ . '/../assets/js/browser-compat.js') ?>" defer></script>
@@ -123,6 +125,7 @@ $trainingImportMap = \Conquer\Game\City\City3dImportMap::build(ROOT_DIR, APP_BAS
 <script src="<?= $base ?>/assets/js/mvp-panels.js?v=<?= filemtime(__DIR__ . '/../assets/js/mvp-panels.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/inventory-overview.js?v=<?= filemtime(__DIR__ . '/../assets/js/inventory-overview.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/research-tree.js?v=<?= filemtime(__DIR__ . '/../assets/js/research-tree.js') ?>" defer></script>
+<script src="<?= $base ?>/assets/js/battle-preview.js?v=<?= filemtime(__DIR__ . '/../assets/js/battle-preview.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/march-panel.js?v=<?= filemtime(__DIR__ . '/../assets/js/march-panel.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/report-share.js?v=<?= filemtime(__DIR__ . '/../assets/js/report-share.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/monster-report.js?v=<?= filemtime(__DIR__ . '/../assets/js/monster-report.js') ?>" defer></script>
@@ -130,6 +133,7 @@ $trainingImportMap = \Conquer\Game\City\City3dImportMap::build(ROOT_DIR, APP_BAS
 <script src="<?= $base ?>/assets/js/village-menu.js?v=<?= filemtime(__DIR__ . '/../assets/js/village-menu.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/congress-panel.js?v=shrines1" defer></script>
 <script src="<?= $base ?>/assets/js/mailbox-panel.js?v=<?= filemtime(ROOT_DIR.'/assets/js/mailbox-panel.js') ?>" defer></script>
+<script src="<?= $base ?>/assets/js/scout-report.js?v=<?= filemtime(ROOT_DIR.'/assets/js/scout-report.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/community-panel.js?v=<?= filemtime(ROOT_DIR.'/assets/js/community-panel.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/defense-panel.js?v=features1" defer></script>
 <script src="<?= $base ?>/assets/js/lord-talents.js?v=<?= filemtime(ROOT_DIR.'/assets/js/lord-talents.js') ?>" defer></script>
@@ -149,6 +153,9 @@ $trainingImportMap = \Conquer\Game\City\City3dImportMap::build(ROOT_DIR, APP_BAS
 <script src="<?= $base ?>/assets/js/beginner-guide.js?v=<?= filemtime(__DIR__ . '/../assets/js/beginner-guide.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/bug-reports.js?v=<?= filemtime(__DIR__ . '/../assets/js/bug-reports.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/command-receipts.js?v=<?= filemtime(ROOT_DIR.'/assets/js/command-receipts.js') ?>" defer></script>
+<script src="<?= $base ?>/assets/js/app-polling.js?v=<?= filemtime(__DIR__ . '/../assets/js/app-polling.js') ?>" defer></script>
+<script src="<?= $base ?>/assets/js/game-comfort.js?v=<?= filemtime(__DIR__ . '/../assets/js/game-comfort.js') ?>" defer></script>
+<script src="<?= $base ?>/assets/js/game-audio.js?v=<?= filemtime(__DIR__ . '/../assets/js/game-audio.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/game.js?v=<?= filemtime(__DIR__ . '/../assets/js/game.js') ?>" defer></script>
 </body>
 </html>

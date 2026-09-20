@@ -12,7 +12,7 @@ const root=path.resolve(__dirname,'..');
   const page=await browser.newPage({viewport:{width:390,height:844},hasTouch:true});page.setDefaultTimeout(10000);
   await page.addInitScript(()=>window.__nativeRandomUuid=crypto.randomUUID);
   page.on('pageerror',e=>errors.push(e.message));const base='http://conquer-http.test:'+port;
-  await page.goto(base);await page.locator('[data-mode=login]').click();await page.locator('[name=username]').fill('PreviewPlayer');await page.locator('[name=password]').fill('PreviewFixture!2026');
+  await page.goto(base+'/?zugang=login');await page.locator('[name=username]').fill('PreviewPlayer');await page.locator('[name=password]').fill('PreviewFixture!2026');
   await Promise.all([page.waitForURL('**/city'),page.locator('#auth-submit').click()]);
   await page.goto(base+'/city#army');await page.locator('.training-school').waitFor();
   assert.equal(await page.locator('#train-count').inputValue(),await page.locator('#train-count').getAttribute('max'),'Training starts with the maximum affordable amount');

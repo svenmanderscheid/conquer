@@ -13,11 +13,16 @@ window.ConquerCombatReport = function ({base, esc, fmt, openDialog, toast, unitN
     const button = (label, action, extra='', classes='') => `<button type="button" class="cr-button ${classes}" data-combat="${action}" ${extra}>${label}</button>`;
     const section = (title, body, extra='') => `<section class="cr-section"><h3>${title}${extra}</h3>${body}</section>`;
     const fold = (title, body, key) => `<details class="cr-section cr-fold" data-cr-fold="${key}"><summary>${title}<span class="cr-chevron" aria-hidden="true">⌄</span></summary>${body}</details>`;
+    const luck = value => {
+        if(value==null||!Number.isFinite(Number(value)))return '';
+        const amount=Math.max(-10,Math.min(10,Number(value))),position=(amount+10)*5;
+        return `<div class="cr-luck" role="img" aria-label="Kampfglück ${percent(amount)}"><div class="cr-luck-heading"><strong>Glück</strong><span class="${amount>0?'cr-positive':amount<0?'cr-negative':''}">${percent(amount)}</span></div><div class="cr-luck-track"><span class="cr-luck-zero" aria-hidden="true"></span><span class="cr-luck-marker" style="left:${position}%" aria-hidden="true"></span></div><div class="cr-luck-scale" aria-hidden="true"><span>−10 %</span><span>0 %</span><span>+10 %</span></div></div>`;
+    };
     const avatar = army => `<img class="cr-avatar" src="${base}/assets/art/${['knight','archer','rider'].includes(army.avatar)?army.avatar:'knight'}.png" alt="">`;
     const troopArt = troop => {
         const tier=Number(troop.tier),prefix={infantry:'infantry',ranged:'archer',cavalry:'cavalry'}[troop.type];
-        if(prefix&&tier>=1&&tier<=10)return `characters/${prefix}-t${tier}-report-v${prefix==='infantry'&&tier===10?2:1}`;
-        return types[troop.type]?.[1]||'knight';
+        if(prefix&&tier>=1&&tier<=10)return `characters/tier-colors-v1/${prefix}-t${tier}-report.webp`;
+        return (types[troop.type]?.[1]||'knight')+'.png';
     };
     const troopName = troop => unitName({...getState().troop_defs.find(t=>Number(t.code)===Number(troop.code)),...troop,type:{infantry:1,ranged:2,cavalry:3}[troop.type]||troop.type});
     const coord = army => Number.isFinite(army.x)&&Number.isFinite(army.y)?`X:${army.x} Y:${army.y}`:'Koordinaten nicht gespeichert';
@@ -83,7 +88,7 @@ window.ConquerCombatReport = function ({base, esc, fmt, openDialog, toast, unitN
         const when=new Date(String(report.created_at).replace(' ','T')+'Z'),near=neighbors();
         openDialog(`<h2>Spieler-Kampfbericht</h2><div class="combat-report">
             <div class="cr-scroll"><div class="cr-banner"><div><small>${report.details.battle_kind==='rally'?'Gemeinsamer Angriff':'Stadtgefecht'} · #${Number(report.id)}</small><strong>X:${Number(report.target_x)} Y:${Number(report.target_y)}</strong></div><time>${Number.isNaN(when.getTime())?esc(report.created_at):when.toLocaleString('de-DE')}</time></div>
-            ${combat.legacy?'<p class="cr-notice">Älterer Bericht: Gegneraufstellung und damalige Boni wurden noch nicht gespeichert.</p>':''}
+            ${luck(combat.luck_percent)}${combat.legacy?'<p class="cr-notice">Älterer Bericht: Gegneraufstellung und damalige Boni wurden noch nicht gespeichert.</p>':''}
             ${section('Kampfübersicht',overview())}${section(report.details.perspective==='defender'?'Verlorene Ressourcen':'Deine Beute',loot())}
             ${section('Truppenvergleich',`<div data-cr-power>${power()}</div>`,button('⇄','metric','aria-label="Zwischen Kampfstärke und Truppenzahl wechseln"'))}
             ${fold('Reliktvergleich',equipment(),'equipment')}${fold('Hunter-Talente',talents(),'talents')}${fold('Werteboni',bonuses(),'bonuses')}</div>
@@ -92,7 +97,7 @@ window.ConquerCombatReport = function ({base, esc, fmt, openDialog, toast, unitN
     }
     function armyDetails(army,role,index) {
         return `<details class="cr-army" ${index===0?'open':''}><summary>${avatar(army)}<span><strong>${esc(army.name)}</strong><small>${number(army.totals.sent)} Truppen · ${number(army.totals.power_lost)} Truppenmacht verloren</small></span><b class="cr-chevron" aria-hidden="true">⌄</b></summary>
-            <div class="cr-troop-list">${army.troops.length?army.troops.map(t=>`<article class="cr-troop"><div class="cr-troop-name"><img src="${base}/assets/art/${troopArt(t)}.png" alt=""><span><strong>${esc(troopName(t))}</strong><small>Tier ${number(t.tier)} · ${number(t.sent)} Truppen</small></span></div><dl>${[['dead','Gefallen'],['injured','Verwundet'],['survived','Einsatzfähig']].map(([key,label])=>`<div><dt>${label}</dt><dd class="${key==='survived'?'':'cr-negative'}">${number(t[key])}</dd></div>`).join('')}</dl></article>`).join(''):'<p class="cr-note">Keine Truppenaufstellung vorhanden.</p>'}</div></details>`;
+            <div class="cr-troop-list">${army.troops.length?army.troops.map(t=>`<article class="cr-troop"><div class="cr-troop-name"><img class="troop-tier-frame" data-troop-tier="${Number(t.tier)||0}" src="${base}/assets/art/${troopArt(t)}" alt=""><span><strong>${esc(troopName(t))}</strong><small>Tier ${number(t.tier)} · ${number(t.sent)} Truppen</small></span></div><dl>${[['dead','Gefallen'],['injured','Verwundet'],['survived','Einsatzfähig']].map(([key,label])=>`<div><dt>${label}</dt><dd class="${key==='survived'?'':'cr-negative'}">${number(t[key])}</dd></div>`).join('')}</dl></article>`).join(''):'<p class="cr-note">Keine Truppenaufstellung vorhanden.</p>'}</div></details>`;
     }
     function showDetails() {
         detail.innerHTML=`<header class="cr-detail-heading"><h2 id="combat-detail-title" tabindex="-1">Kampfdetails</h2>${button('×','close-details','aria-label="Kampfdetails schließen"')}</header><div class="cr-detail-scroll">

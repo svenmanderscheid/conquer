@@ -69,7 +69,7 @@ window.ConquerBeginnerGuide = function(ctx) {
         return `<div class="guide-reading"><span>${new Set(saved.read).size} von ${chapters.length} Kapiteln gelesen</span><span>Lesestand auf diesem Gerät</span></div>
             <div class="guide-chapters" role="group" aria-label="Kapitel auswählen">${chapters.map((c,i)=>`<button type="button" class="guide-chapter" data-action="guide-chapter" data-id="${i}" aria-pressed="${i===chapter}" aria-label="Kapitel ${i+1}: ${esc(c.title)}${saved.read.includes(i)?', gelesen':''}">${i+1}${saved.read.includes(i)?' ✓':''}</button>`).join('')}</div>
             <article class="guide-lesson"><div class="guide-lesson-heading"><img src="${base}/assets/art/${c.art}.svg" alt=""><div><p class="guide-eyebrow">Kapitel ${chapter+1} von ${chapters.length}</p><h2 tabindex="-1" id="guide-heading">${c.title}</h2></div></div><p class="guide-intro">${c.intro}</p><ul>${c.points.map(p=>`<li>${p}</li>`).join('')}</ul><p class="guide-tip">${c.tip}</p>${button(...c.action,true)}</article>
-            <div class="guide-lesson-footer">${chapter>0?button('Zurück','guide-chapter',chapter-1):'<span></span>'}${button(chapter===chapters.length-1?(read?'Zu meinen Zielen':'Gelesen · zu den Zielen'):(read?'Weiter':'Gelesen · weiter'),'guide-next','',true)}</div>`;
+            <div class="guide-lesson-footer">${chapter>0?button('Zurück','guide-chapter',chapter-1):'<span></span>'}${button(chapter===chapters.length-1?(read?'Zu meinen Zielen':'Gelesen · zu den Zielen'):(read?'Weiter':'Gelesen · weiter'),'guide-next','',true)}</div><p>${button('Zielhinweis wieder einblenden','show-goal-hint')}</p>`;
     }
     function buildingList() {
         return `<h2 tabindex="-1" id="guide-heading">Deine ${buildings.length} Gebäude</h2><p>Wofür sie da sind, wann sie helfen und wo es weitergeht. Die Stufen entsprechen deinem aktuellen Spielstand.</p><div class="guide-filters" role="group" aria-label="Gebäude filtern">${Object.entries(groups).map(([id,name])=>`<button type="button" class="guide-button" data-action="guide-filter" data-id="${id}" aria-pressed="${group===id}">${name}</button>`).join('')}</div><div class="guide-building-list">${buildings.filter(b=>group==='all'||b[1]===group).map(([code,category,purpose,tip,target,label])=>`<article class="guide-building" data-guide-building="${code}"><div class="guide-building-heading"><img src="${esc(buildingImage(code))}" alt="" loading="lazy"><div><small>${groups[category]}</small><h3>${esc(labels[code])}</h3></div><span class="guide-level" data-guide-level="${code}"></span></div><p>${purpose}</p><p class="guide-building-tip">${tip}</p><div class="guide-actions">${button('Ausbau ansehen','guide-building',code)}${target?button(label+' öffnen',target==='function'?'guide-function':'guide-nav',target==='function'?code:target):''}</div></article>`).join('')}</div>`;
@@ -112,7 +112,7 @@ window.ConquerBeginnerGuide = function(ctx) {
         if(!act.startsWith('guide-'))return false;
         load();const id=b.dataset.id;
         if(act==='guide-open'){section='start';navigate('help');}
-        if(act==='guide-tab'&&Object.hasOwn(tabs,id)){section=id;redraw(`[data-action="guide-tab"][data-id="${id}"]`);}
+        if(act==='guide-tab'&&Object.hasOwn(tabs,id)){section=id;if(!host().querySelector('.beginner-guide'))navigate('help');redraw(`[data-action="guide-tab"][data-id="${id}"]`);}
         if(act==='guide-filter'&&Object.hasOwn(groups,id)){group=id;redraw(`[data-action="guide-filter"][data-id="${id}"]`);}
         if(act==='guide-chapter'&&/^\d+$/.test(id)&&Number(id)<chapters.length){chapter=Number(id);saved.chapter=chapter;save();redraw();}
         if(act==='guide-next'){
@@ -131,5 +131,5 @@ window.ConquerBeginnerGuide = function(ctx) {
         welcomed=true;saved.welcomed=true;save();
         openDialog(`<h2>Willkommen in deinem Königreich!</h2><div class="guide-welcome"><img src="${base}/assets/art/map/castle.svg" alt=""><p>Aus einem kleinen Dorf wird dein eigenes Reich. Lerne die Gebäude kennen, sichere deinen Nachschub und finde dein erstes Ziel.</p><p>Sechs kurze Kapitel begleiten deinen Start. Du kannst jederzeit unterbrechen und den Anfangsguide im Hauptmenü wieder öffnen.</p><div class="guide-actions">${button('Guide starten','guide-open','',true)}${button('Später entdecken','close-dialog')}</div></div>`,{focusHeading:true});
     }
-    return {render,onClick,maybeWelcome};
+    return {render,onClick,maybeWelcome,nextGoal:()=>goals().find(g=>g.value!==null&&g.value<g.target),openNextGoal(){const goal=goals().find(g=>g.value!==null&&g.value<g.target);if(goal)onClick(goal.action[1],{dataset:{id:goal.action[2]}});}};
 };

@@ -95,7 +95,7 @@ try {
     ob_start();
     \Conquer\Admin\AdminController::rewards();
     $html = ob_get_clean();
-    previewCheck(str_contains($html, 'Erwartete Beute') && str_contains($html, 'Regelverlauf') && str_contains($html, 'langfristige Durchschnittswerte'), 'Admin page renders the expected-value preview and history explanation');
+    previewCheck(str_contains($html, 'Erwartete Beute') && str_contains($html, 'Änderungsverlauf') && str_contains($html, 'langfristige Durchschnittswerte'), 'Admin page renders the expected-value preview and history explanation');
     previewCheck(str_contains($html, 'Zurückgesetzt') && str_contains($html, 'Anpassung') && !str_contains($html, 'HISTORY_SECRET'), 'Rendered history is concise and omits stored JSON');
     previewCheck(!str_contains($html, '<form method="post" action="/conquer/admin/action/reward-preview"'), 'Preview does not add a simulation POST action');
 

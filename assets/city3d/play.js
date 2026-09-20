@@ -5,7 +5,7 @@ const command=$('building-command');command.append(dialog);
 const resourceIcons={food:'🌾',lumber:'🪵',stone:'🪨',gold:'🪙'};
 const names={food:'Nahrung',lumber:'Holz',stone:'Stein',gold:'Gold'};
 const fmt=n=>Math.floor(Number(n)).toLocaleString('de-DE');
-let state=null,receivedAt=0,online=false,busy=false,loading=null,selected='castle',previousLevel=null,openReadyAt=0;
+let state=null,receivedAt=0,online=false,busy=false,loading=null,selected='castle',previousLevel=null,openReadyAt=0,appVisible=true;
 const serverNow=()=>state?state.server_time+(performance.now()-receivedAt)/1000:0;
 const utc=value=>Date.parse(value.replace(' ','T')+'Z')/1000;
 function duration(seconds){const s=Math.max(0,Math.ceil(seconds));return s>=3600?`${Math.floor(s/3600)} Std. ${Math.floor(s%3600/60)} Min.`:s>=60?`${Math.floor(s/60)} Min. ${s%60} Sek.`:`${s} Sek.`;}
@@ -156,10 +156,14 @@ $('start-upgrade').onclick=async()=>{
 };
 $('retry').onclick=()=>refresh();
 $('logout').onclick=async()=>{if(busy||!state)return;busy=true;$('logout').disabled=true;try{await api('/api/auth/logout',{});location.assign(base+'/');}catch{busy=false;$('logout').disabled=false;connection('Abmeldung fehlgeschlagen. Bitte erneut versuchen.',false);render();}};
-setInterval(tick,250);setInterval(()=>{if(!document.hidden&&!busy)refresh();},4000);
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!busy)refresh();});
-window.addEventListener('online',()=>{if(!busy)refresh();});window.addEventListener('offline',()=>{connection('Offline · Dein gespeicherter Ausbau läuft weiter.',false);render();});
+setInterval(()=>{if(!document.hidden&&appVisible)tick();},1000);
+window.ConquerPolling({delay:()=>state?.build_queue?.length?5000:15000,refresh:()=>{if(appVisible&&!busy)return refresh();}});
+window.addEventListener('offline',()=>{connection('Offline · Dein gespeicherter Ausbau läuft weiter.',false);render();});
 window.addEventListener('message',event=>{
+  if(window.CONQUER_PLAY.embedded && event.origin===location.origin && event.source===window.parent && event.data?.type==='conquer:visibility'){
+    const resume=!appVisible&&event.data.visible!==false;appVisible=event.data.visible!==false;
+    if(resume&&!document.hidden&&!busy&&performance.now()-receivedAt>3000)refresh();
+  }
   if(window.CONQUER_PLAY.embedded && event.origin===location.origin && event.source===window.parent && event.data?.type==='conquer:refresh' && !busy)refresh({fresh:true});
 });
 refresh();

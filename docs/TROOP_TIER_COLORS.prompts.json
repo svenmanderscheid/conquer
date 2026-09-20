@@ -1,0 +1,335 @@
+{
+  "generator": "Built-in image_gen tool",
+  "description": "Approved tier armor color variants; one individual edit per original troop icon. Derivatives preserve transparency and only resize/encode.",
+  "palette": [
+    {
+      "tier": 1,
+      "name": "Grau",
+      "color": "#8A8D8F"
+    },
+    {
+      "tier": 2,
+      "name": "Braun",
+      "color": "#8B5E3C"
+    },
+    {
+      "tier": 3,
+      "name": "Grün",
+      "color": "#4F854B"
+    },
+    {
+      "tier": 4,
+      "name": "Blau",
+      "color": "#367BC4"
+    },
+    {
+      "tier": 5,
+      "name": "Violett",
+      "color": "#9656B7"
+    },
+    {
+      "tier": 6,
+      "name": "Rot",
+      "color": "#BF4545"
+    },
+    {
+      "tier": 7,
+      "name": "Orange",
+      "color": "#E58132"
+    },
+    {
+      "tier": 8,
+      "name": "Gelb",
+      "color": "#F0D34A"
+    },
+    {
+      "tier": 9,
+      "name": "Gold",
+      "color": "#C6A04A"
+    },
+    {
+      "tier": 10,
+      "name": "Platinweiß",
+      "color": "#F1F3F5"
+    }
+  ],
+  "jobs": [
+    {
+      "id": "infantry-t1",
+      "tier": 1,
+      "type": "infantry",
+      "name": "Grau",
+      "color": "#8A8D8F",
+      "source": "C:/xampp/htdocs/conquer/assets/art/characters/infantry-t1-ui-v1.png",
+      "prompt": "Use case: precise-object-edit.\nAsset: one production game troop portrait, infantry, existing tier T1. The input image is the edit target.\nSelectively recolor the existing character's ARMOR and its main colored cloth/enamel accents to Grau, base #8A8D8F. Keep all existing armor geometry, equipment, silhouette, pose, chibi proportions, face, hair, eye color, expression and thick dark brown outlines unchanged. Match the supplied hand-painted cartoon rendering and broad shading.\nThe low-level equipment stays simple: do not add any armor or helmet not present. Recolor the main tunic/hood/cape and any existing armor accents into the tier palette.\nUse the specified base color with darker related shadows and light related metal-edge highlights, clearly readable at small icon scale.\nCoordinate the main cape/tabard/hood/saddlecloth and painted shield accents with the tier color; keep ivory trims and small original gold fittings. Existing leather straps, wooden shields, bow wood, belts and boots remain naturally brown except actual armor plates on the boots. Sword/lance blades and arrowheads remain silver. Skin, hair, eyes, horse fur, mane, muzzle and hooves remain their original natural colors. Do not tint the entire image. \nOne single full-body character only (horse plus rider if cavalry), centered, all weapons and extremities fully visible with 5% safe transparent margin. No text, label, tier number, frame, background scene, shadow floor, border, duplicate, montage or grid. GENUINELY TRANSPARENT BACKGROUND, preserve alpha. No white or checkerboard painted background. Do not add equipment, decorations, glows or particle effects."
+    },
+    {
+      "id": "archer-t1",
+      "tier": 1,
+      "type": "archer",
+      "name": "Grau",
+      "color": "#8A8D8F",
+      "source": "C:/xampp/htdocs/conquer/assets/art/characters/archer-t1-ui-v1.png",
+      "prompt": "Use case: precise-object-edit.\nAsset: one production game troop portrait, archer, existing tier T1. The input image is the edit target.\nSelectively recolor the existing character's ARMOR and its main colored cloth/enamel accents to Grau, base #8A8D8F. Keep all existing armor geometry, equipment, silhouette, pose, chibi proportions, face, hair, eye color, expression and thick dark brown outlines unchanged. Match the supplied hand-painted cartoon rendering and broad shading.\nThe low-level equipment stays simple: do not add any armor or helmet not present. Recolor the main tunic/hood/cape and any existing armor accents into the tier palette.\nUse the specified base color with darker related shadows and light related metal-edge highlights, clearly readable at small icon scale.\nCoordinate the main cape/tabard/hood/saddlecloth and painted shield accents with the tier color; keep ivory trims and small original gold fittings. Existing leather straps, wooden shields, bow wood, belts and boots remain naturally brown except actual armor plates on the boots. Sword/lance blades and arrowheads remain silver. Skin, hair, eyes, horse fur, mane, muzzle and hooves remain their original natural colors. Do not tint the entire image. \nOne single full-body character only (horse plus rider if cavalry), centered, all weapons and extremities fully visible with 5% safe transparent margin. No text, label, tier number, frame, background scene, shadow floor, border, duplicate, montage or grid. GENUINELY TRANSPARENT BACKGROUND, preserve alpha. No white or checkerboard painted background. Do not add equipment, decorations, glows or particle effects."
+    },
+    {
+      "id": "cavalry-t1",
+      "tier": 1,
+      "type": "cavalry",
+      "name": "Grau",
+      "color": "#8A8D8F",
+      "source": "C:/xampp/htdocs/conquer/assets/art/characters/cavalry-t1-ui-v1.png",
+      "prompt": "Use case: precise-object-edit.\nAsset: one production game troop portrait, cavalry, existing tier T1. The input image is the edit target.\nSelectively recolor the existing character's ARMOR and its main colored cloth/enamel accents to Grau, base #8A8D8F. Keep all existing armor geometry, equipment, silhouette, pose, chibi proportions, face, hair, eye color, expression and thick dark brown outlines unchanged. Match the supplied hand-painted cartoon rendering and broad shading.\nThe low-level equipment stays simple: do not add any armor or helmet not present. Recolor the main tunic/hood/cape and any existing armor accents into the tier palette.\nUse the specified base color with darker related shadows and light related metal-edge highlights, clearly readable at small icon scale.\nCoordinate the main cape/tabard/hood/saddlecloth and painted shield accents with the tier color; keep ivory trims and small original gold fittings. Existing leather straps, wooden shields, bow wood, belts and boots remain naturally brown except actual armor plates on the boots. Sword/lance blades and arrowheads remain silver. Skin, hair, eyes, horse fur, mane, muzzle and hooves remain their original natural colors. Do not tint the entire image. Recolor the horse's existing metal forehead armor and barding accents as well; preserve its natural fur and the full horse-and-rider composition.\nOne single full-body character only (horse plus rider if cavalry), centered, all weapons and extremities fully visible with 5% safe transparent margin. No text, label, tier number, frame, background scene, shadow floor, border, duplicate, montage or grid. GENUINELY TRANSPARENT BACKGROUND, preserve alpha. No white or checkerboard painted background. Do not add equipment, decorations, glows or particle effects."
+    },
+    {
+      "id": "infantry-t2",
+      "tier": 2,
+      "type": "infantry",
+      "name": "Braun",
+      "color": "#8B5E3C",
+      "source": "C:/xampp/htdocs/conquer/assets/art/characters/infantry-t2-ui-v1.png",
+      "prompt": "Use case: precise-object-edit.\nAsset: one production game troop portrait, infantry, existing tier T2. The input image is the edit target.\nSelectively recolor the existing character's ARMOR and its main colored cloth/enamel accents to Braun, base #8B5E3C. Keep all existing armor geometry, equipment, silhouette, pose, chibi proportions, face, hair, eye color, expression and thick dark brown outlines unchanged. Match the supplied hand-painted cartoon rendering and broad shading.\nThe low-level equipment stays simple: do not add any armor or helmet not present. Recolor the main tunic/hood/cape and any existing armor accents into the tier palette.\nUse the specified base color with darker related shadows and light related metal-edge highlights, clearly readable at small icon scale.\nCoordinate the main cape/tabard/hood/saddlecloth and painted shield accents with the tier color; keep ivory trims and small original gold fittings. Existing leather straps, wooden shields, bow wood, belts and boots remain naturally brown except actual armor plates on the boots. Sword/lance blades and arrowheads remain silver. Skin, hair, eyes, horse fur, mane, muzzle and hooves remain their original natural colors. Do not tint the entire image. \nOne single full-body character only (horse plus rider if cavalry), centered, all weapons and extremities fully visible with 5% safe transparent margin. No text, label, tier number, frame, background scene, shadow floor, border, duplicate, montage or grid. GENUINELY TRANSPARENT BACKGROUND, preserve alpha. No white or checkerboard painted background. Do not add equipment, decorations, glows or particle effects."
+    },
+    {
+      "id": "archer-t2",
+      "tier": 2,
+      "type": "archer",
+      "name": "Braun",
+      "color": "#8B5E3C",
+      "source": "C:/xampp/htdocs/conquer/assets/art/characters/archer-t2-ui-v1.png",
+      "prompt": "Use case: precise-object-edit.\nAsset: one production game troop portrait, archer, existing tier T2. The input image is the edit target.\nSelectively recolor the existing character's ARMOR and its main colored cloth/enamel accents to Braun, base #8B5E3C. Keep all existing armor geometry, equipment, silhouette, pose, chibi proportions, face, hair, eye color, expression and thick dark brown outlines unchanged. Match the supplied hand-painted cartoon rendering and broad shading.\nThe low-level equipment stays simple: do not add any armor or helmet not present. Recolor the main tunic/hood/cape and any existing armor accents into the tier palette.\nUse the specified base color with darker related shadows and light related metal-edge highlights, clearly readable at small icon scale.\nCoordinate the main cape/tabard/hood/saddlecloth and painted shield accents with the tier color; keep ivory trims and small original gold fittings. Existing leather straps, wooden shields, bow wood, belts and boots remain naturally brown except actual armor plates on the boots. Sword/lance blades and arrowheads remain silver. Skin, hair, eyes, horse fur, mane, muzzle and hooves remain their original natural colors. Do not tint the entire image. \nOne single full-body character only (horse plus rider if cavalry), centered, all weapons and extremities fully visible with 5% safe transparent margin. No text, label, tier number, frame, background scene, shadow floor, border, duplicate, montage or grid. GENUINELY TRANSPARENT BACKGROUND, preserve alpha. No white or checkerboard painted background. Do not add equipment, decorations, glows or particle effects."
+    },
+    {
+      "id": "cavalry-t2",
+      "tier": 2,
+      "type": "cavalry",
+      "name": "Braun",
+      "color": "#8B5E3C",
+      "source": "C:/xampp/htdocs/conquer/assets/art/characters/cavalry-t2-ui-v1.png",
+      "prompt": "Use case: precise-object-edit.\nAsset: one production game troop portrait, cavalry, existing tier T2. The input image is the edit target.\nSelectively recolor the existing character's ARMOR and its main colored cloth/enamel accents to Braun, base #8B5E3C. Keep all existing armor geometry, equipment, silhouette, pose, chibi proportions, face, hair, eye color, expression and thick dark brown outlines unchanged. Match the supplied hand-painted cartoon rendering and broad shading.\nThe low-level equipment stays simple: do not add any armor or helmet not present. Recolor the main tunic/hood/cape and any existing armor accents into the tier palette.\nUse the specified base color with darker related shadows and light related metal-edge highlights, clearly readable at small icon scale.\nCoordinate the main cape/tabard/hood/saddlecloth and painted shield accents with the tier color; keep ivory trims and small original gold fittings. Existing leather straps, wooden shields, bow wood, belts and boots remain naturally brown except actual armor plates on the boots. Sword/lance blades and arrowheads remain silver. Skin, hair, eyes, horse fur, mane, muzzle and hooves remain their original natural colors. Do not tint the entire image. Recolor the horse's existing metal forehead armor and barding accents as well; preserve its natural fur and the full horse-and-rider composition.\nOne single full-body character only (horse plus rider if cavalry), centered, all weapons and extremities fully visible with 5% safe transparent margin. No text, label, tier number, frame, background scene, shadow floor, border, duplicate, montage or grid. GENUINELY TRANSPARENT BACKGROUND, preserve alpha. No white or checkerboard painted background. Do not add equipment, decorations, glows or particle effects."
+    },
+    {
+      "id": "infantry-t3",
+      "tier": 3,
+      "type": "infantry",
+      "name": "Grün",
+      "color": "#4F854B",
+      "source": "C:/xampp/htdocs/conquer/assets/art/characters/infantry-t3-ui-v1.png",
+      "prompt": "Use case: precise-object-edit.\nAsset: one production game troop portrait, infantry, existing tier T3. The input image is the edit target.\nSelectively recolor the existing character's ARMOR and its main colored cloth/enamel accents to Grün, base #4F854B. Keep all existing armor geometry, equipment, silhouette, pose, chibi proportions, face, hair, eye color, expression and thick dark brown outlines unchanged. Match the supplied hand-painted cartoon rendering and broad shading.\nRecolor broad helmet/torso/shoulder/limb armor plates into the tier palette with convincing illustrated metal edge highlights. Keep chainmail primarily dark neutral silver for readability.\nUse the specified base color with darker related shadows and light related metal-edge highlights, clearly readable at small icon scale.\nCoordinate the main cape/tabard/hood/saddlecloth and painted shield accents with the tier color; keep ivory trims and small original gold fittings. Existing leather straps, wooden shields, bow wood, belts and boots remain naturally brown except actual armor plates on the boots. Sword/lance blades and arrowheads remain silver. Skin, hair, eyes, horse fur, mane, muzzle and hooves remain their original natural colors. Do not tint the entire image. \nOne single full-body character only (horse plus rider if cavalry), centered, all weapons and extremities fully visible with 5% safe transparent margin. No text, label, tier number, frame, background scene, shadow floor, border, duplicate, montage or grid. GENUINELY TRANSPARENT BACKGROUND, preserve alpha. No white or checkerboard painted background. Do not add equipment, decorations, glows or particle effects."
+    },
+    {
+      "id": "archer-t3",
+      "tier": 3,
+      "type": "archer",
+      "name": "Grün",
+      "color": "#4F854B",
+      "source": "C:/xampp/htdocs/conquer/assets/art/characters/archer-t3-ui-v1.png",
+      "prompt": "Use case: precise-object-edit.\nAsset: one production game troop portrait, archer, existing tier T3. The input image is the edit target.\nSelectively recolor the existing character's ARMOR and its main colored cloth/enamel accents to Grün, base #4F854B. Keep all existing armor geometry, equipment, silhouette, pose, chibi proportions, face, hair, eye color, expression and thick dark brown outlines unchanged. Match the supplied hand-painted cartoon rendering and broad shading.\nRecolor broad helmet/torso/shoulder/limb armor plates into the tier palette with convincing illustrated metal edge highlights. Keep chainmail primarily dark neutral silver for readability.\nUse the specified base color with darker related shadows and light related metal-edge highlights, clearly readable at small icon scale.\nCoordinate the main cape/tabard/hood/saddlecloth and painted shield accents with the tier color; keep ivory trims and small original gold fittings. Existing leather straps, wooden shields, bow wood, belts and boots remain naturally brown except actual armor plates on the boots. Sword/lance blades and arrowheads remain silver. Skin, hair, eyes, horse fur, mane, muzzle and hooves remain their original natural colors. Do not tint the entire image. \nOne single full-body character only (horse plus rider if cavalry), centered, all weapons and extremities fully visible with 5% safe transparent margin. No text, label, tier number, frame, background scene, shadow floor, border, duplicate, montage or grid. GENUINELY TRANSPARENT BACKGROUND, preserve alpha. No white or checkerboard painted background. Do not add equipment, decorations, glows or particle effects."
+    },
+    {
+      "id": "cavalry-t3",
+      "tier": 3,
+      "type": "cavalry",
+      "name": "Grün",
+      "color": "#4F854B",
+      "source": "C:/xampp/htdocs/conquer/assets/art/characters/cavalry-t3-ui-v1.png",
+      "prompt": "Use case: precise-object-edit.\nAsset: one production game troop portrait, cavalry, existing tier T3. The input image is the edit target.\nSelectively recolor the existing character's ARMOR and its main colored cloth/enamel accents to Grün, base #4F854B. Keep all existing armor geometry, equipment, silhouette, pose, chibi proportions, face, hair, eye color, expression and thick dark brown outlines unchanged. Match the supplied hand-painted cartoon rendering and broad shading.\nRecolor broad helmet/torso/shoulder/limb armor plates into the tier palette with convincing illustrated metal edge highlights. Keep chainmail primarily dark neutral silver for readability.\nUse the specified base color with darker related shadows and light related metal-edge highlights, clearly readable at small icon scale.\nCoordinate the main cape/tabard/hood/saddlecloth and painted shield accents with the tier color; keep ivory trims and small original gold fittings. Existing leather straps, wooden shields, bow wood, belts and boots remain naturally brown except actual armor plates on the boots. Sword/lance blades and arrowheads remain silver. Skin, hair, eyes, horse fur, mane, muzzle and hooves remain their original natural colors. Do not tint the entire image. Recolor the horse's existing metal forehead armor and barding accents as well; preserve its natural fur and the full horse-and-rider composition.\nOne single full-body character only (horse plus rider if cavalry), centered, all weapons and extremities fully visible with 5% safe transparent margin. No text, label, tier number, frame, background scene, shadow floor, border, duplicate, montage or grid. GENUINELY TRANSPARENT BACKGROUND, preserve alpha. No white or checkerboard painted background. Do not add equipment, decorations, glows or particle effects."
+    },
+    {
+      "id": "infantry-t4",
+      "tier": 4,
+      "type": "infantry",
+      "name": "Blau",
+      "color": "#367BC4",
+      "source": "C:/xampp/htdocs/conquer/assets/art/characters/infantry-t4-ui-v1.png",
+      "prompt": "Use case: precise-object-edit.\nAsset: one production game troop portrait, infantry, existing tier T4. The input image is the edit target.\nSelectively recolor the existing character's ARMOR and its main colored cloth/enamel accents to Blau, base #367BC4. Keep all existing armor geometry, equipment, silhouette, pose, chibi proportions, face, hair, eye color, expression and thick dark brown outlines unchanged. Match the supplied hand-painted cartoon rendering and broad shading.\nRecolor broad helmet/torso/shoulder/limb armor plates into the tier palette with convincing illustrated metal edge highlights. Keep chainmail primarily dark neutral silver for readability.\nUse the specified base color with darker related shadows and light related metal-edge highlights, clearly readable at small icon scale.\nCoordinate the main cape/tabard/hood/saddlecloth and painted shield accents with the tier color; keep ivory trims and small original gold fittings. Existing leather straps, wooden shields, bow wood, belts and boots remain naturally brown except actual armor plates on the boots. Sword/lance blades and arrowheads remain silver. Skin, hair, eyes, horse fur, mane, muzzle and hooves remain their original natural colors. Do not tint the entire image. \nOne single full-body character only (horse plus rider if cavalry), centered, all weapons and extremities fully visible with 5% safe transparent margin. No text, label, tier number, frame, background scene, shadow floor, border, duplicate, montage or grid. GENUINELY TRANSPARENT BACKGROUND, preserve alpha. No white or checkerboard painted background. Do not add equipment, decorations, glows or particle effects."
+    },
+    {
+      "id": "archer-t4",
+      "tier": 4,
+      "type": "archer",
+      "name": "Blau",
+      "color": "#367BC4",
+      "source": "C:/xampp/htdocs/conquer/assets/art/characters/archer-t4-ui-v1.png",
+      "prompt": "Use case: precise-object-edit.\nAsset: one production game troop portrait, archer, existing tier T4. The input image is the edit target.\nSelectively recolor the existing character's ARMOR and its main colored cloth/enamel accents to Blau, base #367BC4. Keep all existing armor geometry, equipment, silhouette, pose, chibi proportions, face, hair, eye color, expression and thick dark brown outlines unchanged. Match the supplied hand-painted cartoon rendering and broad shading.\nRecolor broad helmet/torso/shoulder/limb armor plates into the tier palette with convincing illustrated metal edge highlights. Keep chainmail primarily dark neutral silver for readability.\nUse the specified base color with darker related shadows and light related metal-edge highlights, clearly readable at small icon scale.\nCoordinate the main cape/tabard/hood/saddlecloth and painted shield accents with the tier color; keep ivory trims and small original gold fittings. Existing leather straps, wooden shields, bow wood, belts and boots remain naturally brown except actual armor plates on the boots. Sword/lance blades and arrowheads remain silver. Skin, hair, eyes, horse fur, mane, muzzle and hooves remain their original natural colors. Do not tint the entire image. \nOne single full-body character only (horse plus rider if cavalry), centered, all weapons and extremities fully visible with 5% safe transparent margin. No text, label, tier number, frame, background scene, shadow floor, border, duplicate, montage or grid. GENUINELY TRANSPARENT BACKGROUND, preserve alpha. No white or checkerboard painted background. Do not add equipment, decorations, glows or particle effects."
+    },
+    {
+      "id": "cavalry-t4",
+      "tier": 4,
+      "type": "cavalry",
+      "name": "Blau",
+      "color": "#367BC4",
+      "source": "C:/xampp/htdocs/conquer/assets/art/characters/cavalry-t4-ui-v1.png",
+      "prompt": "Use case: precise-object-edit.\nAsset: one production game troop portrait, cavalry, existing tier T4. The input image is the edit target.\nSelectively recolor the existing character's ARMOR and its main colored cloth/enamel accents to Blau, base #367BC4. Keep all existing armor geometry, equipment, silhouette, pose, chibi proportions, face, hair, eye color, expression and thick dark brown outlines unchanged. Match the supplied hand-painted cartoon rendering and broad shading.\nRecolor broad helmet/torso/shoulder/limb armor plates into the tier palette with convincing illustrated metal edge highlights. Keep chainmail primarily dark neutral silver for readability.\nUse the specified base color with darker related shadows and light related metal-edge highlights, clearly readable at small icon scale.\nCoordinate the main cape/tabard/hood/saddlecloth and painted shield accents with the tier color; keep ivory trims and small original gold fittings. Existing leather straps, wooden shields, bow wood, belts and boots remain naturally brown except actual armor plates on the boots. Sword/lance blades and arrowheads remain silver. Skin, hair, eyes, horse fur, mane, muzzle and hooves remain their original natural colors. Do not tint the entire image. Recolor the horse's existing metal forehead armor and barding accents as well; preserve its natural fur and the full horse-and-rider composition.\nOne single full-body character only (horse plus rider if cavalry), centered, all weapons and extremities fully visible with 5% safe transparent margin. No text, label, tier number, frame, background scene, shadow floor, border, duplicate, montage or grid. GENUINELY TRANSPARENT BACKGROUND, preserve alpha. No white or checkerboard painted background. Do not add equipment, decorations, glows or particle effects."
+    },
+    {
+      "id": "infantry-t5",
+      "tier": 5,
+      "type": "infantry",
+      "name": "Violett",
+      "color": "#9656B7",
+      "source": "C:/xampp/htdocs/conquer/assets/art/characters/infantry-t5-ui-v1.png",
+      "prompt": "Use case: precise-object-edit.\nAsset: one production game troop portrait, infantry, existing tier T5. The input image is the edit target.\nSelectively recolor the existing character's ARMOR and its main colored cloth/enamel accents to Violett, base #9656B7. Keep all existing armor geometry, equipment, silhouette, pose, chibi proportions, face, hair, eye color, expression and thick dark brown outlines unchanged. Match the supplied hand-painted cartoon rendering and broad shading.\nRecolor broad helmet/torso/shoulder/limb armor plates into the tier palette with convincing illustrated metal edge highlights. Keep chainmail primarily dark neutral silver for readability.\nUse the specified base color with darker related shadows and light related metal-edge highlights, clearly readable at small icon scale.\nCoordinate the main cape/tabard/hood/saddlecloth and painted shield accents with the tier color; keep ivory trims and small original gold fittings. Existing leather straps, wooden shields, bow wood, belts and boots remain naturally brown except actual armor plates on the boots. Sword/lance blades and arrowheads remain silver. Skin, hair, eyes, horse fur, mane, muzzle and hooves remain their original natural colors. Do not tint the entire image. \nOne single full-body character only (horse plus rider if cavalry), centered, all weapons and extremities fully visible with 5% safe transparent margin. No text, label, tier number, frame, background scene, shadow floor, border, duplicate, montage or grid. GENUINELY TRANSPARENT BACKGROUND, preserve alpha. No white or checkerboard painted background. Do not add equipment, decorations, glows or particle effects."
+    },
+    {
+      "id": "archer-t5",
+      "tier": 5,
+      "type": "archer",
+      "name": "Violett",
+      "color": "#9656B7",
+      "source": "C:/xampp/htdocs/conquer/assets/art/characters/archer-t5-ui-v1.png",
+      "prompt": "Use case: precise-object-edit.\nAsset: one production game troop portrait, archer, existing tier T5. The input image is the edit target.\nSelectively recolor the existing character's ARMOR and its main colored cloth/enamel accents to Violett, base #9656B7. Keep all existing armor geometry, equipment, silhouette, pose, chibi proportions, face, hair, eye color, expression and thick dark brown outlines unchanged. Match the supplied hand-painted cartoon rendering and broad shading.\nRecolor broad helmet/torso/shoulder/limb armor plates into the tier palette with convincing illustrated metal edge highlights. Keep chainmail primarily dark neutral silver for readability.\nUse the specified base color with darker related shadows and light related metal-edge highlights, clearly readable at small icon scale.\nCoordinate the main cape/tabard/hood/saddlecloth and painted shield accents with the tier color; keep ivory trims and small original gold fittings. Existing leather straps, wooden shields, bow wood, belts and boots remain naturally brown except actual armor plates on the boots. Sword/lance blades and arrowheads remain silver. Skin, hair, eyes, horse fur, mane, muzzle and hooves remain their original natural colors. Do not tint the entire image. \nOne single full-body character only (horse plus rider if cavalry), centered, all weapons and extremities fully visible with 5% safe transparent margin. No text, label, tier number, frame, background scene, shadow floor, border, duplicate, montage or grid. GENUINELY TRANSPARENT BACKGROUND, preserve alpha. No white or checkerboard painted background. Do not add equipment, decorations, glows or particle effects."
+    },
+    {
+      "id": "cavalry-t5",
+      "tier": 5,
+      "type": "cavalry",
+      "name": "Violett",
+      "color": "#9656B7",
+      "source": "C:/xampp/htdocs/conquer/assets/art/characters/cavalry-t5-ui-v1.png",
+      "prompt": "Use case: precise-object-edit.\nAsset: one production game troop portrait, cavalry, existing tier T5. The input image is the edit target.\nSelectively recolor the existing character's ARMOR and its main colored cloth/enamel accents to Violett, base #9656B7. Keep all existing armor geometry, equipment, silhouette, pose, chibi proportions, face, hair, eye color, expression and thick dark brown outlines unchanged. Match the supplied hand-painted cartoon rendering and broad shading.\nRecolor broad helmet/torso/shoulder/limb armor plates into the tier palette with convincing illustrated metal edge highlights. Keep chainmail primarily dark neutral silver for readability.\nUse the specified base color with darker related shadows and light related metal-edge highlights, clearly readable at small icon scale.\nCoordinate the main cape/tabard/hood/saddlecloth and painted shield accents with the tier color; keep ivory trims and small original gold fittings. Existing leather straps, wooden shields, bow wood, belts and boots remain naturally brown except actual armor plates on the boots. Sword/lance blades and arrowheads remain silver. Skin, hair, eyes, horse fur, mane, muzzle and hooves remain their original natural colors. Do not tint the entire image. Recolor the horse's existing metal forehead armor and barding accents as well; preserve its natural fur and the full horse-and-rider composition.\nOne single full-body character only (horse plus rider if cavalry), centered, all weapons and extremities fully visible with 5% safe transparent margin. No text, label, tier number, frame, background scene, shadow floor, border, duplicate, montage or grid. GENUINELY TRANSPARENT BACKGROUND, preserve alpha. No white or checkerboard painted background. Do not add equipment, decorations, glows or particle effects."
+    },
+    {
+      "id": "infantry-t6",
+      "tier": 6,
+      "type": "infantry",
+      "name": "Rot",
+      "color": "#BF4545",
+      "source": "C:/xampp/htdocs/conquer/assets/art/characters/infantry-t6-ui-v1.png",
+      "prompt": "Use case: precise-object-edit.\nAsset: one production game troop portrait, infantry, existing tier T6. The input image is the edit target.\nSelectively recolor the existing character's ARMOR and its main colored cloth/enamel accents to Rot, base #BF4545. Keep all existing armor geometry, equipment, silhouette, pose, chibi proportions, face, hair, eye color, expression and thick dark brown outlines unchanged. Match the supplied hand-painted cartoon rendering and broad shading.\nRecolor broad helmet/torso/shoulder/limb armor plates into the tier palette with convincing illustrated metal edge highlights. Keep chainmail primarily dark neutral silver for readability.\nUse the specified base color with darker related shadows and light related metal-edge highlights, clearly readable at small icon scale.\nCoordinate the main cape/tabard/hood/saddlecloth and painted shield accents with the tier color; keep ivory trims and small original gold fittings. Existing leather straps, wooden shields, bow wood, belts and boots remain naturally brown except actual armor plates on the boots. Sword/lance blades and arrowheads remain silver. Skin, hair, eyes, horse fur, mane, muzzle and hooves remain their original natural colors. Do not tint the entire image. \nOne single full-body character only (horse plus rider if cavalry), centered, all weapons and extremities fully visible with 5% safe transparent margin. No text, label, tier number, frame, background scene, shadow floor, border, duplicate, montage or grid. GENUINELY TRANSPARENT BACKGROUND, preserve alpha. No white or checkerboard painted background. Do not add equipment, decorations, glows or particle effects."
+    },
+    {
+      "id": "archer-t6",
+      "tier": 6,
+      "type": "archer",
+      "name": "Rot",
+      "color": "#BF4545",
+      "source": "C:/xampp/htdocs/conquer/assets/art/characters/archer-t6-ui-v1.png",
+      "prompt": "Use case: precise-object-edit.\nAsset: one production game troop portrait, archer, existing tier T6. The input image is the edit target.\nSelectively recolor the existing character's ARMOR and its main colored cloth/enamel accents to Rot, base #BF4545. Keep all existing armor geometry, equipment, silhouette, pose, chibi proportions, face, hair, eye color, expression and thick dark brown outlines unchanged. Match the supplied hand-painted cartoon rendering and broad shading.\nRecolor broad helmet/torso/shoulder/limb armor plates into the tier palette with convincing illustrated metal edge highlights. Keep chainmail primarily dark neutral silver for readability.\nUse the specified base color with darker related shadows and light related metal-edge highlights, clearly readable at small icon scale.\nCoordinate the main cape/tabard/hood/saddlecloth and painted shield accents with the tier color; keep ivory trims and small original gold fittings. Existing leather straps, wooden shields, bow wood, belts and boots remain naturally brown except actual armor plates on the boots. Sword/lance blades and arrowheads remain silver. Skin, hair, eyes, horse fur, mane, muzzle and hooves remain their original natural colors. Do not tint the entire image. \nOne single full-body character only (horse plus rider if cavalry), centered, all weapons and extremities fully visible with 5% safe transparent margin. No text, label, tier number, frame, background scene, shadow floor, border, duplicate, montage or grid. GENUINELY TRANSPARENT BACKGROUND, preserve alpha. No white or checkerboard painted background. Do not add equipment, decorations, glows or particle effects."
+    },
+    {
+      "id": "cavalry-t6",
+      "tier": 6,
+      "type": "cavalry",
+      "name": "Rot",
+      "color": "#BF4545",
+      "source": "C:/xampp/htdocs/conquer/assets/art/characters/cavalry-t6-ui-v1.png",
+      "prompt": "Use case: precise-object-edit.\nAsset: one production game troop portrait, cavalry, existing tier T6. The input image is the edit target.\nSelectively recolor the existing character's ARMOR and its main colored cloth/enamel accents to Rot, base #BF4545. Keep all existing armor geometry, equipment, silhouette, pose, chibi proportions, face, hair, eye color, expression and thick dark brown outlines unchanged. Match the supplied hand-painted cartoon rendering and broad shading.\nRecolor broad helmet/torso/shoulder/limb armor plates into the tier palette with convincing illustrated metal edge highlights. Keep chainmail primarily dark neutral silver for readability.\nUse the specified base color with darker related shadows and light related metal-edge highlights, clearly readable at small icon scale.\nCoordinate the main cape/tabard/hood/saddlecloth and painted shield accents with the tier color; keep ivory trims and small original gold fittings. Existing leather straps, wooden shields, bow wood, belts and boots remain naturally brown except actual armor plates on the boots. Sword/lance blades and arrowheads remain silver. Skin, hair, eyes, horse fur, mane, muzzle and hooves remain their original natural colors. Do not tint the entire image. Recolor the horse's existing metal forehead armor and barding accents as well; preserve its natural fur and the full horse-and-rider composition.\nOne single full-body character only (horse plus rider if cavalry), centered, all weapons and extremities fully visible with 5% safe transparent margin. No text, label, tier number, frame, background scene, shadow floor, border, duplicate, montage or grid. GENUINELY TRANSPARENT BACKGROUND, preserve alpha. No white or checkerboard painted background. Do not add equipment, decorations, glows or particle effects."
+    },
+    {
+      "id": "infantry-t7",
+      "tier": 7,
+      "type": "infantry",
+      "name": "Orange",
+      "color": "#E58132",
+      "source": "C:/xampp/htdocs/conquer/assets/art/characters/infantry-t7-ui-v1.png",
+      "prompt": "Use case: precise-object-edit.\nAsset: one production game troop portrait, infantry, existing tier T7. The input image is the edit target.\nSelectively recolor the existing character's ARMOR and its main colored cloth/enamel accents to Orange, base #E58132. Keep all existing armor geometry, equipment, silhouette, pose, chibi proportions, face, hair, eye color, expression and thick dark brown outlines unchanged. Match the supplied hand-painted cartoon rendering and broad shading.\nRecolor broad helmet/torso/shoulder/limb armor plates into the tier palette with convincing illustrated metal edge highlights. Keep chainmail primarily dark neutral silver for readability.\nUse the specified base color with darker related shadows and light related metal-edge highlights, clearly readable at small icon scale.\nCoordinate the main cape/tabard/hood/saddlecloth and painted shield accents with the tier color; keep ivory trims and small original gold fittings. Existing leather straps, wooden shields, bow wood, belts and boots remain naturally brown except actual armor plates on the boots. Sword/lance blades and arrowheads remain silver. Skin, hair, eyes, horse fur, mane, muzzle and hooves remain their original natural colors. Do not tint the entire image. \nOne single full-body character only (horse plus rider if cavalry), centered, all weapons and extremities fully visible with 5% safe transparent margin. No text, label, tier number, frame, background scene, shadow floor, border, duplicate, montage or grid. GENUINELY TRANSPARENT BACKGROUND, preserve alpha. No white or checkerboard painted background. Do not add equipment, decorations, glows or particle effects.\nPriority: The large ARMOR PLATES themselves must visibly carry the chosen tier color, not just the cloth. Neutral silver is restricted to narrow edging, rivets, chainmail and weapons. Preserve any existing gold as SMALL ornamental details only; broad armor plates are the tier color."
+    },
+    {
+      "id": "archer-t7",
+      "tier": 7,
+      "type": "archer",
+      "name": "Orange",
+      "color": "#E58132",
+      "source": "C:/xampp/htdocs/conquer/assets/art/characters/archer-t7-ui-v1.png",
+      "prompt": "Use case: precise-object-edit.\nAsset: one production game troop portrait, archer, existing tier T7. The input image is the edit target.\nSelectively recolor the existing character's ARMOR and its main colored cloth/enamel accents to Orange, base #E58132. Keep all existing armor geometry, equipment, silhouette, pose, chibi proportions, face, hair, eye color, expression and thick dark brown outlines unchanged. Match the supplied hand-painted cartoon rendering and broad shading.\nRecolor broad helmet/torso/shoulder/limb armor plates into the tier palette with convincing illustrated metal edge highlights. Keep chainmail primarily dark neutral silver for readability.\nUse the specified base color with darker related shadows and light related metal-edge highlights, clearly readable at small icon scale.\nCoordinate the main cape/tabard/hood/saddlecloth and painted shield accents with the tier color; keep ivory trims and small original gold fittings. Existing leather straps, wooden shields, bow wood, belts and boots remain naturally brown except actual armor plates on the boots. Sword/lance blades and arrowheads remain silver. Skin, hair, eyes, horse fur, mane, muzzle and hooves remain their original natural colors. Do not tint the entire image. \nOne single full-body character only (horse plus rider if cavalry), centered, all weapons and extremities fully visible with 5% safe transparent margin. No text, label, tier number, frame, background scene, shadow floor, border, duplicate, montage or grid. GENUINELY TRANSPARENT BACKGROUND, preserve alpha. No white or checkerboard painted background. Do not add equipment, decorations, glows or particle effects.\nPriority: The large ARMOR PLATES themselves must visibly carry the chosen tier color, not just the cloth. Neutral silver is restricted to narrow edging, rivets, chainmail and weapons. Preserve any existing gold as SMALL ornamental details only; broad armor plates are the tier color."
+    },
+    {
+      "id": "cavalry-t7",
+      "tier": 7,
+      "type": "cavalry",
+      "name": "Orange",
+      "color": "#E58132",
+      "source": "C:/xampp/htdocs/conquer/assets/art/characters/cavalry-t7-ui-v1.png",
+      "prompt": "Use case: precise-object-edit.\nAsset: one production game troop portrait, cavalry, existing tier T7. The input image is the edit target.\nSelectively recolor the existing character's ARMOR and its main colored cloth/enamel accents to Orange, base #E58132. Keep all existing armor geometry, equipment, silhouette, pose, chibi proportions, face, hair, eye color, expression and thick dark brown outlines unchanged. Match the supplied hand-painted cartoon rendering and broad shading.\nRecolor broad helmet/torso/shoulder/limb armor plates into the tier palette with convincing illustrated metal edge highlights. Keep chainmail primarily dark neutral silver for readability.\nUse the specified base color with darker related shadows and light related metal-edge highlights, clearly readable at small icon scale.\nCoordinate the main cape/tabard/hood/saddlecloth and painted shield accents with the tier color; keep ivory trims and small original gold fittings. Existing leather straps, wooden shields, bow wood, belts and boots remain naturally brown except actual armor plates on the boots. Sword/lance blades and arrowheads remain silver. Skin, hair, eyes, horse fur, mane, muzzle and hooves remain their original natural colors. Do not tint the entire image. Recolor the horse's existing metal forehead armor and barding accents as well; preserve its natural fur and the full horse-and-rider composition.\nOne single full-body character only (horse plus rider if cavalry), centered, all weapons and extremities fully visible with 5% safe transparent margin. No text, label, tier number, frame, background scene, shadow floor, border, duplicate, montage or grid. GENUINELY TRANSPARENT BACKGROUND, preserve alpha. No white or checkerboard painted background. Do not add equipment, decorations, glows or particle effects.\nPriority: The large ARMOR PLATES themselves must visibly carry the chosen tier color, not just the cloth. Neutral silver is restricted to narrow edging, rivets, chainmail and weapons. Preserve any existing gold as SMALL ornamental details only; broad armor plates are the tier color."
+    },
+    {
+      "id": "infantry-t8",
+      "tier": 8,
+      "type": "infantry",
+      "name": "Gelb",
+      "color": "#F0D34A",
+      "source": "C:/xampp/htdocs/conquer/assets/art/characters/infantry-t8-ui-v1.png",
+      "prompt": "Use case: precise-object-edit.\nAsset: one production game troop portrait, infantry, existing tier T8. The input image is the edit target.\nSelectively recolor the existing character's ARMOR and its main colored cloth/enamel accents to Gelb, base #F0D34A. Keep all existing armor geometry, equipment, silhouette, pose, chibi proportions, face, hair, eye color, expression and thick dark brown outlines unchanged. Match the supplied hand-painted cartoon rendering and broad shading.\nRecolor broad helmet/torso/shoulder/limb armor plates into the tier palette with convincing illustrated metal edge highlights. Keep chainmail primarily dark neutral silver for readability.\nUse distinct bright lemon-yellow enamel with muted mustard shadows; not orange and not metallic gold.\nCoordinate the main cape/tabard/hood/saddlecloth and painted shield accents with the tier color; keep ivory trims and small original gold fittings. Existing leather straps, wooden shields, bow wood, belts and boots remain naturally brown except actual armor plates on the boots. Sword/lance blades and arrowheads remain silver. Skin, hair, eyes, horse fur, mane, muzzle and hooves remain their original natural colors. Do not tint the entire image. \nOne single full-body character only (horse plus rider if cavalry), centered, all weapons and extremities fully visible with 5% safe transparent margin. No text, label, tier number, frame, background scene, shadow floor, border, duplicate, montage or grid. GENUINELY TRANSPARENT BACKGROUND, preserve alpha. No white or checkerboard painted background. Do not add equipment, decorations, glows or particle effects.\nPriority: The large ARMOR PLATES themselves must visibly carry the chosen tier color, not just the cloth. Neutral silver is restricted to narrow edging, rivets, chainmail and weapons. Preserve any existing gold as SMALL ornamental details only; broad armor plates are the tier color."
+    },
+    {
+      "id": "archer-t8",
+      "tier": 8,
+      "type": "archer",
+      "name": "Gelb",
+      "color": "#F0D34A",
+      "source": "C:/xampp/htdocs/conquer/assets/art/characters/archer-t8-ui-v1.png",
+      "prompt": "Use case: precise-object-edit.\nAsset: one production game troop portrait, archer, existing tier T8. The input image is the edit target.\nSelectively recolor the existing character's ARMOR and its main colored cloth/enamel accents to Gelb, base #F0D34A. Keep all existing armor geometry, equipment, silhouette, pose, chibi proportions, face, hair, eye color, expression and thick dark brown outlines unchanged. Match the supplied hand-painted cartoon rendering and broad shading.\nRecolor broad helmet/torso/shoulder/limb armor plates into the tier palette with convincing illustrated metal edge highlights. Keep chainmail primarily dark neutral silver for readability.\nUse distinct bright lemon-yellow enamel with muted mustard shadows; not orange and not metallic gold.\nCoordinate the main cape/tabard/hood/saddlecloth and painted shield accents with the tier color; keep ivory trims and small original gold fittings. Existing leather straps, wooden shields, bow wood, belts and boots remain naturally brown except actual armor plates on the boots. Sword/lance blades and arrowheads remain silver. Skin, hair, eyes, horse fur, mane, muzzle and hooves remain their original natural colors. Do not tint the entire image. \nOne single full-body character only (horse plus rider if cavalry), centered, all weapons and extremities fully visible with 5% safe transparent margin. No text, label, tier number, frame, background scene, shadow floor, border, duplicate, montage or grid. GENUINELY TRANSPARENT BACKGROUND, preserve alpha. No white or checkerboard painted background. Do not add equipment, decorations, glows or particle effects.\nPriority: The large ARMOR PLATES themselves must visibly carry the chosen tier color, not just the cloth. Neutral silver is restricted to narrow edging, rivets, chainmail and weapons. Preserve any existing gold as SMALL ornamental details only; broad armor plates are the tier color."
+    },
+    {
+      "id": "cavalry-t8",
+      "tier": 8,
+      "type": "cavalry",
+      "name": "Gelb",
+      "color": "#F0D34A",
+      "source": "C:/xampp/htdocs/conquer/assets/art/characters/cavalry-t8-ui-v1.png",
+      "prompt": "Use case: precise-object-edit.\nAsset: one production game troop portrait, cavalry, existing tier T8. The input image is the edit target.\nSelectively recolor the existing character's ARMOR and its main colored cloth/enamel accents to Gelb, base #F0D34A. Keep all existing armor geometry, equipment, silhouette, pose, chibi proportions, face, hair, eye color, expression and thick dark brown outlines unchanged. Match the supplied hand-painted cartoon rendering and broad shading.\nRecolor broad helmet/torso/shoulder/limb armor plates into the tier palette with convincing illustrated metal edge highlights. Keep chainmail primarily dark neutral silver for readability.\nUse distinct bright lemon-yellow enamel with muted mustard shadows; not orange and not metallic gold.\nCoordinate the main cape/tabard/hood/saddlecloth and painted shield accents with the tier color; keep ivory trims and small original gold fittings. Existing leather straps, wooden shields, bow wood, belts and boots remain naturally brown except actual armor plates on the boots. Sword/lance blades and arrowheads remain silver. Skin, hair, eyes, horse fur, mane, muzzle and hooves remain their original natural colors. Do not tint the entire image. Recolor the horse's existing metal forehead armor and barding accents as well; preserve its natural fur and the full horse-and-rider composition.\nOne single full-body character only (horse plus rider if cavalry), centered, all weapons and extremities fully visible with 5% safe transparent margin. No text, label, tier number, frame, background scene, shadow floor, border, duplicate, montage or grid. GENUINELY TRANSPARENT BACKGROUND, preserve alpha. No white or checkerboard painted background. Do not add equipment, decorations, glows or particle effects.\nPriority: The large ARMOR PLATES themselves must visibly carry the chosen tier color, not just the cloth. Neutral silver is restricted to narrow edging, rivets, chainmail and weapons. Preserve any existing gold as SMALL ornamental details only; broad armor plates are the tier color."
+    },
+    {
+      "id": "infantry-t9",
+      "tier": 9,
+      "type": "infantry",
+      "name": "Gold",
+      "color": "#C6A04A",
+      "source": "C:/xampp/htdocs/conquer/assets/art/characters/infantry-t9-ui-v1.png",
+      "prompt": "Use case: precise-object-edit.\nAsset: one production game troop portrait, infantry, existing tier T9. The input image is the edit target.\nSelectively recolor the existing character's ARMOR and its main colored cloth/enamel accents to Gold, base #C6A04A. Keep all existing armor geometry, equipment, silhouette, pose, chibi proportions, face, hair, eye color, expression and thick dark brown outlines unchanged. Match the supplied hand-painted cartoon rendering and broad shading.\nRecolor broad helmet/torso/shoulder/limb armor plates into the tier palette with convincing illustrated metal edge highlights. Keep chainmail primarily dark neutral silver for readability.\nUse rich metallic antique GOLD with ochre shadows and warm cream highlights; clearly more metallic and deeper than flat lemon yellow.\nCoordinate the main cape/tabard/hood/saddlecloth and painted shield accents with the tier color; keep ivory trims and small original gold fittings. Existing leather straps, wooden shields, bow wood, belts and boots remain naturally brown except actual armor plates on the boots. Sword/lance blades and arrowheads remain silver. Skin, hair, eyes, horse fur, mane, muzzle and hooves remain their original natural colors. Do not tint the entire image. \nOne single full-body character only (horse plus rider if cavalry), centered, all weapons and extremities fully visible with 5% safe transparent margin. No text, label, tier number, frame, background scene, shadow floor, border, duplicate, montage or grid. GENUINELY TRANSPARENT BACKGROUND, preserve alpha. No white or checkerboard painted background. Do not add equipment, decorations, glows or particle effects.\nPriority: The large ARMOR PLATES themselves must visibly carry the chosen tier color, not just the cloth. Neutral silver is restricted to narrow edging, rivets, chainmail and weapons. Preserve any existing gold as SMALL ornamental details only; broad armor plates are the tier color."
+    },
+    {
+      "id": "archer-t9",
+      "tier": 9,
+      "type": "archer",
+      "name": "Gold",
+      "color": "#C6A04A",
+      "source": "C:/xampp/htdocs/conquer/assets/art/characters/archer-t9-ui-v1.png",
+      "prompt": "Use case: precise-object-edit.\nAsset: one production game troop portrait, archer, existing tier T9. The input image is the edit target.\nSelectively recolor the existing character's ARMOR and its main colored cloth/enamel accents to Gold, base #C6A04A. Keep all existing armor geometry, equipment, silhouette, pose, chibi proportions, face, hair, eye color, expression and thick dark brown outlines unchanged. Match the supplied hand-painted cartoon rendering and broad shading.\nRecolor broad helmet/torso/shoulder/limb armor plates into the tier palette with convincing illustrated metal edge highlights. Keep chainmail primarily dark neutral silver for readability.\nUse rich metallic antique GOLD with ochre shadows and warm cream highlights; clearly more metallic and deeper than flat lemon yellow.\nCoordinate the main cape/tabard/hood/saddlecloth and painted shield accents with the tier color; keep ivory trims and small original gold fittings. Existing leather straps, wooden shields, bow wood, belts and boots remain naturally brown except actual armor plates on the boots. Sword/lance blades and arrowheads remain silver. Skin, hair, eyes, horse fur, mane, muzzle and hooves remain their original natural colors. Do not tint the entire image. \nOne single full-body character only (horse plus rider if cavalry), centered, all weapons and extremities fully visible with 5% safe transparent margin. No text, label, tier number, frame, background scene, shadow floor, border, duplicate, montage or grid. GENUINELY TRANSPARENT BACKGROUND, preserve alpha. No white or checkerboard painted background. Do not add equipment, decorations, glows or particle effects.\nPriority: The large ARMOR PLATES themselves must visibly carry the chosen tier color, not just the cloth. Neutral silver is restricted to narrow edging, rivets, chainmail and weapons. Preserve any existing gold as SMALL ornamental details only; broad armor plates are the tier color."
+    },
+    {
+      "id": "cavalry-t9",
+      "tier": 9,
+      "type": "cavalry",
+      "name": "Gold",
+      "color": "#C6A04A",
+      "source": "C:/xampp/htdocs/conquer/assets/art/characters/cavalry-t9-ui-v1.png",
+      "prompt": "Use case: precise-object-edit.\nAsset: one production game troop portrait, cavalry, existing tier T9. The input image is the edit target.\nSelectively recolor the existing character's ARMOR and its main colored cloth/enamel accents to Gold, base #C6A04A. Keep all existing armor geometry, equipment, silhouette, pose, chibi proportions, face, hair, eye color, expression and thick dark brown outlines unchanged. Match the supplied hand-painted cartoon rendering and broad shading.\nRecolor broad helmet/torso/shoulder/limb armor plates into the tier palette with convincing illustrated metal edge highlights. Keep chainmail primarily dark neutral silver for readability.\nUse rich metallic antique GOLD with ochre shadows and warm cream highlights; clearly more metallic and deeper than flat lemon yellow.\nCoordinate the main cape/tabard/hood/saddlecloth and painted shield accents with the tier color; keep ivory trims and small original gold fittings. Existing leather straps, wooden shields, bow wood, belts and boots remain naturally brown except actual armor plates on the boots. Sword/lance blades and arrowheads remain silver. Skin, hair, eyes, horse fur, mane, muzzle and hooves remain their original natural colors. Do not tint the entire image. Recolor the horse's existing metal forehead armor and barding accents as well; preserve its natural fur and the full horse-and-rider composition.\nOne single full-body character only (horse plus rider if cavalry), centered, all weapons and extremities fully visible with 5% safe transparent margin. No text, label, tier number, frame, background scene, shadow floor, border, duplicate, montage or grid. GENUINELY TRANSPARENT BACKGROUND, preserve alpha. No white or checkerboard painted background. Do not add equipment, decorations, glows or particle effects.\nPriority: The large ARMOR PLATES themselves must visibly carry the chosen tier color, not just the cloth. Neutral silver is restricted to narrow edging, rivets, chainmail and weapons. Preserve any existing gold as SMALL ornamental details only; broad armor plates are the tier color."
+    },
+    {
+      "id": "infantry-t10",
+      "tier": 10,
+      "type": "infantry",
+      "name": "Platinweiß",
+      "color": "#F1F3F5",
+      "source": "C:/xampp/htdocs/conquer/assets/art/characters/infantry-t10-ui-v2.png",
+      "prompt": "Use case: precise-object-edit.\nAsset: one production game troop portrait, infantry, existing tier T10. The input image is the edit target.\nSelectively recolor the existing character's ARMOR and its main colored cloth/enamel accents to Platinweiß, base #F1F3F5. Keep all existing armor geometry, equipment, silhouette, pose, chibi proportions, face, hair, eye color, expression and thick dark brown outlines unchanged. Match the supplied hand-painted cartoon rendering and broad shading.\nRecolor broad helmet/torso/shoulder/limb armor plates into the tier palette with convincing illustrated metal edge highlights. Keep chainmail primarily dark neutral silver for readability.\nUse luminous PLATINUM WHITE with cool silver-gray shadows and white highlights. Preserve all elaborate dragonsteel shapes but replace dark/blue armor plates with platinum white. Keep strong dark contours so white armor remains readable.\nCoordinate the main cape/tabard/hood/saddlecloth and painted shield accents with the tier color; keep ivory trims and small original gold fittings. Existing leather straps, wooden shields, bow wood, belts and boots remain naturally brown except actual armor plates on the boots. Sword/lance blades and arrowheads remain silver. Skin, hair, eyes, horse fur, mane, muzzle and hooves remain their original natural colors. Do not tint the entire image. \nOne single full-body character only (horse plus rider if cavalry), centered, all weapons and extremities fully visible with 5% safe transparent margin. No text, label, tier number, frame, background scene, shadow floor, border, duplicate, montage or grid. GENUINELY TRANSPARENT BACKGROUND, preserve alpha. No white or checkerboard painted background. Do not add equipment, decorations, glows or particle effects.\nPriority: The large ARMOR PLATES themselves must visibly carry the chosen tier color, not just the cloth. Neutral silver is restricted to narrow edging, rivets, chainmail and weapons. Preserve any existing gold as SMALL ornamental details only; broad armor plates are the tier color."
+    },
+    {
+      "id": "archer-t10",
+      "tier": 10,
+      "type": "archer",
+      "name": "Platinweiß",
+      "color": "#F1F3F5",
+      "source": "C:/xampp/htdocs/conquer/assets/art/characters/archer-t10-ui-v1.png",
+      "prompt": "Use case: precise-object-edit.\nAsset: one production game troop portrait, archer, existing tier T10. The input image is the edit target.\nSelectively recolor the existing character's ARMOR and its main colored cloth/enamel accents to Platinweiß, base #F1F3F5. Keep all existing armor geometry, equipment, silhouette, pose, chibi proportions, face, hair, eye color, expression and thick dark brown outlines unchanged. Match the supplied hand-painted cartoon rendering and broad shading.\nRecolor broad helmet/torso/shoulder/limb armor plates into the tier palette with convincing illustrated metal edge highlights. Keep chainmail primarily dark neutral silver for readability.\nUse luminous PLATINUM WHITE with cool silver-gray shadows and white highlights. Preserve all elaborate dragonsteel shapes but replace dark/blue armor plates with platinum white. Keep strong dark contours so white armor remains readable.\nCoordinate the main cape/tabard/hood/saddlecloth and painted shield accents with the tier color; keep ivory trims and small original gold fittings. Existing leather straps, wooden shields, bow wood, belts and boots remain naturally brown except actual armor plates on the boots. Sword/lance blades and arrowheads remain silver. Skin, hair, eyes, horse fur, mane, muzzle and hooves remain their original natural colors. Do not tint the entire image. \nOne single full-body character only (horse plus rider if cavalry), centered, all weapons and extremities fully visible with 5% safe transparent margin. No text, label, tier number, frame, background scene, shadow floor, border, duplicate, montage or grid. GENUINELY TRANSPARENT BACKGROUND, preserve alpha. No white or checkerboard painted background. Do not add equipment, decorations, glows or particle effects.\nPriority: The large ARMOR PLATES themselves must visibly carry the chosen tier color, not just the cloth. Neutral silver is restricted to narrow edging, rivets, chainmail and weapons. Preserve any existing gold as SMALL ornamental details only; broad armor plates are the tier color.\nThe empty opening between the bow and bowstring must be transparent as well; remove any opaque white background caught inside that opening. Keep actual ivory armor and ivory bow limbs opaque."
+    },
+    {
+      "id": "cavalry-t10",
+      "tier": 10,
+      "type": "cavalry",
+      "name": "Platinweiß",
+      "color": "#F1F3F5",
+      "source": "C:/xampp/htdocs/conquer/assets/art/characters/cavalry-t10-ui-v1.png",
+      "prompt": "Use case: precise-object-edit.\nAsset: one production game troop portrait, cavalry, existing tier T10. The input image is the edit target.\nSelectively recolor the existing character's ARMOR and its main colored cloth/enamel accents to Platinweiß, base #F1F3F5. Keep all existing armor geometry, equipment, silhouette, pose, chibi proportions, face, hair, eye color, expression and thick dark brown outlines unchanged. Match the supplied hand-painted cartoon rendering and broad shading.\nRecolor broad helmet/torso/shoulder/limb armor plates into the tier palette with convincing illustrated metal edge highlights. Keep chainmail primarily dark neutral silver for readability.\nUse luminous PLATINUM WHITE with cool silver-gray shadows and white highlights. Preserve all elaborate dragonsteel shapes but replace dark/blue armor plates with platinum white. Keep strong dark contours so white armor remains readable.\nCoordinate the main cape/tabard/hood/saddlecloth and painted shield accents with the tier color; keep ivory trims and small original gold fittings. Existing leather straps, wooden shields, bow wood, belts and boots remain naturally brown except actual armor plates on the boots. Sword/lance blades and arrowheads remain silver. Skin, hair, eyes, horse fur, mane, muzzle and hooves remain their original natural colors. Do not tint the entire image. Recolor the horse's existing metal forehead armor and barding accents as well; preserve its natural fur and the full horse-and-rider composition.\nOne single full-body character only (horse plus rider if cavalry), centered, all weapons and extremities fully visible with 5% safe transparent margin. No text, label, tier number, frame, background scene, shadow floor, border, duplicate, montage or grid. GENUINELY TRANSPARENT BACKGROUND, preserve alpha. No white or checkerboard painted background. Do not add equipment, decorations, glows or particle effects.\nPriority: The large ARMOR PLATES themselves must visibly carry the chosen tier color, not just the cloth. Neutral silver is restricted to narrow edging, rivets, chainmail and weapons. Preserve any existing gold as SMALL ornamental details only; broad armor plates are the tier color."
+    }
+  ],
+  "refinements": [
+    {
+      "id": "cavalry-t6",
+      "source": "C:\\Users\\svenm\\.codex\\generated_images\\01a0be81-ac6d-7672-b021-a4b51b95f170\\exec-bb0a5581-c4f6-4615-8dc8-86941a86f83e.png",
+      "prompt": "Use case: precise-object-edit. Edit this exact existing chibi cavalry game icon. SINGLE targeted correction: recolor the broad SILVER ARMOR PLATES into rich RED enameled metal, base #BF4545, dark red shadows and pale rose/silver edge highlights. Specifically the rider's breastplate, shoulder pauldrons, gauntlet plates, kneepads, shin plates, armored shoe tips, and the horse's silver chest armor and leg armor must become visibly red. Retain only thin silver edges. Keep gold fleur-de-lis ornaments and gold trim exactly gold. Preserve the already red shield, scarf, cape and saddlecloth unchanged. Do not change face, auburn hair, blue eyes, skin, brown horse fur, mane, hooves, leather, pose, proportions, equipment shapes, weapon blade, outlines or framing. This must look like the SAME icon with red armor instead of its large white/silver plates, not only red cloth. ONE fullbody horse and rider, all visible, with transparent margin. GENUINELY TRANSPARENT background with alpha. No text, border, shadow floor, glow, additional elements or redesign."
+    }
+  ]
+}

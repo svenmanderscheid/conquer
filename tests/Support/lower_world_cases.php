@@ -43,8 +43,10 @@ DS::processPromotions(101);DS::processPromotions(101);checkD(stockD(101,50100201
 $db->execute('UPDATE cities SET food=0,last_resource_update=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 1 HOUR) WHERE id=101');
 $db->execute('UPDATE worlds SET speed_factor=3 WHERE id=2');$city=rowD('cities',101);$buildings=CS::loadForPlayer(1,2)['buildings'];
 RT::persist($city,$buildings);$gained=(int)rowD('cities',101)['food'];
-$buffs=BE::getBuffs(1,2);$base=\Conquer\Game\City\BuildingData::getHourlyRate('farm',30,['food_prod_pct'=>$buffs['food_production']??0]);
-checkD($gained>=floor($base*3)-2&&$gained<=ceil($base*3)+5,'resource settlement derives speed and research from persisted city world');
+$buffs=BE::getBuffs(1,2);$base=\Conquer\Game\City\BuildingData::getHourlyRate('farm',30,array_merge(\Conquer\Game\Vip\VipService::status(1)['bonuses'],['food_prod_pct'=>$buffs['food_production']??0]));
+$elapsed=strtotime(rowD('cities',101)['last_resource_update'])-strtotime($city['last_resource_update']);
+$expected=$base*3*$elapsed/3600;
+checkD($gained>=floor($expected)-2&&$gained<=ceil($expected)+5,'resource settlement derives speed and research from persisted city world: '.json_encode(compact('gained','expected','base','elapsed')));
 $db->execute("INSERT INTO player_research(player_id,world_id,research_code,level) VALUES(1,2,'hospital_capacity',1)");
 // Capacity derives actual city research; the active request may belong elsewhere.
 $hospital2=HS::getStatus(101);$hospital1=HS::getStatus(1);

@@ -14,6 +14,17 @@ function balanceJson(string $name): array { return json_decode(file_get_contents
 $manifest=balanceJson('balance-source/manifest');
 foreach ($manifest['files'] as $file=>$hash) balanceCheck(hash_file('sha256',ROOT_DIR.'/data/balance-source/'.$file)===$hash,'Source checksum '.$file);
 $materials=balanceJson('source_item_map')['building_materials'];
+$day=86400;
+$timeCurves=[
+    'major'=>[4*$day,5*$day,6*$day,8*$day,10*$day,13*$day,17*$day,21*$day,25*$day,30*$day],
+    'infrastructure'=>[4*$day,5*$day,6*$day,8*$day,10*$day,12*$day,15*$day,18*$day,22*$day,26*$day],
+    'capacity'=>[2*$day,3*$day,4*$day,5*$day,7*$day,9*$day,12*$day,16*$day,21*$day,26*$day],
+    'military'=>[18*3600,$day,32*3600,42*3600,54*3600,3*$day,4*$day,5*$day,7*$day,10*$day],
+    'resource'=>[16*3600,22*3600,30*3600,42*3600,54*3600,3*$day,4*$day,5*$day,7*$day,10*$day],
+];
+$timeGroups=['major'=>['castle','academy'],'infrastructure'=>['hall_of_alliance','hospital','trading_post','treasure_house','wall'],'capacity'=>['storage','watch_tower'],'military'=>['barrack'],'resource'=>['farm','gold_mine','lumber_camp','quarry']];
+$timeGroupByBuilding=[];foreach($timeGroups as $group=>$codes)foreach($codes as $code)$timeGroupByBuilding[$code]=$group;
+$buildingCodes=array_keys(balanceJson('buildings')['buildings']);sort($buildingCodes);$curveCodes=array_keys($timeGroupByBuilding);sort($curveCodes);balanceCheck($curveCodes===$buildingCodes,'Every building has a Conquer time curve');
 foreach(balanceJson('buildings')['buildings'] as $code=>$levels) {
     $source=balanceJson('balance-source/'.$code);$power=0;
     foreach($source as $level=>$row) {
@@ -21,7 +32,8 @@ foreach(balanceJson('buildings')['buildings'] as $code=>$levels) {
         foreach($row['resources'] as $r) { if(isset($materials[$r['type']]))$items[$materials[$r['type']]]=$r['value'];else $resources[$r['type']]=$r['value']; }
         balanceCheck(BuildingData::getCost($code,(int)$level)===$resources,'Exact cost '.$code.' '.$level);
         balanceCheck(BuildingData::getItemCosts($code,(int)$level)==$items,'Exact materials '.$code.' '.$level);
-        balanceCheck(BuildingData::getBuildTime($code,(int)$level)===$row['time'],'Exact seconds '.$code.' '.$level);
+        $expectedTime=(int)$level<=20 ? $row['time'] : $timeCurves[$timeGroupByBuilding[$code]][(int)$level-21];
+        balanceCheck(BuildingData::getBuildTime($code,(int)$level)===$expectedTime,'Conquer seconds '.$code.' '.$level);
         balanceCheck(BuildingData::getTotalPower($code,(int)$level)===$row['power'],'Cumulative power '.$code.' '.$level);
         $power+=BuildingData::getPowerAtLevel($code,(int)$level);
         balanceCheck($power===$row['power'],'Power not double counted '.$code.' '.$level);
@@ -40,7 +52,9 @@ foreach(balanceJson('buildings')['buildings'] as $code=>$levels) {
     balanceCheck(BuildingData::level($code,31)===null,'No invented L31');
 }
 foreach(['archery_range','stable'] as $code) balanceCheck(BuildingData::getCost($code,30)===BuildingData::getCost('barrack',30),'Conquer schools share barrack balance');
-echo "PASS 420 building levels: exact costs, materials, durations, power and enforced prerequisites\n";
+balanceCheck(BuildingData::getBuildTime('castle',30)===30*$day,'Castle L30 takes exactly thirty days');
+balanceCheck(BuildingData::getBuildTime('academy',30)===30*$day,'Academy L30 takes exactly thirty days');
+echo "PASS 420 building levels: source costs/materials/power/prerequisites and Conquer durations\n";
 foreach(['production','battle','advanced'] as $tree) {
     $source=balanceJson('balance-source/'.$tree);
     foreach(ResearchData::tree($tree) as $node) foreach($node['levels'] as $i=>$row) {

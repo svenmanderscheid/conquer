@@ -19,6 +19,34 @@ SOURCE = pathlib.Path(ARGS[0]) if ARGS else ARCHIVE
 BUILDINGS = 'academy barrack castle farm gold_mine hall_of_alliance hospital lumber_camp quarry storage trading_post treasure_house wall watch_tower'.split()
 FILES = [name + '.json' for name in BUILDINGS + ['battle', 'production', 'advanced', 'field_monster', 'field_object']] + ['enum.py']
 
+# The supplied tables are the authoritative source for costs, power and
+# prerequisites.  Their last ten building durations belong to a different
+# progression economy (for example Castle 30 takes more than 160 days), so
+# Conquer intentionally applies its own late-game time curve after import.
+# Levels 1–20 keep the supplied times unchanged.  The final major upgrades
+# become a real end-game goal without making the first twenty levels slower.
+DAY = 86_400
+BUILD_TIME_CURVES = {
+    # Castle and Academy both end at exactly thirty days at level 30.
+    'major': [4*DAY, 5*DAY, 6*DAY, 8*DAY, 10*DAY, 13*DAY, 17*DAY, 21*DAY, 25*DAY, 30*DAY],
+    # Alliance, defensive and treasury structures are deliberately close to
+    # the major curve because they gate collective and storage progression.
+    'infrastructure': [4*DAY, 5*DAY, 6*DAY, 8*DAY, 10*DAY, 12*DAY, 15*DAY, 18*DAY, 22*DAY, 26*DAY],
+    # Capacity and scouting must remain meaningful past city level 20.
+    'capacity': [2*DAY, 3*DAY, 4*DAY, 5*DAY, 7*DAY, 9*DAY, 12*DAY, 16*DAY, 21*DAY, 26*DAY],
+    # Troop schools grow noticeably after T7/T8, while Castle 30 remains the
+    # primary end-game gate for T10.
+    'military': [18*3600, DAY, 32*3600, 42*3600, 54*3600, 3*DAY, 4*DAY, 5*DAY, 7*DAY, 10*DAY],
+    'resource': [16*3600, 22*3600, 30*3600, 42*3600, 54*3600, 3*DAY, 4*DAY, 5*DAY, 7*DAY, 10*DAY],
+}
+BUILD_TIME_GROUPS = {
+    'major': {'castle', 'academy'},
+    'infrastructure': {'hall_of_alliance', 'hospital', 'trading_post', 'treasure_house', 'wall'},
+    'capacity': {'storage', 'watch_tower'},
+    'military': {'barrack'},
+    'resource': {'farm', 'gold_mine', 'lumber_camp', 'quarry'},
+}
+
 
 def read(path):
     return json.loads(path.read_text(encoding='utf-8-sig'))
@@ -33,6 +61,16 @@ def integer(value):
     n = int(value)
     assert float(value) == n and n >= 0, value
     return n
+
+
+def apply_conquer_build_times(buildings):
+    """Replace only levels 21–30 with the documented Conquer time curves."""
+    groups = {code: group for group, codes in BUILD_TIME_GROUPS.items() for code in codes}
+    assert set(groups) == set(buildings), (set(groups), set(buildings))
+    for code, levels in buildings.items():
+        curve = BUILD_TIME_CURVES[groups[code]]
+        for level, seconds in enumerate(curve, start=21):
+            levels[str(level)]['time'] = seconds
 
 
 def main():
@@ -121,6 +159,8 @@ def main():
             levels[level] = {'resources': resources, 'items': costs, 'time': integer(row['time']), 'power': integer(row['power']),
                              'requirements': {r['type']: integer(r['level']) for r in row['requirements']}, 'valid': row['valid']}
         buildings[name] = levels
+
+    apply_conquer_build_times(buildings)
 
     def drops(row, prefix, chance, count):
         result = []
@@ -273,7 +313,7 @@ def main():
         for name in FILES:
             shutil.copyfile(SOURCE / name, ARCHIVE / name)
     (ARCHIVE / '.htaccess').write_text('Require all denied\n', encoding='utf-8')
-    write(ROOT / 'data/buildings.json', {'version': 1, 'buildings': buildings, 'aliases': {'archery_range': 'barrack', 'stable': 'barrack'}})
+    write(ROOT / 'data/buildings.json', {'version': 2, 'buildings': buildings, 'aliases': {'archery_range': 'barrack', 'stable': 'barrack'}})
     write(ROOT / 'data/reference_monsters.json', {'version': 1, 'monsters': monsters})
     write(ROOT / 'data/field_objects.json', {'version': 1, 'objects': fields})
     write(ROOT / 'data/source_item_map.json', {'version': 1, 'items': mappings, 'unresolved': sorted(unresolved, key=lambda r: r['source_code']), 'building_materials': {k: v[0] for k, v in materials.items()}})

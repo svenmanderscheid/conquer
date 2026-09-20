@@ -78,9 +78,9 @@ export const villageBuildings={
  watch_tower:{x:35,z:-18,scale:1.4,radius:3.2,rotation:-.22},
  // Lower town: a western military yard and eastern production quarter flank
  // the straight route from the gate to the central terrace ramp.
- stable:{x:-24,z:10,scale:1.4,radius:5.5},
- archery_range:{x:-27,z:29,scale:1.4,radius:5.4},
- barrack:{x:-11,z:29,scale:1.6,radius:6.8},
+ stable:{x:-28,z:10,scale:1.4,radius:5.5},
+ archery_range:{x:-34,z:27,scale:1.4,radius:5.4},
+ barrack:{x:-13,z:28,scale:1.6,radius:6.8},
  farm:{x:13,z:15,scale:1.4,radius:5.5},
  gold_mine:{x:13,z:30,scale:1.4,radius:4.8,rotation:Math.PI},
  lumber_camp:{x:30,z:15,scale:1.3,radius:5.4,rotation:0},
@@ -106,10 +106,11 @@ export const villageRoads=[
  {id:'storage',surface:'stone',width:1,points:[[9,-2.5],[18,-3],[28,-3]]},
  {id:'watch',surface:'stone',width:1,points:[[28,-3],[34,-7],[35,-13.5]]},
  // Lower military and production lanes stay on their own sides of the gate road.
- {id:'stable',width:1.05,points:[[0,20],[-8,19],[-16,15],[-24,15]]},
- {id:'garrison',width:1,points:[[-16,15],[-19,20],[-19,24]]},
- {id:'archers',width:1,points:[[-19,24],[-23,24],[-27,24]]},
- {id:'infantry',width:1,points:[[-19,24],[-15,24],[-11,23]]},
+ {id:'stable',width:1.05,points:[[0,20],[-8,19],[-18,16],[-28,15.1]]},
+ // Approach every court from the open front; residents share these curves.
+ {id:'garrison',width:1,points:[[-18,16],[-22,22],[-23,29],[-23,35.5]]},
+ {id:'archers',width:1,points:[[-23,35.5],[-29,35],[-34,32]]},
+ {id:'infantry',width:1,points:[[-23,35.5],[-18,36],[-13,35.2]]},
  {id:'production',width:1.05,points:[[0,20],[7,20],[13,20],[21,21],[30,20]]},
  {id:'gold',width:1,points:[[13,20],[13,25]]},
  {id:'quarry',width:1,points:[[30,20],[30,25]]},

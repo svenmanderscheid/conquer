@@ -14,8 +14,11 @@ try{
  foreach(['css','js','city3d']as$part)copyPreviewTree(ROOT_DIR.'/assets/'.$part,$dir.'/assets/'.$part);
  copyPreviewTree(ROOT_DIR.'/assets/art/items',$dir.'/assets/art/items');
  foreach(['manifest.php','service-worker.js','offline.html']as$publicFile)copy(ROOT_DIR.'/'.$publicFile,$dir.'/'.$publicFile);
- file_put_contents($dir.'/config/app.php',"<?php return ['env'=>'development','log_level'=>'ERROR'];");mkdir($dir.'/logs',0700,true);
- $router='<?php $uri=parse_url($_SERVER["REQUEST_URI"],PHP_URL_PATH);if(str_starts_with($uri,"/assets/")){$file=realpath('.var_export(ROOT_DIR,true).'.$uri);$base=realpath('.var_export(ROOT_DIR.'/assets',true).');$ext=strtolower(pathinfo($file?:"",PATHINFO_EXTENSION));if($file&&str_starts_with($file,$base.DIRECTORY_SEPARATOR)&&in_array($ext,["css","js","png","jpg","svg","gif","webp","json","glb","gltf","bin","woff2"])){$mime=["css"=>"text/css","js"=>"text/javascript","svg"=>"image/svg+xml","png"=>"image/png","jpg"=>"image/jpeg","webp"=>"image/webp","json"=>"application/json"];header("Content-Type: ".($mime[$ext]??"application/octet-stream"));readfile($file);return;}http_response_code(404);return;}if(preg_match("#^/(src|views|config|data|logs|tests)/#",$uri)){http_response_code(403);return;}$_SERVER["SCRIPT_NAME"]="/index.php";require __DIR__."/index.php";';
+ // Visual audits deliberately open hundreds of menus faster than a player.
+ // Only their disposable fixture gets a larger read budget; security tests use the default.
+ $previewLimit=in_array('--appearance',$argv,true)?1000:120;
+ file_put_contents($dir.'/config/app.php',"<?php return ['env'=>'development','log_level'=>'ERROR','rate_limit_per_minute'=>".$previewLimit."];");mkdir($dir.'/logs',0700,true);
+ $router='<?php $uri=parse_url($_SERVER["REQUEST_URI"],PHP_URL_PATH);if(str_starts_with($uri,"/assets/")){$file=realpath('.var_export(ROOT_DIR,true).'.$uri);$base=realpath('.var_export(ROOT_DIR.'/assets',true).');$ext=strtolower(pathinfo($file?:"",PATHINFO_EXTENSION));if($file&&str_starts_with($file,$base.DIRECTORY_SEPARATOR)&&in_array($ext,["css","js","png","jpg","svg","gif","webp","json","glb","gltf","bin","woff2","wav"])){$mime=["css"=>"text/css","js"=>"text/javascript","svg"=>"image/svg+xml","png"=>"image/png","jpg"=>"image/jpeg","webp"=>"image/webp","json"=>"application/json","wav"=>"audio/wav"];header("Content-Type: ".($mime[$ext]??"application/octet-stream"));readfile($file);return;}http_response_code(404);return;}if(preg_match("#^/(src|views|config|data|logs|tests)/#",$uri)){http_response_code(403);return;}$_SERVER["SCRIPT_NAME"]="/index.php";require __DIR__."/index.php";';
  $publicRoutes='if(in_array($uri,["/manifest.php","/service-worker.js","/offline.html"],true)){if($uri==="/manifest.php"){$_SERVER["SCRIPT_NAME"]="/manifest.php";require __DIR__.$uri;}else{header("Content-Type: ".($uri==="/service-worker.js"?"text/javascript":"text/html"));readfile(__DIR__.$uri);}return;}';
  $router=str_replace('if(str_starts_with($uri,"/assets/"))',$publicRoutes.'if(str_starts_with($uri,"/assets/"))',$router);
  // Keep scripts/styles in the same snapshot as views and PHP. Serving live
@@ -26,8 +29,20 @@ try{
  $db->execute('INSERT INTO players(id,username,email,password_hash) VALUES(1,?,?,?)',['PreviewPlayer','preview@tests.invalid',password_hash('PreviewFixture!2026',PASSWORD_DEFAULT)]);
  if(in_array('--march-skins',$argv,true))$db->execute('UPDATE players SET gems=10000 WHERE id=1');
  $db->execute("INSERT INTO cities(id,player_id,world_id,name,coord_x,coord_y,castle_level,food,lumber,stone,gold) VALUES(1,1,1,'Vorschaukönigreich',65,65,12,100000,100000,100000,100000)");
+ if(in_array('--charm-runes',$argv,true)){
+  foreach(['normal','epic','legendary'] as $index=>$grade)$db->execute("INSERT INTO map_charms(world_id,coord_x,coord_y,stat_category,grade,charm_code,bonus_pct,effect_duration_seconds,spawned_at,expires_at) VALUES(1,?,69,'research',?,?,5,7200,UTC_TIMESTAMP(),DATE_ADD(UTC_TIMESTAMP(),INTERVAL 1 DAY))",[69+$index*3,$grade,10700001+$index]);
+ }
  foreach(\Conquer\Game\City\CityState::BUILDING_CODES as$code)$db->execute('INSERT INTO city_buildings(city_id,building_code,level) VALUES(1,?,?)',[$code,$code==='castle'?12:7]);
  foreach([50100101,50200101,50300101]as$code)$db->execute('INSERT INTO city_troops(city_id,troop_code,count) VALUES(1,?,500)',[$code]);
+ if(in_array('--march-roster',$argv,true)){
+  $troopCatalog=json_decode((string)file_get_contents(ROOT_DIR.'/data/troops.json'),true,512,JSON_THROW_ON_ERROR);
+  foreach($troopCatalog['troops'] as $troop)$db->execute('INSERT INTO city_troops(city_id,troop_code,count) VALUES(1,?,?) ON DUPLICATE KEY UPDATE count=VALUES(count)',[(int)$troop['code'],5000+(int)$troop['tier']*123]);
+ }
+ if(in_array('--comfort',$argv,true)){
+  $db->execute("INSERT INTO building_queue(city_id,building_code,level_to,started_at,finishes_at,is_processed) VALUES(1,'farm',7,DATE_SUB(UTC_TIMESTAMP(),INTERVAL 2 HOUR),DATE_SUB(UTC_TIMESTAMP(),INTERVAL 20 MINUTE),1)");
+  $db->execute("INSERT INTO troop_queue(city_id,troop_code,count,started_at,finishes_at,is_processed) VALUES(1,50100101,40,DATE_SUB(UTC_TIMESTAMP(),INTERVAL 2 HOUR),DATE_SUB(UTC_TIMESTAMP(),INTERVAL 20 MINUTE),1)");
+  $db->execute("INSERT INTO marches(player_id,world_id,march_type,origin_city_id,target_x,target_y,target_type,troops_json,haul_json,departure_time,arrival_time,return_time,state) VALUES(1,1,9,1,66,65,5,'{\"50100101\":10}','{\"survivors\":{\"50100101\":10}}',DATE_SUB(UTC_TIMESTAMP(),INTERVAL 2 HOUR),DATE_SUB(UTC_TIMESTAMP(),INTERVAL 1 HOUR),DATE_SUB(UTC_TIMESTAMP(),INTERVAL 20 MINUTE),'complete')");
+ }
  if(in_array('--teleport',$argv,true)){
   $db->execute("INSERT INTO alliances(id,world_id,name,tag,leader_id)VALUES(1,1,'Vorschau-Allianz','QA',1)");
   $db->execute("INSERT INTO alliance_members(alliance_id,player_id,world_id,role)VALUES(1,1,1,'leader')");
@@ -83,6 +98,17 @@ try{
   $db->execute("INSERT INTO marches(player_id,world_id,march_type,origin_city_id,target_x,target_y,target_type,troops_json,haul_json,departure_time,arrival_time,return_time,state) VALUES(1,1,9,1,61,71,5,'{\"50200101\":200}', '{\"survivors\":{\"50200101\":200},\"loot\":{\"food\":250}}',DATE_SUB(UTC_TIMESTAMP(),INTERVAL 20 MINUTE),DATE_SUB(UTC_TIMESTAMP(),INTERVAL 10 MINUTE),DATE_ADD(UTC_TIMESTAMP(),INTERVAL 10 MINUTE),'returning')");
  }
  // Receipt QA needs a target from the gathering fixture but empty march slots.
+ if(in_array('--map-privacy',$argv,true)){
+  \Conquer\Game\World\LandProgressService::ensureWorld(1,false);
+  $db->execute("UPDATE worlds SET started_at=UTC_TIMESTAMP() WHERE id=1");
+  $db->execute("UPDATE world_land_zones SET status=IF(zone_key='center','locked','open'),opened_at=IF(zone_key='center',NULL,UTC_TIMESTAMP()) WHERE world_id=1");
+  $db->execute("INSERT INTO worlds(id,name,slug,status,map_size,map_seed) VALUES(2,'Private test world','private-test-world','running',1024,21)");
+  $mapCenter=intdiv((int)$db->query('SELECT map_size FROM worlds WHERE id=1')->fetchColumn(),2);
+  foreach([[4,1,86,65,1],[5,2,86,65,0],[6,1,220,65,0],[7,1,$mapCenter,$mapCenter,0]] as [$pid,$world,$x,$y,$hidden]){
+   $db->execute('INSERT INTO players(id,username,email,password_hash) VALUES(?,?,?,?)',[$pid,'MapPrivacy'.$pid,'map'.$pid.'@tests.invalid','unused']);
+   $db->execute("INSERT INTO cities(player_id,world_id,name,coord_x,coord_y,is_hidden) VALUES(?,?,'Map privacy fixture',?,?,?)",[$pid,$world,$x,$y,$hidden]);
+  }
+ }
  if(in_array('--army-receipts',$argv,true))$db->execute('DELETE FROM marches WHERE player_id=1');
  if(in_array('--dungeons',$argv,true)){
   \Conquer\Db\MigrationSql::apply($db->getPdo(),file_get_contents(ROOT_DIR.'/migrations/0082_create_dungeons.sql'));
@@ -148,6 +174,7 @@ try{
  }
  if(in_array('--mailbox',$argv,true)){require ROOT_DIR.'/tests/Support/MailboxFixture.php';\ConquerTests\MailboxFixture::seed();}
  if(in_array('--monster-reports',$argv,true))require ROOT_DIR.'/tests/fixtures/monster_reports.php';
+ if(in_array('--scout-reports',$argv,true))require ROOT_DIR.'/tests/fixtures/scout_reports.php';
  if(in_array('--monster-health',$argv,true))require ROOT_DIR.'/tests/fixtures/monster_health.php';
  if(in_array('--inventory-overview',$argv,true)){
   foreach([10101001=>108000,10101011=>106800,10101021=>22200,10101031=>11220,10101041=>700,10104001=>150,10106001=>80,10103003=>1879,10103011=>255,10103021=>890,10103031=>600,10103041=>392]as$code=>$quantity){

@@ -1,27 +1,59 @@
 (() => {
     'use strict';
     const base = window.CONQUER_BASE;
+    const sound=window.ConquerAudio?.create({base});
     const $ = selector => document.querySelector(selector);
     const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-    const fmt = n => Math.floor(Number(n) || 0).toLocaleString('de-DE');
+    const i18n=window.ConquerLocale;
+    const t=(key,parameters={})=>i18n?.t(key,parameters)??key;
+    const fmt = n => i18n?.formatNumber(Math.floor(Number(n)||0))??String(Math.floor(Number(n)||0));
     const date = value => { if (!value) return Date.now(); const raw=String(value).replace(' ','T'); return Date.parse(/[zZ]|[+-]\d\d:\d\d$/.test(raw)?raw:raw+'Z'); };
-    const duration = n => { const seconds=Math.max(0,Math.ceil(Number(n)||0));return seconds<60?`${seconds} Sek.`:seconds<3600?`${Math.floor(seconds/60)} Min. ${seconds%60} Sek.`:`${Math.floor(seconds/3600)} Std. ${Math.floor(seconds%3600/60)} Min.`; };
-    const labels = {watch_tower:'Wachturm',castle:'Burg',wall:'Stadtmauer',farm:'Bauernhof',lumber_camp:'Sägewerk',quarry:'Steinbruch',gold_mine:'Goldmine',storage:'Lagerhaus',treasure_house:'Schatzkammer',barrack:'Kaserne',archery_range:'Schützenlager',stable:'Reiterhof',hospital:'Hospital',academy:'Akademie',trading_post:'Handelsposten',hall_of_alliance:'Allianzhalle'};
+    const duration = n => i18n?.formatDuration(n)??String(Math.max(0,Math.ceil(Number(n)||0)));
+    const labels = {watch_tower:t('building.watch_tower'),castle:t('building.castle'),wall:t('building.wall'),farm:t('building.farm'),lumber_camp:t('building.lumber'),quarry:t('building.quarry'),gold_mine:t('building.gold'),storage:t('building.storage'),treasure_house:t('building.treasure'),barrack:t('building.barrack'),archery_range:t('building.archery'),stable:t('building.stable'),hospital:t('building.hospital'),academy:t('building.academy'),trading_post:t('building.market'),hall_of_alliance:t('building.alliance')};
     const symbols = {watch_tower:'⌖',castle:'♜',wall:'▥',farm:'🌾',lumber_camp:'🪵',quarry:'🪨',gold_mine:'🪙',storage:'📦',treasure_house:'💎',barrack:'⚔',archery_range:'🏹',stable:'♞',hospital:'✚',academy:'✦',trading_post:'⚖',hall_of_alliance:'⚑'};
     const resourceIcons = {food:'🌾',lumber:'🪵',stone:'🪨',gold:'🪙'};
-    const resourceNames = {food:'Nahrung',lumber:'Holz',stone:'Stein',gold:'Gold'};
-    const descriptions = {watch_tower:'Ein Aussichtspunkt über deiner Stadt. Von hier gelangst du zur Weltkarte.',castle:'Das Herz deines Reichs. Eine größere Burg erlaubt höhere Gebäudestufen.',farm:'Versorgt deine Truppen mit Nahrung. Produziert auch, während du offline bist.',lumber_camp:'Holz für neue Gebäude und die Ausbildung deiner Armee.',quarry:'Stein macht aus einem kleinen Dorf eine standhafte Festung.',gold_mine:'Gold finanziert deine Forschung und wertvolle Verbesserungen.',barrack:'Bildet standhafte Infanterie für die vorderste Reihe aus.',archery_range:'Hier üben deine Bogenschützen Präzision und Fernkampf.',stable:'Hier trainieren Reiter und ihre treuen Pferde für den nächsten Einsatz.',academy:'Wissen ist Macht. Erforsche dauerhafte Verbesserungen für dein Reich.',wall:'Schützt deine Stadt und ist Voraussetzung für den nächsten Burgausbau.',storage:'Erweitert den Platz für deine produzierten Ressourcen.',hospital:'Ein Zufluchtsort für verwundete Truppen.',treasure_house:'Bewahrt die Schätze deines Königreichs.',trading_post:'Der Treffpunkt für Händler und Reisende.',hall_of_alliance:'Ein Ort für gemeinsame Pläne und Verbündete.'};
-    const researchNames = {food_production:'Reiche Ernte',lumber_production:'Geschickte Holzfäller',wood_production:'Geschickte Holzfäller',stone_production:'Bessere Werkzeuge',gold_production:'Goldene Zeiten',infantry_hp:'Standhafte Infanterie',infantry_atk:'Geschärfte Klingen',infantry_def:'Starke Schilde',ranged_def:'Leichte Rüstungen',ranged_atk:'Präzise Pfeile',cavalry_def:'Gepanzerte Reiter',cavalry_atk:'Mächtiger Ansturm',ranged_hp:'Ausdauer der Schützen',cavalry_hp:'Starke Reittiere',construction_speed:'Flotte Baumeister',research_speed:'Wissensdurst',gathering_speed:'Fleißige Sammler'};
+    const resourceNames = {food:t('common.food'),lumber:t('common.lumber'),stone:t('common.stone'),gold:t('common.gold')};
+    const descriptions = Object.fromEntries(['watch_tower','castle','farm','lumber_camp','quarry','gold_mine','barrack','archery_range','stable','academy','wall','storage','hospital','treasure_house','trading_post','hall_of_alliance'].map(code=>[code,t('building.description.'+code)]));
+    const researchNames = Object.fromEntries(['food_production','lumber_production','wood_production','stone_production','gold_production','infantry_hp','infantry_atk','infantry_def','ranged_def','ranged_atk','cavalry_def','cavalry_atk','ranged_hp','cavalry_hp','construction_speed','research_speed','gathering_speed'].map(code=>[code,t('research.name.'+code)]));
     const monsterArt = m => /^(?:monsters\/)?[a-z0-9-]+$/.test(m.definition?.art||'') ? m.definition.art : /skeleton/i.test(m.definition?.name) ? 'skeleton' : /golem/i.test(m.definition?.name) ? 'golem' : 'orc';
     const iconPaths = {treasures:'M3 10V7l3-4h12l3 4v13H3V10Zm0 0h18M10 8h4v5h-4V8Z',city:'M3 21V9h5V4l4-2 4 2v5h5v12H3Zm6 0v-6h6v6M8 9h8M5 12v2m14-2v2',world:'m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2V5Zm6-2v16m6-14v16',army:'m4 3 7 7-2 2-7-7 2-2Zm16 0-7 7 2 2 7-7-2-2ZM8 14l-5 5m13-5 5 5M5 13l6 6m2 0 6-6',research:'M3 4h7l2 2 2-2h7v15h-7l-2 2-2-2H3V4Zm9 2v15',reports:'M5 3h14v18H5V3Zm3 5h8m-8 4h8m-8 4h5'};
-    const navs = {worlds:'Weltenauswahl',community:'Gemeinschaft',defense:'Verteidigung',events:'Weltereignisse',mastery:'Hunter-Talente',account:'Kontosicherheit',city:'Königreich',expeditions:'Feldzüge',dungeons:'Dungeons',world:'Weltkarte',land:'Landübersicht',alliance:'Allianz',army:'Truppen',research:'Forschung',quests:'Aufgaben',inventory:'Inventar',treasures:'Schatzkammer',reports:'Post',profile:'Profil',rankings:'Rangliste',arena:'Arena',market:'Shop',settings:'Optionen',help:'Anfangsguide',bugreport:'Bug melden'};
-    const navIcons = {dungeons:'⚔',expeditions:'♜',land:'▦',alliance:'⚑',quests:'✓',inventory:'▣',profile:'♛',rankings:'♕',arena:'⚒',market:'⚖',settings:'⚙',help:'?',bugreport:'!'};
+    const navs = Object.fromEntries(['worlds','community','defense','events','mastery','account','city','expeditions','dungeons','world','land','alliance','army','research','quests','inventory','treasures','reports','profile','rankings','arena','market','settings','help','bugreport'].map(code=>[code,t('nav.'+code)]));
+    Object.assign(iconPaths,{
+        worlds:'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm0 0c-5 5-5 13 0 18 5-5 5-13 0-18ZM3 12h18',
+        community:'M8 4a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm8 1a3 3 0 1 1 0 6M2 20v-3a6 6 0 0 1 12 0v3Zm14-6a5 5 0 0 1 6 5v1h-5',
+        defense:'m12 2 8 3v6c0 5-4 8-8 11-4-3-8-6-8-11V5l8-3Zm0 5v9m-4-5h8',
+        events:'M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Zm2-3v6m10-6v6M3 10h18m-14 5 3 3 7-5',
+        mastery:'M12 3v6m0 0-7 5m7-5 7 5M5 14v5m14-5v5M9 3h6v4H9V3ZM3 19h4v3H3v-3Zm14 0h4v3h-4v-3Z',
+        account:'M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM4 21v-2a8 8 0 0 1 16 0v2H4Z',
+        profile:'M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM4 21v-2a8 8 0 0 1 16 0v2H4Z',
+        expeditions:'m3 20 9-17 9 17H3Zm9-17v17m-4 0 4-7 4 7',
+        dungeons:'M4 21V11a8 8 0 0 1 16 0v10H4Zm5 0v-8a3 3 0 0 1 6 0v8M4 12h5m6 0h5M7 5l3 4m7-4-3 4',
+        land:'m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6Zm6-3v15m6-12v15',
+        alliance:'M5 22V3m0 1c4-4 8 4 14 0v10c-6 4-10-4-14 0',
+        quests:'M8 4H5v17h14V4h-3M8 2h8v5H8V2Zm-1 12 3 3 7-7',
+        inventory:'M8 7V5a4 4 0 0 1 8 0v2M5 7h14l2 14H3L5 7Zm3 5h8v6H8v-6Z',
+        rankings:'M8 3h8v6a4 4 0 0 1-8 0V3Zm0 2H3v3a4 4 0 0 0 5 4m8-7h5v3a4 4 0 0 1-5 4m-4 1v5m-5 3h10m-9-3h8v3H8v-3Z',
+        arena:'m4 3 7 7-2 2-7-7 2-2Zm16 0-7 7 2 2 7-7-2-2ZM8 14l-5 5m13-5 5 5M5 13l6 6m2 0 6-6',
+        market:'M3 9h18l-2-6H5L3 9Zm1 0v12h16V9m-11 12v-7h6v7M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0',
+        settings:'M4 6h16M4 12h16M4 18h16M8 3v6m8 0v6m-6 0v6',
+        help:'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM9 9a3 3 0 1 1 5 2c-2 1-2 2-2 3m0 3v1',
+        bugreport:'M6 8h12v7a6 6 0 0 1-12 0V8Zm3 0V5h6v3M2 11h4m12 0h4M2 17h4m12 0h4M7 4 5 2m12 2 2-2m-7 8v10'
+    });
+    const navIcons = {};
     const svg = key => `<span class="nav-emblem">${iconPaths[key] ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${iconPaths[key]}"/></svg>` : `<span class="nav-symbol" aria-hidden="true">${navIcons[key] || '✦'}</span>`}</span>`;
     let state, kingdom, expeditions, market, current = Object.hasOwn(navs, location.hash.slice(1)) ? location.hash.slice(1) : 'city', filter = 'monsters', busy = false, polling = null, offset = 0, toastTimer, lastSignature = '', dialogTrigger=null, teleportSelection=null;
     const loadErrors = {};
+    let apiRetryAt=0;
+    let dialogVersion=0;
+    const viewPositions=new Map();
+    const scrollAreas=['.quest-list','.guide-body','.inventory-overview-scroll','.inventory-scroll-board','.inventory-scroll-list','.inventory-inspector','.rt-scroll','.hospital-list'];
+    function rememberView(){if(isPlayfield(current)||!panelDialog.open||panelDialog.dataset.panel!==current)return;viewPositions.set(current,{top:panelHost.scrollTop,areas:scrollAreas.map(selector=>[selector,panelHost.querySelector(selector)?.scrollTop||0])});}
     let armyTier=1;
     let playfield=current==='world'?'world':'city';
     const playfieldHost=$('#content'),panelHost=$('#panel-content'),panelDialog=$('#panel-dialog');
+    // A native close hides layout before its close event; keep positions while visible.
+    panelHost.addEventListener('scroll',rememberView,{capture:true,passive:true});
+    panelDialog.addEventListener('click',rememberView,true);
     const toastElement=$('#toast');
     let panelTrigger=null;
     let sceneHosts=null;
@@ -36,24 +68,29 @@
     function placeToast() { const host=$('#game-dialog').open?$('#game-dialog'):panelDialog.open?panelDialog:document.body;if(toastElement.parentElement!==host)host.append(toastElement); }
     function toast(message) { placeToast();toastElement.textContent=message;toastElement.classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toastElement.classList.remove('visible'),3200); }
     async function api(path, payload) {
+        if(!payload&&Date.now()<apiRetryAt)throw new Error('Bitte warte einen Moment und versuche es erneut.');
         let response;
         const world=Number(state?.city.world_id||window.CONQUER_WORLD||1);
         if(payload)payload={...payload,expected_world_id:payload.expected_world_id??world};
         let command=null;
         if(payload){try{command=commands.prepare(path,payload);if(command)payload=command.body;}catch(e){commandRecovery();throw e;}}
         try { response = await fetch(base + '/api/' + path, {method:payload ? 'POST':'GET', credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(20000),headers:payload ? {'Content-Type':'application/json','X-CSRF-Token':state?.player.csrf ?? '','X-World-ID':String(world)}:{'X-World-ID':String(world)},body:payload ? JSON.stringify(payload):undefined}); }
-        catch(e){if(command)commandRecovery();throw new Error(e.name==='TimeoutError'?'Die Verbindung braucht länger als erwartet. Bitte prüfe deinen aktuellen Spielstand, bevor du eine Aktion wiederholst.':'Keine Verbindung zum Königreich. Bitte versuche es erneut.');}
-        let body; try { body = await response.json(); } catch { if(command)commandRecovery();throw new Error('Der Server ist gerade nicht erreichbar. Bitte versuche es erneut.'); }
-        if (!body.ok || !response.ok) { if(command){if(response.headers.get('X-Operation-Rejected')==='1'){commands.complete(command);if($('#game-dialog [data-action="command-retry"]'))$('#game-dialog').close();}else commandRecovery();}if (response.status === 401) location.href = base + '/'; if(body.error?.code==='WORLD_CHANGED'){location.reload();} const error=new Error(body.message || body.error?.message || (typeof body.error==='string'?body.error:null) || 'Aktion fehlgeschlagen.');error.code=body.error?.code||null;error.definite=response.status>=400&&response.status<500&&response.status!==408;throw error; }
+        catch(e){if(command)commandRecovery();throw new Error(t(e.name==='TimeoutError'?'error.network_timeout':'error.no_connection'));}
+        if(response.status===429){const seconds=Number(response.headers.get('Retry-After'));apiRetryAt=Math.max(apiRetryAt,Date.now()+Math.max(1,Number.isFinite(seconds)?seconds:10)*1000);}
+        let body; try { body = await response.json(); } catch { if(command)commandRecovery();throw new Error(t('error.server_unavailable')); }
+        if (!body.ok || !response.ok) { if(command){if(response.headers.get('X-Operation-Rejected')==='1'){commands.complete(command);if($('#game-dialog [data-action="command-retry"]'))$('#game-dialog').close();}else commandRecovery();}if (response.status === 401) location.href = base + '/'; if(body.error?.code==='WORLD_CHANGED'){location.reload();} const code=body.error?.code||null,errorKey=code?'error.'+String(code).toLowerCase():'';const error=new Error(errorKey&&i18n?.has(errorKey)?t(errorKey):(body.message || body.error?.message || (typeof body.error==='string'?body.error:null) || t('error.action_failed')));error.code=code;error.definite=response.status>=400&&response.status<500&&response.status!==408;throw error; }
         if(command)commands.complete(command);
+        sound?.confirmed(path,payload,body.data);
         return body.data;
     }
     async function refresh(renderPage = true) {
         if (polling) return polling;
         polling = (async()=>{
             try {
-                const center=playfield==='world'?window.ConquerWorld.getCenter():null;
-                const results=await Promise.allSettled([api('game/state'+(center?`?map_x=${center.x}&map_y=${center.y}&map_radius=${center.radius||30}`:'')),api('kingdom/state'),api('expeditions/state'),api('market/state')]);
+                const center=playfield==='world'?window.ConquerWorld.getCenter():null,returnSince=comfort.since();
+                const query=new URLSearchParams(center?{map_x:center.x,map_y:center.y,map_radius:center.radius||30}:{});
+                if(returnSince)query.set('return_since',returnSince);
+                const results=await Promise.allSettled([api('game/state'+(query.size?'?'+query:'')),api('kingdom/state'),api('expeditions/state'),current==='market'?api('market/state'):Promise.resolve(market)]);
                 if(results[0].status==='rejected')throw results[0].reason;
                 state=results[0].value;offset=state.server_time*1000-Date.now();
                 state.research_defs.forEach(node=>{researchNames[node.code]=window.ConquerResearch.title(node);});
@@ -72,6 +109,8 @@
                 monsterReports.update(state.reports);
                 if(current==='help')beginnerGuide.render();
                 beginnerGuide.maybeWelcome(current);
+                comfort.update();
+                sound?.observe(state);
             } catch(e) {
                 $('#save-state').textContent='Verbindung unterbrochen';$('#save-state').classList.add('error');
                 if(!state)$('#content').innerHTML=`<div class="empty"><span class="empty-icon">♜</span><h3>Dein Reich ist kurz außer Reichweite.</h3><p>${esc(e.message)}</p><button class="button" data-action="retry">Erneut versuchen</button></div>`;
@@ -80,22 +119,29 @@
         try{return await polling;}finally{polling=null;}
     }
     async function action(path, payload, message) {
-        if (busy) return;
+        if (busy) {toast('Dein Auftrag wird noch bestätigt …');return null;}
         const receipt=path==='kingdom/action'&&rewards.tracked(payload);
         if(receipt){payload=rewards.prepare(payload);if(!payload)return null;}
-        busy=true; const buttons=[...document.querySelectorAll('#game-dialog button,#game-dialog input,#game-dialog select,#game-dialog textarea,#content .button')].filter(el=>!el.disabled); buttons.forEach(b=>b.disabled=true);
+        busy=true;
+        const version=dialogVersion,trigger=document.activeElement?.closest('button'),form=trigger?.closest('form');
+        const buttons=(form?[...form.querySelectorAll('button,input,select,textarea')]:trigger?[trigger]:[]).filter(el=>!el.disabled);
+        const triggerHtml=trigger?.innerHTML;
+        buttons.forEach(b=>b.disabled=true);
+        if(trigger){trigger.setAttribute('aria-busy','true');trigger.textContent='Wird bestätigt …';}
+        toast('Dein Auftrag wird bestätigt …');clearTimeout(toastTimer);
         try {
             if(polling)await polling;
-            const result=await api(path,payload);if(!receipt)$('#game-dialog').close();delete $('#content').dataset.dirty;
+            const result=await api(path,payload);if(!receipt&&version===dialogVersion)$('#game-dialog').close();delete $('#content').dataset.dirty;
             if(!receipt||!result?.result?.drops?.length)toast(result?.message||message||'Gespeichert.');
             if(path==='kingdom/action'&&result?.state)kingdom=result.state;if(path==='expeditions/action'&&result?.state)expeditions=result.state;
             await refresh(false);render();lastSignature='';$('#city-frame')?.contentWindow?.postMessage({type:'conquer:refresh'},location.origin);
             if(receipt)rewards.success(result,payload);
             return result;
-        } catch(e){if(receipt)rewards.failure(e);toast(e.message);return null;}
-        finally{busy=false;buttons.forEach(b=>{if(b.isConnected)b.disabled=false;});}
+        } catch(e){sound?.play('error');if(receipt)rewards.failure(e);toast(e.message);return null;}
+        finally{busy=false;buttons.forEach(b=>{if(b.isConnected)b.disabled=false;});if(trigger?.isConnected){trigger.innerHTML=triggerHtml;trigger.removeAttribute('aria-busy');}}
     }
     function openDialog(html,{focusHeading=false}={}) {
+        dialogVersion++;
         const dialog=$('#game-dialog'),content=$('#dialog-content');
         if(!dialog.open)dialogTrigger=document.activeElement;
         delete dialog.dataset.building;delete dialog.dataset.buildingRecommendation;delete dialog.dataset.march;delete dialog.dataset.research;
@@ -162,16 +208,17 @@
         if(!Object.hasOwn(navs,tab))return;
         if($('#scene-transition')?.classList.contains('is-active')&&tab===current)return;
         const changesScene=isPlayfield(tab)&&playfield!==tab;
+        rememberView();
         if(tab!=='world')teleportSelection=null;
         if($('#game-dialog').open)$('#game-dialog').close();
         if(!isPlayfield(tab)&&!panelDialog.open){const trigger=document.activeElement;panelTrigger={node:trigger,id:trigger?.id,tab:trigger?.closest('[data-id]')?.dataset.id};}
         delete $('#content').dataset.dirty;current=tab;if(isPlayfield(tab))playfield=tab;
         location.hash=tab;
-        const commit=()=>{render();panelHost.scrollTop=0;if(!isPlayfield(tab)&&focusTitle)$('#page-title').focus({preventScroll:true});};
+        const commit=()=>{render();const position=viewPositions.get(tab);panelHost.scrollTop=position?.top||0;for(const [selector,top]of position?.areas||[]){const area=panelHost.querySelector(selector);if(area)area.scrollTop=top;}if(!isPlayfield(tab)&&focusTitle)$('#page-title').focus({preventScroll:true});};
         if(changesScene)transitionScene(tab,commit);else commit();
-        if(tab==='market'&&!kingdom?.trading)refresh();
+        if(tab==='market')refresh();
     }
-    function costHtml(cost,illustrated=false) { return `<div class="costs">${Object.entries(cost).filter(([k,v]) => resourceIcons[k] && v > 0).map(([k,v]) => `<span class="${state.city[k] < v ? 'insufficient':''}" title="${resourceNames[k]}">${illustrated?`<img class="research-cost-icon" src="${base}/assets/art/ui-resources/${k}.png" alt="${resourceNames[k]}">`:resourceIcons[k]} ${fmt(v)}</span>`).join('')}</div>`; }
+    function costHtml(cost,illustrated=true) { return `<div class="costs">${Object.entries(cost).filter(([k,v]) => resourceIcons[k] && v > 0).map(([k,v]) => `<span class="${state.city[k] < v ? 'insufficient':''}" title="${resourceNames[k]}">${illustrated?`<img class="research-cost-icon" src="${base}/assets/art/ui-resources/${k}.png" alt="${resourceNames[k]}">`:resourceIcons[k]} ${fmt(v)}</span>`).join('')}</div>`; }
     function canAfford(cost) { return Object.entries(cost).every(([k,v]) => !resourceIcons[k] || state.city[k] >= v); }
     function requirementResources(cost) {
         const entries=Object.entries(cost||{}).filter(([key,value])=>resourceIcons[key]&&Number(value)>0);
@@ -202,7 +249,7 @@
     }
     function resourceDialog(resource){
         const building={food:'farm',lumber:'lumber_camp',stone:'quarry',gold:'gold_mine'}[resource];if(!building)return;
-        openDialog(`<span class="card-icon">${resourceIcons[resource]}</span><h2>${resourceNames[resource]} für dein Reich</h2><p class="muted">Deine Gebäude produzieren auch während deiner Abwesenheit. Mehr Rohstoffe erhältst du durch Sammelzüge, Aufgaben, Vorratspakete und den Handelsposten.</p><div class="detail-row"><span>Aktueller Bestand</span><strong>${fmt(state.city[resource])}</strong></div><div class="detail-row"><span>Produktionslager inkl. Forschung</span><strong>${fmt(state.storage_caps?.[resource])}</strong></div><div class="detail-row"><span>Produktion pro Stunde</span><strong>${fmt(state.production_rates[building])}</strong></div><div class="detail-row"><span>${labels[building]}</span><strong>Stufe ${state.buildings[building].level}</strong></div><div class="button-row"><button class="button gold" data-action="building" data-id="${building}">Produktion ausbauen</button><button class="button secondary" data-action="dialog-tab" data-id="inventory">Vorräte öffnen</button></div>`);
+        openDialog(`<span class="card-icon"><img class="resource-help-icon" src="${base}/assets/art/ui-resources/${resource}.png" alt=""></span><h2>${resourceNames[resource]} für dein Reich</h2><p class="muted">Deine Gebäude produzieren auch während deiner Abwesenheit. Mehr Rohstoffe erhältst du durch Sammelzüge, Aufgaben, Vorratspakete und den Handelsposten.</p><div class="detail-row"><span>Aktueller Bestand</span><strong>${fmt(state.city[resource])}</strong></div><div class="detail-row"><span>Produktionslager inkl. Forschung</span><strong>${fmt(state.storage_caps?.[resource])}</strong></div><div class="detail-row"><span>Produktion pro Stunde</span><strong>${fmt(state.production_rates[building])}</strong></div><div class="detail-row"><span>${labels[building]}</span><strong>Stufe ${state.buildings[building].level}</strong></div><div class="button-row"><button class="button gold" data-action="building" data-id="${building}">Produktion ausbauen</button><button class="button secondary" data-action="dialog-tab" data-id="inventory">Vorräte öffnen</button></div>`);
     }
     function ensureSceneHosts() {
         if(sceneHosts?.root.isConnected)return sceneHosts;
@@ -271,6 +318,7 @@
         worldChat.update(!hasPanel&&isPlayfield(current));
         overlay.update();trainingHud.update();vipPanel.updateHud();
         placeToast();
+        sound?.updateControls();
     }
     function renderCity(host=playfieldHost) {
         if(!$('#city-frame'))host.innerHTML=`<div class="city-playfield"><iframe id="city-frame" class="city-frame" src="${base}/city/3d?embed=1" title="Dein Königreich – wähle ein Gebäude zum Ausbau"></iframe><button class="city-building-tool" data-action="buildings" aria-label="Gebäudeübersicht öffnen" title="Gebäude"><span aria-hidden="true">♜</span><small>Gebäude</small></button></div>`;
@@ -385,11 +433,7 @@
         const r=state.reports.find(r=>Number(r.id)===Number(id));if(!r)return;
         if(['city','rally'].includes(r.details?.battle_kind)){combatReport.open(r);return;}
         if(window.ConquerMonsterReport.isMonster(r))return monsterReports.open(r);
-        if(r.details?.type==='scout'){
-            if(r.details.blocked){openDialog(`<h2>Spähbericht · ${esc(r.details.target_name)}</h2><p>${esc(r.details.reason||'Die Stadt ist vor Spähern geschützt.')}</p>`);return;}
-            const d=r.details,army=rows=>Object.entries(rows||{}).map(([code,n])=>`<div class="detail-row"><span>${esc(unitName(state.troop_defs.find(t=>Number(t.code)===Number(code))||{name:code}))}</span><strong>${fmt(n)}</strong></div>`).join('')||'<p>Keine Truppen gesichtet.</p>';
-            openDialog(`<h2>Spähbericht · ${esc(d.target_name)}</h2><div class="progression-content"><p>Aufklärung bei ${r.target_x}, ${r.target_y}. Die Werte zeigen den Zeitpunkt der Ankunft.</p><h3>Mauer</h3><p>${fmt(d.wall?.durability)} / ${fmt(d.wall?.durability_max)} HP</p><h3>Vorräte</h3>${costHtml(d.resources||{},true)}<h3>Geschützte Vorräte</h3>${costHtml(d.protected_resources||{},true)}<h3>Garnison</h3>${army(d.troops)}<h3>Verstärkungen</h3>${army(d.reinforcements)}<h3>Relikte</h3><ul>${(d.treasures||[]).map(t=>`<li>${esc(t.name||t.treasure_code)} · Stufe ${fmt(t.level)}</li>`).join('')||'<li>Keine ausgerüsteten Relikte.</li>'}</ul><h3>Meisterschaft</h3><ul>${(d.mastery?.nodes||[]).filter(n=>n.level>0).map(n=>`<li>${esc(n.name)} · ${n.level}</li>`).join('')||'<li>Keine Meisterschaftspunkte vergeben.</li>'}</ul></div>`);return;
-        }
+        if(r.details?.type==='scout')return scoutReports.open(r);
         const d=r.details||{},pvp=['city','rally'].includes(d.battle_kind),units=d.troops||[],size=innerHeight<540?1:innerHeight<700?2:3,pages=Math.max(1,Math.ceil(units.length/size));
         page=Math.max(0,Math.min(pages-1,Number(page)||0));
         const summary=`<section>${d.lord_xp>0?`<p class="notice">+${fmt(d.lord_xp)} Jagd-XP für deinen Hunter</p>`:''}<p class="muted">Gefecht bei ${r.target_x}, ${r.target_y}</p><div class="detail-row"><span>Gegner</span><strong>${esc(d.target_name||d.monster_name||'Monster')}</strong></div>${!pvp&&d.army_power!=null?`<div class="detail-row"><span>${d.type==='monster_rally'?'Rally-Macht':'Armeemacht'}</span><strong>${fmt(d.army_power)} / ${fmt(d.required_power)} benötigt</strong></div>`:`<div class="detail-row"><span>${pvp?'Angriffsstärke':d.type==='monster_rally'?'Schaden der Rally':'Schaden'}</span><strong>${fmt(d.attacker_damage)}</strong></div>`}<div class="detail-row"><span>${pvp?'Verteidigung':'Gegner-HP übrig'}</span><strong>${fmt(pvp?d.defender_strength:d.monster_hp_after)}</strong></div></section>`;
@@ -400,7 +444,7 @@
     function sendPreferences(){const frame=$('#city-frame')?.contentWindow;if(!frame)return;frame.postMessage({type:'conquer:preferences',reduced_motion:Boolean(kingdom?.settings?.reduced_motion),city_skin:kingdom?.profile?.city_skin||'default'},location.origin);frame.postMessage({type:'conquer:visibility',visible:!document.hidden&&current==='city'&&!$('#game-dialog').open&&!panelDialog.open},location.origin);}
     function menuDialog() {
         const groups=[['Königreich',['quests','army','research','treasures','mastery','market','defense']],['Gemeinsam',['land','dungeons','expeditions','community','events','rankings','arena']],['Mein Spiel',['settings','worlds','account','help','bugreport']]];
-        openDialog('<h2>Spielmenü</h2><div class="menu-groups">'+groups.map(([title,keys])=>'<section><h3>'+title+'</h3><div class="menu-grid">'+keys.map(key=>'<button class="menu-link '+(current===key?'selected':'')+'" data-action="dialog-tab" data-id="'+key+'" '+(current===key?'aria-current="page"':'')+'>'+svg(key)+'<span>'+navs[key]+'</span></button>').join('')+'</div></section>').join('')+'</div>');
+        openDialog('<h2>Spielmenü</h2><div class="menu-groups">'+groups.map(([title,keys])=>'<section><h3>'+title+'</h3><div class="menu-grid">'+keys.map(key=>'<button class="menu-link '+(current===key?'selected':'')+'" data-action="'+(key==='bugreport'?'bug-report-open':'dialog-tab')+'" data-id="'+key+'" '+(current===key?'aria-current="page"':'')+'>'+svg(key)+'<span>'+navs[key]+'</span></button>').join('')+'</div></section>').join('')+'</div>');
         $('#dialog-content .menu-grid').insertAdjacentHTML('beforeend','<button class="menu-link" data-action="vip-open"><span class="nav-emblem">♛</span><span>VIP</span></button>');
         $('#game-dialog').classList.add('menu-dialog');
     }
@@ -410,15 +454,16 @@
     }
     const reportShare=window.ConquerReportShare({api,toast,esc,getState:()=>state});
     const combatReport=window.ConquerCombatReport({base,esc,fmt,openDialog,toast,unitName,getState:()=>state,openReport:id=>reportDialog(id),shareReport:(text,id)=>reportShare.open(text,id)});
-    const marchPanel=window.ConquerMarch({base,esc,fmt,openDialog,action,toast,getState:()=>state,getKingdom:()=>kingdom,getProfile:()=>kingdom?.profile,unitName,loadFormations:()=>defensePanel.refresh().then(s=>s.formations)});
+    const marchPanel=window.ConquerMarch({base,esc,fmt,openDialog,action,toast,api,getState:()=>state,getKingdom:()=>kingdom,getProfile:()=>kingdom?.profile,unitName,loadFormations:()=>defensePanel.refresh().then(s=>s.formations),shareTarget:(text)=>reportShare.open(text,0,{title:'Ziel teilen',prompt:'In welchem Chat möchtest du dieses Ziel teilen?',destinationLabel:'Chat für das Ziel',success:'Ziel geteilt.'})});
     const rallyPanel=window.ConquerRallies({api,esc,fmt,date,duration,openDialog,action,toast,marchPanel,getState:()=>state});
     window.addEventListener('conquer-rally-updated',()=>rallyPanel.list());
     const congressPanel=window.ConquerCongress({base,esc,fmt,duration,openDialog,getState:()=>state,marchPanel,action,toast});
     const villageMenu=window.ConquerVillage({base,esc,fmt,getState:()=>state,getKingdom:()=>kingdom,openDialog,navigate,action,toast,marchPanel});
     window.addEventListener('conquer-village-menu',e=>villageMenu.open(e.detail));
     let worldChat;
-    const panels=window.ConquerPanels({base,esc,fmt,date,duration,countdown,openDialog,action,api,navigate,refresh,toast,costHtml,now,labels,researchNames,render,sendPreferences,beginTeleport:item=>{const mode=item.teleport_mode,allianceCenters=mode==='alliance'?(kingdom?.alliance?.members||[]).filter(member=>Number.isFinite(Number(member.coord_x))&&Number.isFinite(Number(member.coord_y))).map(member=>({x:Number(member.coord_x),y:Number(member.coord_y)})):[];teleportSelection={item_code:Number(item.item_code),mode,origin_x:Number(state.city.coord_x),origin_y:Number(state.city.coord_y),alliance_centers:allianceCenters,max_distance:mode==='alliance'?12:null};navigate('world',{focusTitle:false});toast(mode==='alliance'?'Wähle einen Platz nahe einer verbündeten Stadt.':'Wähle einen freien Platz auf der Weltkarte.');},openSpeedups:(...args)=>queueSpeedups.show(...args),openPrivateChat:(id,name)=>{if($('#game-dialog').open)$('#game-dialog').close();worldChat?.openPrivate(id,name);navigate(playfield);},getState:()=>state,getKingdom:()=>kingdom,getExpeditions:()=>expeditions,getMarket:()=>market,getErrors:()=>loadErrors,renderGuide:()=>beginnerGuide.render()});
-    const featureContext={base,esc,fmt,date,duration,countdown,openDialog,action,api,navigate,refresh,toast,costHtml,getState:()=>state,getKingdom:()=>kingdom,openShrine:(id,garrison=false)=>marchPanel.open(Number(id),garrison?'shrine-garrison':'shrine')};
+    const panels=window.ConquerPanels({base,esc,fmt,date,duration,countdown,openDialog,action,api,navigate,refresh,toast,costHtml,now,labels,researchNames,render,sendPreferences,beginTeleport:item=>{const mode=item.teleport_mode,allianceCenters=mode==='alliance'?(kingdom?.alliance?.members||[]).filter(member=>Number.isFinite(Number(member.coord_x))&&Number.isFinite(Number(member.coord_y))).map(member=>({x:Number(member.coord_x),y:Number(member.coord_y)})):[];teleportSelection={item_code:Number(item.item_code),mode,origin_x:Number(state.city.coord_x),origin_y:Number(state.city.coord_y),alliance_centers:allianceCenters,max_distance:mode==='alliance'?12:null};navigate('world',{focusTitle:false});toast(mode==='alliance'?'Wähle einen Platz nahe einer verbündeten Stadt.':'Wähle einen freien Platz auf der Weltkarte.');},openSpeedups:(...args)=>queueSpeedups.show(...args),openPrivateChat:(id,name)=>{if($('#game-dialog').open)$('#game-dialog').close();worldChat?.openPrivate(id,name);navigate(playfield);},getState:()=>state,getKingdom:()=>kingdom,getExpeditions:()=>expeditions,getMarket:()=>market,getErrors:()=>loadErrors,renderGuide:()=>beginnerGuide.render(),audioControls:()=>sound?.controls()||''});
+    const featureContext={base,esc,fmt,date,duration,t,locale:()=>i18n?.locale||'de',countdown,openDialog,action,api,navigate,refresh,toast,costHtml,getState:()=>state,getKingdom:()=>kingdom,openShrine:(id,garrison=false)=>marchPanel.open(Number(id),garrison?'shrine-garrison':'shrine')};
+    const scoutReports=window.ConquerScoutReport({...featureContext,unitName});
     const rewards=window.ConquerRewards.create(featureContext);
     const monsterReports=window.ConquerMonsterReport.create({...featureContext,openReport:id=>reportDialog(id),shareReport:(text,id)=>reportShare.open(text,id),locateReport:locateMonsterReport});
     const openSharedReport=async shareId=>{
@@ -426,6 +471,13 @@
         if(['city','rally'].includes(report?.details?.battle_kind)){combatReport.open(report);return;}
         if(window.ConquerMonsterReport.isMonster(report)){monsterReports.open(report);return;}
         throw new Error('Dieser geteilte Bericht wird nicht unterstützt.');
+    };
+    const openSharedLocation=async location=>{
+        const x=Number(location?.x),y=Number(location?.y),targetWorld=Number(location?.world);
+        if(!Number.isInteger(x)||!Number.isInteger(y)||x<0||x>255||y<0||y>255)throw new Error('Diese Koordinaten sind ungültig.');
+        if(targetWorld!==Number(state.city.world_id))throw new Error('Dieses Ziel liegt auf einer anderen Welt.');
+        navigate('world',{focusTitle:false});window.ConquerWorld.focus(x,y);await refresh();
+        if(!window.ConquerWorld.locate(x,y,['monsters']))toast('Das Monster ist nicht mehr vorhanden. Die letzte Position wird gezeigt.');
     };
     const overlay=window.ConquerOverlay({...featureContext,now,labels});
     const activeEffects=window.ConquerActiveEffects({...featureContext,now});
@@ -436,20 +488,22 @@
     const vipPanel=window.ConquerVip(featureContext);
     const treasurePanel=window.ConquerTreasures({...featureContext,now,onUpgrade:()=>buildingDialog('treasure_house'),navigate:tab=>{navigate(tab);if(tab==='inventory')panels.onClick('inventory-category',{dataset:{id:'other'}});}});
     const tradingPanel=window.ConquerTrading({...featureContext,now,getMarket:()=>market,onUpgrade:()=>buildingDialog('trading_post')});
-    const mailboxPanel=window.ConquerMailbox({...featureContext,openPlayerReport:report=>combatReport.open(report),openMonsterReport:mail=>{
+    const mailboxPanel=window.ConquerMailbox({...featureContext,openScoutReport:(...args)=>scoutReports.open(...args),openPlayerReport:report=>combatReport.open(report),openMonsterReport:mail=>{
         const cached=state.reports.find(r=>Number(r.id)===Number(mail.source_id));
         const report=cached||{id:Number(mail.source_id),created_at:mail.created_at,outcome:mail.metadata.details?.outcome,target_x:mail.metadata.x,target_y:mail.metadata.y,details:mail.metadata.details,can_delete:true};
         if(!window.ConquerMonsterReport.isMonster(report))return false;
         monsterReports.open(report);return true;
     }});
-    const communityPanel=window.ConquerCommunity({...featureContext,openSharedReport,openMailbox:()=>{navigate('reports');mailboxPanel.select('private');}});
+    const communityPanel=window.ConquerCommunity({...featureContext,openSharedReport,openSharedLocation,openMailbox:()=>{navigate('reports');mailboxPanel.select('private');}});
     const dungeonPanel=window.ConquerDungeons({...featureContext,unitName});
-    worldChat=window.ConquerWorldChat({...featureContext,openSharedReport});
+    worldChat=window.ConquerWorldChat({...featureContext,openSharedReport,openSharedLocation});
     const defensePanel=window.ConquerDefense(featureContext);
     const progressionPanel=window.ConquerProgression(featureContext);
     const worldPanel=window.ConquerWorldPanel(featureContext);
     const landPanel=window.ConquerLand(featureContext);
     const beginnerGuide=window.ConquerBeginnerGuide({...featureContext,getHost:()=>panelHost,labels,buildingImage,buildingDialog,buildingFunction});
+    const comfort=window.ConquerGameComfort({...featureContext,labels,nextGoal:()=>beginnerGuide.nextGoal(),openGoal:()=>beginnerGuide.openNextGoal()});
+    document.addEventListener('click',event=>{if(event.target.closest('[data-action="show-goal-hint"]')){comfort.showGoal();toast('Der Zielhinweis ist wieder eingeblendet.');}});
     const bugReports=window.ConquerBugReports(featureContext);
     document.addEventListener('submit',async e=>{const form=e.target.closest('form[data-form]');if(!form)return;e.preventDefault();if(busy||!form.reportValidity())return;try{if(await bugReports.onSubmit(form))return;if(mailboxPanel.onSubmit(form)||dungeonPanel.onSubmit(form)||communityPanel.onSubmit(form)||defensePanel.onSubmit(form))return;if(await landPanel.onSubmit(form))return;if(await progressionPanel.onSubmit(form))return;await panels.onSubmit(form);}catch(err){toast(err.message);}});
     document.addEventListener('input',e=>{if($('#content').contains(e.target)&&e.target.matches('input,textarea,select')&&!e.target.matches('[data-hospital-count]'))$('#content').dataset.dirty='true';});
@@ -466,6 +520,7 @@
         if(act==='teleport-confirm'&&teleportSelection){const selection=teleportSelection;(async()=>{const result=await action('kingdom/action',{action:'inventory.use',item_code:selection.item_code,target_x:Number(b.dataset.x),target_y:Number(b.dataset.y)});if(result){teleportSelection=null;renderWorld();}})();return;}
         if(act==='retry') return refresh(); if(!state)return;
         if(act==='close-dialog'){$('#game-dialog').close();return;}
+        if(act==='bug-report-open'){const dialogTitle=$('#game-dialog').open?$('#dialog-content h2,h3')?.textContent.trim():'';bugReports.begin({path:location.pathname+'#'+current,label:dialogTitle?navs[current]+' – '+dialogTitle:navs[current]});return;}
         if(beginnerGuide.onClick(act,b))return;
         if(bugReports.onClick(act,b))return;
         if(overlay.onClick(act,b)||vipPanel.onClick(act,b))return;
@@ -531,20 +586,22 @@
     window.addEventListener('resize',()=>{panelNeedsResize=true;resizePanel();});
     panelHost.addEventListener('focusout',resizePanel);
     $('#game-dialog').addEventListener('close',resizePanel);
-    setInterval(()=>{queueSpeedups.update();activeEffects.update();treasurePanel.updateTime();tradingPanel.updateTime();panels.updateHospitalTime();document.querySelectorAll('[data-end]').forEach(el=>{el.textContent=duration((date(el.dataset.end)-now())/1000);});},1000);
-    setInterval(async()=>{
-        if(document.hidden||busy) return;
+    setInterval(()=>{if(document.hidden)return;queueSpeedups.update();activeEffects.update();treasurePanel.updateTime();tradingPanel.updateTime();panels.updateHospitalTime();document.querySelectorAll('[data-end]').forEach(el=>{const text=duration((date(el.dataset.end)-now())/1000);if(el.textContent!==text)el.textContent=text;});},1000);
+    window.ConquerPolling({delay:()=>Math.max(apiRetryAt-Date.now(),current==='world'||state?.marches?.length||state?.build_queue?.length||state?.troop_queue?.length||state?.research_queue?.length?5000:15000),refresh:async()=>{
+        if(busy) return;
         const dialog=$('#game-dialog');
-        if(!dialog.open) { refresh(); return; }
+        if(!dialog.open) { await refresh(); return; }
         const before=JSON.stringify([state?.buildings,state?.build_queue]);
         await refresh(false);
         marchPanel.update();queueSpeedups.update();
-        if(dialog.open&&dialog.dataset.research&&!state.research_queue.some(q=>(q.research_code||q.code)===dialog.dataset.research))researchDialog(dialog.dataset.research);
+        if(dialog.open&&dialog.dataset.research&&state&&!state.research_queue.some(q=>(q.research_code||q.code)===dialog.dataset.research))researchDialog(dialog.dataset.research);
         if(dialog.open && dialog.dataset.building && before!==JSON.stringify([state?.buildings,state?.build_queue])) buildingDialog(dialog.dataset.building,{recommended:dialog.dataset.buildingRecommendation==='true'});
-    },5000);
-    document.addEventListener('visibilitychange',()=>{sendPreferences();if(!document.hidden&&!busy)refresh();});
+    }});
+    document.addEventListener('visibilitychange',sendPreferences);
+    window.addEventListener('conquer:locale',()=>location.reload());
     const entry=location.hash.slice(1).split('?');if(['treasures','market'].includes(entry[0])&&entry[1]){current=entry[0];const section=new URLSearchParams(entry[1]).get('section');if(current==='treasures')treasurePanel.selectTab(section);else tradingPanel.selectTab(section);history.replaceState(null,'','#'+current);}
     refresh().then(async()=>{
+        if(state&&comfort.since())await refresh(false);
         if(state){queueSpeedups.resume();rewards.resume();commandRecovery();}
         const startupParams=new URLSearchParams(location.search),mapX=Number(startupParams.get('map_x')),mapY=Number(startupParams.get('map_y'));
         if(startupParams.has('map_x')&&startupParams.has('map_y')&&Number.isFinite(mapX)&&Number.isFinite(mapY)&&state){

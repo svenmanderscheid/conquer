@@ -25,7 +25,7 @@ window.ConquerHospital=function(ctx){
     }
     function row(w){
         const code=Number(w.troop_code),unit=S().troop_defs.find(t=>Number(t.code)===code),name=troopLabel(w),n=selection[code],active=hospital().active;
-        return `<article class="hospital-unit ${w.healing_count?'is-in-treatment':''}" data-hospital-unit="${code}"><div class="hospital-portrait"><img src="${base}/assets/art/${({1:'knight',2:'archer',3:'rider'})[unit?.type]||'knight'}.png" alt=""><span>T${Number(unit?.tier)||1}</span>${w.healing_count?'<b class="hospital-treatment-mark" aria-hidden="true">✚</b>':''}</div><div class="hospital-unit-body"><div class="hospital-unit-heading"><h3>${esc(name)}</h3><span>${fmt(w.count)} verwundet</span></div>${active?`<div class="hospital-treatment-label">${w.healing_count?`<strong>${fmt(w.healing_count)} in Behandlung</strong>`:''}${w.healing_count&&w.waiting_count?' <span aria-hidden="true">·</span> ':''}${w.waiting_count?`<span>${fmt(w.waiting_count)} warten</span>`:''}</div>`:`<div class="hospital-quantity"><input id="hospital-range-${code}" data-hospital-count="${code}" type="range" min="0" max="${w.waiting_count}" step="1" value="${n}" aria-label="${esc(name)} zum Heilen auswählen"><input id="hospital-number-${code}" data-hospital-count="${code}" type="number" inputmode="numeric" min="0" max="${w.waiting_count}" step="1" value="${n}" aria-label="Anzahl ${esc(name)} zum Heilen"></div>`}</div></article>`;
+        return `<article class="hospital-unit ${w.healing_count?'is-in-treatment':''}" data-hospital-unit="${code}"><div class="hospital-portrait troop-tier-frame" data-troop-tier="${Number(unit?.tier)||1}"><img src="${base}/assets/art/characters/tier-colors-v1/${({1:'infantry',2:'archer',3:'cavalry'})[unit?.type]||'infantry'}-t${Number(unit?.tier)||1}-thumb.webp" alt=""><span>T${Number(unit?.tier)||1}</span>${w.healing_count?'<b class="hospital-treatment-mark" aria-hidden="true">✚</b>':''}</div><div class="hospital-unit-body"><div class="hospital-unit-heading"><h3>${esc(name)}</h3><span>${fmt(w.count)} verwundet</span></div>${active?`<div class="hospital-treatment-label">${w.healing_count?`<strong>${fmt(w.healing_count)} in Behandlung</strong>`:''}${w.healing_count&&w.waiting_count?' <span aria-hidden="true">·</span> ':''}${w.waiting_count?`<span>${fmt(w.waiting_count)} warten</span>`:''}</div>`:`<div class="hospital-quantity"><input id="hospital-range-${code}" data-hospital-count="${code}" type="range" min="0" max="${w.waiting_count}" step="1" value="${n}" aria-label="${esc(name)} zum Heilen auswählen"><input id="hospital-number-${code}" data-hospital-count="${code}" type="number" inputmode="numeric" min="0" max="${w.waiting_count}" step="1" value="${n}" aria-label="Anzahl ${esc(name)} zum Heilen"></div>`}</div></article>`;
     }
     function render(){
         if(!hospital())return;reconcile();const h=hospital(),active=h.active;
@@ -59,17 +59,29 @@ window.ConquerHospital=function(ctx){
         const n=Math.min(w.waiting_count,Math.max(0,Math.floor(Number(el.value)||0)));selection[w.troop_code]=n;if(e.type==='change'||el.value!=='')el.value=n;update();
     }
     document.addEventListener('input',input);document.addEventListener('change',input);
+    function startHealing(quick=false){
+        reconcile();
+        if(hospital().active){if(quick)ctx.openHospital();return true;}
+        if(quick)units().forEach(w=>selection[w.troop_code]=w.waiting_count);
+        update();const q=quote();
+        if(healingPending||!q.count)return true;
+        if(!q.affordable){
+            if(quick){ctx.openHospital();ctx.toast('Für die Heilung fehlen Rohstoffe. Passe die Auswahl im Hospital an.');}
+            return true;
+        }
+        const troops=Object.fromEntries(Object.entries(selection).filter(([,n])=>n>0));
+        // The shared command helper replaces the focused trigger's contents while it waits.
+        // Keep the persistent HUD structure intact; the icon itself exposes the pending state.
+        if(quick&&document.activeElement instanceof HTMLElement)document.activeElement.blur();
+        healingPending=true;update();
+        Promise.resolve(action('hospital/heal',{action:'hospital.heal',troops,expected_resources:q.cost,expected_seconds:q.seconds,operation_key:crypto.randomUUID(),expected_world_id:Number(S().city.world_id)},'Heilung gestartet.')).finally(()=>{healingPending=false;update();});
+        return true;
+    }
     function onClick(act){
         if(act==='hospital-select'){reconcile();const clear=quote().count===hospital().waiting;units().forEach(w=>selection[w.troop_code]=clear?0:w.waiting_count);update();return true;}
         if(act==='hospital-info'){ctx.openDialog(`<h2>Heilung im Hospital</h2><p>Wähle deine Verwundeten aus und starte die Heilung. Frühe Truppen werden besonders günstig und schnell versorgt; mit höheren Tiers steigen Aufwand und Heilzeit schrittweise.</p><p>Die angezeigten Ressourcen werden beim Start bezahlt. Heilungs- und allgemeine Beschleuniger verkürzen danach den laufenden Auftrag.</p>${button('Verstanden','close-dialog','','secondary wide')}`);return true;}
-        if(act==='hospital-heal'){
-            reconcile();update();if(hospital().active)return true;const q=quote();
-            if(healingPending||!q.count||!q.affordable)return true;
-            const troops=Object.fromEntries(Object.entries(selection).filter(([,n])=>n>0));
-            healingPending=true;update();
-            Promise.resolve(action('hospital/heal',{action:'hospital.heal',troops,expected_resources:q.cost,expected_seconds:q.seconds,operation_key:crypto.randomUUID(),expected_world_id:Number(S().city.world_id)},'Heilung gestartet.')).finally(()=>{healingPending=false;update();});
-            return true;
-        }
+        if(act==='hospital-heal')return startHealing();
+        if(act==='hospital-quick-heal')return startHealing(true);
         return false;
     }
     return {render,sync,onClick,updateTime:update};
