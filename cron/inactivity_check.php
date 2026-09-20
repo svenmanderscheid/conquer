@@ -10,7 +10,7 @@ declare(strict_types=1);
  * What it does:
  *   1. Finds players inactive for >30 days (last_active_at older than 30 days)
  *   2. Sets players.is_hidden = 1
- *   3. Sets cities.is_hidden = 1 for those players
+ *   3. Sets cities.is_hidden = 1 for those players in every world
  *
  * On next login, OAuth::restoreHiddenCityOnLogin() reverses the effect.
  */
@@ -59,16 +59,18 @@ $placeholders = implode(',', array_fill(0, $count, '?'));
 // ---------------------------------------------------------------------------
 
 try {
-    $db->execute(
-        "UPDATE players SET is_hidden = 1 WHERE id IN ({$placeholders})",
-        $playerIds,
-    );
+    $db->transaction(static function (\Conquer\Db\Connection $db) use ($placeholders, $playerIds): void {
+        $db->execute(
+            "UPDATE players SET is_hidden = 1 WHERE id IN ({$placeholders})",
+            $playerIds,
+        );
 
-    $db->execute(
-        "UPDATE cities SET is_hidden = 1
-         WHERE player_id IN ({$placeholders}) AND world_id = 1",
-        $playerIds,
-    );
+        $db->execute(
+            "UPDATE cities SET is_hidden = 1
+             WHERE player_id IN ({$placeholders})",
+            $playerIds,
+        );
+    });
 } catch (\PDOException $e) {
     $log->error('inactivity_check: UPDATE failed: ' . $e->getMessage());
     exit(1);
