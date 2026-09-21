@@ -265,6 +265,9 @@ final class OAuth
         )->fetch();
 
         if ($existing !== false) {
+            if ($user['email'] !== '') {
+                $db->execute('UPDATE players SET email_verified_at=COALESCE(email_verified_at,UTC_TIMESTAMP()) WHERE id=? AND email=?',[(int)$existing['player_id'],$user['email']]);
+            }
             return (int) $existing['player_id'];
         }
 
@@ -277,6 +280,7 @@ final class OAuth
 
             if ($byEmail !== false) {
                 $playerId = (int) $byEmail['id'];
+                $db->execute('UPDATE players SET email_verified_at=COALESCE(email_verified_at,UTC_TIMESTAMP()) WHERE id=?',[$playerId]);
                 $db->execute(
                     'INSERT INTO oauth_accounts (player_id, provider, provider_user_id) VALUES (?, ?, ?)',
                     [$playerId, $provider, $user['provider_user_id']],

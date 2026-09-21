@@ -4,6 +4,8 @@ $base = htmlspecialchars(APP_BASE, ENT_QUOTES);
 $mode = (($_POST['mode'] ?? $_GET['mode'] ?? 'login') === 'register') ? 'register' : 'login';
 $loginError = $loginError ?? '';
 $username = htmlspecialchars(is_string($_POST['username'] ?? null) ? $_POST['username'] : '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+$email = htmlspecialchars(is_string($_POST['email'] ?? null) ? $_POST['email'] : '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+$identifier = htmlspecialchars(is_string($_POST['identifier'] ?? null) ? $_POST['identifier'] : '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 ?>
 <!doctype html>
 <html lang="<?= htmlspecialchars(\Conquer\Game\Locale::current(), ENT_QUOTES) ?>">
@@ -54,9 +56,12 @@ $username = htmlspecialchars(is_string($_POST['username'] ?? null) ? $_POST['use
             <input name="alpha_key" required inputmode="text" autocomplete="one-time-code" maxlength="35" spellcheck="false" value="<?= htmlspecialchars((string)($_POST['alpha_key'] ?? ''), ENT_QUOTES) ?>">
           </label>
           <?php endif ?>
-          <label><span data-i18n="login.username_short">Spielername</span>
-            <input name="username" required minlength="3" maxlength="25" pattern="[A-Za-z0-9_]+" autocomplete="username" autocapitalize="none" spellcheck="false" value="<?= $username ?>">
-          </label>
+          <?php if ($mode === 'register'): ?>
+          <label><span>E-Mail-Adresse</span><input type="email" name="email" required maxlength="254" autocomplete="email" autocapitalize="none" spellcheck="false" value="<?= $email ?>"></label>
+          <label><span data-i18n="login.username_short">Spielername</span><input name="username" required minlength="3" maxlength="25" pattern="[A-Za-z0-9_]+" autocomplete="username" autocapitalize="none" spellcheck="false" value="<?= $username ?>"></label>
+          <?php else: ?>
+          <label><span>E-Mail oder Spielername</span><input name="identifier" required maxlength="254" autocomplete="username" autocapitalize="none" spellcheck="false" value="<?= $identifier ?>"></label>
+          <?php endif ?>
           <label><span data-i18n="login.password_short">Passwort</span>
             <input type="password" name="password" required minlength="<?= $mode === 'register' ? '10' : '1' ?>" maxlength="200" autocomplete="<?= $mode === 'register' ? 'new-password' : 'current-password' ?>">
           </label>

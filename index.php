@@ -201,14 +201,36 @@ if ($path === '/auth/recover') {
     session_start(['cookie_httponly'=>true,'cookie_samesite'=>'Lax','cookie_secure'=>!empty($_SERVER['HTTPS'])]);
     $_SESSION['login_csrf'] ??= bin2hex(random_bytes(32));
     $recoveryMessage='';$recoveryDone=false;
+    $recoveryMode=(($_GET['backup']??'')==='1'||($_POST['recovery_mode']??'')==='backup')?'backup':'email';
     if($method==='POST'){
         if(!is_string($_POST['csrf']??null)||!hash_equals($_SESSION['login_csrf'],$_POST['csrf'])){$recoveryMessage='Die Sitzung ist abgelaufen. Lade die Seite neu.';}
         else{try{
-            \Conquer\Auth\AccountService::recover((string)($_POST['username']??''),(string)($_POST['code']??''),$_POST['new_password']??null);
-            $recoveryDone=true;$recoveryMessage='Dein Passwort wurde geändert. Du kannst dich jetzt wieder anmelden.';
+            if($recoveryMode==='backup'){
+                \Conquer\Auth\AccountService::recover((string)($_POST['username']??''),(string)($_POST['code']??''),$_POST['new_password']??null);
+                $recoveryDone=true;$recoveryMessage='Dein Passwort wurde geändert. Du kannst dich jetzt wieder anmelden.';
+            }else{
+                \Conquer\Auth\AccountService::requestPasswordReset((string)($_POST['email']??''));
+                $recoveryDone=true;$recoveryMessage=\Conquer\Auth\AccountService::RESET_MESSAGE;
+            }
         }catch(\DomainException $e){$recoveryMessage=$e->getMessage();}}
     }
     header('Cache-Control: no-store');require ROOT_DIR.'/views/recover.php';exit;
+}
+
+if($path==='/auth/reset'){
+    session_name('conquer_login');session_start(['cookie_httponly'=>true,'cookie_samesite'=>'Lax','cookie_secure'=>!empty($_SERVER['HTTPS'])]);
+    $_SESSION['login_csrf']??=bin2hex(random_bytes(32));$resetToken=is_string($_GET['token']??null)?$_GET['token']:'';$resetMessage='';$resetDone=false;
+    if($method==='POST'){
+        $resetToken=is_string($_POST['token']??null)?$_POST['token']:'';
+        if(!is_string($_POST['csrf']??null)||!hash_equals($_SESSION['login_csrf'],$_POST['csrf']))$resetMessage='Die Sitzung ist abgelaufen. Lade die Seite neu.';
+        else try{\Conquer\Auth\AccountService::resetWithToken($resetToken,$_POST['new_password']??null);$resetDone=true;$resetMessage='Dein Passwort wurde geändert. Alle bisherigen Sitzungen wurden beendet.';}catch(\DomainException $e){$resetMessage=$e->getMessage();}
+    }
+    header('Cache-Control: no-store');require ROOT_DIR.'/views/reset_password.php';exit;
+}
+
+if($path==='/auth/verify-email'){
+    $verified=\Conquer\Auth\AccountService::verifyEmail(is_string($_GET['token']??null)?$_GET['token']:'');
+    header('Location: '.APP_BASE.'/?email_verified='.($verified?'1':'0'),true,303);exit;
 }
 
 if ($path === '/auth/local') {

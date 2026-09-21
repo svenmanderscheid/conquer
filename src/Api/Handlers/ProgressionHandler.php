@@ -28,7 +28,7 @@ final class ProgressionHandler
         if(!is_array($body)||!is_string($body['action']??null))Response::error(400,'INVALID_ACTION','Aktion fehlt.');
         try{
             $pid=(int)$s['player_id'];$action=$body['action'];
-            if(in_array($action,['password.change','recovery.generate','sessions.revoke'],true)){$result=AccountService::action($pid,$body);}
+            if(in_array($action,['email.change','password.change','recovery.generate','sessions.revoke'],true)){$result=AccountService::action($pid,$body);}
             else{
                 \Conquer\Game\World\WorldContext::current($body['expected_world_id']??null);\Conquer\Game\World\WorldContext::assertActionAvailable();EventService::tick(\Conquer\Game\World\WorldContext::id());$city=CityState::loadForPlayer($pid);if(!$city)throw new \DomainException('Deine Stadt wurde nicht gefunden.');ResourceTick::persist($city['city'],$city['buildings']);
                 $result=Operation::run($pid,$body,static fn()=>match(true){

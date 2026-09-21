@@ -38,6 +38,12 @@ return [
     'csrf_token_lifetime_minutes' => 30,
     'rate_limit_per_minute' => 120,
 
+    // Transactional account email. The server's PHP mail transport must be configured.
+    'mail' => [
+        'from_address' => 'noreply@unionofkingdoms.com',
+        'from_name' => 'Union of Kingdoms',
+    ],
+
     // Player images stay private until this server-side check succeeds.
     'profile_images' => [
         'openai_api_key' => getenv('OPENAI_API_KEY') ?: '',

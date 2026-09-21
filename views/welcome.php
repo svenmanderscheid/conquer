@@ -166,9 +166,7 @@ $structuredData = [
           <label class="alpha-key-field"<?= $postedMode === 'login' ? ' hidden' : '' ?>>Alpha-Key
             <input name="alpha_key" inputmode="text" autocomplete="one-time-code" maxlength="35" spellcheck="false"<?= $postedMode === 'register' ? ' required' : ' disabled' ?> value="<?= htmlspecialchars((string) ($_POST['alpha_key'] ?? ''), ENT_QUOTES) ?>">
           </label>
-          <label>Spielername
-            <input name="username" required minlength="3" maxlength="25" pattern="[A-Za-z0-9_]+" autocomplete="username" autocapitalize="none" spellcheck="false" value="<?= htmlspecialchars((string) ($_POST['username'] ?? ''), ENT_QUOTES) ?>">
-          </label>
+          <?php if($postedMode==='register'): ?><label>E-Mail-Adresse<input type="email" name="email" required maxlength="254" autocomplete="email" autocapitalize="none" spellcheck="false" value="<?= htmlspecialchars((string)($_POST['email']??''),ENT_QUOTES) ?>"></label><label>Spielername<input name="username" required minlength="3" maxlength="25" pattern="[A-Za-z0-9_]+" autocomplete="username" autocapitalize="none" spellcheck="false" value="<?= htmlspecialchars((string)($_POST['username']??''),ENT_QUOTES) ?>"></label><?php else: ?><label>E-Mail oder Spielername<input name="identifier" required maxlength="254" autocomplete="username" autocapitalize="none" spellcheck="false" value="<?= htmlspecialchars((string)($_POST['identifier']??''),ENT_QUOTES) ?>"></label><?php endif ?>
           <label>Passwort
             <input type="password" name="password" required minlength="<?= $postedMode === 'register' ? '10' : '1' ?>" maxlength="200" autocomplete="<?= $postedMode === 'register' ? 'new-password' : 'current-password' ?>" placeholder="<?= $postedMode === 'register' ? 'Mindestens 10 Zeichen' : 'Dein Passwort' ?>">
           </label>
