@@ -40,7 +40,7 @@ try{
     $db->execute("INSERT INTO field_monsters(world_id,monster_code,coord_x,coord_y,hp_current,regional_level_at_spawn,effective_monster_level) VALUES(2,20200101,9,8,100,1,1),(2,20200101,36,36,100,9,1),(1,20200101,9,8,100,1,1)");
     $db->execute("INSERT INTO field_objects(world_id,coord_x,coord_y,object_type,level,resource_amount,resource_max,expires_at) VALUES(2,10,8,1,1,500,1000,DATE_ADD(UTC_TIMESTAMP(),INTERVAL 1 HOUR)),(2,37,36,1,1,500,1000,DATE_ADD(UTC_TIMESTAMP(),INTERVAL 1 HOUR)),(1,10,8,1,1,500,1000,DATE_ADD(UTC_TIMESTAMP(),INTERVAL 1 HOUR))");
     $outerObject=(int)$db->query('SELECT id FROM field_objects WHERE world_id=2 AND coord_x=10')->fetchColumn();
-    $lockedObject=(int)$db->query('SELECT id FROM field_objects WHERE world_id=2 AND coord_x=37')->fetchColumn();
+    $centerObject=(int)$db->query('SELECT id FROM field_objects WHERE world_id=2 AND coord_x=37')->fetchColumn();
     $foreignObject=(int)$db->query('SELECT id FROM field_objects WHERE world_id=1 AND coord_x=10')->fetchColumn();
     $db->execute("INSERT INTO shrines(world_id,shrine_code,tier,coord_x,coord_y) VALUES(2,'MAP_OUTER','C',11,8),(2,'MAP_CENTER','S',38,36)");
     $db->execute("INSERT INTO map_charms(world_id,coord_x,coord_y,stat_category,grade,charm_code,expires_at) VALUES(2,12,8,'research','normal',10700001,DATE_ADD(UTC_TIMESTAMP(),INTERVAL 1 HOUR)),(2,39,36,'research','epic',10700002,DATE_ADD(UTC_TIMESTAMP(),INTERVAL 1 HOUR))");
@@ -65,18 +65,17 @@ PHP;
     $entities=$tiles['json']['data']['entities'];$coords=array_map(static fn(array $e):string=>$e['x'].':'.$e['y'],$entities);
     mapCheck($tiles['status']===200&&$tiles['json']['data']['viewport']['x_max']===71&&$tiles['json']['data']['viewport']['y_max']===71,'viewport is clipped to the selected world instead of 256');
     mapCheck(in_array('9:8',$coords,true)&&in_array('10:8',$coords,true)&&in_array('11:8',$coords,true)&&in_array('12:8',$coords,true)&&in_array('13:8',$coords,true),'open outer targets remain visible');
-    mapCheck(!array_filter($coords,static fn(string $coord):bool=>str_ends_with($coord,':36'))&&!in_array('39:36',$coords,true),'locked center entities are absent from the viewport');
+    mapCheck(in_array('36:36',$coords,true)&&in_array('37:36',$coords,true)&&in_array('38:36',$coords,true)&&in_array('39:36',$coords,true)&&in_array('40:36',$coords,true),'central targets are visible from the beginning');
     mapCheck(count(array_filter($entities,static fn(array $e):bool=>$e['type']==='monster'&&$e['x']===9&&$e['y']===8))===1,'same-coordinate entities from another world do not leak');
 
-    $lockedTile=mapGet($base,'/tile/36/36',$token);
-    mapCheck($lockedTile['status']===200&&$lockedTile['json']['data']['occupant']===null&&$lockedTile['json']['data']['accessible']===false,'direct tile read does not expose a locked target');
+    $centerTile=mapGet($base,'/tile/36/36',$token);
+    mapCheck($centerTile['status']===200&&$centerTile['json']['data']['occupant']['type']==='monster'&&$centerTile['json']['data']['accessible']===true,'direct tile read exposes a central target from the beginning');
     $openTile=mapGet($base,'/tile/9/8',$token);
     mapCheck($openTile['status']===200&&$openTile['json']['data']['occupant']['type']==='monster'&&$openTile['json']['data']['accessible']===true,'direct tile read exposes an open target');
     mapCheck(mapGet($base,'/tile/72/8',$token)['status']===422,'tile coordinates obey the selected map size');
 
     mapCheck(mapGet($base,'/field-object/'.$outerObject,$token)['status']===200,'open field-object detail remains available');
     mapCheck(mapGet($base,'/field-object/'.$foreignObject,$token)['status']===404,'field-object ids remain scoped to the selected world');
-    $lockedDetail=mapGet($base,'/field-object/'.$lockedObject,$token);
-    mapCheck($lockedDetail['status']===409&&$lockedDetail['json']['error']['code']==='LAND_LOCKED','locked field-object detail cannot become a target by id');
+    mapCheck(mapGet($base,'/field-object/'.$centerObject,$token)['status']===200,'central field-object detail is available from the beginning');
     echo "ALL MAP LAND ACCESS CHECKS PASSED\n";
 }finally{$fixture->close();}

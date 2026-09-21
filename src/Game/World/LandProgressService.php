@@ -24,7 +24,7 @@ final class LandProgressService
         }
     }
 
-    /** Initialize a world once. Pass legacy=true only for an existing world that must open every zone. */
+    /** Initialize a world once. Every zone is playable from the world's first moment. */
     public static function ensureWorld(int $worldId,bool $legacy=false): bool
     {
         if(!self::available())return false;$db=Connection::getInstance();$cacheKey=spl_object_id($db->getPdo()).':'.$worldId;
@@ -35,10 +35,8 @@ final class LandProgressService
             if(!$world)throw new \DomainException('Welt nicht gefunden.',404);
             $defaults=LandRules::defaults();
             $db->execute('INSERT IGNORE INTO world_land_rules(world_id,settings_json,revision)VALUES(?,?,1)',[$worldId,json_encode($defaults,JSON_THROW_ON_ERROR)]);
-            foreach(['outer','middle','center'] as $zone){
-                $open=$legacy||$zone==='outer';
-                $db->execute('INSERT IGNORE INTO world_land_zones(world_id,zone_key,status,opened_at,opened_reason,rule_revision)VALUES(?,?,?,'.($open?'UTC_TIMESTAMP()':'NULL').',?,1)',[$worldId,$zone,$open?'open':'locked',$open?($legacy?'legacy':'initial'):null]);
-            }
+            foreach(['outer','middle','center'] as $zone)
+                $db->execute("INSERT IGNORE INTO world_land_zones(world_id,zone_key,status,opened_at,opened_reason,rule_revision)VALUES(?,?,'open',UTC_TIMESTAMP(),?,1)",[$worldId,$zone,$legacy?'legacy':'initial']);
             if($legacy)$db->execute("UPDATE world_land_zones SET status='open',opened_at=COALESCE(opened_at,UTC_TIMESTAMP()),opened_reason='legacy' WHERE world_id=?",[$worldId]);
             $mapSize=(int)$world['map_size'];$expected=LandGeometry::dimensions($mapSize)['columns']**2;
             $existing=(int)$db->query('SELECT COUNT(*) FROM world_land_parts WHERE world_id=? AND geometry_version=?',[$worldId,LandGeometry::VERSION])->fetchColumn();

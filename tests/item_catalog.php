@@ -10,6 +10,7 @@ use Conquer\Game\Inventory\InventoryService;
 use Conquer\Game\Research\{BuffEngine,ResearchEffects};
 use Conquer\Game\Treasure\TreasureData;
 use Conquer\Game\Map\WorldPlacement;
+use Conquer\Game\Map\WorldTerrain;
 $fixture=new \ConquerTests\FeatureDatabase();$db=Connection::getInstance();$checks=0;$failed=false;
 function itemCheck(bool $ok,string $message):void{global$checks;if(!$ok)throw new RuntimeException($message);$checks++;}
 function itemUse(int $code,array $extra=[]):array{return KingdomService::action(1,['action'=>'inventory.use','item_code'=>$code]+$extra)['result'];}
@@ -85,6 +86,12 @@ try{
     $outsideX=(int)$position['coord_x']+13<=197?(int)$position['coord_x']+13:(int)$position['coord_x']-13;
     itemReject(fn()=>itemUse($teleport['code'],['target_x'=>$outsideX,'target_y'=>(int)$position['coord_y']]),'destination outside alliance area is rejected');
     itemCheck((int)$db->query('SELECT quantity FROM player_inventory WHERE player_id=1 AND item_code=?',[$teleport['code']])->fetchColumn()===$qty,'invalid selected destination preserves inventory');
+    $advanced=array_values(array_filter($defs,fn($d)=>$d['category']==='teleport'&&$d['teleport_mode']==='advanced'))[0];
+    $waterTarget=null;for($ty=1;$ty<=253&&$waterTarget===null;$ty++)for($tx=1;$tx<=253;$tx++){if(max(abs($tx-(int)$position['coord_x']),abs($ty-(int)$position['coord_y']))<4)continue;if(!WorldTerrain::isDryRectangle(...WorldPlacement::footprint('city',$tx,$ty))){$waterTarget=[$tx,$ty];break;}}
+    itemCheck($waterTarget!==null,'water teleport test destination exists');
+    $waterQty=(int)$db->query('SELECT quantity FROM player_inventory WHERE player_id=1 AND item_code=?',[$advanced['code']])->fetchColumn();
+    itemReject(fn()=>itemUse($advanced['code'],['target_x'=>$waterTarget[0],'target_y'=>$waterTarget[1]]),'teleport destination touching water is rejected');
+    itemCheck((int)$db->query('SELECT quantity FROM player_inventory WHERE player_id=1 AND item_code=?',[$advanced['code']])->fetchColumn()===$waterQty,'water rejection preserves the teleporter');
     $db->execute("INSERT INTO marches(player_id,world_id,march_type,origin_city_id,target_x,target_y,troops_json,departure_time,arrival_time,return_time,state)VALUES(1,1,5,1,?,?,?,UTC_TIMESTAMP(),DATE_ADD(UTC_TIMESTAMP(),INTERVAL 1 HOUR),DATE_ADD(UTC_TIMESTAMP(),INTERVAL 2 HOUR),'marching')",[$position['coord_x']+6,$position['coord_y'],'{}']);
     $qty=(int)$db->query('SELECT quantity FROM player_inventory WHERE player_id=1 AND item_code=?',[$teleport['code']])->fetchColumn();itemReject(fn()=>itemUse($teleport['code']),'active army blocks teleport');itemCheck((int)$db->query('SELECT quantity FROM player_inventory WHERE player_id=1 AND item_code=?',[$teleport['code']])->fetchColumn()===$qty,'blocked teleport preserves inventory');
     $db->execute('DELETE FROM marches');

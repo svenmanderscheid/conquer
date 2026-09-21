@@ -25,9 +25,9 @@ try{
 
     $db->execute("INSERT INTO worlds(name,slug,status,map_size,map_seed,created_at,started_at)VALUES('Landtest','landtest','running',256,84,DATE_SUB(UTC_TIMESTAMP(),INTERVAL 30 DAY),DATE_SUB(UTC_TIMESTAMP(),INTERVAL 30 DAY))");$world=$db->lastInsertId();
     LandProgressService::ensureWorld($world,false);$status=array_column(LandUnlockService::status($world),null,'key');
-    landCheck($status['outer']['open']&&!$status['middle']['open']&&!$status['center']['open'],'a new world opens only the outer zone');
-    landCheck(LandAccessPolicy::isOpen($world,8,8)&&!LandAccessPolicy::isOpen($world,128,128),'target policy distinguishes open outer and locked central land');
-    landReject(fn()=>LandAccessPolicy::assertTargetOpen($world,128,128),'closed target throws a domain rule error');
+    landCheck($status['outer']['open']&&$status['middle']['open']&&$status['center']['open'],'a new world opens the complete map immediately');
+    landCheck(LandAccessPolicy::isOpen($world,8,8)&&LandAccessPolicy::isOpen($world,128,128),'outer and central targets are accessible from the beginning');
+    LandAccessPolicy::assertTargetOpen($world,128,128);
 
     $db->execute("INSERT INTO players(username,email,password_hash)VALUES('land_player','land@example.test','x')");$player=$db->lastInsertId();
     $db->execute("INSERT INTO cities(player_id,world_id,name,coord_x,coord_y,food,lumber,stone,gold)VALUES(?,?,'Landstadt',8,8,1000000,1000000,1000000,1000000)",[$player,$world]);
@@ -57,15 +57,8 @@ try{
     landCheck($zeroGather['raw_points']===1&&$zeroGather['credited_points']===0,'zero full and reduced gather ratios credit no hidden minimum point');
 
     $rules=LandRules::defaults();$rules['gates']['middle']['not_before_days']=0;$rules['gates']['center']['not_before_days']=0;LandRules::save($world,$rules,1,5);
-    $requiredMiddle=array_column(LandUnlockService::status($world),null,'key')['middle']['required_count'];
-    $db->execute("UPDATE world_land_parts SET current_level=3 WHERE world_id=? AND zone_key='outer' AND has_spawn_anchor=1 ORDER BY id LIMIT ".(int)$requiredMiddle,[$world]);
     LandUnlockService::invalidate($world);LandProgressService::invalidate($world);LandUnlockService::evaluate($world);$status=array_column(LandUnlockService::status($world),null,'key');
-    landCheck($status['middle']['open'],'outer development opens the middle gate');
-    $requiredCenter=$status['center']['required_count'];
-    $db->execute("UPDATE world_land_parts SET current_level=6 WHERE world_id=? AND zone_key='middle' AND has_spawn_anchor=1",[$world]);LandUnlockService::invalidate($world);LandUnlockService::evaluate($world);
-    landCheck(!array_column(LandUnlockService::status($world),null,'key')['center']['open'],'middle start ceiling 6 cannot open the level-7 center gate');
-    $db->execute("UPDATE world_land_parts SET current_level=7 WHERE world_id=? AND zone_key='middle' AND has_spawn_anchor=1 ORDER BY id LIMIT ".(int)$requiredCenter,[$world]);LandUnlockService::invalidate($world);LandProgressService::invalidate($world);LandUnlockService::evaluate($world);
-    landCheck(array_column(LandUnlockService::status($world),null,'key')['center']['open'],'developed level-7 middle lands open the center gate');
+    landCheck($status['outer']['open']&&$status['middle']['open']&&$status['center']['open'],'regional evaluation keeps the complete map open');
 
     $overview=LandProgressService::overview($world,$player);landCheck(count($overview['lands'])===1024&&count($overview['zones'])===3,'overview returns compact state for every land and both gates');
     landCheck(array_key_exists('monsters',$max)&&array_key_exists('sources',$max)&&array_key_exists('recent_events',$max),'detail exposes progression and monster contracts');
