@@ -37,7 +37,9 @@ final class LandProgressService
             $db->execute('INSERT IGNORE INTO world_land_rules(world_id,settings_json,revision)VALUES(?,?,1)',[$worldId,json_encode($defaults,JSON_THROW_ON_ERROR)]);
             foreach(['outer','middle','center'] as $zone)
                 $db->execute("INSERT IGNORE INTO world_land_zones(world_id,zone_key,status,opened_at,opened_reason,rule_revision)VALUES(?,?,'open',UTC_TIMESTAMP(),?,1)",[$worldId,$zone,$legacy?'legacy':'initial']);
-            if($legacy)$db->execute("UPDATE world_land_zones SET status='open',opened_at=COALESCE(opened_at,UTC_TIMESTAMP()),opened_reason='legacy' WHERE world_id=?",[$worldId]);
+            // Keep deployments safe even when the SQL migration has not been run yet:
+            // the first request for an existing world permanently opens every zone.
+            $db->execute("UPDATE world_land_zones SET status='open',opened_at=COALESCE(opened_at,UTC_TIMESTAMP()),opened_reason=? WHERE world_id=? AND status<>'open'",[$legacy?'legacy':'initial',$worldId]);
             $mapSize=(int)$world['map_size'];$expected=LandGeometry::dimensions($mapSize)['columns']**2;
             $existing=(int)$db->query('SELECT COUNT(*) FROM world_land_parts WHERE world_id=? AND geometry_version=?',[$worldId,LandGeometry::VERSION])->fetchColumn();
             if($existing<$expected){

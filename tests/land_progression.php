@@ -24,8 +24,9 @@ try{
     landCheck(count(LandUnlockService::status(1))===3&&!in_array(false,array_column(LandUnlockService::status(1),'open'),true),'migration keeps every zone of an existing world open');
 
     $db->execute("INSERT INTO worlds(name,slug,status,map_size,map_seed,created_at,started_at)VALUES('Landtest','landtest','running',256,84,DATE_SUB(UTC_TIMESTAMP(),INTERVAL 30 DAY),DATE_SUB(UTC_TIMESTAMP(),INTERVAL 30 DAY))");$world=$db->lastInsertId();
+    foreach(['outer','middle','center'] as $zone)$db->execute("INSERT INTO world_land_zones(world_id,zone_key,status,opened_at,opened_reason,rule_revision)VALUES(?,?,'locked',NULL,NULL,1)",[$world,$zone]);
     LandProgressService::ensureWorld($world,false);$status=array_column(LandUnlockService::status($world),null,'key');
-    landCheck($status['outer']['open']&&$status['middle']['open']&&$status['center']['open'],'a new world opens the complete map immediately');
+    landCheck($status['outer']['open']&&$status['middle']['open']&&$status['center']['open'],'a new or previously locked world opens the complete map immediately');
     landCheck(LandAccessPolicy::isOpen($world,8,8)&&LandAccessPolicy::isOpen($world,128,128),'outer and central targets are accessible from the beginning');
     LandAccessPolicy::assertTargetOpen($world,128,128);
 
