@@ -305,6 +305,8 @@ if (str_starts_with($path, '/api/')) {
     $router->post('/api/land/:id/donate', [\Conquer\Api\Handlers\LandHandler::class, 'donate']);
     $router->get('/api/kingdom/state', static fn(array $p) => \Conquer\Api\Handlers\KingdomHandler::state($p));
     $router->post('/api/kingdom/action', static fn(array $p) => \Conquer\Api\Handlers\KingdomHandler::action($p));
+    $router->post('/api/kingdom/profile-image', static fn(array $p) => \Conquer\Api\Handlers\KingdomHandler::profileImage($p));
+    $router->delete('/api/kingdom/profile-image', static fn(array $p) => \Conquer\Api\Handlers\KingdomHandler::removeProfileImage($p));
     $router->get('/api/theme-bundles/state', [\Conquer\Api\Handlers\ThemeBundleHandler::class, 'state']);
     $router->get('/api/expeditions/state', static fn(array $p) => \Conquer\Api\Handlers\ExpeditionHandler::state($p));
     $router->post('/api/expeditions/action', static fn(array $p) => \Conquer\Api\Handlers\ExpeditionHandler::action($p));

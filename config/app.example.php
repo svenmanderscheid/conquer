@@ -38,6 +38,12 @@ return [
     'csrf_token_lifetime_minutes' => 30,
     'rate_limit_per_minute' => 120,
 
+    // Player images stay private until this server-side check succeeds.
+    'profile_images' => [
+        'openai_api_key' => getenv('OPENAI_API_KEY') ?: '',
+        'model' => 'omni-moderation-latest',
+    ],
+
     // Premium checkout stays unavailable until a real provider is configured.
     // The preview adapter is development-only and also requires a 32+ character secret.
     'premium_payments' => [

@@ -83,6 +83,14 @@
         sound?.confirmed(path,payload,body.data);
         return body.data;
     }
+    async function profileImageRequest(file=null) {
+        const world=Number(state?.city.world_id||window.CONQUER_WORLD||1),options={method:file?'POST':'DELETE',credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(30000),headers:{'X-CSRF-Token':state?.player.csrf??'','X-World-ID':String(world)}};
+        if(file){const data=new FormData();data.append('profile_image',file);options.body=data;}
+        let response;try{response=await fetch(base+'/api/kingdom/profile-image',options);}catch(e){throw new Error(e.name==='TimeoutError'?'Die Bildprüfung dauert zu lange. Bitte versuche es erneut.':'Keine Verbindung zur Bildprüfung.');}
+        let body;try{body=await response.json();}catch{throw new Error('Die Bildprüfung ist gerade nicht erreichbar.');}
+        if(!response.ok||!body.ok)throw new Error(body.error?.message||'Das Profilfoto konnte nicht verarbeitet werden.');
+        toast(body.data?.message||'Profilfoto gespeichert.');return body.data;
+    }
     async function refresh(renderPage = true) {
         if (polling) return polling;
         polling = (async()=>{
@@ -235,7 +243,7 @@
         $('#player-hud-name').textContent=kingdom?.profile?.display_name||state.player.name;
         $('#hud-power-value').textContent=fmt(kingdom?.profile?.power||state.city.power);
         window.ConquerNameFrames.syncSelf(kingdom?.name_frames,document,kingdom?.profile?.name_frame||kingdom?.profile?.city_skin||'default');
-        $('#account-button .avatar img').src=base+'/assets/art/'+(['knight','archer','rider'].includes(kingdom?.profile?.avatar)?kingdom.profile.avatar:'knight')+'.png';
+        const customPortrait=kingdom?.profile?.profile_image;$('#account-button .avatar img').src=customPortrait&&/^assets\/uploads\/profile\/\d+-[a-f0-9]{32}\.jpg$/.test(customPortrait)?base+'/'+customPortrait:base+'/assets/art/'+(['knight','archer','rider'].includes(kingdom?.profile?.avatar)?kingdom.profile.avatar:'knight')+'.png';
         overlay.update();trainingHud.update();vipPanel.updateHud();activeEffects.update();
         updateQuestBadge();
         mailboxPanel.badge();
@@ -461,7 +469,7 @@
     const villageMenu=window.ConquerVillage({base,esc,fmt,getState:()=>state,getKingdom:()=>kingdom,openDialog,navigate,action,toast,marchPanel});
     window.addEventListener('conquer-village-menu',e=>villageMenu.open(e.detail));
     let worldChat;
-    const panels=window.ConquerPanels({base,esc,fmt,date,duration,countdown,openDialog,action,api,navigate,refresh,toast,costHtml,now,labels,researchNames,render,sendPreferences,beginTeleport:item=>{const mode=item.teleport_mode,allianceCenters=mode==='alliance'?(kingdom?.alliance?.members||[]).filter(member=>Number.isFinite(Number(member.coord_x))&&Number.isFinite(Number(member.coord_y))).map(member=>({x:Number(member.coord_x),y:Number(member.coord_y)})):[];teleportSelection={item_code:Number(item.item_code),mode,origin_x:Number(state.city.coord_x),origin_y:Number(state.city.coord_y),alliance_centers:allianceCenters,max_distance:mode==='alliance'?12:null};navigate('world',{focusTitle:false});toast(mode==='alliance'?'Wähle einen Platz nahe einer verbündeten Stadt.':'Wähle einen freien Platz auf der Weltkarte.');},openSpeedups:(...args)=>queueSpeedups.show(...args),openPrivateChat:(id,name)=>{if($('#game-dialog').open)$('#game-dialog').close();worldChat?.openPrivate(id,name);navigate(playfield);},getState:()=>state,getKingdom:()=>kingdom,getExpeditions:()=>expeditions,getMarket:()=>market,getErrors:()=>loadErrors,renderGuide:()=>beginnerGuide.render(),audioControls:()=>sound?.controls()||''});
+    const panels=window.ConquerPanels({base,esc,fmt,date,duration,countdown,openDialog,action,api,navigate,refresh,toast,costHtml,now,labels,researchNames,render,sendPreferences,uploadProfileImage:file=>profileImageRequest(file),removeProfileImage:()=>profileImageRequest(),beginTeleport:item=>{const mode=item.teleport_mode,allianceCenters=mode==='alliance'?(kingdom?.alliance?.members||[]).filter(member=>Number.isFinite(Number(member.coord_x))&&Number.isFinite(Number(member.coord_y))).map(member=>({x:Number(member.coord_x),y:Number(member.coord_y)})):[];teleportSelection={item_code:Number(item.item_code),mode,origin_x:Number(state.city.coord_x),origin_y:Number(state.city.coord_y),alliance_centers:allianceCenters,max_distance:mode==='alliance'?12:null};navigate('world',{focusTitle:false});toast(mode==='alliance'?'Wähle einen Platz nahe einer verbündeten Stadt.':'Wähle einen freien Platz auf der Weltkarte.');},openSpeedups:(...args)=>queueSpeedups.show(...args),openPrivateChat:(id,name)=>{if($('#game-dialog').open)$('#game-dialog').close();worldChat?.openPrivate(id,name);navigate(playfield);},getState:()=>state,getKingdom:()=>kingdom,getExpeditions:()=>expeditions,getMarket:()=>market,getErrors:()=>loadErrors,renderGuide:()=>beginnerGuide.render(),audioControls:()=>sound?.controls()||''});
     const featureContext={base,esc,fmt,date,duration,t,locale:()=>i18n?.locale||'de',countdown,openDialog,action,api,navigate,refresh,toast,costHtml,getState:()=>state,getKingdom:()=>kingdom,openShrine:(id,garrison=false)=>marchPanel.open(Number(id),garrison?'shrine-garrison':'shrine')};
     const scoutReports=window.ConquerScoutReport({...featureContext,unitName});
     const rewards=window.ConquerRewards.create(featureContext);

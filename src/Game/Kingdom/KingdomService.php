@@ -44,7 +44,7 @@ final class KingdomService
             unset($w);
             $rankings = array_values($standings);
             usort($rankings, static fn(array $a, array $b): int => ($b['power'] <=> $a['power']) ?: ($a['player_id'] <=> $b['player_id']));
-            foreach ($rankings as $i => &$row) { $row['rank'] = $i + 1; }
+            foreach ($rankings as $i => &$row) { $row['rank'] = $i + 1; $row['profile_image']=self::profileImagePath($row['profile_image']??null); }
             unset($row);
             return [
                 'profile'=>self::profile($profileId ?? $playerId, $playerId, $standings),
@@ -169,7 +169,7 @@ final class KingdomService
     {
         $db = Connection::getInstance();
         $rows = $db->query("SELECT p.id AS player_id,p.lord_level,p.kill_count,COALESCE(k.display_name,p.username) AS display_name,
-            COALESCE(k.avatar,'knight') AS avatar,COALESCE(k.name_frame,'default') AS name_frame,COALESCE(k.city_skin,'default') AS city_skin,k.march_skin,c.id AS city_id,c.name AS city_name,c.castle_level,
+            COALESCE(k.avatar,'knight') AS avatar,k.profile_image,COALESCE(k.name_frame,'default') AS name_frame,COALESCE(k.city_skin,'default') AS city_skin,k.march_skin,c.id AS city_id,c.name AS city_name,c.castle_level,
             a.tag AS alliance_tag,a.id AS alliance_id
             FROM players p JOIN cities c ON c.player_id=p.id AND c.world_id=" . WorldContext::id() . "
             LEFT JOIN kingdom_profiles k ON k.player_id=p.id
@@ -253,7 +253,7 @@ final class KingdomService
             ['code'=>'scholar','name'=>'Wissenshüter','description'=>'Schließe fünf Forschungsstufen ab.','unlocked'=>$p['stats']['research']>=5],
             ['code'=>'arena','name'=>'Fairer Wettstreit','description'=>'Gewinne ein freiwilliges Übungsduell.','unlocked'=>$p['stats']['arena_wins']>0],
         ];
-        $profile = ['id'=>$target,'display_name'=>$p['display_name'],'avatar'=>$p['avatar'],'name_frame'=>$p['name_frame'],'bio'=>$extra['bio'],
+        $profile = ['id'=>$target,'display_name'=>$p['display_name'],'avatar'=>$p['avatar'],'profile_image'=>self::profileImagePath($p['profile_image']??null),'name_frame'=>$p['name_frame'],'bio'=>$extra['bio'],
             'city_skin'=>$p['city_skin'],'march_skin'=>$p['march_skin'] ?? null,'city_name'=>$p['city_name'],'castle_level'=>(int) $p['castle_level'],'power'=>$p['power'],
             'lord_level'=>$lord['level'],'lord_max_level'=>$lord['max_level'],'kill_count'=>(int) $p['kill_count'],
             'alliance'=>$membership ?: null,'stats'=>$p['stats'],'achievements'=>$achievements,
@@ -279,10 +279,10 @@ final class KingdomService
         $a = $db->query('SELECT a.*,m.role FROM alliances a JOIN alliance_members m ON m.alliance_id=a.id WHERE m.player_id=? AND m.world_id=?', [$playerId,WorldContext::id()])->fetch();
         if (!$a) { return null; }
         $members = $db->query("SELECT m.player_id,m.role,m.joined_at,COALESCE(k.display_name,p.username) AS display_name,
-            COALESCE(k.avatar,'knight') AS avatar,COALESCE(k.name_frame,'default') AS name_frame,c.coord_x,c.coord_y FROM alliance_members m JOIN players p ON p.id=m.player_id
+            COALESCE(k.avatar,'knight') AS avatar,k.profile_image,COALESCE(k.name_frame,'default') AS name_frame,c.coord_x,c.coord_y FROM alliance_members m JOIN players p ON p.id=m.player_id
             LEFT JOIN kingdom_profiles k ON k.player_id=m.player_id LEFT JOIN cities c ON c.player_id=m.player_id AND c.world_id=m.world_id WHERE m.alliance_id=?
             ORDER BY FIELD(m.role,'leader','vice_leader','officer','veteran','member'),m.joined_at", [$a['id']])->fetchAll();
-        foreach ($members as &$m) { $m['power'] = $standings[(int) $m['player_id']]['power'] ?? 0; }
+        foreach ($members as &$m) { $m['power'] = $standings[(int) $m['player_id']]['power'] ?? 0; $m['profile_image']=self::profileImagePath($m['profile_image']??null); }
         unset($m);
         $a['members'] = $members;
         $a['member_count'] = count($members);
@@ -298,6 +298,11 @@ final class KingdomService
         self::require(in_array($avatar, array_column(self::AVATARS, 'id'), true), 'Wähle ein verfügbares Porträt.');
         Connection::getInstance()->execute('UPDATE kingdom_profiles SET display_name=?,avatar=?,bio=? WHERE player_id=?', [$name,$avatar,$bio,$playerId]);
         return ['message'=>'Dein Profil wurde gespeichert.'];
+    }
+
+    private static function profileImagePath(mixed $filename): ?string
+    {
+        return is_string($filename)&&preg_match('/^\d+-[a-f0-9]{32}\.jpg$/D',$filename)?'assets/uploads/profile/'.$filename:null;
     }
 
     private static function saveSkin(int $playerId, array $body): array

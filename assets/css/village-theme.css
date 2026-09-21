@@ -2300,6 +2300,16 @@ body.mobile-game :is(#panel-dialog,#game-dialog) .lok-profile-identity {
 }
 body.mobile-game :is(#panel-dialog,#game-dialog) .lok-profile-identity :is(div,strong,span) { color:var(--ui-card-light)!important; }
 body.mobile-game :is(#panel-dialog,#game-dialog) .lok-profile-identity small { color:var(--ui-gold-soft)!important; }
+
+body.mobile-game :is(#panel-dialog,#game-dialog) .profile-photo-upload {
+  display:grid;grid-template-columns:88px minmax(0,1fr);gap:12px;align-items:center;margin:14px 0;padding:12px;
+  border:1px solid var(--ui-line);border-radius:12px;background:var(--ui-card);
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) .profile-photo-preview img { width:88px;height:88px;display:block;object-fit:cover;border:2px solid var(--ui-gold);border-radius:14px;background:var(--ui-card-light); }
+body.mobile-game :is(#panel-dialog,#game-dialog) .profile-photo-upload p { margin:4px 0 9px;color:var(--ui-muted);font-size:13px;line-height:1.35; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .profile-photo-upload input[type=file] { position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .profile-photo-upload .button { min-height:44px;margin:2px 6px 2px 0; }
+@media(max-width:360px){body.mobile-game :is(#panel-dialog,#game-dialog) .profile-photo-upload{grid-template-columns:64px minmax(0,1fr);padding:9px}.profile-photo-preview img{width:64px!important;height:64px!important}}
 body.mobile-game :is(#panel-dialog,#game-dialog) .lok-gear-slot { border-color:var(--ui-gold)!important; }
 body.mobile-game :is(#panel-dialog,#game-dialog) .lok-gear-slot.is-empty { background:var(--ui-card-light)!important;border-color:var(--ui-line)!important; }
 body.mobile-game :is(#panel-dialog,#game-dialog) .lok-gear-slot.grade-purple { border-color:var(--ui-purple)!important; }

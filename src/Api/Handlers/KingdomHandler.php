@@ -5,6 +5,7 @@ namespace Conquer\Api\Handlers;
 use Conquer\Api\Response;
 use Conquer\Auth\Session;
 use Conquer\Game\Kingdom\KingdomService;
+use Conquer\Game\Kingdom\ProfileImageService;
 
 /** Authenticated supporting menus for the cooperative game client. */
 final class KingdomHandler
@@ -48,5 +49,20 @@ final class KingdomHandler
             throw $e;
         }
         Response::ok($result);
+    }
+
+    public static function profileImage(array $params): void
+    {
+        $session=Session::current();if(!$session)Response::error(401,'UNAUTHENTICATED','Bitte melde dich an.');
+        \Conquer\Security\ApiGuard::limit('profile.image',(string)$session['player_id'],5,3600);
+        try{$result=ProfileImageService::upload((int)$session['player_id'],$_FILES['profile_image']??[]);}
+        catch(\DomainException $e){Response::error(in_array($e->getCode(),[403,503],true)?$e->getCode():422,'PROFILE_IMAGE_REJECTED',$e->getMessage());}
+        Response::ok($result);
+    }
+
+    public static function removeProfileImage(array $params): void
+    {
+        $session=Session::current();if(!$session)Response::error(401,'UNAUTHENTICATED','Bitte melde dich an.');
+        Response::ok(ProfileImageService::remove((int)$session['player_id']));
     }
 }
