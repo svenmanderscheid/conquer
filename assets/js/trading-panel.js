@@ -14,7 +14,7 @@ window.ConquerTrading = function(ctx){
     const allOffers=()=>list()?.offers||[];
     const category=o=>({resource_pack:'resources',speedup:'speedups',boost:'boosts',vip_point:'progress',ap_refill:'progress',chest:'treasures',fragment_pack:'treasures'})[o.item?.category]||'other';
     const offers=()=>allOffers().filter(o=>mode!=='vip'||(vipView==='all'||!o.locked)&&(vipCategory==='all'||category(o)===vipCategory));
-    const deadline=()=>Date.parse(mode==='vip'?data()?.vip?.reset_at:data()?.refresh_at);
+    const deadline=()=>Date.parse(mode==='merchant'?getMarket?.()?.refresh_at:mode==='vip'?data()?.vip?.reset_at:data()?.refresh_at);
     const balance=key=>num(key==='gems'?getKingdom()?.profile?.gems??getState()?.player?.gems:getState()?.city?.[key]);
     const affordable=(o,q)=>balance(o.price?.resource)>=num(o.price?.amount)*q;
     const expired=()=>Number.isFinite(deadline())&&deadline()<=now();
@@ -59,7 +59,7 @@ window.ConquerTrading = function(ctx){
         const market=getMarket?.(),offers=market?.offers||[],balances=market?.resources||getState()?.city||{};
         const cards=offers.map(o=>{const balance=num(balances[o.give.resource]),enough=balance>=num(o.give.amount),giveName=resources[o.give.resource]||o.give.resource,receiveName=resources[o.receive.resource]||o.receive.resource;return `<article class="shop-merchant-card"><div class="shop-merchant-reward"><img src="${resourceArt(o.receive.resource)}" alt="${esc(receiveName)}" loading="lazy"><span>Du erhältst</span><strong>+${fmt(o.receive.amount)} ${esc(receiveName)}</strong></div><h3>${esc(o.name)}</h3><div class="shop-merchant-balance"><span>Dein Bestand</span><strong>${fmt(balance)} ${esc(giveName)}</strong></div><button type="button" class="button gold wide shop-merchant-action ${o.give.resource==='gems'?'pays-gems':''}" data-action="market-trade" data-id="${esc(o.id)}" ${enough?'':'disabled'} aria-label="${esc((enough?'Eintauschen':'Nicht genug '+giveName)+': '+fmt(o.give.amount)+' '+giveName)}"><span class="shop-merchant-cost"><img src="${resourceArt(o.give.resource)}" alt=""><strong>${fmt(o.give.amount)}</strong><small>${esc(giveName)}</small></span><span class="shop-merchant-action-label">${enough?'Eintauschen':'Nicht genug'}</span></button></article>`;}).join('');
         const history=(market?.history||[]).map(entry=>`<div class="shop-merchant-history-row"><strong>${esc(entry.name)}</strong><small>${new Date(String(entry.created_at).replace(' ','T')+'Z').toLocaleString('de-DE')}</small></div>`).join('');
-        return `${shopTabs()}<header class="trading-summary"><div><h2>Händler</h2><p>Faire 1:1-Tauschkurse und besondere Kristallangebote.</p></div><span class="trading-level">${fmt(offers.length)} Angebote</span></header><div class="trading-scroll" data-mode="merchant" tabindex="0" aria-label="Angebote des Händlers"><div class="shop-merchant-grid">${cards}</div>${history?`<section class="shop-merchant-history"><h3>Letzte Handelsabschlüsse</h3>${history}</section>`:''}${!offers.length?'<div class="trading-empty">Der Händler wird geladen.</div>':''}</div><footer class="trading-footer"><span>Faire Wechselkurse</span><span>Der Bestand wird serverseitig geprüft.</span></footer>`;
+        return `${shopTabs()}<header class="trading-summary"><div><h2>Händler</h2><p>Faire 1:1-Tauschkurse und besondere Kristallangebote.</p></div><div class="trading-reset"><span>Neue Angebote in</span><strong data-trading-countdown>--:--:--</strong><div class="trading-countdown-track"><i data-trading-progress></i></div></div></header><div class="trading-scroll" data-mode="merchant" tabindex="0" aria-label="Angebote des Händlers"><div class="shop-merchant-grid">${cards}</div>${history?`<section class="shop-merchant-history"><h3>Letzte Handelsabschlüsse</h3>${history}</section>`:''}${!offers.length?'<div class="trading-empty">Der Händler wird geladen.</div>':''}</div><footer class="trading-footer"><span>${fmt(offers.length)} Angebote · Nach jedem Kauf wird der Platz neu belegt.</span><span>Alle 24 Stunden komplett erneuert.</span></footer>`;
     }
     function crystalView(){
         const gems=num(getKingdom()?.profile?.gems??getState()?.player?.gems);
@@ -67,7 +67,7 @@ window.ConquerTrading = function(ctx){
     }
     function render(){
         if(!host())return;
-        if(mode==='merchant'){host().innerHTML=`<section class="trading-shell" aria-label="Shop">${merchantView()}</section>`;return;}
+        if(mode==='merchant'){host().innerHTML=`<section class="trading-shell" aria-label="Shop">${merchantView()}</section>`;updateTime();return;}
         if(mode==='crystals'){host().innerHTML=`<section class="trading-shell" aria-label="Shop">${crystalView()}</section>`;return;}
         const d=data();if(!d){host().innerHTML='<div class="trading-empty">Der Handelsposten wird geladen.</div>';return;}
         if(d.server_time!==lastServerTime){lastServerTime=d.server_time;const t=Date.parse(d.server_time);if(Number.isFinite(t))clockOffset=t-Date.now();}
@@ -83,10 +83,10 @@ window.ConquerTrading = function(ctx){
         const remaining=Math.max(0,Math.ceil((deadline()-now())/1000)),valid=Number.isFinite(remaining);
         const days=Math.floor(remaining/86400),hours=Math.floor(remaining%86400/3600),minutes=Math.floor(remaining%3600/60),seconds=remaining%60;
         el.textContent=valid?(remaining?(days?days+'d ':'')+[hours,minutes,seconds].map(n=>String(n).padStart(2,'0')).join(':'):'Wird erneuert …'):'--:--:--';
-        const fill=host().querySelector('[data-trading-progress]');if(fill)fill.style.width=(valid?Math.min(100,remaining/(mode==='vip'?604800:28800)*100):0)+'%';
+        const fill=host().querySelector('[data-trading-progress]');if(fill)fill.style.width=(valid?Math.min(100,remaining/(mode==='vip'?604800:mode==='merchant'?86400:28800)*100):0)+'%';
         if(valid&&remaining===0){
-            host().querySelectorAll('[data-action="trading-buy"]').forEach(b=>b.disabled=true);
-            const token=mode+':'+list()?.rotation;
+            host().querySelectorAll(mode==='merchant'?'[data-action="market-trade"]':'[data-action="trading-buy"]').forEach(b=>b.disabled=true);
+            const token=mode+':'+(mode==='merchant'?getMarket?.()?.rotation:list()?.rotation);
             if(token!==refreshRequested){refreshRequested=token;if(ctx.refresh)Promise.resolve(ctx.refresh()).catch(()=>{refreshRequested='';});}
         }
     }

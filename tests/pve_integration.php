@@ -29,21 +29,31 @@ try {
     $kingdom=pveData('/api/kingdom/state');$expeditions=pveData('/api/expeditions/state');
     verifyPve(isset($kingdom['profile']) && isset($expeditions['expeditions']),'both new systems return structured live state');
     $market=pveData('/api/market/state');verifyPve(count($market['offers'])===8,'market offers have explicit server-owned rates');
-    verifyPve(callPve('/api/market/action',['offer_id'=>'food_lumber'],false,false)['status']===403,'trade requires CSRF');
+    $resourceOffer=array_values(array_filter($market['offers'],fn($offer)=>$offer['give']['resource']!=='gems'))[0];
+    verifyPve(callPve('/api/market/action',['offer_id'=>$resourceOffer['id']],false,false)['status']===403,'trade requires CSRF');
     verifyPve(callPve('/api/market/action',['offer_id'=>'food;DROP TABLE cities'])['status']===400,'forged offer rejected');
     $before=CityState::loadForPlayer($pid)['city'];
-    verifyPve(callPve('/api/market/action',['offer_id'=>'food_lumber'])['status']===200,'trade spends real resources');
+    verifyPve(callPve('/api/market/action',['offer_id'=>$resourceOffer['id']])['status']===200,'trade spends real resources');
     $after=CityState::loadForPlayer($pid)['city'];
-    verifyPve(abs($after['food']-($before['food']-1000))<=2&&abs($after['lumber']-($before['lumber']+1000))<=2,'1:1 trade charges and delivers advertised amounts');
+    $giveResource=$resourceOffer['give']['resource'];$receiveResource=$resourceOffer['receive']['resource'];
+    verifyPve(abs($after[$giveResource]-($before[$giveResource]-$resourceOffer['give']['amount']))<=2&&abs($after[$receiveResource]-($before[$receiveResource]+$resourceOffer['receive']['amount']))<=2,'1:1 trade charges and delivers advertised amounts');
+    $marketAfterTrade=pveData('/api/market/state');
+    verifyPve(!in_array($resourceOffer['id'],array_column($marketAfterTrade['offers'],'id'),true),'purchased merchant offer is replaced immediately');
     $db->execute('UPDATE players SET gems=100 WHERE id=?',[$pid]);
+    $gemOffer=array_values(array_filter($marketAfterTrade['offers'],fn($offer)=>$offer['give']['resource']==='gems'))[0]??null;
+    if(!$gemOffer){
+        foreach($marketAfterTrade['offers'] as $candidate){if($candidate['give']['resource']!=='gems'){callPve('/api/market/action',['offer_id'=>$candidate['id']]);break;}}
+        $marketAfterTrade=pveData('/api/market/state');$gemOffer=array_values(array_filter($marketAfterTrade['offers'],fn($offer)=>$offer['give']['resource']==='gems'))[0];
+    }
     $gemsBefore=(int)$db->query('SELECT gems FROM players WHERE id=?',[$pid])->fetchColumn();
-    $lumberBefore=(int)CityState::loadForPlayer($pid)['city']['lumber'];
-    verifyPve(callPve('/api/market/action',['offer_id'=>'gems_lumber'])['status']===200,'crystal-priced merchant offer succeeds');
-    verifyPve((int)$db->query('SELECT gems FROM players WHERE id=?',[$pid])->fetchColumn()===$gemsBefore-20&&(int)CityState::loadForPlayer($pid)['city']['lumber']>=$lumberBefore+1100,'crystal trade charges and delivers atomically');
-    verifyPve(count(pveData('/api/market/state')['history'])===2,'trade history persists');
-    $db->execute('UPDATE cities SET food=0,last_resource_update=UTC_TIMESTAMP() WHERE id=?',[$cityId]);
-    verifyPve(callPve('/api/market/action',['offer_id'=>'food_lumber'])['status']===422,'unaffordable trade rejected');
-    verifyPve((int)$db->query('SELECT COUNT(*) FROM market_exchanges WHERE player_id=?',[$pid])->fetchColumn()===2,'failed trade creates no receipt');
+    $gemReceive=$gemOffer['receive']['resource'];$gemReceiveBefore=(int)CityState::loadForPlayer($pid)['city'][$gemReceive];
+    verifyPve(callPve('/api/market/action',['offer_id'=>$gemOffer['id']])['status']===200,'crystal-priced merchant offer succeeds');
+    verifyPve((int)$db->query('SELECT gems FROM players WHERE id=?',[$pid])->fetchColumn()===$gemsBefore-$gemOffer['give']['amount']&&(int)CityState::loadForPlayer($pid)['city'][$gemReceive]>=$gemReceiveBefore+$gemOffer['receive']['amount'],'crystal trade charges and delivers atomically');
+    $currentMarket=pveData('/api/market/state');$historyCount=count($currentMarket['history']);verifyPve($historyCount>=2,'trade history persists');
+    $unaffordable=array_values(array_filter($currentMarket['offers'],fn($offer)=>$offer['give']['resource']!=='gems'))[0];$emptyResource=$unaffordable['give']['resource'];
+    $db->execute("UPDATE cities SET $emptyResource=0,last_resource_update=UTC_TIMESTAMP() WHERE id=?",[$cityId]);
+    verifyPve(callPve('/api/market/action',['offer_id'=>$unaffordable['id']])['status']===422,'unaffordable trade rejected');
+    verifyPve((int)$db->query('SELECT COUNT(*) FROM market_exchanges WHERE player_id=?',[$pid])->fetchColumn()===$historyCount,'failed trade creates no receipt');
     $cap=BuildingData::getStorageCaps($game['buildings'])['food'];
     $db->execute('UPDATE cities SET food=?,last_resource_update=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 1 HOUR) WHERE id=?',[$cap+2000,$cityId]);
     verifyPve(pveData('/api/game/state')['city']['food']===$cap+2000,'earned over-cap balance survives server refresh');
