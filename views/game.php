@@ -122,6 +122,7 @@ $trainingImportMap = \Conquer\Game\City\City3dImportMap::build(ROOT_DIR, APP_BAS
 <script src="<?= $base ?>/assets/js/world-map.js?v=<?= filemtime(__DIR__ . '/../assets/js/world-map.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/land-panel.js?v=<?= filemtime(__DIR__ . '/../assets/js/land-panel.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/hospital-panel.js?v=<?= filemtime(__DIR__ . '/../assets/js/hospital-panel.js') ?>" defer></script>
+<script src="<?= $base ?>/assets/js/graphics-quality.js?v=<?= filemtime(__DIR__ . '/../assets/js/graphics-quality.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/mvp-panels.js?v=<?= filemtime(__DIR__ . '/../assets/js/mvp-panels.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/inventory-overview.js?v=<?= filemtime(__DIR__ . '/../assets/js/inventory-overview.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/research-tree.js?v=<?= filemtime(__DIR__ . '/../assets/js/research-tree.js') ?>" defer></script>

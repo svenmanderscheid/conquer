@@ -2748,6 +2748,8 @@ body.mobile-game #panel-dialog .audio-settings .button { min-height:44px;white-s
 .audio-settings .setting-row { gap:12px; }
 .audio-settings .setting-row>span { min-width:0; }
 .audio-settings .setting-row small { display:block;color:var(--ui-muted); }
+.setting-row-select select { min-width:132px;min-height:44px;padding:8px 32px 8px 10px;border:1px solid var(--ui-line);border-radius:9px;background:var(--ui-card-light);color:var(--ui-ink);font:inherit; }
+@media(max-width:420px) { .setting-row-select { align-items:flex-start;flex-direction:column; }.setting-row-select select { width:100%; } }
 .audio-settings input[type=checkbox] { flex:none;width:24px;height:24px;accent-color:var(--ui-primary); }
 .audio-volume { display:grid;grid-template-columns:minmax(0,1fr) 60px;align-items:center;gap:0 12px;margin:0 0 14px;color:var(--ui-ink); }
 .audio-volume>span { grid-column:1/-1; }
@@ -2791,6 +2793,12 @@ body.mobile-game #panel-dialog .audio-settings .button { min-height:44px;white-s
  .charm-rune-ring,.charm-rune-spark { animation:none!important; }
  .charm-rune-spark { display:none; }
 }
+
+/* The light graphics profile preserves gameplay markers while removing costly
+   ambient filters, particles and decorative motion. */
+body[data-graphics-quality="light"] :is(.atlas-atmosphere,.atlas-march-trail,.atlas-march-impact,.charm-rune-spark,.boss-mote,.landmark-spark,.landmark-orbit) { display:none!important; }
+body[data-graphics-quality="light"] .map-overlay-shell :is(.atlas-marker,.atlas-march-party) { filter:none!important; }
+body[data-graphics-quality="light"] .map-overlay-shell * { animation:none!important; transition-duration:0s!important; }
 body.mobile-game .map-overlay-shell .is-charm { --charm-grade:#20D8EE;--charm-grade-dark:#27616D; }
 body.mobile-game .map-overlay-shell .is-charm[data-grade=epic] { --charm-grade:#F03ECB;--charm-grade-dark:#793366; }
 body.mobile-game .map-overlay-shell .is-charm[data-grade=legendary] { --charm-grade:#FFB72C;--charm-grade-dark:#805C2B; }

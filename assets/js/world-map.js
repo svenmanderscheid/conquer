@@ -72,9 +72,12 @@ window.ConquerWorld = (() => {
   const escape = value => context.esc(String(value??''));
   const asset = name => `${context.base}/assets/art/map/${name}.svg`;
   const motionPreference=matchMedia('(prefers-reduced-motion: reduce)');
+  const graphicsQuality=()=>document.body.dataset.graphicsQuality||'normal';
+  const graphicsLight=()=>graphicsQuality()==='light';
   motionPreference.addEventListener('change',()=>{if(view?.el.isConnected)render(context);});
-  const castleArt=skin=>motionPreference.matches||document.body.classList.contains('reduced-motion')?window.ConquerCastleSkins.image(context.base,skin):window.ConquerCastleSkins.motionImage(context.base,skin);
-  const motionReduced=()=>motionPreference.matches||document.body.classList.contains('reduced-motion')||document.hidden;
+  window.addEventListener('conquer-graphics-quality',()=>{if(view?.el.isConnected){view.terrainStamp=null;resize();updateMarkers();syncMotion();}});
+  const castleArt=skin=>motionPreference.matches||document.body.classList.contains('reduced-motion')||graphicsLight()?window.ConquerCastleSkins.image(context.base,skin):window.ConquerCastleSkins.motionImage(context.base,skin);
+  const motionReduced=()=>motionPreference.matches||document.body.classList.contains('reduced-motion')||graphicsLight()||document.hidden;
   // Explicit monster artwork (including regional bosses) takes precedence over generic animated units.
   const lifeKind=target=>target.kind==='nodes'&&window.ConquerWorldEncounters?.supports(target.resource?.art)?target.resource.art:target.kind==='monsters'&&!target.data.definition?.art&&window.ConquerWorldEncounters?.supports(target.artKey)?target.artKey:null;
   const targetImage=(target,still=motionReduced())=>window.ConquerWorldEncounters?.image(context.base,lifeKind(target),still,target.biome?.id)||target.art;
@@ -257,18 +260,17 @@ window.ConquerWorld = (() => {
     viewport.addEventListener('wheel',e=>{e.preventDefault();const box=viewport.getBoundingClientRect();zoomTo(memory.zoom*(e.deltaY<0?1.12:1/1.12),e.clientX-box.left,e.clientY-box.top);},{passive:false});
     viewport.addEventListener('keydown',e=>{if(e.target!==viewport)return;const step=e.shiftKey?8:1;const keys={ArrowLeft:[-step,0],ArrowRight:[step,0],ArrowUp:[0,-step],ArrowDown:[0,step]};if(keys[e.key]){e.preventDefault();moveTo(memory.x+keys[e.key][0],memory.y+keys[e.key][1]);}else if(e.key==='Enter'||e.key===' '){e.preventDefault();selectCell(memory.x,memory.y);}else if(e.key==='+'||e.key==='='){e.preventDefault();zoomTo(memory.zoom*1.15);}else if(e.key==='-'){e.preventDefault();zoomTo(memory.zoom/1.15);}else if(e.key==='Home'){e.preventDefault();home();}else if(e.key==='Escape'){clearSelection();}});
     const mini=el.querySelector('.atlas-minimap');mini.addEventListener('pointerdown',e=>e.stopPropagation());mini.addEventListener('click',e=>{e.stopPropagation();if(e.detail===0)return;const box=view.mini.getBoundingClientRect();moveTo((e.clientX-box.left)/box.width*255,(e.clientY-box.top)/box.height*255);clearSelection();});mini.addEventListener('keydown',e=>{const shift={ArrowLeft:[-20,0],ArrowRight:[20,0],ArrowUp:[0,-20],ArrowDown:[0,20]}[e.key];if(shift){e.preventDefault();e.stopPropagation();moveTo(memory.x+shift[0],memory.y+shift[1]);}});
-    view.atmosphere=atmosphere;view.atmosphereCtx=atmosphere.getContext('2d');view.ambienceTime=0;view.lastAmbience=null;
+    view.atmosphere=atmosphere;view.atmosphereCtx=atmosphere.getContext('2d');view.ambienceTime=0;view.lastAmbience=null;view.lastMotionFrame=0;
     view.observer=new ResizeObserver(()=>resize());view.observer.observe(viewport);resize();
   }
   function resize() {
     if(!view?.el.isConnected)return;
     view.width=Math.max(1,view.viewport.clientWidth);view.height=Math.max(1,view.viewport.clientHeight);
-    // A 2x full-screen terrain canvas is expensive on phones and tablets and
-    // brings little visible benefit while the map is moving. Keep desktop
-    // sharp, but avoid rendering more than 2.25 physical pixels for each CSS
-    // pixel's area on touch-sized viewports.
-    const touchSized=view.width<900&&matchMedia('(pointer: coarse)').matches;
-    const ratio=Math.min(window.devicePixelRatio||1,touchSized?1.5:2);view.terrainPad=view.width<700?96:144;view.canvas.width=Math.round((view.width+view.terrainPad*2)*ratio);view.canvas.height=Math.round((view.height+view.terrainPad*2)*ratio);view.ctx.setTransform(ratio,0,0,ratio,0,0);
+    // A high-resolution full-screen terrain canvas is expensive while panning.
+    // Touch-sized views render at CSS resolution; desktop keeps modest extra
+    // sharpness without multiplying the off-screen buffer unnecessarily.
+    const touchSized=view.width<900&&matchMedia('(pointer: coarse)').matches,quality=graphicsQuality();
+    const ratioLimit=quality==='light'?.85:quality==='high'?(touchSized?1.25:2):(touchSized?1:1.6),ratio=Math.min(window.devicePixelRatio||1,ratioLimit);view.terrainPad=quality==='light'?(view.width<700?52:80):(view.width<700?72:112);view.canvas.width=Math.round((view.width+view.terrainPad*2)*ratio);view.canvas.height=Math.round((view.height+view.terrainPad*2)*ratio);view.ctx.setTransform(ratio,0,0,ratio,0,0);
     Object.assign(view.canvas.style,{width:`${view.width+view.terrainPad*2}px`,height:`${view.height+view.terrainPad*2}px`,left:`${-view.terrainPad}px`,top:`${-view.terrainPad}px`});
     view.terrainStamp=null;
     view.atmosphere.width=Math.round(view.width*ratio);view.atmosphere.height=Math.round(view.height*ratio);view.atmosphereCtx.setTransform(ratio,0,0,ratio,0,0);view.followAnchor=null;paint();notify();
@@ -331,6 +333,11 @@ window.ConquerWorld = (() => {
   function notify(){clearTimeout(notifyTimer);notifyTimer=setTimeout(()=>{if(view?.el.isConnected)window.dispatchEvent(new Event('conquer-world-moved'));},380);}
   function moveTo(x,y){stopFollowing();memory.x=clamp(x,0,255);memory.y=clamp(y,0,255);paint();updateSidebar();notify();}
   function zoomTo(value,anchorX=view.width/2,anchorY=view.height/2){const before=unproject(anchorX,anchorY);memory.zoom=clamp(value,MIN_ZOOM,MAX_ZOOM);memory.x=clamp(before[0]-(anchorX-view.width/2)/scale(),0,255);memory.y=clamp(before[1]-(anchorY-view.height/2)/scale(),0,255);paint();updateSidebar();notify();}
+  function scheduleZoom(value,anchorX,anchorY){
+    view.pendingZoom={value,anchorX,anchorY};
+    if(view.zoomFrame)return;
+    view.zoomFrame=requestAnimationFrame(()=>{view.zoomFrame=0;const pending=view.pendingZoom;view.pendingZoom=null;if(pending)zoomTo(pending.value,pending.anchorX,pending.anchorY);});
+  }
   function pointerDown(e){
     if(e.button!==0||e.target.closest('.atlas-zoom,.atlas-minimap'))return;
     view.viewport.focus({preventScroll:true});view.pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});view.viewport.setPointerCapture(e.pointerId);
@@ -340,7 +347,7 @@ window.ConquerWorld = (() => {
   function pointerMove(e){
     if(!view.pointers.has(e.pointerId))return;
     e.preventDefault();view.pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
-    if(view.pointers.size===2&&view.pinch){const points=[...view.pointers.values()],box=view.viewport.getBoundingClientRect(),distance=Math.hypot(points[0].x-points[1].x,points[0].y-points[1].y);zoomTo(view.pinch.zoom*distance/Math.max(1,view.pinch.distance),(points[0].x+points[1].x)/2-box.left,(points[0].y+points[1].y)/2-box.top);return;}
+    if(view.pointers.size===2&&view.pinch){const points=[...view.pointers.values()],box=view.viewport.getBoundingClientRect(),distance=Math.hypot(points[0].x-points[1].x,points[0].y-points[1].y);scheduleZoom(view.pinch.zoom*distance/Math.max(1,view.pinch.distance),(points[0].x+points[1].x)/2-box.left,(points[0].y+points[1].y)/2-box.top);return;}
     const drag=view.drag;if(!drag)return;if(Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY)>5)drag.moved=true;
     if(drag.moved&&drag.teleport){const box=view.viewport.getBoundingClientRect(),point=unproject(e.clientX-box.left,e.clientY-box.top);view.viewport.classList.add('is-teleport-dragging');chooseTeleportCell(point[0]-drag.offsetX,point[1]-drag.offsetY,false);drag.x=e.clientX;drag.y=e.clientY;return;}
     if(drag.moved){stopFollowing();if(memory.panel==='actions'&&!context.teleport)clearSelection(false);view.viewport.classList.add('is-dragging');memory.x=clamp(memory.x-(e.clientX-drag.x)/scale(),0,255);memory.y=clamp(memory.y-(e.clientY-drag.y)/scale(),0,255);panBufferedScene();notify();}drag.x=e.clientX;drag.y=e.clientY;
@@ -348,7 +355,7 @@ window.ConquerWorld = (() => {
   function pointerUp(e,cancelled=false){
     if(!view.pointers.has(e.pointerId))return;
     const drag=view.drag;view.pointers.delete(e.pointerId);if(view.viewport.hasPointerCapture(e.pointerId))view.viewport.releasePointerCapture(e.pointerId);
-    if(view.pointers.size===0){view.viewport.classList.remove('is-dragging','is-teleport-dragging');view.suppressUntil=performance.now()+(drag?.moved?400:100);if(drag?.moved&&!drag.teleport)paint();if(!cancelled&&!drag?.moved&&!drag?.teleport){const box=view.viewport.getBoundingClientRect();if(context.teleport)selectCell(...unproject(e.clientX-box.left,e.clientY-box.top));else if(drag?.march)followMarch(drag.march);else if(drag?.target)select(drag.target,false,true);else selectCell(...unproject(e.clientX-box.left,e.clientY-box.top));}view.drag=null;view.pinch=null;}
+    if(view.pointers.size===0){let flushedZoom=false;if(view.pendingZoom){cancelAnimationFrame(view.zoomFrame);view.zoomFrame=0;const pending=view.pendingZoom;view.pendingZoom=null;zoomTo(pending.value,pending.anchorX,pending.anchorY);flushedZoom=true;}view.viewport.classList.remove('is-dragging','is-teleport-dragging');view.suppressUntil=performance.now()+(drag?.moved?400:100);if(drag?.moved&&!drag.teleport&&!flushedZoom)paint();if(!cancelled&&!drag?.moved&&!drag?.teleport){const box=view.viewport.getBoundingClientRect();if(context.teleport)selectCell(...unproject(e.clientX-box.left,e.clientY-box.top));else if(drag?.march)followMarch(drag.march);else if(drag?.target)select(drag.target,false,true);else selectCell(...unproject(e.clientX-box.left,e.clientY-box.top));}view.drag=null;view.pinch=null;}
     else {const point=[...view.pointers.values()][0];view.drag={x:point.x,y:point.y,startX:point.x,startY:point.y,moved:true,target:null};view.pinch=null;}
   }
   function updateMonsterHealth(button,target){
@@ -925,17 +932,19 @@ window.ConquerWorld = (() => {
     if(view.followNotify&&Math.hypot(memory.x-view.followNotify.x,memory.y-view.followNotify.y)>3){view.followNotify={x:memory.x,y:memory.y};notify();}
   }
   function atmosphere(){
-    if(!view?.atmosphereCtx)return;const c=view.atmosphereCtx;c.clearRect(0,0,view.width,view.height);
+    if(!view?.atmosphereCtx)return;const c=view.atmosphereCtx;c.clearRect(0,0,view.width,view.height);if(graphicsLight())return;
     const [left,top]=unproject(0,0),[right,bottom]=unproject(view.width,view.height);
     window.ConquerLandscape.ambience?.(c,project,scale(),{left,top,right,bottom},view.ambienceTime);
   }
   function animate(time){
     if(!view?.el.isConnected||!sceneVisible||document.hidden){frameId=0;view&&(view.lastAmbience=null);return;}frameId=requestAnimationFrame(animate);
     if(document.hidden){view.lastAmbience=null;return;}
+    if(time-view.lastMotionFrame<1000/30)return;
+    view.lastMotionFrame=time;
     syncMotion();
     if(view.cameraDirty){paint();updateSidebar();}
     moveMarches(time);
-    const slow=motionPreference.matches||document.body.classList.contains('reduced-motion');
+    const slow=motionPreference.matches||document.body.classList.contains('reduced-motion')||graphicsLight();
     if(slow)view.lastAmbience=null;
     else if(view.lastAmbience===null||time-view.lastAmbience>=100){
       if(view.lastAmbience!==null)view.ambienceTime+=Math.min((time-view.lastAmbience)/1000,.25);

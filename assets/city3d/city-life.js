@@ -105,12 +105,12 @@ export function buildCityLife({scene}){
  }
 
  function animate(time){
-   for(const {actor,route,offset,speed,lane} of walkers){
+   for(const {actor,route,offset,speed,lane} of walkers){if(!actor.g.visible)continue;
      const t=(offset+time*speed)%1,p=route.getPoint(t),ahead=route.getPoint((t+.001)%1),dx=ahead.x-p.x,dz=ahead.z-p.z,length=Math.hypot(dx,dz)||1,step=Math.sin(time*6.2+actor.phase);
      p.x+=dz/length*lane;p.z-=dx/length*lane;actor.g.position.copy(p);actor.g.rotation.y=Math.atan2(dx,dz);
    }
-   for(const actor of animated)actor.unit.animate(time);
-   for(const {actor,start,end,phase,speed} of guards){
+   for(const actor of animated)if(actor.g.visible)actor.unit.animate(time);
+   for(const {actor,start,end,phase,speed} of guards){if(!actor.g.visible)continue;
      const raw=(phase+time*speed)%2,t=raw<=1?raw:2-raw,segment=start+(end-start)*t,dir=raw<=1?1:-1,p=wallWalkPoint(segment),ahead=wallWalkPoint(segment+dir*.04),dx=ahead.x-p.x,dz=ahead.z-p.z;
      actor.g.position.copy(p);actor.g.rotation.y=Math.atan2(dx,dz);
    }
