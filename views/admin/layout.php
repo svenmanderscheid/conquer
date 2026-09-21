@@ -57,10 +57,11 @@ $newBugCount=(int)$db->query("SELECT COUNT(*) FROM bug_reports WHERE world_id=? 
 </main>
 <footer><span>Conquer · Verwaltung</span><span>Änderungen sind im Verlauf nachvollziehbar. Zeitangaben in UTC.</span></footer>
 </div>
-<dialog id="item-picker-dialog" aria-labelledby="item-picker-title">
+<?php if($usesItemPicker): ?><dialog id="item-picker-dialog" aria-labelledby="item-picker-title">
     <div class="picker-header"><div><h2 id="item-picker-title">Gegenstand auswählen</h2><p>Suche nach Name oder Gegenstandsnummer.</p></div><button type="button" class="secondary" data-picker-close aria-label="Auswahl schließen">✕</button></div>
     <div class="picker-filters"><label>Suche<input type="search" id="item-picker-search" placeholder="z. B. Nahrung, Beschleuniger …"></label><label>Kategorie<select id="item-picker-category"><option value="">Alle Kategorien</option><?php foreach(\Conquer\Admin\ItemPresentation::CATEGORIES+['fragments'=>'Zufällige Reliktfragmente'] as $key=>$label): ?><option value="<?= ah($key) ?>"><?= ah($label) ?></option><?php endforeach ?></select></label></div>
     <p class="picker-count" aria-live="polite"></p><div class="picker-results"></div>
 </dialog>
 <script type="application/json" id="admin-item-catalog"><?= json_encode(\Conquer\Admin\ItemPresentation::catalog(true),JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_THROW_ON_ERROR) ?></script>
+<?php endif ?>
 </body></html>

@@ -263,7 +263,12 @@ window.ConquerWorld = (() => {
   function resize() {
     if(!view?.el.isConnected)return;
     view.width=Math.max(1,view.viewport.clientWidth);view.height=Math.max(1,view.viewport.clientHeight);
-    const ratio=Math.min(window.devicePixelRatio||1,2);view.terrainPad=view.width<700?96:144;view.canvas.width=Math.round((view.width+view.terrainPad*2)*ratio);view.canvas.height=Math.round((view.height+view.terrainPad*2)*ratio);view.ctx.setTransform(ratio,0,0,ratio,0,0);
+    // A 2x full-screen terrain canvas is expensive on phones and tablets and
+    // brings little visible benefit while the map is moving. Keep desktop
+    // sharp, but avoid rendering more than 2.25 physical pixels for each CSS
+    // pixel's area on touch-sized viewports.
+    const touchSized=view.width<900&&matchMedia('(pointer: coarse)').matches;
+    const ratio=Math.min(window.devicePixelRatio||1,touchSized?1.5:2);view.terrainPad=view.width<700?96:144;view.canvas.width=Math.round((view.width+view.terrainPad*2)*ratio);view.canvas.height=Math.round((view.height+view.terrainPad*2)*ratio);view.ctx.setTransform(ratio,0,0,ratio,0,0);
     Object.assign(view.canvas.style,{width:`${view.width+view.terrainPad*2}px`,height:`${view.height+view.terrainPad*2}px`,left:`${-view.terrainPad}px`,top:`${-view.terrainPad}px`});
     view.terrainStamp=null;
     view.atmosphere.width=Math.round(view.width*ratio);view.atmosphere.height=Math.round(view.height*ratio);view.atmosphereCtx.setTransform(ratio,0,0,ratio,0,0);view.followAnchor=null;paint();notify();
@@ -338,12 +343,12 @@ window.ConquerWorld = (() => {
     if(view.pointers.size===2&&view.pinch){const points=[...view.pointers.values()],box=view.viewport.getBoundingClientRect(),distance=Math.hypot(points[0].x-points[1].x,points[0].y-points[1].y);zoomTo(view.pinch.zoom*distance/Math.max(1,view.pinch.distance),(points[0].x+points[1].x)/2-box.left,(points[0].y+points[1].y)/2-box.top);return;}
     const drag=view.drag;if(!drag)return;if(Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY)>5)drag.moved=true;
     if(drag.moved&&drag.teleport){const box=view.viewport.getBoundingClientRect(),point=unproject(e.clientX-box.left,e.clientY-box.top);view.viewport.classList.add('is-teleport-dragging');chooseTeleportCell(point[0]-drag.offsetX,point[1]-drag.offsetY,false);drag.x=e.clientX;drag.y=e.clientY;return;}
-    if(drag.moved){stopFollowing();if(memory.panel==='actions'&&!context.teleport)clearSelection(false);view.viewport.classList.add('is-dragging');memory.x=clamp(memory.x-(e.clientX-drag.x)/scale(),0,255);memory.y=clamp(memory.y-(e.clientY-drag.y)/scale(),0,255);view.cameraDirty=true;notify();}drag.x=e.clientX;drag.y=e.clientY;
+    if(drag.moved){stopFollowing();if(memory.panel==='actions'&&!context.teleport)clearSelection(false);view.viewport.classList.add('is-dragging');memory.x=clamp(memory.x-(e.clientX-drag.x)/scale(),0,255);memory.y=clamp(memory.y-(e.clientY-drag.y)/scale(),0,255);panBufferedScene();notify();}drag.x=e.clientX;drag.y=e.clientY;
   }
   function pointerUp(e,cancelled=false){
     if(!view.pointers.has(e.pointerId))return;
     const drag=view.drag;view.pointers.delete(e.pointerId);if(view.viewport.hasPointerCapture(e.pointerId))view.viewport.releasePointerCapture(e.pointerId);
-    if(view.pointers.size===0){view.viewport.classList.remove('is-dragging','is-teleport-dragging');view.suppressUntil=performance.now()+(drag?.moved?400:100);if(!cancelled&&!drag?.moved&&!drag?.teleport){const box=view.viewport.getBoundingClientRect();if(context.teleport)selectCell(...unproject(e.clientX-box.left,e.clientY-box.top));else if(drag?.march)followMarch(drag.march);else if(drag?.target)select(drag.target,false,true);else selectCell(...unproject(e.clientX-box.left,e.clientY-box.top));}view.drag=null;view.pinch=null;}
+    if(view.pointers.size===0){view.viewport.classList.remove('is-dragging','is-teleport-dragging');view.suppressUntil=performance.now()+(drag?.moved?400:100);if(drag?.moved&&!drag.teleport)paint();if(!cancelled&&!drag?.moved&&!drag?.teleport){const box=view.viewport.getBoundingClientRect();if(context.teleport)selectCell(...unproject(e.clientX-box.left,e.clientY-box.top));else if(drag?.march)followMarch(drag.march);else if(drag?.target)select(drag.target,false,true);else selectCell(...unproject(e.clientX-box.left,e.clientY-box.top));}view.drag=null;view.pinch=null;}
     else {const point=[...view.pointers.values()][0];view.drag={x:point.x,y:point.y,startX:point.x,startY:point.y,moved:true,target:null};view.pinch=null;}
   }
   function updateMonsterHealth(button,target){
@@ -881,6 +886,13 @@ window.ConquerWorld = (() => {
   }
   function paint(){if(!view?.el.isConnected)return;view.cameraDirty=false;shiftScenery(0,0);view.sceneCenter={x:memory.x,y:memory.y};const width=view.width,height=view.height;view.width+=view.terrainPad*2||0;view.height+=view.terrainPad*2||0;try{terrain();}finally{view.width=width;view.height=height;}atmosphere();positionMarkers();positionActions();minimap();marches();view.el.querySelector('.atlas-coordinates').textContent=`X ${Math.round(memory.x)} · Y ${Math.round(memory.y)}`;const jump=view.el.querySelector('.atlas-jump');if(!jump.contains(document.activeElement)){jump.elements.x.value=Math.round(memory.x);jump.elements.y.value=Math.round(memory.y);}view.el.querySelector('.atlas-zoom-value').textContent=`${Math.round(memory.zoom*100)}%`;view.el.querySelector('[data-atlas="zoom-in"]').disabled=memory.zoom>=MAX_ZOOM;view.el.querySelector('[data-atlas="zoom-out"]').disabled=memory.zoom<=MIN_ZOOM;updateFooter();}
   function shiftScenery(x,y){for(const layer of [view.canvas,view.markers,view.creatures,view.routes,view.el.querySelector('.atlas-cell-focus')])if(layer)layer.style.translate=`${x}px ${y}px`;}
+  function panBufferedScene(){
+    const center=view.sceneCenter||{x:memory.x,y:memory.y},dx=(center.x-memory.x)*scale(),dy=(center.y-memory.y)*scale();
+    // The terrain canvas contains an off-screen border specifically so a drag
+    // can reuse the last frame. Repaint only as that border is approached.
+    if(Math.abs(dx)>view.terrainPad*.65||Math.abs(dy)>view.terrainPad*.65){paint();return;}
+    shiftScenery(dx,dy);moveMarches();
+  }
   function stopFollowing(restoreFocus=false){
     if(!view?.followId)return;view.followId=null;view.followAnchor=null;view.marchHud?.sync(context.state);view.cameraDirty=true;if(restoreFocus)view.viewport.focus({preventScroll:true});
   }

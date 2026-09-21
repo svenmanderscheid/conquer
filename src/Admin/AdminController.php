@@ -139,6 +139,9 @@ final class AdminController
         $_SESSION['admin_world_id']=$selectedWorld;
         $world=null;foreach($worlds as $candidate)if((int)$candidate['id']===$selectedWorld)$world=$candidate;
         $pageTitle=$title;$activePage=$view==='player_detail'?'players':$view;$canEdit=$adminSession['role']==='superadmin';
+        // The searchable item picker is sizeable and only used by reward
+        // editing and player gifts. Keep it out of every other admin response.
+        $usesItemPicker=in_array($view,['rewards','player_detail'],true);
         extract($vars,EXTR_SKIP);
         require_once ROOT_DIR.'/views/admin/helpers.php';
         ob_start();
