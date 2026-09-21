@@ -25,5 +25,8 @@
 @media(max-width:360px){.atlas-toolbar{gap:5px;padding-left:8px;padding-right:8px}.atlas-title{max-width:91px}.atlas-title strong{font-size:15px}.atlas-title small{font-size:6px}.atlas-city-link{padding:6px!important}.atlas-jump{gap:3px}.atlas-jump label{gap:2px;font-size:8px}.atlas-jump input{width:30px;font-size:10px}.atlas-jump button{width:25px}.atlas-nearby-toggle{width:27px;height:29px}.atlas-nearby-toggle svg{width:18px}.atlas-target-heading h2{font-size:20px}}
 /* The sprite can overhang its tile; the hit area cannot capture a neighbour. */
 .atlas-marker,.atlas-marker--home{width:var(--hitbox-size,40px);height:var(--hitbox-size,40px);transform:translate(-50%,-50%) scale(var(--marker-scale));transform-origin:50% 50%;overflow:visible!important}.atlas-marker>*{pointer-events:none!important}.atlas-marker:after{pointer-events:none}
+/* Creature and resource artwork is larger than its occupied map tile. Let the
+   visible portrait forward taps to its marker, including the overhanging body. */
+.atlas-marker--monsters>img,.atlas-marker--nodes>img{pointer-events:auto!important}
 /* Opening nearby targets takes precedence over the previously selected detail. */
 @media(max-width:700px){.atlas-shell.has-selection.show-nearby .atlas-nearby{display:block}}

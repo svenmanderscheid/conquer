@@ -40,10 +40,10 @@ const fixture=require('./fixtures/world_life.cjs'),root=path.resolve(__dirname,'
   for(const size of [{width:1440,height:900},{width:390,height:844},{width:320,height:700},{width:844,height:390}]){
    await page.setViewportSize(size);await page.waitForTimeout(150);await page.screenshot({path:path.join(output,`${size.width}-world.png`)});
    // Select the exact one-tile object after coordinate navigation.
-   await page.evaluate(()=>ConquerWorld.focus(66,70));await farm.click();
+   await page.evaluate(()=>ConquerWorld.focus(66,70));const farmArt=await farm.locator('img').boundingBox();await page.mouse.click(farmArt.x+farmArt.width/2,farmArt.y+farmArt.height*.18);
    const actions=page.getByRole('group',{name:'Zielaktionen'});assert(await actions.isVisible());const box=await actions.boundingBox();assert(box.x>=0&&box.x+box.width<=size.width+1&&box.y>=0&&box.y+box.height<=size.height+1,'farm actions fit '+size.width);
    await page.screenshot({path:path.join(output,`${size.width}-farm.png`)});await page.keyboard.press('Escape');
-   await page.evaluate(()=>ConquerWorld.focus(74,70));await orc.click();assert(await actions.getByRole('button',{name:'Angreifen',exact:true}).isVisible());await page.screenshot({path:path.join(output,`${size.width}-monster.png`)});await page.keyboard.press('Escape');
+   await page.evaluate(()=>ConquerWorld.focus(74,70));const orcArt=await orc.locator('img').boundingBox();await page.mouse.click(orcArt.x+orcArt.width/2,orcArt.y+orcArt.height*.18);assert(await actions.getByRole('button',{name:'Angreifen',exact:true}).isVisible());await page.screenshot({path:path.join(output,`${size.width}-monster.png`)});await page.keyboard.press('Escape');
    const daemmerhorn=marker('monsters:13');await page.evaluate(()=>ConquerWorld.focus(82.5,76.5));await daemmerhorn.click();assert(await actions.getByRole('button',{name:'Rally starten',exact:true}).isVisible());assert.match(await daemmerhorn.getAttribute('aria-label'),/Dämmerhorn.*Rally.*2 mal 2 Felder/);await page.screenshot({path:path.join(output,`${size.width}-daemmerhorn.png`)});await page.keyboard.press('Escape');
   }
   assert.deepEqual(errors,[]);assert(!requests.some(url=>url.startsWith('/api/')));console.log('PASS encounter identity, visible motion, stable hitboxes, OS/game motion settings, cached ground and responsive actions');console.log('Screenshots '+output);
