@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 $descriptions=[
     'dashboard'=>'Die wichtigsten Bereiche deines Königreichs, an einem Ort.',
+    'analytics'=>'Aktivität, Wirtschaft und Kämpfe mit belastbaren Zeiträumen auswerten.',
     'rewards'=>'Lege fest, welche Belohnungen deine Spieler erhalten.',
     'items'=>'Alle Gegenstände mit Bild, Seltenheit und Beschreibung.',
     'players'=>'Spieler finden, Fortschritt verwalten und Geschenke zustellen.',
@@ -33,7 +34,7 @@ $newBugCount=(int)$db->query("SELECT COUNT(*) FROM bug_reports WHERE world_id=? 
     <button type="button" class="secondary mobile-menu" aria-expanded="false" aria-controls="admin-nav">☰ Menü</button>
     <nav id="admin-nav" aria-label="Verwaltung">
     <?php foreach([
-        'Start'=>['dashboard'=>['','Übersicht','hud/city.svg']],
+        'Start'=>['dashboard'=>['','Übersicht','hud/city.svg'],'analytics'=>['/analytics','Statistiken','hud/reports.svg']],
         'Spielinhalte'=>['rewards'=>['/rewards','Beute & Drops','items/chest-gold.svg'],'items'=>['/items','Gegenstände','hud/inventory.svg'],'world_create'=>['/world-create','Welt erstellen','hud/city.svg'],'world'=>['/world','Welten & Spawns','hud/world.svg'],'lands'=>['/lands','Länder & Entwicklung','hud/world.svg']],
         'Gemeinschaft'=>['alpha_keys'=>['/alpha-keys','Alpha-Keys','items/scroll.svg'],'players'=>['/players','Spieler & Geschenke','knight.png'],'alliances'=>['/alliances','Allianzen','hud/alliance.svg'],'chat'=>['/chat','Chatprotokoll','hud/reports.svg'],'bug_reports'=>['/bug-reports','Bugmeldungen'.($newBugCount?' · '.$newBugCount:''),'hud/quest.svg']],
         'Verlauf'=>['audit'=>['/audit','Änderungsprotokoll','hud/quest.svg']]

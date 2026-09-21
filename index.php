@@ -149,6 +149,8 @@ if (str_starts_with($_normalizedPath, '/admin')) {
             => \Conquer\Admin\AdminController::logout(),
         $adminUri === '/admin' || $adminUri === '/admin/'
             => \Conquer\Admin\AdminController::dashboard(),
+        $adminUri === '/admin/analytics'
+            => \Conquer\Admin\AdminController::analytics(),
         $adminUri === '/admin/players'
             => \Conquer\Admin\AdminController::players(),
         $adminUri === '/admin/alpha-keys'

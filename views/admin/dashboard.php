@@ -10,6 +10,7 @@ $runs=$db->query('SELECT * FROM world_spawn_runs WHERE world_id=? ORDER BY id DE
     ['/rewards','items/chest-gold.svg','Beute festlegen','Monster, Dungeons, Truhen und Feldzüge. Bestimme Gegenstände, Mengen und Chancen.','Beuteverwaltung öffnen'],
     ['/items','hud/inventory.svg','Gegenstände entdecken','Finde Items über ihre Bilder, Seltenheit und Wirkung.','Bildkatalog öffnen'],
     ['/players?world_id='.$selectedWorld,'knight.png','Spielern helfen','Konten suchen, Fortschritt prüfen und Geschenke mit persönlicher Nachricht senden.','Spieler suchen'],
+    ['/analytics?world_id='.$selectedWorld,'hud/reports.svg','Statistiken auswerten','Online-Aktivität, Farmen, Kämpfe, Monsterkills und Drops nach Zeitraum prüfen.','Statistiken öffnen'],
     ['/bug-reports?world_id='.$selectedWorld,'hud/quest.svg','Bugmeldungen prüfen','Neue Meldungen aus dem Spiel priorisieren, untersuchen und abschließen.','Meldungen öffnen']
 ] as [$path,$art,$label,$description,$action]): ?><a class="quick-action" href="<?= APP_BASE ?>/admin<?= ah($path) ?>"><?= adminIcon($art) ?><h2><?= ah($label) ?></h2><p><?= ah($description) ?></p><span><?= ah($action) ?> →</span></a><?php endforeach ?>
 </div>

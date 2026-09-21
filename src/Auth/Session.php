@@ -105,6 +105,12 @@ final class Session
                 'UPDATE sessions SET last_active = UTC_TIMESTAMP() WHERE id = ?',
                 [(int) $row['id']],
             );
+            // One durable row per active minute: accurate enough for operations,
+            // bounded in size, and independent from session cleanup/revocation.
+            $db->execute(
+                'INSERT IGNORE INTO player_activity_minutes(player_id,world_id,minute_slot) VALUES(?,?,DATE_FORMAT(UTC_TIMESTAMP(),\'%Y-%m-%d %H:%i:00\'))',
+                [(int)$row['player_id'],(int)$row['active_world_id']],
+            );
         } catch (\Throwable) {
             // non-critical
         }

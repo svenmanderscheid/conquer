@@ -47,6 +47,7 @@ final class AdminController
         require ROOT_DIR.'/views/admin/change_password.php';
     }
     public static function dashboard(): void {self::render('dashboard','Übersicht');}
+    public static function analytics(): void {self::render('analytics','Statistiken');}
     public static function rewards(): void {self::render('rewards','Beute & Drops');}
     public static function lands(): void {self::render('lands','Länder & Entwicklung');}
     public static function items(): void {self::render('items','Gegenstandskatalog');}

@@ -117,7 +117,7 @@ final class AdminService
     {
         $id=WorldSettings::integer($input['player_id']??0,1,2147483647,'Spieler-ID');
         $world=WorldSettings::integer($input['world_id']??0,1,2147483647,'Welt-ID');
-        $player=$db->query('SELECT id,username,is_banned,gems FROM players WHERE id=? FOR UPDATE',[$id])->fetch();
+        $player=$db->query('SELECT id,username,is_banned,gems,vip_level,vip_points FROM players WHERE id=? FOR UPDATE',[$id])->fetch();
         if(!$player)throw new \InvalidArgumentException('Spieler nicht gefunden.');
         $city=$db->query('SELECT * FROM cities WHERE player_id=? AND world_id=? FOR UPDATE',[$id,$world])->fetch();
         if(!$city)throw new \InvalidArgumentException('Der Spieler hat in dieser Welt keine Stadt.');
@@ -133,6 +133,13 @@ final class AdminService
                 $before=['gems'=>(int)$player['gems']];$after=['gems'=>(int)$player['gems']+$amount];
                 if($after['gems']>2000000000)throw new \InvalidArgumentException('Edelsteinlimit überschritten.');
                 $db->execute('UPDATE players SET gems=? WHERE id=?',[$after['gems'],$id]);break;
+            case 'set-account-values':
+                $gems=WorldSettings::integer($input['gems']??null,0,2000000000,'Edelsteine');
+                $vip=WorldSettings::integer($input['vip_level']??null,1,15,'VIP-Stufe');
+                $points=WorldSettings::integer($input['vip_points']??null,0,2000000000,'VIP-Punkte');
+                $before=['gems'=>(int)$player['gems'],'vip_level'=>(int)$player['vip_level'],'vip_points'=>(int)$player['vip_points']];
+                $after=['gems'=>$gems,'vip_level'=>$vip,'vip_points'=>$points];
+                $db->execute('UPDATE players SET gems=?,vip_level=?,vip_points=? WHERE id=?',[$gems,$vip,$points,$id]);break;
             case 'grant-shield':
                 $hours=WorldSettings::integer($input['hours']??0,1,720,'Schutzdauer');
                 $before=['is_shielded'=>$city['is_shielded'],'shield_expires_at'=>$city['shield_expires_at']];
@@ -168,9 +175,11 @@ final class AdminService
             case 'add-troops':case 'set-troops':
                 $code=WorldSettings::integer($input['troop_code']??0,1,2147483647,'Truppencode');
                 if(!TroopData::get($code))throw new \InvalidArgumentException('Unbekannter Truppentyp.');
-                $count=WorldSettings::integer($input['count']??null,0,1000000,'Truppenanzahl');
                 $old=$db->query('SELECT count FROM city_troops WHERE city_id=? AND troop_code=? FOR UPDATE',[$cityId,$code])->fetchColumn();
-                $before=['troop_code'=>$code,'count'=>(int)$old];$after=['troop_code'=>$code,'count'=>$count];
+                $amount=WorldSettings::integer($input['count']??null,$action==='add-troops'?1:0,1000000,'Truppenanzahl');
+                $count=$action==='add-troops'?(int)$old+$amount:$amount;
+                if($count>2000000000)throw new \InvalidArgumentException('Truppenlimit überschritten.');
+                $before=['troop_code'=>$code,'count'=>(int)$old];$after=['troop_code'=>$code,'count'=>$count,'added'=>$action==='add-troops'?$amount:null];
                 $db->execute('INSERT INTO city_troops(city_id,troop_code,count) VALUES(?,?,?) ON DUPLICATE KEY UPDATE count=VALUES(count)',[$cityId,$code,$count]);break;
             default:throw new \InvalidArgumentException('Unbekannte Verwaltungsaktion.');
         }
