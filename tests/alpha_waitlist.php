@@ -5,6 +5,7 @@ define('ROOT_DIR',dirname(__DIR__));
 require ROOT_DIR.'/src/Autoloader.php';(new \Conquer\Autoloader(ROOT_DIR.'/src'))->register();
 require __DIR__.'/Support/FeatureDatabase.php';
 use Conquer\Auth\AlphaWaitlist;
+use Conquer\Admin\AlphaWaitlistAdmin;
 use Conquer\Db\Connection;
 function checkWaitlist(bool $ok,string $label):void{if(!$ok)throw new RuntimeException($label);echo "PASS $label\n";}
 $fixture=new \ConquerTests\FeatureDatabase();
@@ -28,4 +29,7 @@ try{
  }
  checkWaitlist((int)$db->query('SELECT COUNT(*) FROM alpha_waitlist')->fetchColumn()===1,'invalid and repeated requests add no records');
  checkWaitlist((int)$db->query('SELECT COUNT(*) FROM players')->fetchColumn()===0,'waitlist does not create a player or grant game access');
+ $list=AlphaWaitlistAdmin::listing($db,['q'=>'tester@tests.invalid','status'=>'invited']);
+ checkWaitlist($list['total']===1&&$list['rows'][0]['email']==='tester@tests.invalid','admin listing exposes stored alpha email');
+ checkWaitlist(is_file(ROOT_DIR.'/views/admin/alpha_waitlist.php'),'admin waitlist view exists');
 }finally{$fixture->close();}

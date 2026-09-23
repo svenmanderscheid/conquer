@@ -7,6 +7,34 @@ use Conquer\Game\World\WorldSettings;
 
 final class AlphaWaitlistAdmin
 {
+    public static function listing(Connection $db, array $input): array
+    {
+        $search = trim(is_string($input['q'] ?? null) ? $input['q'] : '');
+        $search = mb_substr($search, 0, 120);
+        $status = is_string($input['status'] ?? null) ? $input['status'] : '';
+        if (!in_array($status, ['', 'waiting', 'invited'], true)) $status = '';
+        $page = max(1, (int) ($input['page'] ?? 1));
+        $where = [];
+        $params = [];
+        if ($search !== '') {
+            $where[] = '(first_name LIKE ? OR last_name LIKE ? OR email LIKE ?)';
+            $term = '%' . str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $search) . '%';
+            array_push($params, $term, $term, $term);
+        }
+        if ($status === 'waiting') $where[] = 'invited_at IS NULL';
+        if ($status === 'invited') $where[] = 'invited_at IS NOT NULL';
+        $filter = $where ? ' WHERE ' . implode(' AND ', $where) : '';
+        $total = (int) $db->query('SELECT COUNT(*) FROM alpha_waitlist' . $filter, $params)->fetchColumn();
+        $pages = max(1, (int) ceil($total / 25));
+        $page = min($page, $pages);
+        $rows = $db->query(
+            'SELECT id,first_name,last_name,email,locale,created_at,consent_at,consent_version,invited_at FROM alpha_waitlist'
+            . $filter . ' ORDER BY created_at DESC,id DESC LIMIT 25 OFFSET ' . (($page - 1) * 25),
+            $params
+        )->fetchAll();
+        return compact('rows', 'total', 'pages', 'page', 'search', 'status');
+    }
+
     /** Called inside AdminService's authenticated, audited transaction. */
     public static function update(Connection $db, array $input): array
     {

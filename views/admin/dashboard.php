@@ -3,9 +3,11 @@ declare(strict_types=1);
 $state=\Conquer\Game\World\WorldSettings::get($selectedWorld);$cfg=$state['settings'];
 $counts=['players'=>(int)$db->query('SELECT COUNT(*) FROM cities WHERE world_id=?',[$selectedWorld])->fetchColumn(),'resources'=>(int)$db->query('SELECT COUNT(*) FROM field_objects WHERE world_id=? AND resource_amount>0 AND expires_at>UTC_TIMESTAMP()',[$selectedWorld])->fetchColumn(),'monsters'=>(int)$db->query('SELECT COUNT(*) FROM field_monsters WHERE world_id=? AND hp_current>0',[$selectedWorld])->fetchColumn(),'bugs'=>(int)$db->query("SELECT COUNT(*) FROM bug_reports WHERE world_id=? AND status IN ('new','in_progress')",[$selectedWorld])->fetchColumn()];
 $runs=$db->query('SELECT * FROM world_spawn_runs WHERE world_id=? ORDER BY id DESC LIMIT 5',[$selectedWorld])->fetchAll();
+$alphaWaiting=$canEdit?(int)$db->query('SELECT COUNT(*) FROM alpha_waitlist WHERE invited_at IS NULL')->fetchColumn():0;
 ?>
 <div class="quick-actions">
 <?php foreach([
+    ...($canEdit?[[ '/alpha-waitlist','hud/reports.svg','Alpha-E-Mails ansehen',$alphaWaiting.' Interessenten warten aktuell auf eine Einladung.','Warteliste öffnen' ]]:[]),
     ['/world-create','hud/city.svg','Welt erstellen','Name, Tempo, Minen, Monster und Spawnregeln in einem Schritt festlegen.','Neue Welt vorbereiten'],
     ['/rewards','items/chest-gold.svg','Beute festlegen','Monster, Dungeons, Truhen und Feldzüge. Bestimme Gegenstände, Mengen und Chancen.','Beuteverwaltung öffnen'],
     ['/items','hud/inventory.svg','Gegenstände entdecken','Finde Items über ihre Bilder, Seltenheit und Wirkung.','Bildkatalog öffnen'],
