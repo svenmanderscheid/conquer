@@ -170,7 +170,8 @@ final class GatherService
                 // The node lock and returning-state transition make this exactly once.
                 if ($amount === (int)$obj['resource_amount']) {
                     $definition=\Conquer\Game\Map\FieldObjectData::get((int)$obj['object_type'],(int)$obj['level']);
-                    $items=\Conquer\Game\Rewards\RewardCatalog::rollItems($definition['drops']);
+                    $rewards=\Conquer\Game\Rewards\RewardCatalog::effective('farm',$definition['code'].'.'.$definition['level'],(int)$march['world_id']);
+                    $items=\Conquer\Game\Rewards\RewardCatalog::rollItems($rewards['drops']);
                 }
                 \Conquer\Game\World\LandProgressService::recordGather((int)$march['world_id'],(int)$march['id'],(int)$obj['coord_x'],(int)$obj['coord_y'],FieldObjectService::RESOURCE_BY_TYPE[(int)$obj['object_type']],$amount,(int)$march['player_id']);
             }

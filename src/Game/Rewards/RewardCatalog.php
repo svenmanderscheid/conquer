@@ -75,6 +75,13 @@ final class RewardCatalog
                 $active=\Conquer\Game\Map\MonsterData::isActive((int)$key);
                 $out[$key] = ['key'=>$key,'name'=>$name,'subtitle'=>'Stufe '.$d['level'].' · '.($d['type']==='rally'?'Rally-Boss':'Solo-Monster').($active?'':' · Noch nicht aktiv'),'active'=>$active,'catalog_level'=>(int)$raw['level'],'image'=>self::monsterImage($d),'definition'=>$d];
             }
+        } elseif ($type === 'farm') {
+            $images = [1=>'ui-resources/food.png',2=>'ui-resources/lumber.png',3=>'ui-resources/stone.png',4=>'ui-resources/gold.png',5=>'items/gems.svg'];
+            foreach (self::json('field_objects')['objects'] as $d) {
+                if (!isset($images[$d['code']-20100100])) continue; // Only the five gatherable resource families.
+                $key = $d['code'].'.'.$d['level'];
+                $out[$key] = ['key'=>$key,'name'=>\Conquer\Game\Locale::t('admin.drops.field.'.($d['code']-20100100)), 'subtitle'=>\Conquer\Game\Locale::t('admin.drops.level',['level'=>$d['level']]),'image'=>$images[$d['code']-20100100], 'definition'=>$d];
+            }
         } elseif ($type === 'dungeon') {
             foreach (self::json('dungeons')['dungeons'] as $d) {
                 $key = $d['dungeon_code'];
@@ -107,6 +114,7 @@ final class RewardCatalog
         $source = self::sources($type)[$key] ?? null;
         if (!$source) throw new \InvalidArgumentException('Diese Beutequelle wurde nicht gefunden.');
         $d = $source['definition'];
+        if ($type === 'farm') return ['drops'=>self::availableDrops($d['drops']??[])];
         if ($type === 'monster') {
             $drops = $d['drops'] ?? [];
             if ($d['type'] === 'rally' && !isset($d['source_code'])) {
@@ -200,6 +208,7 @@ final class RewardCatalog
             return ['treasure_code'=>$code,'fragments'=>$integer($input['fragments']??null,0,10000,'Fragmente'),'item_chance'=>$probability,'item_quantity'=>$integer($input['item_quantity']??null,1,100000,'Itemmenge'),'items'=>$entries];
         }
         if ($type==='expedition') return ['resources'=>$resources($input['resources']??null),'gems'=>$integer($input['gems']??null,0,1000000,'Edelsteine'),'drops'=>$entries];
+        if ($type==='farm') return ['drops'=>$entries];
         $charms=$input['charms']??[];
         if (!is_array($charms)) throw new \InvalidArgumentException('Ungültige Talisman-Einstellung.');
         $c=['chance'=>1]; // Every defeated monster leaves exactly one map charm.

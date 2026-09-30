@@ -2812,3 +2812,90 @@ body.mobile-game .map-overlay-shell .is-charm[data-grade=legendary] { --charm-gr
 .mobile-game .map-overlay-shell .atlas-marker--nodes > img:is([data-life-kind=quarry],[data-life-kind=gold],[data-life-kind=crystal]) {
  width:calc(var(--tile-size,44px)*2.3125);height:calc(var(--tile-size,44px)*2.3125);margin-left:calc(var(--tile-size,44px)*-1.15625);
 }
+
+/* Reward administration: categories stay reachable above the source browser. */
+.admin-village .reward-category-tabs { display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:18px; }
+.admin-village .reward-category-tabs a { min-width:0;min-height:60px;padding:10px;overflow-wrap:anywhere; }
+.admin-village .reward-category-tabs a small { margin-left:auto;font-family:var(--ui-font-number);flex-shrink:0;white-space:nowrap; }
+.admin-village .reward-category-tabs a span { min-width:0; }
+.admin-village .reward-workspace.has-source-table { display:block; }
+.admin-village .has-source-table .source-browser { position:static;margin-bottom:20px; }
+.admin-village .has-source-table .source-browser-content { display:grid;grid-template-columns:minmax(230px,1fr) minmax(180px,1fr);gap:8px 20px; }
+.admin-village .has-source-table .source-filters { grid-template-columns:repeat(2,minmax(0,1fr));margin:0; }
+.admin-village .has-source-table [data-source-count] { grid-column:1/-1;margin:0; }
+.admin-village .has-source-table .source-list { grid-column:1/-1;max-height:none;padding:0;overflow:visible; }
+.admin-village .monster-table-scope { margin:6px 0;font-size:13px; }
+.admin-village .monster-table-scroll-hint { display:none;font-size:12px;color:var(--ui-muted); }
+.admin-village .monster-table-scroll { max-height:620px;overflow:auto;border:1px solid var(--ui-line);border-radius:12px;overscroll-behavior:contain; }
+.admin-village .monster-reward-table { width:100%;min-width:980px;table-layout:fixed;border-collapse:separate;border-spacing:0;font-size:12px; }
+.admin-village .monster-reward-table caption { text-align:left;padding:10px;background:var(--ui-paper);color:var(--ui-muted);font-size:12px; }
+.admin-village .monster-reward-table :is(th,td) { padding:10px 8px;white-space:normal;vertical-align:top;overflow-wrap:anywhere;border-bottom:1px solid var(--ui-line); }
+.admin-village .monster-reward-table thead th { position:sticky;top:0;z-index:2;background:var(--ui-primary);color:var(--ui-card-light);font-weight:normal; }
+.admin-village .monster-reward-table th:nth-child(1) { width:18%; }
+.admin-village .monster-reward-table th:nth-child(2) { width:5%; }
+.admin-village .monster-reward-table th:nth-child(3) { width:30%; }
+.admin-village .monster-reward-table th:nth-child(4) { width:20%; }
+.admin-village .monster-reward-table th:nth-child(5) { width:9%; }
+.admin-village .monster-reward-table th:nth-child(6) { width:9%; }
+.admin-village .monster-reward-table th:nth-child(7) { width:9%; }
+.admin-village .monster-reward-table tbody tr { background:var(--ui-card-light); }
+.admin-village .monster-reward-table tbody tr:nth-child(even) { background:var(--ui-paper); }
+.admin-village .monster-reward-table tbody tr.is-selected { background:var(--ui-gold-soft); }
+.admin-village .monster-reward-table tbody th { position:sticky;left:0;z-index:1;background:inherit;text-align:left;font-weight:normal; }
+.admin-village .monster-reward-table thead th:first-child { left:0;z-index:3; }
+.admin-village .monster-table-name { display:flex;gap:8px;align-items:center; }
+.admin-village .monster-table-name .admin-icon { width:34px;height:40px;flex-shrink:0;object-fit:contain; }
+.admin-village .monster-table-name small { display:block;margin-top:3px;color:var(--ui-muted);font-size:11px; }
+.admin-village .monster-table-name .monster-table-inactive { color:var(--ui-red-dark); }
+.admin-village .monster-table-level { font-family:var(--ui-font-number); }
+.admin-village .monster-table-drops { list-style:none;margin:0;padding:0; }
+.admin-village .monster-table-drop { display:grid;grid-template-columns:minmax(0,1fr) 36px 50px;gap:5px;align-items:baseline;padding:2px 0; }
+.admin-village .monster-table-drop strong,.admin-village .monster-drop-chance { text-align:right;font-family:var(--ui-font-number);white-space:nowrap; }
+.admin-village .monster-table-drop.is-disabled { color:var(--ui-muted); }
+.admin-village .monster-table-more summary { min-height:44px;align-content:center;color:var(--ui-primary-dark); }
+.admin-village .monster-table-resources { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px; }
+.admin-village .monster-table-resources>span { display:flex;gap:4px;align-items:center;min-width:0; }
+.admin-village .monster-table-resources img { width:22px;height:22px; }
+.admin-village .monster-table-resources small { display:block;color:var(--ui-muted);font-size:10px; }
+.admin-village .monster-table-resources strong { font:normal 11px var(--ui-font-number); }
+.admin-village .monster-table-gems strong,.admin-village .monster-table-gems small { display:block;font-family:var(--ui-font-number); }
+.admin-village .monster-rule { display:inline-block;padding:4px 5px;border:1px solid var(--ui-line);border-radius:7px; }
+.admin-village .monster-rule.is-custom { background:var(--ui-green-soft);color:var(--ui-green-dark); }
+.admin-village .monster-reward-table .button { min-height:44px;padding:6px 4px;font-size:12px;white-space:nowrap; }
+.admin-village .reward-source-row[hidden] { display:none; }
+.admin-village #reward-editor { scroll-margin-top:16px; }
+.admin-village .monster-table-back { margin-bottom:12px;min-height:44px; }
+@media(max-width:1250px) { .admin-village .monster-table-scroll-hint { display:block; } }
+@media(max-width:680px) {
+ .admin-village .has-source-table .source-browser-content { grid-template-columns:minmax(0,1fr); }
+ .admin-village .monster-table-scroll { max-height:460px; }
+ .admin-village .monster-reward-table { min-width:920px; }
+ .admin-village .monster-reward-table th:nth-child(1) { width:15%; }
+ .admin-village .monster-reward-table th:nth-child(3) { width:31%; }
+ .admin-village .monster-reward-table th:nth-child(6),.admin-village .monster-reward-table th:nth-child(7) { width:10%; }
+ .admin-village .monster-table-name { gap:4px; }
+ .admin-village .monster-table-name .admin-icon { width:25px;height:30px; }
+}
+.admin-village .reward-editor .save-area { position:static; }
+.admin-village .source-filters { display:grid;grid-template-columns:minmax(0,1fr);gap:10px;margin-bottom:12px; }
+.admin-village .source-drop-meta { margin-top:5px;color:var(--ui-primary-dark); }
+.admin-village .drop-overview { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 22px; }
+.admin-village .drop-overview>div { padding:14px;border:1px solid var(--ui-line);border-radius:12px;background:var(--ui-card-light);color:var(--ui-ink); }
+.admin-village .drop-overview small { display:block;color:var(--ui-muted); }
+.admin-village .drop-overview strong { display:block;margin-top:5px;font:700 24px/1.3 var(--ui-font-number);overflow-wrap:anywhere; }
+.admin-village .drop-overview p { grid-column:1/-1;margin:0;font-size:13px;color:var(--ui-muted); }
+.admin-village .reward-items .drop-row .drop-outcome { grid-column:1/-1;padding-top:6px;border-top:1px solid var(--ui-line);color:var(--ui-muted);font-size:12px; }
+.admin-village .source-choice[hidden],.admin-village .drop-row[hidden] { display:none; }
+@media(max-width:1100px) {
+ .admin-village .reward-category-tabs { grid-template-columns:repeat(3,minmax(0,1fr)); }
+ .admin-village .source-filters { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media(max-width:600px) {
+ .admin-village .reward-category-tabs { grid-template-columns:repeat(2,minmax(0,1fr)); }
+ .admin-village .reward-category-tabs a { font-size:13px;gap:6px; }
+ .admin-village .reward-category-tabs .admin-icon { width:23px;height:23px; }
+ .admin-village .drop-overview { gap:6px; }
+ .admin-village .drop-overview>div { padding:9px; }
+ .admin-village .drop-overview small { font-size:12px; }
+ .admin-village .drop-overview strong { font-size:20px; }
+}

@@ -91,5 +91,18 @@ try{
     WorldContext::bind(2);$a=G::dispatch(1,101,50,60,selectedTroops:[50100101=>100])['march_id'];dueG($a);WorldContext::bind(1);MarchTick::runForPlayer(1);
     checkG(rowG($a)['state']==='arrived'&&(int)nodeG($n)['gatherer_march_id']===$a&&WorldContext::id()===1,'settlement uses the stored world and restores the viewing context');
     checkG(F::withOccupations([nodeG($n)],2,2)[0]['can_attack'],'field ownership and alliance rules are scoped to the field world');
+    $global=json_encode(['drops'=>[['item_code'=>10103001,'count'=>2,'probability'=>1]]]);
+    $worldReward=json_encode(['drops'=>[['item_code'=>10103001,'count'=>7,'probability'=>1],['item_code'=>10103002,'count'=>9,'probability'=>0]]]);
+    $db->execute("INSERT INTO reward_overrides(source_type,source_key,config_json,updated_by) VALUES('farm','20100101.1',?,1)",[$global]);
+    $db->execute("INSERT INTO reward_world_overrides(world_id,source_type,source_key,config_json,updated_by) VALUES(2,'farm','20100101.1',?,1)",[$worldReward]);
+    \Conquer\Game\Rewards\RewardCatalog::resetCache();
+    $db->execute('UPDATE field_objects SET resource_amount=10 WHERE id=?',[$n]);
+    $db->execute('UPDATE marches SET arrival_time=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 3 SECOND),gathering_finishes_at=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 1 SECOND) WHERE id=?',[$a]);
+    G::finish($a);$haul=json_decode(rowG($a)['haul_json'],true);
+    checkG(($haul['items'][10103001]??0)===7&&!isset($haul['items'][10103002]),'depleted farm uses its own world override and excludes zero-chance items');
+    G::finish($a);checkG(json_decode(rowG($a)['haul_json'],true)['items']===$haul['items'],'repeat settlement does not roll farm drops twice');
+    clearG();
+    $n=makeNodeG(90);$a=sendG(1,$n);dueG($a,3);settleG($a);G::finish($a,true);
+    checkG(empty(json_decode(rowG($a)['haul_json'],true)['items']),'partial recall awards no items even with a guaranteed farm drop');clearG();
     echo "ALL GATHERING LIFECYCLE CHECKS PASSED\n";
 }finally{$fixture->close();}

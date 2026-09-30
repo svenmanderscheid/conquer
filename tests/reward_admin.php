@@ -2,6 +2,7 @@
 declare(strict_types=1);
 /** Isolated schema + synthetic accounts. Never edits live reward settings or players. */
 if(PHP_SAPI!=='cli')exit(1);
+ob_start();session_name('conquer_reward_test');session_start();
 define('ROOT_DIR',dirname(__DIR__));define('APP_BASE','/conquer');
 require ROOT_DIR.'/src/Autoloader.php';(new \Conquer\Autoloader(ROOT_DIR.'/src'))->register();
 require __DIR__.'/Support/FeatureDatabase.php';
@@ -27,7 +28,7 @@ try{
     $fixture=new \ConquerTests\FeatureDatabase();$db=Connection::getInstance();
     \Conquer\Db\MigrationSql::apply($db->getPdo(),(string)file_get_contents(ROOT_DIR.'/migrations/0083_reward_overrides.sql'));
     $db->execute("INSERT INTO admin_users(id,username,password_hash,role) VALUES(1,'RewardAdmin',?,'superadmin'),(2,'RewardModerator',?,'moderator')",[password_hash('Fixture-Reward-123!',PASSWORD_DEFAULT),password_hash('Fixture-Reward-123!',PASSWORD_DEFAULT)]);
-    foreach(['monster','dungeon','chest','expedition']as$type){foreach(R::sources($type)as$key=>$source){$cfg=R::defaults($type,(string)$key);R::validate($type,(string)$key,formConfig($type,$cfg));}ck(true,'Every '.$type.' source has a valid, editable default');}
+    foreach(['monster','farm','dungeon','chest','expedition']as$type){foreach(R::sources($type)as$key=>$source){$cfg=R::defaults($type,(string)$key);R::validate($type,(string)$key,formConfig($type,$cfg));}ck(true,'Every '.$type.' source has a valid, editable default');}
     $f=formConfig('monster',R::defaults('monster','20209901'));$f['rows']=[['target'=>'10103001','quantity'=>7,'chance'=>100],['target'=>'10103002','quantity'=>9,'chance'=>0]];$f['gems_chance']=100;$f['gems_amount']=11;
     $op=bin2hex(random_bytes(16));$a=action('monster','20209901',$f,0,$op);$b=action('monster','20209901',$f,0,$op);
     ck(!$a['duplicate']&&$b['duplicate']&&(int)$db->query('SELECT COUNT(*) FROM reward_overrides')->fetchColumn()===1,'Duplicate save creates exactly one revision');
@@ -79,9 +80,17 @@ try{
     $db->execute('UPDATE marches SET return_time=UTC_TIMESTAMP() WHERE id=?',[$marchId]);\Conquer\Game\March\MarchTick::runForPlayer(1);\Conquer\Game\March\MarchTick::runForPlayer(1);
     ck((int)$db->query('SELECT quantity FROM player_inventory WHERE player_id=1 AND item_code=10103001')->fetchColumn()===13&&(int)$db->query('SELECT gems FROM players WHERE id=1')->fetchColumn()===11,'Returning solo army credits items and gems exactly once');
     action('monster','20209901',[],3,null,1,'reward-reset');
-    $_SESSION=['admin'=>['id'=>1,'username'=>'RewardAdmin','role'=>'superadmin'],'admin_csrf'=>str_repeat('a',64)];
-    foreach(['monster','dungeon','chest','expedition']as$type){$_GET=['world_id'=>1,'type'=>$type];ob_start();\Conquer\Admin\AdminController::rewards();$html=ob_get_clean();ck(str_contains($html,'data-reward-editor')&&!str_contains($html,'Ansicht konnte nicht geladen'),'Render '.$type.' editor');}
-    $_GET=[];ob_start();\Conquer\Admin\AdminController::items();$html=ob_get_clean();ck(str_contains($html,'item-catalog-grid')&&!str_contains($html,'Ansicht konnte nicht geladen'),'Render illustrated catalog');
+    $farm=['rows'=>[['target'=>'10103001','quantity'=>3,'chance'=>100],['target'=>'10103002','quantity'=>2,'chance'=>0]]];
+    action('farm','20100101.1',$farm);
+    ck(R::rollItems(R::effective('farm','20100101.1',1)['drops'])===[10103001=>3],'Farm uses saved independent item chances');
+    reject(fn()=>action('farm','20100101.999',$farm),'Unknown farm level rejected');
+    reject(fn()=>action('farm','20100101.1',$farm,0),'Stale farm save rejected');
+    action('farm','20100101.1',[],1,null,1,'reward-reset');
+    ck(R::effective('farm','20100101.1',1)===R::defaults('farm','20100101.1'),'Farm reset restores defaults');
+    ck(\Conquer\Auth\AdminAuth::login('RewardAdmin','Fixture-Reward-123!'),'real admin login creates a current authenticated session');
+    $_SESSION['admin_csrf']=str_repeat('a',64);
+    foreach(['monster','farm','dungeon','chest','expedition']as$type){$_GET=['world_id'=>1,'type'=>$type];ob_start();\Conquer\Admin\AdminController::rewards();$html=ob_get_clean();ck(str_contains($html,'data-reward-editor')&&!str_contains($html,'<div class="notice error">Die Ansicht konnte nicht geladen'),'Render '.$type.' editor');}
+    $_GET=[];ob_start();\Conquer\Admin\AdminController::items();$html=ob_get_clean();ck(str_contains($html,'item-catalog-grid')&&!str_contains($html,'<div class="notice error">Die Ansicht konnte nicht geladen'),'Render illustrated catalog');
     echo "ALL $checks REWARD CHECKS PASSED\n";
     if(in_array('--browser',$argv,true)){
         $routes= <<<'PHP'
@@ -96,9 +105,9 @@ try{
         if($path==='/admin/login'){if($_SERVER['REQUEST_METHOD']==='POST')\Conquer\Admin\AdminController::loginPost();else \Conquer\Admin\AdminController::loginPage();}
         elseif($path==='/admin/logout')\Conquer\Admin\AdminController::logout();
         elseif(str_starts_with($path,'/admin/action/'))\Conquer\Admin\AdminController::handleAction();
-        else{match($path){'/admin'=>\Conquer\Admin\AdminController::dashboard(),'/admin/rewards'=>\Conquer\Admin\AdminController::rewards(),'/admin/items'=>\Conquer\Admin\AdminController::items(),'/admin/world'=>\Conquer\Admin\AdminController::world(),'/admin/lands'=>\Conquer\Admin\AdminController::lands(),'/admin/players'=>\Conquer\Admin\AdminController::players(),'/admin/audit'=>\Conquer\Admin\AdminController::auditLog(),default=>http_response_code(404)};}
+        else{match($path){'/admin'=>\Conquer\Admin\AdminController::dashboard(),'/admin/rewards'=>\Conquer\Admin\AdminController::rewards(),'/admin/items'=>\Conquer\Admin\AdminController::items(),'/admin/world'=>\Conquer\Admin\AdminController::world(),'/admin/lands'=>\Conquer\Admin\AdminController::lands(),'/admin/players'=>\Conquer\Admin\AdminController::players(),'/admin/bug-reports'=>\Conquer\Admin\AdminController::bugReports(),'/admin/audit'=>\Conquer\Admin\AdminController::auditLog(),default=>http_response_code(404)};}
         PHP;
-        $url=$fixture->serve($routes);
+        $url=$fixture->serve($routes,['-d','session.save_path='.sys_get_temp_dir()]);
         $process=proc_open(['node',ROOT_DIR.'/tests/admin_backoffice.cjs',$url],[0=>['pipe','r'],1=>STDOUT,2=>STDERR],$pipes,ROOT_DIR,null,['bypass_shell'=>true]);
         if(!is_resource($process))throw new RuntimeException('Browser test did not start.');fclose($pipes[0]);
         if(proc_close($process)!==0)throw new RuntimeException('Browser checks failed.');

@@ -3,6 +3,8 @@
     'use strict';
     const $ = (s, root=document) => root.querySelector(s);
     const $$ = (s, root=document) => [...root.querySelectorAll(s)];
+    const rewardText = (key, values={}) => window.ConquerLocale.t('admin.drops.'+key, values);
+    const rewardNumber = value => value.toLocaleString(window.ConquerLocale?.locale??'en',{maximumFractionDigits:2});
     const catalog = JSON.parse($('#admin-item-catalog')?.textContent || '[]');
     const byCode = new Map(catalog.map(i=>[String(i.code),i]));
     const dialog = $('#item-picker-dialog');
@@ -50,7 +52,7 @@
     const sourceSearch=$('[data-source-search]');
     const sourceBrowser=$('[data-source-browser]');
     const compactSources=window.matchMedia('(max-width: 1100px)');
-    function sizeSourceBrowser(){if(sourceBrowser)sourceBrowser.open=!compactSources.matches;}
+    function sizeSourceBrowser(){if(sourceBrowser&&!sourceBrowser.hasAttribute('data-source-table'))sourceBrowser.open=!compactSources.matches;}
     function revealSource(){
         const selected=$('.source-choice.is-selected'),list=$('.source-list');
         if(sourceBrowser?.open&&selected&&list)list.scrollTop+=selected.getBoundingClientRect().top-list.getBoundingClientRect().top-list.clientHeight/2+selected.clientHeight/2;
@@ -61,11 +63,21 @@
     const rewardScope=$('[data-reward-scope]');
     function showScopeWorld(){const field=$('[data-scope-world]');if(field)field.hidden=rewardScope.value!=='world';}
     rewardScope?.addEventListener('change',showScopeWorld);if(rewardScope)showScopeWorld();
-    sourceSearch?.addEventListener('input',()=>{
-        const q=sourceSearch.value.toLocaleLowerCase('de').trim();let count=0;
-        $$('[data-source-name]').forEach(e=>{e.hidden=!e.dataset.sourceName.includes(q);if(!e.hidden)count++;});
-        $('[data-source-count]').textContent=`${count} Quellen gefunden`;$('[data-source-empty]').hidden=count>0;
-    });
+    function filterSources(){
+        if(!sourceSearch)return;
+        const q=sourceSearch.value.toLocaleLowerCase().trim(),level=$('[data-source-level]')?.value,rule=$('[data-source-rule]')?.value;let count=0;
+        $$('[data-source-name]').forEach(e=>{
+            e.hidden=!`${e.dataset.sourceName} ${e.textContent}`.toLocaleLowerCase().includes(q)
+                ||Boolean(level&&e.dataset.sourceLevelValue!==level)
+                ||(rule==='custom'&&e.dataset.sourceCustom!=='1')
+                ||(rule==='default'&&e.dataset.sourceCustom==='1')
+                ||(rule==='empty'&&e.dataset.sourceItems!=='0');
+            if(!e.hidden)count++;
+        });
+        $('[data-source-count]').textContent=rewardText('found',{count});$('[data-source-empty]').hidden=count>0;
+    }
+    sourceSearch?.addEventListener('input',filterSources);
+    $$('[data-source-level],[data-source-rule]').forEach(e=>e.addEventListener('change',filterSources));
     function filterCatalog(){
         if(!$('[data-catalog-search]'))return;
         const q=$('[data-catalog-search]').value.toLocaleLowerCase('de').trim(),category=$('[data-catalog-category]').value,rarity=$('[data-catalog-rarity]').value;let count=0;
@@ -81,7 +93,25 @@
         const rows=$$('.drop-row',editor),weighted=['chest','dungeon'].includes(editor.dataset.rewardEditor);
         const total=rows.reduce((sum,r)=>sum+Math.max(0,Number($('input[name$="[weight]"]',r)?.value)||0),0);
         const query=$('[data-drop-search]').value.trim().toLocaleLowerCase('de');let visible=0;
-        rows.forEach(row=>{const label=$('.drop-probability',row);if(weighted){const value=Number($('input[name$="[weight]"]',row)?.value)||0;label.textContent=(total?value/total*100:0).toLocaleString('de-DE',{maximumFractionDigits:2})+' %';}else{const chance=Number($('input[name$="[chance]"]',row)?.value);label.textContent=chance===100?'Garantiert':chance===0?'Aus':'Zufällig';}const code=$('input[type="hidden"]',row).value;row.hidden=!`${byCode.get(code)?.name||''} ${code}`.toLocaleLowerCase('de').includes(query);if(!row.hidden)visible++;});
+        let active=0,guaranteed=0,expected=0;
+        const dungeon=editor.dataset.rewardEditor==='dungeon',rolls=editor.dataset.rewardEditor==='chest'?Math.max(0,Number($('[name="config[rolls]"]',editor)?.value)||0):1;
+        rows.forEach(row=>{
+            const label=$('.drop-probability',row),weight=Math.max(0,Number($('input[name$="[weight]"]',row)?.value)||0);
+            const share=weighted?(total?weight/total:0):Math.min(1,Math.max(0,Number($('input[name$="[chance]"]',row)?.value)||0)/100);
+            const probability=share*(dungeon?Math.min(100,Math.max(0,Number($('[name="config[item_chance]"]',editor)?.value)||0))/100:1);
+            const quantity=Math.max(0,Number(dungeon?$('[name="config[item_quantity]"]',editor)?.value:$('input[name$="[quantity]"]',row)?.value)||0);
+            if(probability>0)active++;if(probability===1)guaranteed++;
+            expected+=probability*quantity*100*rolls;
+            label.textContent=weighted?rewardNumber(share*100)+' %':rewardText(probability===1?'certain':probability===0?'off':'random');
+            let outcome=$('.drop-outcome',row);
+            if(!outcome){outcome=document.createElement('small');outcome.className='drop-outcome';row.append(outcome);}
+            outcome.textContent=rewardText(dungeon?'row_dungeon':'row_expected',{chance:rewardNumber(probability*100),count:rewardNumber(probability*quantity*100*rolls)});
+            const code=$('input[type="hidden"]',row).value;
+            row.hidden=!`${byCode.get(code)?.name||''} ${code}`.toLocaleLowerCase('de').includes(query);if(!row.hidden)visible++;
+        });
+        $('[data-drop-active]').textContent=String(active);
+        $('[data-drop-guaranteed]').textContent=String(guaranteed);
+        $('[data-drop-expected]').textContent=rewardNumber(expected);
         $('[data-drop-count]').textContent=query?`${visible} / ${rows.length} Einträge`:`${rows.length} Einträge`;$('[data-drop-empty]').hidden=rows.length>0;
         $('[data-drop-no-match]').hidden=visible>0||!rows.length;
         $('[data-add-drop]').disabled=rows.length>=200||form.querySelector('fieldset').disabled;

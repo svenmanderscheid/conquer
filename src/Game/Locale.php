@@ -5,15 +5,16 @@ namespace Conquer\Game;
 /** Explicit translation keys, shared with the browser; no automatic translation of player data. */
 final class Locale
 {
-    public const SUPPORTED=['de'=>'Deutsch','fr'=>'Français','en'=>'English'];
+    public const DEFAULT='en';
+    public const SUPPORTED=['en'=>'English','de'=>'Deutsch','fr'=>'Français'];
     private static array $catalogs=[];
 
     public static function normalize(mixed $locale):string
     {
-        if(!is_string($locale))return 'de';$locale=strtolower(str_replace('_','-',trim($locale)));$locale=explode('-',$locale)[0];return isset(self::SUPPORTED[$locale])?$locale:'de';
+        if(!is_string($locale))return self::DEFAULT;$locale=strtolower(str_replace('_','-',trim($locale)));$locale=explode('-',$locale)[0];return isset(self::SUPPORTED[$locale])?$locale:self::DEFAULT;
     }
 
-    public static function current():string{return self::normalize($_COOKIE['conquer_locale']??'de');}
+    public static function current():string{return self::normalize($_COOKIE['conquer_locale']??self::DEFAULT);}
 
     public static function catalog(?string $locale=null):array
     {
@@ -24,12 +25,40 @@ final class Locale
 
     public static function t(string $key,array $parameters=[],?string $locale=null):string
     {
-        $catalog=self::catalog($locale);$value=$catalog[$key]??self::catalog('de')[$key]??$key;
+        $catalog=self::catalog($locale);$value=$catalog[$key]??self::catalog(self::DEFAULT)[$key]??$key;
         foreach($parameters as$name=>$replacement)if(is_scalar($replacement))$value=str_replace('{'.$name.'}',(string)$replacement,$value);
         return $value;
     }
 
     public static function html(string $key,array $parameters=[],?string $locale=null):string{return htmlspecialchars(self::t($key,$parameters,$locale),ENT_QUOTES|ENT_SUBSTITUTE,'UTF-8');}
+
+    /** Translate shipped editorial copy only. Never pass player names or messages here. */
+    public static function text(string $text,?string $locale=null):string
+    {
+        static $index=null,$patterns=[];
+        if($index===null){
+            $index=[];
+            foreach(['de','en','fr'] as $source)foreach(self::catalog($source) as $key=>$value){
+                $normalized=preg_replace('/\s+/u',' ',trim($value));
+                $index[$normalized]??=$key;
+                if(preg_match_all('/\{([a-zA-Z0-9_]+)\}/',$normalized,$names)){
+                    $parts=preg_split('/\{[a-zA-Z0-9_]+\}/',$normalized);
+                    $literal=implode('',$parts);
+                    if(!preg_match('/\p{L}{2}/u',$literal))continue;
+                    $pattern='~^'.implode('(.+?)',array_map(static fn($part)=>preg_quote($part,'~'),$parts)).'$~u';
+                    $patterns[]=['key'=>$key,'names'=>$names[1],'pattern'=>$pattern,'weight'=>strlen($literal)];
+                }
+            }
+            usort($patterns,static fn($a,$b)=>$b['weight']<=>$a['weight']);
+        }
+        $normalized=preg_replace('/\s+/u',' ',trim($text));
+        if(isset($index[$normalized]))return self::t($index[$normalized],[],$locale);
+        foreach($patterns as $entry)if(preg_match($entry['pattern'],$normalized,$matches)){
+            $parameters=[];foreach($entry['names'] as $i=>$name)$parameters[$name]=$matches[$i+1];
+            return self::t($entry['key'],$parameters,$locale);
+        }
+        return $text;
+    }
 
     public static function bootstrap():string
     {

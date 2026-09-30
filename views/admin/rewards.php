@@ -3,7 +3,8 @@ declare(strict_types=1);
 use Conquer\Game\Rewards\RewardCatalog;
 use Conquer\Game\Rewards\RewardPreview;
 use Conquer\Admin\ItemPresentation;
-$types=['monster'=>['Monster','hud/expeditions.svg'],'dungeon'=>['Dungeons','hud/city.svg'],'chest'=>['Truhen','items/chest-gold.svg'],'expedition'=>['Feldzüge','hud/alliance.svg']];
+use Conquer\Game\Locale;
+$types=['monster'=>['Monster','hud/expeditions.svg'],'farm'=>[Locale::t('admin.drops.farms'),'ui-resources/food.png'],'dungeon'=>['Dungeons','hud/city.svg'],'chest'=>['Truhen','items/chest-gold.svg'],'expedition'=>['Feldzüge','hud/alliance.svg']];
 $type=is_string($_GET['type']??null)&&isset($types[$_GET['type']])?$_GET['type']:'monster';
 $rewardScope=($_GET['scope']??'global')==='world'?'world':'global';
 $scopeWorld=$rewardScope==='world'?$selectedWorld:0;
@@ -30,20 +31,38 @@ $retired=$type==='monster'&&$source['definition']['type']==='solo'?array_values(
 $scopeLabel=$scopeWorld?($world['name']??'Welt '.$scopeWorld):'Alle Welten';
 $saveLabel=$source['name'].($type==='monster'?' · Stufe '.$source['definition']['level']:'').' · '.$scopeLabel;
 $ruleLabel=$custom?($scopeWorld?'Eigene Weltregel':'Angepasste Grundbeute'):($scopeWorld?'Übernimmt die Grundbeute':'Mitgelieferte Grundbeute');
+$sourceRecords=$scopeWorld?RewardCatalog::worldRecords($scopeWorld):RewardCatalog::records();
+$sourceOverview=[];$levels=[];
+foreach($sources as $entryKey=>$entry){
+    $effective=RewardCatalog::effective($type,(string)$entryKey,$scopeWorld);
+    $pool=$effective[$type==='chest'?'drop_table':($type==='dungeon'?'items':'drops')];
+    $enabled=count(array_filter($pool,static fn($r)=>($r['weight']??$r['probability']??0)>0));
+    if($type==='dungeon'&&$effective['item_chance']<=0)$enabled=0;
+    $level=(int)($entry['definition']['level']??0);if($level)$levels[$level]=$level;
+    $sourceOverview[$entryKey]=['enabled'=>$enabled,'level'=>$level,'custom'=>isset($sourceRecords[$type.':'.$entryKey]['config']),'config'=>$effective];
+}
+sort($levels);
 ?>
-<div class="reward-workspace">
-<details class="card source-browser" data-source-browser open>
-<summary><span>1. Quelle auswählen</span><small><?= ah($source['name'].' · '.$source['subtitle']) ?></small></summary>
-<div class="source-browser-content">
-<nav class="reward-tabs" aria-label="Beuteart">
+<nav class="reward-tabs reward-category-tabs" aria-label="Beuteart">
 <?php foreach($types as $id=>[$label,$icon]): ?><a href="<?= APP_BASE ?>/admin/rewards?type=<?= $id ?><?= ah($scopeQuery) ?>" class="<?= $id===$type?'active':'' ?>" <?= $id===$type?'aria-current="page"':'' ?>><?= adminIcon($icon) ?><span><?= $label ?></span><small><?= count(RewardCatalog::sources($id)) ?></small></a><?php endforeach ?>
 </nav>
+<div class="reward-workspace <?= $type==='monster'?'has-source-table':'' ?>">
+<details class="card source-browser" data-source-browser <?= $type==='monster'?'data-source-table id="monster-drop-table"':'' ?> open>
+<summary><span><?= $type==='monster'?Locale::html('admin.drops.table_title'):'1. Quelle auswählen' ?></span><small><?= $type==='monster'?Locale::html('admin.drops.table_hint'):ah($source['name'].' · '.$source['subtitle']) ?></small></summary>
+<div class="source-browser-content">
+<div class="source-filters">
+<?php if($levels): ?><label><?= Locale::html('admin.drops.level_filter') ?><select data-source-level><option value=""><?= Locale::html('admin.drops.all_levels') ?></option><?php foreach($levels as $level): ?><option value="<?= $level ?>"><?= $level ?></option><?php endforeach ?></select></label><?php endif ?>
+<label><?= Locale::html('admin.drops.rule_filter') ?><select data-source-rule><option value=""><?= Locale::html('admin.drops.all_rules') ?></option><option value="custom"><?= Locale::html('admin.drops.custom') ?></option><option value="default"><?= Locale::html('admin.drops.inherited') ?></option><option value="empty"><?= Locale::html('admin.drops.no_items') ?></option></select></label>
+</div>
 <label>Quelle suchen<input type="search" data-source-search placeholder="Name oder Stufe …"></label><p class="subtle" data-source-count aria-live="polite"><?= count($sources) ?> Quellen</p>
 <div class="source-list">
-<?php foreach($sources as $entry): $active=(string)$entry['key']===$key; ?><a class="source-choice <?= $active?'is-selected':'' ?>" data-source-name="<?= ah(mb_strtolower($entry['name'].' '.$entry['subtitle'].' '.$entry['key'])) ?>" href="<?= APP_BASE ?>/admin/rewards?type=<?= $type ?>&amp;source=<?= ah($entry['key'].$scopeQuery) ?>" <?= $active?'aria-current="true"':'' ?>><?= adminIcon($entry['image'],'source-icon') ?><span><strong><?= ah($entry['name']) ?></strong><small><?= ah($entry['subtitle']) ?></small></span><span class="source-arrow" aria-hidden="true"><?= $active?'✓':'›' ?></span></a><?php endforeach ?>
+<?php if($type==='monster'): require __DIR__.'/reward_monster_table.php'; else: ?>
+<?php foreach($sources as $entry): $active=(string)$entry['key']===$key;$overview=$sourceOverview[$entry['key']]; ?><a class="source-choice <?= $active?'is-selected':'' ?>" data-source-level-value="<?= $overview['level'] ?>" data-source-custom="<?= $overview['custom']?'1':'0' ?>" data-source-items="<?= $overview['enabled'] ?>" data-source-name="<?= ah(mb_strtolower(Locale::text($entry['name']).' '.Locale::text($entry['subtitle']).' '.$entry['key'])) ?>" href="<?= APP_BASE ?>/admin/rewards?type=<?= $type ?>&amp;source=<?= ah($entry['key'].$scopeQuery) ?>" <?= $active?'aria-current="true"':'' ?>><?= adminIcon($entry['image'],'source-icon') ?><span><strong><?= ah($entry['name']) ?></strong><small><?= ah($entry['subtitle']) ?></small><small class="source-drop-meta"><?= Locale::html('admin.drops.source_summary',['count'=>$overview['enabled']]) ?> · <?= Locale::html($overview['custom']?'admin.drops.custom':'admin.drops.inherited') ?></small></span><span class="source-arrow" aria-hidden="true"><?= $active?'✓':'›' ?></span></a><?php endforeach ?>
+<?php endif ?>
 <p data-source-empty class="empty" hidden>Keine passende Quelle gefunden.</p></div>
 </div></details>
-<div class="reward-detail">
+<div class="reward-detail" id="reward-editor">
+<?php if($type==='monster'): ?><a class="button secondary monster-table-back" href="#monster-drop-table"><?= Locale::html('admin.drops.table_back') ?></a><?php endif ?>
 <section class="card reward-editor">
 <div class="reward-hero"><?= adminIcon($source['image'],'reward-portrait') ?><div><span class="eyebrow">2. Belohnungen bearbeiten</span><h2><?= ah($source['name']) ?></h2><p><?= ah($source['subtitle']) ?></p></div></div>
 <div class="reward-context">
@@ -51,7 +70,7 @@ $ruleLabel=$custom?($scopeWorld?'Eigene Weltregel':'Angepasste Grundbeute'):($sc
 <details class="reward-scope-settings"><summary>Geltungsbereich ändern</summary>
 <form method="get" class="reward-scope-form" data-reward-scope-form><input type="hidden" name="type" value="<?= ah($type) ?>"><input type="hidden" name="source" value="<?= ah($key) ?>"><label>Geltungsbereich<select name="scope" data-reward-scope><option value="global" <?= $rewardScope==='global'?'selected':'' ?>>Grundbeute · alle Welten</option><option value="world" <?= $rewardScope==='world'?'selected':'' ?>>Abweichung für eine Welt</option></select></label><label data-scope-world>Welt<select name="world_id"><?php foreach($worlds as $w): ?><option value="<?= (int)$w['id'] ?>" <?= (int)$w['id']===$selectedWorld?'selected':'' ?>><?= ah($w['name']) ?></option><?php endforeach ?></select></label><button class="secondary" type="submit">Bereich anzeigen</button></form>
 </details>
-<p class="subtle"><?= $scopeWorld?'Änderungen gelten nur in dieser Welt.':'Die Grundbeute gilt in allen Welten ohne eigene Abweichung.' ?> <?= ['monster'=>'Neue Angriffe und Rallys übernehmen sie beim Start.','dungeon'=>'Neue Gruppen übernehmen diese Regeln.','chest'=>'Änderungen gelten ab der nächsten Truhenöffnung.','expedition'=>'Neue Feldzüge dieses Schwierigkeitsgrads übernehmen diese Regeln.'][$type] ?></p>
+<p class="subtle"><?= $scopeWorld?'Änderungen gelten nur in dieser Welt.':'Die Grundbeute gilt in allen Welten ohne eigene Abweichung.' ?> <?= ['monster'=>'Neue Angriffe und Rallys übernehmen sie beim Start.','farm'=>Locale::html('admin.drops.farm_timing'),'dungeon'=>'Neue Gruppen übernehmen diese Regeln.','chest'=>'Änderungen gelten ab der nächsten Truhenöffnung.','expedition'=>'Neue Feldzüge dieses Schwierigkeitsgrads übernehmen diese Regeln.'][$type] ?></p>
 </div>
 <?php if($type==='monster'&&!$source['active']): ?><div class="notice">Noch nicht aktiver Inhalt. Du kannst die Beute vorbereiten; das Speichern aktiviert dieses Monster nicht und erzeugt keine Spawns.</div><?php endif ?>
 <?php if($hasDraft): ?><div class="notice">Deine Eingaben wurden noch nicht gespeichert und bleiben hier erhalten. <a href="<?= ah($editUrl.'&discard=1') ?>">Gespeicherte Werte neu laden</a></div><?php endif ?>
@@ -59,6 +78,12 @@ $ruleLabel=$custom?($scopeWorld?'Eigene Weltregel':'Angepasste Grundbeute'):($sc
 <input type="hidden" name="source_type" value="<?= $type ?>"><input type="hidden" name="source_key" value="<?= ah($key) ?>"><input type="hidden" name="revision" value="<?= $revision ?>">
 <input type="hidden" name="reward_scope" value="<?= $rewardScope ?>">
 <div class="reward-fields" data-reward-editor="<?= $type ?>" data-has-draft="<?= $hasDraft?'1':'0' ?>">
+<section class="drop-overview" aria-label="<?= Locale::html('admin.drops.overview') ?>">
+<div><small><?= Locale::html('admin.drops.active') ?></small><strong data-drop-active>—</strong></div>
+<div><small><?= Locale::html('admin.drops.guaranteed') ?></small><strong data-drop-guaranteed>—</strong></div>
+<div><small><?= Locale::html('admin.drops.expected') ?></small><strong data-drop-expected>—</strong></div>
+<p><?= Locale::html($type==='farm'?'admin.drops.farm_basis':($type==='dungeon'?'admin.drops.dungeon_basis':($type==='chest'?'admin.drops.chest_basis':'admin.drops.basis'))) ?> <?= Locale::html('admin.drops.draft_preview') ?></p>
+</section>
 <?php if($retired&&!$custom): ?><details class="hint"><summary><?= count($retired) ?> alte Gegenstandsreferenzen sind nicht mehr verfügbar</summary><p>Diese historischen Einträge werden nicht ausgezahlt. Wähle über „Gegenstand hinzufügen“ passende Items aus dem aktuellen Katalog.</p><ul><?php foreach($retired as $drop): ?><li><?= ah($drop['label']??'Gegenstand') ?> · alte Nr. <?= (int)$drop['item_code'] ?></li><?php endforeach ?></ul></details><?php endif ?>
 <?php if($type==='dungeon'): ?>
 <h3>Garantierte Reliktfragmente bei Erfolg</h3><div class="fields"><label>Relikt<select name="config[treasure_code]" data-treasure-select><?php foreach(\Conquer\Game\Treasure\TreasureData::all() as $code=>$def): ?><option value="<?= (int)$code ?>" data-image="<?= ah(ItemPresentation::image('items/'.($def['icon']??'fragment.svg'))) ?>" <?= (string)$code===(string)($form['treasure_code']??'')?'selected':'' ?>><?= ah($def['name_de']??$def['name']) ?> · <?= ah(ItemPresentation::GRADES[$def['grade']]??$def['grade']) ?></option><?php endforeach ?></select></label><?php adminNumber('Fragmente pro Spieler · Basis','config[fragments]',$form['fragments']??3,0,10000); ?></div><div class="treasure-preview"><?= adminIcon('items/fragment.svg') ?><span data-treasure-name></span></div>
