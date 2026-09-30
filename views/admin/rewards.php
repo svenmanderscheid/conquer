@@ -47,21 +47,22 @@ sort($levels);
 <?php foreach($types as $id=>[$label,$icon]): ?><a href="<?= APP_BASE ?>/admin/rewards?type=<?= $id ?><?= ah($scopeQuery) ?>" class="<?= $id===$type?'active':'' ?>" <?= $id===$type?'aria-current="page"':'' ?>><?= adminIcon($icon) ?><span><?= $label ?></span><small><?= count(RewardCatalog::sources($id)) ?></small></a><?php endforeach ?>
 </nav>
 <div class="reward-workspace <?= $type==='monster'?'has-source-table':'' ?>">
-<details class="card source-browser" data-source-browser <?= $type==='monster'?'data-source-table id="monster-drop-table"':'' ?> open>
+<details class="card source-browser" data-source-browser data-source-context="<?= ah($type.':'.$rewardScope.':'.$scopeWorld) ?>" <?= $type==='monster'?'data-source-table id="monster-drop-table"':'' ?> open>
 <summary><span><?= $type==='monster'?Locale::html('admin.drops.table_title'):'1. Quelle auswählen' ?></span><small><?= $type==='monster'?Locale::html('admin.drops.table_hint'):ah($source['name'].' · '.$source['subtitle']) ?></small></summary>
 <div class="source-browser-content">
 <div class="source-filters">
 <?php if($levels): ?><label><?= Locale::html('admin.drops.level_filter') ?><select data-source-level><option value=""><?= Locale::html('admin.drops.all_levels') ?></option><?php foreach($levels as $level): ?><option value="<?= $level ?>"><?= $level ?></option><?php endforeach ?></select></label><?php endif ?>
 <label><?= Locale::html('admin.drops.rule_filter') ?><select data-source-rule><option value=""><?= Locale::html('admin.drops.all_rules') ?></option><option value="custom"><?= Locale::html('admin.drops.custom') ?></option><option value="default"><?= Locale::html('admin.drops.inherited') ?></option><option value="empty"><?= Locale::html('admin.drops.no_items') ?></option></select></label>
 </div>
-<label>Quelle suchen<input type="search" data-source-search placeholder="Name oder Stufe …"></label><p class="subtle" data-source-count aria-live="polite"><?= count($sources) ?> Quellen</p>
+<label><?= Locale::html($type==='monster'?'admin.drops.search_monsters':'admin.drops.search_sources') ?><input type="search" data-source-search placeholder="<?= Locale::html($type==='monster'?'admin.drops.search_monsters_hint':'admin.drops.search_sources_hint') ?>"></label>
+<div class="source-filter-status"><p class="subtle" data-source-count aria-live="polite"><?= Locale::html('admin.drops.found',['count'=>count($sources)]) ?></p><button type="button" class="secondary" data-source-reset hidden><?= Locale::html('admin.drops.reset_filters') ?></button></div>
 <div class="source-list">
 <?php if($type==='monster'): require __DIR__.'/reward_monster_table.php'; else: ?>
 <?php foreach($sources as $entry): $active=(string)$entry['key']===$key;$overview=$sourceOverview[$entry['key']]; ?><a class="source-choice <?= $active?'is-selected':'' ?>" data-source-level-value="<?= $overview['level'] ?>" data-source-custom="<?= $overview['custom']?'1':'0' ?>" data-source-items="<?= $overview['enabled'] ?>" data-source-name="<?= ah(mb_strtolower(Locale::text($entry['name']).' '.Locale::text($entry['subtitle']).' '.$entry['key'])) ?>" href="<?= APP_BASE ?>/admin/rewards?type=<?= $type ?>&amp;source=<?= ah($entry['key'].$scopeQuery) ?>" <?= $active?'aria-current="true"':'' ?>><?= adminIcon($entry['image'],'source-icon') ?><span><strong><?= ah($entry['name']) ?></strong><small><?= ah($entry['subtitle']) ?></small><small class="source-drop-meta"><?= Locale::html('admin.drops.source_summary',['count'=>$overview['enabled']]) ?> · <?= Locale::html($overview['custom']?'admin.drops.custom':'admin.drops.inherited') ?></small></span><span class="source-arrow" aria-hidden="true"><?= $active?'✓':'›' ?></span></a><?php endforeach ?>
 <?php endif ?>
 <p data-source-empty class="empty" hidden>Keine passende Quelle gefunden.</p></div>
 </div></details>
-<div class="reward-detail" id="reward-editor">
+<div class="reward-detail" id="reward-editor" <?= $type==='monster'&&$requested===''&&!$hasDraft?'hidden':'' ?>>
 <?php if($type==='monster'): ?><a class="button secondary monster-table-back" href="#monster-drop-table"><?= Locale::html('admin.drops.table_back') ?></a><?php endif ?>
 <section class="card reward-editor">
 <div class="reward-hero"><?= adminIcon($source['image'],'reward-portrait') ?><div><span class="eyebrow">2. Belohnungen bearbeiten</span><h2><?= ah($source['name']) ?></h2><p><?= ah($source['subtitle']) ?></p></div></div>
@@ -94,6 +95,7 @@ sort($levels);
 <div class="split drop-heading"><h3 id="reward-items-title"><?= $type==='dungeon'?'Mögliche Gegenstände':'Gegenstände & Pakete' ?></h3><span class="pill" data-drop-count></span></div>
 <p class="subtle"><?= $type==='chest'?'Pro Ziehung wird genau ein Eintrag gewählt. Höhere Gewichtung bedeutet höhere Wahrscheinlichkeit; derselbe Gegenstand kann mehrfach gezogen werden.':($type==='dungeon'?'Wenn die Itemchance erfolgreich ist, wird genau ein Gegenstand aus diesem Pool gewählt. Die Gewichtung bestimmt seinen Anteil.':'Jede Zeile wird unabhängig gewürfelt: 100 % ist garantiert, 0 % deaktiviert den Drop. Die Chancen müssen zusammen nicht 100 % ergeben.') ?></p>
 <div class="reward-items-toolbar"><label class="drop-search">Beuteliste durchsuchen<input type="search" data-drop-search placeholder="Name oder Gegenstandsnummer …"></label><button class="secondary" type="button" data-add-drop>＋ Gegenstand hinzufügen</button></div>
+<p class="drop-focus-note" data-drop-focus-note role="status" hidden></p>
 <div class="drop-rows" data-drop-rows><?php foreach(is_array($form['rows']??null)?$form['rows']:[] as $index=>$row)if(is_array($row))adminDropRow($type,$index,$row); ?></div>
 <p class="subtle" data-drop-no-match hidden>Kein passender Eintrag. Leere die Suche, um alle Drops zu sehen.</p>
 <p class="empty" data-drop-empty>Keine Item-Drops eingetragen. Über „Gegenstand hinzufügen“ legst du den ersten Drop an.</p>

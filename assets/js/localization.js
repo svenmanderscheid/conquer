@@ -118,7 +118,7 @@
     window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();installPrompt=event;});
     window.addEventListener('appinstalled',()=>{installPrompt=null;document.dispatchEvent(new CustomEvent('conquer:installed'));});
     window.addEventListener('storage',event=>{if(event.key==='conquer.locale'){locale=normalize(event.newValue);apply();}});
-    window.ConquerLocale={t,has,apply,mount,setLocale,normalize,formatNumber,formatDate,formatDuration,get locale(){return locale;},get supported(){return{...supported};}};
+    window.ConquerLocale={t,text:textTranslation,has,apply,mount,setLocale,normalize,formatNumber,formatDate,formatDuration,get locale(){return locale;},get supported(){return{...supported};}};
     window.ConquerPWA={register,install:installApp};
     const start=()=>{observe();register();};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
