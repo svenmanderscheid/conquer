@@ -40,14 +40,14 @@ $structuredData = [
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Union of Kingdoms – A new Era begins</title>
+<title>Union of Kingdoms – A new Era begins</title><?php require ROOT_DIR.'/views/partials/brand-head.php'; ?>
 <meta name="description" content="Build your kingdom, develop three troop types through ten tiers each, equip relics and face rivals and rally monsters with your alliance. Register for closed alpha.">
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
 <meta name="theme-color" content="#5c4270">
 <link rel="canonical" href="<?= htmlspecialchars($canonical, ENT_QUOTES) ?>">
-<link rel="icon" href="<?= $base ?>/assets/icons/conquer.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="<?= $base ?>/assets/icons/conquer-192.png">
-<link rel="manifest" href="<?= $base ?>/manifest.php?v=<?= filemtime(ROOT_DIR . '/manifest.php') ?>">
+
+
+
 <meta property="og:type" content="website"><meta property="og:locale" content="en_US">
 <meta property="og:site_name" content="Union of Kingdoms"><meta property="og:title" content="Union of Kingdoms – A new Era begins">
 <meta property="og:description" content="Build, research and fight with your alliance in a shared fantasy world. Closed alpha.">

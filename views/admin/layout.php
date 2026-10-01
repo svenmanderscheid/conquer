@@ -24,7 +24,6 @@ $newBugCount=(int)$db->query("SELECT COUNT(*) FROM bug_reports WHERE world_id=? 
 <title><?= ah($pageTitle) ?> · Union of Kingdoms Verwaltung</title>
 <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR.'/assets/css/fantasy-fonts.css') ?>">
 <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/admin-backoffice.css?v=<?= filemtime(ROOT_DIR.'/assets/css/admin-backoffice.css') ?>">
-<link rel="icon" href="<?= APP_BASE ?>/assets/icons/conquer.svg">
 <?php if($activePage==='layout_editor'): ?><link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/layout-editor.css?v=<?= filemtime(ROOT_DIR.'/assets/css/layout-editor.css') ?>"><?php endif ?>
 <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/village-theme.css?v=<?= filemtime(ROOT_DIR.'/assets/css/village-theme.css') ?>">
 <?php require ROOT_DIR.'/views/partials/localization-head.php'; ?>

@@ -1,9 +1,9 @@
 'use strict';
 // Never put authenticated documents, API responses, admin screens, or auth requests in CacheStorage.
-const BUILD='union-of-kingdoms-public-v6';
+const BUILD='union-of-kingdoms-public-v7';
 const ROOT=new URL(self.registration.scope),PREFIX=ROOT.pathname,CACHE=BUILD+':'+PREFIX;
 const OFFLINE=new URL('offline.html',ROOT).href;
-const PRELOAD=['offline.html','assets/icons/conquer.svg','assets/icons/conquer-192.png','assets/icons/conquer-512.png'];
+const PRELOAD=['offline.html','favicon.ico','apple-touch-icon.png','assets/icons/conquer-32.png','assets/icons/conquer-maskable-512.png','assets/icons/conquer.svg','assets/icons/conquer-192.png','assets/icons/conquer-512.png'];
 const STATIC=new Set([
     ...PRELOAD,'assets/js/localization.js','assets/css/localization.css','assets/css/fantasy-fonts.css',
     'assets/fonts/almendra-400-latin.woff2','assets/fonts/almendra-400-latin-ext.woff2',
@@ -28,6 +28,16 @@ async function store(request,response){
     const cache=await caches.open(CACHE);await cache.put(new Request(request.url||request,{credentials:'omit'}),response.clone());const keys=await cache.keys();
     if(keys.length>MAX_ENTRIES){for(const key of keys){if(new URL(key.url).href===OFFLINE)continue;await cache.delete(key);if((await cache.keys()).length<=MAX_ENTRIES)break;}}
 }
+async function offlinePage(){
+    const cached=await caches.match(OFFLINE);
+    if(!cached)return new Response('Offline',{status:503,headers:{'Content-Type':'text/plain; charset=utf-8'}});
+    // Navigation keeps its requested URL; resolve offline assets from the install scope.
+    const base=ROOT.href.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+    const html=(await cached.text()).replace(/<head>/i,`<head><base href="${base}">`);
+    const headers=new Headers(cached.headers);
+    for(const name of ['Content-Length','Content-Encoding','ETag'])headers.delete(name);
+    return new Response(html,{status:cached.status,statusText:cached.statusText,headers});
+}
 self.addEventListener('install',event=>event.waitUntil((async()=>{
     const cache=await caches.open(CACHE);
     for(const path of PRELOAD){const request=new Request(new URL(path,ROOT),{credentials:'omit'});try{const response=await publicFetch(request);if(response.ok)await store(request,response);}catch{if(path==='offline.html')throw new Error('Offline fallback unavailable');}}
@@ -43,7 +53,7 @@ self.addEventListener('fetch',event=>{
     // Authenticated/administrative routes always reach the browser network stack untouched.
     if(request.method!=='GET'||forbidden(path)||url.origin!==ROOT.origin||request.headers.has('Authorization'))return;
     if(request.mode==='navigate'){
-        event.respondWith((async()=>{try{return await fetch(request);}catch{return await caches.match(OFFLINE)||new Response('Offline',{status:503,headers:{'Content-Type':'text/plain; charset=utf-8'}});}})());return;
+        event.respondWith((async()=>{try{return await fetch(request);}catch{return await offlinePage();}})());return;
     }
     if(!cacheable(request))return;
     event.respondWith((async()=>{
