@@ -5,12 +5,12 @@ declare(strict_types=1);
  * Application configuration template.
  *
  * Copy this file to config/app.php for environment-specific overrides.
- * config/app.php is NOT gitignored — non-secret settings only.
+ * config/app.php is gitignored; keep environment settings and secrets off GitHub.
  */
 
 return [
     // App identity
-    'name' => 'Conquer',
+    'name' => 'Union of Kingdoms',
     'codename' => true,  // remove this when final name is chosen
     'version' => '0.1.0-dev',
     
@@ -70,6 +70,8 @@ return [
     ],
     
     // OAuth — register apps at:
+    // Public community invite: configure CONQUER_DISCORD_INVITE or data/community-discord.json.
+    // The community invite is independent of Discord OAuth and contains no credentials.
     //   Google:  https://console.cloud.google.com/apis/credentials
     //   Discord: https://discord.com/developers/applications
     'oauth' => [

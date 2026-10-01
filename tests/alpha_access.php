@@ -9,6 +9,8 @@ require ROOT_DIR . '/src/Bootstrap.php';
 use Conquer\Auth\AlphaAccess;
 use Conquer\Db\Connection;
 
+require __DIR__.'/Support/FeatureDatabase.php';
+$fixture = new \ConquerTests\FeatureDatabase();
 $db = Connection::getInstance();
 $prefix = 'Automatischer Alpha-Test ' . bin2hex(random_bytes(4));
 function alphaCheck(bool $condition, string $label): void {
@@ -44,5 +46,5 @@ try {
     }
     echo "ALL ALPHA ACCESS CHECKS PASSED\n";
 } finally {
-    $db->execute('DELETE FROM alpha_access_keys WHERE label LIKE ?', [$prefix . '%']);
+    $fixture->close();
 }

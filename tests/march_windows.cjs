@@ -9,7 +9,7 @@ const root=path.resolve(__dirname,'..'),out=fs.mkdtempSync(path.join(os.tmpdir()
 const assetBase=pathToFileURL(root).href.replace(/\/$/,'');
 const names=[...fs.readFileSync(root+'/views/game.php','utf8').matchAll(/assets\/css\/([a-z0-9-]+)\.css/g)].map(m=>m[1]);
 const styles=names.map(n=>fs.readFileSync(root+'/assets/css/'+n+'.css','utf8')).join('\n').replaceAll('../fonts/',assetBase+'/assets/fonts/');
-const js=fs.readFileSync(root+'/assets/js/castle-skins.js','utf8')+'\n'+fs.readFileSync(root+'/assets/js/reward-dialog.js','utf8')+'\n'+fs.readFileSync(root+'/assets/js/march-panel.js','utf8');
+const js=require('./fixtures/isolated_locale.cjs')('de')+'\n'+fs.readFileSync(root+'/assets/js/castle-skins.js','utf8')+'\n'+fs.readFileSync(root+'/assets/js/reward-dialog.js','utf8')+'\n'+fs.readFileSync(root+'/assets/js/boss-mechanic.js','utf8')+'\n'+fs.readFileSync(root+'/assets/js/march-panel.js','utf8');
 const defs=[];for(let type=1;type<=3;type++)for(let tier=1;tier<=5;tier++)defs.push({code:50100000+type*100+tier,type,tier,attack:10*tier,gather_carry:10,speed:10,march_speed:11,monster_march_speed:10+type*10,monster_rally_speed:15+type*10,charm_march_speed:30,pvp_march_speed:40,pvp_rally_speed:50,reinforce_march_speed:55,shrine_neutral_speed:60,shrine_occupied_speed:70,gather_speed:80,field_attack_speed:90,monster_power:10*tier,monster_power_single_type:12*tier,monster_rally_power:11*tier,monster_rally_power_single_type:13*tier});
 fs.writeFileSync(out+'/fixture.html',`<!doctype html><html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${styles}</style><body class="mobile-game"><dialog id="game-dialog"><button class="dialog-close" aria-label="Schließen">×</button><div id="dialog-content"></div></dialog><script>${js}</script><script>const defs=${JSON.stringify(defs)};window.state={troop_defs:defs,troops:Object.fromEntries(defs.map(t=>[t.code,5000])),army_limits:{march_capacity:50000,march_slots:3},city:{coord_x:20,coord_y:20,action_points:200},marches:[],players:[],monsters:[{id:99,coord_x:170,coord_y:260,hp_current:1000,required_power:121,definition:{name:'Frostgrimm',art:'monsters/frostgrimm',type:'rally',level:1,action_point_cost:25,stats:{hp:1000,attack:10,defense:5},drops:[{label:'5.000 Gold',count:5},{label:'Ausbildung 30 Minuten',count:1},{label:'Heilung 30 Minuten',count:1},{label:'100.000 Nahrung',count:1},{label:'Goldtruhe',count:1}],gems_drop:{amount:50}}}],nodes:[{id:99,coord_x:170,coord_y:260,object_type:1,resource_amount:100000,gather_rate:10,can_attack:true,gatherer_march_id:null}]};window.sent=[];window.notices=[];const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));window.march=ConquerMarch({base:${JSON.stringify(assetBase)},esc,fmt:n=>Math.floor(Number(n)||0).toLocaleString('de-DE'),unitName:t=>['Infanterie','Bogenschützen','Kavallerie'][t.type-1]+' '+['','I','II','III','IV','V'][t.tier],getState:()=>state,toast:m=>notices.push(m),action:async(path,payload,message)=>{sent.push({path,payload,message});return{}},openDialog:html=>{const d=document.querySelector('#game-dialog');delete d.dataset.march;d.classList.remove('march-dialog');document.querySelector('#dialog-content').innerHTML=html;if(!d.open)d.showModal();d.scrollTop=0;}});document.addEventListener('click',e=>{const b=e.target.closest('[data-action]');if(b)march.onClick(b.dataset.action,b)});window.openMarch=kind=>{localStorage.clear();sent=[];state.congress={id:99,coord_x:170,coord_y:260,name:"Kongress",can_attack:kind==="congress",can_garrison:kind==="congress-garrison",garrison_total:1500000};state.shrines=[{...state.congress,element:"forest",name:"Schrein des Lebens",can_attack:kind==="shrine",can_garrison:kind==="shrine-garrison",event:{active:true,starts_at:"2020-01-01 00:00:00",ends_at:"2099-01-01 00:00:00"}}];march.open(99,kind,{rally_id:421,target:{id:99,coord_x:170,coord_y:260,display_name:'Der lange Name des Königreichs',castle_level:8}})};</script></body></html>`);
 (async()=>{const browser=await chromium.launch({headless:true,...(process.env.PLAYWRIGHT_CHANNEL?{channel:process.env.PLAYWRIGHT_CHANNEL}:{})}),page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));try{await page.goto(pathToFileURL(path.join(out,'fixture.html')).href);
@@ -33,6 +33,8 @@ for(const kind of ['players','rally','monster-rally','nodes','node-attack','rall
   return{boxes:Object.fromEntries(['#game-dialog','#dialog-content','.march-command','.march-layout','.march-target','.march-formation','.march-army','.march-footer','#march-confirm'].map(s=>[s,rect(q(s))])),controls:[...q('#game-dialog').querySelectorAll('button,input,select')].filter(el=>{if(!el.getClientRects().length||getComputedStyle(el).visibility==='hidden')return false;const r=el.getBoundingClientRect();for(let p=el.parentElement;p&&p!==q('#game-dialog');p=p.parentElement){if(/auto|scroll|hidden/.test(getComputedStyle(p).overflowY)){const b=p.getBoundingClientRect();if(r.bottom<=b.top||r.top>=b.bottom)return false;}}return true;}).map(el=>({label:el.id||el.getAttribute('aria-label')||el.textContent,...rect(el)}))}
  });
  const geometry=await read(),d=geometry.boxes['#game-dialog'];
+ check(`${viewport.width}×${viewport.height} ${kind}: action points visible without scrolling`,()=>{});
+ assert(await page.locator('#march-action-points').evaluate(el=>{const r=el.getBoundingClientRect(),box=el.closest('.march-army').getBoundingClientRect();return r.width>0&&r.height>0&&r.top>=box.top&&r.bottom<=box.bottom;}),'Action points must remain inside the visible army summary');
  check(`${viewport.width}×${viewport.height} ${kind}: stable window bounds`,()=>{assert(d.x>=0&&d.y>=0&&d.right<=viewport.width+1&&d.bottom<=viewport.height+1)});
  check(`${viewport.width}×${viewport.height} ${kind}: all visible controls fit inside frame`,()=>{const bad=geometry.controls.filter(c=>c.x<d.x-1||c.y<d.y-1||c.right>d.right+1||c.bottom>d.bottom+1);assert.deepEqual(bad.map(c=>c.label),[])});
  check(`${viewport.width}×${viewport.height} ${kind}: fixed frame has no overflow`,()=>{for(const [name,b]of Object.entries(geometry.boxes))if(!['#march-confirm','.march-target','.march-army'].includes(name))assert(b.scrollWidth<=b.clientWidth+1&&b.scrollHeight<=b.clientHeight+1,name+' '+JSON.stringify(b))});
@@ -44,7 +46,7 @@ for(const kind of ['players','rally','monster-rally','nodes','node-attack','rall
  await page.evaluate(()=>march.onClick('march-max',{}));const maximum=await page.evaluate(()=>Object.fromEntries([...document.querySelectorAll('.march-unit-amount input')].map(i=>[i.id.replace('march-unit-',''),Number(i.value)])));
  check(`${viewport.width}×${viewport.height} ${kind}: Max includes all 15 troop types within 50k`,()=>{assert.equal(Object.values(maximum).reduce((a,b)=>a+b,0),50000);assert.equal(Object.values(maximum).filter(n=>n>0).length,15);assert(Object.values(maximum).every(n=>Number.isSafeInteger(n)&&n<=5000))});
  const roster=await page.evaluate(()=>({count:document.querySelectorAll('.march-unit-row:not([hidden])').length,pages:document.querySelectorAll('[data-action="march-page"]').length,heights:[...document.querySelectorAll('.march-unit-row')].map(el=>el.getBoundingClientRect().height)}));
- check(`${viewport.width}×${viewport.height} ${kind}: all 15 troop types share one compact list`,()=>{assert.equal(roster.count,15);assert.equal(roster.pages,0);assert(roster.heights.every(h=>h>0&&h<=86));});
+ check(`${viewport.width}×${viewport.height} ${kind}: all 15 troop types share one illustrated list`,()=>{assert.equal(roster.count,15);assert.equal(roster.pages,0);assert(roster.heights.every(h=>h>0&&h<=150),'Illustrated rows keep a bounded height and remain in one scrolling roster');});
  await page.locator('.march-unit-amount input').last().scrollIntoViewIfNeeded();
  const scrolled=await page.evaluate(()=>{const list=document.querySelector('.march-unit-list'),input=list.querySelector('.march-unit-row:last-child input[type=number]'),r=input.getBoundingClientRect();return{top:list.scrollTop,reachable:input.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)),counts:Object.fromEntries([...document.querySelectorAll('.march-unit-amount input')].map(i=>[i.id.replace('march-unit-',''),Number(i.value)]))};});
  check(`${viewport.width}×${viewport.height} ${kind}: last troop is reachable and scrolling preserves counts`,()=>{assert(scrolled.top>0);assert(scrolled.reachable);assert.deepEqual(maximum,scrolled.counts);});
@@ -59,7 +61,7 @@ for(const kind of ['players','rally','monster-rally','nodes','node-attack','rall
   const invalid=await page.evaluate(()=>({disabled:document.querySelector('#march-confirm').disabled,requests:sent.length}));check(`${viewport.width}×${viewport.height} ${kind}: ${label} blocks sending`,()=>{assert(invalid.disabled);assert.equal(invalid.requests,1)});
  }
  await page.evaluate(()=>march.onClick('march-max',{}));await page.screenshot({path:out+'/'+viewport.width+'x'+viewport.height+'-'+kind+'.png'});
- if(await page.locator('[data-action="march-view"][data-id="target"]').isVisible()){await page.locator('[data-action="march-view"][data-id="target"]').click();const target=await read();check(`${viewport.width}×${viewport.height} ${kind}: target view incl rally timer fits`,()=>{const bad=target.controls.filter(c=>c.x<d.x-1||c.y<d.y-1||c.right>d.right+1||c.bottom>d.bottom+1);assert.deepEqual(bad.map(c=>c.label),[]);const t=target.boxes['.march-target'];assert(t.scrollWidth<=t.clientWidth+1)});await checkTargetArtwork(`${viewport.width}×${viewport.height} ${kind}`);await page.screenshot({path:out+'/'+viewport.width+'x'+viewport.height+'-'+kind+'-target.png'});}
+ if(await page.locator('[data-action="march-view"][data-id="target"]').isVisible()){await page.locator('[data-action="march-view"][data-id="target"]').click();const target=await read();check(`${viewport.width}×${viewport.height} ${kind}: target view incl rally timer fits`,()=>{const targetFrame=target.boxes['#game-dialog'];assert(targetFrame.x>=0&&targetFrame.y>=0&&targetFrame.right<=viewport.width+1&&targetFrame.bottom<=viewport.height+1);const bad=target.controls.filter(c=>c.x<targetFrame.x-1||c.y<targetFrame.y-1||c.right>targetFrame.right+1||c.bottom>targetFrame.bottom+1);assert.deepEqual(bad.map(c=>c.label),[]);const t=target.boxes['.march-target'];assert(t.scrollWidth<=t.clientWidth+1)});await checkTargetArtwork(`${viewport.width}×${viewport.height} ${kind}`);await page.screenshot({path:out+'/'+viewport.width+'x'+viewport.height+'-'+kind+'-target.png'});}
  if(process.env.MARCH_VERBOSE)console.log('METRICS '+JSON.stringify({viewport,kind,boxes:geometry.boxes}));
 }}
 await page.evaluate(()=>{state.monsters[0].definition.type='solo';openMarch('monsters');});
@@ -89,5 +91,85 @@ for(const [kind,speed] of Object.entries(etaKinds)){
 }
 await page.evaluate(()=>{openMarch('shrine');state.shrines[0].alliance_id=2;march.onClick('march-max',{});march.update();});
 {const actual=await page.locator('#march-travel-time').textContent(),seconds=Math.floor(Math.hypot(150,240)*100/70),expected=`${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,'0')} Min.`;check('occupied shrine ETA uses PvP shrine speed',()=>assert.equal(actual,expected));}
+// Gathering always recomputes the required carry, not the previous manual army.
+await page.evaluate(base=>{openMarch('nodes');localStorage.setItem(`conquer:march-choice:v1:${base}:${state.city.player_id}:${state.city.world_id}:nodes`,JSON.stringify({[defs[0].code]:1}));state.nodes[0].resource_amount=12345;march.open(99,'nodes');},assetBase);
+assert.equal(await page.locator('.march-remembered').count(),0);
+assert.equal(await page.locator('.march-unit-amount input').evaluateAll(inputs=>inputs.reduce((sum,input)=>sum+Number(input.value),0)),1235,'round carry up to cover remaining resources');
+await page.evaluate(()=>{state.nodes[0].resource_amount=100000;});
+// Updated portraits must load, including historical monster IDs and all resource sites.
+for(const [objectType,file] of [[1,'farm-v8'],[2,'lumber-v8'],[3,'quarry-v8'],[4,'gold-v2'],[5,'crystal-v8']]){
+ await page.evaluate(type=>{state.nodes[0].object_type=type;openMarch('nodes');},objectType);
+ await page.waitForFunction(()=>[...document.querySelectorAll('.march-target-art img,.march-portrait img,.march-selected-card img')].every(i=>i.complete&&i.naturalWidth>0));
+ check('Painted resource '+file,()=>{});
+ assert.match(await page.locator('.march-target-art img').getAttribute('src'),new RegExp('world-'+file+'\\.png$'));
+ assert((await page.locator('.march-portrait img').first().getAttribute('src')).includes('fantasy-troops-v2/'));
+}
+for(const id of ['orc','skeleton','golem','treasure-goblin','green-dragon','red-dragon','gold-dragon','magdar','frostgrimm']){
+ await page.evaluate(id=>{state.monsters[0].definition.art='monsters/'+id;state.monsters[0].definition.name=id;openMarch('monster-rally');},id);
+ await page.waitForFunction(()=>{const i=document.querySelector('.march-target-art img');return i.complete&&i.naturalWidth>0;});
+ const src=await page.locator('.march-target-art img').getAttribute('src');
+ assert(src.includes(id==='frostgrimm'?'monsters/storybook-v2/frostgrimm.png':'monsters/2.5d/bright-v2/'),'each encounter uses its current portrait');
+}
+await page.addScriptTag({path:root+'/assets/js/monster-report.js'});
+for(const art of ['', 'orc', 'goblin', 'monsters/treasure-goblin']){
+ await page.evaluate(art=>{Object.assign(state.monsters[0].definition,{name:'Treasure Goblin',art,type:'solo'});openMarch('monsters');},art);
+ assert.match(await page.locator('.march-target-art img').getAttribute('src'),/bright-v2\/treasure-goblin-turquoise\.png$/,'Goblin must not fall back to the orc portrait');
+ await page.waitForFunction(()=>{const i=document.querySelector('.march-target-art img');return i.complete&&i.naturalWidth>0;});
+}
+// Joining uses the rule saved when this rally started, not today's monster catalogue.
+// No calculator/server-result flags are invented for a contribution still being chosen.
+await page.evaluate(()=>{
+ window.savedJoinRule=Object.freeze({id:'frostgrimm_ice_armor',version:1,required_power_percent:17,counter_type:'infantry',counter_power_percent:31});
+ state.monsters[0].definition.boss_mechanic={...savedJoinRule,required_power_percent:12,counter_power_percent:50};
+ window.openJoinSkillCase=(kind,hasRule)=>{
+  state.marches=[];localStorage.clear();sent=[];
+  march.open(99,'rally-join',{rally_id:421,rally_target_kind:kind,rally_status:'gathering',rally_launch_at:new Date(Date.now()+600000).toISOString(),rally_capacity_remaining:1200,rally_boss_mechanic:hasRule?savedJoinRule:null,target:{id:99,coord_x:21,coord_y:20,display_name:'Rally Leader',castle_level:8}});
+ };
+});
+for(const viewport of [{width:320,height:568},{width:568,height:320},{width:1280,height:800}]){
+ await page.setViewportSize(viewport);await page.evaluate(()=>openJoinSkillCase('monster',true));
+ const label=viewport.width+'×'+viewport.height+' monster rally join',card=page.locator('.march-army .boss-mechanic');
+ await card.waitFor({state:'visible'});
+ const rule=await card.evaluate(el=>({id:el.dataset.bossMechanic,state:el.dataset.bossState,params:JSON.parse(el.querySelector('[data-i18n="boss.frostgrimm.rule"]').dataset.i18nParams),text:el.querySelector('[data-i18n="boss.frostgrimm.rule"]').textContent,expected:ConquerLocale.t('boss.frostgrimm.rule',{effect:'17',threshold:'31'}),keys:[...el.querySelectorAll('[data-i18n]')].map(node=>node.dataset.i18n)}));
+ check(label+': saved 17% / 31% rule stays exact',()=>{assert.equal(rule.id,'frostgrimm_ice_armor');assert.deepEqual(rule.params,{effect:'17',threshold:'31'});assert.equal(rule.text,rule.expected);});
+ check(label+': unresolved rule never claims an active or countered result',()=>{assert.equal(rule.state,'rule');assert(!rule.keys.some(key=>/\.(active|inactive|countered|share|formation)$/.test(key)||key.startsWith('boss.effects.required_power')));assert(rule.keys.includes('boss.effects.counter_basis'));assert(rule.keys.includes('boss.frostgrimm.rally'));});
+ check(label+': joining has no unsupported calculator',()=>{});assert.equal(await page.locator('[data-action="march-preview"],.battle-preview-dialog,#march-preflight').count(),0);
+ // Check both ends through actual scrolling: a short army pane need not display
+ // the entire explanation at once, but every part must remain reachable.
+ for(const key of ['boss.frostgrimm.title','boss.frostgrimm.rally']){
+  const text=card.locator('[data-i18n="'+key+'"]');await text.scrollIntoViewIfNeeded();
+  const visible=await text.evaluate(el=>{const r=el.getBoundingClientRect(),pane=el.closest('.march-army').getBoundingClientRect(),left=Math.max(r.left,pane.left,0),right=Math.min(r.right,pane.right,innerWidth),top=Math.max(r.top,pane.top,0),bottom=Math.min(r.bottom,pane.bottom,innerHeight);return right>left&&bottom>top&&(el.closest('p')||el).contains(document.elementFromPoint((left+right)/2,(top+bottom)/2));});
+  check(label+': '+key+' is visible inside its scrolling pane',()=>assert(visible));
+ }
+ check(label+': skill copy has no horizontal overflow',()=>{});assert(await card.evaluate(el=>el.scrollWidth<=el.clientWidth+1));
+ const confirm=await page.locator('#march-confirm').evaluate(el=>{const r=el.getBoundingClientRect();return{width:r.width,height:r.height,inViewport:r.left>=0&&r.top>=0&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1,hit:el.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)),enabled:!el.disabled};});
+ check(label+': 44px confirm remains enabled and reachable after scrolling',()=>{assert(confirm.width>=43&&confirm.height>=43);assert(confirm.inViewport&&confirm.hit&&confirm.enabled);});
+ await page.locator('#march-confirm').click({trial:true});
+ const untouched=await page.evaluate(()=>({sent:sent.length,saved:savedJoinRule,current:state.monsters[0].definition.boss_mechanic}));
+ check(label+': reading and trial tap start no action or mutation',()=>{assert.equal(untouched.sent,0);assert.equal(untouched.saved.required_power_percent,17);assert.equal(untouched.saved.counter_power_percent,31);assert.equal(untouched.current.required_power_percent,12);assert.equal(untouched.current.counter_power_percent,50);});
+ await page.screenshot({path:path.join(out,`saved-boss-rally-join-${viewport.width}x${viewport.height}.png`)});
+ await page.evaluate(()=>{march.onClick('march-clear',{});document.querySelector('.march-unit-amount input').value=500;march.update();});
+ check(label+': changing the army does not resolve a saved rule locally',()=>{});assert.equal(await card.getAttribute('data-boss-state'),'rule');assert.equal(await card.locator('[data-i18n="boss.frostgrimm.countered"],[data-i18n="boss.frostgrimm.active"]').count(),0);
+ await page.evaluate(()=>openJoinSkillCase('player',true));
+ check(label+': city rally join has no monster-skill card',()=>{});assert.equal(await page.locator('.boss-mechanic').count(),0);
+ await page.evaluate(()=>openJoinSkillCase('monster',false));
+ check(label+': legacy monster rally without a saved rule has no card',()=>{});assert.equal(await page.locator('.boss-mechanic').count(),0);
+}
+for(const viewport of [{width:1280,height:800},{width:390,height:844},{width:320,height:568},{width:844,height:390}]){
+ await page.setViewportSize(viewport);
+ await page.evaluate(base=>{
+  const troops=['infantry','ranged','cavalry'].flatMap(type=>[1,5,10].map(tier=>({type,tier,name:type+' '+tier,sent:100,dead:0,injured:0,survived:100})));
+  const report={id:1,outcome:'attacker_wins',target_x:10,target_y:20,details:{monster_snapshot:{name:'Ork',art:'monsters/orc',level:2,count:1},troops}};
+  const dialog=document.querySelector('#game-dialog');dialog.className='combat-report-dialog monster-report-dialog';delete dialog.dataset.march;
+  document.querySelector('#dialog-content').innerHTML=ConquerMonsterReport.render(report,{base});
+  dialog.querySelector(':scope > .popup-heading')?.remove();
+  const header=document.createElement('header');header.className='popup-heading';header.append(dialog.querySelector('h2'));dialog.insertBefore(header,document.querySelector('#dialog-content'));dialog.classList.add('has-popup-heading');
+ },assetBase);
+ await page.waitForFunction(()=>[...document.querySelectorAll('.monster-report img')].every(i=>i.complete&&i.naturalWidth>0));
+ assert((await page.locator('.cr-identity.defender img').getAttribute('src')).includes('bright-v2/orc.png'));
+ assert.equal(await page.locator('img[src*="fantasy-troops-v2"]').count(),9);
+ assert(await page.locator('.combat-report').evaluate(el=>el.scrollWidth<=el.clientWidth+1),'Report has no horizontal overflow');
+ await page.screenshot({path:path.join(out,`updated-report-${viewport.width}.png`)});
+}
 check('No uncaught JavaScript errors',()=>assert.deepEqual(errors,[]));console.log(JSON.stringify({tests,failures,output:out},null,2));if(failures.length)process.exitCode=1;
 }finally{await browser.close();}})().catch(error=>{console.error(error);process.exitCode=1;});

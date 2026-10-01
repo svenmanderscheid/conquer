@@ -1,0 +1,58 @@
+[
+  {
+    "file": "canton-fortress.webp",
+    "width": 512,
+    "height": 512,
+    "bytes": 68244,
+    "transparent": true
+  },
+  {
+    "file": "commune-abbey.webp",
+    "width": 512,
+    "height": 512,
+    "bytes": 66038,
+    "transparent": true
+  },
+  {
+    "file": "commune-food.webp",
+    "width": 512,
+    "height": 512,
+    "bytes": 67958,
+    "transparent": true
+  },
+  {
+    "file": "commune-gold.webp",
+    "width": 512,
+    "height": 512,
+    "bytes": 76238,
+    "transparent": true
+  },
+  {
+    "file": "commune-lumber.webp",
+    "width": 512,
+    "height": 512,
+    "bytes": 71406,
+    "transparent": true
+  },
+  {
+    "file": "commune-rune.webp",
+    "width": 512,
+    "height": 512,
+    "bytes": 60666,
+    "transparent": true
+  },
+  {
+    "file": "commune-stone.webp",
+    "width": 512,
+    "height": 512,
+    "bytes": 69504,
+    "transparent": true
+  },
+  {
+    "file": "crown-krounbuerg.webp",
+    "width": 512,
+    "height": 512,
+    "bytes": 70940,
+    "transparent": true
+  }
+]

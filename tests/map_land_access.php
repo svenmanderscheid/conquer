@@ -34,6 +34,8 @@ try{
     LandProgressService::ensureWorld(2,false);
     $db->execute("INSERT INTO players(id,username,email,password_hash) VALUES(1,'MapPlayer','map@example.invalid','unused')");
     $db->execute("INSERT INTO cities(id,player_id,world_id,name,coord_x,coord_y) VALUES(1,1,2,'Randstadt',8,8)");
+    $db->execute("INSERT INTO players(id,username,email,password_hash) VALUES(2,'CentralNeighbor','center@example.invalid','unused')");
+    $db->execute("INSERT INTO cities(id,player_id,world_id,name,coord_x,coord_y) VALUES(2,2,2,'Zentralstadt',41,36)");
     $token=str_repeat('c',64);
     $db->execute("INSERT INTO sessions(player_id,token,csrf_token,ip_address,user_agent,expires_at,active_world_id) VALUES(1,?,?,'127.0.0.1','map test',DATE_ADD(UTC_TIMESTAMP(),INTERVAL 1 HOUR),2)",[$token,str_repeat('d',64)]);
 
@@ -77,5 +79,14 @@ PHP;
     mapCheck(mapGet($base,'/field-object/'.$outerObject,$token)['status']===200,'open field-object detail remains available');
     mapCheck(mapGet($base,'/field-object/'.$foreignObject,$token)['status']===404,'field-object ids remain scoped to the selected world');
     mapCheck(mapGet($base,'/field-object/'.$centerObject,$token)['status']===200,'central field-object detail is available from the beginning');
+    // This explicit lock must survive a fresh HTTP request's ensureWorld().
+    $db->execute("UPDATE world_land_zones SET status='locked',opened_at=NULL,opened_reason='admin' WHERE world_id=2 AND zone_key='center'");
+    $lockedTiles=mapGet($base,'/tiles?x_min=0&y_min=0&x_max=71&y_max=71',$token);
+    $lockedCoords=array_map(static fn(array $e):string=>$e['x'].':'.$e['y'],$lockedTiles['json']['data']['entities']);
+    mapCheck(in_array('9:8',$lockedCoords,true),'explicit central lock leaves outer targets visible');
+    foreach(['36:36','37:36','38:36','39:36','40:36','41:36'] as $hidden)mapCheck(!in_array($hidden,$lockedCoords,true),'explicit lock hides central map target '.$hidden);
+    $lockedTile=mapGet($base,'/tile/36/36',$token);
+    mapCheck($lockedTile['status']===200&&$lockedTile['json']['data']['accessible']===false&&$lockedTile['json']['data']['occupant']===null,'direct tile lookup conceals an explicitly locked monster');
+    mapCheck(mapGet($base,'/field-object/'.$centerObject,$token)['status']===409,'direct field-object lookup respects the explicit lock');
     echo "ALL MAP LAND ACCESS CHECKS PASSED\n";
 }finally{$fixture->close();}

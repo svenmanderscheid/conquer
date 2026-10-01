@@ -6,6 +6,25 @@ namespace Conquer\Game\Rewards;
 final class MonsterRewardRules
 {
     public const ALLIANCE_COIN = 10300005;
+    public const ALLIANCE_BADGE = 119000002;
+
+    /** Personal material quantity when the supported rally-monster reward drops. */
+    public static function allianceBadgeCount(int $level): int
+    {
+        if($level<1||$level>10)return 0;
+        return $level<=3?2:($level<=6?3:($level<=9?4:5));
+    }
+
+    /** Add the normal default once, leaving every other drop and override policy intact. */
+    public static function rallyDrops(array $definition,array $drops): array
+    {
+        if(($definition['type']??'solo')!=='rally')return $drops;
+        $count=self::allianceBadgeCount((int)($definition['level']??0));
+        if($count===0)return $drops;
+        $drops=array_values(array_filter($drops,static fn(array $drop):bool=>(int)$drop['item_code']!==self::ALLIANCE_BADGE));
+        $drops[]=['item_code'=>self::ALLIANCE_BADGE,'count'=>$count,'probability'=>0.50];
+        return $drops;
+    }
 
     public static function apply(array $definition): array
     {
@@ -45,6 +64,9 @@ final class MonsterRewardRules
             $definition['gems_drop']=['chance'=>0.25,'amount'=>20*$level];
         }
 
+        if($type==='rally'&&self::allianceBadgeCount((int)($definition['level']??0))>0){
+            $definition['drops']=self::rallyDrops($definition,$definition['drops']??[]);
+        }
         return $definition;
     }
 }

@@ -15,7 +15,8 @@ final class MonsterReport
     /** Buffs have already received the battle's talent and composition modifiers. */
     public static function army(array $troops, array $buffs): array
     {
-        $army = ['count'=>0, 'power'=>0.0, 'attack'=>0.0, 'defense'=>0.0, 'hp'=>0.0, 'types'=>[], 'bonuses'=>[]];
+        $army = ['count'=>0, 'power'=>0.0, 'attack'=>0.0, 'defense'=>0.0, 'hp'=>0.0, 'types'=>[], 'bonuses'=>[],
+            'combat_modifiers'=>['vs_monster_attack'=>round(max(0, (float)($buffs['vs_monster_attack'] ?? 0)) * 100, 4)]];
         foreach (['infantry','cavalry','ranged'] as $type) {
             $army['types'][$type] = ['count'=>0, 'attack'=>0.0, 'defense'=>0.0, 'hp'=>0.0];
             foreach (['atk'=>'attack','def'=>'defense','hp'=>'hp'] as $stat=>$field) {

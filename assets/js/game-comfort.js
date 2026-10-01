@@ -31,7 +31,7 @@ window.ConquerGameComfort = function({base,getState,nextGoal,openGoal,openDialog
         if(!requestedSince&&!(lastSeen>0&&Date.now()/1000-lastSeen>=300))lastSeen=Number(state.server_time)||Math.floor(Date.now()/1000);
         if(state.return_summary)lastSeen=Number(state.server_time);
         if(Date.now()-lastWrite>=60000)save();
-        const goal=nextGoal(),html=summary?`<button type="button" data-comfort="return"><strong>Willkommen zurück</strong><small>Deine Abschlüsse ansehen</small></button><button type="button" data-comfort="dismiss-return" aria-label="Rückkehrhinweis ausblenden">×</button>`:!saved.hideGoal&&goal?`<button type="button" data-comfort="goal"><strong>${esc(goal.title)}</strong><small>Nächstes Ziel · ${fmt(Math.min(goal.value,goal.target))} / ${fmt(goal.target)}</small></button><button type="button" data-comfort="dismiss-goal" aria-label="Zielhinweis ausblenden">×</button>`:'';
+        const goal=nextGoal(),html=summary?`<button type="button" data-comfort="return"><strong>Willkommen zurück</strong><small>Deine Abschlüsse ansehen</small></button><button type="button" data-comfort="dismiss-return" aria-label="Rückkehrhinweis ausblenden">×</button>`:!saved.hideGoal&&goal?`<button type="button" data-comfort="goal"><strong>${esc(goal.title)}</strong><small>${goal.ready===false&&goal.reason?esc(goal.reason):`Nächstes Ziel · ${fmt(Math.min(goal.value,goal.target))} / ${fmt(goal.target)}`}</small></button><button type="button" data-comfort="dismiss-goal" aria-label="Zielhinweis ausblenden">×</button>`:'';
         card.hidden=!html;
         if(signature!==html){signature=html;card.innerHTML=html;}
     }

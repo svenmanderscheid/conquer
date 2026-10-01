@@ -137,11 +137,35 @@ final class TreasureData
         if (!is_array($decoded) || !isset($decoded['treasures'])) {
             throw new \RuntimeException('treasures.json has unexpected structure.');
         }
+        // Removed from the active catalog does not mean removed from saved accounts.
+        $legacyFile=ROOT_DIR.'/data/legacy-treasures.json';
+        if(is_file($legacyFile)){
+            $legacy=json_decode((string)file_get_contents($legacyFile),true,512,JSON_THROW_ON_ERROR);
+            $activeCodes=array_column($decoded['treasures'],'code');
+            foreach($legacy['treasures']??[] as $entry)if(!in_array($entry['code'],$activeCodes,true))$decoded['treasures'][]=$entry+['legacy_only'=>true];
+        }
+
+        $effectsByCode = [];
+        $effectsFile = ROOT_DIR . '/data/treasure-effects.json';
+        if (is_file($effectsFile)) {
+            $effectsRaw = file_get_contents($effectsFile);
+            if ($effectsRaw === false) {
+                throw new \RuntimeException('Cannot read treasure-effects.json');
+            }
+            $effectsDecoded = json_decode($effectsRaw, true, 512, JSON_THROW_ON_ERROR);
+            $effectsByCode = is_array($effectsDecoded['treasures'] ?? null)
+                ? $effectsDecoded['treasures']
+                : [];
+        }
 
         self::$cache = [];
         foreach ($decoded['treasures'] as $treasure) {
             $code = (int) ($treasure['code'] ?? 0);
             if ($code > 0) {
+                $catalogEffects = $effectsByCode[(string) $code]['effects'] ?? null;
+                if (is_array($catalogEffects) && $catalogEffects !== []) {
+                    $treasure['effects'] = $catalogEffects;
+                }
                 self::$cache[$code] = $treasure;
             }
         }
@@ -151,6 +175,7 @@ final class TreasureData
     {
         self::$byGrade = [];
         foreach (self::all() as $code => $treasure) {
+            if(!empty($treasure['legacy_only']))continue;
             $grade = (string) ($treasure['grade'] ?? 'normal');
             self::$byGrade[$grade][] = $code;
         }

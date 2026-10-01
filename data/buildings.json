@@ -5,9 +5,9 @@
       "1": {
         "resources": {
           "food": 0,
-          "lumber": 6000,
-          "stone": 6000,
-          "gold": 10000
+          "lumber": 4800,
+          "stone": 4800,
+          "gold": 4800
         },
         "items": {},
         "time": 1,
@@ -21,9 +21,9 @@
       "2": {
         "resources": {
           "food": 0,
-          "lumber": 8280,
-          "stone": 8280,
-          "gold": 13800
+          "lumber": 6624,
+          "stone": 6624,
+          "gold": 6624
         },
         "items": {},
         "time": 3,
@@ -37,9 +37,9 @@
       "3": {
         "resources": {
           "food": 0,
-          "lumber": 11426,
-          "stone": 11426,
-          "gold": 19044
+          "lumber": 9141,
+          "stone": 9141,
+          "gold": 9142
         },
         "items": {},
         "time": 60,
@@ -53,9 +53,9 @@
       "4": {
         "resources": {
           "food": 0,
-          "lumber": 15768,
-          "stone": 15768,
-          "gold": 26281
+          "lumber": 12615,
+          "stone": 12615,
+          "gold": 12615
         },
         "items": {},
         "time": 300,
@@ -69,9 +69,9 @@
       "5": {
         "resources": {
           "food": 0,
-          "lumber": 21760,
-          "stone": 21760,
-          "gold": 36268
+          "lumber": 17408,
+          "stone": 17408,
+          "gold": 17409
         },
         "items": {},
         "time": 1500,
@@ -85,9 +85,9 @@
       "6": {
         "resources": {
           "food": 0,
-          "lumber": 30029,
-          "stone": 30029,
-          "gold": 50050
+          "lumber": 21760,
+          "stone": 21760,
+          "gold": 21761
         },
         "items": {},
         "time": 2400,
@@ -101,9 +101,9 @@
       "7": {
         "resources": {
           "food": 0,
-          "lumber": 41440,
-          "stone": 41440,
-          "gold": 69069
+          "lumber": 27200,
+          "stone": 27200,
+          "gold": 27201
         },
         "items": {},
         "time": 3600,
@@ -117,9 +117,9 @@
       "8": {
         "resources": {
           "food": 0,
-          "lumber": 57187,
-          "stone": 57187,
-          "gold": 95315
+          "lumber": 34000,
+          "stone": 34000,
+          "gold": 34002
         },
         "items": {},
         "time": 5400,
@@ -133,9 +133,9 @@
       "9": {
         "resources": {
           "food": 0,
-          "lumber": 78918,
-          "stone": 78918,
-          "gold": 131535
+          "lumber": 42500,
+          "stone": 42500,
+          "gold": 42502
         },
         "items": {},
         "time": 8100,
@@ -149,9 +149,9 @@
       "10": {
         "resources": {
           "food": 0,
-          "lumber": 108907,
-          "stone": 108907,
-          "gold": 181518
+          "lumber": 53125,
+          "stone": 53125,
+          "gold": 53127
         },
         "items": {},
         "time": 12150,
@@ -165,9 +165,9 @@
       "11": {
         "resources": {
           "food": 0,
-          "lumber": 150292,
-          "stone": 150292,
-          "gold": 250495
+          "lumber": 66407,
+          "stone": 66407,
+          "gold": 66409
         },
         "items": {},
         "time": 18225,
@@ -181,9 +181,9 @@
       "12": {
         "resources": {
           "food": 0,
-          "lumber": 207403,
-          "stone": 207403,
-          "gold": 345683
+          "lumber": 83008,
+          "stone": 83008,
+          "gold": 83011
         },
         "items": {},
         "time": 27338,
@@ -197,9 +197,9 @@
       "13": {
         "resources": {
           "food": 0,
-          "lumber": 286216,
-          "stone": 286216,
-          "gold": 477043
+          "lumber": 103760,
+          "stone": 103760,
+          "gold": 103764
         },
         "items": {},
         "time": 41007,
@@ -213,9 +213,9 @@
       "14": {
         "resources": {
           "food": 0,
-          "lumber": 394978,
-          "stone": 394978,
-          "gold": 658319
+          "lumber": 129700,
+          "stone": 129700,
+          "gold": 129705
         },
         "items": {},
         "time": 61511,
@@ -229,9 +229,9 @@
       "15": {
         "resources": {
           "food": 0,
-          "lumber": 545070,
-          "stone": 545070,
-          "gold": 908480
+          "lumber": 162125,
+          "stone": 162125,
+          "gold": 162131
         },
         "items": {},
         "time": 92267,
@@ -245,9 +245,9 @@
       "16": {
         "resources": {
           "food": 0,
-          "lumber": 752197,
-          "stone": 752197,
-          "gold": 1253702
+          "lumber": 202656,
+          "stone": 202656,
+          "gold": 202664
         },
         "items": {},
         "time": 110720,
@@ -261,9 +261,9 @@
       "17": {
         "resources": {
           "food": 0,
-          "lumber": 1038032,
-          "stone": 1038032,
-          "gold": 1730109
+          "lumber": 253320,
+          "stone": 253320,
+          "gold": 253330
         },
         "items": {},
         "time": 132864,
@@ -277,9 +277,9 @@
       "18": {
         "resources": {
           "food": 0,
-          "lumber": 1432484,
-          "stone": 1432484,
-          "gold": 2387550
+          "lumber": 316650,
+          "stone": 316650,
+          "gold": 316662
         },
         "items": {},
         "time": 159437,
@@ -293,9 +293,9 @@
       "19": {
         "resources": {
           "food": 0,
-          "lumber": 1976828,
-          "stone": 1976828,
-          "gold": 3294819
+          "lumber": 395813,
+          "stone": 395813,
+          "gold": 395827
         },
         "items": {},
         "time": 191324,
@@ -309,9 +309,9 @@
       "20": {
         "resources": {
           "food": 0,
-          "lumber": 2728023,
-          "stone": 2728023,
-          "gold": 4546850
+          "lumber": 494766,
+          "stone": 494766,
+          "gold": 494784
         },
         "items": {},
         "time": 229589,
@@ -325,9 +325,9 @@
       "21": {
         "resources": {
           "food": 0,
-          "lumber": 3764672,
-          "stone": 3764672,
-          "gold": 6274653
+          "lumber": 618457,
+          "stone": 618457,
+          "gold": 618480
         },
         "items": {},
         "time": 345600,
@@ -341,9 +341,9 @@
       "22": {
         "resources": {
           "food": 0,
-          "lumber": 5195247,
-          "stone": 5195247,
-          "gold": 8659021
+          "lumber": 773071,
+          "stone": 773071,
+          "gold": 773099
         },
         "items": {},
         "time": 432000,
@@ -357,9 +357,9 @@
       "23": {
         "resources": {
           "food": 0,
-          "lumber": 7169441,
-          "stone": 7169441,
-          "gold": 11949449
+          "lumber": 966339,
+          "stone": 966339,
+          "gold": 966374
         },
         "items": {},
         "time": 518400,
@@ -373,9 +373,9 @@
       "24": {
         "resources": {
           "food": 0,
-          "lumber": 9893829,
-          "stone": 9893829,
-          "gold": 16490240
+          "lumber": 1207923,
+          "stone": 1207923,
+          "gold": 1207968
         },
         "items": {},
         "time": 691200,
@@ -389,9 +389,9 @@
       "25": {
         "resources": {
           "food": 0,
-          "lumber": 13653484,
-          "stone": 13653484,
-          "gold": 22756531
+          "lumber": 1509904,
+          "stone": 1509904,
+          "gold": 1509959
         },
         "items": {},
         "time": 864000,
@@ -405,9 +405,9 @@
       "26": {
         "resources": {
           "food": 0,
-          "lumber": 18841808,
-          "stone": 18841808,
-          "gold": 31404013
+          "lumber": 1887380,
+          "stone": 1887380,
+          "gold": 1887449
         },
         "items": {},
         "time": 1123200,
@@ -421,9 +421,9 @@
       "27": {
         "resources": {
           "food": 0,
-          "lumber": 26001695,
-          "stone": 26001695,
-          "gold": 43337538
+          "lumber": 2359224,
+          "stone": 2359224,
+          "gold": 2359311
         },
         "items": {},
         "time": 1468800,
@@ -437,9 +437,9 @@
       "28": {
         "resources": {
           "food": 0,
-          "lumber": 35882339,
-          "stone": 35882339,
-          "gold": 59805802
+          "lumber": 2949030,
+          "stone": 2949030,
+          "gold": 2949139
         },
         "items": {},
         "time": 1814400,
@@ -453,9 +453,9 @@
       "29": {
         "resources": {
           "food": 0,
-          "lumber": 49517628,
-          "stone": 49517628,
-          "gold": 82532007
+          "lumber": 3686288,
+          "stone": 3686288,
+          "gold": 3686423
         },
         "items": {},
         "time": 2160000,
@@ -469,13 +469,11 @@
       "30": {
         "resources": {
           "food": 0,
-          "lumber": 68334327,
-          "stone": 68334327,
-          "gold": 113894170
+          "lumber": 4607860,
+          "stone": 4607860,
+          "gold": 4608029
         },
-        "items": {
-          "119000001": 1
-        },
+        "items": {},
         "time": 2592000,
         "power": 2590517,
         "requirements": {
@@ -488,10 +486,10 @@
     "barrack": {
       "1": {
         "resources": {
-          "food": 2000,
-          "lumber": 2000,
-          "stone": 2000,
-          "gold": 1000
+          "food": 1600,
+          "lumber": 1600,
+          "stone": 1600,
+          "gold": 480
         },
         "items": {},
         "time": 1,
@@ -504,10 +502,10 @@
       },
       "2": {
         "resources": {
-          "food": 2640,
-          "lumber": 2640,
-          "stone": 2640,
-          "gold": 1320
+          "food": 2112,
+          "lumber": 2112,
+          "stone": 2112,
+          "gold": 634
         },
         "items": {},
         "time": 3,
@@ -520,10 +518,10 @@
       },
       "3": {
         "resources": {
-          "food": 3485,
-          "lumber": 3485,
-          "stone": 3485,
-          "gold": 1742
+          "food": 2788,
+          "lumber": 2788,
+          "stone": 2788,
+          "gold": 837
         },
         "items": {},
         "time": 60,
@@ -536,10 +534,10 @@
       },
       "4": {
         "resources": {
-          "food": 4600,
-          "lumber": 4600,
-          "stone": 4600,
-          "gold": 2299
+          "food": 3680,
+          "lumber": 3680,
+          "stone": 3680,
+          "gold": 1104
         },
         "items": {},
         "time": 180,
@@ -552,10 +550,10 @@
       },
       "5": {
         "resources": {
-          "food": 6072,
-          "lumber": 6072,
-          "stone": 6072,
-          "gold": 3035
+          "food": 4858,
+          "lumber": 4858,
+          "stone": 4858,
+          "gold": 1457
         },
         "items": {},
         "time": 305,
@@ -568,10 +566,10 @@
       },
       "6": {
         "resources": {
-          "food": 8015,
-          "lumber": 8015,
-          "stone": 8015,
-          "gold": 4006
+          "food": 6072,
+          "lumber": 6072,
+          "stone": 6072,
+          "gold": 1821
         },
         "items": {},
         "time": 458,
@@ -584,10 +582,10 @@
       },
       "7": {
         "resources": {
-          "food": 10580,
-          "lumber": 10580,
-          "stone": 10580,
-          "gold": 5288
+          "food": 7590,
+          "lumber": 7590,
+          "stone": 7590,
+          "gold": 2277
         },
         "items": {},
         "time": 687,
@@ -600,10 +598,10 @@
       },
       "8": {
         "resources": {
-          "food": 13966,
-          "lumber": 13966,
-          "stone": 13966,
-          "gold": 6980
+          "food": 9488,
+          "lumber": 9488,
+          "stone": 9488,
+          "gold": 2846
         },
         "items": {},
         "time": 1031,
@@ -616,10 +614,10 @@
       },
       "9": {
         "resources": {
-          "food": 18435,
-          "lumber": 18435,
-          "stone": 18435,
-          "gold": 9214
+          "food": 11860,
+          "lumber": 11860,
+          "stone": 11860,
+          "gold": 3557
         },
         "items": {},
         "time": 1547,
@@ -632,10 +630,10 @@
       },
       "10": {
         "resources": {
-          "food": 24334,
-          "lumber": 24334,
-          "stone": 24334,
-          "gold": 12162
+          "food": 14825,
+          "lumber": 14825,
+          "stone": 14825,
+          "gold": 4446
         },
         "items": {},
         "time": 2321,
@@ -648,10 +646,10 @@
       },
       "11": {
         "resources": {
-          "food": 32121,
-          "lumber": 32121,
-          "stone": 32121,
-          "gold": 16054
+          "food": 18531,
+          "lumber": 18531,
+          "stone": 18531,
+          "gold": 5558
         },
         "items": {},
         "time": 3482,
@@ -664,10 +662,10 @@
       },
       "12": {
         "resources": {
-          "food": 42400,
-          "lumber": 42400,
-          "stone": 42400,
-          "gold": 21191
+          "food": 23163,
+          "lumber": 23163,
+          "stone": 23163,
+          "gold": 6947
         },
         "items": {},
         "time": 5223,
@@ -680,10 +678,10 @@
       },
       "13": {
         "resources": {
-          "food": 55968,
-          "lumber": 55968,
-          "stone": 55968,
-          "gold": 27972
+          "food": 28954,
+          "lumber": 28954,
+          "stone": 28954,
+          "gold": 8684
         },
         "items": {},
         "time": 7835,
@@ -696,10 +694,10 @@
       },
       "14": {
         "resources": {
-          "food": 73878,
-          "lumber": 73878,
-          "stone": 73878,
-          "gold": 36923
+          "food": 36192,
+          "lumber": 36192,
+          "stone": 36192,
+          "gold": 10855
         },
         "items": {},
         "time": 11753,
@@ -712,10 +710,10 @@
       },
       "15": {
         "resources": {
-          "food": 97519,
-          "lumber": 97519,
-          "stone": 97519,
-          "gold": 48738
+          "food": 45240,
+          "lumber": 45240,
+          "stone": 45240,
+          "gold": 13568
         },
         "items": {},
         "time": 17630,
@@ -728,10 +726,10 @@
       },
       "16": {
         "resources": {
-          "food": 128725,
-          "lumber": 128725,
-          "stone": 128725,
-          "gold": 64334
+          "food": 56550,
+          "lumber": 56550,
+          "stone": 56550,
+          "gold": 16960
         },
         "items": {},
         "time": 21156,
@@ -744,10 +742,10 @@
       },
       "17": {
         "resources": {
-          "food": 169917,
-          "lumber": 169917,
-          "stone": 169917,
-          "gold": 84921
+          "food": 70688,
+          "lumber": 70688,
+          "stone": 70688,
+          "gold": 21200
         },
         "items": {},
         "time": 25387,
@@ -760,10 +758,10 @@
       },
       "18": {
         "resources": {
-          "food": 224290,
-          "lumber": 224290,
-          "stone": 224290,
-          "gold": 112096
+          "food": 88360,
+          "lumber": 88360,
+          "stone": 88360,
+          "gold": 26500
         },
         "items": {},
         "time": 30464,
@@ -776,10 +774,10 @@
       },
       "19": {
         "resources": {
-          "food": 296063,
-          "lumber": 296063,
-          "stone": 296063,
-          "gold": 147967
+          "food": 110450,
+          "lumber": 110450,
+          "stone": 110450,
+          "gold": 33124
         },
         "items": {},
         "time": 36557,
@@ -792,10 +790,10 @@
       },
       "20": {
         "resources": {
-          "food": 390803,
-          "lumber": 390803,
-          "stone": 390803,
-          "gold": 195316
+          "food": 138062,
+          "lumber": 138062,
+          "stone": 138062,
+          "gold": 41405
         },
         "items": {},
         "time": 43868,
@@ -808,10 +806,10 @@
       },
       "21": {
         "resources": {
-          "food": 515860,
-          "lumber": 515860,
-          "stone": 515860,
-          "gold": 257817
+          "food": 172577,
+          "lumber": 172577,
+          "stone": 172577,
+          "gold": 51756
         },
         "items": {},
         "time": 64800,
@@ -824,10 +822,10 @@
       },
       "22": {
         "resources": {
-          "food": 680935,
-          "lumber": 680935,
-          "stone": 680935,
-          "gold": 340318
+          "food": 215721,
+          "lumber": 215721,
+          "stone": 215721,
+          "gold": 64695
         },
         "items": {},
         "time": 86400,
@@ -840,10 +838,10 @@
       },
       "23": {
         "resources": {
-          "food": 898834,
-          "lumber": 898834,
-          "stone": 898834,
-          "gold": 449220
+          "food": 269651,
+          "lumber": 269651,
+          "stone": 269651,
+          "gold": 80869
         },
         "items": {},
         "time": 115200,
@@ -856,10 +854,10 @@
       },
       "24": {
         "resources": {
-          "food": 1186461,
-          "lumber": 1186461,
-          "stone": 1186461,
-          "gold": 592970
+          "food": 337064,
+          "lumber": 337064,
+          "stone": 337064,
+          "gold": 101086
         },
         "items": {},
         "time": 151200,
@@ -872,10 +870,10 @@
       },
       "25": {
         "resources": {
-          "food": 1566129,
-          "lumber": 1566129,
-          "stone": 1566129,
-          "gold": 782720
+          "food": 421330,
+          "lumber": 421330,
+          "stone": 421330,
+          "gold": 126358
         },
         "items": {},
         "time": 194400,
@@ -888,10 +886,10 @@
       },
       "26": {
         "resources": {
-          "food": 2067290,
-          "lumber": 2067290,
-          "stone": 2067290,
-          "gold": 1033190
+          "food": 526663,
+          "lumber": 526663,
+          "stone": 526663,
+          "gold": 157947
         },
         "items": {},
         "time": 259200,
@@ -904,10 +902,10 @@
       },
       "27": {
         "resources": {
-          "food": 2728823,
-          "lumber": 2728823,
-          "stone": 2728823,
-          "gold": 1363811
+          "food": 658328,
+          "lumber": 658328,
+          "stone": 658328,
+          "gold": 197434
         },
         "items": {},
         "time": 345600,
@@ -920,10 +918,10 @@
       },
       "28": {
         "resources": {
-          "food": 3602046,
-          "lumber": 3602046,
-          "stone": 3602046,
-          "gold": 1800231
+          "food": 822910,
+          "lumber": 822910,
+          "stone": 822910,
+          "gold": 246792
         },
         "items": {},
         "time": 432000,
@@ -936,10 +934,10 @@
       },
       "29": {
         "resources": {
-          "food": 4754701,
-          "lumber": 4754701,
-          "stone": 4754701,
-          "gold": 2376305
+          "food": 1028637,
+          "lumber": 1028637,
+          "stone": 1028637,
+          "gold": 308490
         },
         "items": {},
         "time": 604800,
@@ -952,14 +950,12 @@
       },
       "30": {
         "resources": {
-          "food": 6276205,
-          "lumber": 6276205,
-          "stone": 6276205,
-          "gold": 3136723
+          "food": 1285797,
+          "lumber": 1285797,
+          "stone": 1285797,
+          "gold": 385612
         },
-        "items": {
-          "119000001": 1
-        },
+        "items": {},
         "time": 864000,
         "power": 857637,
         "requirements": {
@@ -972,10 +968,10 @@
     "castle": {
       "1": {
         "resources": {
-          "food": 5000,
-          "lumber": 5000,
-          "stone": 5000,
-          "gold": 3000
+          "food": 4000,
+          "lumber": 4000,
+          "stone": 4000,
+          "gold": 1440
         },
         "items": {},
         "time": 1,
@@ -985,10 +981,10 @@
       },
       "2": {
         "resources": {
-          "food": 7100,
-          "lumber": 7100,
-          "stone": 7100,
-          "gold": 4260
+          "food": 5680,
+          "lumber": 5680,
+          "stone": 5680,
+          "gold": 2045
         },
         "items": {},
         "time": 3,
@@ -1001,10 +997,10 @@
       },
       "3": {
         "resources": {
-          "food": 10082,
-          "lumber": 10082,
-          "stone": 10082,
-          "gold": 6049
+          "food": 8066,
+          "lumber": 8066,
+          "stone": 8066,
+          "gold": 2904
         },
         "items": {},
         "time": 60,
@@ -1017,10 +1013,10 @@
       },
       "4": {
         "resources": {
-          "food": 14316,
-          "lumber": 14316,
-          "stone": 14316,
-          "gold": 8590
+          "food": 11453,
+          "lumber": 11453,
+          "stone": 11453,
+          "gold": 4124
         },
         "items": {},
         "time": 300,
@@ -1033,10 +1029,10 @@
       },
       "5": {
         "resources": {
-          "food": 20329,
-          "lumber": 20329,
-          "stone": 20329,
-          "gold": 12198
+          "food": 16264,
+          "lumber": 16264,
+          "stone": 16264,
+          "gold": 5856
         },
         "items": {},
         "time": 1500,
@@ -1049,10 +1045,10 @@
       },
       "6": {
         "resources": {
-          "food": 28867,
-          "lumber": 28867,
-          "stone": 28867,
-          "gold": 17321
+          "food": 20329,
+          "lumber": 20329,
+          "stone": 20329,
+          "gold": 7319
         },
         "items": {},
         "time": 2880,
@@ -1065,10 +1061,10 @@
       },
       "7": {
         "resources": {
-          "food": 40991,
-          "lumber": 40991,
-          "stone": 40991,
-          "gold": 24596
+          "food": 25412,
+          "lumber": 25412,
+          "stone": 25412,
+          "gold": 9149
         },
         "items": {},
         "time": 4320,
@@ -1081,10 +1077,10 @@
       },
       "8": {
         "resources": {
-          "food": 58207,
-          "lumber": 58207,
-          "stone": 58207,
-          "gold": 34926
+          "food": 31765,
+          "lumber": 31765,
+          "stone": 31765,
+          "gold": 11436
         },
         "items": {},
         "time": 6480,
@@ -1097,10 +1093,10 @@
       },
       "9": {
         "resources": {
-          "food": 82654,
-          "lumber": 82654,
-          "stone": 82654,
-          "gold": 49595
+          "food": 39706,
+          "lumber": 39706,
+          "stone": 39706,
+          "gold": 14295
         },
         "items": {},
         "time": 9720,
@@ -1113,10 +1109,10 @@
       },
       "10": {
         "resources": {
-          "food": 117369,
-          "lumber": 117369,
-          "stone": 117369,
-          "gold": 70425
+          "food": 49632,
+          "lumber": 49632,
+          "stone": 49632,
+          "gold": 17869
         },
         "items": {},
         "time": 14580,
@@ -1129,10 +1125,10 @@
       },
       "11": {
         "resources": {
-          "food": 166664,
-          "lumber": 166664,
-          "stone": 166664,
-          "gold": 100004
+          "food": 62040,
+          "lumber": 62040,
+          "stone": 62040,
+          "gold": 22336
         },
         "items": {},
         "time": 21870,
@@ -1145,10 +1141,10 @@
       },
       "12": {
         "resources": {
-          "food": 236663,
-          "lumber": 236663,
-          "stone": 236663,
-          "gold": 142006
+          "food": 77549,
+          "lumber": 77549,
+          "stone": 77549,
+          "gold": 27920
         },
         "items": {},
         "time": 32805,
@@ -1161,10 +1157,10 @@
       },
       "13": {
         "resources": {
-          "food": 336061,
-          "lumber": 336061,
-          "stone": 336061,
-          "gold": 201649
+          "food": 96937,
+          "lumber": 96937,
+          "stone": 96937,
+          "gold": 34899
         },
         "items": {},
         "time": 49208,
@@ -1177,10 +1173,10 @@
       },
       "14": {
         "resources": {
-          "food": 477207,
-          "lumber": 477207,
-          "stone": 477207,
-          "gold": 286342
+          "food": 121171,
+          "lumber": 121171,
+          "stone": 121171,
+          "gold": 43624
         },
         "items": {},
         "time": 73812,
@@ -1193,10 +1189,10 @@
       },
       "15": {
         "resources": {
-          "food": 677634,
-          "lumber": 677634,
-          "stone": 677634,
-          "gold": 406606
+          "food": 151463,
+          "lumber": 151463,
+          "stone": 151463,
+          "gold": 54530
         },
         "items": {},
         "time": 110718,
@@ -1209,10 +1205,10 @@
       },
       "16": {
         "resources": {
-          "food": 962240,
-          "lumber": 962240,
-          "stone": 962240,
-          "gold": 577381
+          "food": 189329,
+          "lumber": 189329,
+          "stone": 189329,
+          "gold": 68162
         },
         "items": {},
         "time": 132862,
@@ -1225,10 +1221,10 @@
       },
       "17": {
         "resources": {
-          "food": 1366381,
-          "lumber": 1366381,
-          "stone": 1366381,
-          "gold": 819881
+          "food": 236661,
+          "lumber": 236661,
+          "stone": 236661,
+          "gold": 85203
         },
         "items": {},
         "time": 159434,
@@ -1241,10 +1237,10 @@
       },
       "18": {
         "resources": {
-          "food": 1940261,
-          "lumber": 1940261,
-          "stone": 1940261,
-          "gold": 1164231
+          "food": 295826,
+          "lumber": 295826,
+          "stone": 295826,
+          "gold": 106503
         },
         "items": {},
         "time": 191321,
@@ -1257,10 +1253,10 @@
       },
       "19": {
         "resources": {
-          "food": 2755171,
-          "lumber": 2755171,
-          "stone": 2755171,
-          "gold": 1653208
+          "food": 369783,
+          "lumber": 369783,
+          "stone": 369783,
+          "gold": 133129
         },
         "items": {},
         "time": 229585,
@@ -1273,10 +1269,10 @@
       },
       "20": {
         "resources": {
-          "food": 3912343,
-          "lumber": 3912343,
-          "stone": 3912343,
-          "gold": 2347555
+          "food": 462228,
+          "lumber": 462228,
+          "stone": 462228,
+          "gold": 166411
         },
         "items": {},
         "time": 275502,
@@ -1289,13 +1285,13 @@
       },
       "21": {
         "resources": {
-          "food": 5555527,
-          "lumber": 5555527,
-          "stone": 5555527,
-          "gold": 3333528
+          "food": 577785,
+          "lumber": 577785,
+          "stone": 577785,
+          "gold": 208013
         },
         "items": {},
-        "time": 345600,
+        "time": 586071,
         "power": 540165,
         "requirements": {
           "wall": 20,
@@ -1305,13 +1301,13 @@
       },
       "22": {
         "resources": {
-          "food": 7888848,
-          "lumber": 7888848,
-          "stone": 7888848,
-          "gold": 4733610
+          "food": 722232,
+          "lumber": 722232,
+          "stone": 722232,
+          "gold": 260017
         },
         "items": {},
-        "time": 432000,
+        "time": 703286,
         "power": 665165,
         "requirements": {
           "wall": 21,
@@ -1321,13 +1317,13 @@
       },
       "23": {
         "resources": {
-          "food": 11202164,
-          "lumber": 11202164,
-          "stone": 11202164,
-          "gold": 6721726
+          "food": 902789,
+          "lumber": 902789,
+          "stone": 902789,
+          "gold": 325021
         },
         "items": {},
-        "time": 518400,
+        "time": 843943,
         "power": 817433,
         "requirements": {
           "wall": 22,
@@ -1337,13 +1333,13 @@
       },
       "24": {
         "resources": {
-          "food": 15907073,
-          "lumber": 15907073,
-          "stone": 15907073,
-          "gold": 9544851
+          "food": 1128487,
+          "lumber": 1128487,
+          "stone": 1128487,
+          "gold": 406276
         },
         "items": {},
-        "time": 691200,
+        "time": 1012731,
         "power": 1002810,
         "requirements": {
           "wall": 23,
@@ -1353,13 +1349,13 @@
       },
       "25": {
         "resources": {
-          "food": 22588044,
-          "lumber": 22588044,
-          "stone": 22588044,
-          "gold": 13553688
+          "food": 1410608,
+          "lumber": 1410608,
+          "stone": 1410608,
+          "gold": 507844
         },
         "items": {},
-        "time": 864000,
+        "time": 1215278,
         "power": 1228260,
         "requirements": {
           "wall": 24,
@@ -1369,13 +1365,13 @@
       },
       "26": {
         "resources": {
-          "food": 32075022,
-          "lumber": 32075022,
-          "stone": 32075022,
-          "gold": 19246237
+          "food": 1763260,
+          "lumber": 1763260,
+          "stone": 1763260,
+          "gold": 634805
         },
         "items": {},
-        "time": 1123200,
+        "time": 1458333,
         "power": 1502230,
         "requirements": {
           "wall": 25,
@@ -1385,13 +1381,13 @@
       },
       "27": {
         "resources": {
-          "food": 45546531,
-          "lumber": 45546531,
-          "stone": 45546531,
-          "gold": 27329657
+          "food": 2204075,
+          "lumber": 2204075,
+          "stone": 2204075,
+          "gold": 793506
         },
         "items": {},
-        "time": 1468800,
+        "time": 1750000,
         "power": 1834940,
         "requirements": {
           "wall": 26,
@@ -1401,13 +1397,13 @@
       },
       "28": {
         "resources": {
-          "food": 64676074,
-          "lumber": 64676074,
-          "stone": 64676074,
-          "gold": 38808113
+          "food": 2755094,
+          "lumber": 2755094,
+          "stone": 2755094,
+          "gold": 991883
         },
         "items": {},
-        "time": 1814400,
+        "time": 2100000,
         "power": 2238629,
         "requirements": {
           "wall": 27,
@@ -1417,13 +1413,13 @@
       },
       "29": {
         "resources": {
-          "food": 91840025,
-          "lumber": 91840025,
-          "stone": 91840025,
-          "gold": 55107520
+          "food": 3443867,
+          "lumber": 3443867,
+          "stone": 3443867,
+          "gold": 1239853
         },
         "items": {},
-        "time": 2160000,
+        "time": 2520000,
         "power": 2728248,
         "requirements": {
           "wall": 28,
@@ -1433,15 +1429,13 @@
       },
       "30": {
         "resources": {
-          "food": 130412836,
-          "lumber": 130412836,
-          "stone": 130412836,
-          "gold": 78252678
+          "food": 4304834,
+          "lumber": 4304834,
+          "stone": 4304834,
+          "gold": 1549817
         },
-        "items": {
-          "119000001": 1
-        },
-        "time": 2592000,
+        "items": {},
+        "time": 3024000,
         "power": 3321651,
         "requirements": {
           "wall": 29,
@@ -1454,9 +1448,9 @@
       "1": {
         "resources": {
           "food": 0,
-          "lumber": 2000,
-          "stone": 2000,
-          "gold": 1000
+          "lumber": 1600,
+          "stone": 1600,
+          "gold": 480
         },
         "items": {},
         "time": 1,
@@ -1469,9 +1463,9 @@
       "2": {
         "resources": {
           "food": 0,
-          "lumber": 2640,
-          "stone": 2640,
-          "gold": 1320
+          "lumber": 2112,
+          "stone": 2112,
+          "gold": 634
         },
         "items": {},
         "time": 3,
@@ -1484,9 +1478,9 @@
       "3": {
         "resources": {
           "food": 0,
-          "lumber": 3485,
-          "stone": 3485,
-          "gold": 1742
+          "lumber": 2788,
+          "stone": 2788,
+          "gold": 837
         },
         "items": {},
         "time": 60,
@@ -1499,9 +1493,9 @@
       "4": {
         "resources": {
           "food": 0,
-          "lumber": 4600,
-          "stone": 4600,
-          "gold": 2299
+          "lumber": 3680,
+          "stone": 3680,
+          "gold": 1104
         },
         "items": {},
         "time": 180,
@@ -1514,9 +1508,9 @@
       "5": {
         "resources": {
           "food": 0,
-          "lumber": 6072,
-          "stone": 6072,
-          "gold": 3035
+          "lumber": 4858,
+          "stone": 4858,
+          "gold": 1457
         },
         "items": {},
         "time": 305,
@@ -1529,9 +1523,9 @@
       "6": {
         "resources": {
           "food": 0,
-          "lumber": 8015,
-          "stone": 8015,
-          "gold": 4006
+          "lumber": 6072,
+          "stone": 6072,
+          "gold": 1821
         },
         "items": {},
         "time": 458,
@@ -1544,9 +1538,9 @@
       "7": {
         "resources": {
           "food": 0,
-          "lumber": 10580,
-          "stone": 10580,
-          "gold": 5288
+          "lumber": 7590,
+          "stone": 7590,
+          "gold": 2277
         },
         "items": {},
         "time": 687,
@@ -1559,9 +1553,9 @@
       "8": {
         "resources": {
           "food": 0,
-          "lumber": 13966,
-          "stone": 13966,
-          "gold": 6980
+          "lumber": 9488,
+          "stone": 9488,
+          "gold": 2846
         },
         "items": {},
         "time": 1031,
@@ -1574,9 +1568,9 @@
       "9": {
         "resources": {
           "food": 0,
-          "lumber": 18435,
-          "stone": 18435,
-          "gold": 9214
+          "lumber": 11860,
+          "stone": 11860,
+          "gold": 3557
         },
         "items": {},
         "time": 1547,
@@ -1589,9 +1583,9 @@
       "10": {
         "resources": {
           "food": 0,
-          "lumber": 24334,
-          "stone": 24334,
-          "gold": 12162
+          "lumber": 14825,
+          "stone": 14825,
+          "gold": 4446
         },
         "items": {},
         "time": 2321,
@@ -1604,9 +1598,9 @@
       "11": {
         "resources": {
           "food": 0,
-          "lumber": 32121,
-          "stone": 32121,
-          "gold": 16054
+          "lumber": 18531,
+          "stone": 18531,
+          "gold": 5558
         },
         "items": {},
         "time": 3482,
@@ -1619,9 +1613,9 @@
       "12": {
         "resources": {
           "food": 0,
-          "lumber": 42400,
-          "stone": 42400,
-          "gold": 21191
+          "lumber": 23163,
+          "stone": 23163,
+          "gold": 6947
         },
         "items": {},
         "time": 5223,
@@ -1634,9 +1628,9 @@
       "13": {
         "resources": {
           "food": 0,
-          "lumber": 55968,
-          "stone": 55968,
-          "gold": 27972
+          "lumber": 28954,
+          "stone": 28954,
+          "gold": 8684
         },
         "items": {},
         "time": 7835,
@@ -1649,9 +1643,9 @@
       "14": {
         "resources": {
           "food": 0,
-          "lumber": 73878,
-          "stone": 73878,
-          "gold": 36923
+          "lumber": 36192,
+          "stone": 36192,
+          "gold": 10855
         },
         "items": {},
         "time": 11753,
@@ -1664,9 +1658,9 @@
       "15": {
         "resources": {
           "food": 0,
-          "lumber": 97519,
-          "stone": 97519,
-          "gold": 48738
+          "lumber": 45240,
+          "stone": 45240,
+          "gold": 13568
         },
         "items": {},
         "time": 17630,
@@ -1679,9 +1673,9 @@
       "16": {
         "resources": {
           "food": 0,
-          "lumber": 128725,
-          "stone": 128725,
-          "gold": 64334
+          "lumber": 56550,
+          "stone": 56550,
+          "gold": 16960
         },
         "items": {},
         "time": 21156,
@@ -1694,9 +1688,9 @@
       "17": {
         "resources": {
           "food": 0,
-          "lumber": 169917,
-          "stone": 169917,
-          "gold": 84921
+          "lumber": 70688,
+          "stone": 70688,
+          "gold": 21200
         },
         "items": {},
         "time": 25387,
@@ -1709,9 +1703,9 @@
       "18": {
         "resources": {
           "food": 0,
-          "lumber": 224290,
-          "stone": 224290,
-          "gold": 112096
+          "lumber": 88360,
+          "stone": 88360,
+          "gold": 26500
         },
         "items": {},
         "time": 30464,
@@ -1724,9 +1718,9 @@
       "19": {
         "resources": {
           "food": 0,
-          "lumber": 296063,
-          "stone": 296063,
-          "gold": 147967
+          "lumber": 110450,
+          "stone": 110450,
+          "gold": 33124
         },
         "items": {},
         "time": 36557,
@@ -1739,9 +1733,9 @@
       "20": {
         "resources": {
           "food": 0,
-          "lumber": 390803,
-          "stone": 390803,
-          "gold": 195316
+          "lumber": 138062,
+          "stone": 138062,
+          "gold": 41405
         },
         "items": {},
         "time": 43868,
@@ -1754,9 +1748,9 @@
       "21": {
         "resources": {
           "food": 0,
-          "lumber": 515860,
-          "stone": 515860,
-          "gold": 257817
+          "lumber": 172577,
+          "stone": 172577,
+          "gold": 51756
         },
         "items": {},
         "time": 57600,
@@ -1769,9 +1763,9 @@
       "22": {
         "resources": {
           "food": 0,
-          "lumber": 680935,
-          "stone": 680935,
-          "gold": 340318
+          "lumber": 215721,
+          "stone": 215721,
+          "gold": 64695
         },
         "items": {},
         "time": 79200,
@@ -1784,9 +1778,9 @@
       "23": {
         "resources": {
           "food": 0,
-          "lumber": 898834,
-          "stone": 898834,
-          "gold": 449220
+          "lumber": 269651,
+          "stone": 269651,
+          "gold": 80869
         },
         "items": {},
         "time": 108000,
@@ -1799,9 +1793,9 @@
       "24": {
         "resources": {
           "food": 0,
-          "lumber": 1186461,
-          "stone": 1186461,
-          "gold": 592970
+          "lumber": 337064,
+          "stone": 337064,
+          "gold": 101086
         },
         "items": {},
         "time": 151200,
@@ -1814,9 +1808,9 @@
       "25": {
         "resources": {
           "food": 0,
-          "lumber": 1566129,
-          "stone": 1566129,
-          "gold": 782720
+          "lumber": 421330,
+          "stone": 421330,
+          "gold": 126358
         },
         "items": {},
         "time": 194400,
@@ -1829,9 +1823,9 @@
       "26": {
         "resources": {
           "food": 0,
-          "lumber": 2067290,
-          "stone": 2067290,
-          "gold": 1033190
+          "lumber": 526663,
+          "stone": 526663,
+          "gold": 157947
         },
         "items": {},
         "time": 259200,
@@ -1844,9 +1838,9 @@
       "27": {
         "resources": {
           "food": 0,
-          "lumber": 2728823,
-          "stone": 2728823,
-          "gold": 1363811
+          "lumber": 658328,
+          "stone": 658328,
+          "gold": 197434
         },
         "items": {},
         "time": 345600,
@@ -1859,9 +1853,9 @@
       "28": {
         "resources": {
           "food": 0,
-          "lumber": 3602046,
-          "stone": 3602046,
-          "gold": 1800231
+          "lumber": 822910,
+          "stone": 822910,
+          "gold": 246792
         },
         "items": {},
         "time": 432000,
@@ -1874,9 +1868,9 @@
       "29": {
         "resources": {
           "food": 0,
-          "lumber": 4754701,
-          "stone": 4754701,
-          "gold": 2376305
+          "lumber": 1028637,
+          "stone": 1028637,
+          "gold": 308490
         },
         "items": {},
         "time": 604800,
@@ -1889,13 +1883,11 @@
       "30": {
         "resources": {
           "food": 0,
-          "lumber": 6276205,
-          "stone": 6276205,
-          "gold": 3136723
+          "lumber": 1285797,
+          "stone": 1285797,
+          "gold": 385612
         },
-        "items": {
-          "119000001": 1
-        },
+        "items": {},
         "time": 864000,
         "power": 724696,
         "requirements": {
@@ -1907,9 +1899,9 @@
     "gold_mine": {
       "1": {
         "resources": {
-          "food": 2500,
-          "lumber": 2500,
-          "stone": 2500,
+          "food": 2000,
+          "lumber": 2000,
+          "stone": 2000,
           "gold": 0
         },
         "items": {},
@@ -1922,9 +1914,9 @@
       },
       "2": {
         "resources": {
-          "food": 3300,
-          "lumber": 3300,
-          "stone": 3300,
+          "food": 2640,
+          "lumber": 2640,
+          "stone": 2640,
           "gold": 0
         },
         "items": {},
@@ -1937,9 +1929,9 @@
       },
       "3": {
         "resources": {
-          "food": 4356,
-          "lumber": 4356,
-          "stone": 4356,
+          "food": 3485,
+          "lumber": 3485,
+          "stone": 3485,
           "gold": 0
         },
         "items": {},
@@ -1952,9 +1944,9 @@
       },
       "4": {
         "resources": {
-          "food": 5750,
-          "lumber": 5750,
-          "stone": 5750,
+          "food": 4600,
+          "lumber": 4600,
+          "stone": 4600,
           "gold": 0
         },
         "items": {},
@@ -1967,9 +1959,9 @@
       },
       "5": {
         "resources": {
-          "food": 7590,
-          "lumber": 7590,
-          "stone": 7590,
+          "food": 6072,
+          "lumber": 6072,
+          "stone": 6072,
           "gold": 0
         },
         "items": {},
@@ -1982,9 +1974,9 @@
       },
       "6": {
         "resources": {
-          "food": 10019,
-          "lumber": 10019,
-          "stone": 10019,
+          "food": 7590,
+          "lumber": 7590,
+          "stone": 7590,
           "gold": 0
         },
         "items": {},
@@ -1997,9 +1989,9 @@
       },
       "7": {
         "resources": {
-          "food": 13225,
-          "lumber": 13225,
-          "stone": 13225,
+          "food": 9488,
+          "lumber": 9488,
+          "stone": 9488,
           "gold": 0
         },
         "items": {},
@@ -2012,9 +2004,9 @@
       },
       "8": {
         "resources": {
-          "food": 17457,
-          "lumber": 17457,
-          "stone": 17457,
+          "food": 11860,
+          "lumber": 11860,
+          "stone": 11860,
           "gold": 0
         },
         "items": {},
@@ -2027,9 +2019,9 @@
       },
       "9": {
         "resources": {
-          "food": 23043,
-          "lumber": 23043,
-          "stone": 23043,
+          "food": 14825,
+          "lumber": 14825,
+          "stone": 14825,
           "gold": 0
         },
         "items": {},
@@ -2042,9 +2034,9 @@
       },
       "10": {
         "resources": {
-          "food": 30417,
-          "lumber": 30417,
-          "stone": 30417,
+          "food": 18531,
+          "lumber": 18531,
+          "stone": 18531,
           "gold": 0
         },
         "items": {},
@@ -2057,9 +2049,9 @@
       },
       "11": {
         "resources": {
-          "food": 40150,
-          "lumber": 40150,
-          "stone": 40150,
+          "food": 23163,
+          "lumber": 23163,
+          "stone": 23163,
           "gold": 0
         },
         "items": {},
@@ -2072,9 +2064,9 @@
       },
       "12": {
         "resources": {
-          "food": 52998,
-          "lumber": 52998,
-          "stone": 52998,
+          "food": 28954,
+          "lumber": 28954,
+          "stone": 28954,
           "gold": 0
         },
         "items": {},
@@ -2087,9 +2079,9 @@
       },
       "13": {
         "resources": {
-          "food": 69957,
-          "lumber": 69957,
-          "stone": 69957,
+          "food": 36192,
+          "lumber": 36192,
+          "stone": 36192,
           "gold": 0
         },
         "items": {},
@@ -2102,9 +2094,9 @@
       },
       "14": {
         "resources": {
-          "food": 92343,
-          "lumber": 92343,
-          "stone": 92343,
+          "food": 45240,
+          "lumber": 45240,
+          "stone": 45240,
           "gold": 0
         },
         "items": {},
@@ -2117,9 +2109,9 @@
       },
       "15": {
         "resources": {
-          "food": 121893,
-          "lumber": 121893,
-          "stone": 121893,
+          "food": 56550,
+          "lumber": 56550,
+          "stone": 56550,
           "gold": 0
         },
         "items": {},
@@ -2132,9 +2124,9 @@
       },
       "16": {
         "resources": {
-          "food": 160899,
-          "lumber": 160899,
-          "stone": 160899,
+          "food": 70688,
+          "lumber": 70688,
+          "stone": 70688,
           "gold": 0
         },
         "items": {},
@@ -2147,9 +2139,9 @@
       },
       "17": {
         "resources": {
-          "food": 212387,
-          "lumber": 212387,
-          "stone": 212387,
+          "food": 88360,
+          "lumber": 88360,
+          "stone": 88360,
           "gold": 0
         },
         "items": {},
@@ -2162,9 +2154,9 @@
       },
       "18": {
         "resources": {
-          "food": 280351,
-          "lumber": 280351,
-          "stone": 280351,
+          "food": 110450,
+          "lumber": 110450,
+          "stone": 110450,
           "gold": 0
         },
         "items": {},
@@ -2177,9 +2169,9 @@
       },
       "19": {
         "resources": {
-          "food": 370063,
-          "lumber": 370063,
-          "stone": 370063,
+          "food": 138062,
+          "lumber": 138062,
+          "stone": 138062,
           "gold": 0
         },
         "items": {},
@@ -2192,9 +2184,9 @@
       },
       "20": {
         "resources": {
-          "food": 488483,
-          "lumber": 488483,
-          "stone": 488483,
+          "food": 172577,
+          "lumber": 172577,
+          "stone": 172577,
           "gold": 0
         },
         "items": {},
@@ -2207,9 +2199,9 @@
       },
       "21": {
         "resources": {
-          "food": 644798,
-          "lumber": 644798,
-          "stone": 644798,
+          "food": 215721,
+          "lumber": 215721,
+          "stone": 215721,
           "gold": 0
         },
         "items": {},
@@ -2222,9 +2214,9 @@
       },
       "22": {
         "resources": {
-          "food": 851133,
-          "lumber": 851133,
-          "stone": 851133,
+          "food": 269651,
+          "lumber": 269651,
+          "stone": 269651,
           "gold": 0
         },
         "items": {},
@@ -2237,9 +2229,9 @@
       },
       "23": {
         "resources": {
-          "food": 1123496,
-          "lumber": 1123496,
-          "stone": 1123496,
+          "food": 337064,
+          "lumber": 337064,
+          "stone": 337064,
           "gold": 0
         },
         "items": {},
@@ -2252,9 +2244,9 @@
       },
       "24": {
         "resources": {
-          "food": 1483015,
-          "lumber": 1483015,
-          "stone": 1483015,
+          "food": 421330,
+          "lumber": 421330,
+          "stone": 421330,
           "gold": 0
         },
         "items": {},
@@ -2267,9 +2259,9 @@
       },
       "25": {
         "resources": {
-          "food": 1957580,
-          "lumber": 1957580,
-          "stone": 1957580,
+          "food": 526663,
+          "lumber": 526663,
+          "stone": 526663,
           "gold": 0
         },
         "items": {},
@@ -2282,9 +2274,9 @@
       },
       "26": {
         "resources": {
-          "food": 2584006,
-          "lumber": 2584006,
-          "stone": 2584006,
+          "food": 658328,
+          "lumber": 658328,
+          "stone": 658328,
           "gold": 0
         },
         "items": {},
@@ -2297,9 +2289,9 @@
       },
       "27": {
         "resources": {
-          "food": 3410888,
-          "lumber": 3410888,
-          "stone": 3410888,
+          "food": 822910,
+          "lumber": 822910,
+          "stone": 822910,
           "gold": 0
         },
         "items": {},
@@ -2312,9 +2304,9 @@
       },
       "28": {
         "resources": {
-          "food": 4502372,
-          "lumber": 4502372,
-          "stone": 4502372,
+          "food": 1028637,
+          "lumber": 1028637,
+          "stone": 1028637,
           "gold": 0
         },
         "items": {},
@@ -2327,9 +2319,9 @@
       },
       "29": {
         "resources": {
-          "food": 5943131,
-          "lumber": 5943131,
-          "stone": 5943131,
+          "food": 1285797,
+          "lumber": 1285797,
+          "stone": 1285797,
           "gold": 0
         },
         "items": {},
@@ -2342,14 +2334,12 @@
       },
       "30": {
         "resources": {
-          "food": 7844933,
-          "lumber": 7844933,
-          "stone": 7844933,
+          "food": 1607246,
+          "lumber": 1607246,
+          "stone": 1607246,
           "gold": 0
         },
-        "items": {
-          "119000001": 1
-        },
+        "items": {},
         "time": 864000,
         "power": 887633,
         "requirements": {
@@ -2361,10 +2351,10 @@
     "hall_of_alliance": {
       "1": {
         "resources": {
-          "food": 5000,
-          "lumber": 5000,
-          "stone": 5000,
-          "gold": 3000
+          "food": 4000,
+          "lumber": 4000,
+          "stone": 4000,
+          "gold": 1440
         },
         "items": {},
         "time": 1,
@@ -2377,10 +2367,10 @@
       },
       "2": {
         "resources": {
-          "food": 6800,
-          "lumber": 6800,
-          "stone": 6800,
-          "gold": 4080
+          "food": 5440,
+          "lumber": 5440,
+          "stone": 5440,
+          "gold": 1959
         },
         "items": {},
         "time": 3,
@@ -2393,10 +2383,10 @@
       },
       "3": {
         "resources": {
-          "food": 9248,
-          "lumber": 9248,
-          "stone": 9248,
-          "gold": 5549
+          "food": 7399,
+          "lumber": 7399,
+          "stone": 7399,
+          "gold": 2664
         },
         "items": {},
         "time": 60,
@@ -2409,10 +2399,10 @@
       },
       "4": {
         "resources": {
-          "food": 12577,
-          "lumber": 12577,
-          "stone": 12577,
-          "gold": 7547
+          "food": 10062,
+          "lumber": 10062,
+          "stone": 10062,
+          "gold": 3623
         },
         "items": {
           "119000002": 10
@@ -2427,10 +2417,10 @@
       },
       "5": {
         "resources": {
-          "food": 17105,
-          "lumber": 17105,
-          "stone": 17105,
-          "gold": 10264
+          "food": 13684,
+          "lumber": 13684,
+          "stone": 13684,
+          "gold": 4927
         },
         "items": {
           "119000002": 20
@@ -2445,10 +2435,10 @@
       },
       "6": {
         "resources": {
-          "food": 23263,
-          "lumber": 23263,
-          "stone": 23263,
-          "gold": 13959
+          "food": 17105,
+          "lumber": 17105,
+          "stone": 17105,
+          "gold": 6159
         },
         "items": {
           "119000002": 30
@@ -2463,10 +2453,10 @@
       },
       "7": {
         "resources": {
-          "food": 31638,
-          "lumber": 31638,
-          "stone": 31638,
-          "gold": 18984
+          "food": 21382,
+          "lumber": 21382,
+          "stone": 21382,
+          "gold": 7698
         },
         "items": {
           "119000002": 40
@@ -2481,10 +2471,10 @@
       },
       "8": {
         "resources": {
-          "food": 43028,
-          "lumber": 43028,
-          "stone": 43028,
-          "gold": 25818
+          "food": 26727,
+          "lumber": 26727,
+          "stone": 26727,
+          "gold": 9623
         },
         "items": {
           "119000002": 50
@@ -2499,10 +2489,10 @@
       },
       "9": {
         "resources": {
-          "food": 58518,
-          "lumber": 58518,
-          "stone": 58518,
-          "gold": 35112
+          "food": 33409,
+          "lumber": 33409,
+          "stone": 33409,
+          "gold": 12029
         },
         "items": {
           "119000002": 70
@@ -2517,10 +2507,10 @@
       },
       "10": {
         "resources": {
-          "food": 79584,
-          "lumber": 79584,
-          "stone": 79584,
-          "gold": 47752
+          "food": 41761,
+          "lumber": 41761,
+          "stone": 41761,
+          "gold": 15036
         },
         "items": {
           "119000002": 90
@@ -2535,10 +2525,10 @@
       },
       "11": {
         "resources": {
-          "food": 108234,
-          "lumber": 108234,
-          "stone": 108234,
-          "gold": 64943
+          "food": 52201,
+          "lumber": 52201,
+          "stone": 52201,
+          "gold": 18794
         },
         "items": {
           "119000002": 110
@@ -2553,10 +2543,10 @@
       },
       "12": {
         "resources": {
-          "food": 147198,
-          "lumber": 147198,
-          "stone": 147198,
-          "gold": 88322
+          "food": 65251,
+          "lumber": 65251,
+          "stone": 65251,
+          "gold": 23493
         },
         "items": {
           "119000002": 130
@@ -2571,10 +2561,10 @@
       },
       "13": {
         "resources": {
-          "food": 200189,
-          "lumber": 200189,
-          "stone": 200189,
-          "gold": 120118
+          "food": 81563,
+          "lumber": 81563,
+          "stone": 81563,
+          "gold": 29366
         },
         "items": {
           "119000002": 150
@@ -2589,10 +2579,10 @@
       },
       "14": {
         "resources": {
-          "food": 272257,
-          "lumber": 272257,
-          "stone": 272257,
-          "gold": 163360
+          "food": 101954,
+          "lumber": 101954,
+          "stone": 101954,
+          "gold": 36707
         },
         "items": {
           "119000002": 200
@@ -2607,10 +2597,10 @@
       },
       "15": {
         "resources": {
-          "food": 370270,
-          "lumber": 370270,
-          "stone": 370270,
-          "gold": 222170
+          "food": 127443,
+          "lumber": 127443,
+          "stone": 127443,
+          "gold": 45884
         },
         "items": {
           "119000002": 250
@@ -2625,10 +2615,10 @@
       },
       "16": {
         "resources": {
-          "food": 503567,
-          "lumber": 503567,
-          "stone": 503567,
-          "gold": 302151
+          "food": 159303,
+          "lumber": 159303,
+          "stone": 159303,
+          "gold": 57355
         },
         "items": {
           "119000002": 300
@@ -2643,10 +2633,10 @@
       },
       "17": {
         "resources": {
-          "food": 684851,
-          "lumber": 684851,
-          "stone": 684851,
-          "gold": 410925
+          "food": 199129,
+          "lumber": 199129,
+          "stone": 199129,
+          "gold": 71694
         },
         "items": {
           "119000002": 350
@@ -2661,10 +2651,10 @@
       },
       "18": {
         "resources": {
-          "food": 931397,
-          "lumber": 931397,
-          "stone": 931397,
-          "gold": 558858
+          "food": 248911,
+          "lumber": 248911,
+          "stone": 248911,
+          "gold": 89617
         },
         "items": {
           "119000002": 400
@@ -2679,10 +2669,10 @@
       },
       "19": {
         "resources": {
-          "food": 1266700,
-          "lumber": 1266700,
-          "stone": 1266700,
-          "gold": 760047
+          "food": 311139,
+          "lumber": 311139,
+          "stone": 311139,
+          "gold": 112021
         },
         "items": {
           "119000002": 450
@@ -2697,10 +2687,10 @@
       },
       "20": {
         "resources": {
-          "food": 1722712,
-          "lumber": 1722712,
-          "stone": 1722712,
-          "gold": 1033664
+          "food": 388923,
+          "lumber": 388923,
+          "stone": 388923,
+          "gold": 140026
         },
         "items": {
           "119000002": 500
@@ -2715,10 +2705,10 @@
       },
       "21": {
         "resources": {
-          "food": 2342888,
-          "lumber": 2342888,
-          "stone": 2342888,
-          "gold": 1405783
+          "food": 486154,
+          "lumber": 486154,
+          "stone": 486154,
+          "gold": 175033
         },
         "items": {
           "119000002": 600
@@ -2733,10 +2723,10 @@
       },
       "22": {
         "resources": {
-          "food": 3186328,
-          "lumber": 3186328,
-          "stone": 3186328,
-          "gold": 1911865
+          "food": 607692,
+          "lumber": 607692,
+          "stone": 607692,
+          "gold": 218791
         },
         "items": {
           "119000002": 700
@@ -2751,10 +2741,10 @@
       },
       "23": {
         "resources": {
-          "food": 4333406,
-          "lumber": 4333406,
-          "stone": 4333406,
-          "gold": 2600136
+          "food": 759615,
+          "lumber": 759615,
+          "stone": 759615,
+          "gold": 273488
         },
         "items": {
           "119000002": 800
@@ -2769,10 +2759,10 @@
       },
       "24": {
         "resources": {
-          "food": 5893432,
-          "lumber": 5893432,
-          "stone": 5893432,
-          "gold": 3536185
+          "food": 949519,
+          "lumber": 949519,
+          "stone": 949519,
+          "gold": 341860
         },
         "items": {
           "119000002": 900
@@ -2787,10 +2777,10 @@
       },
       "25": {
         "resources": {
-          "food": 8015068,
-          "lumber": 8015068,
-          "stone": 8015068,
-          "gold": 4809212
+          "food": 1186898,
+          "lumber": 1186898,
+          "stone": 1186898,
+          "gold": 427325
         },
         "items": {
           "119000002": 1000
@@ -2805,10 +2795,10 @@
       },
       "26": {
         "resources": {
-          "food": 10900492,
-          "lumber": 10900492,
-          "stone": 10900492,
-          "gold": 6540528
+          "food": 1483623,
+          "lumber": 1483623,
+          "stone": 1483623,
+          "gold": 534157
         },
         "items": {
           "119000002": 1500
@@ -2823,10 +2813,10 @@
       },
       "27": {
         "resources": {
-          "food": 14824669,
-          "lumber": 14824669,
-          "stone": 14824669,
-          "gold": 8895118
+          "food": 1854528,
+          "lumber": 1854528,
+          "stone": 1854528,
+          "gold": 667696
         },
         "items": {
           "119000002": 2000
@@ -2841,10 +2831,10 @@
       },
       "28": {
         "resources": {
-          "food": 20161550,
-          "lumber": 20161550,
-          "stone": 20161550,
-          "gold": 12097360
+          "food": 2318160,
+          "lumber": 2318160,
+          "stone": 2318160,
+          "gold": 834619
         },
         "items": {
           "119000002": 2500
@@ -2859,10 +2849,10 @@
       },
       "29": {
         "resources": {
-          "food": 27419708,
-          "lumber": 27419708,
-          "stone": 27419708,
-          "gold": 16452410
+          "food": 2897700,
+          "lumber": 2897700,
+          "stone": 2897700,
+          "gold": 1043274
         },
         "items": {
           "119000002": 3000
@@ -2877,14 +2867,13 @@
       },
       "30": {
         "resources": {
-          "food": 37290803,
-          "lumber": 37290803,
-          "stone": 37290803,
-          "gold": 22375278
+          "food": 3622125,
+          "lumber": 3622125,
+          "stone": 3622125,
+          "gold": 1304092
         },
         "items": {
-          "119000002": 5000,
-          "119000001": 1
+          "119000002": 5000
         },
         "time": 2246400,
         "power": 1964229,
@@ -2898,10 +2887,10 @@
     "hospital": {
       "1": {
         "resources": {
-          "food": 5000,
-          "lumber": 3500,
-          "stone": 3500,
-          "gold": 2000
+          "food": 4000,
+          "lumber": 2800,
+          "stone": 2800,
+          "gold": 960
         },
         "items": {},
         "time": 1,
@@ -2914,10 +2903,10 @@
       },
       "2": {
         "resources": {
-          "food": 6850,
-          "lumber": 4795,
-          "stone": 4795,
-          "gold": 2740
+          "food": 5480,
+          "lumber": 3836,
+          "stone": 3836,
+          "gold": 1316
         },
         "items": {},
         "time": 3,
@@ -2930,10 +2919,10 @@
       },
       "3": {
         "resources": {
-          "food": 9385,
-          "lumber": 6569,
-          "stone": 6569,
-          "gold": 3754
+          "food": 7508,
+          "lumber": 5256,
+          "stone": 5256,
+          "gold": 1802
         },
         "items": {},
         "time": 60,
@@ -2946,10 +2935,10 @@
       },
       "4": {
         "resources": {
-          "food": 12857,
-          "lumber": 9000,
-          "stone": 9000,
-          "gold": 5143
+          "food": 10286,
+          "lumber": 7200,
+          "stone": 7200,
+          "gold": 2469
         },
         "items": {},
         "time": 240,
@@ -2962,10 +2951,10 @@
       },
       "5": {
         "resources": {
-          "food": 17614,
-          "lumber": 12330,
-          "stone": 12330,
-          "gold": 7046
+          "food": 14092,
+          "lumber": 9864,
+          "stone": 9864,
+          "gold": 3383
         },
         "items": {},
         "time": 800,
@@ -2978,10 +2967,10 @@
       },
       "6": {
         "resources": {
-          "food": 24131,
-          "lumber": 16892,
-          "stone": 16892,
-          "gold": 9653
+          "food": 17614,
+          "lumber": 12330,
+          "stone": 12330,
+          "gold": 4228
         },
         "items": {},
         "time": 1920,
@@ -2994,10 +2983,10 @@
       },
       "7": {
         "resources": {
-          "food": 33059,
-          "lumber": 23142,
-          "stone": 23142,
-          "gold": 13225
+          "food": 22018,
+          "lumber": 15413,
+          "stone": 15413,
+          "gold": 5285
         },
         "items": {},
         "time": 2880,
@@ -3010,10 +2999,10 @@
       },
       "8": {
         "resources": {
-          "food": 45291,
-          "lumber": 31705,
-          "stone": 31705,
-          "gold": 18118
+          "food": 27522,
+          "lumber": 19266,
+          "stone": 19266,
+          "gold": 6606
         },
         "items": {},
         "time": 4320,
@@ -3026,10 +3015,10 @@
       },
       "9": {
         "resources": {
-          "food": 62049,
-          "lumber": 43436,
-          "stone": 43436,
-          "gold": 24822
+          "food": 34403,
+          "lumber": 24083,
+          "stone": 24083,
+          "gold": 8258
         },
         "items": {},
         "time": 6480,
@@ -3042,10 +3031,10 @@
       },
       "10": {
         "resources": {
-          "food": 85007,
-          "lumber": 59507,
-          "stone": 59507,
-          "gold": 34006
+          "food": 43003,
+          "lumber": 30103,
+          "stone": 30103,
+          "gold": 10322
         },
         "items": {},
         "time": 9720,
@@ -3058,10 +3047,10 @@
       },
       "11": {
         "resources": {
-          "food": 116460,
-          "lumber": 81525,
-          "stone": 81525,
-          "gold": 46588
+          "food": 53754,
+          "lumber": 37629,
+          "stone": 37629,
+          "gold": 12902
         },
         "items": {},
         "time": 14580,
@@ -3074,10 +3063,10 @@
       },
       "12": {
         "resources": {
-          "food": 159550,
-          "lumber": 111689,
-          "stone": 111689,
-          "gold": 63826
+          "food": 67193,
+          "lumber": 47036,
+          "stone": 47036,
+          "gold": 16128
         },
         "items": {},
         "time": 21870,
@@ -3090,10 +3079,10 @@
       },
       "13": {
         "resources": {
-          "food": 218584,
-          "lumber": 153014,
-          "stone": 153014,
-          "gold": 87442
+          "food": 83991,
+          "lumber": 58795,
+          "stone": 58795,
+          "gold": 20159
         },
         "items": {},
         "time": 32805,
@@ -3106,10 +3095,10 @@
       },
       "14": {
         "resources": {
-          "food": 299460,
-          "lumber": 209629,
-          "stone": 209629,
-          "gold": 119796
+          "food": 104988,
+          "lumber": 73493,
+          "stone": 73493,
+          "gold": 25199
         },
         "items": {},
         "time": 49208,
@@ -3122,10 +3111,10 @@
       },
       "15": {
         "resources": {
-          "food": 410260,
-          "lumber": 287192,
-          "stone": 287192,
-          "gold": 164121
+          "food": 131235,
+          "lumber": 91866,
+          "stone": 91866,
+          "gold": 31499
         },
         "items": {},
         "time": 73812,
@@ -3138,10 +3127,10 @@
       },
       "16": {
         "resources": {
-          "food": 562056,
-          "lumber": 393453,
-          "stone": 393453,
-          "gold": 224846
+          "food": 164044,
+          "lumber": 114833,
+          "stone": 114833,
+          "gold": 39373
         },
         "items": {},
         "time": 88574,
@@ -3154,10 +3143,10 @@
       },
       "17": {
         "resources": {
-          "food": 770017,
-          "lumber": 539031,
-          "stone": 539031,
-          "gold": 308039
+          "food": 205054,
+          "lumber": 143541,
+          "stone": 143541,
+          "gold": 49216
         },
         "items": {},
         "time": 106289,
@@ -3170,10 +3159,10 @@
       },
       "18": {
         "resources": {
-          "food": 1054923,
-          "lumber": 738472,
-          "stone": 738472,
-          "gold": 422013
+          "food": 256318,
+          "lumber": 179426,
+          "stone": 179426,
+          "gold": 61520
         },
         "items": {},
         "time": 127547,
@@ -3186,10 +3175,10 @@
       },
       "19": {
         "resources": {
-          "food": 1445245,
-          "lumber": 1011707,
-          "stone": 1011707,
-          "gold": 578158
+          "food": 320397,
+          "lumber": 224282,
+          "stone": 224282,
+          "gold": 76900
         },
         "items": {},
         "time": 153056,
@@ -3202,10 +3191,10 @@
       },
       "20": {
         "resources": {
-          "food": 1979986,
-          "lumber": 1386039,
-          "stone": 1386039,
-          "gold": 792076
+          "food": 400496,
+          "lumber": 280352,
+          "stone": 280352,
+          "gold": 96125
         },
         "items": {},
         "time": 183667,
@@ -3218,10 +3207,10 @@
       },
       "21": {
         "resources": {
-          "food": 2712581,
-          "lumber": 1898873,
-          "stone": 1898873,
-          "gold": 1085144
+          "food": 500620,
+          "lumber": 350440,
+          "stone": 350440,
+          "gold": 120156
         },
         "items": {},
         "time": 345600,
@@ -3234,10 +3223,10 @@
       },
       "22": {
         "resources": {
-          "food": 3716236,
-          "lumber": 2601456,
-          "stone": 2601456,
-          "gold": 1486647
+          "food": 625775,
+          "lumber": 438050,
+          "stone": 438050,
+          "gold": 150195
         },
         "items": {},
         "time": 432000,
@@ -3250,10 +3239,10 @@
       },
       "23": {
         "resources": {
-          "food": 5091243,
-          "lumber": 3563995,
-          "stone": 3563995,
-          "gold": 2036706
+          "food": 782219,
+          "lumber": 547562,
+          "stone": 547562,
+          "gold": 187744
         },
         "items": {},
         "time": 518400,
@@ -3266,10 +3255,10 @@
       },
       "24": {
         "resources": {
-          "food": 6975003,
-          "lumber": 4882673,
-          "stone": 4882673,
-          "gold": 2790287
+          "food": 977774,
+          "lumber": 684453,
+          "stone": 684453,
+          "gold": 234679
         },
         "items": {},
         "time": 691200,
@@ -3282,10 +3271,10 @@
       },
       "25": {
         "resources": {
-          "food": 9555754,
-          "lumber": 6689262,
-          "stone": 6689262,
-          "gold": 3822693
+          "food": 1222217,
+          "lumber": 855566,
+          "stone": 855566,
+          "gold": 293349
         },
         "items": {},
         "time": 864000,
@@ -3298,10 +3287,10 @@
       },
       "26": {
         "resources": {
-          "food": 13091383,
-          "lumber": 9164289,
-          "stone": 9164289,
-          "gold": 5237089
+          "food": 1527771,
+          "lumber": 1069458,
+          "stone": 1069458,
+          "gold": 366686
         },
         "items": {},
         "time": 1036800,
@@ -3314,10 +3303,10 @@
       },
       "27": {
         "resources": {
-          "food": 17935195,
-          "lumber": 12555076,
-          "stone": 12555076,
-          "gold": 7174812
+          "food": 1909714,
+          "lumber": 1336822,
+          "stone": 1336822,
+          "gold": 458358
         },
         "items": {},
         "time": 1296000,
@@ -3330,10 +3319,10 @@
       },
       "28": {
         "resources": {
-          "food": 24571217,
-          "lumber": 17200454,
-          "stone": 17200454,
-          "gold": 9829492
+          "food": 2387143,
+          "lumber": 1671027,
+          "stone": 1671027,
+          "gold": 572947
         },
         "items": {},
         "time": 1555200,
@@ -3346,10 +3335,10 @@
       },
       "29": {
         "resources": {
-          "food": 33662567,
-          "lumber": 23564622,
-          "stone": 23564622,
-          "gold": 13466404
+          "food": 2983928,
+          "lumber": 2088784,
+          "stone": 2088784,
+          "gold": 716184
         },
         "items": {},
         "time": 1900800,
@@ -3362,14 +3351,12 @@
       },
       "30": {
         "resources": {
-          "food": 46117717,
-          "lumber": 32283532,
-          "stone": 32283532,
-          "gold": 18448973
+          "food": 3729910,
+          "lumber": 2610980,
+          "stone": 2610980,
+          "gold": 895230
         },
-        "items": {
-          "119000001": 1
-        },
+        "items": {},
         "time": 2246400,
         "power": 1892288,
         "requirements": {
@@ -3382,10 +3369,10 @@
     "lumber_camp": {
       "1": {
         "resources": {
-          "food": 2000,
+          "food": 1600,
           "lumber": 0,
-          "stone": 2000,
-          "gold": 1000
+          "stone": 1600,
+          "gold": 480
         },
         "items": {},
         "time": 1,
@@ -3397,10 +3384,10 @@
       },
       "2": {
         "resources": {
-          "food": 2640,
+          "food": 2112,
           "lumber": 0,
-          "stone": 2640,
-          "gold": 1320
+          "stone": 2112,
+          "gold": 634
         },
         "items": {},
         "time": 3,
@@ -3412,10 +3399,10 @@
       },
       "3": {
         "resources": {
-          "food": 3485,
+          "food": 2788,
           "lumber": 0,
-          "stone": 3485,
-          "gold": 1742
+          "stone": 2788,
+          "gold": 837
         },
         "items": {},
         "time": 60,
@@ -3427,10 +3414,10 @@
       },
       "4": {
         "resources": {
-          "food": 4600,
+          "food": 3680,
           "lumber": 0,
-          "stone": 4600,
-          "gold": 2299
+          "stone": 3680,
+          "gold": 1104
         },
         "items": {},
         "time": 180,
@@ -3442,10 +3429,10 @@
       },
       "5": {
         "resources": {
-          "food": 6072,
+          "food": 4858,
           "lumber": 0,
-          "stone": 6072,
-          "gold": 3035
+          "stone": 4858,
+          "gold": 1457
         },
         "items": {},
         "time": 305,
@@ -3457,10 +3444,10 @@
       },
       "6": {
         "resources": {
-          "food": 8015,
+          "food": 6072,
           "lumber": 0,
-          "stone": 8015,
-          "gold": 4006
+          "stone": 6072,
+          "gold": 1821
         },
         "items": {},
         "time": 458,
@@ -3472,10 +3459,10 @@
       },
       "7": {
         "resources": {
-          "food": 10580,
+          "food": 7590,
           "lumber": 0,
-          "stone": 10580,
-          "gold": 5288
+          "stone": 7590,
+          "gold": 2277
         },
         "items": {},
         "time": 687,
@@ -3487,10 +3474,10 @@
       },
       "8": {
         "resources": {
-          "food": 13966,
+          "food": 9488,
           "lumber": 0,
-          "stone": 13966,
-          "gold": 6980
+          "stone": 9488,
+          "gold": 2846
         },
         "items": {},
         "time": 1031,
@@ -3502,10 +3489,10 @@
       },
       "9": {
         "resources": {
-          "food": 18435,
+          "food": 11860,
           "lumber": 0,
-          "stone": 18435,
-          "gold": 9214
+          "stone": 11860,
+          "gold": 3557
         },
         "items": {},
         "time": 1547,
@@ -3517,10 +3504,10 @@
       },
       "10": {
         "resources": {
-          "food": 24334,
+          "food": 14825,
           "lumber": 0,
-          "stone": 24334,
-          "gold": 12162
+          "stone": 14825,
+          "gold": 4446
         },
         "items": {},
         "time": 2321,
@@ -3532,10 +3519,10 @@
       },
       "11": {
         "resources": {
-          "food": 32121,
+          "food": 18531,
           "lumber": 0,
-          "stone": 32121,
-          "gold": 16054
+          "stone": 18531,
+          "gold": 5558
         },
         "items": {},
         "time": 3482,
@@ -3547,10 +3534,10 @@
       },
       "12": {
         "resources": {
-          "food": 42400,
+          "food": 23163,
           "lumber": 0,
-          "stone": 42400,
-          "gold": 21191
+          "stone": 23163,
+          "gold": 6947
         },
         "items": {},
         "time": 5223,
@@ -3562,10 +3549,10 @@
       },
       "13": {
         "resources": {
-          "food": 55968,
+          "food": 28954,
           "lumber": 0,
-          "stone": 55968,
-          "gold": 27972
+          "stone": 28954,
+          "gold": 8684
         },
         "items": {},
         "time": 7835,
@@ -3577,10 +3564,10 @@
       },
       "14": {
         "resources": {
-          "food": 73878,
+          "food": 36192,
           "lumber": 0,
-          "stone": 73878,
-          "gold": 36923
+          "stone": 36192,
+          "gold": 10855
         },
         "items": {},
         "time": 11753,
@@ -3592,10 +3579,10 @@
       },
       "15": {
         "resources": {
-          "food": 97519,
+          "food": 45240,
           "lumber": 0,
-          "stone": 97519,
-          "gold": 48738
+          "stone": 45240,
+          "gold": 13568
         },
         "items": {},
         "time": 17630,
@@ -3607,10 +3594,10 @@
       },
       "16": {
         "resources": {
-          "food": 128725,
+          "food": 56550,
           "lumber": 0,
-          "stone": 128725,
-          "gold": 64334
+          "stone": 56550,
+          "gold": 16960
         },
         "items": {},
         "time": 21156,
@@ -3622,10 +3609,10 @@
       },
       "17": {
         "resources": {
-          "food": 169917,
+          "food": 70688,
           "lumber": 0,
-          "stone": 169917,
-          "gold": 84921
+          "stone": 70688,
+          "gold": 21200
         },
         "items": {},
         "time": 25387,
@@ -3637,10 +3624,10 @@
       },
       "18": {
         "resources": {
-          "food": 224290,
+          "food": 88360,
           "lumber": 0,
-          "stone": 224290,
-          "gold": 112096
+          "stone": 88360,
+          "gold": 26500
         },
         "items": {},
         "time": 30464,
@@ -3652,10 +3639,10 @@
       },
       "19": {
         "resources": {
-          "food": 296063,
+          "food": 110450,
           "lumber": 0,
-          "stone": 296063,
-          "gold": 147967
+          "stone": 110450,
+          "gold": 33124
         },
         "items": {},
         "time": 36557,
@@ -3667,10 +3654,10 @@
       },
       "20": {
         "resources": {
-          "food": 390803,
+          "food": 138062,
           "lumber": 0,
-          "stone": 390803,
-          "gold": 195316
+          "stone": 138062,
+          "gold": 41405
         },
         "items": {},
         "time": 43868,
@@ -3682,10 +3669,10 @@
       },
       "21": {
         "resources": {
-          "food": 515860,
+          "food": 172577,
           "lumber": 0,
-          "stone": 515860,
-          "gold": 257817
+          "stone": 172577,
+          "gold": 51756
         },
         "items": {},
         "time": 57600,
@@ -3697,10 +3684,10 @@
       },
       "22": {
         "resources": {
-          "food": 680935,
+          "food": 215721,
           "lumber": 0,
-          "stone": 680935,
-          "gold": 340318
+          "stone": 215721,
+          "gold": 64695
         },
         "items": {},
         "time": 79200,
@@ -3712,10 +3699,10 @@
       },
       "23": {
         "resources": {
-          "food": 898834,
+          "food": 269651,
           "lumber": 0,
-          "stone": 898834,
-          "gold": 449220
+          "stone": 269651,
+          "gold": 80869
         },
         "items": {},
         "time": 108000,
@@ -3727,10 +3714,10 @@
       },
       "24": {
         "resources": {
-          "food": 1186461,
+          "food": 337064,
           "lumber": 0,
-          "stone": 1186461,
-          "gold": 592970
+          "stone": 337064,
+          "gold": 101086
         },
         "items": {},
         "time": 151200,
@@ -3742,10 +3729,10 @@
       },
       "25": {
         "resources": {
-          "food": 1566129,
+          "food": 421330,
           "lumber": 0,
-          "stone": 1566129,
-          "gold": 782720
+          "stone": 421330,
+          "gold": 126358
         },
         "items": {},
         "time": 194400,
@@ -3757,10 +3744,10 @@
       },
       "26": {
         "resources": {
-          "food": 2067290,
+          "food": 526663,
           "lumber": 0,
-          "stone": 2067290,
-          "gold": 1033190
+          "stone": 526663,
+          "gold": 157947
         },
         "items": {},
         "time": 259200,
@@ -3772,10 +3759,10 @@
       },
       "27": {
         "resources": {
-          "food": 2728823,
+          "food": 658328,
           "lumber": 0,
-          "stone": 2728823,
-          "gold": 1363811
+          "stone": 658328,
+          "gold": 197434
         },
         "items": {},
         "time": 345600,
@@ -3787,10 +3774,10 @@
       },
       "28": {
         "resources": {
-          "food": 3602046,
+          "food": 822910,
           "lumber": 0,
-          "stone": 3602046,
-          "gold": 1800231
+          "stone": 822910,
+          "gold": 246792
         },
         "items": {},
         "time": 432000,
@@ -3802,10 +3789,10 @@
       },
       "29": {
         "resources": {
-          "food": 4754701,
+          "food": 1028637,
           "lumber": 0,
-          "stone": 4754701,
-          "gold": 2376305
+          "stone": 1028637,
+          "gold": 308490
         },
         "items": {},
         "time": 604800,
@@ -3817,14 +3804,12 @@
       },
       "30": {
         "resources": {
-          "food": 6276205,
+          "food": 1285797,
           "lumber": 0,
-          "stone": 6276205,
-          "gold": 3136723
+          "stone": 1285797,
+          "gold": 385612
         },
-        "items": {
-          "119000001": 1
-        },
+        "items": {},
         "time": 864000,
         "power": 724696,
         "requirements": {
@@ -3836,10 +3821,10 @@
     "quarry": {
       "1": {
         "resources": {
-          "food": 2000,
-          "lumber": 2000,
+          "food": 1600,
+          "lumber": 1600,
           "stone": 0,
-          "gold": 1000
+          "gold": 480
         },
         "items": {},
         "time": 1,
@@ -3851,10 +3836,10 @@
       },
       "2": {
         "resources": {
-          "food": 2640,
-          "lumber": 2640,
+          "food": 2112,
+          "lumber": 2112,
           "stone": 0,
-          "gold": 1320
+          "gold": 634
         },
         "items": {},
         "time": 3,
@@ -3866,10 +3851,10 @@
       },
       "3": {
         "resources": {
-          "food": 3485,
-          "lumber": 3485,
+          "food": 2788,
+          "lumber": 2788,
           "stone": 0,
-          "gold": 1742
+          "gold": 837
         },
         "items": {},
         "time": 60,
@@ -3881,10 +3866,10 @@
       },
       "4": {
         "resources": {
-          "food": 4600,
-          "lumber": 4600,
+          "food": 3680,
+          "lumber": 3680,
           "stone": 0,
-          "gold": 2299
+          "gold": 1104
         },
         "items": {},
         "time": 180,
@@ -3896,10 +3881,10 @@
       },
       "5": {
         "resources": {
-          "food": 6072,
-          "lumber": 6072,
+          "food": 4858,
+          "lumber": 4858,
           "stone": 0,
-          "gold": 3035
+          "gold": 1457
         },
         "items": {},
         "time": 305,
@@ -3911,10 +3896,10 @@
       },
       "6": {
         "resources": {
-          "food": 8015,
-          "lumber": 8015,
+          "food": 6072,
+          "lumber": 6072,
           "stone": 0,
-          "gold": 4006
+          "gold": 1821
         },
         "items": {},
         "time": 458,
@@ -3926,10 +3911,10 @@
       },
       "7": {
         "resources": {
-          "food": 10580,
-          "lumber": 10580,
+          "food": 7590,
+          "lumber": 7590,
           "stone": 0,
-          "gold": 5288
+          "gold": 2277
         },
         "items": {},
         "time": 687,
@@ -3941,10 +3926,10 @@
       },
       "8": {
         "resources": {
-          "food": 13966,
-          "lumber": 13966,
+          "food": 9488,
+          "lumber": 9488,
           "stone": 0,
-          "gold": 6980
+          "gold": 2846
         },
         "items": {},
         "time": 1031,
@@ -3956,10 +3941,10 @@
       },
       "9": {
         "resources": {
-          "food": 18435,
-          "lumber": 18435,
+          "food": 11860,
+          "lumber": 11860,
           "stone": 0,
-          "gold": 9214
+          "gold": 3557
         },
         "items": {},
         "time": 1547,
@@ -3971,10 +3956,10 @@
       },
       "10": {
         "resources": {
-          "food": 24334,
-          "lumber": 24334,
+          "food": 14825,
+          "lumber": 14825,
           "stone": 0,
-          "gold": 12162
+          "gold": 4446
         },
         "items": {},
         "time": 2321,
@@ -3986,10 +3971,10 @@
       },
       "11": {
         "resources": {
-          "food": 32121,
-          "lumber": 32121,
+          "food": 18531,
+          "lumber": 18531,
           "stone": 0,
-          "gold": 16054
+          "gold": 5558
         },
         "items": {},
         "time": 3482,
@@ -4001,10 +3986,10 @@
       },
       "12": {
         "resources": {
-          "food": 42400,
-          "lumber": 42400,
+          "food": 23163,
+          "lumber": 23163,
           "stone": 0,
-          "gold": 21191
+          "gold": 6947
         },
         "items": {},
         "time": 5223,
@@ -4016,10 +4001,10 @@
       },
       "13": {
         "resources": {
-          "food": 55968,
-          "lumber": 55968,
+          "food": 28954,
+          "lumber": 28954,
           "stone": 0,
-          "gold": 27972
+          "gold": 8684
         },
         "items": {},
         "time": 7835,
@@ -4031,10 +4016,10 @@
       },
       "14": {
         "resources": {
-          "food": 73878,
-          "lumber": 73878,
+          "food": 36192,
+          "lumber": 36192,
           "stone": 0,
-          "gold": 36923
+          "gold": 10855
         },
         "items": {},
         "time": 11753,
@@ -4046,10 +4031,10 @@
       },
       "15": {
         "resources": {
-          "food": 97519,
-          "lumber": 97519,
+          "food": 45240,
+          "lumber": 45240,
           "stone": 0,
-          "gold": 48738
+          "gold": 13568
         },
         "items": {},
         "time": 17630,
@@ -4061,10 +4046,10 @@
       },
       "16": {
         "resources": {
-          "food": 128725,
-          "lumber": 128725,
+          "food": 56550,
+          "lumber": 56550,
           "stone": 0,
-          "gold": 64334
+          "gold": 16960
         },
         "items": {},
         "time": 21156,
@@ -4076,10 +4061,10 @@
       },
       "17": {
         "resources": {
-          "food": 169917,
-          "lumber": 169917,
+          "food": 70688,
+          "lumber": 70688,
           "stone": 0,
-          "gold": 84921
+          "gold": 21200
         },
         "items": {},
         "time": 25387,
@@ -4091,10 +4076,10 @@
       },
       "18": {
         "resources": {
-          "food": 224290,
-          "lumber": 224290,
+          "food": 88360,
+          "lumber": 88360,
           "stone": 0,
-          "gold": 112096
+          "gold": 26500
         },
         "items": {},
         "time": 30464,
@@ -4106,10 +4091,10 @@
       },
       "19": {
         "resources": {
-          "food": 296063,
-          "lumber": 296063,
+          "food": 110450,
+          "lumber": 110450,
           "stone": 0,
-          "gold": 147967
+          "gold": 33124
         },
         "items": {},
         "time": 36557,
@@ -4121,10 +4106,10 @@
       },
       "20": {
         "resources": {
-          "food": 390803,
-          "lumber": 390803,
+          "food": 138062,
+          "lumber": 138062,
           "stone": 0,
-          "gold": 195316
+          "gold": 41405
         },
         "items": {},
         "time": 43868,
@@ -4136,10 +4121,10 @@
       },
       "21": {
         "resources": {
-          "food": 515860,
-          "lumber": 515860,
+          "food": 172577,
+          "lumber": 172577,
           "stone": 0,
-          "gold": 257817
+          "gold": 51756
         },
         "items": {},
         "time": 57600,
@@ -4151,10 +4136,10 @@
       },
       "22": {
         "resources": {
-          "food": 680935,
-          "lumber": 680935,
+          "food": 215721,
+          "lumber": 215721,
           "stone": 0,
-          "gold": 340318
+          "gold": 64695
         },
         "items": {},
         "time": 79200,
@@ -4166,10 +4151,10 @@
       },
       "23": {
         "resources": {
-          "food": 898834,
-          "lumber": 898834,
+          "food": 269651,
+          "lumber": 269651,
           "stone": 0,
-          "gold": 449220
+          "gold": 80869
         },
         "items": {},
         "time": 108000,
@@ -4181,10 +4166,10 @@
       },
       "24": {
         "resources": {
-          "food": 1186461,
-          "lumber": 1186461,
+          "food": 337064,
+          "lumber": 337064,
           "stone": 0,
-          "gold": 592970
+          "gold": 101086
         },
         "items": {},
         "time": 151200,
@@ -4196,10 +4181,10 @@
       },
       "25": {
         "resources": {
-          "food": 1566129,
-          "lumber": 1566129,
+          "food": 421330,
+          "lumber": 421330,
           "stone": 0,
-          "gold": 782720
+          "gold": 126358
         },
         "items": {},
         "time": 194400,
@@ -4211,10 +4196,10 @@
       },
       "26": {
         "resources": {
-          "food": 2067290,
-          "lumber": 2067290,
+          "food": 526663,
+          "lumber": 526663,
           "stone": 0,
-          "gold": 1033190
+          "gold": 157947
         },
         "items": {},
         "time": 259200,
@@ -4226,10 +4211,10 @@
       },
       "27": {
         "resources": {
-          "food": 2728823,
-          "lumber": 2728823,
+          "food": 658328,
+          "lumber": 658328,
           "stone": 0,
-          "gold": 1363811
+          "gold": 197434
         },
         "items": {},
         "time": 345600,
@@ -4241,10 +4226,10 @@
       },
       "28": {
         "resources": {
-          "food": 3602046,
-          "lumber": 3602046,
+          "food": 822910,
+          "lumber": 822910,
           "stone": 0,
-          "gold": 1800231
+          "gold": 246792
         },
         "items": {},
         "time": 432000,
@@ -4256,10 +4241,10 @@
       },
       "29": {
         "resources": {
-          "food": 4754701,
-          "lumber": 4754701,
+          "food": 1028637,
+          "lumber": 1028637,
           "stone": 0,
-          "gold": 2376305
+          "gold": 308490
         },
         "items": {},
         "time": 604800,
@@ -4271,14 +4256,12 @@
       },
       "30": {
         "resources": {
-          "food": 6276205,
-          "lumber": 6276205,
+          "food": 1285797,
+          "lumber": 1285797,
           "stone": 0,
-          "gold": 3136723
+          "gold": 385612
         },
-        "items": {
-          "119000001": 1
-        },
+        "items": {},
         "time": 864000,
         "power": 724696,
         "requirements": {
@@ -4290,10 +4273,10 @@
     "storage": {
       "1": {
         "resources": {
-          "food": 3000,
-          "lumber": 3000,
-          "stone": 3000,
-          "gold": 1000
+          "food": 2400,
+          "lumber": 2400,
+          "stone": 2400,
+          "gold": 480
         },
         "items": {},
         "time": 1,
@@ -4306,10 +4289,10 @@
       },
       "2": {
         "resources": {
-          "food": 4020,
-          "lumber": 4020,
-          "stone": 4020,
-          "gold": 1340
+          "food": 3216,
+          "lumber": 3216,
+          "stone": 3216,
+          "gold": 644
         },
         "items": {},
         "time": 3,
@@ -4322,10 +4305,10 @@
       },
       "3": {
         "resources": {
-          "food": 5387,
-          "lumber": 5387,
-          "stone": 5387,
-          "gold": 1796
+          "food": 4310,
+          "lumber": 4310,
+          "stone": 4310,
+          "gold": 863
         },
         "items": {},
         "time": 40,
@@ -4338,10 +4321,10 @@
       },
       "4": {
         "resources": {
-          "food": 7219,
-          "lumber": 7219,
-          "stone": 7219,
-          "gold": 2407
+          "food": 5776,
+          "lumber": 5776,
+          "stone": 5776,
+          "gold": 1156
         },
         "items": {},
         "time": 240,
@@ -4354,10 +4337,10 @@
       },
       "5": {
         "resources": {
-          "food": 9673,
-          "lumber": 9673,
-          "stone": 9673,
-          "gold": 3225
+          "food": 7739,
+          "lumber": 7739,
+          "stone": 7739,
+          "gold": 1548
         },
         "items": {},
         "time": 960,
@@ -4370,10 +4353,10 @@
       },
       "6": {
         "resources": {
-          "food": 12962,
-          "lumber": 12962,
-          "stone": 12962,
-          "gold": 4322
+          "food": 9673,
+          "lumber": 9673,
+          "stone": 9673,
+          "gold": 1935
         },
         "items": {},
         "time": 1440,
@@ -4386,10 +4369,10 @@
       },
       "7": {
         "resources": {
-          "food": 17369,
-          "lumber": 17369,
-          "stone": 17369,
-          "gold": 5791
+          "food": 12092,
+          "lumber": 12092,
+          "stone": 12092,
+          "gold": 2419
         },
         "items": {},
         "time": 2160,
@@ -4402,10 +4385,10 @@
       },
       "8": {
         "resources": {
-          "food": 23274,
-          "lumber": 23274,
-          "stone": 23274,
-          "gold": 7760
+          "food": 15115,
+          "lumber": 15115,
+          "stone": 15115,
+          "gold": 3024
         },
         "items": {},
         "time": 3240,
@@ -4418,10 +4401,10 @@
       },
       "9": {
         "resources": {
-          "food": 31187,
-          "lumber": 31187,
-          "stone": 31187,
-          "gold": 10398
+          "food": 18893,
+          "lumber": 18893,
+          "stone": 18893,
+          "gold": 3780
         },
         "items": {},
         "time": 4860,
@@ -4434,10 +4417,10 @@
       },
       "10": {
         "resources": {
-          "food": 41791,
-          "lumber": 41791,
-          "stone": 41791,
-          "gold": 13933
+          "food": 23616,
+          "lumber": 23616,
+          "stone": 23616,
+          "gold": 4725
         },
         "items": {},
         "time": 7290,
@@ -4450,10 +4433,10 @@
       },
       "11": {
         "resources": {
-          "food": 56000,
-          "lumber": 56000,
-          "stone": 56000,
-          "gold": 18670
+          "food": 29520,
+          "lumber": 29520,
+          "stone": 29520,
+          "gold": 5906
         },
         "items": {},
         "time": 10935,
@@ -4466,10 +4449,10 @@
       },
       "12": {
         "resources": {
-          "food": 75040,
-          "lumber": 75040,
-          "stone": 75040,
-          "gold": 25018
+          "food": 36900,
+          "lumber": 36900,
+          "stone": 36900,
+          "gold": 7382
         },
         "items": {},
         "time": 16403,
@@ -4482,10 +4465,10 @@
       },
       "13": {
         "resources": {
-          "food": 100554,
-          "lumber": 100554,
-          "stone": 100554,
-          "gold": 33524
+          "food": 46125,
+          "lumber": 46125,
+          "stone": 46125,
+          "gold": 9227
         },
         "items": {},
         "time": 24605,
@@ -4498,10 +4481,10 @@
       },
       "14": {
         "resources": {
-          "food": 134742,
-          "lumber": 134742,
-          "stone": 134742,
-          "gold": 44922
+          "food": 57656,
+          "lumber": 57656,
+          "stone": 57656,
+          "gold": 11534
         },
         "items": {},
         "time": 36908,
@@ -4514,10 +4497,10 @@
       },
       "15": {
         "resources": {
-          "food": 180554,
-          "lumber": 180554,
-          "stone": 180554,
-          "gold": 60195
+          "food": 72070,
+          "lumber": 72070,
+          "stone": 72070,
+          "gold": 14417
         },
         "items": {},
         "time": 55362,
@@ -4530,10 +4513,10 @@
       },
       "16": {
         "resources": {
-          "food": 241942,
-          "lumber": 241942,
-          "stone": 241942,
-          "gold": 80661
+          "food": 90087,
+          "lumber": 90087,
+          "stone": 90087,
+          "gold": 18022
         },
         "items": {},
         "time": 66434,
@@ -4546,10 +4529,10 @@
       },
       "17": {
         "resources": {
-          "food": 324202,
-          "lumber": 324202,
-          "stone": 324202,
-          "gold": 108086
+          "food": 112609,
+          "lumber": 112609,
+          "stone": 112609,
+          "gold": 22527
         },
         "items": {},
         "time": 79721,
@@ -4562,10 +4545,10 @@
       },
       "18": {
         "resources": {
-          "food": 434431,
-          "lumber": 434431,
-          "stone": 434431,
-          "gold": 144835
+          "food": 140761,
+          "lumber": 140761,
+          "stone": 140761,
+          "gold": 28158
         },
         "items": {},
         "time": 95665,
@@ -4578,10 +4561,10 @@
       },
       "19": {
         "resources": {
-          "food": 582138,
-          "lumber": 582138,
-          "stone": 582138,
-          "gold": 194079
+          "food": 175951,
+          "lumber": 175951,
+          "stone": 175951,
+          "gold": 35198
         },
         "items": {},
         "time": 114798,
@@ -4594,10 +4577,10 @@
       },
       "20": {
         "resources": {
-          "food": 780065,
-          "lumber": 780065,
-          "stone": 780065,
-          "gold": 260066
+          "food": 219939,
+          "lumber": 219939,
+          "stone": 219939,
+          "gold": 43997
         },
         "items": {},
         "time": 137758,
@@ -4610,10 +4593,10 @@
       },
       "21": {
         "resources": {
-          "food": 1045287,
-          "lumber": 1045287,
-          "stone": 1045287,
-          "gold": 348488
+          "food": 274924,
+          "lumber": 274924,
+          "stone": 274924,
+          "gold": 54997
         },
         "items": {},
         "time": 172800,
@@ -4626,10 +4609,10 @@
       },
       "22": {
         "resources": {
-          "food": 1400685,
-          "lumber": 1400685,
-          "stone": 1400685,
-          "gold": 466974
+          "food": 343654,
+          "lumber": 343654,
+          "stone": 343654,
+          "gold": 68746
         },
         "items": {},
         "time": 259200,
@@ -4642,10 +4625,10 @@
       },
       "23": {
         "resources": {
-          "food": 1876918,
-          "lumber": 1876918,
-          "stone": 1876918,
-          "gold": 625745
+          "food": 429568,
+          "lumber": 429568,
+          "stone": 429568,
+          "gold": 85932
         },
         "items": {},
         "time": 345600,
@@ -4658,10 +4641,10 @@
       },
       "24": {
         "resources": {
-          "food": 2515070,
-          "lumber": 2515070,
-          "stone": 2515070,
-          "gold": 838498
+          "food": 536960,
+          "lumber": 536960,
+          "stone": 536960,
+          "gold": 107415
         },
         "items": {},
         "time": 432000,
@@ -4674,10 +4657,10 @@
       },
       "25": {
         "resources": {
-          "food": 3370194,
-          "lumber": 3370194,
-          "stone": 3370194,
-          "gold": 1123587
+          "food": 671200,
+          "lumber": 671200,
+          "stone": 671200,
+          "gold": 134268
         },
         "items": {},
         "time": 604800,
@@ -4690,10 +4673,10 @@
       },
       "26": {
         "resources": {
-          "food": 4516060,
-          "lumber": 4516060,
-          "stone": 4516060,
-          "gold": 1505607
+          "food": 839000,
+          "lumber": 839000,
+          "stone": 839000,
+          "gold": 167835
         },
         "items": {},
         "time": 777600,
@@ -4706,10 +4689,10 @@
       },
       "27": {
         "resources": {
-          "food": 6051520,
-          "lumber": 6051520,
-          "stone": 6051520,
-          "gold": 2017513
+          "food": 1048749,
+          "lumber": 1048749,
+          "stone": 1048749,
+          "gold": 209794
         },
         "items": {},
         "time": 1036800,
@@ -4722,10 +4705,10 @@
       },
       "28": {
         "resources": {
-          "food": 8109037,
-          "lumber": 8109037,
-          "stone": 8109037,
-          "gold": 2703467
+          "food": 1310936,
+          "lumber": 1310936,
+          "stone": 1310936,
+          "gold": 262242
         },
         "items": {},
         "time": 1382400,
@@ -4738,10 +4721,10 @@
       },
       "29": {
         "resources": {
-          "food": 10866110,
-          "lumber": 10866110,
-          "stone": 10866110,
-          "gold": 3622646
+          "food": 1638670,
+          "lumber": 1638670,
+          "stone": 1638670,
+          "gold": 327802
         },
         "items": {},
         "time": 1814400,
@@ -4754,14 +4737,12 @@
       },
       "30": {
         "resources": {
-          "food": 14560587,
-          "lumber": 14560587,
-          "stone": 14560587,
-          "gold": 4854346
+          "food": 2048338,
+          "lumber": 2048338,
+          "stone": 2048338,
+          "gold": 409753
         },
-        "items": {
-          "119000001": 1
-        },
+        "items": {},
         "time": 2246400,
         "power": 1225785,
         "requirements": {
@@ -4774,10 +4755,10 @@
     "trading_post": {
       "1": {
         "resources": {
-          "food": 4000,
-          "lumber": 4000,
-          "stone": 4000,
-          "gold": 2500
+          "food": 3200,
+          "lumber": 3200,
+          "stone": 3200,
+          "gold": 1200
         },
         "items": {},
         "time": 1,
@@ -4790,10 +4771,10 @@
       },
       "2": {
         "resources": {
-          "food": 5400,
-          "lumber": 5400,
-          "stone": 5400,
-          "gold": 3375
+          "food": 4320,
+          "lumber": 4320,
+          "stone": 4320,
+          "gold": 1620
         },
         "items": {},
         "time": 3,
@@ -4806,10 +4787,10 @@
       },
       "3": {
         "resources": {
-          "food": 7290,
-          "lumber": 7290,
-          "stone": 7290,
-          "gold": 4556
+          "food": 5832,
+          "lumber": 5832,
+          "stone": 5832,
+          "gold": 2187
         },
         "items": {},
         "time": 60,
@@ -4822,10 +4803,10 @@
       },
       "4": {
         "resources": {
-          "food": 9842,
-          "lumber": 9842,
-          "stone": 9842,
-          "gold": 6151
+          "food": 7874,
+          "lumber": 7874,
+          "stone": 7874,
+          "gold": 2953
         },
         "items": {},
         "time": 240,
@@ -4838,10 +4819,10 @@
       },
       "5": {
         "resources": {
-          "food": 13287,
-          "lumber": 13287,
-          "stone": 13287,
-          "gold": 8304
+          "food": 10630,
+          "lumber": 10630,
+          "stone": 10630,
+          "gold": 3986
         },
         "items": {},
         "time": 600,
@@ -4854,10 +4835,10 @@
       },
       "6": {
         "resources": {
-          "food": 17937,
-          "lumber": 17937,
-          "stone": 17937,
-          "gold": 11210
+          "food": 13287,
+          "lumber": 13287,
+          "stone": 13287,
+          "gold": 4983
         },
         "items": {},
         "time": 1440,
@@ -4870,10 +4851,10 @@
       },
       "7": {
         "resources": {
-          "food": 24215,
-          "lumber": 24215,
-          "stone": 24215,
-          "gold": 15134
+          "food": 16609,
+          "lumber": 16609,
+          "stone": 16609,
+          "gold": 6228
         },
         "items": {},
         "time": 2160,
@@ -4886,10 +4867,10 @@
       },
       "8": {
         "resources": {
-          "food": 32690,
-          "lumber": 32690,
-          "stone": 32690,
-          "gold": 20431
+          "food": 20761,
+          "lumber": 20761,
+          "stone": 20761,
+          "gold": 7785
         },
         "items": {},
         "time": 3240,
@@ -4902,10 +4883,10 @@
       },
       "9": {
         "resources": {
-          "food": 44132,
-          "lumber": 44132,
-          "stone": 44132,
-          "gold": 27582
+          "food": 25952,
+          "lumber": 25952,
+          "stone": 25952,
+          "gold": 9732
         },
         "items": {},
         "time": 4860,
@@ -4918,10 +4899,10 @@
       },
       "10": {
         "resources": {
-          "food": 59578,
-          "lumber": 59578,
-          "stone": 59578,
-          "gold": 37236
+          "food": 32439,
+          "lumber": 32439,
+          "stone": 32439,
+          "gold": 12165
         },
         "items": {},
         "time": 7290,
@@ -4934,10 +4915,10 @@
       },
       "11": {
         "resources": {
-          "food": 80430,
-          "lumber": 80430,
-          "stone": 80430,
-          "gold": 50269
+          "food": 40549,
+          "lumber": 40549,
+          "stone": 40549,
+          "gold": 15206
         },
         "items": {},
         "time": 10935,
@@ -4950,10 +4931,10 @@
       },
       "12": {
         "resources": {
-          "food": 108581,
-          "lumber": 108581,
-          "stone": 108581,
-          "gold": 67863
+          "food": 50686,
+          "lumber": 50686,
+          "stone": 50686,
+          "gold": 19007
         },
         "items": {},
         "time": 16403,
@@ -4966,10 +4947,10 @@
       },
       "13": {
         "resources": {
-          "food": 146584,
-          "lumber": 146584,
-          "stone": 146584,
-          "gold": 91615
+          "food": 63358,
+          "lumber": 63358,
+          "stone": 63358,
+          "gold": 23758
         },
         "items": {},
         "time": 24605,
@@ -4982,10 +4963,10 @@
       },
       "14": {
         "resources": {
-          "food": 197888,
-          "lumber": 197888,
-          "stone": 197888,
-          "gold": 123680
+          "food": 79197,
+          "lumber": 79197,
+          "stone": 79197,
+          "gold": 29698
         },
         "items": {},
         "time": 36908,
@@ -4998,10 +4979,10 @@
       },
       "15": {
         "resources": {
-          "food": 267149,
-          "lumber": 267149,
-          "stone": 267149,
-          "gold": 166968
+          "food": 98996,
+          "lumber": 98996,
+          "stone": 98996,
+          "gold": 37122
         },
         "items": {},
         "time": 55362,
@@ -5014,10 +4995,10 @@
       },
       "16": {
         "resources": {
-          "food": 360651,
-          "lumber": 360651,
-          "stone": 360651,
-          "gold": 225407
+          "food": 123745,
+          "lumber": 123745,
+          "stone": 123745,
+          "gold": 46403
         },
         "items": {},
         "time": 66434,
@@ -5030,10 +5011,10 @@
       },
       "17": {
         "resources": {
-          "food": 486879,
-          "lumber": 486879,
-          "stone": 486879,
-          "gold": 304299
+          "food": 154682,
+          "lumber": 154682,
+          "stone": 154682,
+          "gold": 58003
         },
         "items": {},
         "time": 79721,
@@ -5046,10 +5027,10 @@
       },
       "18": {
         "resources": {
-          "food": 657287,
-          "lumber": 657287,
-          "stone": 657287,
-          "gold": 410804
+          "food": 193352,
+          "lumber": 193352,
+          "stone": 193352,
+          "gold": 72504
         },
         "items": {},
         "time": 95665,
@@ -5062,10 +5043,10 @@
       },
       "19": {
         "resources": {
-          "food": 887337,
-          "lumber": 887337,
-          "stone": 887337,
-          "gold": 554585
+          "food": 241690,
+          "lumber": 241690,
+          "stone": 241690,
+          "gold": 90630
         },
         "items": {},
         "time": 114798,
@@ -5078,10 +5059,10 @@
       },
       "20": {
         "resources": {
-          "food": 1197905,
-          "lumber": 1197905,
-          "stone": 1197905,
-          "gold": 748690
+          "food": 302112,
+          "lumber": 302112,
+          "stone": 302112,
+          "gold": 113287
         },
         "items": {},
         "time": 137758,
@@ -5094,10 +5075,10 @@
       },
       "21": {
         "resources": {
-          "food": 1617172,
-          "lumber": 1617172,
-          "stone": 1617172,
-          "gold": 1010732
+          "food": 377640,
+          "lumber": 377640,
+          "stone": 377640,
+          "gold": 141609
         },
         "items": {},
         "time": 345600,
@@ -5110,10 +5091,10 @@
       },
       "22": {
         "resources": {
-          "food": 2183182,
-          "lumber": 2183182,
-          "stone": 2183182,
-          "gold": 1364488
+          "food": 472050,
+          "lumber": 472050,
+          "stone": 472050,
+          "gold": 177011
         },
         "items": {},
         "time": 432000,
@@ -5126,10 +5107,10 @@
       },
       "23": {
         "resources": {
-          "food": 2947296,
-          "lumber": 2947296,
-          "stone": 2947296,
-          "gold": 1842059
+          "food": 590062,
+          "lumber": 590062,
+          "stone": 590062,
+          "gold": 221264
         },
         "items": {},
         "time": 518400,
@@ -5142,10 +5123,10 @@
       },
       "24": {
         "resources": {
-          "food": 3978850,
-          "lumber": 3978850,
-          "stone": 3978850,
-          "gold": 2486780
+          "food": 737577,
+          "lumber": 737577,
+          "stone": 737577,
+          "gold": 276579
         },
         "items": {},
         "time": 691200,
@@ -5158,10 +5139,10 @@
       },
       "25": {
         "resources": {
-          "food": 5371448,
-          "lumber": 5371448,
-          "stone": 5371448,
-          "gold": 3357153
+          "food": 921971,
+          "lumber": 921971,
+          "stone": 921971,
+          "gold": 345724
         },
         "items": {},
         "time": 864000,
@@ -5174,10 +5155,10 @@
       },
       "26": {
         "resources": {
-          "food": 7251455,
-          "lumber": 7251455,
-          "stone": 7251455,
-          "gold": 4532157
+          "food": 1152464,
+          "lumber": 1152464,
+          "stone": 1152464,
+          "gold": 432155
         },
         "items": {},
         "time": 1036800,
@@ -5190,10 +5171,10 @@
       },
       "27": {
         "resources": {
-          "food": 9789464,
-          "lumber": 9789464,
-          "stone": 9789464,
-          "gold": 6118412
+          "food": 1440580,
+          "lumber": 1440580,
+          "stone": 1440580,
+          "gold": 540193
         },
         "items": {},
         "time": 1296000,
@@ -5206,10 +5187,10 @@
       },
       "28": {
         "resources": {
-          "food": 13215776,
-          "lumber": 13215776,
-          "stone": 13215776,
-          "gold": 8259856
+          "food": 1800725,
+          "lumber": 1800725,
+          "stone": 1800725,
+          "gold": 675242
         },
         "items": {},
         "time": 1555200,
@@ -5222,10 +5203,10 @@
       },
       "29": {
         "resources": {
-          "food": 17841298,
-          "lumber": 17841298,
-          "stone": 17841298,
-          "gold": 11150806
+          "food": 2250906,
+          "lumber": 2250906,
+          "stone": 2250906,
+          "gold": 844052
         },
         "items": {},
         "time": 1900800,
@@ -5238,14 +5219,12 @@
       },
       "30": {
         "resources": {
-          "food": 24085752,
-          "lumber": 24085752,
-          "stone": 24085752,
-          "gold": 15053588
+          "food": 2813632,
+          "lumber": 2813632,
+          "stone": 2813632,
+          "gold": 1055065
         },
-        "items": {
-          "119000001": 1
-        },
+        "items": {},
         "time": 2246400,
         "power": 1613397,
         "requirements": {
@@ -5258,10 +5237,10 @@
     "treasure_house": {
       "1": {
         "resources": {
-          "food": 5000,
-          "lumber": 5000,
-          "stone": 5000,
-          "gold": 5000
+          "food": 4000,
+          "lumber": 4000,
+          "stone": 4000,
+          "gold": 2400
         },
         "items": {},
         "time": 1,
@@ -5274,10 +5253,10 @@
       },
       "2": {
         "resources": {
-          "food": 6800,
-          "lumber": 6800,
-          "stone": 6800,
-          "gold": 6800
+          "food": 5440,
+          "lumber": 5440,
+          "stone": 5440,
+          "gold": 3264
         },
         "items": {},
         "time": 3,
@@ -5290,10 +5269,10 @@
       },
       "3": {
         "resources": {
-          "food": 9248,
-          "lumber": 9248,
-          "stone": 9248,
-          "gold": 9248
+          "food": 7399,
+          "lumber": 7399,
+          "stone": 7399,
+          "gold": 4440
         },
         "items": {},
         "time": 60,
@@ -5306,10 +5285,10 @@
       },
       "4": {
         "resources": {
-          "food": 12577,
-          "lumber": 12577,
-          "stone": 12577,
-          "gold": 12577
+          "food": 10062,
+          "lumber": 10062,
+          "stone": 10062,
+          "gold": 6037
         },
         "items": {},
         "time": 300,
@@ -5322,10 +5301,10 @@
       },
       "5": {
         "resources": {
-          "food": 17105,
-          "lumber": 17105,
-          "stone": 17105,
-          "gold": 17105
+          "food": 13684,
+          "lumber": 13684,
+          "stone": 13684,
+          "gold": 8211
         },
         "items": {},
         "time": 1500,
@@ -5338,10 +5317,10 @@
       },
       "6": {
         "resources": {
-          "food": 23263,
-          "lumber": 23263,
-          "stone": 23263,
-          "gold": 23263
+          "food": 17105,
+          "lumber": 17105,
+          "stone": 17105,
+          "gold": 10263
         },
         "items": {},
         "time": 2640,
@@ -5354,10 +5333,10 @@
       },
       "7": {
         "resources": {
-          "food": 31638,
-          "lumber": 31638,
-          "stone": 31638,
-          "gold": 31638
+          "food": 21382,
+          "lumber": 21382,
+          "stone": 21382,
+          "gold": 12829
         },
         "items": {},
         "time": 3960,
@@ -5370,10 +5349,10 @@
       },
       "8": {
         "resources": {
-          "food": 43028,
-          "lumber": 43028,
-          "stone": 43028,
-          "gold": 43028
+          "food": 26727,
+          "lumber": 26727,
+          "stone": 26727,
+          "gold": 16036
         },
         "items": {},
         "time": 5940,
@@ -5386,10 +5365,10 @@
       },
       "9": {
         "resources": {
-          "food": 58518,
-          "lumber": 58518,
-          "stone": 58518,
-          "gold": 58518
+          "food": 33409,
+          "lumber": 33409,
+          "stone": 33409,
+          "gold": 20045
         },
         "items": {},
         "time": 8910,
@@ -5402,10 +5381,10 @@
       },
       "10": {
         "resources": {
-          "food": 79584,
-          "lumber": 79584,
-          "stone": 79584,
-          "gold": 79584
+          "food": 41761,
+          "lumber": 41761,
+          "stone": 41761,
+          "gold": 25057
         },
         "items": {},
         "time": 13365,
@@ -5418,10 +5397,10 @@
       },
       "11": {
         "resources": {
-          "food": 108234,
-          "lumber": 108234,
-          "stone": 108234,
-          "gold": 108234
+          "food": 52201,
+          "lumber": 52201,
+          "stone": 52201,
+          "gold": 31321
         },
         "items": {},
         "time": 20048,
@@ -5434,10 +5413,10 @@
       },
       "12": {
         "resources": {
-          "food": 147198,
-          "lumber": 147198,
-          "stone": 147198,
-          "gold": 147198
+          "food": 65251,
+          "lumber": 65251,
+          "stone": 65251,
+          "gold": 39151
         },
         "items": {},
         "time": 30072,
@@ -5450,10 +5429,10 @@
       },
       "13": {
         "resources": {
-          "food": 200189,
-          "lumber": 200189,
-          "stone": 200189,
-          "gold": 200189
+          "food": 81563,
+          "lumber": 81563,
+          "stone": 81563,
+          "gold": 48938
         },
         "items": {},
         "time": 45108,
@@ -5466,10 +5445,10 @@
       },
       "14": {
         "resources": {
-          "food": 272257,
-          "lumber": 272257,
-          "stone": 272257,
-          "gold": 272257
+          "food": 101954,
+          "lumber": 101954,
+          "stone": 101954,
+          "gold": 61173
         },
         "items": {},
         "time": 67662,
@@ -5482,10 +5461,10 @@
       },
       "15": {
         "resources": {
-          "food": 370270,
-          "lumber": 370270,
-          "stone": 370270,
-          "gold": 370270
+          "food": 127443,
+          "lumber": 127443,
+          "stone": 127443,
+          "gold": 76466
         },
         "items": {},
         "time": 101493,
@@ -5498,10 +5477,10 @@
       },
       "16": {
         "resources": {
-          "food": 503567,
-          "lumber": 503567,
-          "stone": 503567,
-          "gold": 503567
+          "food": 159303,
+          "lumber": 159303,
+          "stone": 159303,
+          "gold": 95582
         },
         "items": {},
         "time": 121792,
@@ -5514,10 +5493,10 @@
       },
       "17": {
         "resources": {
-          "food": 684851,
-          "lumber": 684851,
-          "stone": 684851,
-          "gold": 684851
+          "food": 199129,
+          "lumber": 199129,
+          "stone": 199129,
+          "gold": 119478
         },
         "items": {},
         "time": 146150,
@@ -5530,10 +5509,10 @@
       },
       "18": {
         "resources": {
-          "food": 931397,
-          "lumber": 931397,
-          "stone": 931397,
-          "gold": 931397
+          "food": 248911,
+          "lumber": 248911,
+          "stone": 248911,
+          "gold": 149347
         },
         "items": {},
         "time": 175380,
@@ -5546,10 +5525,10 @@
       },
       "19": {
         "resources": {
-          "food": 1266700,
-          "lumber": 1266700,
-          "stone": 1266700,
-          "gold": 1266700
+          "food": 311139,
+          "lumber": 311139,
+          "stone": 311139,
+          "gold": 186683
         },
         "items": {},
         "time": 210456,
@@ -5562,10 +5541,10 @@
       },
       "20": {
         "resources": {
-          "food": 1722712,
-          "lumber": 1722712,
-          "stone": 1722712,
-          "gold": 1722712
+          "food": 388923,
+          "lumber": 388923,
+          "stone": 388923,
+          "gold": 233354
         },
         "items": {},
         "time": 252547,
@@ -5578,10 +5557,10 @@
       },
       "21": {
         "resources": {
-          "food": 2342888,
-          "lumber": 2342888,
-          "stone": 2342888,
-          "gold": 2342888
+          "food": 486154,
+          "lumber": 486154,
+          "stone": 486154,
+          "gold": 291693
         },
         "items": {},
         "time": 345600,
@@ -5594,10 +5573,10 @@
       },
       "22": {
         "resources": {
-          "food": 3186328,
-          "lumber": 3186328,
-          "stone": 3186328,
-          "gold": 3186328
+          "food": 607692,
+          "lumber": 607692,
+          "stone": 607692,
+          "gold": 364616
         },
         "items": {},
         "time": 432000,
@@ -5610,10 +5589,10 @@
       },
       "23": {
         "resources": {
-          "food": 4333406,
-          "lumber": 4333406,
-          "stone": 4333406,
-          "gold": 4333406
+          "food": 759615,
+          "lumber": 759615,
+          "stone": 759615,
+          "gold": 455769
         },
         "items": {},
         "time": 518400,
@@ -5626,10 +5605,10 @@
       },
       "24": {
         "resources": {
-          "food": 5893432,
-          "lumber": 5893432,
-          "stone": 5893432,
-          "gold": 5893432
+          "food": 949519,
+          "lumber": 949519,
+          "stone": 949519,
+          "gold": 569711
         },
         "items": {},
         "time": 691200,
@@ -5642,10 +5621,10 @@
       },
       "25": {
         "resources": {
-          "food": 8015068,
-          "lumber": 8015068,
-          "stone": 8015068,
-          "gold": 8015068
+          "food": 1186898,
+          "lumber": 1186898,
+          "stone": 1186898,
+          "gold": 712139
         },
         "items": {},
         "time": 864000,
@@ -5658,10 +5637,10 @@
       },
       "26": {
         "resources": {
-          "food": 10900492,
-          "lumber": 10900492,
-          "stone": 10900492,
-          "gold": 10900492
+          "food": 1483623,
+          "lumber": 1483623,
+          "stone": 1483623,
+          "gold": 890174
         },
         "items": {},
         "time": 1036800,
@@ -5674,10 +5653,10 @@
       },
       "27": {
         "resources": {
-          "food": 14824669,
-          "lumber": 14824669,
-          "stone": 14824669,
-          "gold": 14824669
+          "food": 1854528,
+          "lumber": 1854528,
+          "stone": 1854528,
+          "gold": 1112717
         },
         "items": {},
         "time": 1296000,
@@ -5690,10 +5669,10 @@
       },
       "28": {
         "resources": {
-          "food": 20161550,
-          "lumber": 20161550,
-          "stone": 20161550,
-          "gold": 20161550
+          "food": 2318160,
+          "lumber": 2318160,
+          "stone": 2318160,
+          "gold": 1390896
         },
         "items": {},
         "time": 1555200,
@@ -5706,10 +5685,10 @@
       },
       "29": {
         "resources": {
-          "food": 27419708,
-          "lumber": 27419708,
-          "stone": 27419708,
-          "gold": 27419708
+          "food": 2897700,
+          "lumber": 2897700,
+          "stone": 2897700,
+          "gold": 1738620
         },
         "items": {},
         "time": 1900800,
@@ -5722,14 +5701,12 @@
       },
       "30": {
         "resources": {
-          "food": 37290803,
-          "lumber": 37290803,
-          "stone": 37290803,
-          "gold": 37290803
+          "food": 3622125,
+          "lumber": 3622125,
+          "stone": 3622125,
+          "gold": 2173275
         },
-        "items": {
-          "119000001": 1
-        },
+        "items": {},
         "time": 2246400,
         "power": 2070539,
         "requirements": {
@@ -5743,9 +5720,9 @@
       "1": {
         "resources": {
           "food": 0,
-          "lumber": 6000,
-          "stone": 6000,
-          "gold": 2500
+          "lumber": 4800,
+          "stone": 4800,
+          "gold": 1200
         },
         "items": {},
         "time": 1,
@@ -5759,9 +5736,9 @@
       "2": {
         "resources": {
           "food": 0,
-          "lumber": 8220,
-          "stone": 8220,
-          "gold": 3425
+          "lumber": 6576,
+          "stone": 6576,
+          "gold": 1644
         },
         "items": {},
         "time": 3,
@@ -5775,9 +5752,9 @@
       "3": {
         "resources": {
           "food": 0,
-          "lumber": 11261,
-          "stone": 11261,
-          "gold": 4692
+          "lumber": 9009,
+          "stone": 9009,
+          "gold": 2253
         },
         "items": {},
         "time": 60,
@@ -5791,9 +5768,9 @@
       "4": {
         "resources": {
           "food": 0,
-          "lumber": 15428,
-          "stone": 15428,
-          "gold": 6428
+          "lumber": 12343,
+          "stone": 12343,
+          "gold": 3086
         },
         "items": {},
         "time": 300,
@@ -5807,9 +5784,9 @@
       "5": {
         "resources": {
           "food": 0,
-          "lumber": 21136,
-          "stone": 21136,
-          "gold": 8806
+          "lumber": 16909,
+          "stone": 16909,
+          "gold": 4227
         },
         "items": {},
         "time": 600,
@@ -5823,9 +5800,9 @@
       "6": {
         "resources": {
           "food": 0,
-          "lumber": 28956,
-          "stone": 28956,
-          "gold": 12064
+          "lumber": 21136,
+          "stone": 21136,
+          "gold": 5284
         },
         "items": {},
         "time": 1440,
@@ -5839,9 +5816,9 @@
       "7": {
         "resources": {
           "food": 0,
-          "lumber": 39670,
-          "stone": 39670,
-          "gold": 16528
+          "lumber": 26420,
+          "stone": 26420,
+          "gold": 6605
         },
         "items": {},
         "time": 2160,
@@ -5855,9 +5832,9 @@
       "8": {
         "resources": {
           "food": 0,
-          "lumber": 54348,
-          "stone": 54348,
-          "gold": 22643
+          "lumber": 33025,
+          "stone": 33025,
+          "gold": 8256
         },
         "items": {},
         "time": 3240,
@@ -5871,9 +5848,9 @@
       "9": {
         "resources": {
           "food": 0,
-          "lumber": 74457,
-          "stone": 74457,
-          "gold": 31021
+          "lumber": 41282,
+          "stone": 41282,
+          "gold": 10320
         },
         "items": {},
         "time": 4860,
@@ -5887,9 +5864,9 @@
       "10": {
         "resources": {
           "food": 0,
-          "lumber": 102006,
-          "stone": 102006,
-          "gold": 42499
+          "lumber": 51602,
+          "stone": 51602,
+          "gold": 12900
         },
         "items": {},
         "time": 7290,
@@ -5903,9 +5880,9 @@
       "11": {
         "resources": {
           "food": 0,
-          "lumber": 139748,
-          "stone": 139748,
-          "gold": 58224
+          "lumber": 64502,
+          "stone": 64502,
+          "gold": 16125
         },
         "items": {},
         "time": 10935,
@@ -5919,9 +5896,9 @@
       "12": {
         "resources": {
           "food": 0,
-          "lumber": 191455,
-          "stone": 191455,
-          "gold": 79767
+          "lumber": 80628,
+          "stone": 80628,
+          "gold": 20156
         },
         "items": {},
         "time": 16403,
@@ -5935,9 +5912,9 @@
       "13": {
         "resources": {
           "food": 0,
-          "lumber": 262293,
-          "stone": 262293,
-          "gold": 109281
+          "lumber": 100785,
+          "stone": 100785,
+          "gold": 25195
         },
         "items": {},
         "time": 24605,
@@ -5951,9 +5928,9 @@
       "14": {
         "resources": {
           "food": 0,
-          "lumber": 359341,
-          "stone": 359341,
-          "gold": 149715
+          "lumber": 125981,
+          "stone": 125981,
+          "gold": 31493
         },
         "items": {},
         "time": 36908,
@@ -5967,9 +5944,9 @@
       "15": {
         "resources": {
           "food": 0,
-          "lumber": 492297,
-          "stone": 492297,
-          "gold": 205110
+          "lumber": 157476,
+          "stone": 157476,
+          "gold": 39366
         },
         "items": {},
         "time": 55362,
@@ -5983,9 +5960,9 @@
       "16": {
         "resources": {
           "food": 0,
-          "lumber": 674447,
-          "stone": 674447,
-          "gold": 281001
+          "lumber": 196845,
+          "stone": 196845,
+          "gold": 49208
         },
         "items": {},
         "time": 66434,
@@ -5999,9 +5976,9 @@
       "17": {
         "resources": {
           "food": 0,
-          "lumber": 923992,
-          "stone": 923992,
-          "gold": 384971
+          "lumber": 246056,
+          "stone": 246056,
+          "gold": 61510
         },
         "items": {},
         "time": 79721,
@@ -6015,9 +5992,9 @@
       "18": {
         "resources": {
           "food": 0,
-          "lumber": 1265869,
-          "stone": 1265869,
-          "gold": 527410
+          "lumber": 307570,
+          "stone": 307570,
+          "gold": 76887
         },
         "items": {},
         "time": 95665,
@@ -6031,9 +6008,9 @@
       "19": {
         "resources": {
           "food": 0,
-          "lumber": 1734241,
-          "stone": 1734241,
-          "gold": 722552
+          "lumber": 384462,
+          "stone": 384462,
+          "gold": 96109
         },
         "items": {},
         "time": 114798,
@@ -6047,9 +6024,9 @@
       "20": {
         "resources": {
           "food": 0,
-          "lumber": 2375910,
-          "stone": 2375910,
-          "gold": 989896
+          "lumber": 480578,
+          "stone": 480578,
+          "gold": 120136
         },
         "items": {},
         "time": 137758,
@@ -6063,9 +6040,9 @@
       "21": {
         "resources": {
           "food": 0,
-          "lumber": 3254997,
-          "stone": 3254997,
-          "gold": 1356158
+          "lumber": 600722,
+          "stone": 600722,
+          "gold": 150169
         },
         "items": {},
         "time": 345600,
@@ -6079,9 +6056,9 @@
       "22": {
         "resources": {
           "food": 0,
-          "lumber": 4459346,
-          "stone": 4459346,
-          "gold": 1857936
+          "lumber": 750902,
+          "stone": 750902,
+          "gold": 187712
         },
         "items": {},
         "time": 432000,
@@ -6095,9 +6072,9 @@
       "23": {
         "resources": {
           "food": 0,
-          "lumber": 6109304,
-          "stone": 6109304,
-          "gold": 2545372
+          "lumber": 938627,
+          "stone": 938627,
+          "gold": 234639
         },
         "items": {},
         "time": 518400,
@@ -6111,9 +6088,9 @@
       "24": {
         "resources": {
           "food": 0,
-          "lumber": 8369746,
-          "stone": 8369746,
-          "gold": 3487160
+          "lumber": 1173284,
+          "stone": 1173284,
+          "gold": 293299
         },
         "items": {},
         "time": 691200,
@@ -6127,9 +6104,9 @@
       "25": {
         "resources": {
           "food": 0,
-          "lumber": 11466552,
-          "stone": 11466552,
-          "gold": 4777409
+          "lumber": 1466605,
+          "stone": 1466605,
+          "gold": 366624
         },
         "items": {},
         "time": 864000,
@@ -6143,9 +6120,9 @@
       "26": {
         "resources": {
           "food": 0,
-          "lumber": 15709176,
-          "stone": 15709176,
-          "gold": 6545050
+          "lumber": 1833256,
+          "stone": 1833256,
+          "gold": 458280
         },
         "items": {},
         "time": 1036800,
@@ -6159,9 +6136,9 @@
       "27": {
         "resources": {
           "food": 0,
-          "lumber": 21521571,
-          "stone": 21521571,
-          "gold": 8966719
+          "lumber": 2291570,
+          "stone": 2291570,
+          "gold": 572850
         },
         "items": {},
         "time": 1296000,
@@ -6175,9 +6152,9 @@
       "28": {
         "resources": {
           "food": 0,
-          "lumber": 29484552,
-          "stone": 29484552,
-          "gold": 12284405
+          "lumber": 2864463,
+          "stone": 2864463,
+          "gold": 716062
         },
         "items": {},
         "time": 1555200,
@@ -6191,9 +6168,9 @@
       "29": {
         "resources": {
           "food": 0,
-          "lumber": 40393836,
-          "stone": 40393836,
-          "gold": 16829635
+          "lumber": 3580578,
+          "stone": 3580578,
+          "gold": 895077
         },
         "items": {},
         "time": 1900800,
@@ -6207,13 +6184,11 @@
       "30": {
         "resources": {
           "food": 0,
-          "lumber": 55339555,
-          "stone": 55339555,
-          "gold": 23056600
+          "lumber": 4475723,
+          "stone": 4475723,
+          "gold": 1118846
         },
-        "items": {
-          "119000001": 1
-        },
+        "items": {},
         "time": 2246400,
         "power": 1925781,
         "requirements": {
@@ -6227,9 +6202,9 @@
       "1": {
         "resources": {
           "food": 0,
-          "lumber": 3000,
-          "stone": 3000,
-          "gold": 1500
+          "lumber": 2400,
+          "stone": 2400,
+          "gold": 720
         },
         "items": {},
         "time": 1,
@@ -6243,9 +6218,9 @@
       "2": {
         "resources": {
           "food": 0,
-          "lumber": 4020,
-          "stone": 4020,
-          "gold": 2010
+          "lumber": 3216,
+          "stone": 3216,
+          "gold": 965
         },
         "items": {},
         "time": 3,
@@ -6259,9 +6234,9 @@
       "3": {
         "resources": {
           "food": 0,
-          "lumber": 5387,
-          "stone": 5387,
-          "gold": 2693
+          "lumber": 4310,
+          "stone": 4310,
+          "gold": 1293
         },
         "items": {},
         "time": 40,
@@ -6275,9 +6250,9 @@
       "4": {
         "resources": {
           "food": 0,
-          "lumber": 7219,
-          "stone": 7219,
-          "gold": 3609
+          "lumber": 5776,
+          "stone": 5776,
+          "gold": 1733
         },
         "items": {},
         "time": 240,
@@ -6291,9 +6266,9 @@
       "5": {
         "resources": {
           "food": 0,
-          "lumber": 9673,
-          "stone": 9673,
-          "gold": 4836
+          "lumber": 7739,
+          "stone": 7739,
+          "gold": 2322
         },
         "items": {},
         "time": 960,
@@ -6307,9 +6282,9 @@
       "6": {
         "resources": {
           "food": 0,
-          "lumber": 12962,
-          "stone": 12962,
-          "gold": 6480
+          "lumber": 9673,
+          "stone": 9673,
+          "gold": 2902
         },
         "items": {},
         "time": 1440,
@@ -6323,9 +6298,9 @@
       "7": {
         "resources": {
           "food": 0,
-          "lumber": 17369,
-          "stone": 17369,
-          "gold": 8683
+          "lumber": 12092,
+          "stone": 12092,
+          "gold": 3627
         },
         "items": {},
         "time": 2160,
@@ -6339,9 +6314,9 @@
       "8": {
         "resources": {
           "food": 0,
-          "lumber": 23274,
-          "stone": 23274,
-          "gold": 11635
+          "lumber": 15115,
+          "stone": 15115,
+          "gold": 4534
         },
         "items": {},
         "time": 3240,
@@ -6355,9 +6330,9 @@
       "9": {
         "resources": {
           "food": 0,
-          "lumber": 31187,
-          "stone": 31187,
-          "gold": 15591
+          "lumber": 18893,
+          "stone": 18893,
+          "gold": 5668
         },
         "items": {},
         "time": 4860,
@@ -6371,9 +6346,9 @@
       "10": {
         "resources": {
           "food": 0,
-          "lumber": 41791,
-          "stone": 41791,
-          "gold": 20892
+          "lumber": 23616,
+          "stone": 23616,
+          "gold": 7084
         },
         "items": {},
         "time": 7290,
@@ -6387,9 +6362,9 @@
       "11": {
         "resources": {
           "food": 0,
-          "lumber": 56000,
-          "stone": 56000,
-          "gold": 27995
+          "lumber": 29520,
+          "stone": 29520,
+          "gold": 8855
         },
         "items": {},
         "time": 10935,
@@ -6403,9 +6378,9 @@
       "12": {
         "resources": {
           "food": 0,
-          "lumber": 75040,
-          "stone": 75040,
-          "gold": 37513
+          "lumber": 36900,
+          "stone": 36900,
+          "gold": 11069
         },
         "items": {},
         "time": 16403,
@@ -6419,9 +6394,9 @@
       "13": {
         "resources": {
           "food": 0,
-          "lumber": 100554,
-          "stone": 100554,
-          "gold": 50267
+          "lumber": 46125,
+          "stone": 46125,
+          "gold": 13836
         },
         "items": {},
         "time": 24605,
@@ -6435,9 +6410,9 @@
       "14": {
         "resources": {
           "food": 0,
-          "lumber": 134742,
-          "stone": 134742,
-          "gold": 67358
+          "lumber": 57656,
+          "stone": 57656,
+          "gold": 17295
         },
         "items": {},
         "time": 36908,
@@ -6451,9 +6426,9 @@
       "15": {
         "resources": {
           "food": 0,
-          "lumber": 180554,
-          "stone": 180554,
-          "gold": 90260
+          "lumber": 72070,
+          "stone": 72070,
+          "gold": 21619
         },
         "items": {},
         "time": 55362,
@@ -6467,9 +6442,9 @@
       "16": {
         "resources": {
           "food": 0,
-          "lumber": 241942,
-          "stone": 241942,
-          "gold": 120948
+          "lumber": 90087,
+          "stone": 90087,
+          "gold": 27024
         },
         "items": {},
         "time": 66434,
@@ -6483,9 +6458,9 @@
       "17": {
         "resources": {
           "food": 0,
-          "lumber": 324202,
-          "stone": 324202,
-          "gold": 162070
+          "lumber": 112609,
+          "stone": 112609,
+          "gold": 33780
         },
         "items": {},
         "time": 79721,
@@ -6499,9 +6474,9 @@
       "18": {
         "resources": {
           "food": 0,
-          "lumber": 434431,
-          "stone": 434431,
-          "gold": 217174
+          "lumber": 140761,
+          "stone": 140761,
+          "gold": 42224
         },
         "items": {},
         "time": 95665,
@@ -6515,9 +6490,9 @@
       "19": {
         "resources": {
           "food": 0,
-          "lumber": 582138,
-          "stone": 582138,
-          "gold": 291013
+          "lumber": 175951,
+          "stone": 175951,
+          "gold": 52780
         },
         "items": {},
         "time": 114798,
@@ -6531,9 +6506,9 @@
       "20": {
         "resources": {
           "food": 0,
-          "lumber": 780065,
-          "stone": 780065,
-          "gold": 389957
+          "lumber": 219939,
+          "stone": 219939,
+          "gold": 65975
         },
         "items": {},
         "time": 137758,
@@ -6547,9 +6522,9 @@
       "21": {
         "resources": {
           "food": 0,
-          "lumber": 1045287,
-          "stone": 1045287,
-          "gold": 522542
+          "lumber": 274924,
+          "stone": 274924,
+          "gold": 82469
         },
         "items": {},
         "time": 172800,
@@ -6563,9 +6538,9 @@
       "22": {
         "resources": {
           "food": 0,
-          "lumber": 1400685,
-          "stone": 1400685,
-          "gold": 700206
+          "lumber": 343654,
+          "stone": 343654,
+          "gold": 103086
         },
         "items": {},
         "time": 259200,
@@ -6579,9 +6554,9 @@
       "23": {
         "resources": {
           "food": 0,
-          "lumber": 1876918,
-          "stone": 1876918,
-          "gold": 938276
+          "lumber": 429568,
+          "stone": 429568,
+          "gold": 128857
         },
         "items": {},
         "time": 345600,
@@ -6595,9 +6570,9 @@
       "24": {
         "resources": {
           "food": 0,
-          "lumber": 2515070,
-          "stone": 2515070,
-          "gold": 1257290
+          "lumber": 536960,
+          "stone": 536960,
+          "gold": 161072
         },
         "items": {},
         "time": 432000,
@@ -6611,9 +6586,9 @@
       "25": {
         "resources": {
           "food": 0,
-          "lumber": 3370194,
-          "stone": 3370194,
-          "gold": 1684769
+          "lumber": 671200,
+          "stone": 671200,
+          "gold": 201339
         },
         "items": {},
         "time": 604800,
@@ -6627,9 +6602,9 @@
       "26": {
         "resources": {
           "food": 0,
-          "lumber": 4516060,
-          "stone": 4516060,
-          "gold": 2257590
+          "lumber": 839000,
+          "stone": 839000,
+          "gold": 251674
         },
         "items": {},
         "time": 777600,
@@ -6643,9 +6618,9 @@
       "27": {
         "resources": {
           "food": 0,
-          "lumber": 6051520,
-          "stone": 6051520,
-          "gold": 3025171
+          "lumber": 1048749,
+          "stone": 1048749,
+          "gold": 314593
         },
         "items": {},
         "time": 1036800,
@@ -6659,9 +6634,9 @@
       "28": {
         "resources": {
           "food": 0,
-          "lumber": 8109037,
-          "stone": 8109037,
-          "gold": 4053729
+          "lumber": 1310936,
+          "stone": 1310936,
+          "gold": 393241
         },
         "items": {},
         "time": 1382400,
@@ -6675,9 +6650,9 @@
       "29": {
         "resources": {
           "food": 0,
-          "lumber": 10866110,
-          "stone": 10866110,
-          "gold": 5431997
+          "lumber": 1638670,
+          "stone": 1638670,
+          "gold": 491551
         },
         "items": {},
         "time": 1814400,
@@ -6691,13 +6666,11 @@
       "30": {
         "resources": {
           "food": 0,
-          "lumber": 14560587,
-          "stone": 14560587,
-          "gold": 7278876
+          "lumber": 2048338,
+          "stone": 2048338,
+          "gold": 614438
         },
-        "items": {
-          "119000001": 1
-        },
+        "items": {},
         "time": 2246400,
         "power": 1061556,
         "requirements": {

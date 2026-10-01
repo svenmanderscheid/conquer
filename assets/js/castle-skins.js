@@ -1,7 +1,13 @@
-// Map portraits and village geometry share these stable skin identifiers.
+// Map portraits and the painted village share these stable skin identifiers.
 window.ConquerCastleSkins = (()=>{
     const entries=Object.freeze([
         {id:'default',name:'Grenzlandburg',rarity:'common',effectColor:'#b8d9ec',description:'Helle Steinmauern, blaue Turmdächer und das Wappen über dem Tor.'},
+        {id:'forest',name:'Waldhain',rarity:'legendary',effectColor:'#78a957',description:'Eine lebende Baumfeste mit mächtigen Wurzeln, warmen Fenstern und ruhigen Blätterkronen.'},
+        {id:'fire',name:'Glutwacht',rarity:'legendary',effectColor:'#ed7a32',description:'Eine runde Basaltfeste mit kupfernen Beschlägen, Glutkaminen und feuerroten Dächern.'},
+        {id:'water',name:'Gezeitenhort',rarity:'legendary',effectColor:'#44bfd0',description:'Eine helle Meeresfeste mit türkisfarbenen Kuppeln, Perlen und fließenden Wasserläufen.'},
+        {id:'wind',name:'Himmelswacht',rarity:'legendary',effectColor:'#89c8eb',description:'Eine luftige Höhenburg mit Wolkenornamenten, hellen Segeln und einem großen Windrad.'}
+    ].map(entry=>Object.freeze(entry)));
+    const legacyEntries=Object.freeze([
         {id:'ironkeep',name:'Eisenwacht',rarity:'legendary',effectColor:'#91a9bc',description:'Eine stählerne Höhenburg mit Zinnen, Werkhöfen und einer drehenden Windmühle.'},
         {id:'rosehall',name:'Rosenpalast',rarity:'legendary',effectColor:'#d97798',description:'Ein heller Gartenpalast mit Rosentürmen und einem wehenden Königsbanner.'},
         {id:'sandspire',name:'Dünenkrone',rarity:'legendary',effectColor:'#e6b55a',description:'Ein Wüstenpalast mit Sandsteinbögen und einem drehenden Sonnenornament.'},
@@ -19,11 +25,13 @@ window.ConquerCastleSkins = (()=>{
         {id:'tempest',name:'Sturmkrone',rarity:'mythic',effectColor:'#8edbff',description:'Eine schwebende Sturmfestung mit kreisenden Wolken und pulsierender Blitzenergie.'},
         {id:'eclipse',name:'Zitadelle der Finstersonne',rarity:'mythic',effectColor:'#cb91ff',description:'Eine obsidianfarbene Zitadelle unter einer schwarzen Sonne mit violetter Korona.'},
         {id:'dragon',name:'Drachenstahl-Zitadelle',rarity:'mythic',effectColor:'#63cfff',description:'Eine goldweiße Drachenzitadelle mit wehenden Bannern, leuchtenden Saphirkristallen und magischem Drachenatem.'}
-    ].map(entry=>Object.freeze(entry)));
+    ].map(entry=>Object.freeze({...entry,legacy:true})));
+    const allEntries=Object.freeze([...entries,...legacyEntries]);
+    const allIds=Object.freeze(allEntries.map(entry=>entry.id));
     const ids=Object.freeze(entries.map(entry=>entry.id));
-    const get=skin=>entries.find(entry=>entry.id===skin)||entries[0];
-    const image=(base,skin='default')=>`${base}/assets/art/map/castle-${get(skin).id}.png?v=epic7`;
-    const motionImage=(base,skin='default')=>get(skin).rarity!=='common'?`${base}/assets/art/map/castle-${get(skin).id}.webp?v=epic7`:image(base,skin);
+    const get=skin=>allEntries.find(entry=>entry.id===skin)||entries[0];
+    const image=(base,skin='default')=>`${base}/assets/art/map/castle-${get(skin).id}.png?v=storybook2`;
+    const motionImage=(base,skin='default')=>get(skin).id==='default'?image(base,skin):`${base}/assets/art/map/castle-${get(skin).id}.webp?v=elemental1`;
     const syncMotion=(root=document)=>{
         const reduced=document.body?.classList.contains('reduced-motion');
         root.querySelectorAll('img[data-castle-motion]').forEach(img=>{
@@ -36,5 +44,5 @@ window.ConquerCastleSkins = (()=>{
         observer.observe(document.body,{attributes:true,attributeFilter:['class']});
     };
     if(typeof document!=='undefined'&&typeof MutationObserver!=='undefined'){if(document.body)observeMotion();else document.addEventListener('DOMContentLoaded',observeMotion,{once:true});}
-    return Object.freeze({entries,ids,get,image,motionImage,syncMotion});
+    return Object.freeze({entries,legacyEntries,ids,allIds,get,image,motionImage,syncMotion});
 })();

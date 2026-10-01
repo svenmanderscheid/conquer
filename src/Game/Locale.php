@@ -8,6 +8,10 @@ final class Locale
     public const DEFAULT='en';
     public const SUPPORTED=['en'=>'English','de'=>'Deutsch','fr'=>'Français'];
     private static array $catalogs=[];
+    private static array $assets=[];
+    private const JSON_FLAGS=JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR;
+    // Increment when the executable wrapper or source-index format changes.
+    private const ASSET_FORMAT='locale-delivery-v1';
 
     public static function normalize(mixed $locale):string
     {
@@ -62,7 +66,64 @@ final class Locale
 
     public static function bootstrap():string
     {
-        $catalogs=[];foreach(self::SUPPORTED as$locale=>$name)$catalogs[$locale]=self::catalog($locale);
-        return 'window.CONQUER_I18N='.json_encode(['locale'=>self::current(),'catalogs'=>$catalogs],JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR).';';
+        $urls=[];foreach(self::SUPPORTED as $locale=>$name)$urls[$locale]=self::assetUrl($locale);
+        return 'window.CONQUER_I18N='.json_encode([
+            'locale'=>self::current(),'catalogs'=>new \stdClass(),'sourceCatalogs'=>new \stdClass(),
+            'catalogUrls'=>$urls,'sourceUrl'=>self::assetUrl('sources-de'),
+        ],self::JSON_FLAGS).';';
+    }
+
+    /** Ordered deferred scripts complete before localization.js, without repeating catalogues in HTML. */
+    public static function bootstrapScripts(?string $nonce=null):string
+    {
+        $nonceAttribute=$nonce===null?'':' nonce="'.htmlspecialchars($nonce,ENT_QUOTES|ENT_SUBSTITUTE,'UTF-8').'"';
+        $html='<script'.$nonceAttribute.'>'.self::bootstrap().'</script>';
+        $names=array_values(array_unique([self::DEFAULT,self::current()]));
+        // A loaded German target catalogue already supplies the same source text.
+        if(self::current()!=='de')$names[]='sources-de';
+        foreach($names as $name)$html.="\n".'<script src="'.htmlspecialchars(self::assetUrl($name,'js'),ENT_QUOTES|ENT_SUBSTITUTE,'UTF-8').'" defer></script>';
+        return $html;
+    }
+
+    /** This URL contains only shipped editorial text, never the session or a player preference. */
+    public static function assetUrl(string $name,string $format='json'):string
+    {
+        if(!in_array($format,['json','js'],true))throw new \InvalidArgumentException('Invalid locale asset format.');
+        $asset=self::asset($name);
+        return (defined('APP_BASE')?APP_BASE:'').'/locale-assets/'.$name.'.'.$asset['version'].'.'.$format;
+    }
+
+    private static function asset(string $name):array
+    {
+        if(!isset(self::SUPPORTED[$name])&&$name!=='sources-de')throw new \InvalidArgumentException('Invalid locale asset.');
+        if(isset(self::$assets[$name]))return self::$assets[$name];
+        if($name==='sources-de'){
+            $english=self::catalog(self::DEFAULT);$data=[];
+            foreach(self::catalog('de') as $key=>$value)if(($english[$key]??null)!==$value)$data[$key]=$value;
+        }else $data=self::catalog($name);
+        $json=json_encode((object)$data,self::JSON_FLAGS);
+        $version=substr(hash('sha256',self::ASSET_FORMAT."\n".$json),0,20);
+        $slot=$name==='sources-de'?'sourceCatalogs.de':'catalogs.'.$name;
+        // Each public script remains harmless when requested outside a page bootstrap.
+        $js='window.CONQUER_I18N=window.CONQUER_I18N||{};window.CONQUER_I18N.catalogs=window.CONQUER_I18N.catalogs||{};window.CONQUER_I18N.sourceCatalogs=window.CONQUER_I18N.sourceCatalogs||{};window.CONQUER_I18N.'.$slot.'='.$json.';';
+        return self::$assets[$name]=['version'=>$version,'json'=>$json,'js'=>$js];
+    }
+
+    /** Pure response builder: the front controller calls it before bootstrap, DB or session work. */
+    public static function assetResponse(string $path,string $method='GET',string $ifNoneMatch=''):array
+    {
+        $headers=['Content-Type'=>'application/json; charset=utf-8','Cache-Control'=>'no-store','X-Content-Type-Options'=>'nosniff','Cross-Origin-Resource-Policy'=>'same-origin'];
+        if(!in_array($method,['GET','HEAD'],true))return ['status'=>405,'headers'=>$headers+['Allow'=>'GET, HEAD'],'body'=>''];
+        if(!preg_match('~^/locale-assets/(en|de|fr|sources-de)\.([a-f0-9]{20})\.(json|js)$~D',$path,$matches))return ['status'=>404,'headers'=>$headers,'body'=>''];
+        $asset=self::asset($matches[1]);
+        if(!hash_equals($asset['version'],$matches[2]))return ['status'=>404,'headers'=>$headers,'body'=>''];
+        $body=$asset[$matches[3]];$etag='"'.$asset['version'].'-'.$matches[3].'"';
+        $headers['Content-Type']=$matches[3]==='js'?'application/javascript; charset=utf-8':'application/json; charset=utf-8';
+        $headers['Cache-Control']='public, max-age=31536000, immutable';
+        $headers['Expires']=gmdate('D, d M Y H:i:s',time()+31536000).' GMT';
+        $headers['ETag']=$etag;
+        foreach(explode(',',$ifNoneMatch) as $candidate)if(trim($candidate)==='*'||preg_replace('~^W/~','',trim($candidate))===$etag)return ['status'=>304,'headers'=>$headers,'body'=>''];
+        $headers['Content-Length']=(string)strlen($body);
+        return ['status'=>200,'headers'=>$headers,'body'=>$method==='HEAD'?'':$body];
     }
 }

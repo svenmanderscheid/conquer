@@ -1,0 +1,30 @@
+'use strict';
+require('./fixtures/browser_locale.cjs')('de'); // This suite asserts the explicit German UI.
+// Mutates only the explicitly isolated territory preview account/database.
+const assert=require('assert'),fs=require('fs'),path=require('path');
+const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
+const base=process.env.TERRITORY_FIXTURE_URL||'http://127.0.0.1:18946';assert(/^http:\/\/127\.0\.0\.1:\d+$/.test(base),'Disposable localhost fixture required');
+const out=path.resolve(__dirname,'../artifacts/territory-main');fs.mkdirSync(out,{recursive:true});
+(async()=>{const browser=await chromium.launch({headless:true,channel:'chrome'});try{
+ const page=await browser.newPage({viewport:{width:1280,height:800}}),errors=[];page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(12000);
+ await page.goto(base+'/?zugang=login');await page.locator('[name="identifier"],[name="username"]').fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');await Promise.all([page.waitForURL('**/city'),page.locator('form[action$="/auth/local"] button[type="submit"]').click()]);await page.waitForFunction(()=>document.querySelector('#player-hud-name')?.textContent.includes('PreviewPlayer'));
+ async function read(route){const response=await page.request.get(base+'/api/'+route),payload=await response.json();assert(payload.ok,payload.message);return payload.data;}
+ const state=await read('territory/state?world_id=1');assert.equal(state.targets.length,113);const goal=state.targets.find(t=>t.id===state.goal.target_id);assert(goal&&goal.y>255);
+ await page.locator('#navigation [data-id="world"]').click();await page.waitForFunction(()=>document.querySelector('.atlas-shell.is-luxembourg'));await page.evaluate(t=>ConquerWorld.focus(t.x,t.y),goal);await page.waitForSelector(`[data-atlas-target="territory:${goal.id}"]`);await page.locator(`[data-atlas-target="territory:${goal.id}"]`).click();await page.waitForSelector('.territory-target-summary');
+ let target=await read('territory/target?world_id=1&id='+encodeURIComponent(goal.id));
+ if(Number(target.owner_alliance_id)!==Number(state.alliance_id)&&!target.campaigns.some(c=>['gathering','marching'].includes(c.status))){
+  await page.locator('[data-action="territory-army"][data-mode="start"]').click();await page.locator('[data-territory-troop]').first().fill('1000');await page.locator('[name="rally_minutes"]').selectOption('1');await page.locator('[data-form="territory-army"] [type="submit"]').click();await page.waitForFunction(()=>!document.querySelector('[data-form="territory-army"]'));console.log('Actual isolated 1-minute conquest rally submitted.');
+ }
+ const deadline=Date.now()+180000;
+ while(Number(target.owner_alliance_id)!==Number(state.alliance_id)&&Date.now()<deadline){await new Promise(resolve=>setTimeout(resolve,5000));target=await read('territory/target?world_id=1&id='+encodeURIComponent(goal.id));}
+ assert.equal(Number(target.owner_alliance_id),Number(state.alliance_id),'Actual server battle must award ownership');assert(target.campaigns.some(c=>c.status==='won'),'Actual campaign must be won');console.log('Actual server conquest completed.');
+ await page.setViewportSize({width:320,height:568});await page.locator('[data-action="territory-tab"][data-id="territories"]').click();await page.locator('.territory-toolbar').waitFor();assert.equal(await page.locator('[data-action="territory-tab"][data-id="territories"]').getAttribute('aria-pressed'),'true');
+ assert(await page.locator('.territory-heading h2').evaluate(e=>e.getBoundingClientRect().height<=parseFloat(getComputedStyle(e).lineHeight)+1),'Narrow title remains on one line');await page.screenshot({path:path.join(out,'overview-320x568.png')});await page.locator(`[data-action="territory-target"][data-id="${goal.id}"]`).click();await page.waitForSelector('.territory-target-summary');
+ for(const viewport of [{width:1280,height:800},{width:390,height:844},{width:844,height:390}]){await page.setViewportSize(viewport);await page.locator('[data-action="territory-reload"]').click();await page.waitForFunction(()=>document.querySelector('.territory-target-summary')?.textContent.includes('Die Morgenwacht'));await page.locator('.territory-body').evaluate(e=>e.scrollTop=0);await page.screenshot({path:path.join(out,`conquered-${viewport.width}x${viewport.height}.png`)});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);}
+ const game=await read('game/state'),report=game.reports.find(r=>r.details?.battle_kind==='territory'&&r.details?.territory_id===goal.id);assert(report,'Actual battle produced a native report');assert.equal(report.details.combat.attacker.armies[0].totals.sent,1000);assert.equal(report.details.combat.npc_troops,120);
+ for(const viewport of [{width:1280,height:800},{width:390,height:844},{width:844,height:390}]){
+  await page.setViewportSize(viewport);await page.goto(base+'/city?combat_report='+report.id+'#world');await page.waitForSelector('.cr-versus').catch(async error=>{await page.screenshot({path:path.join(out,`report-failure-${viewport.width}x${viewport.height}.png`)});console.log('Report open failure',await page.locator('body').innerText(),errors);throw error});assert.match(await page.locator('#game-dialog').innerText(),/Gebiets-Kampfbericht/);assert.match(await page.locator('.cr-result strong').innerText(),/Sieg/);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);await page.screenshot({path:path.join(out,`report-${viewport.width}x${viewport.height}.png`)});
+  await page.locator('[data-combat="details"]').click();await page.waitForSelector('#combat-details');assert.match(await page.locator('#combat-details').innerText(),/120/);await page.screenshot({path:path.join(out,`report-details-${viewport.width}x${viewport.height}.png`)});console.log(`PASS actual territory report ${viewport.width}×${viewport.height}`);
+ }
+ assert.deepEqual(errors,[]);console.log('Screenshots: '+out);
+}finally{await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1});

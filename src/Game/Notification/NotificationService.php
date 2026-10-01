@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Conquer\Game\Notification;
 
 use Conquer\Db\Connection;
+use Conquer\Game\World\WorldContext;
 
 /**
  * In-game notification inbox.
@@ -29,6 +30,7 @@ final class NotificationService
     public const TYPE_BUILD_COMPLETE    = 'build_complete';
     public const TYPE_RESEARCH_COMPLETE = 'research_complete';
     public const TYPE_TRAIN_COMPLETE    = 'train_complete';
+    public const TYPE_HEAL_COMPLETE     = 'heal_complete';
     public const TYPE_MARCH_RETURNED    = 'march_returned';
     public const TYPE_BATTLE_INCOMING   = 'battle_incoming';
     public const TYPE_BATTLE_REPORT     = 'battle_report';
@@ -39,6 +41,8 @@ final class NotificationService
 
     /** Maximum notifications returned per poll call. */
     private const POLL_LIMIT = 50;
+    // Notifications predating multi-world support belong to the original world.
+    private const WORLD_FILTER = "COALESCE(CAST(JSON_UNQUOTE(JSON_EXTRACT(data_json,'$.world_id')) AS UNSIGNED),1)=?";
 
     // -------------------------------------------------------------------------
     // Write
@@ -70,6 +74,18 @@ final class NotificationService
         }
     }
 
+    /** Persist a completion in the same transaction as its automatically credited result. */
+    public static function pushCityCompletion(int $cityId, string $type, array $data): void
+    {
+        $owner = Connection::getInstance()->query(
+            'SELECT player_id, world_id FROM cities WHERE id = ?', [$cityId],
+        )->fetch();
+        if (!$owner) return;
+        $data['city_id'] = $cityId;
+        $data['world_id'] = (int) $owner['world_id'];
+        self::push((int) $owner['player_id'], $type, $data);
+    }
+
     // -------------------------------------------------------------------------
     // Read
     // -------------------------------------------------------------------------
@@ -85,10 +101,10 @@ final class NotificationService
         $rows = $db->query(
             'SELECT id, type, data_json, created_at
              FROM   notifications
-             WHERE  player_id = ? AND read_at IS NULL
+             WHERE  player_id = ? AND read_at IS NULL AND ' . self::WORLD_FILTER . '
              ORDER  BY created_at DESC
              LIMIT  ' . self::POLL_LIMIT,
-            [$playerId],
+            [$playerId,WorldContext::id()],
         )->fetchAll();
 
         return array_map(
@@ -113,6 +129,26 @@ final class NotificationService
         );
     }
 
+    /** Completion markers remain until acknowledged, even after the queues are settled. */
+    public static function buildingCompletions(int $playerId, int $cityId, int $worldId): array
+    {
+        $types = [self::TYPE_BUILD_COMPLETE, self::TYPE_TRAIN_COMPLETE,
+            self::TYPE_RESEARCH_COMPLETE, self::TYPE_HEAL_COMPLETE];
+        $rows = Connection::getInstance()->query(
+            'SELECT id, type, data_json, created_at FROM notifications
+             WHERE player_id = ? AND read_at IS NULL AND ' . self::WORLD_FILTER . '
+               AND CAST(JSON_UNQUOTE(JSON_EXTRACT(data_json,\'$.city_id\')) AS UNSIGNED) = ?
+               AND type IN (?, ?, ?, ?)
+             ORDER BY id DESC LIMIT 200',
+            [$playerId, $worldId, $cityId, ...$types],
+        )->fetchAll();
+        return array_map(static fn(array $row): array => [
+            'id' => (int) $row['id'], 'type' => $row['type'],
+            'data' => json_decode((string) $row['data_json'], true, 32, JSON_THROW_ON_ERROR),
+            'created_at' => $row['created_at'],
+        ], $rows);
+    }
+
     /**
      * Returns the count of unread notifications for a player.
      */
@@ -123,8 +159,8 @@ final class NotificationService
         $row = $db->query(
             'SELECT COUNT(*) AS cnt
              FROM   notifications
-             WHERE  player_id = ? AND read_at IS NULL',
-            [$playerId],
+             WHERE  player_id = ? AND read_at IS NULL AND ' . self::WORLD_FILTER,
+            [$playerId,WorldContext::id()],
         )->fetch();
 
         return $row !== false ? (int) $row['cnt'] : 0;
@@ -164,8 +200,8 @@ final class NotificationService
              SET    read_at = UTC_TIMESTAMP()
              WHERE  player_id = ?
                AND  read_at  IS NULL
-               AND  id IN (' . $placeholders . ')',
-            [$playerId, ...$cleanIds],
+               AND  id IN (' . $placeholders . ') AND ' . self::WORLD_FILTER,
+            [$playerId, ...$cleanIds,WorldContext::id()],
         );
     }
 
@@ -193,6 +229,7 @@ final class NotificationService
     public static function poll(int $playerId, int $cityId): array
     {
         $db = Connection::getInstance();
+        if(!$db->query('SELECT id FROM cities WHERE id=? AND player_id=? AND world_id=?',[$cityId,$playerId,WorldContext::id()])->fetchColumn())throw new \DomainException('Die Stadt gehört nicht zu deinem aktiven Königreich.',403);
 
         // ---- 1. Pending notifications ----------------------------------------
         $notifications = self::getPending($playerId);
@@ -201,12 +238,12 @@ final class NotificationService
         $brRow = $db->query(
             'SELECT COUNT(*) AS cnt
              FROM   battle_reports
-             WHERE  attacker_id = ? AND attacker_read = 0
+             WHERE  attacker_id = ? AND attacker_read = 0 AND world_id = ?
              UNION ALL
              SELECT COUNT(*) AS cnt
              FROM   battle_reports
-             WHERE  defender_id = ? AND defender_read = 0',
-            [$playerId, $playerId],
+             WHERE  defender_id = ? AND defender_read = 0 AND world_id = ?',
+            [$playerId,WorldContext::id(),$playerId,WorldContext::id()],
         )->fetchAll();
 
         $unreadBattleReports = 0;
@@ -243,9 +280,10 @@ final class NotificationService
                     GREATEST(0, TIMESTAMPDIFF(SECOND, UTC_TIMESTAMP(), finishes_at)) AS secs_remaining
              FROM   research_queue
              WHERE  player_id    = ?
+               AND  world_id = ?
                AND  is_processed = 0
              ORDER  BY finishes_at ASC',
-            [$playerId],
+            [$playerId,WorldContext::id()],
         )->fetchAll();
 
         $activeResearch = array_map(
@@ -261,15 +299,16 @@ final class NotificationService
 
         // ---- 5. Active marches -----------------------------------------------
         $marchRows = $db->query(
-            'SELECT id, march_type, state, target_x, target_y, arrives_at, returns_at,
+            'SELECT id, march_type, state, target_x, target_y, arrival_time AS arrives_at, return_time AS returns_at,
                     GREATEST(0, TIMESTAMPDIFF(SECOND, UTC_TIMESTAMP(),
-                        CASE state WHEN \'marching\' THEN arrives_at ELSE returns_at END
+                        CASE state WHEN \'marching\' THEN arrival_time ELSE return_time END
                     )) AS secs_remaining
              FROM   marches
              WHERE  player_id = ?
+               AND  world_id = ?
                AND  state     IN (\'marching\', \'returning\')
              ORDER  BY id ASC',
-            [$playerId],
+            [$playerId,WorldContext::id()],
         )->fetchAll();
 
         $marches = array_map(
@@ -291,7 +330,8 @@ final class NotificationService
             $db->execute(
                 'DELETE FROM notifications
                  WHERE  player_id  = ?
-                   AND  created_at < DATE_SUB(UTC_TIMESTAMP(), INTERVAL ? DAY)',
+                   AND  created_at < DATE_SUB(UTC_TIMESTAMP(), INTERVAL ? DAY)
+                   AND (read_at IS NOT NULL OR type NOT IN (\'build_complete\',\'train_complete\',\'research_complete\',\'heal_complete\'))',
                 [$playerId, self::RETENTION_DAYS],
             );
         } catch (\Throwable) {

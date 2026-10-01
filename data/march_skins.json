@@ -12,6 +12,50 @@
       "unlock_castle_level": 2
     },
     {
+      "id": "forest",
+      "castle_skin": "forest",
+      "name": "Waldläufer",
+      "rarity": "legendary",
+      "description": "Ein verzauberter Wurzelhirsch trägt Blätterkrone und goldene Wegglocke durch den Wald.",
+      "effect_color": "#78a957",
+      "price_gems": 1200,
+      "bonus_pct": 5,
+      "unlock_castle_level": 1
+    },
+    {
+      "id": "fire",
+      "castle_skin": "fire",
+      "name": "Glutstürmer",
+      "rarity": "legendary",
+      "description": "Ein kräftiger Glutwidder schreitet mit Basalthörnern und kupferner Rüstung voran.",
+      "effect_color": "#ed7a32",
+      "price_gems": 1200,
+      "bonus_pct": 5,
+      "unlock_castle_level": 1
+    },
+    {
+      "id": "water",
+      "castle_skin": "water",
+      "name": "Wellenreiter",
+      "rarity": "legendary",
+      "description": "Ein flinker Wellenotter trägt Muschelpanzer, Perlen und einen mächtigen Schweif aus Wasser.",
+      "effect_color": "#44bfd0",
+      "price_gems": 1200,
+      "bonus_pct": 5,
+      "unlock_castle_level": 1
+    },
+    {
+      "id": "wind",
+      "castle_skin": "wind",
+      "name": "Wolkengreif",
+      "rarity": "legendary",
+      "description": "Ein junger Wolkengreif läuft und gleitet mit breiten Schwingen durch die Welt.",
+      "effect_color": "#89c8eb",
+      "price_gems": 1200,
+      "bonus_pct": 5,
+      "unlock_castle_level": 1
+    },
+    {
       "id": "ironkeep",
       "castle_skin": "ironkeep",
       "name": "Eisenkoloss",

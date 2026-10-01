@@ -16,7 +16,7 @@ final class ItemPresentation
         elseif($category==='chest')$image='items/chest-'.($d['chest_type']??'silver').'.svg';
         elseif($category==='ap_refill')$image='items/energy.svg';
         elseif($category==='vip_point')$image='items/prestige.svg';
-        elseif($category==='fragment_pack')$image='items/fragment.svg';
+        elseif($category==='fragment_pack')$image='items/fragment-'.($d['fragment_grade']??$d['rarity']??'normal').'.svg';
         elseif($category==='boost')$image='items/'.(['resource_production'=>'production.svg','gathering_speed'=>'gathering.svg','construction_speed'=>'hammer.svg','research_speed'=>'research.svg','training_speed'=>'helmet.svg','anti_spy'=>'anti-spy.svg'][$d['boost_type']??'']??'shield.svg');
         return ['code'=>(string)$d['code'],'name'=>$d['name_de']??$d['name'],'category'=>$category,'category_name'=>self::CATEGORIES[$category]??'Sonstiges','rarity'=>$d['rarity']??'normal','image'=>self::image($image),'description'=>$d['description_de']??$d['description']??''];
     }
@@ -31,7 +31,7 @@ final class ItemPresentation
     public static function catalog(bool $fragments=false): array
     {
         $out=array_values(array_map(self::item(...),\Conquer\Game\Inventory\InventoryService::allDefs()));
-        if($fragments)foreach(['normal','rare','epic','legendary','mythic'] as $grade)$out[]=['code'=>'fragment:'.$grade,'name'=>self::GRADES[$grade].' · zufällige Reliktfragmente','category'=>'fragments','category_name'=>'Reliktfragmente','rarity'=>$grade,'image'=>self::image('items/fragment.svg'),'description'=>'Fragmente eines zufälligen Relikts dieser Seltenheit.'];
+        if($fragments)foreach(['normal','rare','epic','legendary','mythic'] as $grade)$out[]=['code'=>'fragment:'.$grade,'name'=>self::GRADES[$grade].' · zufällige Reliktfragmente','category'=>'fragments','category_name'=>'Reliktfragmente','rarity'=>$grade,'image'=>self::image('items/fragment-'.$grade.'.svg'),'description'=>'Fragmente eines zufälligen Relikts dieser Seltenheit.'];
         return $out;
     }
 }

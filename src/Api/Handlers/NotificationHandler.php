@@ -133,8 +133,8 @@ final class NotificationHandler
     {
         $db  = Connection::getInstance();
         $row = $db->query(
-            'SELECT id FROM cities WHERE player_id = ? LIMIT 1',
-            [$playerId],
+            'SELECT id FROM cities WHERE player_id = ? AND world_id = ? LIMIT 1',
+            [$playerId,\Conquer\Game\World\WorldContext::id()],
         )->fetch();
 
         return $row !== false ? (int) $row['id'] : null;

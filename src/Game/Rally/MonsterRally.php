@@ -30,10 +30,7 @@ final class MonsterRally
 
     public static function capacity(int $playerId,int $cityId): int
     {
-        $level=max(1,(int)Connection::getInstance()->query("SELECT level FROM city_buildings WHERE city_id=? AND building_code='hall_of_alliance'",[$cityId])->fetchColumn());
-        $base=\Conquer\Game\Map\MonsterPower::rallyCapacity($level);
-        $buffs=BuffEngine::getBuffs($playerId);
-        return (int)floor($base*(1+max(0,(float)($buffs['rally_attack_amount']??0)))+1e-8);
+        return RallyCapacity::forCity($playerId,$cityId)['total'];
     }
 
     public static function drops(array $definition): array
@@ -78,20 +75,25 @@ final class MonsterRally
             $army['source_snapshot']=\Conquer\Game\March\MonsterReport::capture($army['player_id'],$army['city_id'],$world);
         }unset($army);
         $result=BattleEngine::resolveMonsterArmies($armies,$target,$meta['monster']);
-        $weights=array_map(static fn($a)=>array_sum($a['troops']),$armies);$loot=[];$items=[];$xp=[];$settlement=null;
+        $loot=[];$items=[];$xp=[];$settlement=null;
         if($result['monster_killed']){
-            $pool=$meta['monster']['resource_reward']??['food'=>100,'lumber'=>100,'stone'=>50,'gold'=>50];
+            $basePool=$meta['monster']['resource_reward']??['food'=>100,'lumber'=>100,'stone'=>50,'gold'=>50];
             $gems=$meta['monster']['gems_drop']??[];
-            if(self::roll((float)($gems['chance']??0)))$pool['gems']=(int)($gems['amount']??0);
-            foreach($pool as $resource=>$amount)if(in_array($resource,['food','lumber','stone','gold','gems'],true))foreach(BattleEngine::splitAmount((int)$amount,$weights) as $i=>$share)$loot[$i][$resource]=$share;
-            foreach($meta['drops'] as $drop)if(self::roll((float)$drop['probability']))foreach(BattleEngine::splitAmount((int)$drop['count'],$weights) as $i=>$share)if($share>0)$items[$i][(int)$drop['item_code']]=($items[$i][(int)$drop['item_code']]??0)+$share;
-            $xp=BattleEngine::splitAmount($meta['monster']['xp']??(max(1,(int)$meta['monster']['level'])*($meta['monster']['xp_per_level']??(str_contains(strtolower($meta['monster']['name']),'deathkar')?20:10))),$weights);
+            $baseXp=(int)($meta['monster']['xp']??(max(1,(int)$meta['monster']['level'])*($meta['monster']['xp_per_level']??(str_contains(strtolower($meta['monster']['name']),'deathkar')?20:10))));
+            foreach($armies as $i=>$army){
+                foreach($basePool as $resource=>$amount)if(in_array($resource,['food','lumber','stone','gold'],true))$loot[$i][$resource]=(int)$amount;
+                if(self::roll((float)($gems['chance']??0)))$loot[$i]['gems']=(int)($gems['amount']??0);
+                foreach($meta['drops'] as $drop)if(self::roll((float)$drop['probability']))$items[$i][(int)$drop['item_code']]=($items[$i][(int)$drop['item_code']]??0)+(int)$drop['count'];
+                $xp[$i]=$baseXp;
+            }
             $settlement=\Conquer\Game\Charm\MonsterCharmLifecycle::settle(
                 $world,$target,$meta['monster'],'rally',(int)$r['id'],(int)$r['leader_player_id'],
                 isset($meta['alliance_id'])?(int)$meta['alliance_id']:null,
-                ['resources'=>$pool,'items_by_army'=>$items,'xp_by_army'=>$xp],
+                ['resources_by_army'=>$loot,'items_by_army'=>$items,'xp_by_army'=>$xp],
             );
             if(!$settlement['created'])return ['armies'=>$armies,'reason'=>'Das Monster wurde bereits besiegt.','cancelled'=>true,'outcome'=>'cancelled'];
+            $regionalBase=\Conquer\Game\Territory\TerritoryEconomy::regionalBaseResources(array_replace($meta['monster'],['drops'=>$meta['drops']??[]]));
+            $result['regional_supply']=\Conquer\Game\Territory\TerritoryEconomy::regionalKill($world,(int)$r['leader_player_id'],(int)$r['target_x'],(int)$r['target_y'],'monster-rally:'.$r['id'],$regionalBase,strtotime($r['arrival_time'].' UTC'));
             $result['charm']=['id'=>$settlement['charm_id'],'world_id'=>$world,'x'=>(int)$target['coord_x'],'y'=>(int)$target['coord_y'],'guaranteed'=>true,'ownership'=>null,'exclusive_until'=>null];
             $db->execute('DELETE FROM field_monsters WHERE id=? AND world_id=?',[$target['id'],$world]);
         }else{$db->execute('UPDATE field_monsters SET hp_current=? WHERE id=? AND world_id=?',[$result['new_monster_hp'],$target['id'],$world]);}

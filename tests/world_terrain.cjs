@@ -2,7 +2,9 @@
 const fs=require('fs'),path=require('path'),vm=require('vm'),assert=require('assert'),{execFileSync}=require('child_process');
 const root=path.resolve(__dirname,'..'),context={window:{ConquerTerrainData:JSON.parse(fs.readFileSync(path.join(root,'data/world_terrain.json'),'utf8'))}};
 vm.runInNewContext(fs.readFileSync(path.join(root,'assets/js/world-landscape.js'),'utf8'),context);
-const php=`require 'src/Game/Map/WorldTerrain.php';for($y=0;$y<256;$y+=.5)for($x=0;$x<256;$x+=.5)echo \\Conquer\\Game\\Map\\WorldTerrain::isWater($x,$y)?'1':'0';`;
+// WorldTerrain checks whether a database is initialized to select map geometry.
+// Load its class dependency without initialization; this remains a pure sample test.
+const php=`require 'src/Db/Connection.php';require 'src/Game/Map/WorldTerrain.php';if(\\Conquer\\Db\\Connection::isInitialized())throw new RuntimeException('Unexpected database');for($y=0;$y<256;$y+=.5)for($x=0;$x<256;$x+=.5)echo \\Conquer\\Game\\Map\\WorldTerrain::isWater($x,$y)?'1':'0';if(\\Conquer\\Db\\Connection::isInitialized())throw new RuntimeException('Unexpected database');`;
 const server=execFileSync('php',['-r',php],{cwd:root,maxBuffer:1024*1024}).toString();let index=0,count=0;
 for(let y=0;y<256;y+=.5)for(let x=0;x<256;x+=.5){const client=context.window.ConquerLandscape.waterAt(x,y);assert.equal(client,server[index++]==='1',`Water disagreement at ${x},${y}`);if(client)count++;}
 const bridges=context.window.ConquerLandscape.bridgePoints;

@@ -16,12 +16,11 @@
     ];
     const positive = value => Number.isFinite(Number(value)) ? Math.max(0, Math.floor(Number(value))) : 0;
     const balance = value => value == null || !Number.isFinite(Number(value)) ? null : positive(value);
-    const exact = value => value == null ? 'Nicht verfügbar' : value.toLocaleString('de-DE');
+    const authored = value => window.ConquerLocale?.text(value) ?? value;
+    const exact = value => value == null ? authored('Nicht verfügbar') : value.toLocaleString(window.ConquerLocale?.locale??'en');
     function compact(value) {
         if (value == null) return '–';
-        for (const [size, suffix] of [[1e12, 'Bill.'], [1e9, 'Mrd.'], [1e6, 'Mio.'], [1e3, 'Tsd.']]) {
-            if (value >= size) return (value / size).toLocaleString('de-DE', {maximumFractionDigits:2}) + ' ' + suffix;
-        }
+        if (value >= 1000) return new Intl.NumberFormat(window.ConquerLocale?.locale??'en', {notation:'compact', maximumFractionDigits:2}).format(value);
         return exact(value);
     }
     // Only owned items contribute. The full catalogue and random chests are deliberately excluded.
@@ -51,17 +50,18 @@
         };
     }
     function formatTime(seconds, unit = 'days') {
-        if (seconds == null) return 'Nicht verfügbar';
+        if (seconds == null) return authored('Nicht verfügbar');
         let rest = positive(seconds);
-        if (!rest) return 'Keine Items';
+        if (!rest) return authored('Keine Items');
         const parts = [];
-        const units = unit === 'minutes' ? [[60, 'Min.']] : unit === 'hours' ? [[3600, 'Std.'], [60, 'Min.']] : [[86400, 'Tg.'], [3600, 'Std.'], [60, 'Min.']];
+        const short = (key,fallback) => window.ConquerLocale?.t('time.'+key+'_short') ?? fallback;
+        const units = unit === 'minutes' ? [[60, short('minute','min')]] : unit === 'hours' ? [[3600, short('hour','hr')], [60, short('minute','min')]] : [[86400, short('day','d')], [3600, short('hour','hr')], [60, short('minute','min')]];
         for (const [size, label] of units) {
             const value = Math.floor(rest / size);
             if (value) parts.push(exact(value) + ' ' + label);
             rest %= size;
         }
-        if (rest) parts.push(exact(rest) + ' Sek.');
+        if (rest) parts.push(exact(rest) + ' ' + short('second','sec'));
         return parts.join(' ');
     }
     function create({base, esc, getState, getKingdom, openDialog}) {
@@ -73,15 +73,15 @@
         function table(totals) {
             if (tab === 'resources') return `<table class="inventory-overview-table"><caption class="inventory-overview-sr">Rohstoffpakete und aktuelle Vorräte</caption>
                 <thead><tr><th scope="col">Rohstoff</th><th scope="col">In Items</th><th scope="col">Im Vorrat</th></tr></thead><tbody>${totals.resources.map(row => `
-                <tr data-resource="${row.key}"><th scope="row"><span class="inventory-overview-identity"><span class="inventory-overview-art"><img src="${image(row.icon)}" alt=""></span><span>${row.name}</span></span></th>${numberCell(row.items, 'items')}${numberCell(row.stock, 'stock')}</tr>`).join('')}</tbody></table>`;
+                <tr data-resource="${row.key}"><th scope="row"><span class="inventory-overview-identity"><span class="inventory-overview-art"><img src="${image(row.icon)}" alt=""></span><span>${authored(row.name)}</span></span></th>${numberCell(row.items, 'items')}${numberCell(row.stock, 'stock')}</tr>`).join('')}</tbody></table>`;
             return `<table class="inventory-overview-table is-speedups"><caption class="inventory-overview-sr">Gesamte Beschleunigungszeit im Inventar</caption>
                 <thead><tr><th scope="col">Beschleuniger</th><th scope="col">Gesamtdauer</th></tr></thead><tbody>${totals.speedups.map(row => `
-                <tr data-speedup="${row.key}"><th scope="row"><span class="inventory-overview-identity"><span class="inventory-overview-art"><img src="${image(row.icon)}" alt=""></span><span>${row.name}</span></span></th><td data-seconds="${row.seconds ?? ''}">${formatTime(row.seconds, unit)}</td></tr>`).join('')}</tbody></table>`;
+                <tr data-speedup="${row.key}"><th scope="row"><span class="inventory-overview-identity"><span class="inventory-overview-art"><img src="${image(row.icon)}" alt=""></span><span>${authored(row.name)}</span></span></th><td data-seconds="${row.seconds ?? ''}">${formatTime(row.seconds, unit)}</td></tr>`).join('')}</tbody></table>`;
         }
         function update(resetScroll = false) {
             const panel = dialog.open && dialog.querySelector('.inventory-overview');
             if (!panel) return;
-            const totals = summarize(getState(), getKingdom()), signature = JSON.stringify([totals, tab, unit]);
+            const totals = summarize(getState(), getKingdom()), signature = JSON.stringify([totals, tab, unit, window.ConquerLocale?.locale]);
             if (panel.dataset.signature === signature) return;
             panel.dataset.signature = signature;
             const scroll = panel.querySelector('.inventory-overview-scroll'), top = resetScroll ? 0 : scroll.scrollTop;
@@ -108,10 +108,11 @@
             openDialog(`<section class="inventory-overview"><h2>Rohstoffe & Beschleuniger</h2>
                 <nav class="inventory-overview-tabs" aria-label="Übersicht auswählen"><button type="button" data-overview-tab="resources" class="active" aria-pressed="true">Rohstoffe</button><button type="button" data-overview-tab="speedups" aria-pressed="false">Beschleuniger</button></nav>
                 <div class="inventory-overview-scroll" tabindex="0" aria-label="Inventarbestände"></div>
-                <div class="inventory-overview-footer"><div class="inventory-overview-units" role="group" aria-label="Zeitdarstellung" hidden>${[['days','Tage'],['hours','Stunden'],['minutes','Minuten']].map(([key, label]) => `<button type="button" data-overview-unit="${key}" aria-pressed="${unit === key}"><span aria-hidden="true">✓</span>${label}</button>`).join('')}</div><p class="inventory-overview-note"></p></div></section>`);
+                <div class="inventory-overview-footer"><div class="inventory-overview-units" role="group" aria-label="Zeitdarstellung" hidden>${[['days','Tage'],['hours','Stunden'],['minutes','Minuten']].map(([key, label]) => `<button type="button" data-overview-unit="${key}" aria-pressed="${unit === key}"><span aria-hidden="true">✓</span><span>${authored(label)}</span></button>`).join('')}</div><p class="inventory-overview-note"></p></div></section>`,{historyManaged:true});
             update();
         }
         button.addEventListener('click', open);
+        document.addEventListener('conquer:locale',()=>update());
         dialog.addEventListener('click', event => {
             const control = event.target.closest('[data-overview-tab],[data-overview-unit]');
             if (!control || !control.closest('.inventory-overview')) return;

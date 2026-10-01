@@ -12,7 +12,7 @@ const vm = require('vm');
 const assert = require('assert');
 
 const root = path.resolve(__dirname, '..');
-const source = fs.readFileSync(path.join(root, 'assets/js/mvp-panels.js'), 'utf8');
+const source = fs.readFileSync(path.join(root, 'assets/js/alliance-ranks.js'), 'utf8') + '\n' + fs.readFileSync(path.join(root, 'assets/js/mvp-panels.js'), 'utf8');
 const view = fs.readFileSync(path.join(root, 'views/game.php'), 'utf8');
 const stylesheets = [...view.matchAll(/assets\/css\/([^?"']+)\?/g)].map(match => match[1]);
 assert(stylesheets.includes('window-layout.css'), 'The fixture must load the current shared window layout.');
@@ -25,8 +25,17 @@ function itemRenderingChecks() {
     const host = {innerHTML: '', dataset: {}, querySelector: () => null};
     let dialogHTML = '';
     const kingdom = {inventory: [], treasures: {items: [], slots: 2, bonuses: {}}};
-    const sandbox = {window: {innerWidth: 1280, innerHeight: 800}, document: {querySelector: () => host}};
-    vm.runInNewContext(source, sandbox, {filename: 'mvp-panels.js'});
+    const sandbox = {
+        window: {innerWidth: 1280, innerHeight: 800, addEventListener() {}},
+        document: {querySelector: () => host, readyState: 'loading', addEventListener() {}},
+        requestAnimationFrame: callback => callback(),
+    };
+    // The string-rendering VM uses the same explicit German bootstrap and real
+    // catalogues as the browser fixture. DOM lifecycle stays pending here.
+    vm.createContext(sandbox);
+    vm.runInContext(require('./fixtures/isolated_locale.cjs')('de'), sandbox, {filename: 'isolated_locale.js'});
+    assert.equal(sandbox.window.ConquerLocale.locale, 'de', 'Item metadata checks explicitly use German.');
+    vm.runInContext(source, sandbox, {filename: 'mvp-panels.js'});
     const panels = sandbox.window.ConquerPanels({
         openDialog: html => { dialogHTML = html; },
         base: '', esc: String, fmt: number => Number(number).toLocaleString('de-DE'),
@@ -219,6 +228,7 @@ async function main() {
             <dialog id="game-dialog"><div class="popup-heading"><h2>Details</h2><button>×</button></div><div id="dialog-content"></div></dialog>
             </body></html>`);
         await page.addStyleTag({content: styles});
+        await page.addScriptTag({content: require('./fixtures/isolated_locale.cjs')('de')});
         await page.addScriptTag({content: source});
         await page.evaluate(({kingdom, state, expeditions}) => {
             window.K = kingdom; window.S = state; window.E = expeditions;
@@ -255,11 +265,26 @@ async function main() {
                     image.loading = 'eager';
                     try { await image.decode(); } catch { /* The metric below reports failed images. */ }
                 }));
+                await new Promise(resolve=>requestAnimationFrame(resolve));
             });
+            const tabIssues=await page.evaluate(()=>{
+                const strip=document.querySelector('.inventory-category-tabs');if(!strip)return [];
+                const issues=[],initial=strip.scrollLeft,bounds=strip.getBoundingClientRect();
+                for(const tab of strip.querySelectorAll('button')){
+                    const box=tab.getBoundingClientRect();strip.scrollLeft+=(box.left+box.right-bounds.left-bounds.right)/2;
+                    const rect=tab.getBoundingClientRect(),label=tab.querySelector('span'),range=document.createRange();range.selectNodeContents(label||tab);const text=range.getBoundingClientRect();
+                    if(rect.left<bounds.left-2||rect.right>bounds.right+2||rect.height<44||parseFloat(getComputedStyle(tab).fontSize)<12||text.left<rect.left-1||text.right>rect.right+1)issues.push(tab.textContent);
+                }
+                strip.scrollLeft=initial;
+                const active=strip.querySelector('[aria-pressed="true"]')?.getBoundingClientRect();
+                if(active&&(active.left<bounds.left-2||active.right>bounds.right+2))issues.push('active tab outside its strip');
+                return issues;
+            });
+            assert.deepEqual(tabIssues,[],label+': every category is readable and reachable; selected tab stays visible');
             const metrics = await page.evaluate(tolerance => {
                 const host = document.querySelector('#content'), bounds = host.getBoundingClientRect();
                 const frame = document.querySelector('#panel-dialog').getBoundingClientRect();
-                const selectors = ['#panel-dialog', '#content', '.inventory-paged', '#inventory-body', '.inventory-browser', '.inventory-board', '.inventory-inspector', '.inventory-inspector-description', '.inventory-inspector-controls', '.inventory-page-grid', '.inventory-pager', '.window-list', '.treasury-view', '.quest-page', '.alliance-overview'];
+                const selectors = ['#panel-dialog', '#content', '.inventory-paged', '#inventory-body', '.inventory-browser', '.inventory-board', '.inventory-inspector', '.inventory-inspector-description', '.inventory-inspector-controls', '.inventory-page-grid', '.inventory-pager', '.window-list', '.treasury-view', '.quest-page', '.alliance-home-scroll'];
                 return {
                     viewport: [innerWidth, innerHeight],
                     cards: document.querySelectorAll('.inventory-page-grid>.loot-card').length,
@@ -267,21 +292,33 @@ async function main() {
                     frameOutsideViewport: frame.top < -tolerance || frame.left < -tolerance || frame.bottom > innerHeight + tolerance || frame.right > innerWidth + tolerance,
                     overflow: selectors.flatMap(selector => {
                         const node = document.querySelector(selector);
-                        const scrollList = node?.matches('.inventory-scroll-board,.inventory-scroll-list,.inventory-inspector,.quest-list,.alliance-overview') && getComputedStyle(node).overflowY === 'auto';
+                        const scrollList = node?.matches('.inventory-scroll-board,.inventory-scroll-list,.inventory-inspector,.quest-list,.alliance-home-scroll,.treasury-view,[data-panel="alliance"] .window-list') && getComputedStyle(node).overflowY === 'auto';
                         return node && (node.scrollWidth > node.clientWidth + tolerance || (!scrollList && node.scrollHeight > node.clientHeight + tolerance))
                             ? [{selector, size: [node.clientWidth, node.clientHeight], scroll: [node.scrollWidth, node.scrollHeight]}] : [];
                     }),
                     clippedControls: [...host.querySelectorAll('button,input,select')].filter(node => {
                         const rect = node.getBoundingClientRect();
-                        const scrollList = node.closest('.inventory-scroll-board,.inventory-scroll-list,.inventory-inspector,.quest-list,.alliance-overview');
+                        const scrollList = node.closest('.inventory-scroll-board,.inventory-scroll-list,.inventory-inspector,.quest-list,.alliance-home-scroll,.treasury-view,[data-panel="alliance"] .window-list');
+                        const strip=node.closest('.inventory-category-tabs');
+                        if(strip&&getComputedStyle(strip).overflowX==='auto'&&node.getAttribute('aria-pressed')!=='true')return false;
                         return rect.width && rect.height && ((!scrollList && (rect.top < bounds.top - tolerance || rect.bottom > bounds.bottom + tolerance)) || rect.left < bounds.left - tolerance || rect.right > bounds.right + tolerance);
                     }).map(node => ({text: node.textContent.trim(), action: node.dataset.action, bounds: node.getBoundingClientRect().toJSON()})),
                     brokenImages: [...host.querySelectorAll('img')].filter(image => !image.complete || !image.naturalWidth).map(image => image.src),
                 };
             }, tolerance);
-            for (const control of await page.locator('.alliance-overview button').all()) {
+            for (const control of await page.locator('.alliance-home-scroll button').all()) {
+                const disclosure=control.locator('xpath=ancestor::details[1]');if(await disclosure.count()&&!await disclosure.evaluate(el=>el.open))await disclosure.locator('summary').click();
                 await control.scrollIntoViewIfNeeded();
-                assert(await control.evaluate(el=>{const r=el.getBoundingClientRect(),b=el.closest('.alliance-overview').getBoundingClientRect();return r.top>=b.top-2&&r.bottom<=b.bottom+2;}),'All alliance actions remain reachable by scrolling');
+                const title=control.locator(':scope > span > strong');if(await title.count())await title.scrollIntoViewIfNeeded();
+                const reachability=await control.evaluate(el=>{const r=el.getBoundingClientRect(),b=el.closest('.alliance-home-scroll').getBoundingClientRect(),top=Math.max(r.top,b.top),bottom=Math.min(r.bottom,b.bottom),label=el.querySelector(':scope > span > strong')?.getBoundingClientRect(),hit=document.elementFromPoint(r.x+r.width/2,(top+bottom)/2);return {action:el.dataset.action,height:r.height,visible:bottom-top,width:r.width,withinWidth:r.left>=b.left-2&&r.right<=b.right+2,titleVisible:!label||(label.top>=b.top-2&&label.bottom<=b.bottom+2),hit:hit===el||el.contains(hit)};});
+                assert(reachability.width>=44&&reachability.visible>=44&&reachability.withinWidth&&reachability.titleVisible&&reachability.hit,label+': every alliance action retains a readable title and unobscured touch area when its illustration scrolls: '+JSON.stringify(reachability));
+            }
+            for(const control of await page.locator('[data-panel="alliance"] .window-list button').all()){
+                await control.scrollIntoViewIfNeeded();
+                assert(await control.evaluate(el=>{const rect=el.getBoundingClientRect(),list=el.closest('.window-list').getBoundingClientRect(),hit=document.elementFromPoint(rect.x+rect.width/2,rect.y+rect.height/2);return rect.width>=44&&rect.height>=44&&rect.left>=list.left-2&&rect.right<=list.right+2&&rect.top>=list.top-2&&rect.bottom<=list.bottom+2&&(hit===el||el.contains(hit));}),label+': member, management and paging controls stay reachable and unobscured');
+            }
+            for(const control of await page.locator('.treasury-view button,.treasury-view input,.treasury-view select').all()){
+                await control.scrollIntoViewIfNeeded();assert(await control.evaluate(el=>{const r=el.getBoundingClientRect(),b=el.closest('.treasury-view').getBoundingClientRect(),hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return r.top>=b.top-2&&r.bottom<=b.bottom+2&&(hit===el||el.contains(hit));}),label+': every treasury field and action stays reachable within its scroll area');
             }
             report.push({label, ...metrics});
             if (screenshot || hasFailure(metrics)) {

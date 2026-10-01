@@ -8,6 +8,11 @@ use Conquer\Game\Research\{BuffEngine,ResearchEffects};
 /** One source for mission-specific troop travel speeds and ETA read models. */
 final class MarchSpeed
 {
+    public static function duration(float $distance,float $speed,int $world,int $minimum=5): int
+    {
+        $scale=(float)(\Conquer\Game\World\WorldMapProfile::forWorld($world)['travel_scale']??1);
+        return max($minimum,(int)floor($distance*100*$scale/max(1,$speed)));
+    }
     public static function generic(int $code,array $buffs,float $skinMultiplier=1): float
     {
         return self::typedBase($code,$buffs)*self::bonus($buffs,'')*$skinMultiplier;

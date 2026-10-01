@@ -33,15 +33,19 @@ final class AdminService
                 if($receipt){if((int)$receipt['admin_id']!==$adminId||$receipt['action']!==$action||!hash_equals($receipt['payload_hash'],$hash))throw new \InvalidArgumentException('Diese Vorgangs-ID gehört zu einer anderen Änderung.');$result=json_decode($receipt['result_json'],true,512,JSON_THROW_ON_ERROR);$result['duplicate']=true;return $result;}
                 $db->execute('INSERT INTO admin_operations(operation_id,admin_id,action,payload_hash) VALUES(?,?,?,?)',[$op,$adminId,$action,$hash]);
                 $result=match($action) {
+                    'layout-save'=>\Conquer\Game\Ui\LayoutSettings::save($db,$input),
                     'alpha-waitlist-update'=>AlphaWaitlistAdmin::update($db,$input),
                     'alpha-key-create'=>AlphaKeyAdmin::create($db,$input),
                     'alpha-key-revoke'=>AlphaKeyAdmin::revoke($db,$input),
                     'world-save','world-create'=>self::world($db,$adminId,$action,$input),
                     'world-events'=>self::events($input),
+                    'world-territory-rules'=>self::territoryRules($input),
                     'gift'=>self::gift($db,$op,$input),
                     'reward-save','reward-reset'=>RewardEditor::save($db,$adminId,$action,$input),
                     'land-rules-save'=>self::landRules($adminId,$input),
                     'bug-report-update'=>self::bugReport($db,$adminId,$input),
+                    'community-report-update','community-chat-ban','community-chat-unban'=>self::communityModeration($adminId,$action,$input),
+                    'community-news-save'=>\Conquer\Game\Community\CommunityNewsService::save($adminId,$input),
                     default=>self::player($db,$action,$input),
                 };
                 $result['duplicate']=false;$result['operation_id']=$op;
@@ -52,6 +56,14 @@ final class AdminService
                 return $result;
             });
         } finally {foreach(array_reverse($acquired) as $lock)$db->query('SELECT RELEASE_LOCK(?)',[$lock]);}
+    }
+
+    private static function communityModeration(int $adminId,string $action,array $input):array
+    {
+        $map=['community-report-update'=>'report.update','community-chat-ban'=>'chat.ban','community-chat-unban'=>'chat.unban'];
+        $input['action']=$map[$action];
+        foreach(['player_id','world_id','report_id','minutes'] as $field)if(array_key_exists($field,$input))$input[$field]=WorldSettings::integer($input[$field],0,2147483647,$field);
+        return \Conquer\Game\Community\SocialService::moderate($adminId,$input);
     }
 
     private static function bugReport(Connection $db,int $adminId,array $input): array
@@ -78,9 +90,12 @@ final class AdminService
         $before=null;
         if($action==='world-create') {
             $slug=$input['slug']??'';if(!is_string($slug)||!preg_match('/^[a-z0-9][a-z0-9-]{1,19}$/D',$slug))throw new \InvalidArgumentException('Weltkürzel: 2–20 Kleinbuchstaben, Ziffern oder Bindestriche.');
-            $size=WorldSettings::integer($input['map_size']??256,256,256,'Kartengröße');
+            $mapProfile=$input['map_profile']??'legacy';
+            if(!is_string($mapProfile)||!in_array($mapProfile,['legacy','luxembourg'],true))throw new \InvalidArgumentException('Unbekannte Kartenvorlage.');
+            $size=$mapProfile==='luxembourg'?768:WorldSettings::integer($input['map_size']??256,256,256,'Kartengröße');
             if($db->query('SELECT id FROM worlds WHERE slug=?',[$slug])->fetchColumn())throw new \InvalidArgumentException('Dieses Weltkürzel wird bereits verwendet.');
             $db->execute('INSERT INTO worlds(name,slug,status,map_size,map_seed,speed_factor,gather_factor,haul_factor) VALUES(?,?,?,?,?,?,?,?)',[$name,$slug,$status,$size,random_int(1,2147483647),...array_values($factors)]);$id=$db->lastInsertId();
+            if($mapProfile==='luxembourg')\Conquer\Game\World\WorldMapProfile::configureEmptyWorld($id);
             \Conquer\Game\World\WorldService::initializeWorld($id);
         } else {
             $id=WorldSettings::integer($input['world_id']??0,1,2147483647,'Welt-ID');
@@ -90,16 +105,48 @@ final class AdminService
         }
         $next=gmdate('Y-m-d H:i:s',WorldSettings::nextWindow($cfg,time()));
         $db->execute('INSERT INTO world_spawn_settings(world_id,settings_json,next_run_at,updated_by) VALUES(?,?,?,?) ON DUPLICATE KEY UPDATE settings_json=VALUES(settings_json),next_run_at=VALUES(next_run_at),updated_by=VALUES(updated_by)',[$id,json_encode($cfg,JSON_THROW_ON_ERROR),$next,$adminId]);
-        return ['target_type'=>'world','target_id'=>$id,'world_id'=>$id,'before'=>$before,'after'=>['name'=>$name,'status'=>$status,'factors'=>$factors,'spawn'=>$cfg],'message'=>$action==='world-create'?'Welt wurde angelegt.':'Welteinstellungen wurden gespeichert.'];
+        return ['target_type'=>'world','target_id'=>$id,'world_id'=>$id,'before'=>$before,'after'=>['name'=>$name,'status'=>$status,'map_profile'=>\Conquer\Game\World\WorldMapProfile::forWorld($id),'factors'=>$factors,'spawn'=>$cfg],'message'=>$action==='world-create'?'Welt wurde angelegt.':'Welteinstellungen wurden gespeichert.'];
     }
 
     private static function events(array $input): array
     {
         $id=WorldSettings::integer($input['world_id']??0,1,2147483647,'Welt-ID');
+        if(\Conquer\Game\World\WorldMapProfile::isLuxembourg($id))throw new \InvalidArgumentException('Diese Welt verwendet Communes, Shrines und Royal Castle. Verwende ihre Eroberungsregeln.');
         $class='Conquer\\Game\\Conquest\\EventService';
         if(!class_exists($class))throw new \InvalidArgumentException('Eventverwaltung ist noch nicht verfügbar.');
         $before=$class::settings($id);$after=$class::saveSettings($id,$input);
         return ['target_type'=>'world','target_id'=>$id,'before'=>$before,'after'=>$after,'message'=>'Eventtermine wurden gespeichert.'];
+    }
+
+    private static function territoryRules(array $input): array
+    {
+        $world=WorldSettings::integer($input['world_id']??null,1,2147483647,'Welt-ID');
+        $version=WorldSettings::integer($input['version']??null,1,2147483647,'Regelversion');
+        $raw=$input['rules']??null;if(!is_array($raw))throw new \InvalidArgumentException('Eroberungsregeln fehlen.');
+        $limits=['canton_limit'=>[1,2],'pvp_window_start_hour_utc'=>[0,23],'pvp_window_hours'=>[1,24],
+            'crown_period_days'=>[1,365],'crown_duration_hours'=>[1,24],'income_per_hour'=>[0,1000000],
+            'conquest_reward_gold'=>[0,1000000],'support_cost'=>[0,1000000],'special_daily_limit'=>[0,1000000],
+            'rune_daily_charges'=>[0,1000000],'rune_radius'=>[0,1000000],
+            'office_daily_uses'=>[0,1000000],'office_resource_grant'=>[0,1000000],'office_acceleration_seconds'=>[0,1000000],
+            'regional_supply_percent'=>[0,10],'regional_daily_cap'=>[0,1000000],'canton_mission_contributors'=>[1,20],'canton_mission_reward'=>[0,1000000]];
+        $changes=[];foreach($limits as $key=>[$min,$max])if(array_key_exists($key,$raw))$changes[$key]=WorldSettings::integer($raw[$key],$min,$max,$key);
+        $scope=$input['territory_scope']??'full';if(!in_array($scope,['full','alpha'],true))throw new \InvalidArgumentException('Ungültiger Eroberungsbereich.');
+        $cantons=$raw['active_cantons']??[];if(!is_array($cantons)||!array_is_list($cantons))throw new \InvalidArgumentException('Wähle vollständige Kantone.');
+        if($scope==='alpha'){
+            if(count($cantons)<2||count($cantons)>3)throw new \InvalidArgumentException('Wähle für die Alpha zwei oder drei vollständige Kantone.');
+            $changes['active_cantons']=$cantons;$changes['canton_limit']=1;
+        }else $changes['active_cantons']=[];
+        if(isset($raw['crown_anchor'])){
+            if(!is_string($raw['crown_anchor'])||!preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/D',$raw['crown_anchor']))throw new \InvalidArgumentException('Ungültiger Kronentermin.');
+            $changes['crown_anchor']=str_replace('T',' ',$raw['crown_anchor']).':00';
+        }
+        if(isset($raw['npc_troops'])){
+            if(!is_array($raw['npc_troops']))throw new \InvalidArgumentException('Ungültige NPC-Verteidigung.');
+            foreach(['commune','canton','crown']as$kind)$changes['npc_troops'][$kind]=WorldSettings::integer($raw['npc_troops'][$kind]??null,1,500000,'NPC-Verteidigung');
+        }
+        $before=\Conquer\Game\Territory\TerritoryService::profile($world);
+        $after=\Conquer\Game\Territory\TerritoryService::saveProfile($world,$changes,$version);
+        return ['target_type'=>'world','target_id'=>$world,'world_id'=>$world,'before'=>$before,'after'=>$after,'message'=>'Eroberungsregeln gespeichert. Laufende Feldzüge behalten ihren Regelstand.'];
     }
 
     private static function landRules(int $adminId,array $input): array
@@ -174,7 +221,7 @@ final class AdminService
                 $db->execute('INSERT INTO player_research(player_id,world_id,research_code,level) VALUES(?,?,?,?) ON DUPLICATE KEY UPDATE level=VALUES(level)',[$id,$world,$code,$level]);break;
             case 'add-troops':case 'set-troops':
                 $code=WorldSettings::integer($input['troop_code']??0,1,2147483647,'Truppencode');
-                if(!TroopData::get($code))throw new \InvalidArgumentException('Unbekannter Truppentyp.');
+                if(!TroopData::isActive($code))throw new \InvalidArgumentException('Unbekannter Truppentyp.');
                 $old=$db->query('SELECT count FROM city_troops WHERE city_id=? AND troop_code=? FOR UPDATE',[$cityId,$code])->fetchColumn();
                 $amount=WorldSettings::integer($input['count']??null,$action==='add-troops'?1:0,1000000,'Truppenanzahl');
                 $count=$action==='add-troops'?(int)$old+$amount:$amount;

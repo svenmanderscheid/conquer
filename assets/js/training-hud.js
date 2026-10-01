@@ -66,7 +66,7 @@
         function update() {
             if (destroyed || document.hidden || !mount()) return;
             const snapshot = summarize(ctx.getState(), ctx.now());
-            const count = snapshot.count.toLocaleString('de-DE');
+            const count = snapshot.count.toLocaleString(window.ConquerLocale?.locale??'en');
             const time = snapshot.status === 'active' ? formatTime(snapshot.seconds) : ({loading: 'Bitte warten', idle: 'Auftrag starten', unknown: 'Zeit offen', finishing: 'Wird bestätigt'})[snapshot.status];
             const countText = snapshot.batches ? `× ${count}` : 'Truppen';
             if (countNode.textContent !== countText) countNode.textContent = countText;

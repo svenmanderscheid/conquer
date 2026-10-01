@@ -54,6 +54,7 @@ namespace Conquer\Game\Map {
 namespace Conquer\Game\World {
     final class WorldContext { public static function assertActionAvailable(int $world):void {} }
     final class WorldService { public static function initializeWorld(int $world):void {} }
+    final class WorldMapProfile { public static function forWorld(int $world):array { return ['key'=>'legacy','width'=>256,'height'=>256]; } }
 }
 namespace Conquer\Game\City {
     final class CityState { public const BUILDING_CODES = ['castle', 'wall']; }

@@ -1,8 +1,28 @@
 # Regionale Rally-Bosse
 
-Grumwald, der Wurzelbrecher (Smaragdwald), Frostgrimm (Frostlande), Sandmaul (Sonnendünen) und Glutramm (Aschenlande) sind als Rally-Monster integriert. Darstellung: die freigestellten Originalfiguren mit individuellen CSS-Ruhebewegungen und regionalen Partikeln.
+Grumwald, der Wurzelbrecher (Smaragdwald), Frostgrimm (Frostlande), Sandmaul (Sonnendünen) und Glutramm (Aschenlande) sind als Rally-Monster integriert. Darstellung: die vereinfachten Storybook-Figuren passend zu `village2.png` mit individuellen CSS-Ruhebewegungen und regionalen Partikeln.
+
+## Wiederherstellung am 25. September 2026
+
+Die vier Regionalbosse behalten wieder ihre eigenen Namen und Originalgrafiken. Die vorübergehende Zusammenfassung als „Runenhorn“ mit Magdar-Grafik entfällt in Serverdaten, Weltkarte, Rallyfenster, Post, Kampfberichten und geteilten Chat-Zielen. Bestehende Monster, Kampfwerte, regionale Spawnregeln und konfigurierbare Beutetabellen bleiben erhalten. Jeder beteiligte Spieler erhält weiterhin einen eigenen Item-Beutewurf; die Auslieferung erfolgt mit der Rückkehr und ist gegen Wiederholung geschützt.
+
+Prüfung: `tests/regional_bosses.php`, `tests/monster_rallies.php` je Bosscode und `tests/regional_bosses_restored.cjs` mit der isolierten Vorschau auf Port 18949. Der neue Oberflächentest verwendet die aktuelle Anmeldung und das direkte Öffnen des Rallyfensters per Monstertipp. Der Rallykopf reserviert Platz für Melden/Schließen; bis 400 px stehen die antippbaren Reiter in einer eigenen Zeile.
+
+## Storybook-Grafiken (25. September 2026)
+
+Alle vier Bosse wurden mit dem eingebauten Imagegen-Werkzeug anhand ihrer bisherigen Identität und `assets/art/village2.png` neu gezeichnet: große weiche Formen, dunkelbraune Konturen und wenige ruhige Farbstufen. Die aktiven transparenten PNGs liegen unter `assets/art/monsters/storybook-v2/`, maximal 512 px groß und zusammen etwa 350 KB. Versionierte Pfade umgehen alte Browser-Bildcaches. Die bisherigen Namen ohne Unterordner enthalten ebenfalls die neue Fassung für ältere Bildreferenzen.
+
+Die vorherigen Grafiken bleiben unter `assets/art/monsters/originals-v1/`, die hochauflösenden neuen Ausgaben unter `assets/art/monsters/storybook-v2-masters/` erhalten. Vollständige Prompts und Referenzangabe: `assets/art/monsters/storybook-v2-prompts.json`. Karte und Rallyfenster wurden für alle vier Bosse bei 1280×800, 390×844, 320×568 und 568×320 geprüft, inklusive transparenter Bilder, erreichbarer Reiter und fehlerfreier Browserausführung.
 
 ## Regeln
+
+- Stand 1. Oktober 2026: Neue Grumwald-Rallys verwenden die versionierte
+  [Regenerationsregel](GRUMWALD_MECHANIC.md). Nach einem überlebten Angriff heilt er
+  12 % des gerade erlittenen Schadens; mindestens 50 % Fernkampfanteil an der
+  Grund-Truppenmacht unterdrückt dies. Historische Aufträge behalten ihre Regel.
+  Auch die übrigen Regionalbosse benötigen 50 % ihrer jeweiligen Konterart;
+  Dämmerhorn benötigt jeweils 30 % aller drei Arten. Alle Fähigkeiten und
+  Gegenmaßnahmen: [Rally boss skills](RALLY_BOSS_SKILLS.md).
 
 - Je zehn Stufen: Frostgrimm 20202101–20202110, Sandmaul 20202201–20202210, Glutramm 20202301–20202310, Grumwald 20202401–20202410.
 - Die mittleren Rally-Spawns (bestehende Deathkar-Gewichtung) erhalten je nach dominanter Region den passenden Boss, im Wald Grumwald. Bereits vorhandene Deathkar-Ziele behalten ihre Definition und werden nicht ausgetauscht.

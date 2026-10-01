@@ -1,0 +1,87 @@
+.territory-shell{display:flex;flex-direction:column;min-height:0;max-height:min(82dvh,820px);width:min(850px,calc(100vw - 64px));color:var(--ui-ink);font-family:var(--ui-font);background:var(--ui-paper);border-radius:16px;overflow:hidden}
+.territory-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;background:var(--ui-primary);color:var(--ui-card-light);flex-shrink:0}
+.territory-heading h2{margin:3px 0 0;color:inherit}.territory-heading small{color:var(--ui-card)}
+.territory-tabs,.territory-filters,.territory-actions{display:flex;flex-wrap:wrap;gap:8px;padding:10px 0}.territory-tabs{padding:10px 12px;border-bottom:1px solid var(--ui-line);flex-shrink:0}
+.territory-shell button,.territory-shell input,.territory-shell select{min-height:44px;font:inherit;border:1px solid var(--ui-line);border-radius:9px;max-width:100%}.territory-shell button{white-space:normal;cursor:pointer}.territory-shell button[aria-pressed=true]{background:var(--ui-inset);color:var(--ui-ink);border-color:var(--ui-gold)}
+.territory-shell button:disabled{background:var(--ui-disabled);color:var(--ui-muted);opacity:1;cursor:default}.territory-shell button:focus-visible,.territory-shell input:focus-visible,.territory-shell select:focus-visible{outline:3px solid var(--ui-primary-dark);outline-offset:2px}
+.territory-body{overflow:auto;overscroll-behavior:contain;min-height:0;padding:12px 16px;flex:1}.territory-body p{line-height:1.4;margin:.4em 0 .7em}.territory-body h3{margin:.3em 0 .6em}.territory-footer{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;gap:10px;flex-shrink:0;border-top:1px solid var(--ui-line);font-size:.9em}
+.territory-list{display:flex;flex-direction:column;gap:9px}.territory-card{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;margin-bottom:8px;background:var(--ui-card);border:1px solid var(--ui-line);border-radius:12px;min-width:0}.territory-card>div{min-width:0;overflow-wrap:anywhere}.territory-card.is-owned{border-left:4px solid var(--ui-blue)}.territory-card small{display:block;color:var(--ui-muted)}.territory-card-actions{display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap}.territory-notice{padding:12px;background:var(--ui-gold-soft);border:1px solid var(--ui-gold);border-radius:12px;margin-bottom:12px}.territory-error{padding:10px;background:var(--ui-red-soft);color:var(--ui-red-dark);border-radius:9px}.territory-target-summary{display:flex;align-items:center;gap:16px}.territory-target-summary img{width:100px;height:100px;object-fit:contain}.territory-facts{display:grid;gap:8px}.territory-facts>div{display:grid;grid-template-columns:150px 1fr;gap:10px;padding:7px 0;border-bottom:1px solid var(--ui-line)}.territory-facts dt{color:var(--ui-muted)}.territory-facts dd{margin:0;overflow-wrap:anywhere}
+.territory-shell .territory-attack{background:var(--ui-red);color:var(--ui-card-light)}.territory-shell .territory-defend{background:var(--ui-blue);color:var(--ui-card-light)}.territory-form{display:grid;gap:12px;background:var(--ui-card);border:1px solid var(--ui-line);padding:12px;border-radius:12px;margin:12px 0}.territory-form label{display:flex;flex-direction:column;gap:5px}.territory-form input,.territory-form select{padding:8px;background:var(--ui-card-light);color:var(--ui-ink);width:100%}.territory-army-list{max-height:260px;overflow:auto;overscroll-behavior:contain}.territory-army-list label{display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--ui-line)}.territory-army-list small{display:block;color:var(--ui-muted)}.territory-army-list input{width:110px;flex-shrink:0;font-family:var(--ui-font-number)}.territory-rules{margin:12px 0;border:1px solid var(--ui-line);border-radius:12px;padding:10px;background:var(--ui-card)}.territory-rules summary{min-height:44px;align-content:center;cursor:pointer}.territory-support{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:8px 0}.territory-shell progress{width:100%;accent-color:var(--ui-green)}
+.atlas-marker[data-kind=territory] .atlas-marker-name{max-width:190px}.atlas-shell.is-luxembourg .atlas-zone-jumps{max-height:160px;overflow:auto}.atlas-shell.is-luxembourg .atlas-land-overview[hidden]{display:none}
+@media(max-width:600px),(max-height:500px){#game-dialog:has(.territory-shell){width:100%;max-width:100%;height:100dvh;max-height:100dvh;margin:0;padding:0;border-radius:0}.territory-shell{width:100%;height:100dvh;max-height:100dvh;border-radius:0;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}.territory-heading{padding:8px 12px}.territory-heading small{display:none}.territory-heading h2{font-size:1.25rem}.territory-body{padding:10px}.territory-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;padding:6px}.territory-tabs button{padding:5px}.territory-card{align-items:flex-start;padding:10px;gap:7px}.territory-card-actions{flex-direction:column;max-width:94px}.territory-card-actions button{padding:6px 8px}.territory-facts>div{grid-template-columns:1fr;gap:3px}.territory-target-summary img{width:72px;height:80px}.territory-target-summary{gap:8px}.territory-footer{font-size:.8em}.territory-footer button{padding:6px}.territory-army-list input{width:88px}.territory-body .territory-actions button{flex:1 1 120px}}
+@media(max-height:500px) and (min-width:601px){.territory-tabs{grid-template-columns:repeat(4,minmax(0,1fr))}.territory-heading{padding:5px 12px}.territory-heading h2{font-size:1.1rem}.territory-footer{padding:4px 12px}}
+
+#game-dialog:has(.territory-shell){padding:0;overflow:hidden;max-width:calc(100vw - 16px)}
+#game-dialog:has(.territory-shell)> .dialog-close{display:none}
+#game-dialog:has(.territory-shell) #dialog-content{padding:0;overflow:hidden;max-height:none}
+
+.territory-form label,.territory-form label>span{color:var(--ui-ink)}
+
+.territory-heading>div{min-width:0}.territory-heading h2{overflow-wrap:anywhere}.territory-heading>button{flex-shrink:0}
+
+/* Browsing stays compact; only the selected objective exposes full actions. */
+.territory-shell{height:min(82dvh,820px)}
+.territory-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.territory-tabs button{padding:6px 8px;line-height:1.15}
+.territory-back{display:flex;align-items:center;gap:12px;padding:6px 12px;flex-shrink:0}
+.territory-back button{padding:6px 14px}
+.territory-toolbar{flex-shrink:0;padding:8px 12px}
+.territory-toolbar .territory-filters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:0;gap:6px}
+.territory-filters button{padding:5px;line-height:1.1}
+.territory-search-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(120px,.45fr);gap:8px;margin-top:6px}
+.territory-search-row label{display:grid;min-width:0;gap:3px;font-size:.9rem}
+.territory-search-row input,.territory-search-row select{width:100%;min-width:0;padding:6px 9px}
+.territory-result-count{font-size:.9rem}
+.territory-list{gap:6px}
+.territory-card.territory-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(90px,160px) auto;padding:9px 12px;gap:6px 12px;margin:0}
+.territory-row h3{margin:0 0 3px;font-size:1.05rem;line-height:1.15}
+.territory-row small{font-size:.85rem;line-height:1.25}
+.territory-row .territory-card-actions{max-width:none;flex-direction:row}
+.territory-status{font-size:.85rem;line-height:1.2;overflow-wrap:anywhere}
+.territory-overview{display:grid;gap:14px}
+.territory-overview h3{margin:0 0 8px}
+.territory-objective{padding:12px;border:1px solid var(--ui-line);border-radius:12px}
+.territory-objective .territory-row{padding:0;border:0;border-radius:0;background:transparent}
+.territory-ready{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px;border-radius:12px}
+.territory-route{display:grid;gap:6px}
+.territory-route-step{display:grid;grid-template-columns:28px minmax(0,1fr) 12px;align-items:center;gap:9px;padding:9px 12px;text-align:left}
+.territory-route-step strong,.territory-route-step small{display:block}
+.territory-route-step small{font-size:.9rem;line-height:1.3;margin-top:2px}
+.territory-step-number{width:28px;height:28px;display:grid;place-items:center;border-radius:50%;font-family:var(--ui-font-number)}
+.territory-rally p{margin:4px 0}
+.territory-overview .territory-rules,.territory-overview .alliance-contribution{margin:0}
+.territory-rules>summary{font-weight:600;line-height:1.3;overflow-wrap:anywhere}
+.territory-target-state{font-size:.95rem}
+.territory-target-summary h3{font-size:1.1rem}
+.territory-target-summary img{width:80px;height:80px;flex-shrink:0}
+.territory-actions{padding:5px 0}
+@media(max-width:600px){
+ .territory-shell{height:100dvh}
+ .territory-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .territory-toolbar{padding:6px 10px}
+ .territory-filters button{font-size:.9rem}
+ .territory-card.territory-row{grid-template-columns:minmax(0,1fr) auto;gap:4px 8px;padding:8px 10px}
+ .territory-row-main{grid-column:1;grid-row:1}
+ .territory-status{grid-column:1;grid-row:2;font-size:.8rem}
+ .territory-row .territory-card-actions{grid-column:2;grid-row:1 / span 2}
+ .territory-row h3{font-size:1rem}
+ .territory-row small{font-size:.8rem}
+ .territory-overview{gap:10px}
+ .territory-objective{padding:10px}
+ .territory-ready{align-items:flex-start}
+ .territory-target-summary img{width:64px;height:64px}
+ .territory-search-row{grid-template-columns:minmax(0,1fr) minmax(106px,.65fr)}
+}
+@media(max-height:500px){
+ .territory-shell{height:100dvh}
+ .territory-tabs{grid-template-columns:repeat(4,minmax(0,1fr));padding:4px 8px}
+ .territory-heading{padding-top:4px;padding-bottom:4px}
+ .territory-heading small{display:none}
+ .territory-toolbar{display:grid;grid-template-columns:minmax(250px,1fr) minmax(238px,1fr);align-items:end;gap:8px;padding:4px 10px}
+ .territory-search-row{margin:0;grid-template-columns:minmax(0,1fr) 105px;gap:5px}
+ .territory-search-row label{font-size:.8rem}
+ .territory-search-row input,.territory-search-row select{padding:5px;font-size:.9rem}
+ .territory-filters button{font-size:.85rem}
+ .territory-back{padding:3px 10px}
+ .territory-footer{padding:4px 10px}
+}

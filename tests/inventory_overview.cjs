@@ -1,6 +1,8 @@
 'use strict';
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict'),path=require('node:path');
-const sandbox={window:{}};
+const catalogs=Object.fromEntries(['en','de','fr'].map(lang=>[lang,JSON.parse(fs.readFileSync(path.join(__dirname,'../data/i18n',lang+'.json'),'utf8'))]));
+const locale={locale:'de',t(key){return catalogs[this.locale][key]??catalogs.en[key]??key;},text(value){const key=Object.keys(catalogs.de).find(key=>catalogs.de[key]===value);return key?this.t(key):value;}};
+const sandbox={window:{ConquerLocale:locale}};
 vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../assets/js/inventory-overview.js'),'utf8'),sandbox);
 const {summarize,formatTime}=sandbox.window.ConquerInventoryOverview;
 const summary=summarize({city:{food:8750000000,lumber:19,stone:0,gold:250}}, {
@@ -41,6 +43,8 @@ assert.equal(formatTime(183840,'hours'),'51 Std. 4 Min.');
 assert.equal(formatTime(183840,'minutes'),'3.064 Min.');
 assert.equal(formatTime(86461,'days'),'1 Tg. 1 Min. 1 Sek.');
 assert.equal(formatTime(0),'Keine Items');assert.equal(formatTime(null),'Nicht verfügbar');
+locale.locale='en';assert.equal(formatTime(183840,'days'),'2 d 3 hr 4 min');assert.equal(formatTime(183840,'minutes'),'3,064 min');assert.equal(formatTime(86461),'1 d 1 min 1 sec');
+locale.locale='fr';assert.equal(formatTime(183840,'days'),'2 j 3 h 4 min');assert.equal(formatTime(86461),'1 j 1 min 1 s');
 const missing=summarize(undefined,undefined);assert.equal(missing.resources[0].items,null);assert.equal(missing.resources[0].stock,null);assert.equal(missing.speedups[0].seconds,null);
 const empty=summarize({city:{food:0}},{inventory:[]});assert.equal(empty.resources[0].items,0);assert.equal(empty.resources[0].stock,0);
 console.log('PASS inventory overview sums, separate wallets, chest exclusions, zero/missing data and lossless time-unit conversion.');

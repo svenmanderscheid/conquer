@@ -10,15 +10,15 @@ final class AccountMailer
     public static function passwordReset(string $email,string $token): bool
     {
         $url=self::url('/auth/reset?token='.rawurlencode($token));
-        return self::send($email,'Passwort für Union of Kingdoms zurücksetzen',
-            "Du hast das Zurücksetzen deines Passworts angefordert.\n\n{$url}\n\nDer Link ist 30 Minuten gültig und kann nur einmal verwendet werden. Wenn du das nicht warst, ignoriere diese Nachricht.");
+        return self::send($email,'Reset your Union of Kingdoms password',
+            "You requested a password reset.\n\n{$url}\n\nThis link is valid for 30 minutes and can only be used once. If you did not request this, ignore this message.");
     }
 
     public static function verification(string $email,string $token): bool
     {
         $url=self::url('/auth/verify-email?token='.rawurlencode($token));
-        return self::send($email,'E-Mail-Adresse für Union of Kingdoms bestätigen',
-            "Willkommen bei Union of Kingdoms. Bestätige deine E-Mail-Adresse über diesen Link:\n\n{$url}\n\nDer Link ist 24 Stunden gültig und kann nur einmal verwendet werden.");
+        return self::send($email,'Verify your Union of Kingdoms email address',
+            "Welcome to Union of Kingdoms. Verify your email address using this link:\n\n{$url}\n\nThis link is valid for 24 hours and can only be used once.");
     }
 
     private static function send(string $to,string $subject,string $body): bool
@@ -35,14 +35,14 @@ final class AccountMailer
 
     private static function url(string $path): string
     {
-        $host=strtolower((string)parse_url('http://'.($_SERVER['HTTP_HOST']??''),PHP_URL_HOST));
-        $known=in_array($host,['unionofkingdoms.com','www.unionofkingdoms.com','play.unionofkingdoms.com','localhost','127.0.0.1'],true);
-        $root='';
-        if($known){$scheme=(!empty($_SERVER['HTTPS'])&&strtolower((string)$_SERVER['HTTPS'])!=='off')?'https':'http';$root=$scheme.'://'.($_SERVER['HTTP_HOST']??'localhost').(defined('APP_BASE')?APP_BASE:'');}
-        if($root==='')$root=rtrim((string)(Bootstrap::getConfig()['base_url']??''),'/');
-        if(!filter_var($root,FILTER_VALIDATE_URL)){
-            $scheme=(!empty($_SERVER['HTTPS'])&&strtolower((string)$_SERVER['HTTPS'])!=='off')?'https':'http';
-            $root=$scheme.'://'.($_SERVER['HTTP_HOST']??'localhost').(defined('APP_BASE')?APP_BASE:'');
+        // Recovery destinations are operator configuration, never request Host data.
+        $root=rtrim((string)(Bootstrap::getConfig()['base_url']??''),'/');
+        $parts=parse_url($root);
+        $local=is_array($parts)&&in_array(strtolower($parts['host']??''),['localhost','127.0.0.1','[::1]'],true);
+        if(!is_array($parts)||!filter_var($root,FILTER_VALIDATE_URL)||empty($parts['host'])
+            ||isset($parts['user'])||isset($parts['pass'])||isset($parts['query'])||isset($parts['fragment'])
+            ||!in_array($parts['scheme']??'',$local?['http','https']:['https'],true)) {
+            throw new \RuntimeException('Die öffentliche HTTPS-Adresse für Konto-E-Mails ist nicht eingerichtet.');
         }
         return $root.$path;
     }

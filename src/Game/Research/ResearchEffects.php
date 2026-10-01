@@ -7,6 +7,19 @@ use Conquer\Game\City\TroopData;
 /** Applies the units and categories in the complete research catalogue. */
 final class ResearchEffects
 {
+    /** Shared by research previews and newly queued jobs; bonuses are speed, not time discounts. */
+    public static function durationFactor(array $buffs, float $boost = 1.0): float
+    {
+        $speed = 1 + max(0.0, (float) ($buffs['research_speed'] ?? 0));
+        $talent = 1 + max(0.0, (float) ($buffs['talent_research_speed'] ?? 0));
+        return 1 / ($speed * $talent * ($boost > 0 ? $boost : 1.0));
+    }
+
+    public static function researchSeconds(int $base, array $buffs, float $boost = 1.0): int
+    {
+        return max(1, (int) ceil($base * self::durationFactor($buffs, $boost)));
+    }
+
     public static function normalize(array $buffs): array
     {
         $result = [];

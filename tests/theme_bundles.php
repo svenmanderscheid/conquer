@@ -15,6 +15,13 @@ function tbPay(PreviewPaymentGateway $gateway,string $secret,array $order,string
     $body=json_encode(['event_id'=>$event,'provider_reference'=>$order['checkout']['provider_reference'],'amount_cents'=>$amount,'currency'=>$order['currency'],'status'=>'paid'],JSON_THROW_ON_ERROR);
     return ThemeBundleService::handleNotification($gateway,$body,['x-conquer-signature'=>hash_hmac('sha256',$body,$secret)]);
 }
+/** An order already issued before catalog retirement; new checkout may only resume it. */
+function tbHistoricalOrder($db,$gateway,string $bundleId,string $key):void{
+    $b=ThemeBundleCatalog::get($bundleId);$id='pb_'.bin2hex(random_bytes(16));
+    $order=['id'=>$id,'player_id'=>1,'world_id'=>1,'city_id'=>1,'bundle_id'=>$bundleId,'theme_id'=>$b['theme_id'],'step'=>$b['step'],'amount_cents'=>$b['price_cents'],'currency'=>$b['currency']];
+    $checkout=$gateway->createCheckout($order);
+    $db->execute('INSERT INTO theme_bundle_orders(id,player_id,world_id,city_id,skin_code,step,price_cents,currency,provider,provider_reference,client_operation_key,payload_hash,checkout_json)VALUES(?,1,1,1,?,?,?,?,?,?,?,?,?)',[$id,$b['theme_id'],$b['step'],$b['price_cents'],$b['currency'],$gateway->name(),$checkout['provider_reference'],$key,hash('sha256',json_encode(['bundle_id'=>$bundleId],JSON_THROW_ON_ERROR)),json_encode($checkout,JSON_THROW_ON_ERROR)]);
+}
 try{
     $db->execute("INSERT INTO players(id,username,email,password_hash,gems)VALUES(1,'BundleFixture','bundle@tests.invalid','unused',100)");
     $db->execute("INSERT INTO cities(id,player_id,world_id,name,coord_x,coord_y,castle_level,food,lumber,stone,gold)VALUES(1,1,1,'Bundle city',31,31,5,1000,1000,1000,1000)");
@@ -23,9 +30,10 @@ try{
     $dragon1=$catalog['entries']['dragon_1'];$dragon2=$catalog['entries']['dragon_2'];$dragon3=$catalog['entries']['dragon_3'];
     tbCheck($dragon1['price_cents']===599&&$dragon2['price_cents']===999&&$dragon3['price_cents']===999,'prices must stay integer cents');
     tbCheck($dragon1['contents']['resources']===['food'=>100000,'lumber'=>100000,'stone'=>50000,'gold'=>25000]&&$dragon1['contents']['gems']===500,'step one balance changed unexpectedly');
-    $state=ThemeBundleService::state(1);$first=array_values(array_filter($state['entries'],fn($e)=>$e['id']==='dragon_1'))[0];$second=array_values(array_filter($state['entries'],fn($e)=>$e['id']==='dragon_2'))[0];
-    tbCheck(!$state['payment_configured']&&$first['unlocked']&&$first['next']&&!$second['unlocked'],'state exposes provider availability and sequential lock');
-    tbReject(fn()=>ThemeBundleService::checkout(1,['bundle_id'=>'dragon_2','operation_key'=>'bundle-operation-0002'],$gateway),'step two bypassed step one');
+    $state=ThemeBundleService::state(1);tbCheck($state['entries']===[],'retired unowned themes must not be advertised');
+    tbReject(fn()=>ThemeBundleService::checkout(1,['bundle_id'=>'dragon_1','operation_key'=>'bundle-operation-0001'],$gateway),'retired theme sold a new order');
+    tbCheck((int)$db->query('SELECT COUNT(*) FROM theme_bundle_orders')->fetchColumn()===0,'retired checkout must create no order');
+    tbHistoricalOrder($db,$gateway,'dragon_1','bundle-operation-0001');
     $one=$db->transaction(fn()=>ThemeBundleService::checkout(1,['bundle_id'=>'dragon_1','operation_key'=>'bundle-operation-0001'],$gateway));
     $oneAgain=$db->transaction(fn()=>ThemeBundleService::checkout(1,['bundle_id'=>'dragon_1','operation_key'=>'bundle-operation-0001'],$gateway));
     tbCheck($oneAgain['duplicate']&&$oneAgain['order_id']===$one['order_id'],'checkout retry created a second order');
@@ -37,14 +45,17 @@ try{
     $balances=$db->query('SELECT food,lumber,stone,gold FROM cities WHERE id=1')->fetch();
     tbCheck($balances===['food'=>101000,'lumber'=>101000,'stone'=>51000,'gold'=>26000]&&(int)$db->query('SELECT gems FROM players WHERE id=1')->fetchColumn()===600,'step one rewards were not credited exactly once');
     tbCheck($db->query("SELECT 1 FROM player_name_frames WHERE player_id=1 AND frame_code='dragon'")->fetchColumn()!==false,'name frame entitlement missing');
-    $frame=NameFrameService::equip(1,'dragon');tbCheck($frame['name_frame']==='dragon'&&NameFrameService::state(1)['equipped']==='dragon','owned frame could not be equipped');
+    NameFrameService::equip(1,'dragon');
+    tbCheck(NameFrameService::state(1)['equipped']==='dragon','purchased retired frame remains usable');
     tbReject(fn()=>NameFrameService::equip(1,'phoenix'),'unowned name frame was equipped');
     tbReject(fn()=>ThemeBundleService::checkout(1,['bundle_id'=>'dragon_3','operation_key'=>'bundle-operation-0003'],$gateway),'step three bypassed step two');
+    tbHistoricalOrder($db,$gateway,'dragon_2','bundle-operation-0002');
     $two=$db->transaction(fn()=>ThemeBundleService::checkout(1,['bundle_id'=>'dragon_2','operation_key'=>'bundle-operation-0002'],$gateway));
     tbReject(fn()=>tbPay($gateway,$secret,$two,'evt-wrong-amount',998),'wrong payment amount was accepted');
     tbCheck((int)$db->query('SELECT gems FROM players WHERE id=1')->fetchColumn()===600,'rejected payment changed rewards');
     tbPay($gateway,$secret,$two,'evt-two',999);
     tbCheck($db->query("SELECT 1 FROM player_march_skins WHERE player_id=1 AND skin_code='dragon'")->fetchColumn()!==false,'march skin entitlement missing');
+    tbHistoricalOrder($db,$gateway,'dragon_3','bundle-operation-0003');
     $three=$db->transaction(fn()=>ThemeBundleService::checkout(1,['bundle_id'=>'dragon_3','operation_key'=>'bundle-operation-0003'],$gateway));tbPay($gateway,$secret,$three,'evt-three',999);
     tbCheck($db->query("SELECT 1 FROM player_castle_skins WHERE player_id=1 AND skin_code='dragon'")->fetchColumn()!==false,'castle skin entitlement missing');
     tbCheck((int)$db->query('SELECT gems FROM players WHERE id=1')->fetchColumn()===2350,'all three gem grants do not match the catalog');

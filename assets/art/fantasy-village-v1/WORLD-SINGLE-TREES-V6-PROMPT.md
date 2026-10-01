@@ -1,0 +1,5 @@
+# Individual trees, preview v6
+
+Built-in Imagegen, 2026-09-23. Output: `world-tile-single-trees-v6.png` in this folder. Edit reference: `world-tile-3-grove.png`. Original retained.
+
+Use case: precise-object-edit. Edit this terrain tile ONLY its vegetation layout. Preserve exact bright yellow-green meadow texture, palette, painted style, lighting, camera and square dimensions. Remove existing tree group and rocks/bush group. Instead place THREE SINGLE SEPARATE TREES with wide empty grass gaps: a small rounded deciduous tree at (32%,35%), one soft asymmetric pine at (68%,45%), and one smaller crooked deciduous tree at (46%,72%). Each tree only 10-13% image height, with visible trunk and delicate contact shadow. NO adjacent bushes or rocks, no groups, no overlapping crowns. Trees must match the soft hand-painted leafy trees already in reference, NOT low-poly faceted balls, geometric cones or 3D render. Outer20% borders untouched grass only for seamless blending. No buildings, characters, water, paths, text, grid. Mostly open meadow.

@@ -71,7 +71,7 @@ final class GatherService
             $speed=min(array_map(static fn($code)=>self::troopSpeed((int)$code,$buffs,(float)$world['speed_factor'],$attack),array_keys($selected)))
                 * MarchSkinService::speedMultiplier($skinSnapshot);
             $distance=hypot($targetX-(int)$city['coord_x'],$targetY-(int)$city['coord_y']);
-            $seconds=max(5,(int)floor($distance*100/$speed));
+            $seconds=MarchSpeed::duration($distance,$speed,$worldId);
             $resource=FieldObjectService::RESOURCE_BY_TYPE[(int)$obj['object_type']];
             $snapshot=['gather'=>['rate'=>self::rate($resource,(int)$obj['level'],$buffs,(float)$world['gather_factor']),'capacity'=>ResearchEffects::carryCapacity($selected,TalentEffects::gather($buffs))]];
             if($attack){$snapshot['field_attack_march_id']=(int)$occupant['id'];WorldRules::relinquishShield($playerId,$cityId);}

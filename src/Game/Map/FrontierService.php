@@ -20,7 +20,7 @@ final class FrontierService
         if ((int) $db->query('SELECT GET_LOCK(?, 1)', [$lock])->fetchColumn() !== 1) { return; }
         try {
             $db->transaction(static function (Connection $db) use ($city, $playerId, $worldId): void {
-                $size = WorldPlacement::lockWorld($db, $worldId);
+                $size = WorldPlacement::lockWorld($db, $worldId);$profile=\Conquer\Game\World\WorldMapProfile::forWorld($worldId);
                 self::repairCollisions($db, $worldId);
                 $recent = $db->query('SELECT 1 FROM frontier_spawns WHERE player_id = ? AND refreshed_at > DATE_SUB(UTC_TIMESTAMP(), INTERVAL 30 MINUTE)', [$playerId])->fetchColumn();
                 if ($recent) { return; }
@@ -30,8 +30,8 @@ final class FrontierService
                 foreach ($types as $type) {
                     $kind = $type === 0 ? 'monster' : 'resource';
                     for ($attempt = 0; $attempt < 60; $attempt++) {
-                        $x = max(1, min($size - 2, (int) $city['coord_x'] + random_int(-9, 9)));
-                        $y = max(1, min($size - 2, (int) $city['coord_y'] + random_int(-9, 9)));
+                        $x = max(1, min($profile['width'] - 2, (int) $city['coord_x'] + random_int(-9, 9)));
+                        $y = max(1, min($profile['height'] - 2, (int) $city['coord_y'] + random_int(-9, 9)));
                         if (!WorldPlacement::canPlace($db, $worldId, $kind, $x, $y)) { continue; }
                         if ($type === 0) {
                             $scout = MonsterData::get(20209901);

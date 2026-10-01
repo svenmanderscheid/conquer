@@ -21,9 +21,19 @@ RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=308,L]
 
 # Also bounds chunked bodies before PHP attempts to parse JSON.
 LimitRequestBody 65536
+# Only these POST routes accept images. THE_REQUEST retains the original path
+# when mod_rewrite internally dispatches to index.php; query strings cannot turn
+# a different endpoint into an upload. Optional path segments support subfolders.
+# Apache 2.4 / LiteSpeed Enterprise 6+ conditional contexts are required.
+<If "%{THE_REQUEST} =~ m#^POST[[:space:]]+/(?:[^/?[:space:]]+/)*api/kingdom/profile-image(?:\?[^[:space:]]*)?[[:space:]]+HTTP/[0-9.]+$#">
+    LimitRequestBody 5500000
+</If>
+<If "%{THE_REQUEST} =~ m#^POST[[:space:]]+/(?:[^/?[:space:]]+/)*api/bug-reports(?:\?[^[:space:]]*)?[[:space:]]+HTTP/[0-9.]+$#">
+    LimitRequestBody 1300000
+</If>
 
 # Relative rules protect both domain-root and /conquer installations.
-RewriteRule ^(?:src|config|migrations|cron|tests|docs|data|vendor|node_modules|logs|sessions|cache|tmp|tools|bin|artifacts|asset-workflow|views|\.git|\.github|\.claude|\.codex[^/]*)(?:/|$) - [F,L,NC]
+RewriteRule ^(?:src|config|migrations|cron|tests|docs|data|vendor|node_modules|logs|sessions|cache|tmp|tools|bin|artifacts|outputs|preview|asset-workflow|views|\.git|\.github|\.claude|\.codex[^/]*)(?:/|$) - [F,L,NC]
 
 # Local documents and exports at the project root are not public game assets.
 # Intentional downloadable assets belong below assets/.
@@ -66,8 +76,8 @@ RewriteRule ^(.*)$ index.php [QSA,L]
 # Block access to non-public folders even though they live in webroot
 # (Each of these folders also has its own deny-all .htaccess for redundancy)
 # ============================================================================
-RedirectMatch 403 ^/(src|config|migrations|cron|tests|docs|data|vendor|node_modules|logs|sessions|cache|tmp|\.github|\.git)/.*$
-RedirectMatch 403 ^/(src|config|migrations|cron|tests|docs|data|vendor|node_modules|logs|sessions|cache|tmp|\.github|\.git)$
+RedirectMatch 403 ^/(src|config|migrations|cron|tests|docs|data|vendor|node_modules|logs|sessions|cache|tmp|outputs|preview|\.github|\.git)/.*$
+RedirectMatch 403 ^/(src|config|migrations|cron|tests|docs|data|vendor|node_modules|logs|sessions|cache|tmp|outputs|preview|\.github|\.git)$
 
 # ============================================================================
 # Performance — caching for static assets

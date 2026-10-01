@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "normal": {
+    "max_academy_level": 30,
+    "max_seconds": 1209600,
+    "factor_per_academy_level": "1.2",
+    "preserve_shorter_source_times": true
+  },
+  "troop_unlock_seconds": {
+    "warrior": 72000,
+    "longbow_man": 72000,
+    "horseman": 72000,
+    "knight": 345600,
+    "ranger": 345600,
+    "heavy_cavalry": 345600,
+    "guardian": 1814400,
+    "crossbow_man": 1814400,
+    "iron_cavalry": 1814400,
+    "crusader": 3888000,
+    "sniper": 3888000,
+    "dragoon": 3888000
+  }
+}

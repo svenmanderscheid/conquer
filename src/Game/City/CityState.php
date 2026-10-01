@@ -247,30 +247,23 @@ final class CityState
         foreach ($finished as $entry) {
             $code    = $entry['building_code'];
             $levelTo = (int) $entry['level_to'];
-
-            // Update or insert building level.
-            $db->execute(
-                'INSERT INTO city_buildings (city_id, building_code, level)
-                 VALUES (?, ?, ?)
-                 ON DUPLICATE KEY UPDATE level = ?',
-                [$cityId, $code, $levelTo, $levelTo],
-            );
-
-            // Mark queue entry as processed.
-            $db->execute(
-                'UPDATE building_queue SET is_processed = 1 WHERE id = ?',
-                [(int) $entry['id']],
-            );
-
-            // Keep castle_level in sync on cities table.
-            if ($code === 'castle') {
+            $applied = $db->transaction(static function () use ($db, $cityId, $code, $levelTo, $entry): bool {
+                if ($db->execute('UPDATE building_queue SET is_processed=1 WHERE id=? AND city_id=? AND is_processed=0', [(int)$entry['id'],$cityId]) !== 1) return false;
+                // The level and its completion marker share the queue settlement transaction.
                 $db->execute(
-                    'UPDATE cities SET castle_level = ? WHERE id = ?',
-                    [$levelTo, $cityId],
+                    'INSERT INTO city_buildings (city_id, building_code, level)
+                     VALUES (?, ?, ?)
+                     ON DUPLICATE KEY UPDATE level = ?',
+                    [$cityId, $code, $levelTo, $levelTo],
                 );
-            }
-
-            $buildings[$code] = ['code' => $code, 'level' => $levelTo];
+                if ($code === 'castle') $db->execute('UPDATE cities SET castle_level = ? WHERE id = ?', [$levelTo, $cityId]);
+                \Conquer\Game\Notification\NotificationService::pushCityCompletion(
+                    $cityId, \Conquer\Game\Notification\NotificationService::TYPE_BUILD_COMPLETE,
+                    ['building_code'=>$code, 'queue_id'=>(int)$entry['id'], 'level'=>$levelTo],
+                );
+                return true;
+            });
+            if ($applied) $buildings[$code] = ['code' => $code, 'level' => $levelTo];
         }
 
         // Recalculate and persist city power after all upgrades are applied.

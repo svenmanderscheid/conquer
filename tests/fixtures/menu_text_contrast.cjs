@@ -2,9 +2,17 @@
 
 // Browser-side audit of visible text on CSS colour surfaces. Artwork is reported for visual review.
 module.exports = async (page, selector) => page.locator(selector).evaluate(root => {
+  // Resolve modern CSS colours (including color(srgb ...) from color-mix)
+  // through the browser instead of reading 0..1 channels as 0..255 RGB.
+  const canvas = document.createElement('canvas'); canvas.width = canvas.height = 1;
+  const ctx = canvas.getContext('2d', { willReadFrequently: true }), colours = new Map();
   const rgba = value => {
-    const numbers = value.match(/[\d.]+/g)?.map(Number) || [0, 0, 0, 0];
-    return [...numbers.slice(0, 3), numbers[3] ?? 1];
+    if (!colours.has(value)) {
+      ctx.clearRect(0, 0, 1, 1); ctx.fillStyle = value; ctx.fillRect(0, 0, 1, 1);
+      const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
+      colours.set(value, [r, g, b, a / 255]);
+    }
+    return colours.get(value);
   };
   const over = (top, bottom) => {
     const alpha = top[3] + bottom[3] * (1 - top[3]);
@@ -37,7 +45,7 @@ module.exports = async (page, selector) => page.locator(selector).evaluate(root 
       let surfaces = [base];
       if (css.backgroundImage !== 'none' && pairs.some(pair => pair.some(colour => colour[3] < .999))) {
         if (css.backgroundImage.includes('url(')) { uncertain = true; break; }
-        const stops = css.backgroundImage.match(/rgba?\([^)]+\)/g);
+        const stops = css.backgroundImage.match(/(?:rgba?|color|oklab|oklch|lab|lch)\([^)]+\)/g);
         if (!stops) { uncertain = true; break; }
         surfaces = stops.map(stop => over(rgba(stop), base));
       }

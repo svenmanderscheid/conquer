@@ -2,7 +2,7 @@
 window.ConquerCommandReceipts=({scope,storage})=>{
     storage=storage||{getItem:k=>window.sessionStorage.getItem(k),setItem:(k,v)=>window.sessionStorage.setItem(k,v),removeItem:k=>window.sessionStorage.removeItem(k)};
     const memory=new Map();
-    const protectedPath=(path,body)=>['march/dispatch','march/dispatch-charm','march/dispatch-player','march/dispatch-scout','march/dispatch-gather','march/dispatch-field-attack','march/reinforce','rally/start','rally/start-monster','rally/join'].includes(path)||(path==='defense/action'&&['scout','reinforce','promotion.start','wall.repair'].includes(body?.action));
+    const protectedPath=(path,body)=>['march/dispatch','march/dispatch-charm','march/dispatch-player','march/dispatch-scout','march/dispatch-gather','march/dispatch-field-attack','march/reinforce','rally/start','rally/start-monster','rally/join'].includes(path)||(path==='defense/action'&&['scout','reinforce','promotion.start','wall.repair'].includes(body?.action))||(path==='community/action'&&body?.action==='structure.garrison');
     const key=()=>`conquer:command:${scope()}`;
     function pending(){const k=key();if(memory.has(k))return memory.get(k);try{const saved=JSON.parse(storage.getItem(k)||'null');if(saved&&protectedPath(saved.path,saved.body)&&typeof saved.body.operation_key==='string'){memory.set(k,saved);return saved;}}catch{}return null;}
     function prepare(path,body){

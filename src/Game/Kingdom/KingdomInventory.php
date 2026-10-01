@@ -14,8 +14,8 @@ use Conquer\Game\Defense\DefenseService;
 /** Adapts the historical item catalogue to the current city and queue schema. Runs inside a TX. */
 final class KingdomInventory
 {
-    /** These buffs have direct consumers in BuffEngine; three legacy boosts use ActiveBuffService. */
-    public const DIRECT_BOOSTS = ['construction_speed','gathering_speed','food_production','lumber_production',
+    /** These buffs have direct consumers in BuffEngine; production/training also use ActiveBuffService. */
+    public const DIRECT_BOOSTS = ['gathering_speed','food_production','lumber_production',
         'stone_production','gold_production','troops_atk','troops_def','troops_hp','march_size','march_speed','vs_monster_attack'];
     /** Catalogue visibility is separate from ownership; missing items remain unusable. */
     public static function catalog(int $playerId): array
@@ -216,7 +216,9 @@ final class KingdomInventory
     private static function teleport(int $playerId,int $cityId,array $def,array $body): array
     {
         $db=Connection::getInstance();$world=WorldContext::id();
-        $size=\Conquer\Game\Map\WorldPlacement::lockWorld($db,$world);
+        \Conquer\Game\Map\WorldPlacement::lockWorld($db,$world);
+        $mapProfile=\Conquer\Game\World\WorldMapProfile::forWorld($world);
+        $width=(int)$mapProfile['width'];$height=(int)$mapProfile['height'];
         $city=WorldContext::city($playerId,$world,true);$x=(int)$city['coord_x'];$y=(int)$city['coord_y'];
         KingdomService::require((int)$city['id']===$cityId,'Diese Stadt gehört nicht zur aktiven Welt.');
         $march=$db->query("SELECT id FROM marches WHERE world_id=? AND (player_id=? OR (target_x=? AND target_y=?)) AND state IN ('marching','resolving','returning','arrived') LIMIT 1 FOR UPDATE",[$world,$playerId,$x,$y])->fetchColumn();
@@ -224,15 +226,16 @@ final class KingdomInventory
         $support=$db->query("SELECT id FROM reinforcements WHERE (sender_city_id=? OR target_city_id=?) AND state='active' LIMIT 1 FOR UPDATE",[$cityId,$cityId])->fetchColumn();
         $expedition=$db->query("SELECT id FROM expedition_missions WHERE city_id=? AND status IN ('marching','returning') LIMIT 1 FOR UPDATE",[$cityId])->fetchColumn();
         KingdomService::require($march===false&&$rally===false&&$support===false&&$expedition===false,'Hole zuerst deine Armeen zurück. Bei ankommenden Märschen, Rallies oder Verstärkungen ist kein Teleport möglich.');
+        KingdomService::require(!\Conquer\Game\Territory\TerritoryService::hasDetachedArmy($playerId,$world),'Hole zuerst deine Gebietsgarnisonen zurück.');
         $mode=(string)($def['teleport_mode']??'random');
         KingdomService::require(in_array($mode,['random','advanced','alliance'],true),'Dieser Teleporter hat keinen gültigen Zielmodus.');
-        $left=1;$right=$size-3;$top=1;$bottom=$size-3;
+        $left=1;$right=$width-3;$top=1;$bottom=$height-3;
         KingdomService::require($left<=$right&&$top<=$bottom,'Kein gültiges Zielgebiet.');
         $hasTarget=array_key_exists('target_x',$body)||array_key_exists('target_y',$body);
         if($hasTarget){
             KingdomService::require(in_array($mode,['advanced','alliance'],true),'Mit dem Zufallsteleporter kann kein Ziel gewählt werden.');
-            $tx=KingdomService::integer($body,'target_x',1,$size-3);
-            $ty=KingdomService::integer($body,'target_y',1,$size-3);
+            $tx=KingdomService::integer($body,'target_x',1,$width-3);
+            $ty=KingdomService::integer($body,'target_y',1,$height-3);
             KingdomService::require(max(abs($tx-$x),abs($ty-$y))>=4,'Wähle einen anderen Ort für deine Stadt.');
             if($mode==='alliance'){
                 $allianceId=$db->query('SELECT alliance_id FROM alliance_members WHERE player_id=? AND world_id=? FOR UPDATE',[$playerId,$world])->fetchColumn();
@@ -333,7 +336,7 @@ final class KingdomInventory
             return ['message'=>'Der Spähschutz wurde für diese Stadt aktiviert.','anti_spy_until'=>$db->query('SELECT anti_spy_until FROM cities WHERE id=?',[$cityId])->fetchColumn()];
         }
         $bonus = (float) ($def['bonus_pct']??0);
-        KingdomService::require(in_array($type,array_merge(self::DIRECT_BOOSTS,['resource_production','research_speed','training_speed']),true)&&$bonus>0&&$bonus<=100,'Dieser Bonus wird nicht unterstützt.');
+        KingdomService::require(in_array($type,array_merge(self::DIRECT_BOOSTS,['resource_production','training_speed']),true)&&$bonus>0&&$bonus<=100,'Dieser Bonus wird nicht unterstützt.');
         $old=$db->query('SELECT bonus_pct,expires_at FROM player_charms_active WHERE player_id=? AND stat_category=? AND expires_at>UTC_TIMESTAMP() FOR UPDATE',[$playerId,$type])->fetch();
         KingdomService::require(!$old||(float)$old['bonus_pct']<=$bonus+0.00001,'Ein stärkerer Bonus ist bereits aktiv. Der Gegenstand bleibt in deinem Inventar.');
         // Production boosts are account-wide: settle every city before changing their strength.
@@ -349,7 +352,7 @@ final class KingdomInventory
             VALUES (?,?,'normal',?,?,DATE_ADD(UTC_TIMESTAMP(),INTERVAL ? SECOND))
             ON DUPLICATE KEY UPDATE charm_code=VALUES(charm_code),bonus_pct=VALUES(bonus_pct),expires_at=".$expiry,
             [$playerId,$type,(int)$def['code'],$bonus,$seconds,$seconds]);
-        $buffType=['resource_production'=>'production_boost','research_speed'=>'research_boost','training_speed'=>'training_boost'][$type]??null;
+        $buffType=['resource_production'=>'production_boost','training_speed'=>'training_boost'][$type]??null;
         if($buffType!==null){
             $expires=$db->query('SELECT expires_at FROM player_charms_active WHERE player_id=? AND stat_category=?',[$playerId,$type])->fetchColumn();
             $active=$db->query('SELECT id FROM active_buffs WHERE player_id=? AND buff_type=? AND expires_at>UTC_TIMESTAMP() ORDER BY id LIMIT 1 FOR UPDATE',[$playerId,$buffType])->fetchColumn();

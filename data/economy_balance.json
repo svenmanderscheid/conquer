@@ -1,0 +1,15 @@
+{
+  "version": "2026-09-30",
+  "buildings": {
+    "resource_factor": "0.80",
+    "gold_factor": "0.60",
+    "anchor_level": 5,
+    "growth_per_level": "1.25"
+  },
+  "research": {
+    "resource_factor": "0.70",
+    "gold_factor": "0.50",
+    "anchor_academy_level": 5,
+    "factor_per_academy_level": "0.90"
+  }
+}

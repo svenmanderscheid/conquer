@@ -75,7 +75,7 @@ body.mobile-game .lok-profile-progress .progress-track span{display:block;height
 body.mobile-game .lok-profile-progress .ap-progress span{background:var(--ui-green)}
 body.mobile-game .lok-profile-contact{display:flex;gap:7px}
 body.mobile-game .lok-profile-contact .profile-contact{flex:1;min-height:40px}
-body.mobile-game .lok-profile-nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:10px 0 0;padding:9px 14px 12px;border:1px solid var(--ui-line);border-radius:12px 12px 0 0;background:var(--ui-inset)}
+body.mobile-game .lok-profile-nav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;margin:10px 0 0;padding:9px 14px 12px;border:1px solid var(--ui-line);border-radius:12px 12px 0 0;background:var(--ui-inset)}
 body.mobile-game .lok-profile-nav .profile-nav{min-width:0;min-height:50px;padding:7px 3px;font-size:13px}
 body.mobile-game .lok-profile-nav .profile-nav.active{border-color:var(--ui-gold);background:var(--ui-gold-soft)}
 
@@ -132,8 +132,8 @@ body.mobile-game .lok-profile.is-public .lok-profile-hero{inset-inline:44px}
   body.mobile-game .lok-profile-facts>div{padding-block:4px}
   body.mobile-game .lok-profile-progress{padding-block:4px}
   body.mobile-game .lok-profile-progress .progress-track{height:7px;margin:3px 0 4px}
-  body.mobile-game .lok-profile-nav{margin-top:4px;padding-block:4px}
-  body.mobile-game .lok-profile-nav .profile-nav{min-height:36px;padding-block:4px}
+  body.mobile-game .lok-profile-nav{margin-top:4px;padding:4px 5px;gap:3px}
+  body.mobile-game .lok-profile-nav .profile-nav{min-height:36px;padding:4px 1px;font-size:8px}
 }
 
 @media(max-height:720px){

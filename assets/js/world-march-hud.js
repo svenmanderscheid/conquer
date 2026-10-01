@@ -6,8 +6,8 @@ window.ConquerMarchHud=function({host,getContext,follow,locate,stop,focus,getSel
   panel.innerHTML='<header><img alt=""><div><strong></strong><span class="world-march-card-state"></span></div><button data-march-command="close" aria-label="Verfolgung beenden">×</button></header><div class="world-march-summary"></div><div class="world-march-commands"><button data-march-command="origin">⌂<span>Herkunft</span></button><button data-march-command="destination">⚑<span>Ziel</span></button><button data-march-command="details" aria-expanded="false">☷<span>Details</span></button><button data-march-command="recall">↶<span>Rückruf</span></button></div><div class="world-march-details" hidden></div><p class="world-march-feedback" role="status" hidden></p>';
   host.append(root,panel);const rows=new Map();let expanded=true,selected=null,lastState=null,detailOpen=false,pending=false,layoutDirty=true;
   const number=v=>Number(v)||0,clock=t=>{if(!t)return NaN;const s=String(t);return Date.parse(/[zZ]|[+-]\d\d:\d\d$/.test(s)?s:s.replace(' ','T')+'Z')},timeLeft=end=>{const ms=end-getContext().now();if(!Number.isFinite(ms))return 'Zeit offen';const s=Math.max(0,Math.ceil(ms/1000));return [Math.floor(s/3600),Math.floor(s/60)%60,s%60].map(n=>String(n).padStart(2,'0')).join(':')};
-  const types={5:'Angriff',6:'Charm',7:'Angriff',8:'Späher',9:'Sammeltrupp',10:'Verstärkung',13:'Angriff',14:'Garnison',15:'Angriff'};
-  const status=m=>m.state==='returning'?'Rückkehr':m.state==='arrived'&&number(m.march_type)===9?'Sammelt':m.state==='arrived'?'Stationiert':m.state==='gathering'?'Rally sammelt':m.state==='resolving'||getContext().now()>=clock(m.arrival_time)?'Am Ziel':number(m.march_type)===9?'Zur Mine':m.march_type==='rally'?'Rally':types[m.march_type]||'Marsch';
+  const types={territory_garrison:'Gebietsgarnison',5:'Angriff',6:'Charm',7:'Angriff',8:'Späher',9:'Sammeltrupp',10:'Verstärkung',13:'Angriff',14:'Garnison',15:'Angriff'};
+  const status=m=>m.state==='returning'?'Rückkehr':m.state==='arrived'&&number(m.march_type)===9?'Sammelt':m.state==='arrived'?'Stationiert':m.state==='gathering'?'Rally startet in':m.state==='resolving'||getContext().now()>=clock(m.arrival_time)?'Am Ziel':number(m.march_type)===9?'Zur Mine':m.march_type==='rally'?'Rally kommt an in':types[m.march_type]||'Marsch';
   const end=m=>clock(m.state==='returning'?m.return_time:m.state==='arrived'?m.gathering_finishes_at:m.arrival_time);
   function troops(m){let army=m.troops||m.troops_json||{};if(typeof army==='string'){try{army=JSON.parse(army)}catch{army={}}}return Object.entries(army).filter(([,n])=>number(n)>0)}
   const coordinates=m=>`X ${number(m.target_x)} · Y ${number(m.target_y)}`;
@@ -19,10 +19,10 @@ window.ConquerMarchHud=function({host,getContext,follow,locate,stop,focus,getSel
     const node=lastState?.nodes?.find(node=>String(node.id)===String(m.target_id));
     return ({1:'food',2:'lumber',3:'stone',4:'gold',5:'gems'})[number(node?.object_type)]||null;
   }
-  const image=m=>{const resource=targetResource(m);if(resource)return resource==='gems'?`${getContext().base}/assets/art/items/gems.svg`:`${getContext().base}/assets/art/ui-resources/${resource}.png`;return window.ConquerMarchSkins?.ids.includes(m.march_skin)?window.ConquerMarchSkins.image(getContext().base,m.march_skin):`${getContext().base}/assets/art/map/march-infantry.svg`};
+  const image=m=>{const resource=targetResource(m);if(resource)return resource==='gems'?`${getContext().base}/assets/art/items/gems.svg`:`${getContext().base}/assets/art/ui-resources/${resource}.png`;return window.ConquerMarchSkins?.allIds.includes(m.march_skin)?window.ConquerMarchSkins.image(getContext().base,m.march_skin):`${getContext().base}/assets/art/map/march-infantry.svg`};
   const imageLabel=m=>{const resource=targetResource(m);return resource?`${resourceNames[resource]} sammeln`:`${status(m)}: Truppensymbol`};
   const active=()=>lastState?.marches?.find(m=>String(m.id)===selected);
-  const recallable=m=>m&&/^\d+$/.test(String(m.id))&&![13,14].includes(number(m.march_type))&&((m.state==='marching'&&end(m)>getContext().now())||(number(m.march_type)===9&&m.state==='arrived'));
+  const recallable=m=>m&&m.march_type==='territory_garrison'?['marching','arrived'].includes(m.state):m&&/^\d+$/.test(String(m.id))&&![13,14].includes(number(m.march_type))&&((m.state==='marching'&&end(m)>getContext().now())||(number(m.march_type)===9&&m.state==='arrived'));
   root.querySelector('.world-march-heading').onclick=()=>{expanded=!expanded;root.classList.toggle('is-collapsed',!expanded);root.querySelector('.world-march-heading').setAttribute('aria-expanded',String(expanded));layoutDirty=true;layout();};
   root.addEventListener('click',async e=>{
     const recall=e.target.closest('[data-march-recall]');
@@ -31,7 +31,7 @@ window.ConquerMarchHud=function({host,getContext,follow,locate,stop,focus,getSel
   });
   async function recallMarch(m,trigger){
     const ctx=getContext();if(pending||!recallable(m)||!ctx.onMarchRecall)return;
-    pending=true;sync(lastState);try{await ctx.onMarchRecall(Number(m.id));}
+    pending=true;sync(lastState);try{await ctx.onMarchRecall(m.march_type==='territory_garrison'?m.id:Number(m.id));}
     catch(error){const feedback=panel.querySelector('.world-march-feedback');feedback.textContent=error.message;feedback.hidden=false;}
     finally{pending=false;const current=active();if(current)renderCard(current);const updated=lastState?.marches?.find(item=>String(item.id)===String(m.id));if(updated)renderRow(updated);if(trigger?.isConnected)trigger.focus({preventScroll:true});}
   }
@@ -46,15 +46,15 @@ window.ConquerMarchHud=function({host,getContext,follow,locate,stop,focus,getSel
   });
   for(const el of [root,panel]){el.addEventListener('pointerdown',e=>e.stopPropagation());el.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation();stop(true)}})}
   function renderCard(m){
-    const ctx=getContext(),skin=window.ConquerMarchSkins?.ids.includes(m.march_skin)?window.ConquerMarchSkins.get(m.march_skin):null;
+    const ctx=getContext(),skin=window.ConquerMarchSkins?.allIds.includes(m.march_skin)?window.ConquerMarchSkins.get(m.march_skin):null;
     const img=panel.querySelector('header img');if(img.getAttribute('src')!==image(m))img.src=image(m);
     panel.querySelector('header strong').textContent=skin?.name||'Dein Marsch';
     panel.querySelector('.world-march-card-state').textContent=`Kamera folgt · ${status(m)} · ${timeLeft(end(m))}`;
-    panel.querySelector('.world-march-summary').textContent=`${troops(m).reduce((n,[,v])=>n+number(v),0).toLocaleString('de-DE')} Truppen · Ziel X ${number(m.target_x)} · Y ${number(m.target_y)}`;
-    const recall=panel.querySelector('[data-march-command="recall"]');recall.hidden=!ctx.onMarchRecall||!recallable(m);if(recall.hidden&&document.activeElement===recall)panel.querySelector('[data-march-command="close"]').focus({preventScroll:true});recall.disabled=pending;recall.querySelector('span').textContent=pending?'Rückruf …':'Rückruf';
+    panel.querySelector('.world-march-summary').textContent=`${troops(m).reduce((n,[,v])=>n+number(v),0).toLocaleString(window.ConquerLocale?.locale??'en')} Truppen · Ziel X ${number(m.target_x)} · Y ${number(m.target_y)}`;
+    const recall=panel.querySelector('[data-march-command="recall"]');recall.hidden=!ctx.onMarchRecall||!recallable(m);if(recall.hidden&&document.activeElement===recall)panel.querySelector('[data-march-command="close"]').focus({preventScroll:true});recall.disabled=pending;const recallLabel=recall.querySelector('span');if(recallLabel)recallLabel.textContent=pending?'Rückruf …':'Rückruf'; // Shared action feedback temporarily replaces the button's children.
     panel.querySelector('[data-march-command="details"]').setAttribute('aria-expanded',String(detailOpen));
     const details=panel.querySelector('.world-march-details');details.hidden=!detailOpen;
-    if(detailOpen){const esc=ctx.esc,defs=lastState.troop_defs||[];const html=`<dl><div><dt>Herkunft</dt><dd>X ${number(m.origin_x??lastState.city.coord_x)} · Y ${number(m.origin_y??lastState.city.coord_y)}</dd></div><div><dt>Ziel</dt><dd>X ${number(m.target_x)} · Y ${number(m.target_y)}</dd></div></dl>`+troops(m).map(([code,count])=>{const def=defs.find(t=>number(t.code)===number(code)),name=def?.name_de||def?.name||({1:'Infanterie',2:'Bogenschützen',3:'Kavallerie'}[def?.type])||'Truppen';return `<div class="world-march-unit"><span>${esc(name)}${def?.tier?' · Stufe '+number(def.tier):''}</span><b>${number(count).toLocaleString('de-DE')}</b></div>`}).join('');if(details.innerHTML!==html)details.innerHTML=html;}
+    if(detailOpen){const esc=ctx.esc,defs=lastState.troop_defs||[];const html=`<dl><div><dt>Herkunft</dt><dd>X ${number(m.origin_x??lastState.city.coord_x)} · Y ${number(m.origin_y??lastState.city.coord_y)}</dd></div><div><dt>Ziel</dt><dd>X ${number(m.target_x)} · Y ${number(m.target_y)}</dd></div></dl>`+troops(m).map(([code,count])=>{const def=defs.find(t=>number(t.code)===number(code)),name=def?.name_de||def?.name||({1:'Infanterie',2:'Bogenschützen',3:'Kavallerie'}[def?.type])||'Truppen';return `<div class="world-march-unit"><span>${esc(name)}${def?.tier?' · Stufe '+number(def.tier):''}</span><b>${number(count).toLocaleString(window.ConquerLocale?.locale??'en')}</b></div>`}).join('');if(details.innerHTML!==html)details.innerHTML=html;}
   }
   function sync(state){
     lastState=state;const current=getSelected(),changed=current!==selected;selected=current;
@@ -77,19 +77,38 @@ window.ConquerMarchHud=function({host,getContext,follow,locate,stop,focus,getSel
   function layout(){
     onLayout?.();
     layoutDirty=false;const viewport=host.getBoundingClientRect(),short=viewport.height<=520&&viewport.width>viewport.height;
-    const army=document.querySelector('#hud-left-tools [data-world-only]')?.getBoundingClientRect()||document.querySelector('#hud-left-tools')?.getBoundingClientRect();
+    const armyButton=document.querySelector('#hud-left-tools [data-world-only]');
+    const army=armyButton?.getBoundingClientRect()||document.querySelector('#hud-left-tools')?.getBoundingClientRect();
+    const replacesArmy=armyButton&&getComputedStyle(armyButton).visibility==='hidden';
     const profile=document.querySelector('.topbar')?.getBoundingClientRect(),chat=document.querySelector('.world-chat')?.getBoundingClientRect();
     const top=Math.max(8,(profile?.bottom||viewport.top)-viewport.top+8),bottom=chat&&chat.height>36?Math.max(top+180,chat.top-viewport.top-10):viewport.height-105;
-    root.style.left=short&&army?`${Math.max(army.right-viewport.left+8,76)}px`:'8px';root.style.top=`${Math.max(top,army?army.top-viewport.top:16)}px`;
+    root.style.left=short&&army?`${Math.max(army.right-viewport.left+8,76)}px`:army?`${Math.max(8,army.left-viewport.left)}px`:'8px';root.style.top=`${Math.max(top,army?(short||replacesArmy?army.top:army.bottom+6)-viewport.top:16)}px`;
+    const rootBox=root.getBoundingClientRect();
+    const below=[...document.querySelectorAll('.map-overlay-coordinate-toggle,#hud-objective,.world-chat,#navigation')]
+      .filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden').map(el=>el.getBoundingClientRect())
+      .filter(r=>r.top>rootBox.top&&r.left<rootBox.right&&r.right>rootBox.left);
+    root.style.maxHeight=`${Math.max(102,Math.min(viewport.bottom-8,...below.map(r=>r.top-8))-rootBox.top)}px`;
     const rightEdge=viewport.width<700?Math.min(viewport.right-8,...[...document.querySelectorAll('.hud-right-tools button,#navigation button')].filter(b=>b.getClientRects().length).map(b=>b.getBoundingClientRect()).filter(r=>r.left>viewport.left+viewport.width*.65&&r.width<110).map(r=>r.left-8))-viewport.left:viewport.width-8;
     panel.style.width=`${Math.min(short?290:320,rightEdge-8)}px`;
     panel.style.left=short?`${Math.max(8,viewport.width-parseFloat(panel.style.width)-92)}px`:`${Math.max(8,(rightEdge+8-parseFloat(panel.style.width))/2)}px`;
     panel.style.top=short?`${Math.max(top,90)}px`:'auto';panel.style.bottom=short?'auto':`${Math.max(100,viewport.height-bottom)}px`;panel.style.maxHeight=`${Math.max(120,(short?viewport.height-95:bottom)-top)}px`;
     if(short){
-      const tools=document.querySelector('.hud-right-tools')?.getBoundingClientRect(),dock=document.querySelector('#navigation')?.getBoundingClientRect();
+      // HUD containers can stretch below their visible controls. Measure the
+      // buttons, otherwise the selected army card is pushed under the dock.
+      const buttons=[...document.querySelectorAll('.hud-right-tools button')].filter(b=>b.getClientRects().length&&getComputedStyle(b).visibility!=='hidden').map(b=>b.getBoundingClientRect()),dock=document.querySelector('#navigation')?.getBoundingClientRect();
       panel.style.left=`${Math.max(8,viewport.width-parseFloat(panel.style.width)-24)}px`;
-      panel.style.top=`${Math.max(top,tools?tools.bottom-viewport.top+8:90)}px`;
+      panel.style.top=`${Math.max(top,buttons.length?Math.max(...buttons.map(r=>r.bottom))-viewport.top+8:90)}px`;
+      if(chat&&chat.height>36){
+        const clearWidth=viewport.right-chat.right-24;
+        if(clearWidth>=220){panel.style.width=`${Math.min(parseFloat(panel.style.width),clearWidth)}px`;panel.style.left=`${viewport.width-parseFloat(panel.style.width)-16}px`;}
+      }
       panel.style.maxHeight=`${Math.max(146,(dock?.top||viewport.bottom)-viewport.top-parseFloat(panel.style.top)-8)}px`;
+      if(viewport.width<=700&&viewport.height<=360){
+        // The focused army replaces its list on very short phones, leaving
+        // room above the dock instead of squeezing controls under it.
+        panel.style.left='8px';panel.style.top=`${top}px`;
+        panel.style.maxHeight=`${Math.max(96,(dock?.top||viewport.bottom)-viewport.top-top-8)}px`;
+      }
     }
     if(!short&&viewport.width<700&&viewport.height<700)panel.style.maxHeight=`${Math.max(146,bottom-parseFloat(root.style.top)-92)}px`;
   }

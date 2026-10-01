@@ -134,8 +134,8 @@ try {
         foreach (\Conquer\Game\City\CityState::BUILDING_CODES as $code) {
             $db->execute('INSERT INTO city_buildings(city_id,building_code,level) VALUES(?,?,1)', [$player, $code]);
         }
-        // Current T1 fighters have 1 attack, rather than the historical 45.
-        // Scale only fixture armies; keep the real encounter rules unchanged.
+        // A large fixture garrison supports overlapping reservation/race checks.
+        // Encounter-strength expectations below follow the active troop catalog.
         $db->execute('INSERT INTO city_troops(city_id,troop_code,count) VALUES(?,50100101,4500)', [$player]);
     }
     $db->execute("INSERT INTO alliances(id,world_id,name,tag,leader_id,member_count) VALUES(101,1,'Test host','HOST',?,2),(102,1,'Test guest','GUEST',?,1)", [$host, $guest]);
@@ -150,8 +150,9 @@ try {
     foreach ([[], [50100101 => -1], [50100101 => 1.2], [50100101 => '2'], [123 => 1], [50100101 => 5001]] as $invalid) {
         rejects(fn () => ExpeditionRules::troops($invalid), 'INVALID_TROOPS');
     }
-    check(ExpeditionRules::strength([50100101 => 450], 'pass', []) === 2700, 'the pass uses defense strength and assault uses attack');
-    check(ExpeditionRules::strength([50100101 => 450], 'boss', ['infantry_atk' => 0.2, 'vs_monster_attack' => 0.5]) === 810, 'research and monster bonuses affect the reserved army strength');
+    $fighter = \Conquer\Game\City\TroopData::get(50100101);
+    check(ExpeditionRules::strength([50100101 => 450], 'pass', []) === 450 * (int)$fighter['defense'], 'the pass uses the active troop defense strength');
+    check(ExpeditionRules::strength([50100101 => 450], 'boss', ['infantry_atk' => 0.2, 'vs_monster_attack' => 0.5]) === (int)floor(450 * (int)$fighter['attack'] * 1.2 * 1.5), 'research and monster bonuses multiply the reserved army attack strength');
     $id = act($host, 'create')['expedition_id'];
     rejects(fn () => act($host, 'create'), 'ALLIANCE_BUSY');
     rejects(fn () => act($member, 'invite', $id, ['alliance_id' => 102]), 'LEADER_REQUIRED');

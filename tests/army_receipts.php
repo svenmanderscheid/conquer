@@ -6,8 +6,9 @@ require ROOT_DIR.'/tests/Support/FeatureDatabase.php';
 use Conquer\Db\Connection;
 function armyCheck(bool $ok,string $label):void{if(!$ok)throw new RuntimeException($label);echo "PASS $label\n";}
 $fixture=new \ConquerTests\FeatureDatabase();
+$testLog=tempnam(sys_get_temp_dir(),'conquer-army-receipts-');
 try{
- $db=Connection::getInstance();\Conquer\Logger::init(ROOT_DIR.'/logs/security-test.log');
+ $db=Connection::getInstance();\Conquer\Logger::init($testLog);
  $db->execute("UPDATE worlds SET status='running' WHERE id=1");
  \Conquer\Game\World\LandProgressService::ensureWorld(1,true);
  $tokens=[];$csrf=str_repeat('b',64);
@@ -79,4 +80,4 @@ try{
  \Conquer\Security\ActivityMonitor::record(2,1);
  armyCheck((int)$db->query("SELECT COUNT(*) FROM security_activity_flags WHERE player_id=2 AND reason='high_command_volume'")->fetchColumn()===1,'high command volume creates a manual review signal');
  echo "ALL ARMY RECEIPT CHECKS PASSED\n";
-}finally{$fixture->close();}
+}finally{$fixture->close();if(is_file($testLog))unlink($testLog);}

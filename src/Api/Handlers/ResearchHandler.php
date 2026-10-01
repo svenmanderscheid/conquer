@@ -10,6 +10,8 @@ use Conquer\Auth\Session;
 use Conquer\Db\Connection;
 use Conquer\Game\Research\BuffEngine;
 use Conquer\Game\Research\ResearchData;
+use Conquer\Game\Research\ResearchEffects;
+use Conquer\Game\Buff\ActiveBuffService;
 use Conquer\Game\Research\ResearchProcessor;
 
 /**
@@ -106,6 +108,7 @@ final class ResearchHandler
             'research'      => $research,
             'queue'         => $queue,
             'buffs'         => $buffs,
+            'research_duration_factor' => ResearchEffects::durationFactor($buffs, ActiveBuffService::getMultiplier($playerId, 'research_boost')),
             'academy_level' => $academyLevel,
         ]);
     }
@@ -267,16 +270,10 @@ final class ResearchHandler
         }
 
         $cost        = $levelEntry['resources'];
-        $durationSec = (int) $levelEntry['time'];
-
-        // Apply research_speed buff to reduce duration.
-        $buffs         = BuffEngine::getBuffs($playerId, $worldId);
-        $speedReduction = (float) ($buffs['research_speed'] ?? 0.0);
-        $durationSec = (int)max(1,round($durationSec/(1+max(0,(float)($buffs['talent_research_speed']??0)))));
-        if ($speedReduction > 0.0) {
-            $durationSec = (int) max(1, (int) round($durationSec * (1.0 - $speedReduction)));
-        }
-        $durationSec=max(1,(int)ceil($durationSec / \Conquer\Game\Buff\ActiveBuffService::getMultiplier($playerId,'research_boost')));
+        // Snapshot speed bonuses once at start; existing queue timestamps stay unchanged.
+        $buffs = BuffEngine::getBuffs($playerId, $worldId);
+        $durationSec = ResearchEffects::researchSeconds((int) $levelEntry['time'], $buffs,
+            ActiveBuffService::getMultiplier($playerId, 'research_boost'));
 
         $cityState = \Conquer\Game\City\CityState::loadForPlayer($playerId);
         if ($cityState) { \Conquer\Game\City\ResourceTick::persist($cityState['city'], $cityState['buildings']); }
@@ -531,6 +528,11 @@ final class ResearchHandler
                      SET is_processed = 1, finishes_at = UTC_TIMESTAMP()
                      WHERE id = ?',
                     [$entryId],
+                );
+                $cityId = (int) $db->query('SELECT id FROM cities WHERE player_id=? AND world_id=?', [$playerId,$worldId])->fetchColumn();
+                \Conquer\Game\Notification\NotificationService::pushCityCompletion(
+                    $cityId, \Conquer\Game\Notification\NotificationService::TYPE_RESEARCH_COMPLETE,
+                    ['building_code'=>'academy', 'queue_id'=>$entryId, 'research_code'=>$resCode, 'level'=>$levelTo],
                 );
             } else {
                 $db->execute(

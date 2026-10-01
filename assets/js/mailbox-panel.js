@@ -14,14 +14,17 @@ window.ConquerMailbox=function(ctx){
     const host=()=>document.querySelector('#content');
     const active=()=>Boolean(host()?.querySelector('.mailbox-shell'));
     const world=()=>Number(ctx.getState()?.city?.world_id||1);
-    const time=v=>new Date(date(v)).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    const time=v=>new Date(date(v)).toLocaleString(window.ConquerLocale?.locale??'en',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
     const star=filled=>`<svg viewBox="0 0 24 24" aria-hidden="true" class="mail-star-icon ${filled?'filled':''}"><path d="m12 2 3 6.2 6.8 1-4.9 4.8 1.2 6.8-6.1-3.2-6.1 3.2 1.2-6.8-4.9-4.8 6.8-1Z"/></svg>`;
     const monsterIcon=r=>{
-        const art=String(r.monster_art||r.metadata?.details?.monster_snapshot?.art||''),name=String(r.monster_name||r.metadata?.details?.monster_snapshot?.name||r.metadata?.details?.monster_name||'').toLowerCase();
-        if(/^monsters\/[a-z-]+$/.test(art))return `${base}/assets/art/${art}.png`;
-        const aliases={skeleton:['skeleton','skelett'],golem:['golem'],goblin:['goblin'],orc:['orc','ork']};
-        const kind=Object.keys(aliases).find(key=>art===key||aliases[key].some(alias=>name.includes(alias)));
-        return kind?`${base}/assets/art/map/life-${kind}.png`:`${base}/assets/art/orc.png`;
+        const art=String(r.monster_art||r.metadata?.details?.monster_snapshot?.art||'').replace(/\.png$/,''),name=String(r.monster_name||r.metadata?.details?.monster_snapshot?.name||r.metadata?.details?.monster_name||'').toLowerCase();
+        const regional=`${art} ${name}`.match(/grumwald|frostgrimm|sandmaul|glutramm/i);
+        if(regional)return `${base}/assets/art/monsters/storybook-v2/${regional[0].toLowerCase()}.png`;
+        const id=art.split('/').pop(),current={goblin:'treasure-goblin-turquoise','treasure-goblin':'treasure-goblin-turquoise'}[id]||id;
+        const aliases={skeleton:['skeleton','skelett'],golem:['golem'],goblin:['goblin'],orc:['orc','ork'],'green-dragon':['green dragon','grüner drache'],'red-dragon':['red dragon','roter drache'],'gold-dragon':['gold dragon','golddrache'],magdar:['magdar']};
+        const kind=['orc','skeleton','golem','treasure-goblin-turquoise','green-dragon','red-dragon','gold-dragon','magdar'].includes(current)?current:Object.keys(aliases).find(key=>aliases[key].some(alias=>name.includes(alias)));
+        const file=kind==='goblin'?'treasure-goblin-turquoise':kind;
+        return file?`${base}/assets/art/monsters/2.5d/bright-v2/${file}.png`:/^monsters\/[a-z0-9-]+$/.test(art)?`${base}/assets/art/${art}.png`:`${base}/assets/art/monsters/2.5d/bright-v2/orc.png`;
     };
     const icon=r=>r.source==='battle'&&r.category==='reports'?monsterIcon(r):`${base}/assets/art/hud/${r.source==='alliance_gift'?'inventory':r.category==='war'?'expeditions':r.category==='alliance'?'alliance':r.category==='system'?'quest':'reports'}.svg`;
     const btn=(label,act,extra='',style='')=>`<button type="button" class="mail-button ${style}" data-action="mailbox-${act}" ${extra}>${label}</button>`;
@@ -106,7 +109,7 @@ window.ConquerMailbox=function(ctx){
             ctx.openScoutReport({id:Number(m.source_id),created_at:m.created_at,target_x:m.metadata.x,target_y:m.metadata.y,details:m.metadata.details||{}},{footer:btn('‹ Zur Post','back')+btn(star(saved),'detail-star',`data-id="${Number(m.id)}" data-starred="${!saved}" aria-pressed="${saved}" aria-label="${saved?'Favorit entfernen':'Als Favorit speichern'}"`,'mail-star')});return;
         }
         if(m.source==='battle'&&ctx.openMonsterReport?.(m))return;
-        if(m.source==='battle'&&['city','rally'].includes(m.metadata?.details?.battle_kind)&&ctx.openPlayerReport){
+        if(m.source==='battle'&&['city','rally','territory'].includes(m.metadata?.details?.battle_kind)&&ctx.openPlayerReport){
             ctx.openPlayerReport({id:Number(m.source_id),created_at:m.created_at,target_x:m.metadata.x,target_y:m.metadata.y,outcome:m.metadata.details.outcome,details:m.metadata.details});return;
         }
         openDialog(`<h2>${esc(m.subject)}</h2><section class="mail-detail"><div class="mail-detail-scroll"><div class="mail-letter-heading"><img src="${icon(m)}" alt=""><div><strong>${esc(m.metadata.sender||'Dein Reich')}${m.metadata.recipient?' → '+esc(m.metadata.recipient):''}</strong><time>${esc(time(m.created_at))}</time></div></div><div class="mail-letter-body">${esc(m.body)}</div>${battleHtml(m)}${rewardHtml(m)}</div><footer class="mail-detail-actions">${btn('‹ Zur Post','back')}${btn(star(Boolean(Number(m.starred))),'detail-star',`data-id="${Number(m.id)}" data-starred="${!Number(m.starred)}" aria-pressed="${Boolean(Number(m.starred))}" aria-label="${Number(m.starred)?'Favorit entfernen':'Als Favorit speichern'}"`,'mail-star')}${m.source==='letter'?btn('Antworten','reply',`data-id="${Number(m.id)}"`):''}${m.reward_status==='pending'?btn('Abholen','claim',`data-id="${Number(m.id)}"`,'mail-collect'):''}</footer></section>`);

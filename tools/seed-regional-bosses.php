@@ -25,7 +25,10 @@ foreach($db->query("SELECT id FROM worlds WHERE status IN ('open','running')")->
    for($attempt=0;$attempt<1000;$attempt++){$x=random_int(1,$size-2);$y=random_int(1,$size-2);if(WorldTerrain::biomeAt($x,$y)===$biome&&WorldPlacement::canPlace($db,$id,'boss',$x,$y)){$spot=[$x,$y];break;}}
    if(!$spot){$output[]=['world'=>$id,'zone'=>$biome,'status'=>'no_free_land'];continue;}
    $def=MonsterData::get($base+$level);
-   if($apply)$db->execute("INSERT INTO field_monsters(world_id,monster_code,coord_x,coord_y,hp_current,monster_type,expires_at) VALUES(?,?,?,?,?,'rally',?)",[$id,$base+$level,$spot[0],$spot[1],$def['stats']['hp']*$def['amount'],gmdate('Y-m-d H:i:s',time()+$cfg['monster_lifetime_hours']*3600)]);
+   if($apply){
+    $db->execute("INSERT INTO field_monsters(world_id,monster_code,coord_x,coord_y,hp_current,monster_type,expires_at) VALUES(?,?,?,?,?,'rally',?)",[$id,$base+$level,$spot[0],$spot[1],$def['stats']['hp']*$def['amount'],gmdate('Y-m-d H:i:s',time()+$cfg['monster_lifetime_hours']*3600)]);
+    \Conquer\Game\World\RegionalSpawns::stamp('field_monsters',$db->lastInsertId(),$id,$spot[0],$spot[1]);
+   }
    $count++;$output[]=['world'=>$id,'zone'=>$biome,'name'=>$def['name'],'level'=>$level,'x'=>$spot[0],'y'=>$spot[1],'status'=>$apply?'spawned':'preview'];
   }
  });

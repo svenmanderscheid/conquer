@@ -20,11 +20,12 @@ try{
  $db->execute("INSERT INTO players(id,username,email,password_hash)VALUES(1,'TrainingFixture','training@tests.invalid','unused')");
  $db->execute("INSERT INTO cities(id,player_id,world_id,name,coord_x,coord_y,castle_level,food,lumber,stone,gold)VALUES(1,1,1,'Training',65,65,30,100000000,100000000,100000000,100000000)");
  foreach(CityState::BUILDING_CODES as $code)if(!in_array($code,['stable','archery_range'],true))$db->execute('INSERT INTO city_buildings(city_id,building_code,level)VALUES(1,?,30)',[$code]);
+ foreach(TroopData::all() as $unit)if($unit['unlock_research'])$db->execute('INSERT INTO player_research(player_id,world_id,research_code,level)VALUES(1,1,?,1)',[$unit['unlock_research']]);
  $migration=file_get_contents(ROOT_DIR.'/migrations/0090_training_buildings.sql');
  \Conquer\Db\MigrationSql::apply($db->getPdo(),$migration);\Conquer\Db\MigrationSql::apply($db->getPdo(),$migration);
  checkTraining((int)$db->query("SELECT SUM(level) FROM city_buildings WHERE city_id=1 AND building_code IN('archery_range','stable')")->fetchColumn()===60,'migration preserves former barrack progress and is repeatable');
- checkTraining(count(TroopData::all())===30&&TroopData::get(50101101)===null,'three types support T1–T10; T11 is excluded');
- foreach([1=>[94,14,20,20,13],2=>[99,22,15,14,21],3=>[94,20,15,14,19]] as $type=>$stats){$t=TroopData::get(50001001+$type*100000);checkTraining(array_map(fn($k)=>$t[$k],['power','attack','defense','hp','lethality'])===$stats&&$t['carry']===379&&$t['speed']===11,'T10 reference values for type '.$type);}
+ checkTraining(count(TroopData::all())===15&&TroopData::get(50101101)===null,'three types support T1–T5; T11 is excluded');
+ foreach([50100601,50201001,50301001] as $code)rejectTraining(fn()=>startTraining($code));
  rejectTraining(fn()=>startTraining(50100101,20,2));rejectTraining(fn()=>startTraining(50101101));
  $receipt=['action'=>'troops.train','operation_key'=>'training_replay_0001','world_id'=>1,'troop_code'=>50100101,'count'=>20,'barrack_slot'=>1];
  Operation::run(1,$receipt,fn()=>startTraining(50100101));$food=$db->query('SELECT food FROM cities WHERE id=1')->fetchColumn();
@@ -33,10 +34,10 @@ try{
  startTraining(50200101);startTraining(50300101);
  checkTraining(queued()===3&&$db->query('SELECT DISTINCT barrack_slot FROM troop_queue ORDER BY barrack_slot')->fetchAll(PDO::FETCH_COLUMN)===[1,2,3],'all three schools train in parallel');
  rejectTraining(fn()=>startTraining(50200201));rejectTraining(fn()=>DefenseService::promote(1,1,50100101,1));
- $s=CityState::loadForPlayer(1);$defs=TroopData::forCity($s,\Conquer\Game\Research\BuffEngine::getBuffs(1),[],1);
- checkTraining(count(array_filter($defs,fn($t)=>$t['unlocked']))===30,'all tiers unlock with each school and town center, without research');
- $s['buildings']['archery_range']['level']=1;$defs=TroopData::forCity($s,[],[],1);
- checkTraining(!$defs[19]['unlocked']&&TroopData::isUnlocked(50101001,30,30),'school-level gates are independent');
+ $s=CityState::loadForPlayer(1);$defs=TroopData::forCity($s,\Conquer\Game\Research\BuffEngine::getBuffs(1),TroopData::researchLevels(1,1),1);
+ checkTraining(count(array_filter($defs,fn($t)=>$t['unlocked']))===15,'all tiers unlock with the required academy and research');
+ $s['buildings']['archery_range']['level']=0;$defs=TroopData::forCity($s,[],TroopData::researchLevels(1,1),1);
+ checkTraining(!$defs[9]['unlocked']&&TroopData::isUnlocked(50100501,30,30,30,TroopData::researchLevels(1,1)),'school-level gates are independent');
  $qid=(int)$db->query('SELECT id FROM troop_queue WHERE city_id=1 AND barrack_slot=2')->fetchColumn();
  InventoryService::addItems(1,10103003,5);
  $speed=['action'=>'inventory.use','item_code'=>10103003,'queue_type'=>'training','queue_id'=>$qid,'operation_key'=>'training_speedup_001','expected_world_id'=>1];

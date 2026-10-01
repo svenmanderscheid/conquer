@@ -10,6 +10,26 @@ use Conquer\Game\World\WorldContext;
 final class TreasureService
 {
     public const SLOT_UNLOCK_LEVELS = [1,1,5,10,20,25];
+    private const UNLOCK_COST = 10;
+    private const EFFECT_UPGRADE_BASE_COST = 10;
+    private const EFFECT_CURVE = [0.0,0.10,0.25,0.45,0.70,1.0];
+    /** Gewöhnliche Relikte: zwei frei aufwertbare Effekte mit je einem Meisterbonus. */
+    private const EFFECT_OVERRIDES = [
+        60100001=>[['food_production',5,'food_production',5],['food_storage_capacity',5,'gathering_speed',3]],
+        60100107=>[['lumber_production',5,'lumber_production',5],['lumber_storage_capacity',5,'gathering_speed',3]],
+        60100101=>[['stone_production',5,'stone_production',5],['stone_storage_capacity',5,'gathering_speed',3]],
+        60100105=>[['gold_production',5,'gold_production',5],['gold_storage_capacity',5,'gathering_speed',3]],
+        60100103=>[['food_gathering_speed',5,'food_gathering_speed',5],['food_protection_capacity',5,'resource_production',3]],
+        60100002=>[['lumber_gathering_speed',5,'lumber_gathering_speed',5],['lumber_protection_capacity',5,'resource_production',3]],
+        60100003=>[['stone_gathering_speed',5,'stone_gathering_speed',5],['stone_protection_capacity',5,'resource_production',3]],
+        60100102=>[['gold_gathering_speed',5,'gold_gathering_speed',5],['gold_protection_capacity',5,'resource_production',3]],
+        60100104=>[['infantry_attack',3,'ranged_attack',3],['infantry_speed',3,'infantry_load',3]],
+        60100108=>[['ranged_attack',3,'cavalry_attack',3],['ranged_speed',3,'ranged_load',3]],
+        60100106=>[['cavalry_attack',3,'cavalry_speed',3],['infantry_speed',3,'cavalry_load',3]],
+        60100109=>[['infantry_load',3,'infantry_defense',3],['infantry_defense',3,'infantry_hp',3]],
+        60100006=>[['ranged_load',3,'ranged_defense',3],['ranged_defense',3,'ranged_hp',3]],
+        60200003=>[['cavalry_load',3,'cavalry_defense',3],['cavalry_defense',3,'cavalry_hp',3]],
+    ];
     // Each catalog key has a real consumer through BuffEngine. Values below are
     // percentages, except the two capacities, which are flat troop counts.
     public const ACTIVE_STATS = ['all_attack','all_defense','all_hp','cavalry_attack','construction_speed',
@@ -25,13 +45,21 @@ final class TreasureService
             LEFT JOIN player_treasure_loadouts l ON l.player_id=t.player_id AND l.treasure_code=t.treasure_code AND l.world_id=?
             WHERE t.player_id=?', [$worldId,$playerId])->fetchAll();
         $owned = []; foreach ($rows as $row) $owned[(int)$row['treasure_code']] = $row;
+        $progress=[];
+        foreach($db->query('SELECT treasure_code,effect_index,parts FROM player_treasure_effects WHERE player_id=?',[$playerId])->fetchAll() as $row)$progress[(int)$row['treasure_code']][(int)$row['effect_index']]=(int)$row['parts'];
         $items = [];
         foreach (TreasureData::all() as $code=>$definition) {
+            if(!empty($definition['legacy_only'])&&!isset($owned[$code]))continue;
             $row = $owned[$code] ?? [];
             $fragments = (int)($row['fragments'] ?? 0);
-            $level = self::levelFromFragments($fragments,$code);
-            $max = (int)($definition['max_level'] ?? 10);
-            $preview = self::stats($definition,1);
+            $parts=$progress[$code]??[];
+            $unlocked=isset($parts[0])&&$parts[0]>=1;
+            $effects=self::effectState($definition,$parts,$code);
+            $active=self::effectStats($definition,$parts,true,$code);
+            $boosts=self::effectStats($definition,$parts,false,$code);
+            $preview=self::effectStats($definition,[0=>1],false,$code);
+            $level=$unlocked?max(1,count(array_filter($effects,static fn(array $effect):bool=>$effect['master_unlocked']))):0;
+            $max=max(1,count($effects));
             $unsupported = array_diff_key($preview,array_flip(self::ACTIVE_STATS));
             $items[] = [
                 'treasure_code'=>$code,'name'=>(string)$definition['name'],'grade'=>(string)$definition['grade'],
@@ -39,13 +67,17 @@ final class TreasureService
                 'icon'=>(string)($definition['icon'] ?? ''),'icon_framed'=>(bool)($definition['icon_framed'] ?? false),
                 'source_reference'=>$definition['source_reference'] ?? null,
                 'description'=>(string)($definition['description'] ?? ''),'fragments'=>$fragments,
-                'fragments_next'=>self::fragmentsForNextLevel($definition,$level),
+                'fragments_next'=>0,
                 'fragments_per_level'=>(int)$definition['fragments_per_level'],'level'=>$level,'max_level'=>$max,
                 'equipped_slot'=>isset($row['equipped_slot'])?(int)$row['equipped_slot']:null,
-                'stats_at_level'=>$level>0?self::activeStats($definition,$level):[],
-                'preview_stats'=>self::activeStats($definition,1),
-                'next_level_stats'=>$level<$max?self::activeStats($definition,$level+1):[],
-                'is_unlocked'=>$level>0,'is_usable'=>(bool)self::activeStats($definition,1),
+                'stats_at_level'=>$unlocked?$active:[],
+                'preview_stats'=>$preview,
+                'next_level_stats'=>[],
+                'boost_stats_at_level'=>$unlocked?$boosts:[],
+                'next_boost_stats'=>[],
+                'effects'=>$effects,
+                'master_bonus'=>self::effectMasterSummary($effects),
+                'is_unlocked'=>$unlocked,'is_usable'=>(bool)$effects,
                 'unsupported_stats'=>$unsupported,
                 'effect_note'=>$unsupported?'Zusätzliche Sammlereffekte sind noch nicht aktiv.':'',
             ];
@@ -59,7 +91,57 @@ final class TreasureService
         $house = self::houseLevel($playerId,$worldId);
         return ['items'=>self::getPlayerTreasures($playerId,$worldId),'slots'=>TreasureData::getUnlockSlots($house),
             'house_level'=>$house,'slot_unlock_levels'=>self::SLOT_UNLOCK_LEVELS,'world_id'=>$worldId,
-            'bonuses'=>self::getEquippedStats($playerId,$worldId),'presets'=>self::getPresets($playerId,$worldId)];
+            'bonuses'=>self::getEquippedStats($playerId,$worldId),'presets'=>self::getPresets($playerId,$worldId),
+            'universal_fragments'=>self::universalFragments($playerId)];
+    }
+
+    public static function universalFragments(int $playerId): array
+    {
+        $result=['normal'=>0,'rare'=>0,'epic'=>0,'legendary'=>0,'mythic'=>0];
+        foreach(Connection::getInstance()->query('SELECT grade,quantity FROM player_universal_treasure_fragments WHERE player_id=?',[$playerId])->fetchAll() as $row)$result[(string)$row['grade']]=(int)$row['quantity'];
+        return $result;
+    }
+
+    public static function exchangeUniversalFragments(int $playerId,int $treasureCode,int $amount): array
+    {
+        $definition=TreasureData::get($treasureCode);
+        if(!$definition||$amount<1||$amount>10000)throw new \DomainException('Ungültiger Fragmenttausch.');
+        $grade=(string)($definition['grade']??'normal');
+        return self::atomic($playerId,static function(Connection $db)use($playerId,$treasureCode,$amount,$grade):array{
+            $db->execute('INSERT IGNORE INTO player_universal_treasure_fragments(player_id,grade,quantity) VALUES(?,?,0)',[$playerId,$grade]);
+            $available=(int)$db->query('SELECT quantity FROM player_universal_treasure_fragments WHERE player_id=? AND grade=? FOR UPDATE',[$playerId,$grade])->fetchColumn();
+            if($available<$amount)throw new \DomainException('Du hast nicht genug Allround-Fragmente dieser Seltenheit.');
+            $db->execute('UPDATE player_universal_treasure_fragments SET quantity=quantity-? WHERE player_id=? AND grade=?',[$amount,$playerId,$grade]);
+            $db->execute('INSERT INTO player_treasures(player_id,treasure_code,fragments) VALUES(?,?,?) ON DUPLICATE KEY UPDATE fragments=fragments+VALUES(fragments)',[$playerId,$treasureCode,$amount]);
+            $newlyUnlocked=self::unlockIfReady($db,$playerId,$treasureCode);
+            $total=(int)$db->query('SELECT fragments FROM player_treasures WHERE player_id=? AND treasure_code=?',[$playerId,$treasureCode])->fetchColumn();
+            return ['message'=>$newlyUnlocked?'Relikt freigeschaltet: Der erste Teilstern ist aktiv.':$amount.' Allround-Fragmente umgetauscht.','grade'=>$grade,'remaining'=>$available-$amount,'fragments'=>$total,'newly_unlocked'=>$newlyUnlocked];
+        });
+    }
+
+    public static function upgradeEffect(int $playerId,int $treasureCode,int $effectIndex): array
+    {
+        $definition=TreasureData::get($treasureCode);
+        $effects=$definition?self::effectDefinitions($definition,$treasureCode):[];
+        if(!$definition||!isset($effects[$effectIndex]))throw new \DomainException('Dieser Relikt-Effekt ist nicht verfügbar.');
+        return self::atomic($playerId,static function(Connection $db)use($playerId,$treasureCode,$effectIndex,$definition):array{
+            $owned=$db->query('SELECT fragments FROM player_treasures WHERE player_id=? AND treasure_code=? FOR UPDATE',[$playerId,$treasureCode])->fetchColumn();
+            if($owned===false)throw new \DomainException('Dieses Relikt ist noch nicht freigeschaltet.');
+            $parts=$db->query('SELECT parts FROM player_treasure_effects WHERE player_id=? AND treasure_code=? AND effect_index=? FOR UPDATE',[$playerId,$treasureCode,$effectIndex])->fetchColumn();
+            if($parts===false){
+                if(!self::isUnlocked($db,$playerId,$treasureCode))throw new \DomainException('Dieses Relikt ist noch nicht freigeschaltet.');
+                $parts=0;
+            }
+            $parts=(int)$parts;
+            if($parts>=5)throw new \DomainException('Dieser Effekt ist bereits vollständig aufgewertet.');
+            $cost=self::effectUpgradeCost($definition,$parts);
+            if((int)$owned<$cost)throw new \DomainException('Du hast nicht genug Reliktfragmente.');
+            $cities=$db->query('SELECT c.* FROM cities c JOIN player_treasure_loadouts l ON l.player_id=c.player_id AND l.world_id=c.world_id WHERE c.player_id=? AND l.treasure_code=? ORDER BY c.world_id FOR UPDATE',[$playerId,$treasureCode])->fetchAll();
+            foreach($cities as $city)self::settle($city);
+            $db->execute('UPDATE player_treasures SET fragments=fragments-? WHERE player_id=? AND treasure_code=?',[$cost,$playerId,$treasureCode]);
+            $db->execute('INSERT INTO player_treasure_effects(player_id,treasure_code,effect_index,parts) VALUES(?,?,?,1) ON DUPLICATE KEY UPDATE parts=parts+1',[$playerId,$treasureCode,$effectIndex]);
+            return ['message'=>$parts+1===5?'Effekt gemeistert – Meisterbonus freigeschaltet.':'Relikt-Effekt aufgewertet.','effect_index'=>$effectIndex,'parts'=>$parts+1,'spent'=>$cost,'fragments'=>(int)$owned-$cost];
+        });
     }
 
     public static function houseLevel(int $playerId, ?int $worldId = null): int
@@ -76,16 +158,10 @@ final class TreasureService
             $db->execute('INSERT IGNORE INTO player_treasures(player_id,treasure_code,fragments) VALUES(?,?,0)',[$playerId,$treasureCode]);
             $before=(int)$db->query('SELECT fragments FROM player_treasures WHERE player_id=? AND treasure_code=? FOR UPDATE',[$playerId,$treasureCode])->fetchColumn();
             if($before>4294967295-$amount)throw new \DomainException('Zu viele Schatzfragmente.');
-            $oldLevel=self::levelFromFragments($before,$treasureCode);
-            $level=self::levelFromFragments($before+$amount,$treasureCode);
-            if($level!==$oldLevel){
-                // An equipped treasure also changes production when fragments level it up.
-                $cities=$db->query('SELECT c.* FROM cities c JOIN player_treasure_loadouts l ON l.player_id=c.player_id AND l.world_id=c.world_id
-                    WHERE c.player_id=? AND l.treasure_code=? ORDER BY c.world_id FOR UPDATE',[$playerId,$treasureCode])->fetchAll();
-                foreach($cities as $city)self::settle($city);
-            }
             $db->execute('UPDATE player_treasures SET fragments=fragments+? WHERE player_id=? AND treasure_code=?',[$amount,$playerId,$treasureCode]);
-            return ['fragments'=>$before+$amount,'level'=>$level,'newly_unlocked'=>$oldLevel<1&&$level>=1];
+            $newlyUnlocked=self::unlockIfReady($db,$playerId,$treasureCode);
+            $remaining=(int)$db->query('SELECT fragments FROM player_treasures WHERE player_id=? AND treasure_code=?',[$playerId,$treasureCode])->fetchColumn();
+            return ['fragments'=>$remaining,'level'=>$newlyUnlocked?2:(self::isUnlocked($db,$playerId,$treasureCode)?2:0),'newly_unlocked'=>$newlyUnlocked];
         });
     }
 
@@ -99,8 +175,8 @@ final class TreasureService
             $city=WorldContext::city($playerId,$worldId,true);
             if($slot>TreasureData::getUnlockSlots(self::houseLevel($playerId,$worldId)))return false;
             $fragments=$db->query('SELECT fragments FROM player_treasures WHERE player_id=? AND treasure_code=? FOR UPDATE',[$playerId,$treasureCode])->fetchColumn();
-            if($fragments===false || self::levelFromFragments((int)$fragments,$treasureCode)<1)return false;
-            if(!self::activeStats(TreasureData::get($treasureCode),1))return false;
+            if($fragments===false || !self::isUnlocked($db,$playerId,$treasureCode))return false;
+            if(!self::effectDefinitions(TreasureData::get($treasureCode),$treasureCode))return false;
             self::settle($city); // Persist at old bonuses before touching either slot.
             self::ensureSlots($playerId,$worldId);
             $db->execute('UPDATE player_treasure_loadouts SET treasure_code=NULL WHERE player_id=? AND world_id=? AND (slot=? OR treasure_code=?)',[$playerId,$worldId,$slot,$treasureCode]);
@@ -123,16 +199,39 @@ final class TreasureService
 
     public static function getEquippedStats(int $playerId,?int $worldId=null): array
     {
+        return self::equippedStats($playerId,$worldId,false);
+    }
+
+    /** Runtime bonuses preserve percent/flat units before effects are aggregated. */
+    public static function getEquippedBuffs(int $playerId,?int $worldId=null): array
+    {
+        return self::equippedStats($playerId,$worldId,true);
+    }
+
+    private static function equippedStats(int $playerId,?int $worldId,bool $forBuffs): array
+    {
         $worldId??=WorldContext::id();
         $slots=TreasureData::getUnlockSlots(self::houseLevel($playerId,$worldId));
-        $rows=Connection::getInstance()->query('SELECT t.treasure_code,t.fragments FROM player_treasure_loadouts l
+        $db=Connection::getInstance();
+        $rows=$db->query('SELECT t.treasure_code,t.fragments FROM player_treasure_loadouts l
             JOIN player_treasures t ON t.player_id=l.player_id AND t.treasure_code=l.treasure_code
             WHERE l.player_id=? AND l.world_id=? AND l.slot<=?',[$playerId,$worldId,$slots])->fetchAll();
         $result=[];
         foreach($rows as $row){
-            $code=(int)$row['treasure_code'];$definition=TreasureData::get($code);$level=self::levelFromFragments((int)$row['fragments'],$code);
-            if(!$definition||$level<1)continue;
-            foreach(self::activeStats($definition,$level)as$key=>$value)$result[$key]=($result[$key]??0)+$value;
+            $code=(int)$row['treasure_code'];$definition=TreasureData::get($code);$parts=self::effectProgress($db,$playerId,$code);
+            if(!$definition||!isset($parts[0]))continue;
+            if(!$forBuffs){foreach(self::effectStats($definition,$parts,true,$code)as$key=>$value)$result[$key]=($result[$key]??0)+$value;continue;}
+            foreach(self::effectState($definition,$parts,$code) as $effect){
+                $values=[[$effect['type'],$effect['current_value'],$effect['unit']??null]];
+                if($effect['master_unlocked'])$values[]=[$effect['master_type'],$effect['master_value'],$effect['master_unit']??$effect['unit']??null];
+                foreach($values as [$key,$value,$unit]){
+                    // Older catalogs used absolute capacity stats without unit metadata.
+                    $capacity=in_array($key,['march_capacity','hospital_capacity'],true);
+                    $flat=$unit==='flat'||($unit===null&&$capacity);
+                    if($capacity)$key=$flat?$key.'_flat':($key==='march_capacity'?'march_size':$key);
+                    $result[$key]=($result[$key]??0)+($flat?(float)$value:(float)$value/100);
+                }
+            }
         }
         return $result;
     }
@@ -193,7 +292,7 @@ final class TreasureService
             $definition=TreasureData::get($code);
             if(!$definition||!self::activeStats($definition,1)||isset($seen[$code]))throw new \DomainException('Dieses Preset enthält ein ungültiges oder doppeltes Relikt.');
             $fragments=$db->query('SELECT fragments FROM player_treasures WHERE player_id=? AND treasure_code=? FOR UPDATE',[$playerId,$code])->fetchColumn();
-            if($fragments===false||self::levelFromFragments((int)$fragments,$code)<1)throw new \DomainException('Ein Relikt dieses Presets ist noch nicht freigeschaltet.');
+            if($fragments===false||!self::isUnlocked($db,$playerId,$code))throw new \DomainException('Ein Relikt dieses Presets ist noch nicht freigeschaltet.');
             $seen[$code]=true;
         }
     }
@@ -224,11 +323,111 @@ final class TreasureService
         try{return $db->getPdo()->inTransaction()?$operation($db):$db->transaction($operation);}
         finally{$db->query('SELECT RELEASE_LOCK(?)',[$key]);}
     }
+    private static function effectDefinitions(array $definition,?int $treasureCode=null): array
+    {
+        if(isset($definition['effects'])&&is_array($definition['effects'])&&$definition['effects']!==[])return array_values(array_map(
+            static fn(array $effect):array=>[
+                'type'=>(string)($effect['type']??''),
+                'label_de'=>(string)($effect['label_de']??''),
+                'boost_max'=>(float)($effect['boost_max']??0),
+                'master_type'=>(string)($effect['master_type']??$effect['type']??''),
+                'master_label_de'=>(string)($effect['master_label_de']??''),
+                'master_value'=>(float)($effect['master_value']??0),
+                'unit'=>(string)($effect['unit']??'percent'),
+                'master_unit'=>(string)($effect['master_unit']??$effect['unit']??'percent'),
+            ],
+            $definition['effects']
+        ));
+        if($treasureCode!==null&&isset(self::EFFECT_OVERRIDES[$treasureCode]))return array_map(
+            static fn(array $effect):array=>['type'=>$effect[0],'boost_max'=>(float)$effect[1],'master_type'=>$effect[2],'master_value'=>(float)$effect[3]],
+            self::EFFECT_OVERRIDES[$treasureCode]
+        );
+        $effects=[];
+        foreach($definition['stats']??[] as $stat){
+            $type=(string)($stat['type']??'');
+            if(!in_array($type,self::ACTIVE_STATS,true))continue;
+            $boostMax=(float)($stat['base_value']??0)+(float)($stat['per_level']??0)*4;
+            $master=(float)($stat['per_level']??0)*5;
+            $effects[]=['type'=>$type,'boost_max'=>$boostMax,'master_type'=>$type,'master_value'=>$master];
+        }
+        return $effects;
+    }
+    private static function effectState(array $definition,array $parts,?int $treasureCode=null): array
+    {
+        $result=[];
+        foreach(self::effectDefinitions($definition,$treasureCode) as $index=>$effect){
+            $part=max(0,min(5,(int)($parts[$index]??0)));
+            $current=$effect['boost_max']*self::EFFECT_CURVE[$part];
+            $next=$part<5?$effect['boost_max']*self::EFFECT_CURVE[$part+1]:$current;
+            $result[]=$effect+['index'=>$index,'parts'=>$part,'current_value'=>$current,'next_value'=>$next,
+                'upgrade_cost'=>$part<5?self::EFFECT_UPGRADE_BASE_COST*($part+1):0,'master_unlocked'=>$part>=5];
+        }
+        return $result;
+    }
+    private static function effectStats(array $definition,array $parts,bool $includeMaster,?int $treasureCode=null): array
+    {
+        $stats=[];
+        foreach(self::effectState($definition,$parts,$treasureCode) as $effect){
+            $stats[$effect['type']]=($stats[$effect['type']]??0)+(float)$effect['current_value'];
+            if($includeMaster&&$effect['master_unlocked'])$stats[$effect['master_type']]=($stats[$effect['master_type']]??0)+(float)$effect['master_value'];
+        }
+        return $stats;
+    }
+    private static function effectMasterSummary(array $effects): array
+    {
+        $current=[];$maximum=[];
+        foreach($effects as $effect){
+            $type=(string)$effect['master_type'];$maximum[$type]=($maximum[$type]??0)+(float)$effect['master_value'];
+            if($effect['master_unlocked'])$current[$type]=($current[$type]??0)+(float)$effect['master_value'];
+        }
+        return ['unlock_level'=>5,'is_unlocked'=>$effects!==[]&&count(array_filter($effects,static fn(array $effect):bool=>$effect['master_unlocked']))===count($effects),'stats'=>$current,'max_stats'=>$maximum];
+    }
+    private static function effectUpgradeCost(array $definition,int $parts): int
+    {
+        return self::EFFECT_UPGRADE_BASE_COST*(max(0,min(4,$parts))+1);
+    }
+    private static function effectProgress(Connection $db,int $playerId,int $treasureCode): array
+    {
+        $result=[];
+        foreach($db->query('SELECT effect_index,parts FROM player_treasure_effects WHERE player_id=? AND treasure_code=?',[$playerId,$treasureCode])->fetchAll() as $row)$result[(int)$row['effect_index']]=(int)$row['parts'];
+        return $result;
+    }
+    private static function isUnlocked(Connection $db,int $playerId,int $treasureCode): bool
+    {
+        return $db->query('SELECT 1 FROM player_treasure_effects WHERE player_id=? AND treasure_code=? AND effect_index=0 AND parts>=1',[$playerId,$treasureCode])->fetchColumn()!==false;
+    }
+    private static function unlockIfReady(Connection $db,int $playerId,int $treasureCode): bool
+    {
+        if(self::isUnlocked($db,$playerId,$treasureCode))return false;
+        $available=$db->query('SELECT fragments FROM player_treasures WHERE player_id=? AND treasure_code=? FOR UPDATE',[$playerId,$treasureCode])->fetchColumn();
+        if($available===false||(int)$available<self::UNLOCK_COST)return false;
+        $definition=TreasureData::get($treasureCode);
+        if(!$definition||!self::effectDefinitions($definition,$treasureCode))return false;
+        $db->execute('UPDATE player_treasures SET fragments=fragments-? WHERE player_id=? AND treasure_code=?',[self::UNLOCK_COST,$playerId,$treasureCode]);
+        $db->execute('INSERT INTO player_treasure_effects(player_id,treasure_code,effect_index,parts) VALUES(?,?,0,1)',[$playerId,$treasureCode]);
+        return true;
+    }
     private static function stats(array $definition,int $level): array
     {
         $stats=[];foreach($definition['stats']as$stat)$stats[$stat['type']]=TreasureData::getStatValue($definition,$level,$stat['type']);return $stats;
     }
     private static function activeStats(array $definition,int $level): array {return array_intersect_key(self::stats($definition,$level),array_flip(self::ACTIVE_STATS));}
+    /**
+     * Levels 1-5 build the normal treasure boost. Levels 6-10 add the
+     * master portion. Both parts still sum to the established stat formula.
+     */
+    private static function masterBonus(array $definition,int $level): array
+    {
+        $current=[];$maximum=[];
+        foreach($definition['stats'] as $stat){
+            $type=(string)($stat['type']??'');
+            if(!in_array($type,self::ACTIVE_STATS,true))continue;
+            $step=(float)($stat['per_level']??0);
+            $current[$type]=$step*max(0,min(5,$level-5));
+            $maximum[$type]=$step*5;
+        }
+        return ['unlock_level'=>6,'is_unlocked'=>$level>=6,'stats'=>$current,'max_stats'=>$maximum];
+    }
     private static function levelFromFragments(int $fragments,int $code): int
     {
         $definition=TreasureData::get($code);if(!$definition)return 0;

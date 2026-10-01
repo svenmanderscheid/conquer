@@ -2,6 +2,7 @@
   'use strict';
   window.ConquerLand = function (ctx) {
     const {api, esc, fmt, toast, navigate, getState} = ctx;
+    const editorial=value=>window.ConquerLocale?.text(value)??value;
     const host = () => document.querySelector('#content');
     const zoneNames = {outer:'Außenbereich', middle:'Mittlerer Bereich', center:'Zentrum'};
     const sourceNames = {monster_kill:'Monsterjagden', gather:'Sammelertrag', donation:'Ressourcenspenden'};
@@ -9,7 +10,7 @@
     let state = null, detail = null, selected = null, active = false, generation = 0, pending = false;
     let filter = 'all', search = '', retry = null;
     const opId = () => globalThis.crypto?.randomUUID?.() || `land_${Date.now().toString(36)}_${Math.random().toString(36).slice(2)}`;
-    const date = value => value ? new Date(String(value).replace(' ', 'T') + (/[zZ]|[+-]\d\d:\d\d$/.test(String(value)) ? '' : 'Z')).toLocaleString('de-DE') : 'Noch nicht geöffnet';
+    const date = value => value ? new Date(String(value).replace(' ', 'T') + (/[zZ]|[+-]\d\d:\d\d$/.test(String(value)) ? '' : 'Z')).toLocaleString(window.ConquerLocale?.locale??'en') : 'Noch nicht geöffnet';
     const percent = value => Math.max(0, Math.min(100, Number(value) || 0));
     const zone = key => state?.zones?.find(item => item.key === key);
     const chosen = () => state?.lands?.find(item => Number(item.id) === Number(selected));
@@ -54,7 +55,7 @@
     }
 
     function resultRows() {
-      return state.lands.filter(matches).slice(0, 24).map(item => `<button type="button" class="land-result-row ${Number(item.id) === Number(selected) ? 'is-selected' : ''}" data-action="land-select" data-id="${Number(item.id)}" aria-pressed="${Number(item.id) === Number(selected)}"><span><strong>Land ${fmt(item.parcel_x + 1)}/${fmt(item.parcel_y + 1)}</strong><small>${esc(zoneNames[item.zone] || item.zone)}${item.own_land ? ' · Bei deiner Stadt' : ''}</small></span><em>Stufe ${fmt(item.level)} · ${item.open ? 'offen' : 'gesperrt'}</em></button>`).join('');
+      return state.lands.filter(matches).slice(0, 24).map(item => `<button type="button" class="land-result-row ${Number(item.id) === Number(selected) ? 'is-selected' : ''}" data-action="land-select" data-id="${Number(item.id)}" aria-pressed="${Number(item.id) === Number(selected)}"><span><strong>Land ${fmt(item.parcel_x + 1)}/${fmt(item.parcel_y + 1)}</strong><small>${esc(zoneNames[item.zone] || item.zone)}${item.own_land ? ' · Bei deiner Stadt' : ''}</small></span><em>Stufe ${fmt(item.level)} · ${editorial(item.open ? 'offen' : 'gesperrt')}</em></button>`).join('');
     }
 
     function paint() {
@@ -148,10 +149,10 @@
     function lootHtml(list) {
       if (!list?.length) return '<p class="land-muted">In diesem Land stehen aktuell keine aktiven Monster.</p>';
       return `<div class="land-loot-list">${list.map(monster => {
-        const resources = Object.entries(monster.resource_reward || {}).filter(([, amount]) => Number(amount) > 0).map(([key, amount]) => `${resourceNames[key] || key} ${fmt(amount)}`);
-        const drops = (monster.drops || []).map(drop => `${drop.label || `Item ${drop.item_code}`} × ${fmt(drop.count)} · ${Math.round(Number(drop.probability || 0) * 100)} %`);
-        const gems = monster.gems_drop && Number(monster.gems_drop.amount) > 0 ? [`Edelsteine ${fmt(monster.gems_drop.amount)} · ${Math.round(Number(monster.gems_drop.chance || 0) * 100)} %`] : [];
-        return `<article><h4>${esc(monster.name)} · Stufe ${fmt(monster.level)}</h4><span>${esc(monster.type === 'rally' ? 'Rally' : 'Solo')}</span><p>${[...resources, ...drops, ...gems].map(esc).join(' · ') || 'Keine Beutevorschau verfügbar'}${monster.guaranteed_charms ? ' · 1 Karten-Charm garantiert' : ''}</p></article>`;
+        const resources = Object.entries(monster.resource_reward || {}).filter(([, amount]) => Number(amount) > 0).map(([key, amount]) => `${editorial(resourceNames[key] || key)} ${fmt(amount)}`);
+        const drops = (monster.drops || []).map(drop => `${editorial(drop.label || `Item ${drop.item_code}`)} × ${fmt(drop.count)} · ${Math.round(Number(drop.probability || 0) * 100)} %`);
+        const gems = monster.gems_drop && Number(monster.gems_drop.amount) > 0 ? [`${editorial("Edelsteine")} ${fmt(monster.gems_drop.amount)} · ${Math.round(Number(monster.gems_drop.chance || 0) * 100)} %`] : [];
+        return `<article><h4>${esc(editorial(monster.name))} · Stufe ${fmt(monster.level)}</h4><span>${esc(monster.type === 'rally' ? 'Rally' : 'Solo')}</span><p>${[...resources, ...drops, ...gems].map(esc).join(' · ') || 'Keine Beutevorschau verfügbar'}${monster.guaranteed_charms ? ' · '+editorial('1 Karten-Charm garantiert') : ''}</p></article>`;
       }).join('')}</div>`;
     }
 
@@ -175,7 +176,7 @@
       const city = getState()?.city || {}, donation = item.donation || {}, units = Number(donation.resource_units_per_point), values = donation.resource_values || {};
       const rate = key => units > 0 && Number(values[key]) > 0 ? Math.ceil(units / Number(values[key])) : null;
       const allowance = Number.isFinite(Number(donation.remaining_points)) ? `<p class="land-donation-help"><strong>Heute noch ${fmt(donation.remaining_points)} Entwicklungspunkte</strong><span>Ressourcen werden nur bis zu diesem Tagesrest angerechnet.</span></p>` : '';
-      return `${allowance}<form data-form="land-donate" data-id="${Number(item.id)}" data-revision="${Number(item.revision)}"><div class="land-donation-grid">${Object.entries(resourceNames).map(([key, label]) => `<label>${label}<input name="${key}" type="number" inputmode="numeric" min="0" max="${Math.max(0, Number(city[key]) || 0)}" step="1" value="0"><small>${fmt(city[key])} verfügbar${rate(key) ? ` · ${fmt(rate(key))} ${label} = 1 Punkt` : ''}</small></label>`).join('')}</div><button class="button gold" ${pending ? 'disabled' : ''}>${pending ? 'Spende wird bestätigt …' : 'Ressourcen spenden'}</button></form>`;
+      return `${allowance}<form data-form="land-donate" data-id="${Number(item.id)}" data-revision="${Number(item.revision)}"><div class="land-donation-grid">${Object.entries(resourceNames).map(([key, label]) => `<label>${label}<input name="${key}" type="number" inputmode="numeric" min="0" max="${Math.max(0, Number(city[key]) || 0)}" step="1" value="0"><small>${fmt(city[key])} verfügbar${rate(key) ? ` · ${fmt(rate(key))} ${editorial(label)} = 1 ${editorial("Punkt")}` : ''}</small></label>`).join('')}</div><button class="button gold" ${pending ? 'disabled' : ''}>${pending ? 'Spende wird bestätigt …' : 'Ressourcen spenden'}</button></form>`;
     }
 
     async function loadDetail(id, focus = true) {

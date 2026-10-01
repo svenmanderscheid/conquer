@@ -1,6 +1,7 @@
 /* Shared illustrated item picker and backoffice interactions. No remote dependencies. */
-(() => {
+(async () => {
     'use strict';
+    if(window.ConquerLocale?.ready)await window.ConquerLocale.ready;
     const $ = (s, root=document) => root.querySelector(s);
     const $$ = (s, root=document) => [...root.querySelectorAll(s)];
     const rewardText = (key, values={}) => window.ConquerLocale.t('admin.drops.'+key, values);

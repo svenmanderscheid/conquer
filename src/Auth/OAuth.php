@@ -129,7 +129,7 @@ final class OAuth
         setcookie(self::STATE_COOKIE, $state . '|' . $provider, [
             'expires'  => time() + self::STATE_COOKIE_TTL,
             'path'     => '/',
-            'secure'   => ($_SERVER['HTTPS'] ?? '') !== '',
+            'secure'   => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
             'httponly' => true,
             'samesite' => 'Lax',
         ]);
@@ -138,6 +138,9 @@ final class OAuth
     private function verifyState(string $incoming, string $provider): void
     {
         $cookie = $_COOKIE[self::STATE_COOKIE] ?? '';
+        if (!is_string($cookie) || $incoming === '') {
+            throw new \RuntimeException('OAuth state mismatch — possible CSRF attempt.');
+        }
         $parts  = explode('|', $cookie, 2);
         [$storedState, $storedProvider] = [$parts[0] ?? '', $parts[1] ?? ''];
 
@@ -239,15 +242,26 @@ final class OAuth
 
     private function normalizeUser(string $provider, array $raw): array
     {
+        // An email is profile data until the provider explicitly proves ownership.
+        // Keep subject IDs opaque and reject malformed responses before any DB lookup.
+        if (!is_string($raw['id'] ?? null) || trim($raw['id']) === '' || strlen($raw['id']) > 255) {
+            throw new \DomainException('Der Anmeldedienst hat keine gültige Konto-ID geliefert.');
+        }
+        $email = is_string($raw['email'] ?? null) ? strtolower(trim($raw['email'])) : '';
+        if ($email !== '' && (strlen($email) > 254 || !filter_var($email, FILTER_VALIDATE_EMAIL))) {
+            throw new \DomainException('Der Anmeldedienst hat keine gültige E-Mail-Adresse geliefert.');
+        }
         return match ($provider) {
             'google' => [
-                'provider_user_id' => (string) ($raw['id'] ?? ''),
-                'email'            => strtolower(trim($raw['email'] ?? '')),
+                'provider_user_id' => $raw['id'],
+                'email'            => $email,
+                'email_verified'   => ($raw['verified_email'] ?? false) === true,
                 'display_name'     => $raw['name'] ?? $raw['email'] ?? 'Player',
             ],
             'discord' => [
-                'provider_user_id' => (string) ($raw['id'] ?? ''),
-                'email'            => strtolower(trim($raw['email'] ?? '')),
+                'provider_user_id' => $raw['id'],
+                'email'            => $email,
+                'email_verified'   => ($raw['verified'] ?? false) === true,
                 'display_name'     => $raw['global_name'] ?? $raw['username'] ?? 'Player',
             ],
             default => throw new \RuntimeException("Unknown provider: {$provider}"),
@@ -256,33 +270,56 @@ final class OAuth
 
     private function findOrCreatePlayer(string $provider, array $user): int
     {
+        return Connection::getInstance()->transaction(fn():int => $this->resolvePlayerIdentity($provider,$user));
+    }
+
+    private function resolvePlayerIdentity(string $provider, array $user): int
+    {
         $db = Connection::getInstance();
 
         // 1. Known OAuth link → return existing player
         $existing = $db->query(
-            'SELECT player_id FROM oauth_accounts WHERE provider = ? AND provider_user_id = ?',
+            'SELECT player_id,identity_verified_at FROM oauth_accounts WHERE provider = ? AND provider_user_id = ?',
             [$provider, $user['provider_user_id']],
         )->fetch();
 
         if ($existing !== false) {
-            if ($user['email'] !== '') {
+            $owner = $db->query('SELECT email,email_verified_at,is_banned FROM players WHERE id=? FOR UPDATE', [(int)$existing['player_id']])->fetch();
+            if (!$owner || (int)$owner['is_banned'] === 1) {
+                throw new \DomainException('Die Anmeldung ist für dieses Spielkonto nicht möglich.');
+            }
+            if (!$existing['identity_verified_at']) {
+                if (!$owner['email_verified_at'] || ($user['email_verified'] ?? false) !== true || $user['email'] === '' || strcasecmp((string)$owner['email'], $user['email']) !== 0) {
+                    throw new \DomainException('Bestätige zuerst die E-Mail-Adresse deines Spielkontos oder setze dessen Passwort zurück. Dein Anmeldedienst muss dieselbe bestätigte E-Mail-Adresse verwenden.');
+                }
+                $db->execute('UPDATE oauth_accounts SET identity_verified_at=UTC_TIMESTAMP() WHERE provider=? AND provider_user_id=?', [$provider, $user['provider_user_id']]);
+            }
+            if ($user['email'] !== '' && ($user['email_verified'] ?? false) === true) {
                 $db->execute('UPDATE players SET email_verified_at=COALESCE(email_verified_at,UTC_TIMESTAMP()) WHERE id=? AND email=?',[(int)$existing['player_id'],$user['email']]);
             }
             return (int) $existing['player_id'];
         }
 
         // 2. Same email registered via another provider → link, don't duplicate
-        if ($user['email'] !== '') {
+        if ($user['email'] !== '' && ($user['email_verified'] ?? false) === true) {
             $byEmail = $db->query(
-                'SELECT id FROM players WHERE email = ?',
+                'SELECT id,email_verified_at,is_banned FROM players WHERE email = ? FOR UPDATE',
                 [$user['email']],
             )->fetch();
 
             if ($byEmail !== false) {
+                if ((int)$byEmail['is_banned'] === 1) {
+                    throw new \DomainException('Die Anmeldung ist für dieses Spielkonto nicht möglich.');
+                }
+                // Prevent pre-hijacking: someone may have registered this address
+                // with a password they know but never proved local mailbox ownership.
+                if (!$byEmail['email_verified_at']) {
+                    throw new \DomainException('Bestätige zuerst die E-Mail-Adresse deines Spielkontos oder setze dessen Passwort über deine E-Mail zurück.');
+                }
                 $playerId = (int) $byEmail['id'];
                 $db->execute('UPDATE players SET email_verified_at=COALESCE(email_verified_at,UTC_TIMESTAMP()) WHERE id=?',[$playerId]);
                 $db->execute(
-                    'INSERT INTO oauth_accounts (player_id, provider, provider_user_id) VALUES (?, ?, ?)',
+                    'INSERT INTO oauth_accounts (player_id, provider, provider_user_id,identity_verified_at) VALUES (?, ?, ?,UTC_TIMESTAMP())',
                     [$playerId, $provider, $user['provider_user_id']],
                 );
                 Logger::getInstance()->info(
@@ -327,7 +364,7 @@ final class OAuth
                  (player_id, world_id, name, coord_x, coord_y,
                   food, lumber, stone, gold,
                   wall_hp_current, wall_hp_max, castle_level, power)
-             VALUES (?, ?, ?, ?, ?, 10000, 10000, 10000, 5000, 5000, 5000, 1, ?)',
+             VALUES (?, ?, ?, ?, ?, 100000, 100000, 100000, 100000, 5000, 5000, 1, ?)',
             [$playerId,$worldId, $cityName, $coord['x'], $coord['y'], $initialPower],
         );
         $cityId = $db->lastInsertId();
@@ -349,22 +386,25 @@ final class OAuth
      */
     private static function randomCoord(Connection $db,int $worldId, ?int $ignoreCityId = null): array
     {
-        $size = WorldPlacement::lockWorld($db, $worldId);
-        $min = $size > 22 ? 10 : 1;
-        $max = min($size - $min - 1, $size - 3);
-        if ($max < $min) {
+        WorldPlacement::lockWorld($db, $worldId);
+        $profile = \Conquer\Game\World\WorldMapProfile::forWorld($worldId);
+        $width = (int)$profile['width']; $height = (int)$profile['height'];
+        $min = min($width, $height) > 22 ? 10 : 1;
+        $maxX = min($width - $min - 1, $width - 3);
+        $maxY = min($height - $min - 1, $height - 3);
+        if ($maxX < $min || $maxY < $min) {
             throw new \RuntimeException('The world has no space for a city.');
         }
 
         for ($i = 0; $i < 64; $i++) {
-            $x = random_int($min, $max);
-            $y = random_int($min, $max);
+            $x = random_int($min, $maxX);
+            $y = random_int($min, $maxY);
             if (WorldPlacement::canPlace($db, $worldId, 'city', $x, $y, $ignoreCityId)) {
                 return ['x' => $x, 'y' => $y];
             }
         }
 
-        $coord = WorldPlacement::findNear($db, $worldId, 'city', intdiv($size, 2), intdiv($size, 2), $ignoreCityId, $size);
+        $coord = WorldPlacement::findNear($db, $worldId, 'city', intdiv($width, 2), intdiv($height, 2), $ignoreCityId, max($width, $height));
         if ($coord !== null) {
             return ['x' => $coord[0], 'y' => $coord[1]];
         }

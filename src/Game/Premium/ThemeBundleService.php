@@ -22,15 +22,17 @@ final class ThemeBundleService
         foreach($catalog['entries']as$entry)if(!isset($firstOpen[$entry['theme_id']])&&!isset($purchased[$entry['theme_id']][$entry['step']]))$firstOpen[$entry['theme_id']]=$entry['step'];
         $entries=[];
         foreach($catalog['entries']as$entry){
-            $theme=$entry['theme_id'];$step=$entry['step'];$owned=isset($purchased[$theme][$step]);
-            $unlocked=$step===1||isset($purchased[$theme][$step-1]);$isPending=isset($pending[$theme][$step]);
+            $theme=$entry['theme_id'];$retired=!in_array($theme,\Conquer\Game\March\MarchSkinService::ACTIVE_IDS,true);
+            if($retired&&!isset($purchased[$theme])&&!isset($pending[$theme])&&!isset($frames[$theme])&&!isset($marches[$theme])&&!isset($castles[$theme]))continue;
+            $step=$entry['step'];$owned=isset($purchased[$theme][$step]);
+            $unlocked=!$retired&&($step===1||isset($purchased[$theme][$step-1]));$isPending=isset($pending[$theme][$step]);
             $type=$entry['contents']['cosmetic']['type'];$id=$entry['contents']['cosmetic']['id'];
             $ownedCosmetics=$type==='name_frame'?$frames:($type==='march_skin'?$marches:$castles);
             $cosmeticOwned=isset($ownedCosmetics[$id]);
-            $entry['status']=$owned?'owned':($isPending?'pending':($unlocked?'available':'locked'));
+            $entry['status']=$owned?'owned':($isPending?'pending':($retired?'retired':($unlocked?'available':'locked')));
             $entry['owned']=$owned;$entry['cosmetic_owned']=$cosmeticOwned;$entry['unlocked']=$unlocked;
-            $entry['lock_reason']=$unlocked?null:'Kaufe zuerst Paket '.($step-1).' dieses Skins.';
-            $entry['next']=($firstOpen[$theme]??null)===$step;$entries[]=$entry;
+            $entry['lock_reason']=$retired?'Archivierte Reihe: Bereits erworbene Inhalte bleiben verwendbar.':($unlocked?null:'Kaufe zuerst Paket '.($step-1).' dieses Skins.');
+            $entry['next']=!$retired&&($firstOpen[$theme]??null)===$step;$entries[]=$entry;
         }
         $gateway=PaymentGatewayFactory::configured();
         $nextId=null;foreach($entries as$entry)if($entry['next']&&$entry['unlocked']&&!$entry['owned']){$nextId=$entry['id'];break;}
@@ -56,6 +58,7 @@ final class ThemeBundleService
         if($db->query('SELECT 1 FROM player_theme_bundle_purchases WHERE player_id=? AND skin_code=? AND step=?',[$playerId,$bundle['theme_id'],$bundle['step']])->fetchColumn()!==false)throw new \DomainException('Dieses Paket gehört dir bereits.');
         $sameBundle=$db->query('SELECT * FROM theme_bundle_orders WHERE player_id=? AND skin_code=? AND step=? FOR UPDATE',[$playerId,$bundle['theme_id'],$bundle['step']])->fetch();
         if($sameBundle)return self::checkoutResult($sameBundle,true);
+        if(!in_array($bundle['theme_id'],\Conquer\Game\March\MarchSkinService::ACTIVE_IDS,true))throw new \DomainException('Diese archivierte Themenreihe ist nicht mehr erhältlich.');
         if($bundle['step']>1&&$db->query('SELECT 1 FROM player_theme_bundle_purchases WHERE player_id=? AND skin_code=? AND step=?',[$playerId,$bundle['theme_id'],$bundle['step']-1])->fetchColumn()===false)throw new \DomainException('Kaufe zuerst das vorherige Paket dieses Skins.');
         $city=$db->query('SELECT id,world_id FROM cities WHERE player_id=? AND world_id=? FOR UPDATE',[$playerId,WorldContext::id()])->fetch();
         if(!$city)throw new \DomainException('Deine Stadt wurde nicht gefunden.');

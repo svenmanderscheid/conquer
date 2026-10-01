@@ -63,9 +63,14 @@ const ConquerMap = (() => {
     // -------------------------------------------------------------------------
 
     const MONSTER_SPRITE_SRCS = {
-        202001: '/assets/sprites/monsters/orc.png',
-        202002: '/assets/sprites/monsters/skeleton.png',
-        202003: '/assets/sprites/monsters/golem.png',
+        202001: '/assets/art/monsters/2.5d/bright-v2/orc.png',
+        202002: '/assets/art/monsters/2.5d/bright-v2/skeleton.png',
+        202003: '/assets/art/monsters/2.5d/bright-v2/golem.png',
+        202004: '/assets/art/monsters/2.5d/bright-v2/treasure-goblin-turquoise.png',
+        202006: '/assets/art/monsters/2.5d/bright-v2/green-dragon.png',
+        202007: '/assets/art/monsters/2.5d/bright-v2/red-dragon.png',
+        202008: '/assets/art/monsters/2.5d/bright-v2/gold-dragon.png',
+        202009: '/assets/art/monsters/2.5d/bright-v2/magdar.png',
     };
 
     const monsterImgs   = {};   // typeId → HTMLImageElement

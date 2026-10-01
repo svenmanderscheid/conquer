@@ -135,9 +135,9 @@ final class Session
     // Helpers
     // -------------------------------------------------------------------------
 
-    private static function isValidTokenFormat(string $token): bool
+    private static function isValidTokenFormat(mixed $token): bool
     {
-        return strlen($token) === 64 && ctype_xdigit($token);
+        return is_string($token) && strlen($token) === 64 && ctype_xdigit($token);
     }
 
     private static function setCookie(string $value, int $maxAge): void

@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 namespace Conquer\Game\Map;
+use Conquer\Game\World\{WorldMapProfile,WorldContext,LuxembourgGeography,LuxembourgHydrology};
 
 /** Same world geometry that is sent to the canvas renderer. Banks stay unbuildable. */
 final class WorldTerrain
@@ -11,8 +12,9 @@ final class WorldTerrain
         return $data ??= json_decode(file_get_contents(dirname(__DIR__,3).'/data/world_terrain.json'),true,512,JSON_THROW_ON_ERROR);
     }
     /** Dominant biome; mirrors world-landscape.js including curved borders. */
-    public static function biomeAt(float $x,float $y): string
+    public static function biomeAt(float $x,float $y,?int $worldId=null): string
     {
+        if(self::luxembourg($worldId)){$x=$x*256/768;$y=$y*256/1100;}
         $b=self::definition()['biomes']??[];$cx=$b['centerX']??128;$cy=$b['centerY']??128;$width=$b['transitionWidth']??52;
         $smooth=static function(float $v):float{$v=max(0,min(1,$v));return $v*$v*(3-2*$v);};
         $east=$smooth(.5+($x-$cx-13*sin(($y-$cy)/34)-5*sin(($y-$cy)/13))/$width);
@@ -20,8 +22,9 @@ final class WorldTerrain
         $weights=[(1-$east)*(1-$south),$east*(1-$south),(1-$east)*$south,$east*$south];
         return ['forest','ice','sand','lava'][array_search(max($weights),$weights,true)];
     }
-    public static function isWater(float $x,float $y): bool
+    public static function isWater(float $x,float $y,?int $worldId=null): bool
     {
+        if(self::luxembourg($worldId))return LuxembourgGeography::at($x,$y)===null||LuxembourgHydrology::waterAt($x,$y);
         $d=self::definition();$r=$d['rivers'];
         foreach($r['sides'] as $side){$rx=$side+sin($y/$r['period']+$side)*$r['amplitude']+sin($y/$r['detailPeriod'])*$r['detailAmplitude'];if(abs($x-$rx)<$r['bankWidth'])return true;}
         foreach($d['streams'] as $s){$sx=max($s['from'],min($s['to'],$x));$sy=$s['base']+sin($sx/$s['period'])*$s['amplitude']+sin($sx/$s['detailPeriod'])*$s['detailAmplitude'];if(hypot($x-$sx,$y-$sy)<$d['streamBankWidth'])return true;}
@@ -29,10 +32,15 @@ final class WorldTerrain
         return false;
     }
     /** Coordinates describe occupied tile centers, including all four corners and shoreline. */
-    public static function isDryRectangle(int $left,int $top,int $right,int $bottom): bool
+    public static function isDryRectangle(int $left,int $top,int $right,int $bottom,?int $worldId=null,?string $cantonId=null): bool
     {
+        if(self::luxembourg($worldId))return LuxembourgGeography::isDryRectangle($left-.5,$top-.5,$right+.5,$bottom+.5,$cantonId);
         // Quarter-tile samples plus the reserved bank margin conservatively cover shore edges.
-        for($y=$top-.5;$y<=$bottom+.5;$y+=.25)for($x=$left-.5;$x<=$right+.5;$x+=.25)if(self::isWater($x,$y))return false;
+        for($y=$top-.5;$y<=$bottom+.5;$y+=.25)for($x=$left-.5;$x<=$right+.5;$x+=.25)if(self::isWater($x,$y,$worldId))return false;
         return true;
+    }
+    private static function luxembourg(?int $worldId): bool
+    {
+        return \Conquer\Db\Connection::isInitialized()&&WorldMapProfile::isLuxembourg($worldId??WorldContext::id());
     }
 }

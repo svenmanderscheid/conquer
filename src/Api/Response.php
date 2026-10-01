@@ -33,6 +33,7 @@ final class Response
      */
     public static function error(int $status, string $code, string $message = ''): never
     {
+        $message=\Conquer\Game\Locale::text($message);
         self::send($status, [
             'ok'    => false,
             'data'  => null,

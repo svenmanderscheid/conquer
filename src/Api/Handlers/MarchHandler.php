@@ -252,6 +252,21 @@ final class MarchHandler
      * Body: { target_x: int, target_y: int, troops: {code: count} }
      * Legacy clients may continue to send troop_count instead of troops.
      */
+    public static function dispatchNeutralVillage(array $params): void { self::neutralVillage(false); }
+    public static function scoutNeutralVillage(array $params): void { self::neutralVillage(true); }
+
+    private static function neutralVillage(bool $scout): void
+    {
+        $session=Session::current();if(!$session)Response::error(401,'UNAUTHENTICATED','Bitte melde dich an.');
+        $csrf=$_SERVER['HTTP_X_CSRF_TOKEN']??'';if($csrf===''||!hash_equals($session['csrf_token'],$csrf))Response::error(403,'CSRF_INVALID','Bitte lade das Spiel neu.');
+        $body=json_decode((string)file_get_contents('php://input'),true)??[];$x=(int)($body['target_x']??-1);$y=(int)($body['target_y']??-1);$troops=$body['troops']??[];
+        if($x<0||$y<0||(!$scout&&!is_array($troops)))Response::error(400,'INVALID_INPUT','Ziel und Truppen sind erforderlich.');
+        $state=CityState::loadForPlayer((int)$session['player_id']);if(!$state)Response::error(404,'NO_CITY','Keine Stadt vorhanden.');
+        try{$id=MarchDispatcher::dispatchNeutralVillage((int)$session['player_id'],(int)$state['city']['id'],$x,$y,(array)$troops,$scout);}
+        catch(\RuntimeException|\DomainException $e){Response::error(400,'DISPATCH_FAILED',$e->getMessage());}
+        Response::ok(['march_id'=>$id]);
+    }
+
     public static function dispatchGather(array $session,bool $attack=false): void
     {
         if (!isset($session['player_id'], $session['csrf_token'])) {
@@ -326,7 +341,7 @@ final class MarchHandler
     /**
      * GET /api/map/marches
      *
-     * Returns all publicly visible active marches (all players, types 5+7).
+     * Returns all publicly visible active marches from all players.
      * Used for the map overlay — includes origin_x/origin_y per march.
      */
     public static function listAll(array $params): void
@@ -336,7 +351,10 @@ final class MarchHandler
             Response::error(401, 'UNAUTHENTICATED', 'Not logged in.');
         }
 
-        $marches = MarchDispatcher::listAllActive();
+        $playerId=(int)$session['player_id'];
+        $marches = MarchDispatcher::listAllActive($playerId);
+        $alliance=\Conquer\Game\WorldRules::alliance($playerId);
+        if($alliance!==null)$marches=array_merge($marches,\Conquer\Game\Rally\RallyService::publicMapMarches($alliance,$playerId));
         Response::ok(['marches' => $marches]);
     }
 
@@ -464,8 +482,8 @@ final class MarchHandler
         try { $body = json_decode($raw, true, 32, JSON_THROW_ON_ERROR); }
         catch (\JsonException) { Response::error(400, 'INVALID_INPUT', 'Ungültige Anfrage.'); }
         if (!is_array($body) || array_is_list($body)) { Response::error(400, 'INVALID_INPUT', 'Ein Aktionsobjekt ist erforderlich.'); }
-        $max = max(0, (int) Connection::getInstance()->query('SELECT map_size FROM worlds WHERE id=?', [WorldContext::id()])->fetchColumn() - 1);
-        foreach (['target_x', 'target_y'] as $key) {
+        $map = \Conquer\Game\World\WorldMapProfile::forWorld(WorldContext::id());
+        foreach (['target_x' => $map['width']-1, 'target_y' => $map['height']-1] as $key => $max) {
             if (!isset($body[$key]) || !is_int($body[$key]) || $body[$key] < 0 || $body[$key] > $max) {
                 Response::error(400, 'INVALID_INPUT', 'Zielkoordinaten müssen ganze Zahlen zwischen 0 und '.$max.' sein.');
             }

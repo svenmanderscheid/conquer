@@ -24,6 +24,8 @@ final class ActiveEffectService
         $mirrors = [];
         $types = ['production_boost'=>'resource_production', 'research_boost'=>'research_speed', 'training_boost'=>'training_speed'];
         foreach ($charms as $row) {
+            // Map runes use construction/research; the *_speed categories belonged to removed items.
+            if (in_array($row['stat_category'], ['construction_speed','research_speed'], true)) continue;
             $bonus = (float)$row['bonus_pct'];
             if ($bonus == 0.0) continue;
             $effects[] = [
@@ -42,6 +44,7 @@ final class ActiveEffectService
              WHERE player_id=? AND expires_at>UTC_TIMESTAMP() ORDER BY expires_at,id', [$playerId],
         )->fetchAll();
         foreach ($buffs as $row) {
+            if (ActiveBuffService::isRetired($row['buff_type'], (float)$row['multiplier'])) continue;
             $category = $types[$row['buff_type']] ?? null;
             $bonus = round(((float)$row['multiplier'] - 1) * 100, 4);
             if ($category === null || (float)$row['multiplier'] <= 0 || $bonus == 0.0) continue;

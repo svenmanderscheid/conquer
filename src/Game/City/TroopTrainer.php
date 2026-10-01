@@ -22,7 +22,7 @@ final class TroopTrainer
      *
      * Validates:
      *  - troop code is valid
-     *  - troop is unlocked (own school + town center levels)
+     *  - troop is active and unlocked through its academy and research
      *  - count >= 1
      *  - resources are sufficient
      *  - barrack slot is not already busy
@@ -48,7 +48,7 @@ final class TroopTrainer
         }
 
         $troop = TroopData::get($troopCode);
-        if ($troop === null) {
+        if ($troop === null || !TroopData::isActive($troopCode)) {
             throw new \RuntimeException('Unknown troop code.');
         }
 
@@ -61,8 +61,10 @@ final class TroopTrainer
         $barrackLevel = (int) ($buildings[$building]['level'] ?? 0);
         $castleLevel = (int) ($buildings['castle']['level'] ?? 0);
 
-        if (!TroopData::isUnlocked($troopCode, $barrackLevel, $castleLevel)) {
-            throw new \DomainException('Benötigt '.CityState::BUILDING_NAMES[$building].' Stufe '.$troop['unlock_building'].' und Stadtzentrum Stufe '.$troop['unlock_castle'].'.');
+        \Conquer\Game\Research\ResearchProcessor::processQueue((int)$owned['player_id'], (int)$owned['world_id']);
+        $research=TroopData::researchLevels((int)$owned['player_id'], (int)$owned['world_id']);
+        if (!TroopData::isUnlocked($troopCode, $barrackLevel, $castleLevel, (int)($buildings['academy']['level']??0), $research)) {
+            throw new \DomainException('Benötigt '.CityState::BUILDING_NAMES[$building].' Stufe '.$troop['unlock_building'].' und Stadtzentrum Stufe '.$troop['unlock_castle'].($troop['unlock_research'] ? ', Akademie Stufe '.$troop['unlock_academy'].' sowie die Forschung für '.$troop['name_de'] : '').'.');
         }
 
         $db = Connection::getInstance();
@@ -183,7 +185,7 @@ final class TroopTrainer
         foreach ($finished as $entry) {
             $db->transaction(static function (Connection $db) use ($entry, $cityId): void {
             if ($db->execute('UPDATE troop_queue SET is_processed = 1 WHERE id = ? AND is_processed = 0', [(int) $entry['id']]) !== 1) { return; }
-            $code  = (int) $entry['troop_code'];
+            $code  = TroopData::activeCode((int) $entry['troop_code']);
             $count = (int) $entry['count'];
 
             $db->execute(
@@ -196,6 +198,11 @@ final class TroopTrainer
             $db->execute(
                 'UPDATE troop_queue SET is_processed = 1 WHERE id = ?',
                 [(int) $entry['id']],
+            );
+            \Conquer\Game\Notification\NotificationService::pushCityCompletion(
+                $cityId, \Conquer\Game\Notification\NotificationService::TYPE_TRAIN_COMPLETE,
+                ['building_code'=>TroopData::buildingFor($code), 'queue_id'=>(int)$entry['id'],
+                    'troop_code'=>$code, 'count'=>$count],
             );
             });
         }

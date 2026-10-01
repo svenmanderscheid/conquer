@@ -1,0 +1,136 @@
+{
+  "treasures": [
+    {
+      "code": 60100004,
+      "name": "Coin Purse",
+      "grade": "normal",
+      "slot_type": "any",
+      "description": "Ein verzauberter Lederbeutel steigert die laufende Goldproduktion.",
+      "stats": [
+        {
+          "type": "gold_production",
+          "base_value": 2.0,
+          "per_level": 0.5
+        }
+      ],
+      "max_level": 10,
+      "fragments_per_level": 10,
+      "name_de": "Münzbeutel",
+      "icon": "pouch.svg",
+      "icon_framed": false,
+      "source_reference": null,
+      "legacy_only": true
+    },
+    {
+      "code": 60100005,
+      "name": "Leather Strap",
+      "grade": "normal",
+      "slot_type": "any",
+      "description": "Der runenverstärkte Lederriemen schützt die Infanterie und stärkt ihre Verteidigung.",
+      "stats": [
+        {
+          "type": "infantry_defense",
+          "base_value": 1.5,
+          "per_level": 0.4
+        }
+      ],
+      "max_level": 10,
+      "fragments_per_level": 10,
+      "name_de": "Lederriemen",
+      "icon": "strap.svg",
+      "icon_framed": false,
+      "source_reference": null,
+      "legacy_only": true
+    },
+    {
+      "code": 60200005,
+      "name": "Scholar's Tome",
+      "grade": "rare",
+      "slot_type": "any",
+      "description": "Gesammeltes Wissen beschleunigt die Forschung in der Akademie.",
+      "stats": [
+        {
+          "type": "research_speed",
+          "base_value": 4.0,
+          "per_level": 1.0
+        }
+      ],
+      "max_level": 10,
+      "fragments_per_level": 20,
+      "name_de": "Gelehrtenbuch",
+      "icon": "book.svg",
+      "icon_framed": false,
+      "source_reference": null,
+      "legacy_only": true
+    },
+    {
+      "code": 60400002,
+      "name": "Celestial Compass",
+      "grade": "legendary",
+      "slot_type": "any",
+      "description": "Der Himmelskompass beschleunigt Armee- und Sammelmärsche und vergrößert die Truppenzahl je Marsch.",
+      "stats": [
+        {
+          "type": "march_speed",
+          "base_value": 8.0,
+          "per_level": 2.0
+        },
+        {
+          "type": "march_capacity",
+          "base_value": 1000,
+          "per_level": 300
+        },
+        {
+          "type": "gathering_speed",
+          "base_value": 6.0,
+          "per_level": 1.5
+        }
+      ],
+      "max_level": 10,
+      "fragments_per_level": 80,
+      "name_de": "Himmelskompass",
+      "icon": "compass.svg",
+      "icon_framed": false,
+      "source_reference": null,
+      "legacy_only": true
+    },
+    {
+      "code": 60500001,
+      "name": "Eternal Flame Crown",
+      "grade": "mythic",
+      "slot_type": "any",
+      "description": "Die flammende Krone stärkt Angriff, Verteidigung und Lebenspunkte der Armee und vergrößert ihre Märsche.",
+      "stats": [
+        {
+          "type": "all_attack",
+          "base_value": 15.0,
+          "per_level": 3.0
+        },
+        {
+          "type": "all_defense",
+          "base_value": 10.0,
+          "per_level": 2.5
+        },
+        {
+          "type": "all_hp",
+          "base_value": 8.0,
+          "per_level": 2.0
+        },
+        {
+          "type": "march_capacity",
+          "base_value": 2000,
+          "per_level": 500
+        }
+      ],
+      "max_level": 10,
+      "fragments_per_level": 150,
+      "name_de": "Krone der Ewigen Flamme",
+      "icon": "prestige.svg",
+      "icon_framed": false,
+      "source_reference": null,
+      "legacy_only": true
+    }
+  ],
+  "version": 1,
+  "description": "Retired definitions retained for existing ownership and loadouts; excluded from all new random drops."
+}

@@ -31,6 +31,10 @@ try{
   $current=$all[$protected['code']]??null;catalogCheck($current!==null,'old code preserved '.$protected['code']);
   foreach(['stats','max_level','fragments_per_level']as$field)catalogCheck($current[$field]===$protected[$field],'old balance preserved '.$protected['code'].' '.$field);
  }
+ $sunArrow=$all[60300119]??null;
+ catalogCheck($sunArrow!==null&&array_column($sunArrow['stats'],'type')===['ranged_attack','march_speed','vs_monster_attack','all_attack'],'Pfeil des Sonnenfalken has all four effects');
+ $vitalis=$all[60300107]??null;
+ catalogCheck($vitalis!==null&&array_column($vitalis['stats'],'type')===['all_hp','hospital_capacity','all_defense','infantry_hp'],'Vitalis-Smaragd has all four effects');
  // All numeric types must have real, active consumers; none can silently become decorative metadata.
  $consumers=[
   'all_attack'=>['src/Game/March/BattleEngine.php',"effectiveMultiplier(\$buffs, \$type, 'atk')"],
@@ -45,9 +49,9 @@ try{
   'stone_production'=>['src/Game/City/ResourceTick.php',"\$resource.'_production'"],
   'gold_production'=>['src/Game/City/ResourceTick.php',"\$resource.'_production'"],
   'construction_speed'=>['src/Game/City/BuildingData.php',"\$vipBonuses['construction_speed']"],
-  'research_speed'=>['src/Api/Handlers/ResearchHandler.php',"\$buffs['research_speed']"],
+  'research_speed'=>['src/Game/Research/ResearchEffects.php',"\$buffs['research_speed']"],
   'training_speed'=>['src/Game/Research/ResearchEffects.php',"\$buffs['training_speed']"],
-  'march_speed'=>['src/Game/March/MarchDispatcher.php',"\$buffs['march_speed']"],
+  'march_speed'=>['src/Game/March/MarchSpeed.php',"\$buffs['march_speed']"],
   'gathering_speed'=>['src/Game/March/GatherService.php',"\$buffs['gathering_speed']"],
   'vs_monster_attack'=>['src/Game/March/BattleEngine.php',"\$buffs['vs_monster_attack']"],
   'march_capacity'=>['src/Game/Research/ResearchEffects.php',"\$buffs['march_capacity_flat']"],
@@ -68,8 +72,13 @@ try{
    catalogCheck($stat['base_value']>0&&$stat['per_level']>=0,'meaningful positive effect '.$code.' '.$stat['type']);
    $previous=0.0;for($level=1;$level<=10;$level++){$value=TreasureData::getStatValue($def,$level,$stat['type']);catalogCheck(is_finite($value)&&$value>0&&$value>=$previous,'valid level '.$code.'/'.$level);$previous=$value;}
   }
-  catalogCheck(in_array($code,TreasureData::getCodesByGrade($def['grade']),true),'obtainable through actual rarity drop pool '.$code);
+  catalogCheck(in_array($code,TreasureData::getCodesByGrade($def['grade']),true)===empty($def['legacy_only']),'only active cards belong to the random drop pool '.$code);
+  if(!empty($def['effects']))foreach($def['effects'] as $effect){
+   catalogCheck(in_array($effect['unit'],['percent','flat'],true)&&in_array($effect['master_unit'],['percent','flat'],true),'explicit effect units '.$code);
+   catalogCheck(is_numeric($effect['boost_max'])&&is_finite((float)$effect['boost_max'])&&is_numeric($effect['master_value'])&&is_finite((float)$effect['master_value'])&&($effect['boost_max']!=0||$effect['master_value']!=0),'valid star/master progression including signed debuffs '.$code);
+  }
  }
  catalogCheck($native===5,'five own legacy relics retained');
- echo "ALL $checks TREASURE CATALOG CHECKS PASSED (82 relics,77 unchanged source cards,24 preserved balances).\n";
+ catalogCheck(array_sum(array_map(static fn($grade)=>count(TreasureData::getCodesByGrade($grade)),array_keys($observed)))===77,'exactly 77 active cards, five legacy definitions are ownership-only');
+ echo "ALL $checks TREASURE CATALOG CHECKS PASSED (77 active cards,5 ownership-only legacy relics,24 preserved base balances).\n";
 }catch(Throwable $e){fwrite(STDERR,'FAIL '.$e->getMessage()."\n");exit(1);}

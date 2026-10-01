@@ -21,20 +21,20 @@ function durationCheck(bool $ok, string $label): void {
     echo "PASS $label\n";
 }
 
-$times=[3,5,9,14,20,27,35,44,54,65];
+$times=[3,5,9,16,27];
 foreach (TroopData::all() as $code=>$troop) {
     durationCheck($troop['time']===$times[$troop['tier']-1]
         && TroopData::trainingSeconds($code,2000)===$times[$troop['tier']-1]*2000,
         "type {$troop['type']} T{$troop['tier']}: new per-unit and batch duration");
 }
-durationCheck(TroopData::trainingSeconds(50100401,2000)===28000,'2,000 T4 take 7h 46m 40s before bonuses');
+durationCheck(TroopData::trainingSeconds(50100401,2000)===32000,'2,000 T4 take 8h 53m 20s before bonuses');
 foreach ([1=>'infantry',2=>'ranged',3=>'cavalry'] as $type=>$name) {
     $code=50000401+$type*100000;
     $buffs=['training_speed'=>.1,$name.'_training_speed'=>.2];
     $training=ResearchEffects::training($code,$buffs,1.25);
     durationCheck(abs($training['speed_multiplier']-1.625)<1e-9,'general, type-specific and active training bonuses combine for '.$name);
     $quote=DefenseService::promotionQuote($code-100,2000,$buffs,1.25);
-    durationCheck($quote['duration_seconds']===(int)ceil(28000*.5/1.625),'promotion uses half the new target-tier duration for '.$name);
+    durationCheck($quote['duration_seconds']===(int)ceil(32000*.5/1.625),'promotion uses half the new target-tier duration for '.$name);
 }
 
 $fixture=new \ConquerTests\FeatureDatabase();
@@ -44,6 +44,7 @@ try {
     $db->execute("INSERT INTO cities(id,player_id,world_id,name,coord_x,coord_y,castle_level,food,lumber,stone,gold,last_resource_update) VALUES(1,1,1,'Duration',65,65,30,100000000,100000000,100000000,100000000,DATE_ADD(UTC_TIMESTAMP(),INTERVAL 1 DAY))");
     foreach (CityState::BUILDING_CODES as $school) $db->execute('INSERT INTO city_buildings(city_id,building_code,level) VALUES(1,?,30)',[$school]);
 
+ foreach(TroopData::all() as $unit)if($unit['unlock_research'])$db->execute('INSERT INTO player_research(player_id,world_id,research_code,level)VALUES(1,1,?,1)',[$unit['unlock_research']]);
     // The balance update must never silently reset or reprice a saved order.
     $db->execute("INSERT INTO troop_queue(city_id,troop_code,count,barrack_slot,started_at,finishes_at,cost_json) VALUES(1,50100401,2000,1,UTC_TIMESTAMP(),DATE_ADD(UTC_TIMESTAMP(),INTERVAL 216000 SECOND),?)",[json_encode(TroopData::trainingCost(50100401,2000))]);
     $legacy=$db->query('SELECT * FROM troop_queue WHERE city_id=1')->fetch();
@@ -61,7 +62,7 @@ try {
             $expected=(int)ceil($definition['time']*2000/$definition['training']['speed_multiplier']);
             TroopTrainer::train($state['city'],$state['buildings'],$code,2000);
             $row=$db->query('SELECT *,TIMESTAMPDIFF(SECOND,started_at,finishes_at) AS duration FROM troop_queue WHERE city_id=1 AND troop_code=? AND is_processed=0',[$code])->fetch();
-            durationCheck((int)$row['duration']===$expected && $expected<28800,"actual $code queue matches API preview with boost $boost");
+            durationCheck((int)$row['duration']===$expected && $expected<=32000,"actual $code queue matches API preview with boost $boost");
             durationCheck(json_decode($row['cost_json'],true)===TroopData::trainingCost($code,2000),'shorter duration keeps the full resource receipt');
             if ($boost===1.0) TroopTrainer::cancel(1,(int)$row['id']);
         }

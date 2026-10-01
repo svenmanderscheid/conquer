@@ -148,11 +148,14 @@ try {
     ck($db->query('SELECT status FROM dungeon_runs WHERE id=?',[$utilityId])->fetchColumn()==='running','utility-only party starts');
     $db->execute("UPDATE dungeon_runs SET status='cancelled',completed_at=UTC_TIMESTAMP() WHERE id=?",[$utilityId]);D::tick();
 
-    // The current low-stat T1 catalogue requires real armies of 10,000 per member, not the historical 200-unit fixture. Execute a successful run; manipulate only fixture deadlines, never results.
-    $id=(int)act(1,'create',0,$create)['run_id'];
-    act(2,'join',$id,['role'=>'defense','troops'=>[50100101=>10000]]);
-    act(3,'join',$id,['role'=>'gather','troops'=>[50100101=>10000]]);
-    act(4,'join',$id,['role'=>'hunter','troops'=>[50100101=>10000]]);
+    // A lifecycle victory must stay clear of the 18-round boss threshold.
+    // The prior 10,000-per-member fixture could randomly leave the boss at 22 HP.
+    // Use the real available army, retaining actual stats, hidden seed and results.
+    $victoryCreate=array_replace($create,['troops'=>[50100101=>20000]]);
+    $id=(int)act(1,'create',0,$victoryCreate)['run_id'];
+    act(2,'join',$id,['role'=>'defense','troops'=>[50100101=>20000]]);
+    act(3,'join',$id,['role'=>'gather','troops'=>[50100101=>20000]]);
+    act(4,'join',$id,['role'=>'hunter','troops'=>[50100101=>20000]]);
     $started=race([[1,['action'=>'start','run_id'=>$id,'expected_world_id'=>1]],[1,['action'=>'start','run_id'=>$id,'expected_world_id'=>1]]]);
     ck(count(array_filter($started,fn($r)=>$r['ok']))===1,'concurrent start begins one run');
     deny(fn()=>act(1,'preview',$id,['dungeon_code'=>$code,'difficulty'=>'normal','stance'=>'cautious','role'=>'attack','troops'=>[50100101=>10000]]),'preview rejects a started run');
@@ -211,10 +214,10 @@ try {
     D::tick();
     ck($db->query('SELECT status FROM dungeon_runs WHERE id=?',[$expiry])->fetchColumn()==='cancelled'&&stock(1)===20000&&stock(2)===20000,'weekly turnover expires recruiting groups and restores armies');
 
-    $offline=(int)act(1,'create',0,$create)['run_id'];
-    act(2,'join',$offline,['role'=>'defense','troops'=>[50100101=>10000]]);
-    act(3,'join',$offline,['role'=>'gather','troops'=>[50100101=>10000]]);
-    act(4,'join',$offline,['role'=>'hunter','troops'=>[50100101=>10000]]);
+    $offline=(int)act(1,'create',0,$victoryCreate)['run_id'];
+    act(2,'join',$offline,['role'=>'defense','troops'=>[50100101=>20000]]);
+    act(3,'join',$offline,['role'=>'gather','troops'=>[50100101=>20000]]);
+    act(4,'join',$offline,['role'=>'hunter','troops'=>[50100101=>20000]]);
     act(1,'start',$offline);
     $db->execute("UPDATE dungeon_runs SET week_key='2020-W01',started_at=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 3 DAY),decision_at=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 2 DAY),decision_deadline=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 1 DAY) WHERE id=?",[$offline]);
     W::bind(2,1);D::tick();

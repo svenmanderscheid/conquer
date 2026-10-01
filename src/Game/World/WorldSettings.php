@@ -10,10 +10,10 @@ final class WorldSettings
     public static function defaults(): array
     {
         return ['enabled'=>true,'interval_minutes'=>60,'window_start'=>'00:00','window_end'=>'00:00',
-            'resource_density_pct'=>1.0,'monster_density_pct'=>0.5,'resource_chance_pct'=>100.0,'monster_chance_pct'=>100.0,
-            'resource_limit'=>1000,'monster_limit'=>600,'batch_limit'=>120,'resource_lifetime_hours'=>24,'monster_lifetime_hours'=>12,
+            'resource_density_pct'=>1.0,'monster_density_pct'=>0.5,'village_density_pct'=>0.08,'resource_chance_pct'=>100.0,'monster_chance_pct'=>100.0,'village_chance_pct'=>100.0,
+            'resource_limit'=>1000,'monster_limit'=>600,'village_limit'=>80,'batch_limit'=>120,'resource_lifetime_hours'=>24,'monster_lifetime_hours'=>12,
             'resource_level_min'=>1,'resource_level_max'=>3,'monster_level_min'=>0,'monster_level_max'=>3,
-            'alliance_center_radius'=>12,'alliance_outpost_radius'=>6,
+            'alliance_center_radius'=>24,'alliance_outpost_radius'=>6,
             'resource_weights'=>['food'=>30,'lumber'=>30,'stone'=>20,'gold'=>19,'gems'=>1],
             'monster_weights'=>['Orc'=>40,'Skeleton'=>30,'Golem'=>20,'Treasure Goblin'=>5,'Deathkar'=>5,'dragon'=>0,'Magdar'=>0]];
     }
@@ -29,12 +29,12 @@ final class WorldSettings
     {
         $out=self::defaults();
         $out['enabled']=in_array($input['enabled']??false,[true,1,'1','on'],true);
-        foreach(['interval_minutes'=>[1,10080],'resource_limit'=>[0,25000],'monster_limit'=>[0,25000],'batch_limit'=>[1,500],
+        foreach(['interval_minutes'=>[1,10080],'resource_limit'=>[0,25000],'monster_limit'=>[0,25000],'village_limit'=>[0,1000],'batch_limit'=>[1,500],
             'resource_lifetime_hours'=>[1,720],'monster_lifetime_hours'=>[1,720],'resource_level_min'=>[1,10],'resource_level_max'=>[1,10],
             'monster_level_min'=>[0,20],'monster_level_max'=>[0,20],'alliance_center_radius'=>[4,40],'alliance_outpost_radius'=>[2,24]] as $key=>[$min,$max]) {
             $out[$key]=self::integer($input[$key]??$out[$key],$min,$max,$key);
         }
-        foreach(['resource_density_pct','monster_density_pct','resource_chance_pct','monster_chance_pct'] as $key) {
+        foreach(['resource_density_pct','monster_density_pct','village_density_pct','resource_chance_pct','monster_chance_pct','village_chance_pct'] as $key) {
             $v=$input[$key]??$out[$key];
             if(!is_scalar($v)||!is_numeric($v)||!is_finite((float)$v)||(float)$v<0||(float)$v>100)throw new \InvalidArgumentException('Prozentwert muss zwischen 0 und 100 liegen: '.$key);
             $out[$key]=round((float)$v,3);

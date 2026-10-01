@@ -9,7 +9,7 @@ const out=path.resolve(__dirname,'../artifacts/alpha-keys-admin');fs.mkdirSync(o
  const context=await browser.newContext({viewport:{width:1280,height:900},hasTouch:true});
  const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
  page.setDefaultTimeout(15000);
- const login=async name=>{await page.goto(base+'/admin/login');await page.locator('[name=username]').fill(name);await page.locator('[name=password]').fill('Fixture-Alpha-2026!');await page.getByRole('button',{name:'Anmelden',exact:true}).click();await page.waitForURL(base+'/admin');};
+ const login=async name=>{await page.goto(base+'/admin/login');await page.locator("[name=identifier], [name=username]").fill(name);await page.locator('[name=password]').fill('Fixture-Alpha-2026!');await page.getByRole('button',{name:'Anmelden',exact:true}).click();await page.waitForURL(base+'/admin');};
  const formData=()=>page.locator('.alpha-create form').evaluate(f=>Object.fromEntries(new FormData(f)));
  const post=async(data,action='alpha-key-create')=>context.request.post(base+'/admin/action/'+action,{form:data,maxRedirects:0});
  try{
@@ -53,7 +53,13 @@ const out=path.resolve(__dirname,'../artifacts/alpha-keys-admin');fs.mkdirSync(o
   await page.locator('.toolbar [name=q]').fill('Seitentest');await page.locator('.toolbar [name=status]').selectOption('');await page.getByRole('button',{name:'Filtern',exact:true}).click();await page.waitForURL('**/alpha-keys?q=Seitentest&status=');await page.locator('.pagination').getByRole('link',{name:'Weiter →'}).click();await page.waitForURL('**/alpha-keys?q=Seitentest&status=&page=2');assert.equal(await page.locator('.alpha-key-row').count(),3);
   await page.locator('.mobile-menu').click();await page.locator('#admin-nav a').filter({hasText:'Alpha-Keys'}).click();await page.waitForURL('**/admin/alpha-keys?world_id=1');
   const validPayload=await formData();
-  await page.goto(base+'/admin/logout');await login('AlphaModerator');await page.goto(base+'/admin/alpha-keys');assert(await form.locator('button[type=submit]').isDisabled());assert.equal(await page.locator('.alpha-key-revoke').count(),0);assert.equal(await page.locator('#alpha-issued-keys').count(),0);
+  const logoutForm=page.locator('form[action$="/admin/logout"]');
+  if(!await logoutForm.locator('button').isVisible()) await page.locator('.mobile-menu').click();
+  const logoutMeta=await logoutForm.evaluate(f=>({action:f.action,method:f.method,valid:f.checkValidity(),invalid:[...f.elements].filter(e=>e.validity&&!e.validity.valid).map(e=>e.name)}));
+  const logoutRequests=[];page.on('request',r=>{if(r.isNavigationRequest())logoutRequests.push({path:new URL(r.url()).pathname,method:r.method()});});
+  await logoutForm.locator('button').click();
+  try{await page.waitForURL('**/admin/login',{timeout:5000});}catch(error){console.error({logoutMeta,logoutRequests,url:page.url()});throw error;}
+  await login('AlphaModerator');await page.goto(base+'/admin/alpha-keys');assert(await form.locator('button[type=submit]').isDisabled());assert.equal(await page.locator('.alpha-key-revoke').count(),0);assert.equal(await page.locator('#alpha-issued-keys').count(),0);
   const moderator=await formData();assert.equal((await post({...validPayload,csrf_token:moderator.csrf_token})).status(),403,'moderator cannot forge creation');assert.equal((await post({...moderator,key_id:id},'alpha-key-revoke')).status(),403,'moderator cannot forge revocation');
   assert.deepEqual(errors,[],'no browser errors');console.log('ALL ALPHA KEY BROWSER CHECKS PASSED · '+out);
  }finally{await browser.close();}

@@ -6,6 +6,7 @@ namespace Conquer\Api\Handlers;
 use Conquer\Api\Response;
 use Conquer\Auth\Session;
 use Conquer\Db\Connection;
+use Conquer\Game\Defense\DefenseService;
 use Conquer\Game\Player\ActionPoints;
 use Conquer\Game\Player\LordLevel;
 
@@ -14,8 +15,8 @@ use Conquer\Game\Player\LordLevel;
  *
  * GET  /api/player/me                — own full profile
  * GET  /api/player/profile/:id       — public profile of any player
- * GET  /api/player/formations        — get 4 saved troop formations
- * POST /api/player/formations/:slot  — save a troop formation (slot 1-4)
+ * GET  /api/player/formations        — get 6 saved troop formations
+ * POST /api/player/formations/:slot  — save a troop formation (slot 1-6)
  * POST /api/player/emoji             — set active emoji (5 seconds)
  * GET  /api/player/skins             — list owned skins
  * POST /api/player/skin/equip        — equip a skin
@@ -83,15 +84,15 @@ final class PlayerHandler
         $session = Session::current();
         if ($session === null) Response::error(401, 'UNAUTHENTICATED', 'Not logged in.');
 
-        $targetId = (int) ($params['id'] ?? 0);
-        if ($targetId <= 0) Response::error(400, 'INVALID_INPUT', 'Ungültige Spieler-ID.');
+        $targetId = filter_var($params['id'] ?? null,FILTER_VALIDATE_INT,['options'=>['min_range'=>1]]);
+        if ($targetId === false) Response::error(400, 'INVALID_INPUT', 'Ungültige Spieler-ID.');
 
         $db = Connection::getInstance();
         $worldId=\Conquer\Game\World\WorldContext::id();
 
         $player = $db->query(
             'SELECT p.id, p.username, p.kill_count, p.vip_level,
-                    c.castle_level, c.power,
+                    c.castle_level, c.power, c.coord_x, c.coord_y, c.is_hidden,
                     a.tag AS alliance_tag, a.name AS alliance_name
              FROM   players p
              JOIN cities c ON c.player_id = p.id AND c.world_id = ?
@@ -103,18 +104,11 @@ final class PlayerHandler
 
         if ($player === false) Response::error(404, 'NOT_FOUND', 'Spieler nicht gefunden.');
 
-        // Troops visible on public profile (for context / scout display)
-        $troopRows = $db->query(
-            'SELECT ct.troop_code, ct.count
-             FROM   city_troops ct
-             JOIN   cities c ON c.id = ct.city_id
-             WHERE  c.player_id = ? AND c.world_id = ? AND ct.count > 0',
-            [$targetId,$worldId],
-        )->fetchAll();
-
-        $troops = [];
-        foreach ($troopRows as $r) {
-            $troops[(int) $r['troop_code']] = (int) $r['count'];
+        // A public profile is not a scouting report. Hidden or locked enemy
+        // cities must not become discoverable by enumerating player IDs.
+        if ($targetId !== (int)$session['player_id']
+            && ((bool)$player['is_hidden'] || !\Conquer\Game\World\LandAccessPolicy::isOpen($worldId,(int)$player['coord_x'],(int)$player['coord_y']))) {
+            Response::error(404, 'NOT_FOUND', 'Spieler nicht gefunden.');
         }
 
         Response::ok([
@@ -127,7 +121,6 @@ final class PlayerHandler
             'kill_count'    => (int) $player['kill_count'],
             'vip_level'     => (int) $player['vip_level'],
             'lord_level'    => LordLevel::snapshot($targetId,$worldId)['level'],
-            'troops'        => $troops,
             'world_id'      => $worldId,
         ]);
     }
@@ -150,10 +143,10 @@ final class PlayerHandler
             )->fetchAll();
         } catch (\PDOException) {}
 
-        $formations = [1 => [], 2 => [], 3 => [], 4 => []];
+        $formations = array_fill(1, DefenseService::FORMATION_SLOTS, []);
         foreach ($rows as $r) {
             $slot = (int) $r['slot'];
-            if ($slot >= 1 && $slot <= 4) {
+            if ($slot >= 1 && $slot <= DefenseService::FORMATION_SLOTS) {
                 $formations[$slot] = json_decode($r['troops_json'], true) ?? [];
             }
         }
@@ -174,7 +167,7 @@ final class PlayerHandler
         }
 
         $slot = (int) ($params['slot'] ?? 0);
-        if ($slot < 1 || $slot > 4) Response::error(400, 'INVALID_INPUT', 'Slot muss 1-4 sein.');
+        if ($slot < 1 || $slot > DefenseService::FORMATION_SLOTS) Response::error(400, 'INVALID_INPUT', \Conquer\Game\Locale::t('formation.invalid_slot',['count'=>DefenseService::FORMATION_SLOTS]));
 
         $body   = json_decode((string) file_get_contents('php://input'), true) ?? [];
         $troops = (array) ($body['troops'] ?? []);

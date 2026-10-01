@@ -19,11 +19,12 @@
     "advanced.json": "330842174b825fa5a4d8d0acca132490d5419b165baa1676b93da1c3632eaea5",
     "field_monster.json": "712704e0fc994475314df2f25c80d497c51dd7e4a344ae11e6f3aae3e0b2845c",
     "field_object.json": "f03144457addb259f5c7d439e15c85ccfe67ede7a9e217d02ea45b594fa44a3d",
-    "enum.py": "18b31ddd879a0e74974e2ad0daa6559a0b1aa19efe0100ded36db6d954bf1328"
+    "enum.py": "18b31ddd879a0e74974e2ad0daa6559a0b1aa19efe0100ded36db6d954bf1328",
+    "troop.json": "1aa6e167d3ce987b1419e7f791967e29acb9cc2d090b8e6878d1c097f2f9e2f0"
   },
   "building_levels": 420,
-  "research_nodes": 117,
-  "research_levels": 951,
+  "research_nodes": 129,
+  "research_levels": 963,
   "monsters": 167,
   "field_objects": 131,
   "mapped_items": 59,

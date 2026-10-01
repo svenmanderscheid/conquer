@@ -53,8 +53,8 @@ try{
  Shop::buy(1,'vip',$vip['id'],1,$state['vip']['rotation']);
  ceCheck((int)$db->query('SELECT gems FROM players WHERE id=1')->fetchColumn()===$before-$vip['price']['amount'],'VIP point purchase did not charge correctly');
  ceCheck((int)$db->query('SELECT quantity FROM player_inventory WHERE player_id=1 AND item_code=?',[$vip['item_code']])->fetchColumn()===1,'VIP shop item not delivered');
- $skin=$db->transaction(fn()=>\Conquer\Game\March\MarchSkinService::buy(1,'ironkeep'));
- ceCheck($skin['charged_gems']===1200&&$db->query("SELECT 1 FROM player_march_skins WHERE player_id=1 AND skin_code='ironkeep'")->fetchColumn()!==false,'Skin purchase no longer works');
+ $skin=$db->transaction(fn()=>\Conquer\Game\March\MarchSkinService::buy(1,'fire'));
+ ceCheck($skin['charged_gems']===1200&&$db->query("SELECT 1 FROM player_march_skins WHERE player_id=1 AND skin_code='fire'")->fetchColumn()!==false,'Skin purchase no longer works');
  // The real HTTP adapters reject old browser requests while preserving authentication and CSRF.
  $token=bin2hex(random_bytes(32));$db->execute("INSERT INTO sessions(player_id,token,csrf_token,ip_address,user_agent,expires_at,active_world_id)VALUES(1,?,'crystal-test','127.0.0.1','test',DATE_ADD(UTC_TIMESTAMP(),INTERVAL 10 MINUTE),1)",[$token]);
  $base=$fixture->serve('$path=parse_url($_SERVER["REQUEST_URI"],PHP_URL_PATH);match($path){"/build"=>\Conquer\Api\Handlers\CityHandler::instantBuild(["queue_id"=>1]),"/research"=>\Conquer\Api\Handlers\ResearchHandler::instant([]),"/instant"=>\Conquer\Api\Handlers\HospitalHandler::instantHeal([]),"/finish"=>\Conquer\Api\Handlers\HospitalHandler::finish([]),"/chest"=>\Conquer\Api\Handlers\TreasureHandler::openChest([])};');

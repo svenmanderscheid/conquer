@@ -3,7 +3,7 @@ window.ConquerScoutReport = function(ctx) {
     'use strict';
     const {base,esc,fmt,openDialog,getState,getKingdom,unitName}=ctx;
     const number=value=>value==null||!Number.isFinite(Number(value))?'—':fmt(Number(value));
-    const percent=value=>value==null?'—':`${Number(value)>=0?'+':''}${Number(value).toLocaleString('de-DE',{maximumFractionDigits:2})} %`;
+    const percent=value=>value==null?'—':`${Number(value)>=0?'+':''}${Number(value).toLocaleString(window.ConquerLocale?.locale??'en',{maximumFractionDigits:2})} %`;
     const resources={food:'Nahrung',lumber:'Holz',stone:'Stein',gold:'Gold'};
     const branchDefaults=[{code:'attack',name:'Angriff',icon:'shadow-blade.png'},{code:'defense',name:'Verteidigung',icon:'iron-shield.png'},{code:'gather',name:'Sammler',icon:'woodcutter.png'},{code:'hunter',name:'Jäger',icon:'hunters-bow.png'}];
     const section=(title,body,kind)=>`<section class="sr-section sr-${kind}"><h3>${title}</h3>${body}</section>`;
@@ -17,8 +17,8 @@ window.ConquerScoutReport = function(ctx) {
         if(!entries.length)return note(empty);
         const cards=entries.map(t=>{
             const def=getState()?.troop_defs?.find(u=>Number(u.code)===Number(t.code)),tier=Number(t.tier??def?.tier),type=t.type??def?.type;
-            const prefix=({1:'infantry',2:'archer',3:'cavalry',infantry:'infantry',ranged:'archer',cavalry:'cavalry'})[type];
-            const art=prefix&&tier>=1&&tier<=10?`characters/tier-colors-v1/${prefix}-t${tier}-report.webp`:'hud/expeditions.svg';
+            const prefix=({1:'guardian',2:'fire-archer',3:'shadow-rider',infantry:'guardian',ranged:'fire-archer',cavalry:'shadow-rider'})[type];
+            const art=prefix&&tier>=1&&tier<=10?`characters/fantasy-troops-v2/${prefix}-t${tier}-ui.webp`:'hud/expeditions.svg';
             const name=t.name||(def?unitName(def):'Truppe #'+t.code);
             return `<article class="sr-troop"><div class="sr-portrait troop-tier-frame" data-troop-tier="${Number(tier)||0}">${image(art)}<span class="sr-tier">${tier?'T'+tier:'?'}</span><b>${number(t.count??t.sent)}</b></div><strong>${esc(name)}</strong></article>`;
         }).join('');
@@ -65,11 +65,12 @@ window.ConquerScoutReport = function(ctx) {
     }
     function render(r,footer) {
         const d=r.details||{},wall=d.wall;
-        const observed=d.observed_at||r.created_at,stamp=new Date(observed?ctx.date(observed):NaN),time=Number.isNaN(stamp.getTime())?'Zeitpunkt unbekannt':stamp.toLocaleString('de-DE');
-        const identity=`<div class="sr-target">${image('map/castle-default.png')}<div><small>Ausgespähtes Königreich</small><strong>${esc(d.target_name||'Unbekanntes Ziel')}</strong><span>Burgstufe ${number(d.castle_level)}</span><b>Macht ${number(d.target_power)}</b></div></div>`;
+        const observed=d.observed_at||r.created_at,stamp=new Date(observed?ctx.date(observed):NaN),time=Number.isNaN(stamp.getTime())?'Zeitpunkt unbekannt':stamp.toLocaleString(window.ConquerLocale?.locale??'en');
+        const neutral=d.type==='neutral_village_scout';
+        const identity=`<div class="sr-target">${image('map/castle-default.png')}<div><small>${neutral?'Ausgespähtes freies Dorf':'Ausgespähtes Königreich'}</small><strong>${esc(d.target_name||'Unbekanntes Ziel')}</strong><span>${neutral?'Dorfstufe '+number(d.village_level):'Burgstufe '+number(d.castle_level)}</span>${neutral?'':`<b>Macht ${number(d.target_power)}</b>`}</div></div>`;
         const defense=wall?`<div class="sr-wall"><div class="sr-wall-label">${image('map/wall.svg')}<strong>Mauer <small>Stufe ${number(wall.level)}</small></strong></div><dl class="sr-stats">${stat('Haltbarkeit',`${number(wall.durability)} / ${number(wall.durability_max)}`)}${stat('Angriffsbonus',percent(wall.attack_buff))}${stat('Verteidigungsbonus',percent(wall.defense_buff))}</dl><progress max="${Math.max(1,Number(wall.durability_max)||1)}" value="${Math.max(0,Number(wall.durability)||0)}" aria-label="Haltbarkeit der Mauer"></progress></div>`:note('Mauerwerte wurden nicht erfasst.');
         const intro=`<header class="sr-banner">${image('hud/expeditions.svg')}<div><strong>${d.blocked?'Aufklärung verhindert':'Aufklärung erfolgreich'}</strong><span>${esc(d.target_name||'Unbekanntes Ziel')} · X:${number(r.target_x)} Y:${number(r.target_y)}</span></div></header><div class="sr-date"><time>${esc(time)}</time><span>Bericht #${number(r.id)}</span></div>`;
-        const body=d.blocked?`<section class="sr-blocked">${image('items/shield.svg')}<h3>Spähschutz aktiv</h3>${note(d.reason||'Die Stadt ist vor Spähern geschützt.')}</section>`:`<section class="sr-overview" aria-label="Ziel und Mauer">${identity}${defense}</section>${supplies(d)}${section('Truppenübersicht',troopList(d.troops,'Keine Truppen in der Garnison gesichtet.'),'troops')}${section('Verstärkungen',troopList(d.reinforcements,'Keine Verstärkungen gesichtet.'),'reinforcements')}${mastery(d)}${equipment(d)}${bonuses(d)}`;
+        const body=d.blocked?`<section class="sr-blocked">${image('items/shield.svg')}<h3>Spähschutz aktiv</h3>${note(d.reason||'Die Stadt ist vor Spähern geschützt.')}</section>`:neutral?`<section class="sr-overview" aria-label="Ziel">${identity}</section>${section('Truppenübersicht',troopList(d.troops,'Keine Truppen in der Garnison gesichtet.'),'troops')}${section('Vorräte',note('Die Vorräte freier Dörfer können nicht ausgespäht werden. Ihre Höhe bleibt bis nach einem erfolgreichen Angriff unbekannt.'),'supplies')}`:`<section class="sr-overview" aria-label="Ziel und Mauer">${identity}${defense}</section>${supplies(d)}${section('Truppenübersicht',troopList(d.troops,'Keine Truppen in der Garnison gesichtet.'),'troops')}${section('Verstärkungen',troopList(d.reinforcements,'Keine Verstärkungen gesichtet.'),'reinforcements')}${mastery(d)}${equipment(d)}${bonuses(d)}`;
         return `<h2>Spähbericht</h2><article class="mail-detail scout-report"><div class="mail-detail-scroll sr-scroll" tabindex="0" aria-label="Spähbericht, nach unten scrollen">${intro}${body}</div><footer class="mail-detail-actions sr-footer">${footer||'<button type="button" class="mail-button" data-action="mailbox-back">Schließen</button>'}<small>Aufnahme zum Spähzeitpunkt</small></footer></article>`;
     }
     const dialog=document.querySelector('#game-dialog');
@@ -88,6 +89,6 @@ window.ConquerScoutReport = function(ctx) {
     return {open(r,{footer=''}={}){
         if(closingHistory)return;
         if(!entry){entry={token:crypto.randomUUID(),url:location.href};history.pushState({...history.state,conquerScoutReport:entry.token},'',location.href);}
-        openDialog(render(r,footer));
+        openDialog(render(r,footer),{historyManaged:true});
     }};
 };

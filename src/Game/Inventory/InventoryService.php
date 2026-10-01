@@ -33,6 +33,14 @@ final class InventoryService
     /** Path to item definitions. Resolved from ROOT_DIR at runtime. */
     private const ITEMS_FILE = 'data/items.json';
 
+    /** Removed timed construction/research boosts. Never reuse these saved inventory IDs. */
+    public const RETIRED_ITEMS = [10102021, 10102031, 10202010, 10202011];
+
+    public static function isRetired(int $code): bool
+    {
+        return in_array($code, self::RETIRED_ITEMS, true);
+    }
+
     /** Valid resources stored in the cities table. */
     private const CITY_RESOURCES = ['food', 'lumber', 'stone', 'gold'];
 
@@ -58,6 +66,7 @@ final class InventoryService
      */
     public static function getItemDef(int $code): ?array
     {
+        if (self::isRetired($code)) return null;
         self::loadDefs();
         return self::$defs[$code] ?? null;
     }
@@ -70,7 +79,7 @@ final class InventoryService
     public static function allDefs(): array
     {
         self::loadDefs();
-        return self::$defs ?? [];
+        return array_diff_key(self::$defs ?? [], array_flip(self::RETIRED_ITEMS));
     }
 
     // -------------------------------------------------------------------------
@@ -83,7 +92,7 @@ final class InventoryService
      */
     public static function addItems(int $playerId, int $itemCode, int $quantity): void
     {
-        if ($quantity <= 0) {
+        if ($quantity <= 0 || self::isRetired($itemCode)) {
             return;
         }
 
@@ -148,6 +157,7 @@ final class InventoryService
 
         foreach ($rows as $row) {
             $code = (int) $row['item_code'];
+            if (self::isRetired($code)) continue;
             $def  = self::$defs[$code] ?? null;
 
             $entry = [
@@ -413,8 +423,6 @@ final class InventoryService
         $validTypes = [
             'resource_production',
             'gathering_speed',
-            'construction_speed',
-            'research_speed',
             'training_speed',
             'anti_spy',
         ];
@@ -451,7 +459,6 @@ final class InventoryService
         // multiplicative stacking via ActiveBuffService::getMultiplier().
         $activeBuffType = match ($boostType) {
             'resource_production' => 'production_boost',
-            'research_speed'      => 'research_boost',
             'training_speed'      => 'training_boost',
             default               => null,
         };

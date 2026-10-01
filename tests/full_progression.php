@@ -27,10 +27,19 @@ try{
  operation(1,['action'=>'mastery.apply','ranks'=>['gather_1'=>5],'revision'=>1]);
  denies(fn()=>operation(1,['action'=>'mastery.apply','ranks'=>['gather_1'=>6],'revision'=>2]),'mastery maximum level enforced');
  operation(1,['action'=>'mastery.apply','ranks'=>[],'revision'=>2]);ok(MasteryService::snapshot(1)['available']===11,'respec returns exactly the earned points');
- \Conquer\Game\Treasure\TreasureService::addFragments(1,60500002,1000);$db->execute('INSERT INTO player_treasure_loadouts(player_id,world_id,slot,treasure_code) VALUES(1,1,1,60500002)');
- $buffs=BuffEngine::getBuffs(1);ok(($buffs['hospital_capacity_flat']??0)>=2000&&($buffs['resource_protection']??0)>=.2,'relic flat hospital and fractional protection are distinct');
- \Conquer\Game\Treasure\TreasureService::addFragments(1,60400002,1000);$db->execute('INSERT INTO player_treasure_loadouts(player_id,world_id,slot,treasure_code) VALUES(1,1,2,60400002)');
- $baseCapacity=ResearchEffects::limits($buffs)['march_capacity'];$buffs=BuffEngine::getBuffs(1);ok(ResearchEffects::limits($buffs)['march_capacity']===$baseCapacity+(int)$buffs['march_capacity_flat'],'flat relic march capacity applies to real march limit');
+ // Active catalog: stars are explicitly upgraded; merely owning fragments is not an upgrade.
+ $baseHospital=\Conquer\Game\Hospital\HospitalService::getStatus(1)['capacity'];$baseMarch=ResearchEffects::limits(BuffEngine::getBuffs(1))['march_capacity'];
+ foreach([[60500101,4,1],[60500102,4,2]] as [$relic,$effect,$slot]){
+     \Conquer\Game\Treasure\TreasureService::addFragments(1,$relic,1000);
+     for($star=0;$star<5;$star++)\Conquer\Game\Treasure\TreasureService::upgradeEffect(1,$relic,$effect);
+     ok(\Conquer\Game\Treasure\TreasureService::equipTreasure(1,$relic,$slot,1,1),'current relic equips through the real service');
+ }
+ $buffs=BuffEngine::getBuffs(1);
+ ok(abs(($buffs['hospital_capacity']??0)-.25)<.000001&&empty($buffs['hospital_capacity_flat']),'25 percent hospital relic stays a percentage, not 25 flat beds');
+ ok(\Conquer\Game\Hospital\HospitalService::getStatus(1)['capacity']===(int)floor($baseHospital*1.25),'hospital percentage increases actual capacity by 25 percent');
+ ok(abs(($buffs['march_size']??0)-.10)<.000001&&empty($buffs['march_capacity_flat'])&&ResearchEffects::limits($buffs)['march_capacity']===(int)floor($baseMarch*1.1),'10 percent march relic scales the actual castle-based capacity');
+ \Conquer\Game\Treasure\TreasureService::unequipTreasure(1,60500101,1);\Conquer\Game\Treasure\TreasureService::unequipTreasure(1,60500102,1);
+ ok(\Conquer\Game\Hospital\HospitalService::getStatus(1)['capacity']===$baseHospital&&ResearchEffects::limits(BuffEngine::getBuffs(1))['march_capacity']===$baseMarch,'unequipping removes both capacity effects');
  $settings=['enabled'=>1,'next_start'=>gmdate('Y-m-d H:i:s',time()-600),'interval_hours'=>2,'duration_hours'=>1,'invasion_enabled'=>1,'invasion_interval_hours'=>2,'invasion_next_start'=>gmdate('Y-m-d H:i:s',time()-60)];
  denies(fn()=>EventService::saveSettings(1,array_replace($settings,['duration_hours'=>3])),'overlapping event schedule rejected');
  denies(fn()=>EventService::saveSettings(1,array_replace($settings,['next_start'=>'2026-02-30 18:00:00'])),'invalid calendar date rejected');

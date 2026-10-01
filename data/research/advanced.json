@@ -15,10 +15,10 @@
           "time": 65340,
           "power": 8600,
           "resources": {
-            "food": 495000,
-            "lumber": 247500,
-            "stone": 742500,
-            "gold": 1485000
+            "food": 52008,
+            "lumber": 26004,
+            "stone": 78012,
+            "gold": 78012
           },
           "requirements": [
             {
@@ -38,10 +38,10 @@
           "time": 91476,
           "power": 18800,
           "resources": {
-            "food": 693000,
-            "lumber": 346500,
-            "stone": 1039500,
-            "gold": 2079000
+            "food": 72811,
+            "lumber": 36406,
+            "stone": 109217,
+            "gold": 109217
           },
           "requirements": [
             {
@@ -61,10 +61,10 @@
           "time": 130680,
           "power": 43500,
           "resources": {
-            "food": 1020000,
-            "lumber": 510000,
-            "stone": 1530000,
-            "gold": 3060000
+            "food": 96451,
+            "lumber": 48226,
+            "stone": 144677,
+            "gold": 144677
           },
           "requirements": [
             {
@@ -84,10 +84,10 @@
           "time": 176418,
           "power": 72200,
           "resources": {
-            "food": 1377000,
-            "lumber": 688500,
-            "stone": 2065500,
-            "gold": 4131000
+            "food": 130209,
+            "lumber": 65105,
+            "stone": 195313,
+            "gold": 195313
           },
           "requirements": [
             {
@@ -107,10 +107,10 @@
           "time": 248292,
           "power": 106800,
           "resources": {
-            "food": 1995000,
-            "lumber": 997500,
-            "stone": 2992500,
-            "gold": 5985000
+            "food": 169782,
+            "lumber": 84891,
+            "stone": 254673,
+            "gold": 254673
           },
           "requirements": [
             {
@@ -130,10 +130,10 @@
           "time": 352836,
           "power": 148000,
           "resources": {
-            "food": 2835000,
-            "lumber": 1417500,
-            "stone": 4252500,
-            "gold": 8505000
+            "food": 241269,
+            "lumber": 120635,
+            "stone": 361904,
+            "gold": 361904
           },
           "requirements": [
             {
@@ -153,10 +153,10 @@
           "time": 490050,
           "power": 223000,
           "resources": {
-            "food": 4162500,
-            "lumber": 2081250,
-            "stone": 6243750,
-            "gold": 12487500
+            "food": 318820,
+            "lumber": 159410,
+            "stone": 478230,
+            "gold": 478230
           },
           "requirements": [
             {
@@ -173,13 +173,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 686070,
+          "time": 583334,
           "power": 311650,
           "resources": {
-            "food": 5827500,
-            "lumber": 2913750,
-            "stone": 8741250,
-            "gold": 17482500
+            "food": 446348,
+            "lumber": 223174,
+            "stone": 669522,
+            "gold": 669522
           },
           "requirements": [
             {
@@ -196,13 +196,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 967032,
+          "time": 700000,
           "power": 418300,
           "resources": {
-            "food": 8436000,
-            "lumber": 4218000,
-            "stone": 12654000,
-            "gold": 25308000
+            "food": 581527,
+            "lumber": 290764,
+            "stone": 872291,
+            "gold": 872291
           },
           "requirements": [
             {
@@ -219,13 +219,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 1352538,
+          "time": 700000,
           "power": 544450,
           "resources": {
-            "food": 11799000,
-            "lumber": 5899500,
-            "stone": 17698500,
-            "gold": 35397000
+            "food": 813352,
+            "lumber": 406676,
+            "stone": 1220028,
+            "gold": 1220028
           },
           "requirements": [
             {
@@ -256,10 +256,10 @@
           "time": 105840,
           "power": 9700,
           "resources": {
-            "food": 630000,
-            "lumber": 315000,
-            "stone": 945000,
-            "gold": 1890000
+            "food": 59573,
+            "lumber": 29787,
+            "stone": 89359,
+            "gold": 89359
           },
           "requirements": [
             {
@@ -279,10 +279,10 @@
           "time": 148176,
           "power": 21200,
           "resources": {
-            "food": 882000,
-            "lumber": 441000,
-            "stone": 1323000,
-            "gold": 2646000
+            "food": 83402,
+            "lumber": 41701,
+            "stone": 125103,
+            "gold": 125103
           },
           "requirements": [
             {
@@ -302,10 +302,10 @@
           "time": 211680,
           "power": 49000,
           "resources": {
-            "food": 1290000,
-            "lumber": 645000,
-            "stone": 1935000,
-            "gold": 3870000
+            "food": 109784,
+            "lumber": 54892,
+            "stone": 164676,
+            "gold": 164676
           },
           "requirements": [
             {
@@ -325,10 +325,10 @@
           "time": 285768,
           "power": 81300,
           "resources": {
-            "food": 1741500,
-            "lumber": 870750,
-            "stone": 2612250,
-            "gold": 5224500
+            "food": 148209,
+            "lumber": 74105,
+            "stone": 222313,
+            "gold": 222313
           },
           "requirements": [
             {
@@ -348,10 +348,10 @@
           "time": 402192,
           "power": 120500,
           "resources": {
-            "food": 2565000,
-            "lumber": 1282500,
-            "stone": 3847500,
-            "gold": 7695000
+            "food": 196462,
+            "lumber": 98231,
+            "stone": 294693,
+            "gold": 294693
           },
           "requirements": [
             {
@@ -371,10 +371,10 @@
           "time": 571536,
           "power": 167300,
           "resources": {
-            "food": 3645000,
-            "lumber": 1822500,
-            "stone": 5467500,
-            "gold": 10935000
+            "food": 279183,
+            "lumber": 139592,
+            "stone": 418774,
+            "gold": 418774
           },
           "requirements": [
             {
@@ -391,13 +391,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 793800,
+          "time": 700000,
           "power": 251750,
           "resources": {
-            "food": 5287500,
-            "lumber": 2643750,
-            "stone": 7931250,
-            "gold": 15862500
+            "food": 364489,
+            "lumber": 182245,
+            "stone": 546733,
+            "gold": 546733
           },
           "requirements": [
             {
@@ -414,13 +414,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 1111320,
+          "time": 700000,
           "power": 351650,
           "resources": {
-            "food": 7402500,
-            "lumber": 3701250,
-            "stone": 11103750,
-            "gold": 22207500
+            "food": 510284,
+            "lumber": 255142,
+            "stone": 765426,
+            "gold": 765426
           },
           "requirements": [
             {
@@ -437,13 +437,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 1566432,
+          "time": 840000,
           "power": 471650,
           "resources": {
-            "food": 10656000,
-            "lumber": 5328000,
-            "stone": 15984000,
-            "gold": 31968000
+            "food": 661105,
+            "lumber": 330553,
+            "stone": 991657,
+            "gold": 991657
           },
           "requirements": [
             {
@@ -460,13 +460,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 2190888,
+          "time": 840000,
           "power": 613550,
           "resources": {
-            "food": 14904000,
-            "lumber": 7452000,
-            "stone": 22356000,
-            "gold": 44712000
+            "food": 924653,
+            "lumber": 462327,
+            "stone": 1386979,
+            "gold": 1386979
           },
           "requirements": [
             {
@@ -497,10 +497,10 @@
           "time": 138240,
           "power": 10400,
           "resources": {
-            "food": 720000,
-            "lumber": 360000,
-            "stone": 1080000,
-            "gold": 2160000
+            "food": 68083,
+            "lumber": 34042,
+            "stone": 102125,
+            "gold": 102125
           },
           "requirements": [
             {
@@ -520,10 +520,10 @@
           "time": 193536,
           "power": 22700,
           "resources": {
-            "food": 1008000,
-            "lumber": 504000,
-            "stone": 1512000,
-            "gold": 3024000
+            "food": 95317,
+            "lumber": 47659,
+            "stone": 142975,
+            "gold": 142975
           },
           "requirements": [
             {
@@ -543,10 +543,10 @@
           "time": 276480,
           "power": 52700,
           "resources": {
-            "food": 1500000,
-            "lumber": 750000,
-            "stone": 2250000,
-            "gold": 4500000
+            "food": 127656,
+            "lumber": 63828,
+            "stone": 191484,
+            "gold": 191484
           },
           "requirements": [
             {
@@ -566,10 +566,10 @@
           "time": 373248,
           "power": 87600,
           "resources": {
-            "food": 2025000,
-            "lumber": 1012500,
-            "stone": 3037500,
-            "gold": 6075000
+            "food": 172335,
+            "lumber": 86168,
+            "stone": 258503,
+            "gold": 258503
           },
           "requirements": [
             {
@@ -589,10 +589,10 @@
           "time": 525312,
           "power": 129800,
           "resources": {
-            "food": 2964000,
-            "lumber": 1482000,
-            "stone": 4446000,
-            "gold": 8892000
+            "food": 227023,
+            "lumber": 113512,
+            "stone": 340534,
+            "gold": 340534
           },
           "requirements": [
             {
@@ -609,13 +609,13 @@
         {
           "level": 6,
           "ability_value": 0.21,
-          "time": 746496,
+          "time": 583334,
           "power": 180100,
           "resources": {
-            "food": 4212000,
-            "lumber": 2106000,
-            "stone": 6318000,
-            "gold": 12636000
+            "food": 322611,
+            "lumber": 161306,
+            "stone": 483917,
+            "gold": 483917
           },
           "requirements": [
             {
@@ -632,13 +632,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 1036800,
+          "time": 700000,
           "power": 270700,
           "resources": {
-            "food": 6075000,
-            "lumber": 3037500,
-            "stone": 9112500,
-            "gold": 18225000
+            "food": 418774,
+            "lumber": 209387,
+            "stone": 628161,
+            "gold": 628161
           },
           "requirements": [
             {
@@ -655,13 +655,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 1451520,
+          "time": 700000,
           "power": 377800,
           "resources": {
-            "food": 8505000,
-            "lumber": 4252500,
-            "stone": 12757500,
-            "gold": 25515000
+            "food": 586284,
+            "lumber": 293142,
+            "stone": 879426,
+            "gold": 879426
           },
           "requirements": [
             {
@@ -678,13 +678,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 2045952,
+          "time": 840000,
           "power": 507400,
           "resources": {
-            "food": 12432000,
-            "lumber": 6216000,
-            "stone": 18648000,
-            "gold": 37296000
+            "food": 771289,
+            "lumber": 385645,
+            "stone": 1156933,
+            "gold": 1156933
           },
           "requirements": [
             {
@@ -701,13 +701,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 2861568,
+          "time": 840000,
           "power": 660550,
           "resources": {
-            "food": 17388000,
-            "lumber": 8694000,
-            "stone": 26082000,
-            "gold": 52164000
+            "food": 1078762,
+            "lumber": 539381,
+            "stone": 1618143,
+            "gold": 1618143
           },
           "requirements": [
             {
@@ -738,10 +738,10 @@
           "time": 65340,
           "power": 8600,
           "resources": {
-            "food": 247500,
-            "lumber": 742500,
-            "stone": 495000,
-            "gold": 1485000
+            "food": 26004,
+            "lumber": 78012,
+            "stone": 52008,
+            "gold": 78012
           },
           "requirements": [
             {
@@ -761,10 +761,10 @@
           "time": 91476,
           "power": 18800,
           "resources": {
-            "food": 346500,
-            "lumber": 1039500,
-            "stone": 693000,
-            "gold": 2079000
+            "food": 36406,
+            "lumber": 109217,
+            "stone": 72811,
+            "gold": 109217
           },
           "requirements": [
             {
@@ -784,10 +784,10 @@
           "time": 130680,
           "power": 43500,
           "resources": {
-            "food": 510000,
-            "lumber": 1530000,
-            "stone": 1020000,
-            "gold": 3060000
+            "food": 48226,
+            "lumber": 144677,
+            "stone": 96451,
+            "gold": 144677
           },
           "requirements": [
             {
@@ -807,10 +807,10 @@
           "time": 176418,
           "power": 72200,
           "resources": {
-            "food": 688500,
-            "lumber": 2065500,
-            "stone": 1377000,
-            "gold": 4131000
+            "food": 65105,
+            "lumber": 195313,
+            "stone": 130209,
+            "gold": 195313
           },
           "requirements": [
             {
@@ -830,10 +830,10 @@
           "time": 248292,
           "power": 106800,
           "resources": {
-            "food": 997500,
-            "lumber": 2992500,
-            "stone": 1995000,
-            "gold": 5985000
+            "food": 84891,
+            "lumber": 254673,
+            "stone": 169782,
+            "gold": 254673
           },
           "requirements": [
             {
@@ -853,10 +853,10 @@
           "time": 352836,
           "power": 148000,
           "resources": {
-            "food": 1417500,
-            "lumber": 4252500,
-            "stone": 2835000,
-            "gold": 8505000
+            "food": 120635,
+            "lumber": 361904,
+            "stone": 241269,
+            "gold": 361904
           },
           "requirements": [
             {
@@ -876,10 +876,10 @@
           "time": 490050,
           "power": 223000,
           "resources": {
-            "food": 2081250,
-            "lumber": 6243750,
-            "stone": 4162500,
-            "gold": 12487500
+            "food": 159410,
+            "lumber": 478230,
+            "stone": 318820,
+            "gold": 478230
           },
           "requirements": [
             {
@@ -896,13 +896,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 686070,
+          "time": 583334,
           "power": 311650,
           "resources": {
-            "food": 2913750,
-            "lumber": 8741250,
-            "stone": 5827500,
-            "gold": 17482500
+            "food": 223174,
+            "lumber": 669522,
+            "stone": 446348,
+            "gold": 669522
           },
           "requirements": [
             {
@@ -919,13 +919,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 967032,
+          "time": 700000,
           "power": 418300,
           "resources": {
-            "food": 4218000,
-            "lumber": 12654000,
-            "stone": 8436000,
-            "gold": 25308000
+            "food": 290764,
+            "lumber": 872291,
+            "stone": 581527,
+            "gold": 872291
           },
           "requirements": [
             {
@@ -942,13 +942,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 1352538,
+          "time": 700000,
           "power": 544450,
           "resources": {
-            "food": 5899500,
-            "lumber": 17698500,
-            "stone": 11799000,
-            "gold": 35397000
+            "food": 406676,
+            "lumber": 1220028,
+            "stone": 813352,
+            "gold": 1220028
           },
           "requirements": [
             {
@@ -979,10 +979,10 @@
           "time": 105840,
           "power": 9700,
           "resources": {
-            "food": 315000,
-            "lumber": 945000,
-            "stone": 630000,
-            "gold": 1890000
+            "food": 29787,
+            "lumber": 89359,
+            "stone": 59573,
+            "gold": 89359
           },
           "requirements": [
             {
@@ -1002,10 +1002,10 @@
           "time": 148176,
           "power": 21200,
           "resources": {
-            "food": 441000,
-            "lumber": 1323000,
-            "stone": 882000,
-            "gold": 2646000
+            "food": 41701,
+            "lumber": 125103,
+            "stone": 83402,
+            "gold": 125103
           },
           "requirements": [
             {
@@ -1025,10 +1025,10 @@
           "time": 211680,
           "power": 49000,
           "resources": {
-            "food": 645000,
-            "lumber": 1935000,
-            "stone": 1290000,
-            "gold": 3870000
+            "food": 54892,
+            "lumber": 164676,
+            "stone": 109784,
+            "gold": 164676
           },
           "requirements": [
             {
@@ -1048,10 +1048,10 @@
           "time": 285768,
           "power": 81300,
           "resources": {
-            "food": 870750,
-            "lumber": 2612250,
-            "stone": 1741500,
-            "gold": 5224500
+            "food": 74105,
+            "lumber": 222313,
+            "stone": 148209,
+            "gold": 222313
           },
           "requirements": [
             {
@@ -1071,10 +1071,10 @@
           "time": 402192,
           "power": 120500,
           "resources": {
-            "food": 1282500,
-            "lumber": 3847500,
-            "stone": 2565000,
-            "gold": 7695000
+            "food": 98231,
+            "lumber": 294693,
+            "stone": 196462,
+            "gold": 294693
           },
           "requirements": [
             {
@@ -1094,10 +1094,10 @@
           "time": 571536,
           "power": 167300,
           "resources": {
-            "food": 1822500,
-            "lumber": 5467500,
-            "stone": 3645000,
-            "gold": 10935000
+            "food": 139592,
+            "lumber": 418774,
+            "stone": 279183,
+            "gold": 418774
           },
           "requirements": [
             {
@@ -1114,13 +1114,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 793800,
+          "time": 700000,
           "power": 251750,
           "resources": {
-            "food": 2643750,
-            "lumber": 7931250,
-            "stone": 5287500,
-            "gold": 15862500
+            "food": 182245,
+            "lumber": 546733,
+            "stone": 364489,
+            "gold": 546733
           },
           "requirements": [
             {
@@ -1137,13 +1137,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 1111320,
+          "time": 700000,
           "power": 351650,
           "resources": {
-            "food": 3701250,
-            "lumber": 11103750,
-            "stone": 7402500,
-            "gold": 22207500
+            "food": 255142,
+            "lumber": 765426,
+            "stone": 510284,
+            "gold": 765426
           },
           "requirements": [
             {
@@ -1160,13 +1160,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 1566432,
+          "time": 840000,
           "power": 471650,
           "resources": {
-            "food": 5328000,
-            "lumber": 15984000,
-            "stone": 10656000,
-            "gold": 31968000
+            "food": 330553,
+            "lumber": 991657,
+            "stone": 661105,
+            "gold": 991657
           },
           "requirements": [
             {
@@ -1183,13 +1183,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 2190888,
+          "time": 840000,
           "power": 613550,
           "resources": {
-            "food": 7452000,
-            "lumber": 22356000,
-            "stone": 14904000,
-            "gold": 44712000
+            "food": 462327,
+            "lumber": 1386979,
+            "stone": 924653,
+            "gold": 1386979
           },
           "requirements": [
             {
@@ -1220,10 +1220,10 @@
           "time": 138240,
           "power": 10400,
           "resources": {
-            "food": 360000,
-            "lumber": 1080000,
-            "stone": 720000,
-            "gold": 2160000
+            "food": 34042,
+            "lumber": 102125,
+            "stone": 68083,
+            "gold": 102125
           },
           "requirements": [
             {
@@ -1243,10 +1243,10 @@
           "time": 193536,
           "power": 22700,
           "resources": {
-            "food": 504000,
-            "lumber": 1512000,
-            "stone": 1008000,
-            "gold": 3024000
+            "food": 47659,
+            "lumber": 142975,
+            "stone": 95317,
+            "gold": 142975
           },
           "requirements": [
             {
@@ -1266,10 +1266,10 @@
           "time": 276480,
           "power": 52700,
           "resources": {
-            "food": 750000,
-            "lumber": 2250000,
-            "stone": 1500000,
-            "gold": 4500000
+            "food": 63828,
+            "lumber": 191484,
+            "stone": 127656,
+            "gold": 191484
           },
           "requirements": [
             {
@@ -1289,10 +1289,10 @@
           "time": 373248,
           "power": 87600,
           "resources": {
-            "food": 1012500,
-            "lumber": 3037500,
-            "stone": 2025000,
-            "gold": 6075000
+            "food": 86168,
+            "lumber": 258503,
+            "stone": 172335,
+            "gold": 258503
           },
           "requirements": [
             {
@@ -1312,10 +1312,10 @@
           "time": 525312,
           "power": 129800,
           "resources": {
-            "food": 1482000,
-            "lumber": 4446000,
-            "stone": 2964000,
-            "gold": 8892000
+            "food": 113512,
+            "lumber": 340534,
+            "stone": 227023,
+            "gold": 340534
           },
           "requirements": [
             {
@@ -1332,13 +1332,13 @@
         {
           "level": 6,
           "ability_value": 0.21,
-          "time": 746496,
+          "time": 583334,
           "power": 180100,
           "resources": {
-            "food": 2106000,
-            "lumber": 6318000,
-            "stone": 4212000,
-            "gold": 12636000
+            "food": 161306,
+            "lumber": 483917,
+            "stone": 322611,
+            "gold": 483917
           },
           "requirements": [
             {
@@ -1355,13 +1355,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 1036800,
+          "time": 700000,
           "power": 270700,
           "resources": {
-            "food": 3037500,
-            "lumber": 9112500,
-            "stone": 6075000,
-            "gold": 18225000
+            "food": 209387,
+            "lumber": 628161,
+            "stone": 418774,
+            "gold": 628161
           },
           "requirements": [
             {
@@ -1378,13 +1378,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 1451520,
+          "time": 700000,
           "power": 377800,
           "resources": {
-            "food": 4252500,
-            "lumber": 12757500,
-            "stone": 8505000,
-            "gold": 25515000
+            "food": 293142,
+            "lumber": 879426,
+            "stone": 586284,
+            "gold": 879426
           },
           "requirements": [
             {
@@ -1401,13 +1401,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 2045952,
+          "time": 840000,
           "power": 507400,
           "resources": {
-            "food": 6216000,
-            "lumber": 18648000,
-            "stone": 12432000,
-            "gold": 37296000
+            "food": 385645,
+            "lumber": 1156933,
+            "stone": 771289,
+            "gold": 1156933
           },
           "requirements": [
             {
@@ -1424,13 +1424,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 2861568,
+          "time": 840000,
           "power": 660550,
           "resources": {
-            "food": 8694000,
-            "lumber": 26082000,
-            "stone": 17388000,
-            "gold": 52164000
+            "food": 539381,
+            "lumber": 1618143,
+            "stone": 1078762,
+            "gold": 1618143
           },
           "requirements": [
             {
@@ -1461,10 +1461,10 @@
           "time": 65340,
           "power": 8600,
           "resources": {
-            "food": 742500,
-            "lumber": 495000,
-            "stone": 247500,
-            "gold": 1485000
+            "food": 78012,
+            "lumber": 52008,
+            "stone": 26004,
+            "gold": 78012
           },
           "requirements": [
             {
@@ -1484,10 +1484,10 @@
           "time": 91476,
           "power": 18800,
           "resources": {
-            "food": 1039500,
-            "lumber": 693000,
-            "stone": 346500,
-            "gold": 2079000
+            "food": 109217,
+            "lumber": 72811,
+            "stone": 36406,
+            "gold": 109217
           },
           "requirements": [
             {
@@ -1507,10 +1507,10 @@
           "time": 130680,
           "power": 43500,
           "resources": {
-            "food": 1530000,
-            "lumber": 1020000,
-            "stone": 510000,
-            "gold": 3060000
+            "food": 144677,
+            "lumber": 96451,
+            "stone": 48226,
+            "gold": 144677
           },
           "requirements": [
             {
@@ -1530,10 +1530,10 @@
           "time": 176418,
           "power": 72200,
           "resources": {
-            "food": 2065500,
-            "lumber": 1377000,
-            "stone": 688500,
-            "gold": 4131000
+            "food": 195313,
+            "lumber": 130209,
+            "stone": 65105,
+            "gold": 195313
           },
           "requirements": [
             {
@@ -1553,10 +1553,10 @@
           "time": 248292,
           "power": 106800,
           "resources": {
-            "food": 2992500,
-            "lumber": 1995000,
-            "stone": 997500,
-            "gold": 5985000
+            "food": 254673,
+            "lumber": 169782,
+            "stone": 84891,
+            "gold": 254673
           },
           "requirements": [
             {
@@ -1576,10 +1576,10 @@
           "time": 352836,
           "power": 148000,
           "resources": {
-            "food": 4252500,
-            "lumber": 2835000,
-            "stone": 1417500,
-            "gold": 8505000
+            "food": 361904,
+            "lumber": 241269,
+            "stone": 120635,
+            "gold": 361904
           },
           "requirements": [
             {
@@ -1599,10 +1599,10 @@
           "time": 490050,
           "power": 223000,
           "resources": {
-            "food": 6243750,
-            "lumber": 4162500,
-            "stone": 2081250,
-            "gold": 12487500
+            "food": 478230,
+            "lumber": 318820,
+            "stone": 159410,
+            "gold": 478230
           },
           "requirements": [
             {
@@ -1619,13 +1619,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 686070,
+          "time": 583334,
           "power": 311650,
           "resources": {
-            "food": 8741250,
-            "lumber": 5827500,
-            "stone": 2913750,
-            "gold": 17482500
+            "food": 669522,
+            "lumber": 446348,
+            "stone": 223174,
+            "gold": 669522
           },
           "requirements": [
             {
@@ -1642,13 +1642,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 967032,
+          "time": 700000,
           "power": 418300,
           "resources": {
-            "food": 12654000,
-            "lumber": 8436000,
-            "stone": 4218000,
-            "gold": 25308000
+            "food": 872291,
+            "lumber": 581527,
+            "stone": 290764,
+            "gold": 872291
           },
           "requirements": [
             {
@@ -1665,13 +1665,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 1352538,
+          "time": 700000,
           "power": 544450,
           "resources": {
-            "food": 17698500,
-            "lumber": 11799000,
-            "stone": 5899500,
-            "gold": 35397000
+            "food": 1220028,
+            "lumber": 813352,
+            "stone": 406676,
+            "gold": 1220028
           },
           "requirements": [
             {
@@ -1702,10 +1702,10 @@
           "time": 105840,
           "power": 9700,
           "resources": {
-            "food": 945000,
-            "lumber": 630000,
-            "stone": 315000,
-            "gold": 1890000
+            "food": 89359,
+            "lumber": 59573,
+            "stone": 29787,
+            "gold": 89359
           },
           "requirements": [
             {
@@ -1725,10 +1725,10 @@
           "time": 148176,
           "power": 21200,
           "resources": {
-            "food": 1323000,
-            "lumber": 882000,
-            "stone": 441000,
-            "gold": 2646000
+            "food": 125103,
+            "lumber": 83402,
+            "stone": 41701,
+            "gold": 125103
           },
           "requirements": [
             {
@@ -1748,10 +1748,10 @@
           "time": 211680,
           "power": 49000,
           "resources": {
-            "food": 1935000,
-            "lumber": 1290000,
-            "stone": 645000,
-            "gold": 3870000
+            "food": 164676,
+            "lumber": 109784,
+            "stone": 54892,
+            "gold": 164676
           },
           "requirements": [
             {
@@ -1771,10 +1771,10 @@
           "time": 285768,
           "power": 81300,
           "resources": {
-            "food": 2612250,
-            "lumber": 1741500,
-            "stone": 870750,
-            "gold": 5224500
+            "food": 222313,
+            "lumber": 148209,
+            "stone": 74105,
+            "gold": 222313
           },
           "requirements": [
             {
@@ -1794,10 +1794,10 @@
           "time": 402192,
           "power": 120500,
           "resources": {
-            "food": 3847500,
-            "lumber": 2565000,
-            "stone": 1282500,
-            "gold": 7695000
+            "food": 294693,
+            "lumber": 196462,
+            "stone": 98231,
+            "gold": 294693
           },
           "requirements": [
             {
@@ -1817,10 +1817,10 @@
           "time": 571536,
           "power": 167300,
           "resources": {
-            "food": 5467500,
-            "lumber": 3645000,
-            "stone": 1822500,
-            "gold": 10935000
+            "food": 418774,
+            "lumber": 279183,
+            "stone": 139592,
+            "gold": 418774
           },
           "requirements": [
             {
@@ -1837,13 +1837,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 793800,
+          "time": 700000,
           "power": 251750,
           "resources": {
-            "food": 7931250,
-            "lumber": 5287500,
-            "stone": 2643750,
-            "gold": 15862500
+            "food": 546733,
+            "lumber": 364489,
+            "stone": 182245,
+            "gold": 546733
           },
           "requirements": [
             {
@@ -1860,13 +1860,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 1111320,
+          "time": 700000,
           "power": 351650,
           "resources": {
-            "food": 11103750,
-            "lumber": 7402500,
-            "stone": 3701250,
-            "gold": 22207500
+            "food": 765426,
+            "lumber": 510284,
+            "stone": 255142,
+            "gold": 765426
           },
           "requirements": [
             {
@@ -1883,13 +1883,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 1566432,
+          "time": 840000,
           "power": 471650,
           "resources": {
-            "food": 15984000,
-            "lumber": 10656000,
-            "stone": 5328000,
-            "gold": 31968000
+            "food": 991657,
+            "lumber": 661105,
+            "stone": 330553,
+            "gold": 991657
           },
           "requirements": [
             {
@@ -1906,13 +1906,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 2190888,
+          "time": 840000,
           "power": 613550,
           "resources": {
-            "food": 22356000,
-            "lumber": 14904000,
-            "stone": 7452000,
-            "gold": 44712000
+            "food": 1386979,
+            "lumber": 924653,
+            "stone": 462327,
+            "gold": 1386979
           },
           "requirements": [
             {
@@ -1943,10 +1943,10 @@
           "time": 138240,
           "power": 10400,
           "resources": {
-            "food": 1080000,
-            "lumber": 720000,
-            "stone": 360000,
-            "gold": 2160000
+            "food": 102125,
+            "lumber": 68083,
+            "stone": 34042,
+            "gold": 102125
           },
           "requirements": [
             {
@@ -1966,10 +1966,10 @@
           "time": 193536,
           "power": 22700,
           "resources": {
-            "food": 1512000,
-            "lumber": 1008000,
-            "stone": 504000,
-            "gold": 3024000
+            "food": 142975,
+            "lumber": 95317,
+            "stone": 47659,
+            "gold": 142975
           },
           "requirements": [
             {
@@ -1989,10 +1989,10 @@
           "time": 276480,
           "power": 52700,
           "resources": {
-            "food": 2250000,
-            "lumber": 1500000,
-            "stone": 750000,
-            "gold": 4500000
+            "food": 191484,
+            "lumber": 127656,
+            "stone": 63828,
+            "gold": 191484
           },
           "requirements": [
             {
@@ -2012,10 +2012,10 @@
           "time": 373248,
           "power": 87600,
           "resources": {
-            "food": 3037500,
-            "lumber": 2025000,
-            "stone": 1012500,
-            "gold": 6075000
+            "food": 258503,
+            "lumber": 172335,
+            "stone": 86168,
+            "gold": 258503
           },
           "requirements": [
             {
@@ -2035,10 +2035,10 @@
           "time": 525312,
           "power": 129800,
           "resources": {
-            "food": 4446000,
-            "lumber": 2964000,
-            "stone": 1482000,
-            "gold": 8892000
+            "food": 340534,
+            "lumber": 227023,
+            "stone": 113512,
+            "gold": 340534
           },
           "requirements": [
             {
@@ -2055,13 +2055,13 @@
         {
           "level": 6,
           "ability_value": 0.21,
-          "time": 746496,
+          "time": 583334,
           "power": 180100,
           "resources": {
-            "food": 6318000,
-            "lumber": 4212000,
-            "stone": 2106000,
-            "gold": 12636000
+            "food": 483917,
+            "lumber": 322611,
+            "stone": 161306,
+            "gold": 483917
           },
           "requirements": [
             {
@@ -2078,13 +2078,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 1036800,
+          "time": 700000,
           "power": 270700,
           "resources": {
-            "food": 9112500,
-            "lumber": 6075000,
-            "stone": 3037500,
-            "gold": 18225000
+            "food": 628161,
+            "lumber": 418774,
+            "stone": 209387,
+            "gold": 628161
           },
           "requirements": [
             {
@@ -2101,13 +2101,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 1451520,
+          "time": 700000,
           "power": 377800,
           "resources": {
-            "food": 12757500,
-            "lumber": 8505000,
-            "stone": 4252500,
-            "gold": 25515000
+            "food": 879426,
+            "lumber": 586284,
+            "stone": 293142,
+            "gold": 879426
           },
           "requirements": [
             {
@@ -2124,13 +2124,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 2045952,
+          "time": 840000,
           "power": 507400,
           "resources": {
-            "food": 18648000,
-            "lumber": 12432000,
-            "stone": 6216000,
-            "gold": 37296000
+            "food": 1156933,
+            "lumber": 771289,
+            "stone": 385645,
+            "gold": 1156933
           },
           "requirements": [
             {
@@ -2147,13 +2147,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 2861568,
+          "time": 840000,
           "power": 660550,
           "resources": {
-            "food": 26082000,
-            "lumber": 17388000,
-            "stone": 8694000,
-            "gold": 52164000
+            "food": 1618143,
+            "lumber": 1078762,
+            "stone": 539381,
+            "gold": 1618143
           },
           "requirements": [
             {
@@ -2184,10 +2184,10 @@
           "time": 223260,
           "power": 11700,
           "resources": {
-            "food": 915000,
-            "lumber": 457500,
-            "stone": 1372500,
-            "gold": 2745000
+            "food": 77870,
+            "lumber": 38935,
+            "stone": 116805,
+            "gold": 116805
           },
           "requirements": [
             {
@@ -2207,10 +2207,10 @@
           "time": 312564,
           "power": 25550,
           "resources": {
-            "food": 1281000,
-            "lumber": 640500,
-            "stone": 1921500,
-            "gold": 3843000
+            "food": 109018,
+            "lumber": 54509,
+            "stone": 163527,
+            "gold": 163527
           },
           "requirements": [
             {
@@ -2230,10 +2230,10 @@
           "time": 446520,
           "power": 59450,
           "resources": {
-            "food": 1920000,
-            "lumber": 960000,
-            "stone": 2880000,
-            "gold": 5760000
+            "food": 147060,
+            "lumber": 73530,
+            "stone": 220589,
+            "gold": 220589
           },
           "requirements": [
             {
@@ -2250,13 +2250,13 @@
         {
           "level": 4,
           "ability_value": 0.13,
-          "time": 602802,
+          "time": 583334,
           "power": 98850,
           "resources": {
-            "food": 2592000,
-            "lumber": 1296000,
-            "stone": 3888000,
-            "gold": 7776000
+            "food": 198530,
+            "lumber": 99265,
+            "stone": 297795,
+            "gold": 297795
           },
           "requirements": [
             {
@@ -2273,13 +2273,13 @@
         {
           "level": 5,
           "ability_value": 0.17,
-          "time": 848388,
+          "time": 700000,
           "power": 146350,
           "resources": {
-            "food": 3762000,
-            "lumber": 1881000,
-            "stone": 5643000,
-            "gold": 11286000
+            "food": 259330,
+            "lumber": 129665,
+            "stone": 388995,
+            "gold": 388995
           },
           "requirements": [
             {
@@ -2296,13 +2296,13 @@
         {
           "level": 6,
           "ability_value": 0.21,
-          "time": 1205604,
+          "time": 700000,
           "power": 202950,
           "resources": {
-            "food": 5346000,
-            "lumber": 2673000,
-            "stone": 8019000,
-            "gold": 16038000
+            "food": 368521,
+            "lumber": 184261,
+            "stone": 552782,
+            "gold": 552782
           },
           "requirements": [
             {
@@ -2319,13 +2319,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 1674450,
+          "time": 840000,
           "power": 305250,
           "resources": {
-            "food": 7762500,
-            "lumber": 3881250,
-            "stone": 11643750,
-            "gold": 23287500
+            "food": 481590,
+            "lumber": 240795,
+            "stone": 722385,
+            "gold": 722385
           },
           "requirements": [
             {
@@ -2342,13 +2342,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 2344230,
+          "time": 840000,
           "power": 426300,
           "resources": {
-            "food": 10867500,
-            "lumber": 5433750,
-            "stone": 16301250,
-            "gold": 32602500
+            "food": 674226,
+            "lumber": 337113,
+            "stone": 1011339,
+            "gold": 1011339
           },
           "requirements": [
             {
@@ -2365,13 +2365,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 3304248,
+          "time": 1008000,
           "power": 572100,
           "resources": {
-            "food": 15762000,
-            "lumber": 7881000,
-            "stone": 23643000,
-            "gold": 47286000
+            "food": 880096,
+            "lumber": 440048,
+            "stone": 1320143,
+            "gold": 1320143
           },
           "requirements": [
             {
@@ -2388,13 +2388,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 4621482,
+          "time": 1008000,
           "power": 744600,
           "resources": {
-            "food": 22045500,
-            "lumber": 11022750,
-            "stone": 33068250,
-            "gold": 66136500
+            "food": 1230944,
+            "lumber": 615472,
+            "stone": 1846416,
+            "gold": 1846416
           },
           "requirements": [
             {
@@ -2425,10 +2425,10 @@
           "time": 285660,
           "power": 12450,
           "resources": {
-            "food": 1035000,
-            "lumber": 517500,
-            "stone": 1552500,
-            "gold": 3105000
+            "food": 79275,
+            "lumber": 39638,
+            "stone": 118912,
+            "gold": 118912
           },
           "requirements": [
             {
@@ -2448,10 +2448,10 @@
           "time": 399924,
           "power": 27200,
           "resources": {
-            "food": 1449000,
-            "lumber": 724500,
-            "stone": 2173500,
-            "gold": 4347000
+            "food": 110984,
+            "lumber": 55492,
+            "stone": 166476,
+            "gold": 166476
           },
           "requirements": [
             {
@@ -2471,10 +2471,10 @@
           "time": 571320,
           "power": 62900,
           "resources": {
-            "food": 2130000,
-            "lumber": 1065000,
-            "stone": 3195000,
-            "gold": 6390000
+            "food": 146830,
+            "lumber": 73415,
+            "stone": 220245,
+            "gold": 220245
           },
           "requirements": [
             {
@@ -2491,13 +2491,13 @@
         {
           "level": 4,
           "ability_value": 0.13,
-          "time": 771282,
+          "time": 700000,
           "power": 104400,
           "resources": {
-            "food": 2875500,
-            "lumber": 1437750,
-            "stone": 4313250,
-            "gold": 8626500
+            "food": 198220,
+            "lumber": 99110,
+            "stone": 297330,
+            "gold": 297330
           },
           "requirements": [
             {
@@ -2514,13 +2514,13 @@
         {
           "level": 5,
           "ability_value": 0.17,
-          "time": 1085508,
+          "time": 840000,
           "power": 154700,
           "resources": {
-            "food": 4218000,
-            "lumber": 2109000,
-            "stone": 6327000,
-            "gold": 12654000
+            "food": 261688,
+            "lumber": 130844,
+            "stone": 392531,
+            "gold": 392531
           },
           "requirements": [
             {
@@ -2537,13 +2537,13 @@
         {
           "level": 6,
           "ability_value": 0.21,
-          "time": 1542564,
+          "time": 840000,
           "power": 214700,
           "resources": {
-            "food": 5994000,
-            "lumber": 2997000,
-            "stone": 8991000,
-            "gold": 17982000
+            "food": 371872,
+            "lumber": 185936,
+            "stone": 557807,
+            "gold": 557807
           },
           "requirements": [
             {
@@ -2560,13 +2560,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 2142450,
+          "time": 1008000,
           "power": 322850,
           "resources": {
-            "food": 8662500,
-            "lumber": 4331250,
-            "stone": 12993750,
-            "gold": 25987500
+            "food": 483684,
+            "lumber": 241842,
+            "stone": 725526,
+            "gold": 725526
           },
           "requirements": [
             {
@@ -2583,13 +2583,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 2999430,
+          "time": 1008000,
           "power": 450800,
           "resources": {
-            "food": 12127500,
-            "lumber": 6063750,
-            "stone": 18191250,
-            "gold": 36382500
+            "food": 677158,
+            "lumber": 338579,
+            "stone": 1015736,
+            "gold": 1015736
           },
           "requirements": [
             {
@@ -2606,13 +2606,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 4227768,
+          "time": 1209600,
           "power": 604700,
           "resources": {
-            "food": 17538000,
-            "lumber": 8769000,
-            "stone": 26307000,
-            "gold": 52614000
+            "food": 881335,
+            "lumber": 440668,
+            "stone": 1322002,
+            "gold": 1322002
           },
           "requirements": [
             {
@@ -2629,13 +2629,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 5913162,
+          "time": 1209600,
           "power": 786650,
           "resources": {
-            "food": 24529500,
-            "lumber": 12264750,
-            "stone": 36794250,
-            "gold": 73588500
+            "food": 1232678,
+            "lumber": 616339,
+            "stone": 1849017,
+            "gold": 1849017
           },
           "requirements": [
             {
@@ -2666,10 +2666,10 @@
           "time": 328560,
           "power": 12900,
           "resources": {
-            "food": 1110000,
-            "lumber": 555000,
-            "stone": 1665000,
-            "gold": 3330000
+            "food": 85019,
+            "lumber": 42510,
+            "stone": 127528,
+            "gold": 127528
           },
           "requirements": [
             {
@@ -2689,10 +2689,10 @@
           "time": 459984,
           "power": 28150,
           "resources": {
-            "food": 1554000,
-            "lumber": 777000,
-            "stone": 2331000,
-            "gold": 4662000
+            "food": 119026,
+            "lumber": 59513,
+            "stone": 178539,
+            "gold": 178539
           },
           "requirements": [
             {
@@ -2712,10 +2712,10 @@
           "time": 657120,
           "power": 65150,
           "resources": {
-            "food": 2280000,
-            "lumber": 1140000,
-            "stone": 3420000,
-            "gold": 6840000
+            "food": 157170,
+            "lumber": 78585,
+            "stone": 235755,
+            "gold": 235755
           },
           "requirements": [
             {
@@ -2732,13 +2732,13 @@
         {
           "level": 4,
           "ability_value": 0.13,
-          "time": 887112,
+          "time": 700000,
           "power": 108150,
           "resources": {
-            "food": 3078000,
-            "lumber": 1539000,
-            "stone": 4617000,
-            "gold": 9234000
+            "food": 212179,
+            "lumber": 106090,
+            "stone": 318269,
+            "gold": 318269
           },
           "requirements": [
             {
@@ -2755,13 +2755,13 @@
         {
           "level": 5,
           "ability_value": 0.17,
-          "time": 1248528,
+          "time": 840000,
           "power": 160150,
           "resources": {
-            "food": 4503000,
-            "lumber": 2251500,
-            "stone": 6754500,
-            "gold": 13509000
+            "food": 279369,
+            "lumber": 139685,
+            "stone": 419054,
+            "gold": 419054
           },
           "requirements": [
             {
@@ -2778,13 +2778,13 @@
         {
           "level": 6,
           "ability_value": 0.21,
-          "time": 1774224,
+          "time": 840000,
           "power": 222150,
           "resources": {
-            "food": 6399000,
-            "lumber": 3199500,
-            "stone": 9598500,
-            "gold": 19197000
+            "food": 396998,
+            "lumber": 198499,
+            "stone": 595497,
+            "gold": 595497
           },
           "requirements": [
             {
@@ -2801,13 +2801,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 2464200,
+          "time": 1008000,
           "power": 333750,
           "resources": {
-            "food": 9225000,
-            "lumber": 4612500,
-            "stone": 13837500,
-            "gold": 27675000
+            "food": 515092,
+            "lumber": 257546,
+            "stone": 772638,
+            "gold": 772638
           },
           "requirements": [
             {
@@ -2824,13 +2824,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 3449880,
+          "time": 1008000,
           "power": 465750,
           "resources": {
-            "food": 12915000,
-            "lumber": 6457500,
-            "stone": 19372500,
-            "gold": 38745000
+            "food": 721129,
+            "lumber": 360565,
+            "stone": 1081693,
+            "gold": 1081693
           },
           "requirements": [
             {
@@ -2847,13 +2847,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 4862688,
+          "time": 1209600,
           "power": 625350,
           "resources": {
-            "food": 18870000,
-            "lumber": 9435000,
-            "stone": 28305000,
-            "gold": 56610000
+            "food": 948272,
+            "lumber": 474136,
+            "stone": 1422408,
+            "gold": 1422408
           },
           "requirements": [
             {
@@ -2870,13 +2870,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 6801192,
+          "time": 1209600,
           "power": 814050,
           "resources": {
-            "food": 26392500,
-            "lumber": 13196250,
-            "stone": 39588750,
-            "gold": 79177500
+            "food": 1326299,
+            "lumber": 663150,
+            "stone": 1989448,
+            "gold": 1989448
           },
           "requirements": [
             {
@@ -2907,10 +2907,10 @@
           "time": 223260,
           "power": 11700,
           "resources": {
-            "food": 457500,
-            "lumber": 1372500,
-            "stone": 915000,
-            "gold": 2745000
+            "food": 38935,
+            "lumber": 116805,
+            "stone": 77870,
+            "gold": 116805
           },
           "requirements": [
             {
@@ -2930,10 +2930,10 @@
           "time": 312564,
           "power": 25550,
           "resources": {
-            "food": 640500,
-            "lumber": 1921500,
-            "stone": 1281000,
-            "gold": 3843000
+            "food": 54509,
+            "lumber": 163527,
+            "stone": 109018,
+            "gold": 163527
           },
           "requirements": [
             {
@@ -2953,10 +2953,10 @@
           "time": 446520,
           "power": 59450,
           "resources": {
-            "food": 960000,
-            "lumber": 2880000,
-            "stone": 1920000,
-            "gold": 5760000
+            "food": 73530,
+            "lumber": 220589,
+            "stone": 147060,
+            "gold": 220589
           },
           "requirements": [
             {
@@ -2973,13 +2973,13 @@
         {
           "level": 4,
           "ability_value": 0.13,
-          "time": 602802,
+          "time": 583334,
           "power": 98850,
           "resources": {
-            "food": 1296000,
-            "lumber": 3888000,
-            "stone": 2592000,
-            "gold": 7776000
+            "food": 99265,
+            "lumber": 297795,
+            "stone": 198530,
+            "gold": 297795
           },
           "requirements": [
             {
@@ -2996,13 +2996,13 @@
         {
           "level": 5,
           "ability_value": 0.17,
-          "time": 848388,
+          "time": 700000,
           "power": 146350,
           "resources": {
-            "food": 1881000,
-            "lumber": 5643000,
-            "stone": 3762000,
-            "gold": 11286000
+            "food": 129665,
+            "lumber": 388995,
+            "stone": 259330,
+            "gold": 388995
           },
           "requirements": [
             {
@@ -3019,13 +3019,13 @@
         {
           "level": 6,
           "ability_value": 0.21,
-          "time": 1205604,
+          "time": 700000,
           "power": 202950,
           "resources": {
-            "food": 2673000,
-            "lumber": 8019000,
-            "stone": 5346000,
-            "gold": 16038000
+            "food": 184261,
+            "lumber": 552782,
+            "stone": 368521,
+            "gold": 552782
           },
           "requirements": [
             {
@@ -3042,13 +3042,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 1674450,
+          "time": 840000,
           "power": 305250,
           "resources": {
-            "food": 3881250,
-            "lumber": 11643750,
-            "stone": 7762500,
-            "gold": 23287500
+            "food": 240795,
+            "lumber": 722385,
+            "stone": 481590,
+            "gold": 722385
           },
           "requirements": [
             {
@@ -3065,13 +3065,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 2344230,
+          "time": 840000,
           "power": 426300,
           "resources": {
-            "food": 5433750,
-            "lumber": 16301250,
-            "stone": 10867500,
-            "gold": 32602500
+            "food": 337113,
+            "lumber": 1011339,
+            "stone": 674226,
+            "gold": 1011339
           },
           "requirements": [
             {
@@ -3088,13 +3088,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 3304248,
+          "time": 1008000,
           "power": 572100,
           "resources": {
-            "food": 7881000,
-            "lumber": 23643000,
-            "stone": 15762000,
-            "gold": 47286000
+            "food": 440048,
+            "lumber": 1320143,
+            "stone": 880096,
+            "gold": 1320143
           },
           "requirements": [
             {
@@ -3111,13 +3111,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 4621482,
+          "time": 1008000,
           "power": 744600,
           "resources": {
-            "food": 11022750,
-            "lumber": 33068250,
-            "stone": 22045500,
-            "gold": 66136500
+            "food": 615472,
+            "lumber": 1846416,
+            "stone": 1230944,
+            "gold": 1846416
           },
           "requirements": [
             {
@@ -3148,10 +3148,10 @@
           "time": 285660,
           "power": 12450,
           "resources": {
-            "food": 517500,
-            "lumber": 1552500,
-            "stone": 1035000,
-            "gold": 3105000
+            "food": 39638,
+            "lumber": 118912,
+            "stone": 79275,
+            "gold": 118912
           },
           "requirements": [
             {
@@ -3171,10 +3171,10 @@
           "time": 399924,
           "power": 27200,
           "resources": {
-            "food": 724500,
-            "lumber": 2173500,
-            "stone": 1449000,
-            "gold": 4347000
+            "food": 55492,
+            "lumber": 166476,
+            "stone": 110984,
+            "gold": 166476
           },
           "requirements": [
             {
@@ -3194,10 +3194,10 @@
           "time": 571320,
           "power": 62900,
           "resources": {
-            "food": 1065000,
-            "lumber": 3195000,
-            "stone": 2130000,
-            "gold": 6390000
+            "food": 73415,
+            "lumber": 220245,
+            "stone": 146830,
+            "gold": 220245
           },
           "requirements": [
             {
@@ -3214,13 +3214,13 @@
         {
           "level": 4,
           "ability_value": 0.13,
-          "time": 771282,
+          "time": 700000,
           "power": 104400,
           "resources": {
-            "food": 1437750,
-            "lumber": 4313250,
-            "stone": 2875500,
-            "gold": 8626500
+            "food": 99110,
+            "lumber": 297330,
+            "stone": 198220,
+            "gold": 297330
           },
           "requirements": [
             {
@@ -3237,13 +3237,13 @@
         {
           "level": 5,
           "ability_value": 0.17,
-          "time": 1085508,
+          "time": 840000,
           "power": 154700,
           "resources": {
-            "food": 2109000,
-            "lumber": 6327000,
-            "stone": 4218000,
-            "gold": 12654000
+            "food": 130844,
+            "lumber": 392531,
+            "stone": 261688,
+            "gold": 392531
           },
           "requirements": [
             {
@@ -3260,13 +3260,13 @@
         {
           "level": 6,
           "ability_value": 0.21,
-          "time": 1542564,
+          "time": 840000,
           "power": 214700,
           "resources": {
-            "food": 2997000,
-            "lumber": 8991000,
-            "stone": 5994000,
-            "gold": 17982000
+            "food": 185936,
+            "lumber": 557807,
+            "stone": 371872,
+            "gold": 557807
           },
           "requirements": [
             {
@@ -3283,13 +3283,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 2142450,
+          "time": 1008000,
           "power": 322850,
           "resources": {
-            "food": 4331250,
-            "lumber": 12993750,
-            "stone": 8662500,
-            "gold": 25987500
+            "food": 241842,
+            "lumber": 725526,
+            "stone": 483684,
+            "gold": 725526
           },
           "requirements": [
             {
@@ -3306,13 +3306,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 2999430,
+          "time": 1008000,
           "power": 450800,
           "resources": {
-            "food": 6063750,
-            "lumber": 18191250,
-            "stone": 12127500,
-            "gold": 36382500
+            "food": 338579,
+            "lumber": 1015736,
+            "stone": 677158,
+            "gold": 1015736
           },
           "requirements": [
             {
@@ -3329,13 +3329,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 4227768,
+          "time": 1209600,
           "power": 604700,
           "resources": {
-            "food": 8769000,
-            "lumber": 26307000,
-            "stone": 17538000,
-            "gold": 52614000
+            "food": 440668,
+            "lumber": 1322002,
+            "stone": 881335,
+            "gold": 1322002
           },
           "requirements": [
             {
@@ -3352,13 +3352,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 5913162,
+          "time": 1209600,
           "power": 786650,
           "resources": {
-            "food": 12264750,
-            "lumber": 36794250,
-            "stone": 24529500,
-            "gold": 73588500
+            "food": 616339,
+            "lumber": 1849017,
+            "stone": 1232678,
+            "gold": 1849017
           },
           "requirements": [
             {
@@ -3389,10 +3389,10 @@
           "time": 328560,
           "power": 12900,
           "resources": {
-            "food": 555000,
-            "lumber": 1665000,
-            "stone": 1110000,
-            "gold": 3330000
+            "food": 42510,
+            "lumber": 127528,
+            "stone": 85019,
+            "gold": 127528
           },
           "requirements": [
             {
@@ -3412,10 +3412,10 @@
           "time": 459984,
           "power": 28150,
           "resources": {
-            "food": 777000,
-            "lumber": 2331000,
-            "stone": 1554000,
-            "gold": 4662000
+            "food": 59513,
+            "lumber": 178539,
+            "stone": 119026,
+            "gold": 178539
           },
           "requirements": [
             {
@@ -3435,10 +3435,10 @@
           "time": 657120,
           "power": 65150,
           "resources": {
-            "food": 1140000,
-            "lumber": 3420000,
-            "stone": 2280000,
-            "gold": 6840000
+            "food": 78585,
+            "lumber": 235755,
+            "stone": 157170,
+            "gold": 235755
           },
           "requirements": [
             {
@@ -3455,13 +3455,13 @@
         {
           "level": 4,
           "ability_value": 0.13,
-          "time": 887112,
+          "time": 700000,
           "power": 108150,
           "resources": {
-            "food": 1539000,
-            "lumber": 4617000,
-            "stone": 3078000,
-            "gold": 9234000
+            "food": 106090,
+            "lumber": 318269,
+            "stone": 212179,
+            "gold": 318269
           },
           "requirements": [
             {
@@ -3478,13 +3478,13 @@
         {
           "level": 5,
           "ability_value": 0.17,
-          "time": 1248528,
+          "time": 840000,
           "power": 160150,
           "resources": {
-            "food": 2251500,
-            "lumber": 6754500,
-            "stone": 4503000,
-            "gold": 13509000
+            "food": 139685,
+            "lumber": 419054,
+            "stone": 279369,
+            "gold": 419054
           },
           "requirements": [
             {
@@ -3501,13 +3501,13 @@
         {
           "level": 6,
           "ability_value": 0.21,
-          "time": 1774224,
+          "time": 840000,
           "power": 222150,
           "resources": {
-            "food": 3199500,
-            "lumber": 9598500,
-            "stone": 6399000,
-            "gold": 19197000
+            "food": 198499,
+            "lumber": 595497,
+            "stone": 396998,
+            "gold": 595497
           },
           "requirements": [
             {
@@ -3524,13 +3524,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 2464200,
+          "time": 1008000,
           "power": 333750,
           "resources": {
-            "food": 4612500,
-            "lumber": 13837500,
-            "stone": 9225000,
-            "gold": 27675000
+            "food": 257546,
+            "lumber": 772638,
+            "stone": 515092,
+            "gold": 772638
           },
           "requirements": [
             {
@@ -3547,13 +3547,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 3449880,
+          "time": 1008000,
           "power": 465750,
           "resources": {
-            "food": 6457500,
-            "lumber": 19372500,
-            "stone": 12915000,
-            "gold": 38745000
+            "food": 360565,
+            "lumber": 1081693,
+            "stone": 721129,
+            "gold": 1081693
           },
           "requirements": [
             {
@@ -3570,13 +3570,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 4862688,
+          "time": 1209600,
           "power": 625350,
           "resources": {
-            "food": 9435000,
-            "lumber": 28305000,
-            "stone": 18870000,
-            "gold": 56610000
+            "food": 474136,
+            "lumber": 1422408,
+            "stone": 948272,
+            "gold": 1422408
           },
           "requirements": [
             {
@@ -3593,13 +3593,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 6801192,
+          "time": 1209600,
           "power": 814050,
           "resources": {
-            "food": 13196250,
-            "lumber": 39588750,
-            "stone": 26392500,
-            "gold": 79177500
+            "food": 663150,
+            "lumber": 1989448,
+            "stone": 1326299,
+            "gold": 1989448
           },
           "requirements": [
             {
@@ -3630,10 +3630,10 @@
           "time": 223260,
           "power": 11700,
           "resources": {
-            "food": 1372500,
-            "lumber": 915000,
-            "stone": 457500,
-            "gold": 2745000
+            "food": 116805,
+            "lumber": 77870,
+            "stone": 38935,
+            "gold": 116805
           },
           "requirements": [
             {
@@ -3653,10 +3653,10 @@
           "time": 312564,
           "power": 25550,
           "resources": {
-            "food": 1921500,
-            "lumber": 1281000,
-            "stone": 640500,
-            "gold": 3843000
+            "food": 163527,
+            "lumber": 109018,
+            "stone": 54509,
+            "gold": 163527
           },
           "requirements": [
             {
@@ -3676,10 +3676,10 @@
           "time": 446520,
           "power": 59450,
           "resources": {
-            "food": 2880000,
-            "lumber": 1920000,
-            "stone": 960000,
-            "gold": 5760000
+            "food": 220589,
+            "lumber": 147060,
+            "stone": 73530,
+            "gold": 220589
           },
           "requirements": [
             {
@@ -3696,13 +3696,13 @@
         {
           "level": 4,
           "ability_value": 0.13,
-          "time": 602802,
+          "time": 583334,
           "power": 98850,
           "resources": {
-            "food": 3888000,
-            "lumber": 2592000,
-            "stone": 1296000,
-            "gold": 7776000
+            "food": 297795,
+            "lumber": 198530,
+            "stone": 99265,
+            "gold": 297795
           },
           "requirements": [
             {
@@ -3719,13 +3719,13 @@
         {
           "level": 5,
           "ability_value": 0.17,
-          "time": 848388,
+          "time": 700000,
           "power": 146350,
           "resources": {
-            "food": 5643000,
-            "lumber": 3762000,
-            "stone": 1881000,
-            "gold": 11286000
+            "food": 388995,
+            "lumber": 259330,
+            "stone": 129665,
+            "gold": 388995
           },
           "requirements": [
             {
@@ -3742,13 +3742,13 @@
         {
           "level": 6,
           "ability_value": 0.21,
-          "time": 1205604,
+          "time": 700000,
           "power": 202950,
           "resources": {
-            "food": 8019000,
-            "lumber": 5346000,
-            "stone": 2673000,
-            "gold": 16038000
+            "food": 552782,
+            "lumber": 368521,
+            "stone": 184261,
+            "gold": 552782
           },
           "requirements": [
             {
@@ -3765,13 +3765,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 1674450,
+          "time": 840000,
           "power": 305250,
           "resources": {
-            "food": 11643750,
-            "lumber": 7762500,
-            "stone": 3881250,
-            "gold": 23287500
+            "food": 722385,
+            "lumber": 481590,
+            "stone": 240795,
+            "gold": 722385
           },
           "requirements": [
             {
@@ -3788,13 +3788,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 2344230,
+          "time": 840000,
           "power": 426300,
           "resources": {
-            "food": 16301250,
-            "lumber": 10867500,
-            "stone": 5433750,
-            "gold": 32602500
+            "food": 1011339,
+            "lumber": 674226,
+            "stone": 337113,
+            "gold": 1011339
           },
           "requirements": [
             {
@@ -3811,13 +3811,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 3304248,
+          "time": 1008000,
           "power": 572100,
           "resources": {
-            "food": 23643000,
-            "lumber": 15762000,
-            "stone": 7881000,
-            "gold": 47286000
+            "food": 1320143,
+            "lumber": 880096,
+            "stone": 440048,
+            "gold": 1320143
           },
           "requirements": [
             {
@@ -3834,13 +3834,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 4621482,
+          "time": 1008000,
           "power": 744600,
           "resources": {
-            "food": 33068250,
-            "lumber": 22045500,
-            "stone": 11022750,
-            "gold": 66136500
+            "food": 1846416,
+            "lumber": 1230944,
+            "stone": 615472,
+            "gold": 1846416
           },
           "requirements": [
             {
@@ -3871,10 +3871,10 @@
           "time": 285660,
           "power": 12450,
           "resources": {
-            "food": 1552500,
-            "lumber": 1035000,
-            "stone": 517500,
-            "gold": 3105000
+            "food": 118912,
+            "lumber": 79275,
+            "stone": 39638,
+            "gold": 118912
           },
           "requirements": [
             {
@@ -3894,10 +3894,10 @@
           "time": 399924,
           "power": 27200,
           "resources": {
-            "food": 2173500,
-            "lumber": 1449000,
-            "stone": 724500,
-            "gold": 4347000
+            "food": 166476,
+            "lumber": 110984,
+            "stone": 55492,
+            "gold": 166476
           },
           "requirements": [
             {
@@ -3917,10 +3917,10 @@
           "time": 571320,
           "power": 62900,
           "resources": {
-            "food": 3195000,
-            "lumber": 2130000,
-            "stone": 1065000,
-            "gold": 6390000
+            "food": 220245,
+            "lumber": 146830,
+            "stone": 73415,
+            "gold": 220245
           },
           "requirements": [
             {
@@ -3937,13 +3937,13 @@
         {
           "level": 4,
           "ability_value": 0.13,
-          "time": 771282,
+          "time": 700000,
           "power": 104400,
           "resources": {
-            "food": 4313250,
-            "lumber": 2875500,
-            "stone": 1437750,
-            "gold": 8626500
+            "food": 297330,
+            "lumber": 198220,
+            "stone": 99110,
+            "gold": 297330
           },
           "requirements": [
             {
@@ -3960,13 +3960,13 @@
         {
           "level": 5,
           "ability_value": 0.17,
-          "time": 1085508,
+          "time": 840000,
           "power": 154700,
           "resources": {
-            "food": 6327000,
-            "lumber": 4218000,
-            "stone": 2109000,
-            "gold": 12654000
+            "food": 392531,
+            "lumber": 261688,
+            "stone": 130844,
+            "gold": 392531
           },
           "requirements": [
             {
@@ -3983,13 +3983,13 @@
         {
           "level": 6,
           "ability_value": 0.21,
-          "time": 1542564,
+          "time": 840000,
           "power": 214700,
           "resources": {
-            "food": 8991000,
-            "lumber": 5994000,
-            "stone": 2997000,
-            "gold": 17982000
+            "food": 557807,
+            "lumber": 371872,
+            "stone": 185936,
+            "gold": 557807
           },
           "requirements": [
             {
@@ -4006,13 +4006,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 2142450,
+          "time": 1008000,
           "power": 322850,
           "resources": {
-            "food": 12993750,
-            "lumber": 8662500,
-            "stone": 4331250,
-            "gold": 25987500
+            "food": 725526,
+            "lumber": 483684,
+            "stone": 241842,
+            "gold": 725526
           },
           "requirements": [
             {
@@ -4029,13 +4029,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 2999430,
+          "time": 1008000,
           "power": 450800,
           "resources": {
-            "food": 18191250,
-            "lumber": 12127500,
-            "stone": 6063750,
-            "gold": 36382500
+            "food": 1015736,
+            "lumber": 677158,
+            "stone": 338579,
+            "gold": 1015736
           },
           "requirements": [
             {
@@ -4052,13 +4052,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 4227768,
+          "time": 1209600,
           "power": 604700,
           "resources": {
-            "food": 26307000,
-            "lumber": 17538000,
-            "stone": 8769000,
-            "gold": 52614000
+            "food": 1322002,
+            "lumber": 881335,
+            "stone": 440668,
+            "gold": 1322002
           },
           "requirements": [
             {
@@ -4075,13 +4075,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 5913162,
+          "time": 1209600,
           "power": 786650,
           "resources": {
-            "food": 36794250,
-            "lumber": 24529500,
-            "stone": 12264750,
-            "gold": 73588500
+            "food": 1849017,
+            "lumber": 1232678,
+            "stone": 616339,
+            "gold": 1849017
           },
           "requirements": [
             {
@@ -4112,10 +4112,10 @@
           "time": 328560,
           "power": 12900,
           "resources": {
-            "food": 1665000,
-            "lumber": 1110000,
-            "stone": 555000,
-            "gold": 3330000
+            "food": 127528,
+            "lumber": 85019,
+            "stone": 42510,
+            "gold": 127528
           },
           "requirements": [
             {
@@ -4135,10 +4135,10 @@
           "time": 459984,
           "power": 28150,
           "resources": {
-            "food": 2331000,
-            "lumber": 1554000,
-            "stone": 777000,
-            "gold": 4662000
+            "food": 178539,
+            "lumber": 119026,
+            "stone": 59513,
+            "gold": 178539
           },
           "requirements": [
             {
@@ -4158,10 +4158,10 @@
           "time": 657120,
           "power": 65150,
           "resources": {
-            "food": 3420000,
-            "lumber": 2280000,
-            "stone": 1140000,
-            "gold": 6840000
+            "food": 235755,
+            "lumber": 157170,
+            "stone": 78585,
+            "gold": 235755
           },
           "requirements": [
             {
@@ -4178,13 +4178,13 @@
         {
           "level": 4,
           "ability_value": 0.13,
-          "time": 887112,
+          "time": 700000,
           "power": 108150,
           "resources": {
-            "food": 4617000,
-            "lumber": 3078000,
-            "stone": 1539000,
-            "gold": 9234000
+            "food": 318269,
+            "lumber": 212179,
+            "stone": 106090,
+            "gold": 318269
           },
           "requirements": [
             {
@@ -4201,13 +4201,13 @@
         {
           "level": 5,
           "ability_value": 0.17,
-          "time": 1248528,
+          "time": 840000,
           "power": 160150,
           "resources": {
-            "food": 6754500,
-            "lumber": 4503000,
-            "stone": 2251500,
-            "gold": 13509000
+            "food": 419054,
+            "lumber": 279369,
+            "stone": 139685,
+            "gold": 419054
           },
           "requirements": [
             {
@@ -4224,13 +4224,13 @@
         {
           "level": 6,
           "ability_value": 0.21,
-          "time": 1774224,
+          "time": 840000,
           "power": 222150,
           "resources": {
-            "food": 9598500,
-            "lumber": 6399000,
-            "stone": 3199500,
-            "gold": 19197000
+            "food": 595497,
+            "lumber": 396998,
+            "stone": 198499,
+            "gold": 595497
           },
           "requirements": [
             {
@@ -4247,13 +4247,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 2464200,
+          "time": 1008000,
           "power": 333750,
           "resources": {
-            "food": 13837500,
-            "lumber": 9225000,
-            "stone": 4612500,
-            "gold": 27675000
+            "food": 772638,
+            "lumber": 515092,
+            "stone": 257546,
+            "gold": 772638
           },
           "requirements": [
             {
@@ -4270,13 +4270,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 3449880,
+          "time": 1008000,
           "power": 465750,
           "resources": {
-            "food": 19372500,
-            "lumber": 12915000,
-            "stone": 6457500,
-            "gold": 38745000
+            "food": 1081693,
+            "lumber": 721129,
+            "stone": 360565,
+            "gold": 1081693
           },
           "requirements": [
             {
@@ -4293,13 +4293,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 4862688,
+          "time": 1209600,
           "power": 625350,
           "resources": {
-            "food": 28305000,
-            "lumber": 18870000,
-            "stone": 9435000,
-            "gold": 56610000
+            "food": 1422408,
+            "lumber": 948272,
+            "stone": 474136,
+            "gold": 1422408
           },
           "requirements": [
             {
@@ -4316,13 +4316,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 6801192,
+          "time": 1209600,
           "power": 814050,
           "resources": {
-            "food": 39588750,
-            "lumber": 26392500,
-            "stone": 13196250,
-            "gold": 79177500
+            "food": 1989448,
+            "lumber": 1326299,
+            "stone": 663150,
+            "gold": 1989448
           },
           "requirements": [
             {
@@ -4353,10 +4353,10 @@
           "time": 433500,
           "power": 13850,
           "resources": {
-            "food": 1275000,
-            "lumber": 637500,
-            "stone": 1912500,
-            "gold": 3825000
+            "food": 87891,
+            "lumber": 43946,
+            "stone": 131837,
+            "gold": 131837
           },
           "requirements": [
             {
@@ -4376,10 +4376,10 @@
           "time": 606900,
           "power": 30200,
           "resources": {
-            "food": 1785000,
-            "lumber": 892500,
-            "stone": 2677500,
-            "gold": 5355000
+            "food": 123048,
+            "lumber": 61524,
+            "stone": 184571,
+            "gold": 184571
           },
           "requirements": [
             {
@@ -4396,13 +4396,13 @@
         {
           "level": 3,
           "ability_value": 0.09,
-          "time": 867000,
+          "time": 840000,
           "power": 70200,
           "resources": {
-            "food": 2670000,
-            "lumber": 1335000,
-            "stone": 4005000,
-            "gold": 8010000
+            "food": 165649,
+            "lumber": 82825,
+            "stone": 248473,
+            "gold": 248473
           },
           "requirements": [
             {
@@ -4419,13 +4419,13 @@
         {
           "level": 4,
           "ability_value": 0.13,
-          "time": 1170450,
+          "time": 840000,
           "power": 116700,
           "resources": {
-            "food": 3604500,
-            "lumber": 1802250,
-            "stone": 5406750,
-            "gold": 10813500
+            "food": 223626,
+            "lumber": 111813,
+            "stone": 335438,
+            "gold": 335438
           },
           "requirements": [
             {
@@ -4442,13 +4442,13 @@
         {
           "level": 5,
           "ability_value": 0.17,
-          "time": 1647300,
+          "time": 1008000,
           "power": 172800,
           "resources": {
-            "food": 5244000,
-            "lumber": 2622000,
-            "stone": 7866000,
-            "gold": 15732000
+            "food": 292807,
+            "lumber": 146404,
+            "stone": 439210,
+            "gold": 439210
           },
           "requirements": [
             {
@@ -4465,13 +4465,13 @@
         {
           "level": 6,
           "ability_value": 0.21,
-          "time": 2340900,
+          "time": 1008000,
           "power": 239700,
           "resources": {
-            "food": 7452000,
-            "lumber": 3726000,
-            "stone": 11178000,
-            "gold": 22356000
+            "food": 416094,
+            "lumber": 208047,
+            "stone": 624141,
+            "gold": 624141
           },
           "requirements": [
             {
@@ -4488,13 +4488,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 3251250,
+          "time": 1209600,
           "power": 359850,
           "resources": {
-            "food": 10687500,
-            "lumber": 5343750,
-            "stone": 16031250,
-            "gold": 32062500
+            "food": 537078,
+            "lumber": 268539,
+            "stone": 805617,
+            "gold": 805617
           },
           "requirements": [
             {
@@ -4511,13 +4511,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 4551750,
+          "time": 1209600,
           "power": 501900,
           "resources": {
-            "food": 14962500,
-            "lumber": 7481250,
-            "stone": 22443750,
-            "gold": 44887500
+            "food": 751909,
+            "lumber": 375955,
+            "stone": 1127863,
+            "gold": 1127863
           },
           "requirements": [
             {
@@ -4534,13 +4534,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 6415800,
+          "time": 1209600,
           "power": 670650,
           "resources": {
-            "food": 21090000,
-            "lumber": 10545000,
-            "stone": 31635000,
-            "gold": 63270000
+            "food": 1059833,
+            "lumber": 529917,
+            "stone": 1589750,
+            "gold": 1589750
           },
           "requirements": [
             {
@@ -4557,13 +4557,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 8973450,
+          "time": 1209600,
           "power": 870150,
           "resources": {
-            "food": 29497500,
-            "lumber": 14748750,
-            "stone": 44246250,
-            "gold": 88492500
+            "food": 1482334,
+            "lumber": 741167,
+            "stone": 2223501,
+            "gold": 2223501
           },
           "requirements": [
             {
@@ -4594,10 +4594,10 @@
           "time": 518940,
           "power": 14450,
           "resources": {
-            "food": 1395000,
-            "lumber": 697500,
-            "stone": 2092500,
-            "gold": 4185000
+            "food": 86547,
+            "lumber": 43274,
+            "stone": 129820,
+            "gold": 129820
           },
           "requirements": [
             {
@@ -4617,10 +4617,10 @@
           "time": 726516,
           "power": 31550,
           "resources": {
-            "food": 1953000,
-            "lumber": 976500,
-            "stone": 2929500,
-            "gold": 5859000
+            "food": 121166,
+            "lumber": 60583,
+            "stone": 181748,
+            "gold": 181748
           },
           "requirements": [
             {
@@ -4637,13 +4637,13 @@
         {
           "level": 3,
           "ability_value": 0.09,
-          "time": 1037880,
+          "time": 1008000,
           "power": 73150,
           "resources": {
-            "food": 2880000,
-            "lumber": 1440000,
-            "stone": 4320000,
-            "gold": 8640000
+            "food": 160810,
+            "lumber": 80405,
+            "stone": 241214,
+            "gold": 241214
           },
           "requirements": [
             {
@@ -4660,13 +4660,13 @@
         {
           "level": 4,
           "ability_value": 0.13,
-          "time": 1401138,
+          "time": 1008000,
           "power": 121450,
           "resources": {
-            "food": 3888000,
-            "lumber": 1944000,
-            "stone": 5832000,
-            "gold": 11664000
+            "food": 217093,
+            "lumber": 108547,
+            "stone": 325639,
+            "gold": 325639
           },
           "requirements": [
             {
@@ -4683,13 +4683,13 @@
         {
           "level": 5,
           "ability_value": 0.17,
-          "time": 1971972,
+          "time": 1209600,
           "power": 179650,
           "resources": {
-            "food": 5643000,
-            "lumber": 2821500,
-            "stone": 8464500,
-            "gold": 16929000
+            "food": 283577,
+            "lumber": 141789,
+            "stone": 425366,
+            "gold": 425366
           },
           "requirements": [
             {
@@ -4706,13 +4706,13 @@
         {
           "level": 6,
           "ability_value": 0.21,
-          "time": 2802276,
+          "time": 1209600,
           "power": 249050,
           "resources": {
-            "food": 8019000,
-            "lumber": 4009500,
-            "stone": 12028500,
-            "gold": 24057000
+            "food": 402978,
+            "lumber": 201489,
+            "stone": 604467,
+            "gold": 604467
           },
           "requirements": [
             {
@@ -4729,13 +4729,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 3892050,
+          "time": 1209600,
           "power": 371600,
           "resources": {
-            "food": 11137500,
-            "lumber": 5568750,
-            "stone": 16706250,
-            "gold": 33412500
+            "food": 559692,
+            "lumber": 279846,
+            "stone": 839537,
+            "gold": 839537
           },
           "requirements": [
             {
@@ -4752,13 +4752,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 5448870,
+          "time": 1209600,
           "power": 516650,
           "resources": {
-            "food": 15592500,
-            "lumber": 7796250,
-            "stone": 23388750,
-            "gold": 46777500
+            "food": 783568,
+            "lumber": 391784,
+            "stone": 1175352,
+            "gold": 1175352
           },
           "requirements": [
             {
@@ -4775,13 +4775,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 7680312,
+          "time": 1209600,
           "power": 688850,
           "resources": {
-            "food": 21978000,
-            "lumber": 10989000,
-            "stone": 32967000,
-            "gold": 65934000
+            "food": 1104458,
+            "lumber": 552229,
+            "stone": 1656687,
+            "gold": 1656687
           },
           "requirements": [
             {
@@ -4798,13 +4798,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 10742058,
+          "time": 1209600,
           "power": 892550,
           "resources": {
-            "food": 30739500,
-            "lumber": 15369750,
-            "stone": 46109250,
-            "gold": 92218500
+            "food": 1544748,
+            "lumber": 772374,
+            "stone": 2317122,
+            "gold": 2317122
           },
           "requirements": [
             {
@@ -4835,10 +4835,10 @@
           "time": 564540,
           "power": 14750,
           "resources": {
-            "food": 1455000,
-            "lumber": 727500,
-            "stone": 2182500,
-            "gold": 4365000
+            "food": 90270,
+            "lumber": 45135,
+            "stone": 135404,
+            "gold": 135404
           },
           "requirements": [
             {
@@ -4858,10 +4858,10 @@
           "time": 790356,
           "power": 32250,
           "resources": {
-            "food": 2037000,
-            "lumber": 1018500,
-            "stone": 3055500,
-            "gold": 6111000
+            "food": 126377,
+            "lumber": 63189,
+            "stone": 189565,
+            "gold": 189565
           },
           "requirements": [
             {
@@ -4878,13 +4878,13 @@
         {
           "level": 3,
           "ability_value": 0.09,
-          "time": 1129080,
+          "time": 1008000,
           "power": 74650,
           "resources": {
-            "food": 3000000,
-            "lumber": 1500000,
-            "stone": 4500000,
-            "gold": 9000000
+            "food": 167510,
+            "lumber": 83755,
+            "stone": 251265,
+            "gold": 251265
           },
           "requirements": [
             {
@@ -4901,13 +4901,13 @@
         {
           "level": 4,
           "ability_value": 0.13,
-          "time": 1524258,
+          "time": 1008000,
           "power": 123950,
           "resources": {
-            "food": 4050000,
-            "lumber": 2025000,
-            "stone": 6075000,
-            "gold": 12150000
+            "food": 226138,
+            "lumber": 113069,
+            "stone": 339207,
+            "gold": 339207
           },
           "requirements": [
             {
@@ -4924,13 +4924,13 @@
         {
           "level": 5,
           "ability_value": 0.17,
-          "time": 2145252,
+          "time": 1209600,
           "power": 183550,
           "resources": {
-            "food": 5928000,
-            "lumber": 2964000,
-            "stone": 8892000,
-            "gold": 17784000
+            "food": 297899,
+            "lumber": 148950,
+            "stone": 446849,
+            "gold": 446849
           },
           "requirements": [
             {
@@ -4947,13 +4947,13 @@
         {
           "level": 6,
           "ability_value": 0.21,
-          "time": 3048516,
+          "time": 1209600,
           "power": 254650,
           "resources": {
-            "food": 8424000,
-            "lumber": 4212000,
-            "stone": 12636000,
-            "gold": 25272000
+            "food": 423331,
+            "lumber": 211666,
+            "stone": 634996,
+            "gold": 634996
           },
           "requirements": [
             {
@@ -4970,13 +4970,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 4234050,
+          "time": 1209600,
           "power": 380350,
           "resources": {
-            "food": 11700000,
-            "lumber": 5850000,
-            "stone": 17550000,
-            "gold": 35100000
+            "food": 587959,
+            "lumber": 293980,
+            "stone": 881938,
+            "gold": 881938
           },
           "requirements": [
             {
@@ -4993,13 +4993,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 5927670,
+          "time": 1209600,
           "power": 529000,
           "resources": {
-            "food": 16380000,
-            "lumber": 8190000,
-            "stone": 24570000,
-            "gold": 49140000
+            "food": 823142,
+            "lumber": 411571,
+            "stone": 1234713,
+            "gold": 1234713
           },
           "requirements": [
             {
@@ -5016,13 +5016,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 8355192,
+          "time": 1209600,
           "power": 705550,
           "resources": {
-            "food": 23088000,
-            "lumber": 11544000,
-            "stone": 34632000,
-            "gold": 69264000
+            "food": 1160239,
+            "lumber": 580120,
+            "stone": 1740358,
+            "gold": 1740358
           },
           "requirements": [
             {
@@ -5039,13 +5039,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 11685978,
+          "time": 1209600,
           "power": 914350,
           "resources": {
-            "food": 32292000,
-            "lumber": 16146000,
-            "stone": 48438000,
-            "gold": 96876000
+            "food": 1622766,
+            "lumber": 811383,
+            "stone": 2434148,
+            "gold": 2434148
           },
           "requirements": [
             {
@@ -5076,10 +5076,10 @@
           "time": 433500,
           "power": 13850,
           "resources": {
-            "food": 637500,
-            "lumber": 1912500,
-            "stone": 1275000,
-            "gold": 3825000
+            "food": 43946,
+            "lumber": 131837,
+            "stone": 87891,
+            "gold": 131837
           },
           "requirements": [
             {
@@ -5099,10 +5099,10 @@
           "time": 606900,
           "power": 30200,
           "resources": {
-            "food": 892500,
-            "lumber": 2677500,
-            "stone": 1785000,
-            "gold": 5355000
+            "food": 61524,
+            "lumber": 184571,
+            "stone": 123048,
+            "gold": 184571
           },
           "requirements": [
             {
@@ -5119,13 +5119,13 @@
         {
           "level": 3,
           "ability_value": 0.09,
-          "time": 867000,
+          "time": 840000,
           "power": 70200,
           "resources": {
-            "food": 1335000,
-            "lumber": 4005000,
-            "stone": 2670000,
-            "gold": 8010000
+            "food": 82825,
+            "lumber": 248473,
+            "stone": 165649,
+            "gold": 248473
           },
           "requirements": [
             {
@@ -5142,13 +5142,13 @@
         {
           "level": 4,
           "ability_value": 0.13,
-          "time": 1170450,
+          "time": 840000,
           "power": 116700,
           "resources": {
-            "food": 1802250,
-            "lumber": 5406750,
-            "stone": 3604500,
-            "gold": 10813500
+            "food": 111813,
+            "lumber": 335438,
+            "stone": 223626,
+            "gold": 335438
           },
           "requirements": [
             {
@@ -5165,13 +5165,13 @@
         {
           "level": 5,
           "ability_value": 0.17,
-          "time": 1647300,
+          "time": 1008000,
           "power": 172800,
           "resources": {
-            "food": 2622000,
-            "lumber": 7866000,
-            "stone": 5244000,
-            "gold": 15732000
+            "food": 146404,
+            "lumber": 439210,
+            "stone": 292807,
+            "gold": 439210
           },
           "requirements": [
             {
@@ -5188,13 +5188,13 @@
         {
           "level": 6,
           "ability_value": 0.21,
-          "time": 2340900,
+          "time": 1008000,
           "power": 239700,
           "resources": {
-            "food": 3726000,
-            "lumber": 11178000,
-            "stone": 7452000,
-            "gold": 22356000
+            "food": 208047,
+            "lumber": 624141,
+            "stone": 416094,
+            "gold": 624141
           },
           "requirements": [
             {
@@ -5211,13 +5211,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 3251250,
+          "time": 1209600,
           "power": 359850,
           "resources": {
-            "food": 5343750,
-            "lumber": 16031250,
-            "stone": 10687500,
-            "gold": 32062500
+            "food": 268539,
+            "lumber": 805617,
+            "stone": 537078,
+            "gold": 805617
           },
           "requirements": [
             {
@@ -5234,13 +5234,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 4551750,
+          "time": 1209600,
           "power": 501900,
           "resources": {
-            "food": 7481250,
-            "lumber": 22443750,
-            "stone": 14962500,
-            "gold": 44887500
+            "food": 375955,
+            "lumber": 1127863,
+            "stone": 751909,
+            "gold": 1127863
           },
           "requirements": [
             {
@@ -5257,13 +5257,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 6415800,
+          "time": 1209600,
           "power": 670650,
           "resources": {
-            "food": 10545000,
-            "lumber": 31635000,
-            "stone": 21090000,
-            "gold": 63270000
+            "food": 529917,
+            "lumber": 1589750,
+            "stone": 1059833,
+            "gold": 1589750
           },
           "requirements": [
             {
@@ -5280,13 +5280,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 8973450,
+          "time": 1209600,
           "power": 870150,
           "resources": {
-            "food": 14748750,
-            "lumber": 44246250,
-            "stone": 29497500,
-            "gold": 88492500
+            "food": 741167,
+            "lumber": 2223501,
+            "stone": 1482334,
+            "gold": 2223501
           },
           "requirements": [
             {
@@ -5317,10 +5317,10 @@
           "time": 518940,
           "power": 14450,
           "resources": {
-            "food": 697500,
-            "lumber": 2092500,
-            "stone": 1395000,
-            "gold": 4185000
+            "food": 43274,
+            "lumber": 129820,
+            "stone": 86547,
+            "gold": 129820
           },
           "requirements": [
             {
@@ -5340,10 +5340,10 @@
           "time": 726516,
           "power": 31550,
           "resources": {
-            "food": 976500,
-            "lumber": 2929500,
-            "stone": 1953000,
-            "gold": 5859000
+            "food": 60583,
+            "lumber": 181748,
+            "stone": 121166,
+            "gold": 181748
           },
           "requirements": [
             {
@@ -5360,13 +5360,13 @@
         {
           "level": 3,
           "ability_value": 0.09,
-          "time": 1037880,
+          "time": 1008000,
           "power": 73150,
           "resources": {
-            "food": 1440000,
-            "lumber": 4320000,
-            "stone": 2880000,
-            "gold": 8640000
+            "food": 80405,
+            "lumber": 241214,
+            "stone": 160810,
+            "gold": 241214
           },
           "requirements": [
             {
@@ -5383,13 +5383,13 @@
         {
           "level": 4,
           "ability_value": 0.13,
-          "time": 1401138,
+          "time": 1008000,
           "power": 121450,
           "resources": {
-            "food": 1944000,
-            "lumber": 5832000,
-            "stone": 3888000,
-            "gold": 11664000
+            "food": 108547,
+            "lumber": 325639,
+            "stone": 217093,
+            "gold": 325639
           },
           "requirements": [
             {
@@ -5406,13 +5406,13 @@
         {
           "level": 5,
           "ability_value": 0.17,
-          "time": 1971972,
+          "time": 1209600,
           "power": 179650,
           "resources": {
-            "food": 2821500,
-            "lumber": 8464500,
-            "stone": 5643000,
-            "gold": 16929000
+            "food": 141789,
+            "lumber": 425366,
+            "stone": 283577,
+            "gold": 425366
           },
           "requirements": [
             {
@@ -5429,13 +5429,13 @@
         {
           "level": 6,
           "ability_value": 0.21,
-          "time": 2802276,
+          "time": 1209600,
           "power": 249050,
           "resources": {
-            "food": 4009500,
-            "lumber": 12028500,
-            "stone": 8019000,
-            "gold": 24057000
+            "food": 201489,
+            "lumber": 604467,
+            "stone": 402978,
+            "gold": 604467
           },
           "requirements": [
             {
@@ -5452,13 +5452,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 3892050,
+          "time": 1209600,
           "power": 371600,
           "resources": {
-            "food": 5568750,
-            "lumber": 16706250,
-            "stone": 11137500,
-            "gold": 33412500
+            "food": 279846,
+            "lumber": 839537,
+            "stone": 559692,
+            "gold": 839537
           },
           "requirements": [
             {
@@ -5475,13 +5475,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 5448870,
+          "time": 1209600,
           "power": 516650,
           "resources": {
-            "food": 7796250,
-            "lumber": 23388750,
-            "stone": 15592500,
-            "gold": 46777500
+            "food": 391784,
+            "lumber": 1175352,
+            "stone": 783568,
+            "gold": 1175352
           },
           "requirements": [
             {
@@ -5498,13 +5498,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 7680312,
+          "time": 1209600,
           "power": 688850,
           "resources": {
-            "food": 10989000,
-            "lumber": 32967000,
-            "stone": 21978000,
-            "gold": 65934000
+            "food": 552229,
+            "lumber": 1656687,
+            "stone": 1104458,
+            "gold": 1656687
           },
           "requirements": [
             {
@@ -5521,13 +5521,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 10742058,
+          "time": 1209600,
           "power": 892550,
           "resources": {
-            "food": 15369750,
-            "lumber": 46109250,
-            "stone": 30739500,
-            "gold": 92218500
+            "food": 772374,
+            "lumber": 2317122,
+            "stone": 1544748,
+            "gold": 2317122
           },
           "requirements": [
             {
@@ -5558,10 +5558,10 @@
           "time": 564540,
           "power": 14750,
           "resources": {
-            "food": 727500,
-            "lumber": 2182500,
-            "stone": 1455000,
-            "gold": 4365000
+            "food": 45135,
+            "lumber": 135404,
+            "stone": 90270,
+            "gold": 135404
           },
           "requirements": [
             {
@@ -5581,10 +5581,10 @@
           "time": 790356,
           "power": 32250,
           "resources": {
-            "food": 1018500,
-            "lumber": 3055500,
-            "stone": 2037000,
-            "gold": 6111000
+            "food": 63189,
+            "lumber": 189565,
+            "stone": 126377,
+            "gold": 189565
           },
           "requirements": [
             {
@@ -5601,13 +5601,13 @@
         {
           "level": 3,
           "ability_value": 0.09,
-          "time": 1129080,
+          "time": 1008000,
           "power": 74650,
           "resources": {
-            "food": 1500000,
-            "lumber": 4500000,
-            "stone": 3000000,
-            "gold": 9000000
+            "food": 83755,
+            "lumber": 251265,
+            "stone": 167510,
+            "gold": 251265
           },
           "requirements": [
             {
@@ -5624,13 +5624,13 @@
         {
           "level": 4,
           "ability_value": 0.13,
-          "time": 1524258,
+          "time": 1008000,
           "power": 123950,
           "resources": {
-            "food": 2025000,
-            "lumber": 6075000,
-            "stone": 4050000,
-            "gold": 12150000
+            "food": 113069,
+            "lumber": 339207,
+            "stone": 226138,
+            "gold": 339207
           },
           "requirements": [
             {
@@ -5647,13 +5647,13 @@
         {
           "level": 5,
           "ability_value": 0.17,
-          "time": 2145252,
+          "time": 1209600,
           "power": 183550,
           "resources": {
-            "food": 2964000,
-            "lumber": 8892000,
-            "stone": 5928000,
-            "gold": 17784000
+            "food": 148950,
+            "lumber": 446849,
+            "stone": 297899,
+            "gold": 446849
           },
           "requirements": [
             {
@@ -5670,13 +5670,13 @@
         {
           "level": 6,
           "ability_value": 0.21,
-          "time": 3048516,
+          "time": 1209600,
           "power": 254650,
           "resources": {
-            "food": 4212000,
-            "lumber": 12636000,
-            "stone": 8424000,
-            "gold": 25272000
+            "food": 211666,
+            "lumber": 634996,
+            "stone": 423331,
+            "gold": 634996
           },
           "requirements": [
             {
@@ -5693,13 +5693,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 4234050,
+          "time": 1209600,
           "power": 380350,
           "resources": {
-            "food": 5850000,
-            "lumber": 17550000,
-            "stone": 11700000,
-            "gold": 35100000
+            "food": 293980,
+            "lumber": 881938,
+            "stone": 587959,
+            "gold": 881938
           },
           "requirements": [
             {
@@ -5716,13 +5716,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 5927670,
+          "time": 1209600,
           "power": 529000,
           "resources": {
-            "food": 8190000,
-            "lumber": 24570000,
-            "stone": 16380000,
-            "gold": 49140000
+            "food": 411571,
+            "lumber": 1234713,
+            "stone": 823142,
+            "gold": 1234713
           },
           "requirements": [
             {
@@ -5739,13 +5739,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 8355192,
+          "time": 1209600,
           "power": 705550,
           "resources": {
-            "food": 11544000,
-            "lumber": 34632000,
-            "stone": 23088000,
-            "gold": 69264000
+            "food": 580120,
+            "lumber": 1740358,
+            "stone": 1160239,
+            "gold": 1740358
           },
           "requirements": [
             {
@@ -5762,13 +5762,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 11685978,
+          "time": 1209600,
           "power": 914350,
           "resources": {
-            "food": 16146000,
-            "lumber": 48438000,
-            "stone": 32292000,
-            "gold": 96876000
+            "food": 811383,
+            "lumber": 2434148,
+            "stone": 1622766,
+            "gold": 2434148
           },
           "requirements": [
             {
@@ -5799,10 +5799,10 @@
           "time": 433500,
           "power": 13850,
           "resources": {
-            "food": 1912500,
-            "lumber": 1275000,
-            "stone": 637500,
-            "gold": 3825000
+            "food": 131837,
+            "lumber": 87891,
+            "stone": 43946,
+            "gold": 131837
           },
           "requirements": [
             {
@@ -5822,10 +5822,10 @@
           "time": 606900,
           "power": 30200,
           "resources": {
-            "food": 2677500,
-            "lumber": 1785000,
-            "stone": 892500,
-            "gold": 5355000
+            "food": 184571,
+            "lumber": 123048,
+            "stone": 61524,
+            "gold": 184571
           },
           "requirements": [
             {
@@ -5842,13 +5842,13 @@
         {
           "level": 3,
           "ability_value": 0.09,
-          "time": 867000,
+          "time": 840000,
           "power": 70200,
           "resources": {
-            "food": 4005000,
-            "lumber": 2670000,
-            "stone": 1335000,
-            "gold": 8010000
+            "food": 248473,
+            "lumber": 165649,
+            "stone": 82825,
+            "gold": 248473
           },
           "requirements": [
             {
@@ -5865,13 +5865,13 @@
         {
           "level": 4,
           "ability_value": 0.13,
-          "time": 1170450,
+          "time": 840000,
           "power": 116700,
           "resources": {
-            "food": 5406750,
-            "lumber": 3604500,
-            "stone": 1802250,
-            "gold": 10813500
+            "food": 335438,
+            "lumber": 223626,
+            "stone": 111813,
+            "gold": 335438
           },
           "requirements": [
             {
@@ -5888,13 +5888,13 @@
         {
           "level": 5,
           "ability_value": 0.17,
-          "time": 1647300,
+          "time": 1008000,
           "power": 172800,
           "resources": {
-            "food": 7866000,
-            "lumber": 5244000,
-            "stone": 2622000,
-            "gold": 15732000
+            "food": 439210,
+            "lumber": 292807,
+            "stone": 146404,
+            "gold": 439210
           },
           "requirements": [
             {
@@ -5911,13 +5911,13 @@
         {
           "level": 6,
           "ability_value": 0.21,
-          "time": 2340900,
+          "time": 1008000,
           "power": 239700,
           "resources": {
-            "food": 11178000,
-            "lumber": 7452000,
-            "stone": 3726000,
-            "gold": 22356000
+            "food": 624141,
+            "lumber": 416094,
+            "stone": 208047,
+            "gold": 624141
           },
           "requirements": [
             {
@@ -5934,13 +5934,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 3251250,
+          "time": 1209600,
           "power": 359850,
           "resources": {
-            "food": 16031250,
-            "lumber": 10687500,
-            "stone": 5343750,
-            "gold": 32062500
+            "food": 805617,
+            "lumber": 537078,
+            "stone": 268539,
+            "gold": 805617
           },
           "requirements": [
             {
@@ -5957,13 +5957,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 4551750,
+          "time": 1209600,
           "power": 501900,
           "resources": {
-            "food": 22443750,
-            "lumber": 14962500,
-            "stone": 7481250,
-            "gold": 44887500
+            "food": 1127863,
+            "lumber": 751909,
+            "stone": 375955,
+            "gold": 1127863
           },
           "requirements": [
             {
@@ -5980,13 +5980,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 6415800,
+          "time": 1209600,
           "power": 670650,
           "resources": {
-            "food": 31635000,
-            "lumber": 21090000,
-            "stone": 10545000,
-            "gold": 63270000
+            "food": 1589750,
+            "lumber": 1059833,
+            "stone": 529917,
+            "gold": 1589750
           },
           "requirements": [
             {
@@ -6003,13 +6003,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 8973450,
+          "time": 1209600,
           "power": 870150,
           "resources": {
-            "food": 44246250,
-            "lumber": 29497500,
-            "stone": 14748750,
-            "gold": 88492500
+            "food": 2223501,
+            "lumber": 1482334,
+            "stone": 741167,
+            "gold": 2223501
           },
           "requirements": [
             {
@@ -6040,10 +6040,10 @@
           "time": 518940,
           "power": 14450,
           "resources": {
-            "food": 2092500,
-            "lumber": 1395000,
-            "stone": 697500,
-            "gold": 4185000
+            "food": 129820,
+            "lumber": 86547,
+            "stone": 43274,
+            "gold": 129820
           },
           "requirements": [
             {
@@ -6063,10 +6063,10 @@
           "time": 726516,
           "power": 31550,
           "resources": {
-            "food": 2929500,
-            "lumber": 1953000,
-            "stone": 976500,
-            "gold": 5859000
+            "food": 181748,
+            "lumber": 121166,
+            "stone": 60583,
+            "gold": 181748
           },
           "requirements": [
             {
@@ -6083,13 +6083,13 @@
         {
           "level": 3,
           "ability_value": 0.09,
-          "time": 1037880,
+          "time": 1008000,
           "power": 73150,
           "resources": {
-            "food": 4320000,
-            "lumber": 2880000,
-            "stone": 1440000,
-            "gold": 8640000
+            "food": 241214,
+            "lumber": 160810,
+            "stone": 80405,
+            "gold": 241214
           },
           "requirements": [
             {
@@ -6106,13 +6106,13 @@
         {
           "level": 4,
           "ability_value": 0.13,
-          "time": 1401138,
+          "time": 1008000,
           "power": 121450,
           "resources": {
-            "food": 5832000,
-            "lumber": 3888000,
-            "stone": 1944000,
-            "gold": 11664000
+            "food": 325639,
+            "lumber": 217093,
+            "stone": 108547,
+            "gold": 325639
           },
           "requirements": [
             {
@@ -6129,13 +6129,13 @@
         {
           "level": 5,
           "ability_value": 0.17,
-          "time": 1971972,
+          "time": 1209600,
           "power": 179650,
           "resources": {
-            "food": 8464500,
-            "lumber": 5643000,
-            "stone": 2821500,
-            "gold": 16929000
+            "food": 425366,
+            "lumber": 283577,
+            "stone": 141789,
+            "gold": 425366
           },
           "requirements": [
             {
@@ -6152,13 +6152,13 @@
         {
           "level": 6,
           "ability_value": 0.21,
-          "time": 2802276,
+          "time": 1209600,
           "power": 249050,
           "resources": {
-            "food": 12028500,
-            "lumber": 8019000,
-            "stone": 4009500,
-            "gold": 24057000
+            "food": 604467,
+            "lumber": 402978,
+            "stone": 201489,
+            "gold": 604467
           },
           "requirements": [
             {
@@ -6175,13 +6175,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 3892050,
+          "time": 1209600,
           "power": 371600,
           "resources": {
-            "food": 16706250,
-            "lumber": 11137500,
-            "stone": 5568750,
-            "gold": 33412500
+            "food": 839537,
+            "lumber": 559692,
+            "stone": 279846,
+            "gold": 839537
           },
           "requirements": [
             {
@@ -6198,13 +6198,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 5448870,
+          "time": 1209600,
           "power": 516650,
           "resources": {
-            "food": 23388750,
-            "lumber": 15592500,
-            "stone": 7796250,
-            "gold": 46777500
+            "food": 1175352,
+            "lumber": 783568,
+            "stone": 391784,
+            "gold": 1175352
           },
           "requirements": [
             {
@@ -6221,13 +6221,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 7680312,
+          "time": 1209600,
           "power": 688850,
           "resources": {
-            "food": 32967000,
-            "lumber": 21978000,
-            "stone": 10989000,
-            "gold": 65934000
+            "food": 1656687,
+            "lumber": 1104458,
+            "stone": 552229,
+            "gold": 1656687
           },
           "requirements": [
             {
@@ -6244,13 +6244,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 10742058,
+          "time": 1209600,
           "power": 892550,
           "resources": {
-            "food": 46109250,
-            "lumber": 30739500,
-            "stone": 15369750,
-            "gold": 92218500
+            "food": 2317122,
+            "lumber": 1544748,
+            "stone": 772374,
+            "gold": 2317122
           },
           "requirements": [
             {
@@ -6281,10 +6281,10 @@
           "time": 564540,
           "power": 14750,
           "resources": {
-            "food": 2182500,
-            "lumber": 1455000,
-            "stone": 727500,
-            "gold": 4365000
+            "food": 135404,
+            "lumber": 90270,
+            "stone": 45135,
+            "gold": 135404
           },
           "requirements": [
             {
@@ -6304,10 +6304,10 @@
           "time": 790356,
           "power": 32250,
           "resources": {
-            "food": 3055500,
-            "lumber": 2037000,
-            "stone": 1018500,
-            "gold": 6111000
+            "food": 189565,
+            "lumber": 126377,
+            "stone": 63189,
+            "gold": 189565
           },
           "requirements": [
             {
@@ -6324,13 +6324,13 @@
         {
           "level": 3,
           "ability_value": 0.09,
-          "time": 1129080,
+          "time": 1008000,
           "power": 74650,
           "resources": {
-            "food": 4500000,
-            "lumber": 3000000,
-            "stone": 1500000,
-            "gold": 9000000
+            "food": 251265,
+            "lumber": 167510,
+            "stone": 83755,
+            "gold": 251265
           },
           "requirements": [
             {
@@ -6347,13 +6347,13 @@
         {
           "level": 4,
           "ability_value": 0.13,
-          "time": 1524258,
+          "time": 1008000,
           "power": 123950,
           "resources": {
-            "food": 6075000,
-            "lumber": 4050000,
-            "stone": 2025000,
-            "gold": 12150000
+            "food": 339207,
+            "lumber": 226138,
+            "stone": 113069,
+            "gold": 339207
           },
           "requirements": [
             {
@@ -6370,13 +6370,13 @@
         {
           "level": 5,
           "ability_value": 0.17,
-          "time": 2145252,
+          "time": 1209600,
           "power": 183550,
           "resources": {
-            "food": 8892000,
-            "lumber": 5928000,
-            "stone": 2964000,
-            "gold": 17784000
+            "food": 446849,
+            "lumber": 297899,
+            "stone": 148950,
+            "gold": 446849
           },
           "requirements": [
             {
@@ -6393,13 +6393,13 @@
         {
           "level": 6,
           "ability_value": 0.21,
-          "time": 3048516,
+          "time": 1209600,
           "power": 254650,
           "resources": {
-            "food": 12636000,
-            "lumber": 8424000,
-            "stone": 4212000,
-            "gold": 25272000
+            "food": 634996,
+            "lumber": 423331,
+            "stone": 211666,
+            "gold": 634996
           },
           "requirements": [
             {
@@ -6416,13 +6416,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 4234050,
+          "time": 1209600,
           "power": 380350,
           "resources": {
-            "food": 17550000,
-            "lumber": 11700000,
-            "stone": 5850000,
-            "gold": 35100000
+            "food": 881938,
+            "lumber": 587959,
+            "stone": 293980,
+            "gold": 881938
           },
           "requirements": [
             {
@@ -6439,13 +6439,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 5927670,
+          "time": 1209600,
           "power": 529000,
           "resources": {
-            "food": 24570000,
-            "lumber": 16380000,
-            "stone": 8190000,
-            "gold": 49140000
+            "food": 1234713,
+            "lumber": 823142,
+            "stone": 411571,
+            "gold": 1234713
           },
           "requirements": [
             {
@@ -6462,13 +6462,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 8355192,
+          "time": 1209600,
           "power": 705550,
           "resources": {
-            "food": 34632000,
-            "lumber": 23088000,
-            "stone": 11544000,
-            "gold": 69264000
+            "food": 1740358,
+            "lumber": 1160239,
+            "stone": 580120,
+            "gold": 1740358
           },
           "requirements": [
             {
@@ -6485,13 +6485,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 11685978,
+          "time": 1209600,
           "power": 914350,
           "resources": {
-            "food": 48438000,
-            "lumber": 32292000,
-            "stone": 16146000,
-            "gold": 96876000
+            "food": 2434148,
+            "lumber": 1622766,
+            "stone": 811383,
+            "gold": 2434148
           },
           "requirements": [
             {
@@ -6522,10 +6522,10 @@
           "time": 31740,
           "power": 7200,
           "resources": {
-            "food": 345000,
-            "lumber": 345000,
-            "stone": 345000,
-            "gold": 1035000
+            "food": 36248,
+            "lumber": 36248,
+            "stone": 36248,
+            "gold": 54372
           },
           "requirements": [
             {
@@ -6540,10 +6540,10 @@
           "time": 44436,
           "power": 15700,
           "resources": {
-            "food": 483000,
-            "lumber": 483000,
-            "stone": 483000,
-            "gold": 1449000
+            "food": 50747,
+            "lumber": 50747,
+            "stone": 50747,
+            "gold": 76121
           },
           "requirements": [
             {
@@ -6563,10 +6563,10 @@
           "time": 63480,
           "power": 36500,
           "resources": {
-            "food": 720000,
-            "lumber": 720000,
-            "stone": 720000,
-            "gold": 2160000
+            "food": 68083,
+            "lumber": 68083,
+            "stone": 68083,
+            "gold": 102125
           },
           "requirements": [
             {
@@ -6586,10 +6586,10 @@
           "time": 85698,
           "power": 60600,
           "resources": {
-            "food": 972000,
-            "lumber": 972000,
-            "stone": 972000,
-            "gold": 2916000
+            "food": 91912,
+            "lumber": 91912,
+            "stone": 91912,
+            "gold": 137868
           },
           "requirements": [
             {
@@ -6609,10 +6609,10 @@
           "time": 120612,
           "power": 89800,
           "resources": {
-            "food": 1425000,
-            "lumber": 1425000,
-            "stone": 1425000,
-            "gold": 4275000
+            "food": 121273,
+            "lumber": 121273,
+            "stone": 121273,
+            "gold": 181910
           },
           "requirements": [
             {
@@ -6632,10 +6632,10 @@
           "time": 171396,
           "power": 124700,
           "resources": {
-            "food": 2025000,
-            "lumber": 2025000,
-            "stone": 2025000,
-            "gold": 6075000
+            "food": 172335,
+            "lumber": 172335,
+            "stone": 172335,
+            "gold": 258503
           },
           "requirements": [
             {
@@ -6655,10 +6655,10 @@
           "time": 238050,
           "power": 187550,
           "resources": {
-            "food": 2925000,
-            "lumber": 2925000,
-            "stone": 2925000,
-            "gold": 8775000
+            "food": 224036,
+            "lumber": 224036,
+            "stone": 224036,
+            "gold": 336054
           },
           "requirements": [
             {
@@ -6678,10 +6678,10 @@
           "time": 333270,
           "power": 261950,
           "resources": {
-            "food": 4095000,
-            "lumber": 4095000,
-            "stone": 4095000,
-            "gold": 12285000
+            "food": 313650,
+            "lumber": 313650,
+            "stone": 313650,
+            "gold": 470475
           },
           "requirements": [
             {
@@ -6701,10 +6701,10 @@
           "time": 469752,
           "power": 351950,
           "resources": {
-            "food": 5994000,
-            "lumber": 5994000,
-            "stone": 5994000,
-            "gold": 17982000
+            "food": 413191,
+            "lumber": 413191,
+            "stone": 413191,
+            "gold": 619786
           },
           "requirements": [
             {
@@ -6724,10 +6724,10 @@
           "time": 657018,
           "power": 458300,
           "resources": {
-            "food": 8383500,
-            "lumber": 8383500,
-            "stone": 8383500,
-            "gold": 25150500
+            "food": 577908,
+            "lumber": 577908,
+            "stone": 577908,
+            "gold": 866862
           },
           "requirements": [
             {
@@ -6758,10 +6758,10 @@
           "time": 188160,
           "power": 11200,
           "resources": {
-            "food": 840000,
-            "lumber": 840000,
-            "stone": 840000,
-            "gold": 2520000
+            "food": 71488,
+            "lumber": 71488,
+            "stone": 71488,
+            "gold": 107231
           },
           "requirements": [
             {
@@ -6791,10 +6791,10 @@
           "time": 263424,
           "power": 24500,
           "resources": {
-            "food": 1176000,
-            "lumber": 1176000,
-            "stone": 1176000,
-            "gold": 3528000
+            "food": 100082,
+            "lumber": 100082,
+            "stone": 100082,
+            "gold": 150123
           },
           "requirements": [
             {
@@ -6814,10 +6814,10 @@
           "time": 376320,
           "power": 56800,
           "resources": {
-            "food": 1740000,
-            "lumber": 1740000,
-            "stone": 1740000,
-            "gold": 5220000
+            "food": 133273,
+            "lumber": 133273,
+            "stone": 133273,
+            "gold": 199909
           },
           "requirements": [
             {
@@ -6837,10 +6837,10 @@
           "time": 508032,
           "power": 94300,
           "resources": {
-            "food": 2349000,
-            "lumber": 2349000,
-            "stone": 2349000,
-            "gold": 7047000
+            "food": 179918,
+            "lumber": 179918,
+            "stone": 179918,
+            "gold": 269877
           },
           "requirements": [
             {
@@ -6857,13 +6857,13 @@
         {
           "level": 5,
           "ability_value": 0.7,
-          "time": 715008,
+          "time": 700000,
           "power": 139600,
           "resources": {
-            "food": 3420000,
-            "lumber": 3420000,
-            "stone": 3420000,
-            "gold": 10260000
+            "food": 235755,
+            "lumber": 235755,
+            "stone": 235755,
+            "gold": 353632
           },
           "requirements": [
             {
@@ -6880,13 +6880,13 @@
         {
           "level": 6,
           "ability_value": 0.9,
-          "time": 1016064,
+          "time": 700000,
           "power": 193600,
           "resources": {
-            "food": 4860000,
-            "lumber": 4860000,
-            "stone": 4860000,
-            "gold": 14580000
+            "food": 335020,
+            "lumber": 335020,
+            "stone": 335020,
+            "gold": 502529
           },
           "requirements": [
             {
@@ -6903,13 +6903,13 @@
         {
           "level": 7,
           "ability_value": 1.2,
-          "time": 1411200,
+          "time": 840000,
           "power": 291400,
           "resources": {
-            "food": 7087500,
-            "lumber": 7087500,
-            "stone": 7087500,
-            "gold": 21262500
+            "food": 439713,
+            "lumber": 439713,
+            "stone": 439713,
+            "gold": 659569
           },
           "requirements": [
             {
@@ -6926,13 +6926,13 @@
         {
           "level": 8,
           "ability_value": 1.5,
-          "time": 1975680,
+          "time": 840000,
           "power": 407200,
           "resources": {
-            "food": 9922500,
-            "lumber": 9922500,
-            "stone": 9922500,
-            "gold": 29767500
+            "food": 615598,
+            "lumber": 615598,
+            "stone": 615598,
+            "gold": 923397
           },
           "requirements": [
             {
@@ -6949,13 +6949,13 @@
         {
           "level": 9,
           "ability_value": 1.8,
-          "time": 2784768,
+          "time": 1008000,
           "power": 546700,
           "resources": {
-            "food": 14430000,
-            "lumber": 14430000,
-            "stone": 14430000,
-            "gold": 43290000
+            "food": 805721,
+            "lumber": 805721,
+            "stone": 805721,
+            "gold": 1208582
           },
           "requirements": [
             {
@@ -6972,13 +6972,13 @@
         {
           "level": 10,
           "ability_value": 2.5,
-          "time": 3894912,
+          "time": 1008000,
           "power": 711700,
           "resources": {
-            "food": 20182500,
-            "lumber": 20182500,
-            "stone": 20182500,
-            "gold": 60547500
+            "food": 1126921,
+            "lumber": 1126921,
+            "stone": 1126921,
+            "gold": 1690381
           },
           "requirements": [
             {
@@ -7009,10 +7009,10 @@
           "time": 393660,
           "power": 13500,
           "resources": {
-            "food": 1215000,
-            "lumber": 1215000,
-            "stone": 1215000,
-            "gold": 3645000
+            "food": 83755,
+            "lumber": 83755,
+            "stone": 83755,
+            "gold": 125633
           },
           "requirements": [
             {
@@ -7042,10 +7042,10 @@
           "time": 551124,
           "power": 29450,
           "resources": {
-            "food": 1701000,
-            "lumber": 1701000,
-            "stone": 1701000,
-            "gold": 5103000
+            "food": 117257,
+            "lumber": 117257,
+            "stone": 117257,
+            "gold": 175886
           },
           "requirements": [
             {
@@ -7065,10 +7065,10 @@
           "time": 787320,
           "power": 68350,
           "resources": {
-            "food": 2520000,
-            "lumber": 2520000,
-            "stone": 2520000,
-            "gold": 7560000
+            "food": 156343,
+            "lumber": 156343,
+            "stone": 156343,
+            "gold": 234514
           },
           "requirements": [
             {
@@ -7085,13 +7085,13 @@
         {
           "level": 4,
           "ability_value": 0.5,
-          "time": 1062882,
+          "time": 840000,
           "power": 113550,
           "resources": {
-            "food": 3402000,
-            "lumber": 3402000,
-            "stone": 3402000,
-            "gold": 10206000
+            "food": 211063,
+            "lumber": 211063,
+            "stone": 211063,
+            "gold": 316594
           },
           "requirements": [
             {
@@ -7108,13 +7108,13 @@
         {
           "level": 5,
           "ability_value": 0.7,
-          "time": 1495908,
+          "time": 1008000,
           "power": 168050,
           "resources": {
-            "food": 4959000,
-            "lumber": 4959000,
-            "stone": 4959000,
-            "gold": 14877000
+            "food": 276894,
+            "lumber": 276894,
+            "stone": 276894,
+            "gold": 415340
           },
           "requirements": [
             {
@@ -7131,13 +7131,13 @@
         {
           "level": 6,
           "ability_value": 0.9,
-          "time": 2125764,
+          "time": 1008000,
           "power": 233050,
           "resources": {
-            "food": 7047000,
-            "lumber": 7047000,
-            "stone": 7047000,
-            "gold": 21141000
+            "food": 393480,
+            "lumber": 393480,
+            "stone": 393480,
+            "gold": 590220
           },
           "requirements": [
             {
@@ -7154,13 +7154,13 @@
         {
           "level": 7,
           "ability_value": 1.2,
-          "time": 2952450,
+          "time": 1209600,
           "power": 349900,
           "resources": {
-            "food": 10125000,
-            "lumber": 10125000,
-            "stone": 10125000,
-            "gold": 30375000
+            "food": 508811,
+            "lumber": 508811,
+            "stone": 508811,
+            "gold": 763216
           },
           "requirements": [
             {
@@ -7177,13 +7177,13 @@
         {
           "level": 8,
           "ability_value": 1.5,
-          "time": 4133430,
+          "time": 1209600,
           "power": 488200,
           "resources": {
-            "food": 14175000,
-            "lumber": 14175000,
-            "stone": 14175000,
-            "gold": 42525000
+            "food": 712335,
+            "lumber": 712335,
+            "stone": 712335,
+            "gold": 1068502
           },
           "requirements": [
             {
@@ -7200,13 +7200,13 @@
         {
           "level": 9,
           "ability_value": 1.8,
-          "time": 5826168,
+          "time": 1209600,
           "power": 652450,
           "resources": {
-            "food": 19980000,
-            "lumber": 19980000,
-            "stone": 19980000,
-            "gold": 59940000
+            "food": 1004053,
+            "lumber": 1004053,
+            "stone": 1004053,
+            "gold": 1506079
           },
           "requirements": [
             {
@@ -7223,13 +7223,13 @@
         {
           "level": 10,
           "ability_value": 2.5,
-          "time": 8148762,
+          "time": 1209600,
           "power": 846700,
           "resources": {
-            "food": 27945000,
-            "lumber": 27945000,
-            "stone": 27945000,
-            "gold": 83835000
+            "food": 1404317,
+            "lumber": 1404317,
+            "stone": 1404317,
+            "gold": 2106475
           },
           "requirements": [
             {
@@ -7260,10 +7260,10 @@
           "time": 661500,
           "power": 15350,
           "resources": {
-            "food": 1575000,
-            "lumber": 1575000,
-            "stone": 1575000,
-            "gold": 4725000
+            "food": 87943,
+            "lumber": 87943,
+            "stone": 87943,
+            "gold": 131914
           },
           "requirements": [
             {
@@ -7293,10 +7293,10 @@
           "time": 926100,
           "power": 33550,
           "resources": {
-            "food": 2205000,
-            "lumber": 2205000,
-            "stone": 2205000,
-            "gold": 6615000
+            "food": 123120,
+            "lumber": 123120,
+            "stone": 123120,
+            "gold": 184680
           },
           "requirements": [
             {
@@ -7313,13 +7313,13 @@
         {
           "level": 3,
           "ability_value": 0.09,
-          "time": 1323000,
+          "time": 1209600,
           "power": 77650,
           "resources": {
-            "food": 3240000,
-            "lumber": 3240000,
-            "stone": 3240000,
-            "gold": 9720000
+            "food": 162820,
+            "lumber": 162820,
+            "stone": 162820,
+            "gold": 244229
           },
           "requirements": [
             {
@@ -7336,13 +7336,13 @@
         {
           "level": 4,
           "ability_value": 0.13,
-          "time": 1786050,
+          "time": 1209600,
           "power": 128850,
           "resources": {
-            "food": 4374000,
-            "lumber": 4374000,
-            "stone": 4374000,
-            "gold": 13122000
+            "food": 219807,
+            "lumber": 219807,
+            "stone": 219807,
+            "gold": 329710
           },
           "requirements": [
             {
@@ -7359,13 +7359,13 @@
         {
           "level": 5,
           "ability_value": 0.17,
-          "time": 2513700,
+          "time": 1209600,
           "power": 189650,
           "resources": {
-            "food": 6156000,
-            "lumber": 6156000,
-            "stone": 6156000,
-            "gold": 18468000
+            "food": 309357,
+            "lumber": 309357,
+            "stone": 309357,
+            "gold": 464035
           },
           "requirements": [
             {
@@ -7382,13 +7382,13 @@
         {
           "level": 6,
           "ability_value": 0.21,
-          "time": 3572100,
+          "time": 1209600,
           "power": 262050,
           "resources": {
-            "food": 8748000,
-            "lumber": 8748000,
-            "stone": 8748000,
-            "gold": 26244000
+            "food": 439613,
+            "lumber": 439613,
+            "stone": 439613,
+            "gold": 659419
           },
           "requirements": [
             {
@@ -7405,13 +7405,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 4961250,
+          "time": 1209600,
           "power": 390150,
           "resources": {
-            "food": 12150000,
-            "lumber": 12150000,
-            "stone": 12150000,
-            "gold": 36450000
+            "food": 610573,
+            "lumber": 610573,
+            "stone": 610573,
+            "gold": 915859
           },
           "requirements": [
             {
@@ -7428,13 +7428,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 6945750,
+          "time": 1209600,
           "power": 541650,
           "resources": {
-            "food": 17010000,
-            "lumber": 17010000,
-            "stone": 17010000,
-            "gold": 51030000
+            "food": 854802,
+            "lumber": 854802,
+            "stone": 854802,
+            "gold": 1282202
           },
           "requirements": [
             {
@@ -7451,13 +7451,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 9790200,
+          "time": 1209600,
           "power": 721500,
           "resources": {
-            "food": 23976000,
-            "lumber": 23976000,
-            "stone": 23976000,
-            "gold": 71928000
+            "food": 1204863,
+            "lumber": 1204863,
+            "stone": 1204863,
+            "gold": 1807294
           },
           "requirements": [
             {
@@ -7474,13 +7474,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 13693050,
+          "time": 1209600,
           "power": 934200,
           "resources": {
-            "food": 33534000,
-            "lumber": 33534000,
-            "stone": 33534000,
-            "gold": 100602000
+            "food": 1685180,
+            "lumber": 1685180,
+            "stone": 1685180,
+            "gold": 2527770
           },
           "requirements": [
             {
@@ -7511,10 +7511,10 @@
           "time": 712860,
           "power": 15650,
           "resources": {
-            "food": 1635000,
-            "lumber": 817500,
-            "stone": 2452500,
-            "gold": 4905000
+            "food": 91293,
+            "lumber": 45647,
+            "stone": 136940,
+            "gold": 136940
           },
           "requirements": [
             {
@@ -7534,10 +7534,10 @@
           "time": 998004,
           "power": 34200,
           "resources": {
-            "food": 2289000,
-            "lumber": 1144500,
-            "stone": 3433500,
-            "gold": 6867000
+            "food": 127810,
+            "lumber": 63905,
+            "stone": 191715,
+            "gold": 191715
           },
           "requirements": [
             {
@@ -7554,13 +7554,13 @@
         {
           "level": 3,
           "ability_value": 0.09,
-          "time": 1425720,
+          "time": 1209600,
           "power": 79100,
           "resources": {
-            "food": 3360000,
-            "lumber": 1680000,
-            "stone": 5040000,
-            "gold": 10080000
+            "food": 168850,
+            "lumber": 84425,
+            "stone": 253275,
+            "gold": 253275
           },
           "requirements": [
             {
@@ -7577,13 +7577,13 @@
         {
           "level": 4,
           "ability_value": 0.13,
-          "time": 1924722,
+          "time": 1209600,
           "power": 131300,
           "resources": {
-            "food": 4536000,
-            "lumber": 2268000,
-            "stone": 6804000,
-            "gold": 13608000
+            "food": 227947,
+            "lumber": 113974,
+            "stone": 341921,
+            "gold": 341921
           },
           "requirements": [
             {
@@ -7600,13 +7600,13 @@
         {
           "level": 5,
           "ability_value": 0.17,
-          "time": 2708868,
+          "time": 1209600,
           "power": 193200,
           "resources": {
-            "food": 6384000,
-            "lumber": 3192000,
-            "stone": 9576000,
-            "gold": 19152000
+            "food": 320815,
+            "lumber": 160408,
+            "stone": 481222,
+            "gold": 481222
           },
           "requirements": [
             {
@@ -7623,13 +7623,13 @@
         {
           "level": 6,
           "ability_value": 0.21,
-          "time": 3849444,
+          "time": 1209600,
           "power": 267000,
           "resources": {
-            "food": 9072000,
-            "lumber": 4536000,
-            "stone": 13608000,
-            "gold": 27216000
+            "food": 455894,
+            "lumber": 227947,
+            "stone": 683841,
+            "gold": 683841
           },
           "requirements": [
             {
@@ -7646,13 +7646,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 5346450,
+          "time": 1209600,
           "power": 397350,
           "resources": {
-            "food": 12600000,
-            "lumber": 6300000,
-            "stone": 18900000,
-            "gold": 37800000
+            "food": 633187,
+            "lumber": 316594,
+            "stone": 949780,
+            "gold": 949780
           },
           "requirements": [
             {
@@ -7669,13 +7669,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 7485030,
+          "time": 1209600,
           "power": 551700,
           "resources": {
-            "food": 17640000,
-            "lumber": 8820000,
-            "stone": 26460000,
-            "gold": 52920000
+            "food": 886461,
+            "lumber": 443231,
+            "stone": 1329691,
+            "gold": 1329691
           },
           "requirements": [
             {
@@ -7692,13 +7692,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 10550328,
+          "time": 1209600,
           "power": 734850,
           "resources": {
-            "food": 24864000,
-            "lumber": 12432000,
-            "stone": 37296000,
-            "gold": 74592000
+            "food": 1249488,
+            "lumber": 624744,
+            "stone": 1874231,
+            "gold": 1874231
           },
           "requirements": [
             {
@@ -7715,13 +7715,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 14756202,
+          "time": 1209600,
           "power": 951450,
           "resources": {
-            "food": 34776000,
-            "lumber": 17388000,
-            "stone": 52164000,
-            "gold": 104328000
+            "food": 1747594,
+            "lumber": 873797,
+            "stone": 2621391,
+            "gold": 2621391
           },
           "requirements": [
             {
@@ -7752,10 +7752,10 @@
           "time": 807360,
           "power": 16150,
           "resources": {
-            "food": 1740000,
-            "lumber": 870000,
-            "stone": 2610000,
-            "gold": 5220000
+            "food": 87440,
+            "lumber": 43720,
+            "stone": 131160,
+            "gold": 131160
           },
           "requirements": [
             {
@@ -7775,10 +7775,10 @@
           "time": 1130304,
           "power": 35250,
           "resources": {
-            "food": 2436000,
-            "lumber": 1218000,
-            "stone": 3654000,
-            "gold": 7308000
+            "food": 122416,
+            "lumber": 61208,
+            "stone": 183624,
+            "gold": 183624
           },
           "requirements": [
             {
@@ -7795,13 +7795,13 @@
         {
           "level": 3,
           "ability_value": 0.09,
-          "time": 1614720,
+          "time": 1209600,
           "power": 80950,
           "resources": {
-            "food": 3480000,
-            "lumber": 1740000,
-            "stone": 5220000,
-            "gold": 10440000
+            "food": 174880,
+            "lumber": 87440,
+            "stone": 262320,
+            "gold": 262320
           },
           "requirements": [
             {
@@ -7818,13 +7818,13 @@
         {
           "level": 4,
           "ability_value": 0.13,
-          "time": 2179872,
+          "time": 1209600,
           "power": 134050,
           "resources": {
-            "food": 4698000,
-            "lumber": 2349000,
-            "stone": 7047000,
-            "gold": 14094000
+            "food": 236088,
+            "lumber": 118044,
+            "stone": 354132,
+            "gold": 354132
           },
           "requirements": [
             {
@@ -7841,13 +7841,13 @@
         {
           "level": 5,
           "ability_value": 0.17,
-          "time": 3067968,
+          "time": 1209600,
           "power": 197050,
           "resources": {
-            "food": 6612000,
-            "lumber": 3306000,
-            "stone": 9918000,
-            "gold": 19836000
+            "food": 332272,
+            "lumber": 166136,
+            "stone": 498408,
+            "gold": 498408
           },
           "requirements": [
             {
@@ -7864,13 +7864,13 @@
         {
           "level": 6,
           "ability_value": 0.21,
-          "time": 4359744,
+          "time": 1209600,
           "power": 272150,
           "resources": {
-            "food": 9396000,
-            "lumber": 4698000,
-            "stone": 14094000,
-            "gold": 28188000
+            "food": 472176,
+            "lumber": 236088,
+            "stone": 708264,
+            "gold": 708264
           },
           "requirements": [
             {
@@ -7887,13 +7887,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 6055200,
+          "time": 1209600,
           "power": 404900,
           "resources": {
-            "food": 13050000,
-            "lumber": 6525000,
-            "stone": 19575000,
-            "gold": 39150000
+            "food": 655800,
+            "lumber": 327900,
+            "stone": 983700,
+            "gold": 983700
           },
           "requirements": [
             {
@@ -7910,13 +7910,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 8477280,
+          "time": 1209600,
           "power": 561950,
           "resources": {
-            "food": 18270000,
-            "lumber": 9135000,
-            "stone": 27405000,
-            "gold": 54810000
+            "food": 918120,
+            "lumber": 459060,
+            "stone": 1377180,
+            "gold": 1377180
           },
           "requirements": [
             {
@@ -7933,13 +7933,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 11948928,
+          "time": 1209600,
           "power": 748400,
           "resources": {
-            "food": 25752000,
-            "lumber": 12876000,
-            "stone": 38628000,
-            "gold": 77256000
+            "food": 1294112,
+            "lumber": 647056,
+            "stone": 1941168,
+            "gold": 1941168
           },
           "requirements": [
             {
@@ -7956,13 +7956,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 16712352,
+          "time": 1209600,
           "power": 968900,
           "resources": {
-            "food": 36018000,
-            "lumber": 18009000,
-            "stone": 54027000,
-            "gold": 108054000
+            "food": 1810008,
+            "lumber": 905004,
+            "stone": 2715012,
+            "gold": 2715012
           },
           "requirements": [
             {
@@ -7993,10 +7993,10 @@
           "time": 864000,
           "power": 16450,
           "resources": {
-            "food": 1800000,
-            "lumber": 900000,
-            "stone": 2700000,
-            "gold": 5400000
+            "food": 90456,
+            "lumber": 45228,
+            "stone": 135683,
+            "gold": 135683
           },
           "requirements": [
             {
@@ -8016,10 +8016,10 @@
           "time": 1209600,
           "power": 35900,
           "resources": {
-            "food": 2520000,
-            "lumber": 1260000,
-            "stone": 3780000,
-            "gold": 7560000
+            "food": 126638,
+            "lumber": 63319,
+            "stone": 189956,
+            "gold": 189956
           },
           "requirements": [
             {
@@ -8036,13 +8036,13 @@
         {
           "level": 3,
           "ability_value": 0.09,
-          "time": 1728000,
+          "time": 1209600,
           "power": 82400,
           "resources": {
-            "food": 3600000,
-            "lumber": 1800000,
-            "stone": 5400000,
-            "gold": 10800000
+            "food": 180911,
+            "lumber": 90456,
+            "stone": 271366,
+            "gold": 271366
           },
           "requirements": [
             {
@@ -8059,13 +8059,13 @@
         {
           "level": 4,
           "ability_value": 0.13,
-          "time": 2332800,
+          "time": 1209600,
           "power": 136400,
           "resources": {
-            "food": 4860000,
-            "lumber": 2430000,
-            "stone": 7290000,
-            "gold": 14580000
+            "food": 244229,
+            "lumber": 122115,
+            "stone": 366344,
+            "gold": 366344
           },
           "requirements": [
             {
@@ -8082,13 +8082,13 @@
         {
           "level": 5,
           "ability_value": 0.17,
-          "time": 3283200,
+          "time": 1209600,
           "power": 200500,
           "resources": {
-            "food": 6840000,
-            "lumber": 3420000,
-            "stone": 10260000,
-            "gold": 20520000
+            "food": 343730,
+            "lumber": 171865,
+            "stone": 515595,
+            "gold": 515595
           },
           "requirements": [
             {
@@ -8105,13 +8105,13 @@
         {
           "level": 6,
           "ability_value": 0.21,
-          "time": 4665600,
+          "time": 1209600,
           "power": 276900,
           "resources": {
-            "food": 9720000,
-            "lumber": 4860000,
-            "stone": 14580000,
-            "gold": 29160000
+            "food": 488458,
+            "lumber": 244229,
+            "stone": 732687,
+            "gold": 732687
           },
           "requirements": [
             {
@@ -8128,13 +8128,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 6480000,
+          "time": 1209600,
           "power": 411900,
           "resources": {
-            "food": 13500000,
-            "lumber": 6750000,
-            "stone": 20250000,
-            "gold": 40500000
+            "food": 678414,
+            "lumber": 339207,
+            "stone": 1017621,
+            "gold": 1017621
           },
           "requirements": [
             {
@@ -8151,13 +8151,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 9072000,
+          "time": 1209600,
           "power": 571650,
           "resources": {
-            "food": 18900000,
-            "lumber": 9450000,
-            "stone": 28350000,
-            "gold": 56700000
+            "food": 949780,
+            "lumber": 474890,
+            "stone": 1424669,
+            "gold": 1424669
           },
           "requirements": [
             {
@@ -8174,13 +8174,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 12787200,
+          "time": 1209600,
           "power": 761250,
           "resources": {
-            "food": 26640000,
-            "lumber": 13320000,
-            "stone": 39960000,
-            "gold": 79920000
+            "food": 1338737,
+            "lumber": 669369,
+            "stone": 2008105,
+            "gold": 2008105
           },
           "requirements": [
             {
@@ -8197,13 +8197,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 17884800,
+          "time": 1209600,
           "power": 985500,
           "resources": {
-            "food": 37260000,
-            "lumber": 18630000,
-            "stone": 55890000,
-            "gold": 111780000
+            "food": 1872422,
+            "lumber": 936211,
+            "stone": 2808633,
+            "gold": 2808633
           },
           "requirements": [
             {
@@ -8234,10 +8234,10 @@
           "time": 712860,
           "power": 15650,
           "resources": {
-            "food": 817500,
-            "lumber": 2452500,
-            "stone": 1635000,
-            "gold": 4905000
+            "food": 45647,
+            "lumber": 136940,
+            "stone": 91293,
+            "gold": 136940
           },
           "requirements": [
             {
@@ -8257,10 +8257,10 @@
           "time": 998004,
           "power": 34200,
           "resources": {
-            "food": 1144500,
-            "lumber": 3433500,
-            "stone": 2289000,
-            "gold": 6867000
+            "food": 63905,
+            "lumber": 191715,
+            "stone": 127810,
+            "gold": 191715
           },
           "requirements": [
             {
@@ -8277,13 +8277,13 @@
         {
           "level": 3,
           "ability_value": 0.09,
-          "time": 1425720,
+          "time": 1209600,
           "power": 79100,
           "resources": {
-            "food": 1680000,
-            "lumber": 5040000,
-            "stone": 3360000,
-            "gold": 10080000
+            "food": 84425,
+            "lumber": 253275,
+            "stone": 168850,
+            "gold": 253275
           },
           "requirements": [
             {
@@ -8300,13 +8300,13 @@
         {
           "level": 4,
           "ability_value": 0.13,
-          "time": 1924722,
+          "time": 1209600,
           "power": 131300,
           "resources": {
-            "food": 2268000,
-            "lumber": 6804000,
-            "stone": 4536000,
-            "gold": 13608000
+            "food": 113974,
+            "lumber": 341921,
+            "stone": 227947,
+            "gold": 341921
           },
           "requirements": [
             {
@@ -8323,13 +8323,13 @@
         {
           "level": 5,
           "ability_value": 0.17,
-          "time": 2708868,
+          "time": 1209600,
           "power": 193200,
           "resources": {
-            "food": 3192000,
-            "lumber": 9576000,
-            "stone": 6384000,
-            "gold": 19152000
+            "food": 160408,
+            "lumber": 481222,
+            "stone": 320815,
+            "gold": 481222
           },
           "requirements": [
             {
@@ -8346,13 +8346,13 @@
         {
           "level": 6,
           "ability_value": 0.21,
-          "time": 3849444,
+          "time": 1209600,
           "power": 267000,
           "resources": {
-            "food": 4536000,
-            "lumber": 13608000,
-            "stone": 9072000,
-            "gold": 27216000
+            "food": 227947,
+            "lumber": 683841,
+            "stone": 455894,
+            "gold": 683841
           },
           "requirements": [
             {
@@ -8369,13 +8369,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 5346450,
+          "time": 1209600,
           "power": 397350,
           "resources": {
-            "food": 6300000,
-            "lumber": 18900000,
-            "stone": 12600000,
-            "gold": 37800000
+            "food": 316594,
+            "lumber": 949780,
+            "stone": 633187,
+            "gold": 949780
           },
           "requirements": [
             {
@@ -8392,13 +8392,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 7485030,
+          "time": 1209600,
           "power": 551700,
           "resources": {
-            "food": 8820000,
-            "lumber": 26460000,
-            "stone": 17640000,
-            "gold": 52920000
+            "food": 443231,
+            "lumber": 1329691,
+            "stone": 886461,
+            "gold": 1329691
           },
           "requirements": [
             {
@@ -8415,13 +8415,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 10550328,
+          "time": 1209600,
           "power": 734850,
           "resources": {
-            "food": 12432000,
-            "lumber": 37296000,
-            "stone": 24864000,
-            "gold": 74592000
+            "food": 624744,
+            "lumber": 1874231,
+            "stone": 1249488,
+            "gold": 1874231
           },
           "requirements": [
             {
@@ -8438,13 +8438,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 14756202,
+          "time": 1209600,
           "power": 951450,
           "resources": {
-            "food": 17388000,
-            "lumber": 52164000,
-            "stone": 34776000,
-            "gold": 104328000
+            "food": 873797,
+            "lumber": 2621391,
+            "stone": 1747594,
+            "gold": 2621391
           },
           "requirements": [
             {
@@ -8475,10 +8475,10 @@
           "time": 807360,
           "power": 16150,
           "resources": {
-            "food": 870000,
-            "lumber": 2610000,
-            "stone": 1740000,
-            "gold": 5220000
+            "food": 43720,
+            "lumber": 131160,
+            "stone": 87440,
+            "gold": 131160
           },
           "requirements": [
             {
@@ -8498,10 +8498,10 @@
           "time": 1130304,
           "power": 35250,
           "resources": {
-            "food": 1218000,
-            "lumber": 3654000,
-            "stone": 2436000,
-            "gold": 7308000
+            "food": 61208,
+            "lumber": 183624,
+            "stone": 122416,
+            "gold": 183624
           },
           "requirements": [
             {
@@ -8518,13 +8518,13 @@
         {
           "level": 3,
           "ability_value": 0.09,
-          "time": 1614720,
+          "time": 1209600,
           "power": 80950,
           "resources": {
-            "food": 1740000,
-            "lumber": 5220000,
-            "stone": 3480000,
-            "gold": 10440000
+            "food": 87440,
+            "lumber": 262320,
+            "stone": 174880,
+            "gold": 262320
           },
           "requirements": [
             {
@@ -8541,13 +8541,13 @@
         {
           "level": 4,
           "ability_value": 0.13,
-          "time": 2179872,
+          "time": 1209600,
           "power": 134050,
           "resources": {
-            "food": 2349000,
-            "lumber": 7047000,
-            "stone": 4698000,
-            "gold": 14094000
+            "food": 118044,
+            "lumber": 354132,
+            "stone": 236088,
+            "gold": 354132
           },
           "requirements": [
             {
@@ -8564,13 +8564,13 @@
         {
           "level": 5,
           "ability_value": 0.17,
-          "time": 3067968,
+          "time": 1209600,
           "power": 197050,
           "resources": {
-            "food": 3306000,
-            "lumber": 9918000,
-            "stone": 6612000,
-            "gold": 19836000
+            "food": 166136,
+            "lumber": 498408,
+            "stone": 332272,
+            "gold": 498408
           },
           "requirements": [
             {
@@ -8587,13 +8587,13 @@
         {
           "level": 6,
           "ability_value": 0.21,
-          "time": 4359744,
+          "time": 1209600,
           "power": 272150,
           "resources": {
-            "food": 4698000,
-            "lumber": 14094000,
-            "stone": 9396000,
-            "gold": 28188000
+            "food": 236088,
+            "lumber": 708264,
+            "stone": 472176,
+            "gold": 708264
           },
           "requirements": [
             {
@@ -8610,13 +8610,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 6055200,
+          "time": 1209600,
           "power": 404900,
           "resources": {
-            "food": 6525000,
-            "lumber": 19575000,
-            "stone": 13050000,
-            "gold": 39150000
+            "food": 327900,
+            "lumber": 983700,
+            "stone": 655800,
+            "gold": 983700
           },
           "requirements": [
             {
@@ -8633,13 +8633,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 8477280,
+          "time": 1209600,
           "power": 561950,
           "resources": {
-            "food": 9135000,
-            "lumber": 27405000,
-            "stone": 18270000,
-            "gold": 54810000
+            "food": 459060,
+            "lumber": 1377180,
+            "stone": 918120,
+            "gold": 1377180
           },
           "requirements": [
             {
@@ -8656,13 +8656,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 11948928,
+          "time": 1209600,
           "power": 748400,
           "resources": {
-            "food": 12876000,
-            "lumber": 38628000,
-            "stone": 25752000,
-            "gold": 77256000
+            "food": 647056,
+            "lumber": 1941168,
+            "stone": 1294112,
+            "gold": 1941168
           },
           "requirements": [
             {
@@ -8679,13 +8679,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 16712352,
+          "time": 1209600,
           "power": 968900,
           "resources": {
-            "food": 18009000,
-            "lumber": 54027000,
-            "stone": 36018000,
-            "gold": 108054000
+            "food": 905004,
+            "lumber": 2715012,
+            "stone": 1810008,
+            "gold": 2715012
           },
           "requirements": [
             {
@@ -8716,10 +8716,10 @@
           "time": 864000,
           "power": 16450,
           "resources": {
-            "food": 900000,
-            "lumber": 2700000,
-            "stone": 1800000,
-            "gold": 5400000
+            "food": 45228,
+            "lumber": 135683,
+            "stone": 90456,
+            "gold": 135683
           },
           "requirements": [
             {
@@ -8739,10 +8739,10 @@
           "time": 1209600,
           "power": 35900,
           "resources": {
-            "food": 1260000,
-            "lumber": 3780000,
-            "stone": 2520000,
-            "gold": 7560000
+            "food": 63319,
+            "lumber": 189956,
+            "stone": 126638,
+            "gold": 189956
           },
           "requirements": [
             {
@@ -8759,13 +8759,13 @@
         {
           "level": 3,
           "ability_value": 0.09,
-          "time": 1728000,
+          "time": 1209600,
           "power": 82400,
           "resources": {
-            "food": 1800000,
-            "lumber": 5400000,
-            "stone": 3600000,
-            "gold": 10800000
+            "food": 90456,
+            "lumber": 271366,
+            "stone": 180911,
+            "gold": 271366
           },
           "requirements": [
             {
@@ -8782,13 +8782,13 @@
         {
           "level": 4,
           "ability_value": 0.13,
-          "time": 2332800,
+          "time": 1209600,
           "power": 136400,
           "resources": {
-            "food": 2430000,
-            "lumber": 7290000,
-            "stone": 4860000,
-            "gold": 14580000
+            "food": 122115,
+            "lumber": 366344,
+            "stone": 244229,
+            "gold": 366344
           },
           "requirements": [
             {
@@ -8805,13 +8805,13 @@
         {
           "level": 5,
           "ability_value": 0.17,
-          "time": 3283200,
+          "time": 1209600,
           "power": 200500,
           "resources": {
-            "food": 3420000,
-            "lumber": 10260000,
-            "stone": 6840000,
-            "gold": 20520000
+            "food": 171865,
+            "lumber": 515595,
+            "stone": 343730,
+            "gold": 515595
           },
           "requirements": [
             {
@@ -8828,13 +8828,13 @@
         {
           "level": 6,
           "ability_value": 0.21,
-          "time": 4665600,
+          "time": 1209600,
           "power": 276900,
           "resources": {
-            "food": 4860000,
-            "lumber": 14580000,
-            "stone": 9720000,
-            "gold": 29160000
+            "food": 244229,
+            "lumber": 732687,
+            "stone": 488458,
+            "gold": 732687
           },
           "requirements": [
             {
@@ -8851,13 +8851,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 6480000,
+          "time": 1209600,
           "power": 411900,
           "resources": {
-            "food": 6750000,
-            "lumber": 20250000,
-            "stone": 13500000,
-            "gold": 40500000
+            "food": 339207,
+            "lumber": 1017621,
+            "stone": 678414,
+            "gold": 1017621
           },
           "requirements": [
             {
@@ -8874,13 +8874,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 9072000,
+          "time": 1209600,
           "power": 571650,
           "resources": {
-            "food": 9450000,
-            "lumber": 28350000,
-            "stone": 18900000,
-            "gold": 56700000
+            "food": 474890,
+            "lumber": 1424669,
+            "stone": 949780,
+            "gold": 1424669
           },
           "requirements": [
             {
@@ -8897,13 +8897,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 12787200,
+          "time": 1209600,
           "power": 761250,
           "resources": {
-            "food": 13320000,
-            "lumber": 39960000,
-            "stone": 26640000,
-            "gold": 79920000
+            "food": 669369,
+            "lumber": 2008105,
+            "stone": 1338737,
+            "gold": 2008105
           },
           "requirements": [
             {
@@ -8920,13 +8920,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 17884800,
+          "time": 1209600,
           "power": 985500,
           "resources": {
-            "food": 18630000,
-            "lumber": 55890000,
-            "stone": 37260000,
-            "gold": 111780000
+            "food": 936211,
+            "lumber": 2808633,
+            "stone": 1872422,
+            "gold": 2808633
           },
           "requirements": [
             {
@@ -8957,10 +8957,10 @@
           "time": 712860,
           "power": 15650,
           "resources": {
-            "food": 2452500,
-            "lumber": 1635000,
-            "stone": 817500,
-            "gold": 4905000
+            "food": 136940,
+            "lumber": 91293,
+            "stone": 45647,
+            "gold": 136940
           },
           "requirements": [
             {
@@ -8980,10 +8980,10 @@
           "time": 998004,
           "power": 34200,
           "resources": {
-            "food": 3433500,
-            "lumber": 2289000,
-            "stone": 1144500,
-            "gold": 6867000
+            "food": 191715,
+            "lumber": 127810,
+            "stone": 63905,
+            "gold": 191715
           },
           "requirements": [
             {
@@ -9000,13 +9000,13 @@
         {
           "level": 3,
           "ability_value": 0.09,
-          "time": 1425720,
+          "time": 1209600,
           "power": 79100,
           "resources": {
-            "food": 5040000,
-            "lumber": 3360000,
-            "stone": 1680000,
-            "gold": 10080000
+            "food": 253275,
+            "lumber": 168850,
+            "stone": 84425,
+            "gold": 253275
           },
           "requirements": [
             {
@@ -9023,13 +9023,13 @@
         {
           "level": 4,
           "ability_value": 0.13,
-          "time": 1924722,
+          "time": 1209600,
           "power": 131300,
           "resources": {
-            "food": 6804000,
-            "lumber": 4536000,
-            "stone": 2268000,
-            "gold": 13608000
+            "food": 341921,
+            "lumber": 227947,
+            "stone": 113974,
+            "gold": 341921
           },
           "requirements": [
             {
@@ -9046,13 +9046,13 @@
         {
           "level": 5,
           "ability_value": 0.17,
-          "time": 2708868,
+          "time": 1209600,
           "power": 193200,
           "resources": {
-            "food": 9576000,
-            "lumber": 6384000,
-            "stone": 3192000,
-            "gold": 19152000
+            "food": 481222,
+            "lumber": 320815,
+            "stone": 160408,
+            "gold": 481222
           },
           "requirements": [
             {
@@ -9069,13 +9069,13 @@
         {
           "level": 6,
           "ability_value": 0.21,
-          "time": 3849444,
+          "time": 1209600,
           "power": 267000,
           "resources": {
-            "food": 13608000,
-            "lumber": 9072000,
-            "stone": 4536000,
-            "gold": 27216000
+            "food": 683841,
+            "lumber": 455894,
+            "stone": 227947,
+            "gold": 683841
           },
           "requirements": [
             {
@@ -9092,13 +9092,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 5346450,
+          "time": 1209600,
           "power": 397350,
           "resources": {
-            "food": 18900000,
-            "lumber": 12600000,
-            "stone": 6300000,
-            "gold": 37800000
+            "food": 949780,
+            "lumber": 633187,
+            "stone": 316594,
+            "gold": 949780
           },
           "requirements": [
             {
@@ -9115,13 +9115,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 7485030,
+          "time": 1209600,
           "power": 551700,
           "resources": {
-            "food": 26460000,
-            "lumber": 17640000,
-            "stone": 8820000,
-            "gold": 52920000
+            "food": 1329691,
+            "lumber": 886461,
+            "stone": 443231,
+            "gold": 1329691
           },
           "requirements": [
             {
@@ -9138,13 +9138,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 10550328,
+          "time": 1209600,
           "power": 734850,
           "resources": {
-            "food": 37296000,
-            "lumber": 24864000,
-            "stone": 12432000,
-            "gold": 74592000
+            "food": 1874231,
+            "lumber": 1249488,
+            "stone": 624744,
+            "gold": 1874231
           },
           "requirements": [
             {
@@ -9161,13 +9161,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 14756202,
+          "time": 1209600,
           "power": 951450,
           "resources": {
-            "food": 52164000,
-            "lumber": 34776000,
-            "stone": 17388000,
-            "gold": 104328000
+            "food": 2621391,
+            "lumber": 1747594,
+            "stone": 873797,
+            "gold": 2621391
           },
           "requirements": [
             {
@@ -9198,10 +9198,10 @@
           "time": 807360,
           "power": 16150,
           "resources": {
-            "food": 2610000,
-            "lumber": 1740000,
-            "stone": 870000,
-            "gold": 5220000
+            "food": 131160,
+            "lumber": 87440,
+            "stone": 43720,
+            "gold": 131160
           },
           "requirements": [
             {
@@ -9221,10 +9221,10 @@
           "time": 1130304,
           "power": 35250,
           "resources": {
-            "food": 3654000,
-            "lumber": 2436000,
-            "stone": 1218000,
-            "gold": 7308000
+            "food": 183624,
+            "lumber": 122416,
+            "stone": 61208,
+            "gold": 183624
           },
           "requirements": [
             {
@@ -9241,13 +9241,13 @@
         {
           "level": 3,
           "ability_value": 0.09,
-          "time": 1614720,
+          "time": 1209600,
           "power": 80950,
           "resources": {
-            "food": 5220000,
-            "lumber": 3480000,
-            "stone": 1740000,
-            "gold": 10440000
+            "food": 262320,
+            "lumber": 174880,
+            "stone": 87440,
+            "gold": 262320
           },
           "requirements": [
             {
@@ -9264,13 +9264,13 @@
         {
           "level": 4,
           "ability_value": 0.13,
-          "time": 2179872,
+          "time": 1209600,
           "power": 134050,
           "resources": {
-            "food": 7047000,
-            "lumber": 4698000,
-            "stone": 2349000,
-            "gold": 14094000
+            "food": 354132,
+            "lumber": 236088,
+            "stone": 118044,
+            "gold": 354132
           },
           "requirements": [
             {
@@ -9287,13 +9287,13 @@
         {
           "level": 5,
           "ability_value": 0.17,
-          "time": 3067968,
+          "time": 1209600,
           "power": 197050,
           "resources": {
-            "food": 9918000,
-            "lumber": 6612000,
-            "stone": 3306000,
-            "gold": 19836000
+            "food": 498408,
+            "lumber": 332272,
+            "stone": 166136,
+            "gold": 498408
           },
           "requirements": [
             {
@@ -9310,13 +9310,13 @@
         {
           "level": 6,
           "ability_value": 0.21,
-          "time": 4359744,
+          "time": 1209600,
           "power": 272150,
           "resources": {
-            "food": 14094000,
-            "lumber": 9396000,
-            "stone": 4698000,
-            "gold": 28188000
+            "food": 708264,
+            "lumber": 472176,
+            "stone": 236088,
+            "gold": 708264
           },
           "requirements": [
             {
@@ -9333,13 +9333,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 6055200,
+          "time": 1209600,
           "power": 404900,
           "resources": {
-            "food": 19575000,
-            "lumber": 13050000,
-            "stone": 6525000,
-            "gold": 39150000
+            "food": 983700,
+            "lumber": 655800,
+            "stone": 327900,
+            "gold": 983700
           },
           "requirements": [
             {
@@ -9356,13 +9356,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 8477280,
+          "time": 1209600,
           "power": 561950,
           "resources": {
-            "food": 27405000,
-            "lumber": 18270000,
-            "stone": 9135000,
-            "gold": 54810000
+            "food": 1377180,
+            "lumber": 918120,
+            "stone": 459060,
+            "gold": 1377180
           },
           "requirements": [
             {
@@ -9379,13 +9379,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 11948928,
+          "time": 1209600,
           "power": 748400,
           "resources": {
-            "food": 38628000,
-            "lumber": 25752000,
-            "stone": 12876000,
-            "gold": 77256000
+            "food": 1941168,
+            "lumber": 1294112,
+            "stone": 647056,
+            "gold": 1941168
           },
           "requirements": [
             {
@@ -9402,13 +9402,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 16712352,
+          "time": 1209600,
           "power": 968900,
           "resources": {
-            "food": 54027000,
-            "lumber": 36018000,
-            "stone": 18009000,
-            "gold": 108054000
+            "food": 2715012,
+            "lumber": 1810008,
+            "stone": 905004,
+            "gold": 2715012
           },
           "requirements": [
             {
@@ -9439,10 +9439,10 @@
           "time": 864000,
           "power": 16450,
           "resources": {
-            "food": 2700000,
-            "lumber": 1800000,
-            "stone": 900000,
-            "gold": 5400000
+            "food": 135683,
+            "lumber": 90456,
+            "stone": 45228,
+            "gold": 135683
           },
           "requirements": [
             {
@@ -9462,10 +9462,10 @@
           "time": 1209600,
           "power": 35900,
           "resources": {
-            "food": 3780000,
-            "lumber": 2520000,
-            "stone": 1260000,
-            "gold": 7560000
+            "food": 189956,
+            "lumber": 126638,
+            "stone": 63319,
+            "gold": 189956
           },
           "requirements": [
             {
@@ -9482,13 +9482,13 @@
         {
           "level": 3,
           "ability_value": 0.09,
-          "time": 1728000,
+          "time": 1209600,
           "power": 82400,
           "resources": {
-            "food": 5400000,
-            "lumber": 3600000,
-            "stone": 1800000,
-            "gold": 10800000
+            "food": 271366,
+            "lumber": 180911,
+            "stone": 90456,
+            "gold": 271366
           },
           "requirements": [
             {
@@ -9505,13 +9505,13 @@
         {
           "level": 4,
           "ability_value": 0.13,
-          "time": 2332800,
+          "time": 1209600,
           "power": 136400,
           "resources": {
-            "food": 7290000,
-            "lumber": 4860000,
-            "stone": 2430000,
-            "gold": 14580000
+            "food": 366344,
+            "lumber": 244229,
+            "stone": 122115,
+            "gold": 366344
           },
           "requirements": [
             {
@@ -9528,13 +9528,13 @@
         {
           "level": 5,
           "ability_value": 0.17,
-          "time": 3283200,
+          "time": 1209600,
           "power": 200500,
           "resources": {
-            "food": 10260000,
-            "lumber": 6840000,
-            "stone": 3420000,
-            "gold": 20520000
+            "food": 515595,
+            "lumber": 343730,
+            "stone": 171865,
+            "gold": 515595
           },
           "requirements": [
             {
@@ -9551,13 +9551,13 @@
         {
           "level": 6,
           "ability_value": 0.21,
-          "time": 4665600,
+          "time": 1209600,
           "power": 276900,
           "resources": {
-            "food": 14580000,
-            "lumber": 9720000,
-            "stone": 4860000,
-            "gold": 29160000
+            "food": 732687,
+            "lumber": 488458,
+            "stone": 244229,
+            "gold": 732687
           },
           "requirements": [
             {
@@ -9574,13 +9574,13 @@
         {
           "level": 7,
           "ability_value": 0.25,
-          "time": 6480000,
+          "time": 1209600,
           "power": 411900,
           "resources": {
-            "food": 20250000,
-            "lumber": 13500000,
-            "stone": 6750000,
-            "gold": 40500000
+            "food": 1017621,
+            "lumber": 678414,
+            "stone": 339207,
+            "gold": 1017621
           },
           "requirements": [
             {
@@ -9597,13 +9597,13 @@
         {
           "level": 8,
           "ability_value": 0.29,
-          "time": 9072000,
+          "time": 1209600,
           "power": 571650,
           "resources": {
-            "food": 28350000,
-            "lumber": 18900000,
-            "stone": 9450000,
-            "gold": 56700000
+            "food": 1424669,
+            "lumber": 949780,
+            "stone": 474890,
+            "gold": 1424669
           },
           "requirements": [
             {
@@ -9620,13 +9620,13 @@
         {
           "level": 9,
           "ability_value": 0.33,
-          "time": 12787200,
+          "time": 1209600,
           "power": 761250,
           "resources": {
-            "food": 39960000,
-            "lumber": 26640000,
-            "stone": 13320000,
-            "gold": 79920000
+            "food": 2008105,
+            "lumber": 1338737,
+            "stone": 669369,
+            "gold": 2008105
           },
           "requirements": [
             {
@@ -9643,13 +9643,13 @@
         {
           "level": 10,
           "ability_value": 0.4,
-          "time": 17884800,
+          "time": 1209600,
           "power": 985500,
           "resources": {
-            "food": 55890000,
-            "lumber": 37260000,
-            "stone": 18630000,
-            "gold": 111780000
+            "food": 2808633,
+            "lumber": 1872422,
+            "stone": 936211,
+            "gold": 2808633
           },
           "requirements": [
             {

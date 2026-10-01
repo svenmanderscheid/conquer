@@ -2,62 +2,23 @@
 
 For all menus, HUD elements, building dialogs, backoffice screens and world-map colours, also follow **`docs/UI_STYLE_GUIDE.md`**. The shared UI tokens and appearance layer are in `assets/css/village-theme.css`; the active world terrain palette is in `assets/js/world-landscape.js`. These extend the village reference below.
 
-The user-approved interface reference is **`assets/art/ui-violet-beige-reference.png`** (variant A, 13 September 2026): dark-violet headers, warm beige surfaces, restrained gold accents, Almendra text and Lora numerals. This applies to the main app, standalone 3D controls and labels, map overlays and backoffice. Use the shared UI tokens for those surfaces; the painted buildings, role colours and natural landscape continue to use the world palette below.
+The user-approved interface reference is **`assets/art/ui-violet-beige-reference.png`** (variant A, 13 September 2026): dark-violet headers, warm beige surfaces, restrained gold accents, Almendra text and Lora numerals. This applies to the main app, map overlays and backoffice. Use the shared UI tokens for those surfaces; the painted buildings, role colours and natural landscape continue to use the world palette below.
 
 Generated with the built-in Imagegen tool on 2026-09-08. These are new original illustrations; the supplied screenshot informed the requested stylistic direction and was not used as a source of extracted assets. No CLI image-generation fallback was used.
 
 Files are project-local under `assets/art/`. The production village is `village2.png`; `village.png` is the unused first draft. `knight.png`, `archer.png`, `rider.png`, `orc.png`, `skeleton.png` and `golem.png` illustrate the guide, troops and encounters. `world.png` is the map backdrop.
 
-## Active 3D style rules
+## Active painted-world style rules
 
-`assets/art/village2.png` is the binding visual reference for the playable 3D city. The prompts below document the origin of the 2D artwork; their restrictions such as “no textures” describe that illustration and do not forbid restrained, hand-painted textures in the 3D scene.
+Since 26 September 2026 the game uses only the painted city (`assets/js/city-painted.js`) and the existing illustrated world map. The separate 3D/2.5D city, Three.js runtime and GLB models were removed at the user's request; see `REMOVED_3D_2026-09-26.md`. `village2.png` remains the binding style reference. Current city and world asset paths are defined by the active renderer modules; preserve those approved illustrations.
 
-The 3D city should look like a playable version of the illustration: chunky toy-like buildings, rounded and slightly exaggerated silhouettes, a muted sage landscape, warm paths, strong roof colors, broad toon shading and selective dark brown outlines. Readability from the normal isometric camera matters more than small realistic detail. New objects should use the shared colors and materials from `assets/city3d/storybook-style.js` wherever possible.
+Use chunky, rounded silhouettes, warm ivory walls, saturated roof colors, dark espresso outlines and two broad light values. Paths are warm tan with soft edges and sparse irregular marks. Landscapes use muted sage grass and varied tree silhouettes. Characters use large heads, short limbs and clear, oversized role equipment. Avoid photographic textures and glossy realism. Add interface depth through restrained shadows, layering and light edges, using the shared UI variables.
 
-The shared `paintedMap()` surface in that module is part of the required material language. It adds very soft broad color variation and a faint relief to stone, plaster, wood, cloth and roofs. It must remain subtle: the reference uses clean illustrated areas rather than dirt, photographic grain or weathered realism. New building materials should go through `storybookMaterials` or `shadeStorybookRoot()` so they inherit this surface automatically. Completely clean single-color materials should be reserved for light effects, water highlights and very small symbols.
+Animation stays calm, supports reduced motion and never obscures labels, selection or touch controls. Inspect the whole city and building dialogs in the actual app at desktop, narrow portrait and landscape sizes. Keep images compressed and reuse sprites.
 
-### What the supplied screenshots establish
+Construction reuses the approved scaffold artwork with a fixed frame and worker silhouette. Only the isolated hammer moves, with small timed dust/chip accents at the strike point; do not stack transparent whole-frame poses or move the entire building. The detail SVG is mounted only for an authoritative active build queue, retained across refreshes and removed when that queue settles. Countdown expiry alone does not finish the work. Timer labels stay above the scaffold. Light graphics retains the small tool motion and omits particles; reduced motion uses a fully still worksite. Dialogs, hidden tabs and the world view pause construction. Check `tests/city_construction_app.cjs` and `tests/painted_city.cjs`.
 
-The active reference is the simpler `village2.png`, not the more detailed first draft `village.png`. Its buildings use warm ivory walls, saturated blue, orange, purple and red roofs, dark espresso outlines and only two broad light values. Roof seams and a few oversized functional props provide detail. Surfaces remain calm and clean.
-
-Paths are pale warm tan ribbons with soft edges and only occasional flat oval marks. They do not use dense gravel, regular paving rows or high-frequency noise. Grass is a muted yellow-green. Dark teal pines frame the outside, while rounded shrubs and a few rocks, flowers and mushrooms fill gaps without covering buildings.
-
-Character proportions follow `knight.png`, `archer.png`, `rider.png`, `orc.png`, `skeleton.png` and `golem.png`: the head occupies roughly 40–50 percent of total height, limbs are short and rounded, facial features are simple and equipment is oversized. These proportions take priority over realistic anatomy.
-
-### Surfaces and paths
-
-Natural surfaces may use small procedural or project-local image textures when flat color cannot communicate the material. Textures must be seamless, softly hand-painted and limited to a few related colors. They should add broad mottling, grain or embedded stones without photographic noise, sharp pixel art, visible square repetition or realistic gloss.
-
-City paths use the warm dirt-and-gravel texture created by `paintedRoadTexture()` in `assets/city3d/full-city.js`. New paths and extensions must use this material and scale their UVs by physical path length so the texture retains the same density. Use only sparse, irregular 3D border stones. Do not restore evenly spaced rectangular slabs. Path details remain flat and the center remains clear for pedestrians.
-
-### Buildings and props
-
-Start with a simple, recognizable silhouette and exaggerate the part that communicates the function: large crossed swords for a barracks, a broad wheel for a mill or an open rock arch for a mine. Prefer curved roofs, broad arches, thick beams and a few oversized props. Apply dark outlines to the main shapes, not to every tiny mesh. Repeated roof tiles, stones, plants and small props should use instancing.
-
-The village identity pass of 17 September 2026 uses large functional landmarks:
-crossed swords and shield practice for infantry, bow and round targets for archers,
-horse head and ponies for cavalry, an open book for research, twin grain bins for
-storage, a coffer above the treasury door, paired heraldry for the alliance hall,
-wheat on the farm roof, a saw and axe at the lumber mill, cut blocks at the quarry,
-and exposed ore at the gold mine. Keep these cues readable from the normal camera;
-do not replace them with a collection of tiny props. The hospital cross and the
-market's striped stalls remain their existing landmarks.
-
-The playable island and its sloping banks share one irregular shoreline in
-`village-landscape.js`; the old ten-sided study disc is hidden in the game scene.
-Low shore rocks, reeds and lily pads stay outside the walls and clear of the south
-bridge. Repeated details and moving water strokes use instances. Preserve the flat
-playable ground, building coordinates and authored walking routes.
-
-### Trees and plants
-
-Trees use crooked trunks, visible root flares and off-centre crowns. Mix rounded cloud-like deciduous trees with squat layered pines. Change crown offsets, scale, lean and tone deterministically so rows never look cloned. Fruits and flowers are sparse accents. Avoid perfect cones, straight poles and three identical centered foliage layers.
-
-### People and animation
-
-Characters use clear chibi proportions: the head is large, the torso and legs are short, hands and boots are broad, and one clothing or equipment shape identifies the role. Faces remain simple and readable. Farmers, craftspeople, pedestrians and guards should differ through hats, tunics, tools, shields or color rather than realistic anatomy.
-
-Walking uses short steps, visible arm swing, a small vertical bounce and slight body lean. Pedestrians follow the authored road polylines and may use only small lane offsets. Workers remain beside their workplace. Wall guards stand and walk on the center of the visible wall walkway and turn before the gate. Animated characters must never cross buildings, props, walls or closed ground.
+Luxembourg conquest landmarks use the eight transparent illustrations in `assets/art/territory-v2/`: six commune benefits, a canton fortress and the Royal Castle. The 30 September revision gives them broader halls, stronger foundations, heavier bastions and more substantial walls while retaining the original roof colors and benefit emblems. Map and territory dialogs share `assets/js/territory-art.js`; their illustrated size follows the authoritative footprint. Sources, prompts, compression and visual checks are documented in `TERRITORY_ART.md`. The previous `territory-v1` set remains available for comparison.
 
 ### Premium castle and march skins
 
@@ -69,12 +30,12 @@ Review castle, march loop and arrival together before release. Verify their shar
 
 ### Review checklist for every visual addition
 
-- Compare the new content with `village2.png` and the surrounding 3D objects at normal zoom.
-- Inspect the silhouette and material once in a close view and once in the full-city view.
+- Compare the new content with `village2.png` and the surrounding illustrated assets at normal zoom.
+- Inspect the silhouette and artwork once in a close view and once in the full-city view.
 - Confirm paths and animated routes remain unobstructed.
 - Confirm labels, selection and mobile controls remain readable and clickable.
 - Check JavaScript syntax, current cache-version imports and browser warnings or errors.
-- Keep repeated details instanced and compare the scene metrics after substantial additions.
+- Reuse image assets and inspect mobile memory and loading after substantial additions.
 
 ## Final village prompt
 

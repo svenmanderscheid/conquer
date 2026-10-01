@@ -184,7 +184,7 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conquer — <?= htmlspecialchars($name) ?></title>
+    <title>Union of Kingdoms — <?= htmlspecialchars($name) ?></title>
     <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR.'/assets/css/fantasy-fonts.css') ?>">
 <?php endif ?>
 <style>
@@ -1501,7 +1501,8 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
                 <?php if ($buildingCode === 'barrack'):
                     $castleLevel = (int) ($buildings['castle']['level'] ?? 0);
                     $allTroops    = TroopData::all();
-                    $troopsData   = array_values(array_map(function($t) use ($buildings, $castleLevel, $troops) {
+                    $troopResearch = TroopData::researchLevels((int)$city['player_id'],(int)$city['world_id']);
+                    $troopsData   = array_values(array_map(function($t) use ($buildings, $castleLevel, $troops, $troopResearch) {
                         return [
                             'code'          => (int)$t['code'],
                             'name'          => $t['name'],
@@ -1519,7 +1520,8 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
                             'time'          => (int)$t['time'],
                             'unlock_building'=> (int)$t['unlock_building'],
                             'unlock_castle' => (int)$t['unlock_castle'],
-                            'unlocked'      => TroopData::isUnlocked((int)$t['code'], (int)($buildings[TroopData::buildingFor((int)$t['code'])]['level']??0), $castleLevel),
+                            'unlock_academy' => (int)($t['unlock_academy'] ?? 0),
+                            'unlocked'      => TroopData::isUnlocked((int)$t['code'], (int)($buildings[TroopData::buildingFor((int)$t['code'])]['level']??0), $castleLevel, (int)($buildings['academy']['level']??0), $troopResearch),
                             'in_city'       => (int)($troops[(int)$t['code']] ?? 0),
                         ];
                     }, $allTroops));
@@ -1962,7 +1964,7 @@ if (cdEl) {
     let brkSelectedCode = null;
 
     function fmtNum(n) {
-        return Number(n).toLocaleString('de-DE');
+        return Number(n).toLocaleString(window.ConquerLocale?.locale||'en');
     }
     function fmtTimeSec(s) {
         if (s < 60)  return s + 's';
@@ -2060,7 +2062,7 @@ if (cdEl) {
             trainBtn.dataset.name = t.name;
             if (!t.unlocked) {
                 trainBtn.disabled = true;
-                trainBtn.textContent = '🔒 Ausbildungsgebäude ' + t.unlock_building + ' / Stadtzentrum ' + t.unlock_castle;
+                trainBtn.textContent = t.tier > 1 ? '🔒 Akademie ' + t.unlock_academy + ' und ' + t.name + ' erforschen' : '🔒 Ausbildungsgebäude ' + t.unlock_building;
             } else {
                 trainBtn.disabled = false;
                 trainBtn.textContent = 'AUSBILDEN';
@@ -2509,7 +2511,7 @@ function caravanApp() {
         // ---- helpers --------------------------------------------------------
 
         fmt(n) {
-            return Number(n).toLocaleString('de-DE');
+            return Number(n).toLocaleString(window.ConquerLocale?.locale||'en');
         },
 
         currencyIcon(cur) {

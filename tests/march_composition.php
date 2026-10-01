@@ -59,7 +59,7 @@ try {
         if(!preg_match('/^[a-zA-Z0-9_]+$/D',$table))throw new RuntimeException('Invalid source table name.');
         $admin->exec('CREATE TABLE `'.$name.'`.`'.$table.'` LIKE `'.$source.'`.`'.$table.'`');
     }
-    $admin->exec('INSERT INTO `'.$name.'`.worlds SELECT * FROM `'.$source.'`.worlds WHERE id=1');
+    $admin->exec("INSERT INTO `".$name."`.worlds(id,name,slug,status,map_size,map_seed) VALUES(1,'March fixture','march-fixture','running',256,42)");
     copyTree(ROOT_DIR.'/src',$root.'/src');copyTree(ROOT_DIR.'/data',$root.'/data');
     mkdir($root.'/config',0700,true);mkdir($root.'/logs',0700,true);
     $cfg['database']=$name;file_put_contents($root.'/config/database.php',"<?php\nreturn ".var_export($cfg,true).";\n");
@@ -68,7 +68,8 @@ try {
     file_put_contents($root.'/router.php',"<?php\n\$_SERVER['SCRIPT_NAME']='/index.php';require __DIR__.'/index.php';\n");
     $db=Connection::init($root);
     \Conquer\Game\World\WorldContext::bind(1);
-    $db->execute('UPDATE worlds SET gather_factor=1,speed_factor=1 WHERE id=1');
+    // Keep tiny current-catalog armies gathering while the combat army returns.
+    $db->execute('UPDATE worlds SET gather_factor=0.01,speed_factor=1 WHERE id=1');
     foreach(['0083_reward_overrides.sql','0084_land_progression.sql','0085_monster_charms.sql','0086_reward_world_revisions.sql','0087_charm_compatibility.sql'] as $migration)\Conquer\Db\MigrationSql::apply($db->getPdo(),(string)file_get_contents(ROOT_DIR.'/migrations/'.$migration));
     $player=random_int(400000000,450000000);$other=$player+1;
     foreach([$player,$other]as$i=>$id){
@@ -101,6 +102,8 @@ try {
     $r=request('/api/march/dispatch-gather',['target_x'=>51,'target_y'=>51,'troops'=>[50100101=>3,50200101=>999]]);
     verify($r['status']===400&&troops($player)===$initial,'unavailable mixed gather selection atomically rolls back earlier troop deductions');
     $selected=[50100201=>1,50200101=>3,50300101=>2];
+    $expectedCarry=(int)floor(array_sum(array_map(static fn(int $code,int $count):float=>(float)\Conquer\Game\City\TroopData::get($code)['carry']*$count,array_keys($selected),array_values($selected))));
+    $legacyCarry=(int)floor(3*(float)\Conquer\Game\City\TroopData::get(50100101)['carry']);
     $r=request('/api/march/dispatch-gather',['target_x'=>51,'target_y'=>51,'troops'=>$selected,'troop_count'=>50000,'city_id'=>$other]);
     verify($r['status']===200,'mixed gather request accepts exactly owned types including an owned higher tier');$gather=(int)$r['json']['data']['march_id'];
     verify(composition($gather)===$selected,'gather persists explicit composition instead of replacing it with automatic selection');
@@ -121,17 +124,16 @@ try {
     $monsterHaul=json_decode($db->query('SELECT haul_json FROM marches WHERE id=?',[$monster])->fetchColumn(),true);
     verify($monsterHaul['survivors']===$attack,'monster homecoming preserves every surviving troop type and count');
     $foodBefore=(int)$db->query('SELECT food FROM cities WHERE id=?',[$player])->fetchColumn();
-    $db->execute("UPDATE marches SET departure_time=DATE_SUB(departure_time,INTERVAL 120 SECOND),arrival_time=DATE_SUB(arrival_time,INTERVAL 120 SECOND),gathering_finishes_at=DATE_SUB(gathering_finishes_at,INTERVAL 120 SECOND) WHERE player_id=? AND state='arrived'",[$player]);
+    $db->execute("UPDATE marches SET departure_time=DATE_SUB(departure_time,INTERVAL 3600 SECOND),arrival_time=DATE_SUB(arrival_time,INTERVAL 3600 SECOND),gathering_finishes_at=DATE_SUB(gathering_finishes_at,INTERVAL 3600 SECOND) WHERE player_id=? AND state='arrived'",[$player]);
     MarchTick::runForPlayer($player);
     verify(troops($player)===$initial,'mixed armies return to their original types without duplication');
     $haul=json_decode($db->query('SELECT haul_json FROM marches WHERE id=?',[$gather])->fetchColumn(),true);
-    // One T2 infantry carries 124; three cavalry and two archers carry 108 each.
-    verify($haul['survivors']===$selected&&$haul['loot']['food']===664,'gather carry uses the six selected troops and preserves survivor composition');
+    verify($haul['survivors']===$selected&&$haul['loot']['food']===$expectedCarry,'gather carry uses the six selected troops and preserves survivor composition');
     verify((int)$db->query("SELECT COUNT(*) FROM marches WHERE player_id=? AND state='complete'",[$player])->fetchColumn()===3,'offline settlement finishes gathering and both return journeys');
     $foodAfter=(int)$db->query('SELECT food FROM cities WHERE id=?',[$player])->fetchColumn();
-    verify($foodAfter-$foodBefore===664+324,'both gathering hauls are credited to the original city');
+    verify($foodAfter-$foodBefore===$expectedCarry+$legacyCarry,'both gathering hauls are credited to the original city');
     $fieldStock=$db->query('SELECT coord_x,resource_amount FROM field_objects WHERE world_id=1 AND coord_y=51 AND coord_x IN (51,52) ORDER BY coord_x')->fetchAll(PDO::FETCH_KEY_PAIR);
-    verify(array_map('intval',$fieldStock)===[51=>10000-664,52=>10000-324],'gathered resources are deducted from each field exactly once');
+    verify(array_map('intval',$fieldStock)===[51=>10000-$expectedCarry,52=>10000-$legacyCarry],'gathered resources are deducted from each field exactly once');
     MarchTick::runForPlayer($player);
     verify(troops($player)===$initial&&(int)$db->query('SELECT food FROM cities WHERE id=?',[$player])->fetchColumn()===$foodAfter,'repeated settlement cannot duplicate returned troops or loot');
     // Maximum selection is validated against stored inventory, not a client flag.
@@ -152,16 +154,19 @@ try {
     rejected(fn()=>MarchDispatcher::assertSlotAvailable($player),'four researched slots still enforce the actual limit');
     $db->execute('UPDATE cities SET food=1000000,lumber=1000000,stone=1000000,gold=1000000,last_resource_update=UTC_TIMESTAMP() WHERE id=?',[$player]);
     $trainingCity=$db->query('SELECT * FROM cities WHERE id=?',[$player])->fetch();
-    $trainingBuildings=['barrack'=>['level'=>4],'castle'=>['level'=>3],'academy'=>['level'=>1]];
-    rejected(fn()=>\Conquer\Game\City\TroopTrainer::train($trainingCity,$trainingBuildings,50100201,10),'school 4 cannot bypass the town center 4 requirement');
-    $trainingBuildings['castle']['level']=4;
+    $tierTwo=\Conquer\Game\City\TroopData::get(50100201);
+    $trainingBuildings=['barrack'=>['level'=>$tierTwo['unlock_building']],'castle'=>['level'=>$tierTwo['unlock_castle']-1],'academy'=>['level'=>$tierTwo['unlock_academy']]];
+    rejected(fn()=>\Conquer\Game\City\TroopTrainer::train($trainingCity,$trainingBuildings,50100201,10),'tier-two training requires its current town center level');
+    $trainingBuildings['castle']['level']=$tierTwo['unlock_castle'];
+    rejected(fn()=>\Conquer\Game\City\TroopTrainer::train($trainingCity,$trainingBuildings,50100201,10),'tier-two training still requires its unlock research');
+    $db->execute('INSERT INTO player_research(player_id,world_id,research_code,level)VALUES(?,1,?,1)',[$player,$tierTwo['unlock_research']]);
     \Conquer\Game\City\TroopTrainer::train($trainingCity,$trainingBuildings,50100201,10);
-    verify((int)$db->query('SELECT count FROM troop_queue WHERE city_id=? AND troop_code=50100201 AND is_processed=0',[$player])->fetchColumn()===10,'school 4 and town center 4 enable real tier-two training without research');
+    verify((int)$db->query('SELECT count FROM troop_queue WHERE city_id=? AND troop_code=50100201 AND is_processed=0',[$player])->fetchColumn()===10,'current buildings and unlock research enable real tier-two training');
     $r=request('/api/game/state?map_x=50&map_y=50&map_radius=60');
     verify($r['status']===200&&$r['json']['data']['map_center']===['x'=>50,'y'=>50,'radius'=>60],'world snapshot supports an explicit larger map viewport');
     $snapshot=$r['json']['data'];
-    verify(count($snapshot['research_defs'])===117&&array_sum(array_map(static fn($n)=>count($n['levels']),$snapshot['research_defs']))===951,'actual client endpoint delivers all 117 research technologies and 951 levels');
-    verify(array_intersect_key($snapshot['army_limits'],array_flip(['march_capacity','march_slots']))===['march_capacity'=>50500,'march_slots'=>4]&&count($snapshot['troop_defs'])===30,'client snapshot exposes researched army limits and all 30 troop definitions');
+    verify(count($snapshot['research_defs'])===129&&array_sum(array_map(static fn($n)=>count($n['levels']),$snapshot['research_defs']))===963,'actual client endpoint delivers all 129 research technologies and 963 levels');
+    verify(array_intersect_key($snapshot['army_limits'],array_flip(['march_capacity','march_slots']))===['march_capacity'=>50500,'march_slots'=>4]&&count($snapshot['troop_defs'])===15,'client snapshot exposes researched army limits and all 15 active troop definitions');
     verify(request('/api/game/state?map_x=50&map_y=50&map_radius=100')['status']===400,'out-of-range world viewport is rejected');
     echo "ALL MIXED MARCH AND RESEARCH INTEGRATION CHECKS PASSED (disposable database and HTTP server).\n";
 } catch(Throwable $e){fwrite(STDERR,'FAIL '.$e->getMessage()."\n".$e->getTraceAsString()."\n");$exit=1;}

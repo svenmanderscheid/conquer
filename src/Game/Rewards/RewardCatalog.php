@@ -54,7 +54,15 @@ final class RewardCatalog
 
     public static function override(string $type, string $key,?int $worldId=null): ?array
     {
-        return self::records($worldId??\Conquer\Game\World\WorldContext::id())[$type.':'.$key]['config'] ?? null;
+        $config = self::records($worldId??\Conquer\Game\World\WorldContext::id())[$type.':'.$key]['config'] ?? null;
+        if ($config === null) return null;
+        foreach (['drops','items','drop_table'] as $field) {
+            if (!isset($config[$field])) continue;
+            $config[$field] = array_values(array_filter($config[$field], static fn(array $row): bool => !InventoryService::isRetired((int)($row['item_code'] ?? 0))));
+        }
+        // An old chest override containing only retired rewards falls back to its current default pool.
+        if ($type === 'chest' && empty($config['drop_table'])) $config['drop_table'] = self::defaults($type, $key)['drop_table'];
+        return $config;
     }
 
     public static function json(string $file): array
@@ -101,7 +109,7 @@ final class RewardCatalog
     private static function monsterImage(array $d): string
     {
         $name = strtolower($d['name']);
-        foreach (['grumwald','frostgrimm','glutramm','sandmaul'] as $boss) if (str_contains($name,$boss)) return 'monsters/'.$boss.'.png';
+        foreach (['grumwald','frostgrimm','glutramm','sandmaul'] as $boss) if (str_contains($name,$boss)) return 'monsters/storybook-v2/'.$boss.'.png';
         if (str_contains($name,'skeleton')) return 'skeleton.png';
         if (str_contains($name,'golem')) return 'golem.png';
         if (str_contains($name,'goblin')) return 'map/life-goblin.png';
@@ -122,6 +130,7 @@ final class RewardCatalog
                 $family = $d['reward_family'] ?? (str_contains($name,'magdar')?'magdar':(str_contains($name,'deathkar')?'deathkar':'dragon'));
                 $drops = self::json('rally_rewards')[$family];
             }
+            $drops=MonsterRewardRules::rallyDrops($d,$drops);
             $level = (int)$d['level']; $family = (int)floor((int)$key/100)%100;
             $weights = $level<=3?[82,18,0]:($level<=6?[70,30,0]:($level<=8?[0,80,20]:[0,50,50]));
             return ['drops'=>self::availableDrops($drops),

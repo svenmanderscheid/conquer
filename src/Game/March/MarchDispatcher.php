@@ -31,6 +31,8 @@ final class MarchDispatcher
     private const MARCH_SCOUT         = 8;
     public const  MARCH_GATHER        = 9;
     public const  MARCH_SUPPORT       = 10;
+    public const  MARCH_NEUTRAL_ATTACK = 11;
+    public const  MARCH_NEUTRAL_SCOUT  = 12;
 
     private function __construct() {}
 
@@ -51,7 +53,9 @@ final class MarchDispatcher
             [$playerId,$worldId],
         )->fetchColumn();
 
-        $active += (int)$db->query("SELECT COUNT(*) FROM rallies r WHERE r.world_id=? AND r.status IN ('gathering','marching','returning') AND (r.leader_player_id=? OR EXISTS(SELECT 1 FROM rally_participants rp WHERE rp.rally_id=r.id AND rp.player_id=? AND rp.status IN ('pending','marching')))",[$worldId,$playerId,$playerId])->fetchColumn();
+        $active += (int)$db->query("SELECT COUNT(*) FROM rallies r WHERE r.world_id=? AND r.status IN ('gathering','marching','returning') AND (r.leader_player_id=? OR EXISTS(SELECT 1 FROM rally_participants rp WHERE rp.rally_id=r.id AND rp.player_id=? AND rp.status IN ('joining','pending','marching')))",[$worldId,$playerId,$playerId])->fetchColumn();
+        if(\Conquer\Game\Territory\TerritoryService::available())$active+=(int)$db->query("SELECT COUNT(*) FROM territory_garrisons WHERE world_id=? AND player_id=? AND status<>'returned'",[$worldId,$playerId])->fetchColumn();
+        if(\Conquer\Game\Territory\TerritoryService::available())$active+=(int)$db->query("SELECT COUNT(*) FROM territory_army_returns WHERE world_id=? AND player_id=? AND status='returning'",[$worldId,$playerId])->fetchColumn();
 
         $limits = \Conquer\Game\Research\ResearchEffects::limits(\Conquer\Game\Research\BuffEngine::getBuffs($playerId,$worldId));
         $gathering=(int)$db->query("SELECT COUNT(*) FROM marches WHERE player_id=? AND world_id=? AND march_type=9 AND state IN ('marching','resolving','returning','arrived')",[$playerId,$worldId])->fetchColumn();
@@ -153,7 +157,7 @@ final class MarchDispatcher
         // ── Transaction: deduct troops + insert march ─────────────────────────
         $dispatchLock=self::acquirePlayerLock($db,$playerId);
         try{$skinSnapshot=MarchSkinService::dispatchSnapshot($playerId);
-        $marchSecs=max(5,(int)floor($distance*100/($minSpeed*MarchSkinService::speedMultiplier($skinSnapshot))));
+        $marchSecs=MarchSpeed::duration($distance,$minSpeed*MarchSkinService::speedMultiplier($skinSnapshot),$worldId);
         $marchId=$db->transaction(function () use (
             $db, $cityId, $playerId, $targetX, $targetY,
             $monsterId, $troopsJson, $marchSecs, $cleanTroops,$worldId,$snapshotJson,$requestId,$payloadHash,$skinSnapshot,$actionPointCost,
@@ -275,7 +279,7 @@ final class MarchDispatcher
 
         $dispatchLock=self::acquirePlayerLock($db,$playerId);
         try{$skinSnapshot=MarchSkinService::dispatchSnapshot($playerId);
-        $marchSecs=max(5,(int)floor($distance*100/($minSpeed*MarchSkinService::speedMultiplier($skinSnapshot))));
+        $marchSecs=MarchSpeed::duration($distance,$minSpeed*MarchSkinService::speedMultiplier($skinSnapshot),$worldId);
         $marchId=$db->transaction(function () use (
             $db, $cityId, $playerId, $targetX, $targetY,
             $charmId, $troopsJson, $marchSecs, $cleanTroops,$worldId,$requestId,$payloadHash,$skinSnapshot,
@@ -377,6 +381,23 @@ final class MarchDispatcher
         return self::dispatchCityMarch($playerId,$cityId,$targetX,$targetY,self::MARCH_SUPPORT,$selectedTroops,$targetCityId,$targetPlayerId);
     }
 
+    public static function dispatchNeutralVillage(int $playerId,int $cityId,int $targetX,int $targetY,array $troops,bool $scout=false): int
+    {
+        $db=Connection::getInstance();$origin=\Conquer\Game\WorldRules::origin($playerId,$cityId);$world=(int)$origin['world_id'];WorldContext::assertActionAvailable($world);
+        $lock='conquer-player-'.$playerId;if((int)$db->query('SELECT GET_LOCK(?,5)',[$lock])->fetchColumn()!==1)throw new \RuntimeException('Deine Armee wird gerade aktualisiert.');
+        try{return $db->transaction(function()use($db,$playerId,$cityId,$targetX,$targetY,$troops,$scout,$origin,$world):int{
+            \Conquer\Game\Map\WorldPlacement::lockWorld($db,$world);self::assertSlotAvailable($playerId,$world);
+            $target=\Conquer\Game\Map\NeutralVillageService::findAt($db,$world,$targetX,$targetY,true);
+            $buffs=\Conquer\Game\Research\BuffEngine::getBuffs($playerId,$world);$clean=$scout?[]:MarchArmy::clean($troops,\Conquer\Game\Research\ResearchEffects::limits($buffs)['march_capacity']);
+            if(!$scout&&!$clean)throw new \RuntimeException('Wähle Truppen für den Angriff.');
+            $speed=200.0;if($clean){$speed=PHP_FLOAT_MAX;foreach($clean as $code=>$count)$speed=min($speed,MarchSpeed::pvp((int)$code,$buffs));MarchArmy::reserve($db,$cityId,$clean);}
+            $seconds=MarchSpeed::duration(hypot($targetX-(int)$origin['coord_x'],$targetY-(int)$origin['coord_y']),$speed,(int)$origin['world_id'],$scout?2:5);
+            \Conquer\Game\WorldRules::relinquishShield($playerId,$cityId);
+            $db->execute("INSERT INTO marches(player_id,world_id,march_type,origin_city_id,target_x,target_y,target_type,target_id,troops_json,departure_time,arrival_time,state) VALUES(?,?,?,?,?,?,6,?,?,UTC_TIMESTAMP(),DATE_ADD(UTC_TIMESTAMP(),INTERVAL ? SECOND),'marching')",[$playerId,$world,$scout?self::MARCH_NEUTRAL_SCOUT:self::MARCH_NEUTRAL_ATTACK,$cityId,$targetX,$targetY,(int)$target['id'],json_encode($clean,JSON_THROW_ON_ERROR),$seconds]);
+            return (int)$db->lastInsertId();
+        });}finally{$db->query('SELECT RELEASE_LOCK(?)',[$lock]);}
+    }
+
     private static function requestId(?string $requestId): ?string
     {
         if($requestId===null)return null;
@@ -432,7 +453,7 @@ final class MarchDispatcher
             $skinMultiplier=MarchSkinService::speedMultiplier($skinSnapshot);
             if($clean){$speed=PHP_FLOAT_MAX;foreach($clean as $code=>$count){$speed=min($speed,$type===self::MARCH_ATTACK_PLAYER?MarchSpeed::pvp((int)$code,$buffs,$skinMultiplier):MarchSpeed::generic((int)$code,$buffs,$skinMultiplier));}}
             else $speed*=$skinMultiplier;
-            $seconds=max($type===self::MARCH_SCOUT?2:5,(int)floor(hypot($targetX-(int)$origin['coord_x'],$targetY-(int)$origin['coord_y'])*100/max(1,$speed)));
+            $seconds=MarchSpeed::duration(hypot($targetX-(int)$origin['coord_x'],$targetY-(int)$origin['coord_y']),$speed,(int)$origin['world_id'],$type===self::MARCH_SCOUT?2:5);
             if($clean)MarchArmy::reserve($db,$cityId,$clean);
             if($type!==self::MARCH_SUPPORT)\Conquer\Game\WorldRules::relinquishShield($playerId,$cityId);
             $db->execute("INSERT INTO marches(player_id,world_id,march_type,march_skin,march_speed_bonus_pct,origin_city_id,target_x,target_y,target_type,target_id,troops_json,departure_time,arrival_time,state) VALUES(?,?,?,?,?,?,?, ?,2,?,?,UTC_TIMESTAMP(),DATE_ADD(UTC_TIMESTAMP(),INTERVAL ? SECOND),'marching')",[$playerId,$world,$type,$skinSnapshot['march_skin'],$skinSnapshot['bonus_pct'],$cityId,$targetX,$targetY,(int)$target['id'],json_encode($clean),$seconds]);
@@ -476,28 +497,32 @@ final class MarchDispatcher
     }
 
     /**
-     * Returns all active marches from all players (for public map overlay).
-     * Only includes PvP attacks (type 7) and monster marches (type 5).
+     * Returns all active marches from all players for the public map overlay.
+     * Composition and haul remain private; only route data is exposed.
      *
      * @return list<array<string,mixed>>
      */
-    public static function listAllActive(): array
+    public static function listAllActive(int $viewerPlayerId): array
     {
         $db = Connection::getInstance();
 
         try {
-            return $db->query(
+            $viewerAlliance=\Conquer\Game\WorldRules::alliance($viewerPlayerId,WorldContext::id());
+            $rows=$db->query(
                 "SELECT m.id, m.march_type, m.march_skin, m.player_id,
                         c.coord_x AS origin_x, c.coord_y AS origin_y,
-                        m.target_x, m.target_y,
-                        m.departure_time, m.arrival_time, m.return_time, m.state
+                        m.target_x, m.target_y, m.target_type,
+                        m.departure_time, m.arrival_time, m.return_time, m.state,
+                        am.alliance_id AS owner_alliance_id
                  FROM   marches m
                  JOIN   cities c ON c.id = m.origin_city_id
+                 LEFT JOIN alliance_members am ON am.player_id=m.player_id AND am.world_id=m.world_id
                  WHERE  m.world_id=? AND m.state IN ('marching','resolving','returning','arrived')
-                   AND  m.march_type IN (5, 7, 15)
                  ORDER  BY m.arrival_time ASC",
                 [WorldContext::id()],
             )->fetchAll();
+            foreach($rows as &$row){$row['is_own']=(int)$row['player_id']===$viewerPlayerId;$row['is_allied']=$viewerAlliance!==null&&(int)$row['owner_alliance_id']===$viewerAlliance;unset($row['owner_alliance_id']);}unset($row);
+            return $rows;
         } catch (\PDOException) {
             return [];
         }

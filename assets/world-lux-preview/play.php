@@ -1,0 +1,42 @@
+<?php
+declare(strict_types=1);
+function playPreviewVersion(string $path): string { return (string) filemtime(__DIR__ . '/' . $path); }
+?>
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#5c4270">
+  <title>Spielansicht · Union of Kingdoms · Luxemburg</title>
+  <link rel="icon" href="../art/items/compass.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../css/fantasy-fonts.css">
+  <link rel="stylesheet" href="play.css?v=<?= playPreviewVersion('play.css') ?>">
+  <link rel="stylesheet" href="../css/village-theme.css?v=<?= playPreviewVersion('../css/village-theme.css') ?>">
+  <script type="module" src="play.js?v=<?= playPreviewVersion('play.js') ?>"></script>
+</head>
+<body class="lux-play-preview">
+  <header class="play-header"><div class="play-brand"><strong>Union of Kingdoms</strong><span>Luxemburg · Spielansicht</span></div><div class="play-modes"><label><span class="sr-only">Beispielbelegung wählen</span><select id="population"><option value="alpha">Alpha · 20 Städte</option><option value="live">Live · 1.000 Städte</option></select></label><button type="button" data-open-map>Weltübersicht</button><button id="info-button" type="button" aria-label="Maßstab und Spielerzahl erklären">?</button></div></header>
+  <main id="play-stage" tabindex="0" aria-label="Spielwelt. Ziehen zum Verschieben, Plus und Minus zum Zoomen. Pfeiltasten verschieben die fokussierte Karte.">
+    <canvas id="play-canvas" aria-hidden="true"></canvas><div id="play-markers"></div>
+    <div class="location-card"><strong id="location-name">Mersch</strong><span id="population-note">20 Beispielstädte · in allen 12 Kantonen</span></div>
+    <div class="play-options"><label><input type="checkbox" id="grid-toggle"> Felder</label><label><input type="checkbox" id="borders-toggle" checked> Grenzen</label><button type="button" id="tp-toggle" aria-pressed="false">TP testen</button></div>
+    <section id="tp-panel" class="tp-panel" aria-label="Teleport-Platzprobe" hidden><strong id="tp-status" role="status" aria-live="polite"></strong><p id="tp-reason"></p><p class="tp-hint">Karte antippen · nur Platzprobe</p><div><button type="button" id="tp-find">Freien Platz finden</button><button type="button" id="tp-close" aria-label="Platzprobe beenden">Fertig</button></div></section>
+    <div class="play-zoom" role="group" aria-label="Kartensteuerung"><button type="button" id="play-plus" aria-label="Vergrößern">+</button><button type="button" id="play-minus" aria-label="Verkleinern">−</button><button type="button" id="play-home" aria-label="Zur eigenen Beispielstadt">⌂</button></div>
+    <div class="coordinate-bar"><span id="coordinates">X 0 · Y 0</span><button type="button" data-open-map aria-label="Luxemburg-Karte öffnen">◈</button></div>
+    <button type="button" id="minimap-button" data-open-map aria-label="Minikarte: ganz Luxemburg öffnen"><canvas id="minimap" width="100" height="145" aria-hidden="true"></canvas><span>Luxemburg ↗</span></button>
+    <div id="play-loading" role="status">Deine Welt wird aufgebaut …</div>
+  </main>
+  <footer class="play-footer"><span id="density-note">Beispielbelegung · keine echten Spieler</span><span>768 × 1.100 Felder · Fantasy-Entwurf</span></footer>
+  <dialog id="world-overview" class="play-dialog overview-dialog" aria-labelledby="overview-title">
+    <header><div><p>Dieselbe Welt von oben</p><h2 id="overview-title">Luxemburg</h2></div><button type="button" data-close aria-label="Weltübersicht schließen">×</button></header>
+    <div class="border-comparison" role="group" aria-label="Grenzen vergleichen"><button type="button" data-border-mode="original" aria-pressed="false">Bisherige Grenzen</button><button type="button" data-border-mode="game" aria-pressed="true">Spielgrenzen</button><div class="border-layers"><label><input type="checkbox" id="original-overlay"> Original darüber</label><label><input type="checkbox" id="city-overlay"> Städte</label></div></div>
+    <p id="border-description" class="border-description">Ruhigere Grenzen, ganze Baufelder. Die Platzprobe nutzt diese Aufteilung.</p>
+    <div class="overview-tools"><label><span class="sr-only">Ort besuchen</span><select id="commune-jump"><option value="">Fluss / Gemeinde …</option></select></label><span id="overview-count">20 Städte</span></div>
+    <div id="overview-stage"><canvas id="overview-canvas" aria-label="Luxemburg mit Beispielstädten. Einen Ort antippen, um dorthin zu wechseln."></canvas></div>
+    <footer><span id="overview-legend">Kantone · Gold: dein Blickfeld</span><div class="overview-actions"><button type="button" id="overview-tp">TP-Platzprobe</button><button type="button" id="overview-home">Zu meiner Stadt</button></div></footer>
+  </dialog>
+  <dialog id="object-dialog" class="play-dialog" aria-labelledby="object-title"><header><div><p id="object-kind"></p><h2 id="object-title"></h2></div><button type="button" data-close aria-label="Ortsfenster schließen">×</button></header><div class="dialog-body" id="object-content"></div><footer><span>Gestaltungsvorschau</span><button type="button" data-close>Zur Karte</button></footer></dialog>
+  <dialog id="scale-dialog" class="play-dialog" aria-labelledby="scale-title"><header><div><p>Maßstab & Belegung</p><h2 id="scale-title">20 in der Alpha. Raum für mehr.</h2></div><button type="button" data-close aria-label="Erklärung schließen">×</button></header><div class="dialog-body"><p><strong>Die normale Spielansicht bleibt groß und frei verschiebbar.</strong> Die Luxemburg-Form siehst du in der Minikarte und der Weltübersicht. Jedes eingeblendete Kästchen entspricht einem Feld; eine Stadt belegt 4 × 4 Felder.</p><div class="scale-facts"><span><strong>ca. 468.000</strong>Felder in der Landesform</span><span><strong>768 × 1.100</strong>äußerer Kartenrahmen</span></div><p><strong>Alpha:</strong> 20 Beispielstädte verteilen sich über alle zwölf Kantone. Mersch ist nur der Standort deiner Beispielstadt; auch der Norden, Süden, Osten und Westen sind besiedelt.</p><p><strong>Live:</strong> 1.000 Beispielstädte besiedeln alle 100 Gemeinden. Neue Städte füllen die freien Flächen über das ganze Land mit Abstand zu ihren Nachbarn. Ihre reinen Stadtflächen belegen 16.000 Felder. Wasser, Rohstoffe, Monster, Wege und Freiflächen brauchen zusätzlichen Platz.</p><p><strong>Mehr Platz für Allianzstädte:</strong> Die Karte enthält neun ausgewählte Hauptflüsse und die großen Seen. Kleine Bäche und Teiche entfallen auch bei der Platz- und Teleportprüfung. Die Flüsse sind zwei Felder breit und folgen weichen, großzügigen Kurven. Sechs kleinere Flussläufe, enge Schleifen und breite Uferstreifen entfallen. Ihre Lage orientiert sich an den echten Flüssen; die großen Seen behalten ihre Uferform. Angezeigtes Wasser und Teleportprüfung stimmen überein.</p><p class="fine-print">Gewässerdaten: <a href="https://data.public.lu/en/datasets/inspire-annex-i-theme-hydrography-physical-waters-waterbody-watercourselink/" target="_blank" rel="noopener">Géoportail / AGE – Flussnetz</a> und <a href="https://data.public.lu/en/datasets/inspire-annex-i-theme-hydrography-physical-waters-waterbody-standing-water-age-3/" target="_blank" rel="noopener">Seen und Wasserflächen</a>, CC0. Für den Spielmaßstab vereinfacht.</p><p><strong>Gleichzeitig online ist nicht dasselbe wie Städte insgesamt.</strong> Auch ausgeloggte Spieler behalten ihre Städte. Die spätere Serverkapazität muss deshalb anhand aller Städte und durch Lasttests mit 1.000 aktiven Verbindungen geprüft werden.</p><p class="fine-print">Dies ist eine räumliche Vorschau, kein Nachweis für 1.000 gleichzeitig aktive Spieler. Die echte Welt bleibt unverändert. Namen, Verteilung und Belegung sind Beispiele.</p><p class="fine-print">Landes- und Gemeindegrenzen: <a href="https://data.public.lu/en/datasets/municipalities-in-the-greater-region-2026/" target="_blank" rel="noopener">ACT / SIG-GR 2026</a>, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>. Für die Spielkarte projiziert. <a href="./">Zur illustrierten Konzeptübersicht</a>.</p></div><footer><span>Union of Kingdoms</span><button type="button" data-close>Weiter erkunden</button></footer></dialog>
+  <noscript>Bitte JavaScript aktivieren, um die Spielansicht zu sehen.</noscript>
+</body></html>

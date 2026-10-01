@@ -84,7 +84,7 @@ try {
     $db->execute("UPDATE marches SET departure_time=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 120 SECOND),arrival_time=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 60 SECOND) WHERE player_id=? AND state='marching'",[$pid]);
     $caughtUp=pveData('/api/game/state');
     verifyPve(count($caughtUp['marches'])===0&&($caughtUp['troops'][50100101]??0)===27,'offline solo and gather trips catch up through return without extra online waiting');
-    verifyPve(str_contains(callPve('/city/3d?embed=1')['text'],'embedded: true'),'3D scene exposes the verified parent bridge');
+    verifyPve(str_contains(callPve('/city')['text'],'assets/js/city-painted.js'),'app loads the painted city');
     $db->execute('UPDATE cities SET food=5000,lumber=5000,stone=5000,gold=3000,last_resource_update=UTC_TIMESTAMP() WHERE id=?',[$cityId]);
     file_put_contents(sys_get_temp_dir().'/conquer-pve-review.json',json_encode(['username'=>$name,'password'=>$password,'base'=>$base]));
     echo "ALL $checks INTEGRATION CHECKS PASSED for $name. Local browser credentials saved in temporary conquer-pve-review.json.\n";

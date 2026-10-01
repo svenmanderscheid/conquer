@@ -1,0 +1,9 @@
+# Dorfhintergrund v3
+
+Mit dem eingebauten Imagegen-Tool aus background-v2-current-layout.png bearbeitet. Ergebnis: background-v3-three-military-plots.png. Unten links drei separate Bauflächen für Stall, Schießstand und Kaserne. Visuell geprüft; noch nicht in den Renderer eingebunden. Vorgängervarianten bleiben erhalten.
+
+Wasseranimation ist noch nicht umgesetzt. Vorgesehen: separate, auf Wasserflächen begrenzte Glanzlinien-/Wellenebene; keine Animation des gesamten Hintergrundbildes. Reduzierte Bewegung und ausgeblendete Ansicht müssen Effekte stoppen. Leistung vor Integration messen.
+
+## Verwendeter Prompt
+
+Use case: precise-object-edit. Image 1 is EDIT TARGET. Preserve this exact village terrain background, camera, framing, art style, colors, water, bridge, walls, upper terrace, fountain, all upper building clearings and lower RIGHT production quarter. Change ONLY the lower LEFT military quarter inside the wall, to the left of the main entrance-to-ramp road and below the raised terrace retaining wall. It currently has two usable large grassy building clearings. It needs THREE spacious distinct empty building clearings for stable, archery range and barracks. Arrange them as a triangular group: one back clearing directly below the terrace wall, two forward clearings beside each other toward the front-left wall. Remove/move small shrubs or a small tree within this military quarter as needed, and reroute the local tan dirt lane so each of the three clearings has clear access. Keep the main gate road and ramp untouched. Exactly THREE useful clearings in this lower-left quarter, not two, not four; each sized to fit a full building, no tiny leftover triangle mistaken for a lot. Keep same clean illustrated grass surfaces and soft irregular edges, no drawn construction outlines. Do not add buildings, labels, text, characters or UI. Everything outside the lower-left military quarter unchanged.

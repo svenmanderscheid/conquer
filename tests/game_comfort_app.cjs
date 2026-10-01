@@ -1,4 +1,5 @@
 'use strict';
+require('./fixtures/browser_locale.cjs')('de'); // This suite asserts the explicit German UI.
 const assert=require('assert/strict'),fs=require('fs'),path=require('path'),net=require('net');
 const {spawn}=require('child_process'),{chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/game-feel-2026-09-20');fs.mkdirSync(out,{recursive:true});
@@ -11,11 +12,27 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/game-feel-
   browser=await chromium.launch({headless:true,executablePath:process.env.BROWSER_EXECUTABLE_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe'});
   const context=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,locale:'de-DE'}),base='http://127.0.0.1:'+port;
   page=await context.newPage();page.setDefaultTimeout(25000);page.on('pageerror',e=>errors.push(e.message));
-  await page.goto(base+'/?zugang=login');await page.locator('[name=username]').fill('PreviewPlayer');await page.locator('[name=password]').fill('PreviewFixture!2026');
-  await Promise.all([page.waitForURL('**/city'),page.locator('#auth-submit').click()]);await page.locator('[data-comfort=goal]').waitFor();
+  await page.goto(base+'/?zugang=login');await page.locator("[name=identifier], [name=username]").fill('PreviewPlayer');await page.locator('[name=password]').fill('PreviewFixture!2026');
+  await Promise.all([page.waitForURL('**/city'),page.locator("form[action$=\"/auth/local\"] button[type=\"submit\"]").click()]);await page.locator('[data-comfort=goal]').waitFor();
   assert.equal(await page.locator('[data-comfort=return]').count(),0,'first visit does not invent an absence');
-  await page.locator('[data-comfort=goal]').click();await page.locator('#panel-dialog[data-panel=research]').waitFor();
-  await page.keyboard.press('Escape');await page.locator('[data-comfort=dismiss-goal]').click();assert(await page.locator('.comfort-hint').isHidden());
+
+  const auditJourney=(await(await context.request.get(base+'/api/game/state')).json()).data;
+  assert.equal(auditJourney.beginner_journey.progress.gather,false,'An old empty return does not complete the delivery goal');
+  assert(Number(auditJourney.trained_total)>=20);
+  for(const code of ['castle','farm','lumber_camp','quarry','gold_mine'])assert(Number(auditJourney.buildings[code].level)>=2);
+  assert(Object.values(auditJourney.troops).some(count=>Number(count)>0),'Gathering has available troops');
+  const auditGoalText=await page.locator('[data-comfort=goal] strong').textContent();
+  const auditExpectedTitle=await page.evaluate(()=>ConquerLocale.text('Deine erste Sammelbeute nach Hause bringen'));
+  assert.equal(auditGoalText,auditExpectedTitle,'HUD selects the current first unfinished ready goal');
+  const auditGoalWrites=[];const auditGoalRequest=request=>{if(request.method()==='POST'&&request.url().includes('/api/'))auditGoalWrites.push(request.url());};page.on('request',auditGoalRequest);
+  await page.locator('[data-comfort=goal]').click();
+  await page.waitForFunction(()=>location.hash==='#world'&&document.body.classList.contains('world-mode'));
+  await page.locator('.atlas-shell').waitFor();await page.waitForFunction(()=>!document.querySelector('.scene-transition.is-active'));
+  assert.deepEqual(auditGoalWrites,[],'Following a goal opens its destination without dispatching troops');page.off('request',auditGoalRequest);
+  fs.writeFileSync(path.join(out,'current-journey-destination.json'),JSON.stringify({goal:auditGoalText,progress:auditJourney.beginner_journey.progress,destination:'world',writes:auditGoalWrites},null,2));
+  // Return to the same city playfield from which the original later comfort checks start.
+  await page.keyboard.press('Escape');await page.locator('#navigation [data-id=city]').click();
+  await page.waitForFunction(()=>location.hash==='#city'&&document.body.classList.contains('city-mode')&&!document.querySelector('.scene-transition.is-active'));await page.locator('[data-comfort=dismiss-goal]').click();assert(await page.locator('.comfort-hint').isHidden());
   await page.reload();await page.locator('#hud-menu').waitFor();await page.waitForFunction(()=>document.querySelector('#save-state').textContent.includes('gespeichert'));assert(await page.locator('.comfort-hint').isHidden(),'dismissal survives reload');
   await page.addInitScript(()=>{const key='conquer:comfort:v1::1:1',value=JSON.parse(localStorage.getItem(key)||'{}');localStorage.setItem(key,JSON.stringify({...value,lastSeen:Math.floor(Date.now()/1000)-3600}));});
   await page.reload();await page.locator('[data-comfort=return]').waitFor();
@@ -39,7 +56,7 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/game-feel-
   await page.evaluate(()=>location.hash='quests');await page.locator('.quest-list').waitFor();await page.locator('[data-group=quests][data-id=active]').click();
   for(let attempt=0;attempt<5;attempt++){
    await page.locator('.quest-list').evaluate(el=>el.scrollTop=200);const top=await page.locator('.quest-list').evaluate(el=>el.scrollTop);
-   if(attempt%2)await page.locator('.panel-close').click();else await page.keyboard.press('Escape');await page.locator('#navigation [data-id=quests]').click();assert.equal(await page.locator('.quest-list').evaluate(el=>el.scrollTop),top);
+   if(attempt%2)await page.locator("#panel-dialog .panel-close:visible, #panel-dialog .mobile-page-back:visible").first().click();else await page.keyboard.press('Escape');await page.locator('#navigation [data-id=quests]').click();assert.equal(await page.locator('.quest-list').evaluate(el=>el.scrollTop),top);
   }
   await page.keyboard.press('Escape');await page.locator('#navigation [data-id=world]').click();await page.locator('.atlas-shell').waitFor();await page.waitForFunction(()=>!document.querySelector('.scene-transition.is-active'));
   const state=(await(await context.request.get(base+'/api/game/state')).json()).data,monster=state.monsters.find(m=>m.definition?.type==='solo');assert(monster);

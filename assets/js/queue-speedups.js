@@ -101,8 +101,14 @@ window.ConquerQueueSpeedups = function(ctx) {
     }
     async function quickUse(){
         if(pending||awaitingState||Date.now()<cooldownUntil)return;const plan=quickPlan(),first=plan[0];
-        if(!first){const feedback=picker()?.querySelector('.queue-speedup-feedback');if(feedback)feedback.textContent='Deine passenden Beschleuniger reichen noch nicht zum Fertigstellen.';return;}
+        if(!first){const message='Deine passenden Beschleuniger reichen noch nicht zum Fertigstellen.',feedback=picker()?.querySelector('.queue-speedup-feedback');if(feedback)feedback.textContent=message;else toast(message);return;}
         itemCode=first.item_code;quantity=Math.min(10000,first.quantity);save(receipt(itemCode,quantity,{quick_use:true,quick_used:0}));update();await use();
+    }
+    async function quick(type,id){
+        restore();if(!names[type]||pending||awaitingState||Date.now()<cooldownUntil)return;
+        if(type==='training'&&ctx.canUseTrainingSpeedups&&!ctx.canUseTrainingSpeedups()){toast('Prüfe zuerst den noch unbestätigten Ausbildungsauftrag.');return;}
+        if(request){await use();return;}
+        selected={type,id:type==='healing'?(getKingdom()?.hospital?.active?.batch_id||String(id)):Number(id)};choose();version++;await quickUse();
     }
     async function use(){
         if(pending||awaitingState||Date.now()<cooldownUntil)return;
@@ -119,17 +125,18 @@ window.ConquerQueueSpeedups = function(ctx) {
                 if(!isQuick||!job()||remaining()<=0)break;const next=quickPlan()[0];if(!next)break;itemCode=next.item_code;quantity=Math.min(10000,next.quantity);save(receipt(itemCode,quantity,{quick_use:true,quick_used:total}));
             }
             cooldownUntil=Date.now()+600;setTimeout(update,620);
-            if(ownsDialog()){ctx.render();choose(itemCode);pending=false;draw(true);const feedback=picker()?.querySelector('.queue-speedup-feedback');if(feedback)feedback.textContent=isQuick?`QuickUse: ${fmt(total)} Beschleuniger automatisch verwendet.`:`${fmt(firstReceipt.quantity||1)} verwendet. ${result?.message||'Die Restzeit wurde verkürzt.'}`;}
-            document.querySelector('#city-frame')?.contentWindow?.postMessage({type:'conquer:refresh'},location.origin);
+            if(ownsDialog()){ctx.render();choose(itemCode);pending=false;draw(true);const feedback=picker()?.querySelector('.queue-speedup-feedback');if(feedback)feedback.textContent=isQuick?`QuickUse: ${fmt(total)} Beschleuniger automatisch verwendet.`:`${fmt(firstReceipt.quantity||1)} verwendet. ${result?.message||'Die Restzeit wurde verkürzt.'}`;}else if(isQuick)toast(`QuickUse: ${fmt(total)} Beschleuniger automatisch verwendet.`);
+
         }catch(e){
             if(scope!==oldScope)return;
             if(e.code){save(null);await ctx.refresh(false);}
-            pending=false;if(ownsDialog()){draw(true);const feedback=picker()?.querySelector('.queue-speedup-feedback');if(feedback)feedback.textContent=e.message;else toast(e.message);}
+            pending=false;if(ownsDialog()){draw(true);const feedback=picker()?.querySelector('.queue-speedup-feedback');if(feedback)feedback.textContent=e.message;else toast(e.message);}else toast(e.message);
         }finally{pending=false;update();document.querySelector('[data-action="queue-speedup-retry"]')?.removeAttribute('disabled');}
     }
     function onClick(action,b,event){
         if(action==='queue-speedups'){show(b.dataset.type,b.dataset.id);return true;}
         if(action==='training-speedups'){show('training',b.dataset.id);return true;}
+        if(action==='training-speedups-quick'){quick('training',b.dataset.id);return true;}
         if(action==='hospital-speedups'){show('healing');return true;}
         if(action==='speedup-target'){show(b.dataset.type,b.dataset.queue,b.dataset.id);return true;}
         if(!action.startsWith('queue-speedup-'))return false;

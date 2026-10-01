@@ -9,11 +9,11 @@ window.ConquerBugReports=function(ctx){
     function render(){
         const host=$('#content');if(!host)return;
         if(lastId){
-            host.innerHTML=`<section class="panel bug-report-success"><span class="bug-report-seal" aria-hidden="true">✓</span><h2>Meldung ist angekommen</h2><p>Danke, dass du hilfst, Conquer besser zu machen. Deine Referenz lautet <strong>#${lastId}</strong>.</p><button class="button secondary" data-action="bug-report-new">Weiteren Bug melden</button></section>`;
+            host.innerHTML=`<section class="panel bug-report-success"><span class="bug-report-seal" aria-hidden="true">✓</span><h2>Meldung ist angekommen</h2><p data-i18n="bugreport.thanks" data-i18n-params="${escapeHtml(JSON.stringify({reference:'#'+lastId}))}">${escapeHtml(window.ConquerLocale.t('bugreport.thanks',{reference:'#'+lastId}))}</p><button class="button secondary" data-action="bug-report-new">Weiteren Bug melden</button></section>`;
             return;
         }
         host.innerHTML=`<section class="panel bug-report-panel">
-          <div class="bug-report-intro"><span aria-hidden="true">!</span><div><h2>Bug oder Idee melden</h2><p>Beschreibe kurz, was passiert ist oder was Conquer besser machen würde.</p></div></div>
+          <div class="bug-report-intro"><span class="bug-report-mark" aria-hidden="true"><img src="${ctx.base}/assets/art/menu-icons/bug-report.png" alt=""></span><div><h2>Bug oder Idee melden</h2><p data-i18n="bugreport.intro">${escapeHtml(window.ConquerLocale.t('bugreport.intro'))}</p></div></div>
           <form data-form="bug-report">
             <div class="bug-report-fields">
               <label for="bug-type">Meldungsart<select id="bug-type" name="report_type" required><option value="bug">Bug</option><option value="idea">Idee / Vorschlag</option></select></label>
@@ -51,7 +51,7 @@ window.ConquerBugReports=function(ctx){
         sourceContext=context;screenshot='';lastId=0;operationKey='';
         const dialog=$('#game-dialog');previousDialog=dialog?.open?$('#dialog-content')?.innerHTML||'':'';
         const supported=Boolean(navigator.mediaDevices?.getDisplayMedia);
-        openDialog(`<section class="bug-capture-consent"><h2>Bug oder Idee melden</h2><p>Der geöffnete Bereich <strong>${escapeHtml(context?.label||'Conquer')}</strong> wird automatisch notiert.</p><p>Möchtest du zusätzlich einen Screenshot mitsenden? Erst nach deinem Klick fragt der Browser, welchen Tab oder Bildschirm du freigeben willst. Passwörter oder private Nachrichten sollten nicht sichtbar sein.</p><div class="button-row"><button class="button secondary" data-action="bug-report-without-screenshot">Ohne Screenshot</button><button class="button" data-action="bug-report-capture" ${supported?'':'disabled'}>Screenshot aufnehmen</button></div>${supported?'':'<small>Screenshot-Aufnahme wird von diesem Gerät nicht unterstützt.</small>'}</section>`,{focusHeading:true});
+        openDialog(`<section class="bug-capture-consent"><h2>Bug oder Idee melden</h2><p>Der geöffnete Bereich <strong>${escapeHtml(context?.label||'Union of Kingdoms')}</strong> wird automatisch notiert.</p><p>Möchtest du zusätzlich einen Screenshot mitsenden? Erst nach deinem Klick fragt der Browser, welchen Tab oder Bildschirm du freigeben willst. Passwörter oder private Nachrichten sollten nicht sichtbar sein.</p><div class="button-row"><button class="button secondary" data-action="bug-report-without-screenshot">Ohne Screenshot</button><button class="button" data-action="bug-report-capture" ${supported?'':'disabled'}>Screenshot aufnehmen</button></div>${supported?'':'<small>Screenshot-Aufnahme wird von diesem Gerät nicht unterstützt.</small>'}</section>`,{focusHeading:true});
     }
     async function capture(){
         let stream;

@@ -66,8 +66,14 @@ try {
     // when another local test briefly holds a server-wide advisory lock.
     $db->execute('UPDATE cities SET last_resource_update=DATE_ADD(UTC_TIMESTAMP(),INTERVAL 1 HOUR) WHERE id IN (?,?)',[$city1,$city2]);
     WorldContext::bind(1,1);$res1=$db->query('SELECT food,lumber FROM cities WHERE id=?',[$city1])->fetch();$res2=$db->query('SELECT food,lumber FROM cities WHERE id=?',[$city2])->fetch();
-    WorldContext::bind(2,1);MarketService::exchange(1,'food_lumber');
-    verifyAdmin((int)$db->query('SELECT food FROM cities WHERE id=?',[$city2])->fetchColumn()===(int)$res2['food']-1000&&(int)$db->query('SELECT food FROM cities WHERE id=?',[$city1])->fetchColumn()===(int)$res1['food'],'market spends selected city resources only');
+    WorldContext::bind(2,1);
+    $offer=current(array_filter(MarketService::state(1)['offers'],static fn($offer)=>in_array($offer['give']['resource'],['food','lumber','stone','gold'],true)));
+    verifyAdmin(is_array($offer),'current rotation includes a city resource exchange');
+    $resource=$offer['give']['resource'];
+    $beforeSelected=(int)$db->query('SELECT '.$resource.' FROM cities WHERE id=?',[$city2])->fetchColumn();
+    $beforeOther=(int)$db->query('SELECT '.$resource.' FROM cities WHERE id=?',[$city1])->fetchColumn();
+    MarketService::exchange(1,$offer['id']);
+    verifyAdmin((int)$db->query('SELECT '.$resource.' FROM cities WHERE id=?',[$city2])->fetchColumn()===$beforeSelected-$offer['give']['amount']&&(int)$db->query('SELECT '.$resource.' FROM cities WHERE id=?',[$city1])->fetchColumn()===$beforeOther,'market spends selected city resources only');
     verifyAdmin(count(MarketService::state(1)['history'])===1,'market history selected world visible');WorldContext::bind(1,1);verifyAdmin(count(MarketService::state(1)['history'])===0,'other world market history hidden');
     $node=array_key_first(\Conquer\Game\Research\ResearchData::allNodes());$db->execute('INSERT INTO player_research(player_id,world_id,research_code,level)VALUES(1,2,?,2)',[$node]);
     verifyAdmin(KingdomService::state(1)['profile']['stats']['research']===0,'research ranking isolated from other world');WorldContext::bind(2,1);verifyAdmin(KingdomService::state(1)['profile']['stats']['research']===2,'selected world research included');

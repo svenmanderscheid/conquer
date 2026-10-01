@@ -6,7 +6,7 @@ namespace Conquer\Game\March;
 use Conquer\Game\City\TroopData;
 
 /**
- * Deterministic single-pass battle resolution (SPEC §9).
+ * Single-pass battle resolution with server-side luck (SPEC §9).
  *
  * Monsters are neutral. Applied research, equipment, charm and talent bonuses
  * are recorded with the result. Injured troops are settled through the hospital.
@@ -17,6 +17,17 @@ final class BattleEngine
 
     /** Each owner's research and talents contribute only to that owner's troops. */
     public static function resolveMonsterArmies(array $armies, array $monster, array $definition): array
+    {
+        return self::monsterArmies($armies, $monster, $definition, false);
+    }
+
+    /** Read-only zero-luck reference; never used to settle an actual battle. */
+    public static function previewMonsterArmies(array $armies, array $monster, array $definition): array
+    {
+        return self::monsterArmies($armies, $monster, $definition, true);
+    }
+
+    private static function monsterArmies(array $armies, array $monster, array $definition, bool $reference): array
     {
         $combined=[];$base=[];$effective=[];$armyPower=0.0;
         foreach($armies as $army){
@@ -39,7 +50,7 @@ final class BattleEngine
         // Fold already-applied bonuses into equivalent type multipliers. The
         // ordinary resolver then supplies the same battle and casualty rules.
         $folded=[];foreach($base as $key=>$value)$folded[$key]=$value>0?$effective[$key]/$value-1:0;
-        $result=self::resolveMonster($combined,$monster,$definition,$folded,$armyPower);
+        $result=$reference ? self::previewMonster($combined,$monster,$definition,$folded,$armyPower) : self::resolveMonster($combined,$monster,$definition,$folded,$armyPower);
         $result['report']['combat_snapshot']['power']=$armyPower;
         foreach($armies as &$army){
             $ownBuffs=\Conquer\Game\Player\TalentEffects::combat($army['buffs']??[],'monster',true);
@@ -94,6 +105,17 @@ final class BattleEngine
         array $buffs = [],
         ?float $armyPowerOverride = null,
     ): array {
+        return self::monsterWithLuck($attackerTroops, $monster, $monsterDef, $buffs, $armyPowerOverride, BattleLuck::roll());
+    }
+
+    /** Stable 0% reference. The caller cannot set the luck used in real combat. */
+    public static function previewMonster(array $attackerTroops, array $monster, array $monsterDef, array $buffs = [], ?float $armyPowerOverride = null): array
+    {
+        return self::monsterWithLuck($attackerTroops, $monster, $monsterDef, $buffs, $armyPowerOverride, 0.0);
+    }
+
+    private static function monsterWithLuck(array $attackerTroops, array $monster, array $monsterDef, array $buffs, ?float $armyPowerOverride, float $luckPercent): array
+    {
         $buffs = \Conquer\Game\Player\TalentEffects::combat($buffs,'monster');
         $buffs = \Conquer\Game\Research\ResearchEffects::armyBuffs($buffs,$attackerTroops);
         // ── Monster stats ─────────────────────────────────────────────────────
@@ -130,13 +152,25 @@ final class BattleEngine
         // ── Power threshold, monster damage and outcome ───────────────────────
         $requiredPower=\Conquer\Game\Map\MonsterPower::currentRequired($monsterDef,$hpCurrent);
         $baseArmyPower=max(0.0,$armyPowerOverride??ArmyPower::effective($attackerTroops,$buffs));
-        $luckPercent=BattleLuck::roll();
+        $requiredBeforeMechanic=$requiredPower;$armyBeforeMechanic=$baseArmyPower;
+        $bossMechanic=BossMechanics::beforeBattle($monsterDef,$attackerTroops,$hpCurrent,$requiredPower,$baseArmyPower);
+        if($bossMechanic!==null){
+            $requiredPower=$bossMechanic['required_power_after']??$requiredPower;
+            $baseArmyPower=$bossMechanic['army_power_after']??$baseArmyPower;
+        }
         $armyPower=$baseArmyPower*BattleLuck::factor($luckPercent);
         $powerRatio=$requiredPower>0?$armyPower/$requiredPower:1.0;
         $monsterKilled=$powerRatio>=1.0;
         $monsterLossRatio=min(1.0,$powerRatio);
-        $hpDamage=$monsterKilled?$hpCurrent:min($hpCurrent,max($armyPower>0?1:0,(int)round($hpCurrent*$monsterLossRatio)));
+        // A rounded hit below the power threshold must leave a living target.
+        $hpDamage=$monsterKilled?$hpCurrent:min(max(0,$hpCurrent-1),max($armyPower>0?1:0,(int)round($hpCurrent*$monsterLossRatio)));
         $newMonsterHp=max(0,$hpCurrent-$hpDamage);
+        $regeneration=BossMechanics::afterDamage($monsterDef,$attackerTroops,$hpCurrent,$newMonsterHp);
+        if($regeneration!==null){
+            $bossMechanic=$regeneration;
+            $newMonsterHp=$regeneration['hp_after_regeneration'];
+            $monsterLossRatio=$hpCurrent>0?($hpCurrent-$newMonsterHp)/$hpCurrent:0.0;
+        }
 
         // Early defeats are forgiving. Injury severity rises gradually with
         // underpower and monster level, but never returns to the former 80% cap.
@@ -148,6 +182,11 @@ final class BattleEngine
         }else{
             $attackerLossRatio=min(.35,(.05+.30*(1-min(1.0,$powerRatio)))*$levelFactor);
             $outcome='defender_wins';
+        }
+        $backlash=BossMechanics::afterInjuries($monsterDef,$attackerTroops,$attackerLossRatio,$monsterKilled);
+        if($backlash!==null){
+            $bossMechanic=$backlash;
+            $attackerLossRatio=$backlash['injury_ratio_after'];
         }
 
         // ── Attacker losses (per troop type, proportional) ───────────────────
@@ -202,6 +241,12 @@ final class BattleEngine
             'troops'              => $reportTroops,
             'outcome'             => $outcome,
         ];
+        if($bossMechanic!==null)$report['boss_mechanic']=$bossMechanic;
+        if($bossMechanic!==null&&$regeneration===null){
+            $report['required_power_before_mechanic']=$requiredBeforeMechanic;
+            $report['army_power_before_mechanic']=round($armyBeforeMechanic);
+            $report['monster_snapshot']['required_power_before_mechanic']=$requiredBeforeMechanic;
+        }
 
         return [
             'outcome'            => $outcome,

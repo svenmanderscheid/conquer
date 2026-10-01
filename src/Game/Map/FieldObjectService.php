@@ -65,16 +65,27 @@ final class FieldObjectService
         if(!$nodes)return [];
         $ids=array_map('intval',array_column($nodes,'id'));
         \Conquer\Game\March\GatherService::refreshNodes($worldId,$ids);
-        $rows=Connection::getInstance()->query("SELECT o.id,o.resource_amount,m.id AS gatherer_march_id,m.player_id AS gatherer_player_id,m.gathering_finishes_at,COALESCE(k.display_name,p.username) AS gatherer_name,a.alliance_id AS gatherer_alliance_id FROM field_objects o LEFT JOIN marches m ON m.id=o.gatherer_march_id AND m.world_id=o.world_id AND m.target_id=o.id AND m.march_type=9 AND m.state='arrived' LEFT JOIN players p ON p.id=m.player_id LEFT JOIN kingdom_profiles k ON k.player_id=p.id LEFT JOIN alliance_members a ON a.player_id=m.player_id AND a.world_id=o.world_id WHERE o.world_id=? AND o.id IN (".implode(',',$ids).")",[$worldId])->fetchAll();
+        $rows=Connection::getInstance()->query("SELECT o.id,o.resource_amount,m.id AS gatherer_march_id,m.player_id AS gatherer_player_id,m.gathering_finishes_at,m.arrival_time,m.haul_json,COALESCE(k.display_name,p.username) AS gatherer_name,a.alliance_id AS gatherer_alliance_id FROM field_objects o LEFT JOIN marches m ON m.id=o.gatherer_march_id AND m.world_id=o.world_id AND m.target_id=o.id AND m.march_type=9 AND m.state='arrived' LEFT JOIN players p ON p.id=m.player_id LEFT JOIN kingdom_profiles k ON k.player_id=p.id LEFT JOIN alliance_members a ON a.player_id=m.player_id AND a.world_id=o.world_id WHERE o.world_id=? AND o.id IN (".implode(',',$ids).")",[$worldId])->fetchAll();
         $owners=array_column($rows,null,'id');$alliance=\Conquer\Game\WorldRules::alliance($viewerId,$worldId);
         foreach($nodes as &$node){
-            unset($node['gathering_finishes_at']);
+            unset($node['gathering_finishes_at'],$node['gathering_progress']);
             $row=$owners[$node['id']]??[];$owner=(int)($row['gatherer_player_id']??0);
             $node['resource_amount']=$row['resource_amount']??$node['resource_amount'];
             foreach(['gatherer_march_id','gatherer_player_id','gatherer_name','gatherer_alliance_id'] as $key)$node[$key]=$row[$key]??null;
             $node['is_own_gathering']=$owner>0&&$owner===$viewerId;
             $node['can_attack']=$owner>0&&$owner!==$viewerId&&($alliance===null||$alliance!==(int)($row['gatherer_alliance_id']??0));
-            if($node['is_own_gathering'])$node['gathering_finishes_at']=$row['gathering_finishes_at'];
+            if($node['is_own_gathering']){
+                $node['gathering_finishes_at']=$row['gathering_finishes_at'];
+                $gather=(json_decode($row['haul_json']??'{}',true)?:[])['gather']??[];
+                $capacity=max(0,(int)($gather['capacity']??0));$rate=max(0,(float)($gather['rate']??0));
+                $start=strtotime(($row['arrival_time']??'').' UTC');$finish=strtotime(($row['gathering_finishes_at']??'').' UTC');
+                if($capacity>0&&$rate>0&&$start!==false&&$finish!==false){
+                    $now=time();$limit=min($capacity,max(0,(int)$node['resource_amount']));
+                    // Same elapsed-work formula as GatherService::finishOne. Private to owner.
+                    $amount=min($limit,(int)floor(max(0,min($now,$finish)-$start)*$rate+1e-8));
+                    $node['gathering_progress']=['amount'=>$amount,'capacity'=>$capacity,'limit'=>$limit,'rate'=>$rate,'sampled_at'=>gmdate('Y-m-d H:i:s',$now)];
+                }
+            }
         }unset($node);
         return $nodes;
     }
@@ -245,6 +256,10 @@ final class FieldObjectService
      */
     public static function spawnObjects(int $worldId): void
     {
+        if(\Conquer\Game\World\WorldMapProfile::isLuxembourg($worldId)){
+            // Rectangular worlds have one bounded, world-wide spawn owner.
+            \Conquer\Game\World\WorldSpawnService::tick($worldId,true,'field-seed');return;
+        }
         $db = Connection::getInstance();
         if ($db->getPdo()->inTransaction()) {
             self::spawnObjectsLocked($db, $worldId);

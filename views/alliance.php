@@ -37,7 +37,7 @@ $csrf = $session['csrf_token'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conquer — Allianz</title>
+    <title>Union of Kingdoms — Allianz</title>
     <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR.'/assets/css/fantasy-fonts.css') ?>">
     <link rel="stylesheet" href="/assets/css/main.css">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -1096,7 +1096,7 @@ function allianceMember() {
         fmtRallyDate(dt) {
             if (!dt) return '—';
             try {
-                return new Date(dt.replace(' ', 'T') + 'Z').toLocaleString('de-DE', {
+                return new Date(dt.replace(' ', 'T') + 'Z').toLocaleString(window.ConquerLocale?.locale||'en', {
                     hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit',
                 });
             } catch { return dt; }
@@ -1138,7 +1138,7 @@ function allianceMember() {
 
         fmtNum(n) {
             if (!n) return '0';
-            return Number(n).toLocaleString('de-DE');
+            return Number(n).toLocaleString(window.ConquerLocale?.locale||'en');
         },
 
         nodeCardBg(node) {
@@ -1184,7 +1184,7 @@ function allianceMember() {
 
         fmtDate(dt) {
             if (!dt) return '—';
-            return new Date(dt.replace(' ', 'T') + 'Z').toLocaleString('de-DE', {
+            return new Date(dt.replace(' ', 'T') + 'Z').toLocaleString(window.ConquerLocale?.locale||'en', {
                 hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit',
             });
         },

@@ -29,7 +29,8 @@ try {
     }
 
     $catalog=MarchSkinService::catalog();
-    checkSkin(count($catalog)===18&&array_keys($catalog)===['default','ironkeep','rosehall','sandspire','tidewatch','winterhold','jadecourt','emberforge','ravenloft','clockwork','sapphire','phoenix','dragon','astral','leviathan','yggdrasil','tempest','eclipse'],'catalog mirrors every stable castle skin id');
+    checkSkin(count($catalog)===22&&array_keys($catalog)===['default','forest','fire','water','wind','ironkeep','rosehall','sandspire','tidewatch','winterhold','jadecourt','emberforge','ravenloft','clockwork','sapphire','phoenix','dragon','astral','leviathan','yggdrasil','tempest','eclipse'],'catalog includes the four elemental themes alongside stable legacy ids');
+    checkSkin($catalog['forest']['castle_skin']==='forest'&&$catalog['fire']['castle_skin']==='fire'&&$catalog['water']['castle_skin']==='water'&&$catalog['wind']['castle_skin']==='wind'&&count(array_unique(array_column(array_intersect_key($catalog,array_flip(['forest','fire','water','wind'])),'bonus_pct')))===1,'all four elemental marches match their castle themes and use the common bonus');
     checkSkin($catalog['dragon']['name']==='Drachenmarsch'&&$catalog['dragon']['rarity']==='mythic'&&$catalog['dragon']['price_gems']===2400&&$catalog['dragon']['bonus_pct']===5,'dragon march has the intended mythic price and five percent bonus');
     checkSkin(count(array_unique(array_column($catalog,'bonus_pct')))===1&&$catalog['default']['bonus_pct']===5,'every themed skin has the same five percent bonus');
     $buffs=['march_speed'=>.20,'talent_hunt_march'=>.30,'talent_pvp_march'=>.10,'troop_speed_when_participating_a_rally'=>.40];
@@ -52,15 +53,17 @@ try {
     $repeatClaim=$db->transaction(fn()=>MarchSkinService::claim(1,'default'));
     checkSkin($claim['charged_gems']===0&&$repeatClaim['charged_gems']===0&&(int)$db->query('SELECT COUNT(*) FROM player_march_skins WHERE player_id=1')->fetchColumn()===1,'free claim is idempotent and never spends gems');
 
-    $buy=$db->transaction(fn()=>MarchSkinService::buy(1,'ironkeep'));
-    $repeatBuy=$db->transaction(fn()=>MarchSkinService::buy(1,'ironkeep'));
+    $buy=$db->transaction(fn()=>MarchSkinService::buy(1,'forest'));
+    $repeatBuy=$db->transaction(fn()=>MarchSkinService::buy(1,'forest'));
     checkSkin($buy['charged_gems']===1200&&$repeatBuy['charged_gems']===0&&(int)$db->query('SELECT gems FROM players WHERE id=1')->fetchColumn()===3800,'repeat purchase cannot charge the same skin twice');
-    $dragonBuy=$db->transaction(fn()=>MarchSkinService::buy(1,'dragon'));
-    checkSkin($dragonBuy['charged_gems']===2400&&(int)$db->query('SELECT gems FROM players WHERE id=1')->fetchColumn()===1400&&(int)$db->query("SELECT COUNT(*) FROM player_march_skins WHERE player_id=1 AND skin_code='dragon'")->fetchColumn()===1,'dragon purchase charges its server-owned mythic price exactly once');
+    rejectSkin(fn()=>$db->transaction(fn()=>MarchSkinService::buy(1,'dragon')),'retired skins cannot be newly purchased');
+    checkSkin((int)$db->query('SELECT gems FROM players WHERE id=1')->fetchColumn()===3800,'retired purchase leaves gems untouched');
+    // Simulate legitimate ownership acquired before retirement, preserving snapshots and equip rights.
+    $db->execute("INSERT INTO player_march_skins(player_id,skin_code) VALUES(1,'ironkeep'),(1,'dragon')");
     rejectSkin(fn()=>$db->transaction(fn()=>MarchSkinService::equip(1,'phoenix')),'unowned skin cannot be equipped');
     $db->execute('UPDATE players SET gems=100 WHERE id=1');
-    rejectSkin(fn()=>$db->transaction(fn()=>MarchSkinService::buy(1,'phoenix')),'insufficient gems cannot create ownership or a negative balance');
-    checkSkin((int)$db->query('SELECT gems FROM players WHERE id=1')->fetchColumn()===100&&(int)$db->query("SELECT COUNT(*) FROM player_march_skins WHERE player_id=1 AND skin_code='phoenix'")->fetchColumn()===0,'failed purchase leaves balance and ownership unchanged');
+    rejectSkin(fn()=>$db->transaction(fn()=>MarchSkinService::buy(1,'fire')),'insufficient gems cannot create ownership or a negative balance');
+    checkSkin((int)$db->query('SELECT gems FROM players WHERE id=1')->fetchColumn()===100&&(int)$db->query("SELECT COUNT(*) FROM player_march_skins WHERE player_id=1 AND skin_code='fire'")->fetchColumn()===0,'failed purchase leaves balance and ownership unchanged');
 
     $db->transaction(fn()=>MarchSkinService::equip(1,'ironkeep'));
     $state=MarchSkinService::state(1);$iron=$state['entries'][array_search('ironkeep',array_column($state['entries'],'id'),true)];

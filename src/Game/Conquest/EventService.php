@@ -7,6 +7,7 @@ use Conquer\Game\City\CityState;
 use Conquer\Game\City\ResourceTick;
 use Conquer\Game\Expedition\ExpeditionRules;
 use Conquer\Game\Research\BuffEngine;
+use Conquer\Game\World\WorldMapProfile;
 
 /** One scheduler for announced conquest cycles and cooperative world invasions. */
 final class EventService
@@ -19,6 +20,7 @@ final class EventService
 
     public static function saveSettings(int $worldId,array $body): array
     {
+        if(WorldMapProfile::isLuxembourg($worldId))throw new \DomainException('Diese Welt verwendet das Ereignisprofil der Gebietseroberung.',409);
         $db=Connection::getInstance();if(!$db->query('SELECT id FROM worlds WHERE id=?',[$worldId])->fetchColumn())throw new \DomainException('Welt nicht gefunden.');
         $values=[];foreach(['enabled','invasion_enabled']as$key){$v=$body[$key]??0;if(!in_array($v,[0,1,'0','1',false,true],true))throw new \DomainException('Ungültiger Ereignisschalter.');$values[$key]=(int)$v;}
         foreach(['interval_hours','duration_hours','invasion_interval_hours']as$key){$v=filter_var($body[$key]??null,FILTER_VALIDATE_INT,['options'=>['min_range'=>1,'max_range'=>8760]]);if($v===false)throw new \DomainException('Ereigniszeiten benötigen 1 bis 8.760 Stunden.');$values[$key]=$v;}
@@ -38,7 +40,7 @@ final class EventService
         $db=Connection::getInstance();$key='conquer-world-events';if((int)$db->query('SELECT GET_LOCK(?,5)',[$key])->fetchColumn()!==1)return;
         try{
             $worlds=$db->query("SELECT id FROM worlds WHERE 1=1".($worldId===null?'':' AND id=?'),$worldId===null?[]:[$worldId])->fetchAll(\PDO::FETCH_COLUMN);
-            foreach($worlds as$id){$id=(int)$id;$db->transaction(function()use($db,$id):void{
+            foreach($worlds as$id){$id=(int)$id;if(WorldMapProfile::isLuxembourg($id))continue;$db->transaction(function()use($db,$id):void{
                 $settings=$db->query('SELECT * FROM world_event_settings WHERE world_id=? FOR UPDATE',[$id])->fetch();if(!$settings)return;if(!in_array($db->query('SELECT status FROM worlds WHERE id=?',[$id])->fetchColumn(),['open','running'],true))return;
                 if($settings['enabled'])self::schedule($id,$settings);
                 if($settings['invasion_enabled'])self::scheduleInvasion($id,$settings);
@@ -82,6 +84,7 @@ final class EventService
     /** Independent competition objectives, placed only when this world enables Conquest. */
     private static function ensureObjectives(int $worldId): void
     {
+        if(WorldMapProfile::isLuxembourg($worldId))return;
         $db=Connection::getInstance();\Conquer\Game\Map\WorldPlacement::lockWorld($db,$worldId);
         foreach(['C'=>[48,48],'B'=>[204,48],'A'=>[48,204],'S'=>[204,204]]as$tier=>[$x,$y]){
             if($db->query("SELECT id FROM shrines WHERE world_id=? AND tier=? AND shrine_code NOT IN ('CONGRESS','SHRINE_FOREST','SHRINE_ICE','SHRINE_SAND','SHRINE_LAVA') LIMIT 1",[$worldId,$tier])->fetchColumn())continue;
@@ -93,6 +96,7 @@ final class EventService
 
     public static function objectives(int $playerId,int $worldId): array
     {
+        if(WorldMapProfile::isLuxembourg($worldId))return [];
         $ids=Connection::getInstance()->query("SELECT id FROM shrines WHERE world_id=? AND shrine_code NOT IN ('CONGRESS','SHRINE_FOREST','SHRINE_ICE','SHRINE_SAND','SHRINE_LAVA') ORDER BY FIELD(tier,'C','B','A','S'),id",[$worldId])->fetchAll(\PDO::FETCH_COLUMN);
         return \Conquer\Game\World\WorldContext::run($worldId,static fn()=>array_map(static fn($id)=>\Conquer\Game\Shrine\CongressService::detail((int)$id,$playerId),$ids));
     }
@@ -114,6 +118,7 @@ final class EventService
     /** Credit the outgoing owner before a battle changes the capture record. */
     public static function beforeCapture(array $shrine): void
     {
+        if(WorldMapProfile::isLuxembourg((int)$shrine['world_id']))return;
         if(in_array($shrine['shrine_code'],['CONGRESS','SHRINE_FOREST','SHRINE_ICE','SHRINE_SAND','SHRINE_LAVA'],true))return;
         $event=Connection::getInstance()->query("SELECT * FROM conquest_events WHERE world_id=? AND state='active' FOR UPDATE",[$shrine['world_id']])->fetch();
         if($event)self::score($event);
@@ -121,6 +126,7 @@ final class EventService
 
     public static function assertShrineOpen(array $shrine): void
     {
+        if(WorldMapProfile::isLuxembourg((int)$shrine['world_id']))throw new \DomainException('Schreine gehören nicht zu dieser Welt.',409);
         if(in_array($shrine['shrine_code']??'', ['CONGRESS','SHRINE_FOREST','SHRINE_ICE','SHRINE_SAND','SHRINE_LAVA'],true))return;
         $event=ConquestService::getActiveEvent((int)$shrine['world_id']);$settings=self::settings((int)$shrine['world_id']);
         if(!$settings['enabled'])return;
@@ -137,6 +143,7 @@ final class EventService
     public static function state(int $playerId,?int $worldId=null): array
     {
         $worldId??=\Conquer\Game\World\WorldContext::id();
+        if(WorldMapProfile::isLuxembourg($worldId))return ['objectives'=>[],'events'=>[],'invasions'=>[],'missions'=>[],'chapter'=>1,'settings'=>self::settings($worldId),'available'=>false];
         self::tick($worldId);$db=Connection::getInstance();$events=$db->query('SELECT * FROM conquest_events WHERE world_id=? ORDER BY starts_at DESC LIMIT 12',[$worldId])->fetchAll();
         foreach($events as&$e){$e['leaderboard']=self::leaderboard((int)$e['id']);$r=$db->query('SELECT result_json FROM conquest_results WHERE event_id=?',[$e['id']])->fetchColumn();$e['report']=$r?json_decode($r,true):null;$e['my_points']=(int)$db->query('SELECT points FROM conquest_contributions WHERE event_id=? AND player_id=?',[$e['id'],$playerId])->fetchColumn();$e['claimed']=(bool)$db->query('SELECT player_id FROM conquest_reward_claims WHERE event_id=? AND player_id=?',[$e['id'],$playerId])->fetchColumn();}unset($e);
         $invasions=$db->query('SELECT i.*,COALESCE(c.contribution,0) AS mine,COALESCE(c.claimed,0) AS claimed FROM world_invasions i LEFT JOIN invasion_contributions c ON c.invasion_id=i.id AND c.player_id=? WHERE i.world_id=? ORDER BY i.starts_at DESC LIMIT 10',[$playerId,$worldId])->fetchAll();
@@ -147,6 +154,7 @@ final class EventService
     public static function action(int $playerId,array $body,?int $worldId=null): array
     {
         $worldId??=\Conquer\Game\World\WorldContext::id();
+        if(WorldMapProfile::isLuxembourg($worldId))throw new \DomainException('Diese Welt verwendet die Gebietseroberung.',409);
         $id=filter_var($body['id']??null,FILTER_VALIDATE_INT,['options'=>['min_range'=>1]]);if(!$id)throw new \DomainException('Ungültiges Ereignis.');
         $db=Connection::getInstance();$city=$db->query('SELECT * FROM cities WHERE player_id=? AND world_id=? FOR UPDATE',[$playerId,$worldId])->fetch();if(!$city)throw new \DomainException('Keine eigene Stadt in dieser Welt.');
         if($body['action']==='event.claim'){
@@ -183,7 +191,7 @@ final class EventService
         $db=Connection::getInstance();$rows=$db->query("SELECT m.id FROM invasion_missions m JOIN world_invasions i ON i.id=m.invasion_id WHERE i.world_id=? AND ((m.state='marching' AND m.arrival_at<=UTC_TIMESTAMP()) OR (m.state='returning' AND m.return_at<=UTC_TIMESTAMP())) ORDER BY m.arrival_at,m.id LIMIT 200",[$worldId])->fetchAll(\PDO::FETCH_COLUMN);
         foreach($rows as$id)$db->transaction(function()use($db,$id):void{$m=$db->query('SELECT * FROM invasion_missions WHERE id=? FOR UPDATE',[$id])->fetch();$e=$db->query('SELECT * FROM world_invasions WHERE id=? FOR UPDATE',[$m['invasion_id']])->fetch();
             if($m['state']==='marching'){if($e['state']==='active'&&$m['arrival_at']<=$e['ends_at'])self::contribute($e,(int)$m['player_id'],(int)$m['city_id'],(int)$m['damage']);$db->execute("UPDATE invasion_missions SET state='returning' WHERE id=?",[$id]);$m['state']='returning';}
-            if($m['state']==='returning'&&strtotime($m['return_at'].' UTC')<=time()){foreach(json_decode($m['troops_json'],true)as$code=>$count)$db->execute('INSERT INTO city_troops(city_id,troop_code,count) VALUES(?,?,?) ON DUPLICATE KEY UPDATE count=count+VALUES(count)',[$m['city_id'],$code,$count]);$db->execute("UPDATE invasion_missions SET state='returned' WHERE id=?",[$id]);}
+            if($m['state']==='returning'&&strtotime($m['return_at'].' UTC')<=time()){foreach(json_decode($m['troops_json'],true)as$code=>$count)$db->execute('INSERT INTO city_troops(city_id,troop_code,count) VALUES(?,?,?) ON DUPLICATE KEY UPDATE count=count+VALUES(count)',[$m['city_id'],\Conquer\Game\City\TroopData::activeCode((int)$code),$count]);$db->execute("UPDATE invasion_missions SET state='returned' WHERE id=?",[$id]);}
         });
     }
 }

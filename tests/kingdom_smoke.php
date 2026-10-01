@@ -135,9 +135,9 @@ try {
     verify($multiplier>1,'production booster changes actual production multiplier');
     action(0,'inventory.use',['item_code'=>10102001]);
     verify(\Conquer\Game\Buff\ActiveBuffService::getMultiplier($pid,'production_boost')===$multiplier,'repeated boost extends duration without exponential stacking');
-    \Conquer\Game\Inventory\InventoryService::addItems($pid,10102021,1);
-    action(0,'inventory.use',['item_code'=>10102021]);
-    verify((\Conquer\Game\Research\BuffEngine::getBuffs($pid)['construction_speed']??0)>0,'construction booster changes actual building bonus');
+    \Conquer\Game\Inventory\InventoryService::addItems($pid,10102011,1);
+    action(0,'inventory.use',['item_code'=>10102011]);
+    verify((\Conquer\Game\Research\BuffEngine::getBuffs($pid)['gathering_speed']??0)>0,'gathering booster changes actual gathering bonus');
     $db->execute('INSERT INTO city_troops (city_id,troop_code,count) VALUES (?,50100101,3) ON DUPLICATE KEY UPDATE count=3',[$actors[1]['city_id']]);
     $challenge=action(0,'arena.challenge',['opponent_id'=>$actors[1]['id']])['result']['challenge_id'];
     action(2,'arena.accept',['challenge_id'=>$challenge],422);

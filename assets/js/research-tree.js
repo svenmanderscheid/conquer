@@ -1,5 +1,6 @@
 (() => {
     'use strict';
+    const localText=value=>window.ConquerLocale?.text(value)??value;
 
     const branches = [
         {id:'economy', name:'Wirtschaft', subtitle:'Vorräte für ein wachsendes Reich', icon:'harvest'},
@@ -38,8 +39,9 @@
     const icon = key => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${paths[key] || paths.book}"/></svg>`;
     const branchOf = node => node.tree === 'advanced' ? 'development' : node.tree === 'battle' ? 'military' : 'economy';
     const groupNames = {food:'Nahrung',wood:'Holz',stone:'Stein',general:'Reich & Versorgung',infantry:'Infanterie',ranged:'Schützen',cavalry:'Reiterei',counter:'Konter',castle_def:'Stadtverteidigung',composed:'Reine Truppentypen',rally:'Reich & Sammelangriffe'};
-    const troopType = code => /infantry|infantrys/.test(code) ? 'Infanterie' : /ranged|archer/.test(code) ? 'Schützen' : /cavalry|cavalrys/.test(code) ? 'Reiterei' : 'Armee';
-    function title(value) {
+    const troopType = code => localText(/infantry|infantrys/.test(code) ? 'Infanterie' : /ranged|archer/.test(code) ? 'Schützen' : /cavalry|cavalrys/.test(code) ? 'Reiterei' : 'Armee');
+    function title(value) { return localText(rawTitle(value)); }
+    function rawTitle(value) {
         const code = typeof value === 'string' ? value : value?.code || '';
         if (names[code]) return names[code];
         if (code.startsWith('advanced_')) return title(code.slice(9)) + ' II';
@@ -50,7 +52,8 @@
         if (/^(infantry|ranged|cavalry|troops)_/.test(code)) return `${troopType(code)} · ${statLabel(code)}`;
         return (typeof value === 'object' && value.name) || code.replace(/_/g,' ');
     }
-    function statLabel(code) {
+    function statLabel(code) { return localText(rawStatLabel(code)); }
+    function rawStatLabel(code) {
         if (/training_amount/.test(code)) return 'Ausbildungsplätze';
         if (/training_speed/.test(code)) return 'Ausbildungstempo';
         if (/training_cost/.test(code)) return 'Ausbildungskosten';
@@ -97,7 +100,7 @@
         const raw = String(value).replace(' ', 'T');
         return Date.parse(/[zZ]|[+-]\d\d:\d\d$/.test(raw) ? raw : raw + 'Z');
     };
-    const percent = value => (Math.round((Number(value) || 0) * 1000) / 10).toLocaleString('de-DE', {maximumFractionDigits:1}) + ' %';
+    const percent = value => (Math.round((Number(value) || 0) * 1000) / 10).toLocaleString(window.ConquerLocale?.locale??'en', {maximumFractionDigits:1}) + ' %';
 
     const unitUnlockArt={warrior:'infantry-tier2',knight:'infantry-tier3',guardian:'infantry-tier4',crusader:'infantry-tier5',longbow_man:'ranged-tier2',ranger:'ranged-tier3',crossbow_man:'ranged-tier4',sniper:'ranged-tier5',horseman:'cavalry-tier2',heavy_cavalry:'cavalry-tier3',iron_cavalry:'cavalry-tier4',dragoon:'cavalry-tier5'};
     function artFor(node){
@@ -114,9 +117,11 @@
         return {key:effect?family+'-'+effect:'research',advanced};
     }
     function nodeArt(node, base, esc) {
-        const art=artFor(node),src=`${base}/assets/art/research/${art.key}.svg`;
+        const code=String(node.code||''),art=artFor(node),specific=code&&code!=='academy';
+        const src=specific?`${base}/assets/art/research/characters-v9/${encodeURIComponent(code)}.png`:`${base}/assets/art/research/${art.key}.svg`;
         const resourceSrc=art.resource?`${base}/assets/art/${art.resource==='crystal'?'items/gems.svg':'ui-resources/'+art.resource+'.png'}`:null;
-        return `<span class="rt-node-art rt-illustrated${art.resource?' rt-resource':''}" data-art="${art.key}">${resourceSrc?`<img class="rt-resource-art" src="${esc(resourceSrc)}" alt="" loading="lazy"><img class="rt-resource-effect" src="${esc(src)}" alt="" loading="lazy">`:`<img src="${esc(src)}" alt="" loading="lazy">`}${art.advanced?'<small class="rt-art-rank" aria-hidden="true">II</small>':''}</span>`;
+        const picture=specific?`<img src="${esc(src)}" alt="" loading="lazy">`:resourceSrc?`<img class="rt-resource-art" src="${esc(resourceSrc)}" alt="" loading="lazy"><img class="rt-resource-effect" src="${esc(src)}" alt="" loading="lazy">`:`<img src="${esc(src)}" alt="" loading="lazy">`;
+        return `<span class="rt-node-art rt-illustrated${art.resource?' rt-resource':''}${specific?' rt-specific-art':''}" data-art="${art.key}"${specific?` data-research-art="${esc(code)}"`:''}>${picture}${art.advanced?'<small class="rt-art-rank" aria-hidden="true">II</small>':''}</span>`;
     }
 
     function renderRequirements({requirements, state, base, esc, researchNames = {}}) {
@@ -143,12 +148,17 @@
         military:[
             chapter('battle-basics','Grundausbildung',[unitColumn('hp'),unitColumn('def'),unitColumn('atk')],['Lebenspunkte','Verteidigung','Angriff'],['Infanterie','Schützen','Reiterei']),
             chapter('battle-muster','Aufmarsch & Versorgung',[unitColumn('spd'),center('troops_storage')],['Marschtempo','Traglast']),
+            chapter('battle-tier2','T2-Truppen',[['warrior','longbow_man','horseman']],['Truppen freischalten'],['Infanterie','Schützen','Reiterei']),
             chapter('battle-training','Truppenausbildung',[unitColumn('training_amount'),unitColumn('training_speed'),unitColumn('training_cost')],['Plätze','Ausbildungstempo','Kosten'],['Infanterie','Schützen','Reiterei']),
             chapter('battle-command','Heeresführung',[center('march_size'),center('march_limit')],['Marschgröße','Marschplätze']),
+            chapter('battle-tier3','T3-Truppen',[['knight','ranger','heavy_cavalry']],['Truppen freischalten'],['Infanterie','Schützen','Reiterei']),
             chapter('battle-army','Die starke Armee',[center('troops_spd'),['troops_hp','troops_def','troops_atk'],center('hospital_capacity')],['Marschtempo','Kampfkraft','Hospital']),
-            chapter('battle-elite','Heilkunst & Sammelangriffe',[center('healing_time_reduced'),center('rally_attack_amount')],['Heilkunst','Sammelangriff']),
+            chapter('battle-elite','Heilkunst',[center('healing_time_reduced')],['Heilkunst']),
+            chapter('battle-tier4','T4-Truppen',[['guardian','crossbow_man','iron_cavalry']],['Truppen freischalten'],['Infanterie','Schützen','Reiterei']),
+            chapter('battle-rally','Sammelangriffe',[center('rally_attack_amount')],['Sammelangriff']),
             chapter('battle-veterans','Veteranen',[advancedColumn('hp'),advancedColumn('def'),advancedColumn('atk')],['Lebenspunkte II','Verteidigung II','Angriff II'],['Infanterie','Schützen','Reiterei']),
-            chapter('battle-masters','Marschtempo II',[advancedColumn('spd')],['Marschtempo II'],['Infanterie','Schützen','Reiterei'])
+            chapter('battle-masters','Marschtempo II',[advancedColumn('spd')],['Marschtempo II'],['Infanterie','Schützen','Reiterei']),
+            chapter('battle-tier5','T5-Truppen',[['crusader','sniper','dragoon']],['Truppen freischalten'],['Infanterie','Schützen','Reiterei'])
         ],
         economy:[
             chapter('economy-supply','Grundversorgung',[resourceColumn('production'),center('gold_production'),resourceColumn('capacity')],['Produktion','Goldproduktion','Lager']),
@@ -235,7 +245,7 @@
             const outside=m.requirements.filter(req=>!slots.has(req.code));
             const stateText={available:'Verfügbar',running:'Wird erforscht',locked:'Gesperrt',complete:'Vollständig erforscht'}[m.status];
             const requirements=outside.map(req=>title(byCode.get(req.code)||req.code)+' Stufe '+req.level).join(', ');
-            return `<button type="button" class="rt-node rt-${m.status}${focusCode===node.code?' rt-focused':''}" style="grid-column:${pos.col+1};grid-row:${pos.gridRow}" data-action="${searchQuery?'research-focus':'research-dialog'}" data-id="${esc(node.code)}" data-row="${pos.row}" data-col="${pos.col}" aria-label="${esc(title(node))}, Stufe ${m.level} von ${node.max_level}. ${stateText}. ${searchQuery?'Im Forschungsbaum zeigen':'Details öffnen'}." title="${esc(title(node)+' · '+stateText+(requirements?' · Vorstufen: '+requirements:''))}"><span class="rt-node-emblem">${nodeArt(node,base,esc)}<span class="rt-node-marker" aria-hidden="true">${icon(m.status==='locked'?'lock':m.status==='running'?'clock':m.status==='complete'?'check':'arrow')}</span></span><span class="rt-level-track" role="progressbar" aria-label="Erforschte Stufen" aria-valuemin="0" aria-valuemax="${node.max_level}" aria-valuenow="${m.level}"><span style="width:${ratio}%"></span><b>${m.level} / ${node.max_level}</b></span><span class="rt-node-name">${esc(compactTitle(node))}</span>${outside.length&&!searchQuery?`<span class="rt-source-count" aria-hidden="true">↤ ${outside.length}</span>`:''}</button>`;
+            return `<button type="button" class="rt-node rt-${m.status}${focusCode===node.code?' rt-focused':''}" style="grid-column:${pos.col+1};grid-row:${pos.gridRow}" data-action="${searchQuery?'research-focus':'research-dialog'}" data-id="${esc(node.code)}" data-row="${pos.row}" data-col="${pos.col}" aria-label="${esc(title(node))}, Stufe ${m.level} von ${node.max_level}. ${stateText}${m.running?', Restzeit wird angezeigt':''}. ${searchQuery?'Im Forschungsbaum zeigen':'Details öffnen'}." title="${esc(title(node)+' · '+stateText+(requirements?' · Vorstufen: '+requirements:''))}">${m.running?'<span class="rt-running-badge">Aktiv</span>':''}<span class="rt-node-emblem">${nodeArt(node,base,esc)}<span class="rt-node-marker" aria-hidden="true">${icon(m.status==='locked'?'lock':m.status==='running'?'clock':m.status==='complete'?'check':'arrow')}</span></span><span class="rt-level-track" role="progressbar" aria-label="Erforschte Stufen" aria-valuemin="0" aria-valuemax="${node.max_level}" aria-valuenow="${m.level}"><span style="width:${ratio}%"></span><b>${m.level} / ${node.max_level}</b></span>${m.running?`<span class="rt-running-time">${countdown(m.running.finishes_at)}</span>`:''}<span class="rt-node-name">${esc(compactTitle(node))}</span>${outside.length&&!searchQuery?`<span class="rt-source-count" aria-hidden="true">↤ ${outside.length}</span>`:''}</button>`;
         }
         const empty=searchQuery?'Keine Forschung gefunden. Versuche einen Truppentyp oder einen Bonus.':'Für diesen Bereich sind noch keine Forschungen verfügbar.';
         const edgesHtml='<g class="rt-connection-beds"/>'+[...lastEdges].sort((a,b)=>Number(a.met)-Number(b.met)).map(edge=>`<g class="rt-edge${edge.met?' rt-edge-met':''}${edge.external?' rt-edge-external':''}" data-from="${esc(edge.from)}" data-to="${esc(edge.to)}" data-level="${edge.level}"><title>${esc(title(byCode.get(edge.from)||edge.from))} Stufe ${edge.level} → ${esc(title(byCode.get(edge.to)||edge.to))}</title><path class="rt-edge-line"/><circle r="3"/></g>`).join('');
@@ -243,7 +253,7 @@
             <nav class="rt-branches" aria-label="Forschungsbereiche">${branches.map(branch=>`<button type="button" class="rt-branch${branch.id===selected.id?' is-selected':''}" data-action="research-branch" data-id="${branch.id}" aria-pressed="${branch.id===selected.id}" aria-label="${branch.name}, ${defs.filter(node=>branchOf(node)===branch.id).length} Forschungen">${icon(branch.icon)}<span>${branch.name}<small>${defs.filter(node=>branchOf(node)===branch.id).length}</small></span></button>`).join('')}</nav>
             <div class="rt-toolbar"><span class="rt-result-count" role="status">${searchQuery?`${searchMatches.length} Treffer in allen Tabs`:`${branchCount} Forschungen`}</span><label class="rt-search"><span class="rt-sr-only">Alle Forschungen durchsuchen</span><input id="research-search" type="search" value="${esc(searchQuery)}" placeholder="Forschung suchen …" maxlength="80" autocomplete="off"><button type="button" data-action="${searchQuery?'research-clear':'research-search'}" aria-label="${searchQuery?'Suche schließen':'Suchen'}">${searchQuery?'×':'⌕'}</button></label></div>
             ${nodes.length?`<div class="rt-scroll" tabindex="0" role="region" aria-label="${searchQuery?'Suchergebnisse':esc(selected.name)+' – Forschungsbaum'}" aria-describedby="research-scroll-hint"><div class="rt-board" style="grid-template-rows:${tracks.join(' ')}"><svg class="rt-connections" aria-hidden="true">${edgesHtml}</svg>${sectionSlots.map(section=>`<h3 class="rt-section-title" style="grid-column:1 / -1;grid-row:${section.gridRow}"><span>${esc(section.name)}</span></h3>${section.columns.flat().filter(Boolean).map(code=>nodeHtml(byCode.get(code))).join('')}`).join('')}</div></div>`:`<div class="rt-empty">${empty}</div>`}
-            <div id="research-scroll-hint" class="rt-scroll-hint">↓ Nach unten scrollen${searchQuery?' · Treffer zeigt die Forschung im Baum.':' · Forschung antippen für Details.'}</div>
+            <div id="research-scroll-hint" class="rt-scroll-hint">↓ Nach unten scrollen${localText(searchQuery?' · Treffer zeigt die Forschung im Baum.':' · Forschung antippen für Details.')}</div>
         </section>`;
     }
     function afterRender(container){

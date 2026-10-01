@@ -34,9 +34,10 @@ try{
  ck(ResearchEffects::limits(BuffEngine::getBuffs(1,2))['march_capacity']===5000,'Building bonuses stay within their world');
  ck(ResearchEffects::limits($buffs+[])['march_capacity']===50000&&ResearchEffects::limits(array_replace($buffs,['march_size'=>.15,'march_capacity_flat'=>100]))['march_capacity']===57600,'Research and flat talents apply on the castle base');
  $previous=0;for($level=1;$level<=30;$level++){$current=BuildingProgression::atLevels(['castle'=>$level])['base_march_capacity'];ck($current>$previous,'Castle capacity grows at level '.$level);$previous=$current;}
- ck(ResearchEffects::carryCapacity([50100101=>100,50200101=>100,50300101=>100],[])===32400,'Mixed T1 army uses current 108 carry per troop');
- ck(ResearchEffects::carryCapacity([50100101=>10000],[])===1080000,'Large armies have no artificial 5000 haul ceiling');
- ck(ResearchEffects::carryCapacity([50100101=>100,50200101=>100],['troops_storage'=>.1,'infantry_storage'=>.2])===25920,'Carry buffs respect each troop type');
+ $infantryCarry=(float)\Conquer\Game\City\TroopData::get(50100101)['carry'];$rangedCarry=(float)\Conquer\Game\City\TroopData::get(50200101)['carry'];$cavalryCarry=(float)\Conquer\Game\City\TroopData::get(50300101)['carry'];
+ ck(ResearchEffects::carryCapacity([50100101=>100,50200101=>100,50300101=>100],[])===(int)floor(100*($infantryCarry+$rangedCarry+$cavalryCarry)),'Mixed T1 army sums each active troop type carry');
+ ck(ResearchEffects::carryCapacity([50100101=>10000],[])===(int)floor(10000*$infantryCarry),'Large armies have no artificial 5000 haul ceiling');
+ ck(ResearchEffects::carryCapacity([50100101=>100,50200101=>100],['troops_storage'=>.1,'infantry_storage'=>.2])===(int)floor(100*$infantryCarry*1.3+100*$rangedCarry*1.1),'Carry buffs respect each troop type');
  ck(GatherService::troopSpeed(50300101,[])>GatherService::troopSpeed(50100101,[]),'Cavalry travels faster than infantry');
  ck(GatherService::troopSpeed(50100101,['gathering_speed'=>1])===GatherService::troopSpeed(50100101,[]),'Gather speed never shortens travel');
  ck(abs(GatherService::rate('food',1,['gathering_speed'=>.2,'food_gathering_speed'=>.3],2)-40000/1200)<.000001,'Resource, general and world gathering bonuses combine');
@@ -59,7 +60,7 @@ try{
  ck(stock()===25000&&(int)$db->query('SELECT food FROM cities WHERE id=1')->fetchColumn()===$before+$loot['food'],'Return credits troops and resources exactly once');
  $remainingNode=(int)$db->query('SELECT resource_amount FROM field_objects WHERE world_id=1')->fetchColumn();$id=GatherService::dispatch(1,1,90,90,100)['march_id'];reach($id,1000);
  ck(row($id)['state']==='complete'&&stock()===25000,'Offline tick completes travel, work and return in order');
- ck(json_decode(row($id)['haul_json'],true)['loot']['food']===$remainingNode,'Legacy count-only request carries its real selected troop load');
+ ck(json_decode(row($id)['haul_json'],true)['loot']['food']===min($remainingNode,(int)floor(100*$infantryCarry)),'Legacy count-only request carries its real selected troop load');
  $db->execute('DELETE FROM field_objects');node(45);$id=GatherService::dispatch(1,1,90,90,0,[50100101=>100])['march_id'];reach($id,1000);
  ck(json_decode(row($id)['haul_json'],true)['loot']['food']===45,'Depleted node returns its remaining amount without overdraw');
  $db->execute('DELETE FROM field_objects');node();$id=GatherService::dispatch(1,1,90,90,0,[50100101=>100])['march_id'];$db->execute('DELETE FROM field_objects');node();reach($id,1000);
@@ -67,7 +68,7 @@ try{
  ck(stock()===25000,'Vanished node safely returns the army');
  $db->execute('DELETE FROM field_objects');node(10000,2);rejects(fn()=>GatherService::dispatch(1,1,90,90,0,[50100101=>100]),'Gather targets cannot cross worlds');
  $db->execute('DELETE FROM field_objects');node(10000,1,5);$before=(int)$db->query('SELECT gems FROM players WHERE id=1')->fetchColumn();$id=GatherService::dispatch(1,1,90,90,0,[50100101=>1])['march_id'];reach($id,50000);
- ck((int)$db->query('SELECT gems FROM players WHERE id=1')->fetchColumn()===$before+108,'Gem node yields gems to the player on return');
+ ck((int)$db->query('SELECT gems FROM players WHERE id=1')->fetchColumn()===$before+(int)floor($infantryCarry),'Gem node yields the selected troop carry to the player on return');
  $db->execute('DELETE FROM field_objects');node();$id=GatherService::dispatch(1,1,90,90,0,[50100101=>10])['march_id'];$db->execute('UPDATE marches SET haul_json=NULL WHERE id=?',[$id]);reach($id,1000);ck(row($id)['state']==='complete','Pre-migration gather marches receive a snapshot on arrival');
 
  $city=CityState::loadForPlayer(1);TroopTrainer::train($city['city'],$city['buildings'],50100101,600);
@@ -92,10 +93,12 @@ try{
  $response=$http('/api/rally/start-monster',$body);ck($response['status']===200,'Monster rally API starts through the real handler');
  $rid=(int)$response['body']['data']['rally_id'];ck((int)$db->query('SELECT TIMESTAMPDIFF(MINUTE,created_at,launch_at) FROM rallies WHERE id=?',[$rid])->fetchColumn()===15,'HTTP rally uses the selected preparation time');
  $game=$http('/api/game/state?map_x=90&map_y=90');ck($game['status']===200,'Game state API returns the integrated progression model');$state=$game['body']['data'];
- ck(count(array_filter($state['monsters'],fn($m)=>($m['definition']['art']??'')==='monsters/frostgrimm'&&($m['definition']['biome']??'')==='ice'))===1,'HTTP state preserves regional boss artwork and biome');
+ $bossDefinition=\Conquer\Game\Map\MonsterData::definition(20202101);
+ ck(($bossDefinition['biome']??'')==='ice'&&is_file(ROOT_DIR.'/assets/art/'.$bossDefinition['art'].'.png'),'regional boss catalog references an existing ice-biome image');
+ ck(count(array_filter($state['monsters'],fn($m)=>(int)$m['monster_code']===20202101&&($m['definition']['art']??'')===$bossDefinition['art']&&($m['definition']['biome']??'')==='ice'))===1,'HTTP state preserves the active regional boss artwork and biome');
  ck($state['army_limits']['march_capacity']===5000&&(int)$state['active_rally_count']===1,'Game state includes castle capacity and occupied rally slots');
  ck(count(array_filter($state['marches'],fn($m)=>$m['march_type']==='rally'))===1,'Real rally appears once in the shared march list');
- ck($state['troop_defs'][0]['gather_carry']==108&&$state['troop_defs'][0]['training']['max_count']===500,'UI receives real troop carry and barrack capacity');
+ ck($state['troop_defs'][0]['gather_carry']==$infantryCarry&&$state['troop_defs'][0]['training']['max_count']===500,'UI receives real troop carry and barrack capacity');
  ck(count(array_filter($state['nodes'],fn($n)=>isset($n['gather_rate'])&&$n['gather_rate']>0))>0,'Resource previews receive effective work rates');
  $gather=$http('/api/march/dispatch-gather',['target_x'=>90,'target_y'=>90,'troops'=>[50100101=>10]]);ck($gather['status']===200,'Gather API accepts the selected army');
  $db->execute('UPDATE sessions SET active_world_id=2 WHERE token=?',[$token]);$other=$http('/api/game/state?map_x=90&map_y=90');

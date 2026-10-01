@@ -3,11 +3,11 @@
 const fs = require('fs'), path = require('path'), vm = require('vm'), assert = require('assert'), cp = require('child_process');
 const root = path.resolve(__dirname,'..');
 const trees = ['production','battle','advanced'];
-const expected = {production:[34,245],battle:[43,306],advanced:[40,400]};
+const expected = {production:[34,245],battle:[55,318],advanced:[40,400]};
 const defs = trees.flatMap(tree => JSON.parse(fs.readFileSync(path.join(root,'data/research',tree+'.json'),'utf8')).nodes.map(node => ({...node,tree})));
 function check(label, fn) { fn(); process.stdout.write('PASS '+label+'\n'); }
-check('all three complete source catalogues retain 117 technologies and 951 levels', () => {
-    assert.equal(defs.length,117); assert.equal(defs.reduce((sum,node)=>sum+node.levels.length,0),951);
+check('all three complete source catalogues retain 129 technologies and 963 levels', () => {
+    assert.equal(defs.length,129); assert.equal(defs.reduce((sum,node)=>sum+node.levels.length,0),963);
     for (const tree of trees) { const nodes=defs.filter(node=>node.tree===tree); assert.deepEqual([nodes.length,nodes.reduce((sum,node)=>sum+node.levels.length,0)],expected[tree]); }
     assert.equal(new Set(defs.map(node=>node.code)).size,defs.length);
 });
@@ -43,7 +43,7 @@ check('actual PHP loader exposes all nodes without silently overwriting an ID', 
     const php=process.env.PHP_BINARY || (process.platform==='win32'?'C:/xampp/php/php.exe':'php');
     const code="define('ROOT_DIR',getcwd());require 'src/Autoloader.php';(new \\Conquer\\Autoloader(ROOT_DIR.'/src'))->register();echo json_encode(array_values(\\Conquer\\Game\\Research\\ResearchData::allNodes()));";
     const loaded=JSON.parse(cp.execFileSync(php,['-r',code],{cwd:root,encoding:'utf8'}));
-    assert.equal(loaded.length,117);assert.equal(loaded.reduce((sum,node)=>sum+node.levels.length,0),951);
+    assert.equal(loaded.length,129);assert.equal(loaded.reduce((sum,node)=>sum+node.levels.length,0),963);
     assert.deepEqual(loaded.map(node=>node.code).sort(),defs.map(node=>node.code).sort());
 });
 const env={window:{}};
@@ -53,7 +53,7 @@ const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;
 const state={research_defs:defs,research:{},research_queue:[],buildings:{academy:{level:1}},city:{food:5000,lumber:5000,stone:5000,gold:5000},server_time:Date.now()/1000};
 const options={state,base:'/conquer',esc,fmt:String,duration:value=>value+' Sek.',countdown:String};
 const branchTrees=[['economy','production'],['military','battle'],['development','advanced']];
-check('all 117 discoveries belong to explicit meaningful chapters exactly once',()=>{
+check('all 129 discoveries belong to explicit meaningful chapters exactly once',()=>{
     for(const [branch,tree] of branchTrees){
         const chapters=ui.getChapters(defs,branch),codes=chapters.flatMap(ch=>Array.from(ch.codes));
         assert(!chapters.some(ch=>ch.id.startsWith('extra-')),'Source technology lacks a designed chapter');
@@ -77,6 +77,8 @@ check('each continuous tab renders every technology once at every viewport witho
                 for(const edge of displayed)assert.equal(edge.external,!info.codes.includes(edge.from));
             }
             assert.equal(new Set(info.codes).size,info.codes.length);
+            const rows=new Map([...html.matchAll(/data-id="([^"]+)" data-row="(\d+)"/g)].map(match=>[match[1],Number(match[2])]));
+            for(const edge of info.edges)if(!edge.external)assert(rows.get(edge.from)<rows.get(edge.to),edge.from+' must appear above '+edge.to);
             assert.deepEqual(Array.from(info.codes).sort(),defs.filter(node=>node.tree===tree).map(node=>node.code).sort());
         }
     }
@@ -154,6 +156,6 @@ check('every technology has a real subject-specific illustration and counter ico
     assert(renderedArt('food_capacity').includes('data-art="resource-capacity"'));
     assert(renderedArt('food_production').includes('data-art="resource-production"'));
     assert(renderedArt('food_gathering_speed').includes('data-art="resource-gathering"'));
-    for(const code of ['warrior','knight','guardian','crusader','longbow_man','ranger','crossbow_man','sniper','horseman','heavy_cavalry','iron_cavalry','dragoon'])assert(!byCode.has(code),code+' must be absent from research');
+    for(const code of ['warrior','knight','guardian','crusader','longbow_man','ranger','crossbow_man','sniper','horseman','heavy_cavalry','iron_cavalry','dragoon'])assert(byCode.has(code),code+' must unlock troops through research');
 });
 process.stdout.write('ALL FULL RESEARCH CATALOGUE CHECKS PASSED\n');

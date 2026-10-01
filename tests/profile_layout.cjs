@@ -9,10 +9,16 @@ const assert = require('assert');
 
 const root = path.resolve(__dirname, '..');
 const view = fs.readFileSync(path.join(root, 'views/game.php'), 'utf8');
+const panels = fs.readFileSync(path.join(root, 'assets/js/alliance-ranks.js'), 'utf8') + '\n' + fs.readFileSync(path.join(root, 'assets/js/mvp-panels.js'), 'utf8');
 const sheets = [...view.matchAll(/assets\/css\/([^?"']+)\?/g)].map(match => match[1]);
 const styles = sheets.map(name => fs.readFileSync(path.join(root, 'assets/css', name), 'utf8')).join('\n');
 const output = fs.mkdtempSync(path.join(os.tmpdir(), 'conquer-profile-layout-'));
 const viewports = [[320, 568], [390, 844], [568, 320], [1024, 683], [1280, 800]];
+
+assert.match(panels, /ConquerLocale\.text\('Relikte'\)\)\+'<\/span>','treasures-tab'/, 'localized profile relic label links to the relic menu');
+assert.match(panels, /ConquerLocale\.text\('Mastery'\)\)\+'<\/span>','tab','mastery'/, 'localized profile mastery label links to the mastery menu');
+assert.doesNotMatch(panels, /Optionen','tab','settings','profile-nav'/, 'profile no longer links to options');
+assert.doesNotMatch(panels, /function profileEquipment\(/, 'undeveloped equipment slots stay out of the profile');
 
 function playwright() {
     try { return require('playwright'); }
@@ -22,18 +28,14 @@ function playwright() {
     }
 }
 
-const slot = (number, filled = false) => filled
-    ? `<button class="lok-gear-slot grade-gold"><small>Stufe 1</small><span aria-hidden="true">♜</span><strong>Holzfälleraxt</strong></button>`
-    : `<button class="lok-gear-slot is-empty"><span aria-hidden="true">◇</span><small>Platz ${number}</small></button>`;
-
-const html = `<!doctype html><html lang="de"><head><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+const html = `<!doctype html><html lang="de"><head><meta name="viewport" content="width=device-width,initial-scale=1"><base href="https://profile.fixture/"></head>
 <body class="mobile-game"><dialog id="panel-dialog" data-panel="profile">
   <div class="page-heading"><span class="panel-emblem">♛</span><h1 id="page-title">Profil</h1><button class="panel-close">×</button></div>
   <section id="panel-content" class="panel-content">
     <div class="subtabs">${['Königreich','Fortschritt','Erfolge','Konto'].map((name, index) => `<button class="subtab ${index ? '' : 'active'}">${name}</button>`).join('')}</div>
     <section class="lok-profile is-own">
       <div class="lok-profile-main">
-        <div class="lok-profile-stage"><div class="lok-profile-gear">${[1,2,3,4,5,6].map((n, i) => slot(n, i === 0)).join('')}</div>
+        <div class="lok-profile-stage">
           <figure class="lok-profile-hero"><span class="lok-profile-crown">♛</span><div style="width:100%;height:65%;background:var(--ui-card-light);border:3px solid var(--ui-frame);border-radius:45% 45% 20px 20px"></div><figcaption><strong>Ekki1992</strong><small>Burg Stufe 3</small></figcaption></figure>
         </div>
         <div class="lok-profile-data">
@@ -43,7 +45,7 @@ const html = `<!doctype html><html lang="de"><head><meta name="viewport" content
           <div class="lok-profile-progress"><div><span>Hunter-Stufe 1</span><strong>0 / 250 XP</strong></div><div class="progress-track lord-progress"><span style="width:0%"></span></div><div><span>Aktionspunkte</span><strong>190 / 200 AP</strong></div><div class="progress-track ap-progress"><span style="width:95%"></span></div></div>
         </div>
       </div>
-      <nav class="lok-profile-nav">${['Skins','Truppen','Rangliste','Optionen'].map(name => `<button class="button profile-nav">${name}</button>`).join('')}</nav>
+      <nav class="lok-profile-nav">${['Skins','Truppen','Relikte','Mastery','Rangliste'].map(name => `<button class="button profile-nav">${name}</button>`).join('')}</nav>
     </section>
   </section>
 </dialog></body></html>`;
@@ -54,9 +56,15 @@ const html = `<!doctype html><html lang="de"><head><meta name="viewport" content
     const failures = [];
     try {
         const page = await browser.newPage();
+        await page.route('https://profile.fixture/fonts/**', route => {
+            const file=path.join(root,'assets/fonts',path.basename(new URL(route.request().url()).pathname));
+            return fs.existsSync(file)?route.fulfill({body:fs.readFileSync(file),contentType:'font/woff2'}):route.abort();
+        });
         await page.setContent(html);
         await page.addStyleTag({content:styles});
         await page.locator('#panel-dialog').evaluate(dialog => dialog.showModal());
+        await page.evaluate(async()=>{await document.fonts.load('16px \"Conquer UI\"','Äé Kingdom 0123456789');await document.fonts.ready;});
+        assert(await page.evaluate(()=>document.fonts.check('16px "Conquer UI"','Äé Kingdom 0123456789')),'Profile geometry uses the loaded shared typeface');
         for (const [width, height] of viewports) {
             await page.setViewportSize({width, height});
             const result = await page.evaluate(() => {

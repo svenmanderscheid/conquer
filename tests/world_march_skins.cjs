@@ -11,10 +11,11 @@ ${['world-atlas','map-overlay','castle-skins','village-theme'].map(name=>`<link 
 const now=Date.now(),date=n=>new Date(now+n).toISOString();
 window.options={host:document.querySelector('#map'),base:'',esc:s=>String(s).replaceAll('<','&lt;'),monsterArt:()=>'',now:()=>now,state:{city:{id:1,coord_x:64,coord_y:64,castle_level:3,city_skin:'default'},kingdom:{march_skin:'phoenix'},players:[],nodes:[],monsters:[],troop_defs:[{code:1,type:1},{code:2,type:2},{code:3,type:3}],marches:[
 {id:1,target_x:69,target_y:64,target_type:2,troops:{1:20,2:30,3:40},state:'marching',departure_time:date(-5000),arrival_time:date(5000),march_skin:null},
-{id:2,target_x:64,target_y:69,target_type:2,troops:{1:50,2:50},state:'marching',departure_time:date(-5000),arrival_time:date(5000),march_skin:'default'},
+{id:2,target_x:64,target_y:69,target_type:2,troops:{1:50,2:50},state:'marching',departure_time:date(-5000),arrival_time:date(5000),march_skin:'forest'},
 {id:3,target_x:59,target_y:64,target_type:2,troops:{3:75},state:'marching',departure_time:date(-5000),arrival_time:date(5000),march_skin:'ironkeep'},
 {id:4,target_x:64,target_y:59,target_type:2,troops:{1:33},state:'marching',departure_time:date(-5000),arrival_time:date(5000),march_skin:'unknown'},
-{id:5,target_x:69,target_y:69,target_type:2,troops:{2:25},state:'marching',departure_time:date(-5000),arrival_time:date(5000),march_skin:'rosehall'}]}};
+{id:5,target_x:69,target_y:69,target_type:2,troops:{2:25},state:'marching',departure_time:date(-5000),arrival_time:date(5000),march_skin:'rosehall'},
+{id:6,target_x:66,target_y:68,target_type:2,troops:{1:50,2:50},state:'marching',departure_time:date(-5000),arrival_time:date(5000),march_skin:'default'}]}};
 ConquerWorld.render(options);
 </script></body></html>`;
 
@@ -27,14 +28,15 @@ const server=http.createServer((req,res)=>{const name=decodeURIComponent(new URL
    const page=await browser.newPage({viewport}),errors=[];page.on('pageerror',error=>errors.push(error.message));
    await page.goto(`http://127.0.0.1:${server.address().port}`,{waitUntil:'domcontentloaded'});
    await page.evaluate(()=>{options.state.marches.find(march=>march.id===5).march_skin=null;ConquerWorld.render(options);});
-   await page.waitForSelector('.atlas-march-party[data-march-skin="default"].is-skinned');
+   await page.waitForSelector('.atlas-march-party[data-march-skin="forest"].is-skinned');
    await page.waitForSelector('.atlas-march-party[data-march-skin="ironkeep"].is-skin-fallback');
+   const ordinary=page.locator('.atlas-march-party[data-march-skin="default"]');assert.equal(await ordinary.locator('.atlas-party-type').count(),2);assert.equal(await ordinary.evaluate(el=>el.classList.contains('is-skinned')),false,'default keeps the visible troop formation');
    const legacy=page.locator('.atlas-march-party[data-march-skin=""]').first();
    assert.equal(await legacy.locator('.atlas-party-type').count(),3,'legacy march keeps its full troop composition');
    assert.equal(await legacy.evaluate(el=>el.classList.contains('is-skinned')),false,'legacy march never inherits equipped skin');
-   const themed=page.locator('.atlas-march-party[data-march-skin="default"]');
-   assert.match(await themed.locator('.atlas-party-skin img').getAttribute('src'),/march-default\.webp\?v=1$/);
-   assert.match(await themed.getAttribute('aria-label'),/^Grenzlandzug\. Feldzug/,'accessible label names the visual skin');
+   const themed=page.locator('.atlas-march-party[data-march-skin="forest"]');
+   assert.match(await themed.locator('.atlas-party-skin img').getAttribute('src'),/animated-march-forest\.webp\?v=2$/);
+   assert.match(await themed.getAttribute('aria-label'),/^Waldläufer\. Feldzug/,'accessible label names the visual skin');
    assert.equal(await themed.locator('.atlas-party-units').evaluate(el=>getComputedStyle(el).display),'none','themed group replaces ordinary figures');
    assert.equal(await themed.locator('small').isVisible(),true,'troop count remains readable');
    assert.equal(await themed.evaluate(el=>getComputedStyle(el).pointerEvents),'none','skin does not enlarge the map hitbox');
@@ -49,7 +51,7 @@ const server=http.createServer((req,res)=>{const name=decodeURIComponent(new URL
    await page.evaluate(()=>{options.state.kingdom.march_skin='ironkeep';ConquerWorld.render(options);});
    assert.equal(await themed.locator('.atlas-party-skin img').getAttribute('src'),oldSrc,'equipment changes do not repaint an active snapshot');
    assert.equal(await legacy.evaluate(el=>el.classList.contains('is-skinned')),false,'equipment changes do not skin legacy marches');
-   assert.equal(await page.locator('.atlas-routes line').count(),5,'route semantics remain present for every moving march');
+   assert.equal(await page.locator('.atlas-routes line').count(),6,'route semantics remain present for every moving march');
    await page.evaluate(()=>document.body.classList.add('reduced-motion'));
    assert.equal(await themed.locator('.atlas-party-skin img').evaluate(el=>getComputedStyle(el).animationName),'none','reduced motion stops skin animation');
    assert.deepEqual(errors,[]);

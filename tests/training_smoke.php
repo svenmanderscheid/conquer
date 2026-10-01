@@ -68,8 +68,8 @@ function trainingSignIn(int $session, string $name, string $password, string $mo
 
 function trainingState(int $session): array
 {
-    $result = trainingRequest($session, '/api/city3d/state');
-    trainingCheck($result['status'] === 200 && ($result['json']['ok'] ?? false), '3D state loads');
+    $result = trainingRequest($session, '/api/game/state');
+    trainingCheck($result['status'] === 200 && ($result['json']['ok'] ?? false), 'authenticated game state loads');
     return $result['json']['data'];
 }
 

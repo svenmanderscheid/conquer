@@ -293,48 +293,6 @@
       ]
     },
     {
-      "code": 10102021,
-      "name": "Construction Boost 8h",
-      "category": "boost",
-      "subcategory": "construction",
-      "boost_type": "construction_speed",
-      "bonus_pct": 25,
-      "duration_seconds": 28800,
-      "description": "Increases construction speed by 25% for 8 hours.",
-      "icon": "hammer.svg",
-      "name_de": "Baugeschwindigkeit +25 % · 8 Stunden",
-      "description_de": "Erhöht Baugeschwindigkeit für 8 Stunden um 25 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
-      "rarity": "rare",
-      "icon_framed": false,
-      "is_usable": true,
-      "loot_sources": [
-        "silver",
-        "gold",
-        "platinum"
-      ]
-    },
-    {
-      "code": 10102031,
-      "name": "Research Boost 8h",
-      "category": "boost",
-      "subcategory": "research",
-      "boost_type": "research_speed",
-      "bonus_pct": 25,
-      "duration_seconds": 28800,
-      "description": "Increases research speed by 25% for 8 hours.",
-      "icon": "research.svg",
-      "name_de": "Forschungsgeschwindigkeit +25 % · 8 Stunden",
-      "description_de": "Erhöht Forschungsgeschwindigkeit für 8 Stunden um 25 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
-      "rarity": "rare",
-      "icon_framed": false,
-      "is_usable": true,
-      "loot_sources": [
-        "silver",
-        "gold",
-        "platinum"
-      ]
-    },
-    {
       "code": 10102041,
       "name": "Training Boost 8h",
       "category": "boost",
@@ -1631,44 +1589,6 @@
       ]
     },
     {
-      "code": 10202010,
-      "name": "Baugeschwindigkeit",
-      "category": "boost",
-      "subcategory": "construction_speed",
-      "boost_type": "construction_speed",
-      "bonus_pct": 25,
-      "duration_seconds": 86400,
-      "icon": "hammer.svg",
-      "name_de": "Baugeschwindigkeit +25 % · 1 Tag",
-      "description_de": "Erhöht Baugeschwindigkeit für 1 Tag um 25 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
-      "rarity": "epic",
-      "icon_framed": false,
-      "is_usable": true,
-      "loot_sources": [
-        "gold",
-        "platinum"
-      ]
-    },
-    {
-      "code": 10202011,
-      "name": "Forschungsgeschwindigkeit",
-      "category": "boost",
-      "subcategory": "research_speed",
-      "boost_type": "research_speed",
-      "bonus_pct": 25,
-      "duration_seconds": 86400,
-      "icon": "research.svg",
-      "name_de": "Forschungsgeschwindigkeit +25 % · 1 Tag",
-      "description_de": "Erhöht Forschungsgeschwindigkeit für 1 Tag um 25 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere.",
-      "rarity": "epic",
-      "icon_framed": false,
-      "is_usable": true,
-      "loot_sources": [
-        "gold",
-        "platinum"
-      ]
-    },
-    {
       "code": 10202012,
       "name": "Ausbildungsgeschwindigkeit",
       "category": "boost",
@@ -2791,7 +2711,7 @@
       "fragment_grade": "normal",
       "fragment_amount": 10,
       "rarity": "normal",
-      "icon": "fragment.svg",
+      "icon": "fragment-normal.svg",
       "name_de": "Reliktfragmente · Gewöhnlich",
       "description_de": "Gewährt 10 Fragmente eines zufälligen Relikts der Seltenheit „Gewöhnlich“. Fragmente erhöhen automatisch dessen Stufe.",
       "icon_framed": false,
@@ -2809,7 +2729,7 @@
       "fragment_grade": "rare",
       "fragment_amount": 10,
       "rarity": "rare",
-      "icon": "fragment.svg",
+      "icon": "fragment-rare.svg",
       "name_de": "Reliktfragmente · Selten",
       "description_de": "Gewährt 10 Fragmente eines zufälligen Relikts der Seltenheit „Selten“. Fragmente erhöhen automatisch dessen Stufe.",
       "icon_framed": false,
@@ -2828,7 +2748,7 @@
       "fragment_grade": "epic",
       "fragment_amount": 10,
       "rarity": "epic",
-      "icon": "fragment.svg",
+      "icon": "fragment-epic.svg",
       "name_de": "Reliktfragmente · Episch",
       "description_de": "Gewährt 10 Fragmente eines zufälligen Relikts der Seltenheit „Episch“. Fragmente erhöhen automatisch dessen Stufe.",
       "icon_framed": false,
@@ -2846,7 +2766,7 @@
       "fragment_grade": "legendary",
       "fragment_amount": 5,
       "rarity": "legendary",
-      "icon": "fragment.svg",
+      "icon": "fragment-legendary.svg",
       "name_de": "Reliktfragmente · Legendär",
       "description_de": "Gewährt 5 Fragmente eines zufälligen Relikts der Seltenheit „Legendär“. Fragmente erhöhen automatisch dessen Stufe.",
       "icon_framed": false,
@@ -2863,7 +2783,7 @@
       "fragment_grade": "mythic",
       "fragment_amount": 3,
       "rarity": "mythic",
-      "icon": "fragment.svg",
+      "icon": "fragment-mythic.svg",
       "name_de": "Reliktfragmente · Mythisch",
       "description_de": "Gewährt 3 Fragmente eines zufälligen Relikts der Seltenheit „Mythisch“. Fragmente erhöhen automatisch dessen Stufe.",
       "icon_framed": false,
@@ -3005,7 +2925,7 @@
       "subcategory": "fragments",
       "fragment_grade": "legendary",
       "fragment_amount": 1,
-      "icon": "fragment.svg",
+      "icon": "fragment-legendary.svg",
       "rarity": "legendary",
       "icon_framed": false,
       "is_usable": true,
@@ -3025,7 +2945,7 @@
       "fragment_grade": "epic",
       "fragment_amount": 1,
       "treasure_code": 60300115,
-      "icon": "fragment.svg",
+      "icon": "fragment-epic.svg",
       "rarity": "epic",
       "icon_framed": false,
       "is_usable": true,
@@ -3081,7 +3001,9 @@
       "icon": "pouch.svg",
       "icon_framed": false,
       "description_de": "Wird beim Gebäudeausbau automatisch verbraucht.",
-      "loot_sources": []
+      "loot_sources": [
+        "rally_monster"
+      ]
     },
     {
       "code": 120601001,
@@ -3418,6 +3340,21 @@
       "icon": "pouch.svg",
       "icon_framed": false,
       "loot_sources": []
+    },
+    {
+      "code": 10300005,
+      "name": "Alliance Coin",
+      "name_de": "Allianzmünze",
+      "category": "material",
+      "subcategory": "alliance_currency",
+      "rarity": "normal",
+      "description_de": "Eine Münze als Belohnung für gemeinsame Kämpfe gegen regionale Bosse. Wird im Inventar gesammelt; derzeit nicht direkt verwendbar.",
+      "is_usable": false,
+      "icon": "reference/resource-gold.png",
+      "icon_framed": false,
+      "loot_sources": [
+        "regional_boss"
+      ]
     }
   ]
 }

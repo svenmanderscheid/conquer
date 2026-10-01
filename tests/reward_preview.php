@@ -5,6 +5,9 @@ declare(strict_types=1);
 if (PHP_SAPI !== 'cli') {
     exit(1);
 }
+ob_start();
+session_name('conquer_reward_preview_test');
+session_start();
 
 define('ROOT_DIR', dirname(__DIR__));
 define('APP_BASE', '/conquer');
@@ -33,6 +36,7 @@ function previewCheck(bool $condition, string $message): void
 try {
     $fixture = new \ConquerTests\FeatureDatabase();
     $db = Connection::getInstance();
+    $db->execute("INSERT INTO admin_users(id,username,password_hash,role) VALUES(1,'PreviewAdmin',?,'superadmin')", [password_hash('Fixture-Preview-123!', PASSWORD_DEFAULT)]);
     $monsterKey = '20209901';
 
     foreach (['monster', 'dungeon', 'chest', 'expedition'] as $type) {
@@ -90,7 +94,8 @@ try {
     previewCheck(count($globalHistory) === 1 && $globalHistory[0]['revision'] === 1, 'History is isolated to the selected scope');
     previewCheck(!array_key_exists('config_json', $worldHistory[0]) && !str_contains(json_encode($worldHistory, JSON_THROW_ON_ERROR), 'HISTORY_SECRET'), 'History projection never exposes rule JSON');
 
-    $_SESSION = ['admin' => ['id' => 1, 'username' => 'PreviewAdmin', 'role' => 'superadmin'], 'admin_csrf' => str_repeat('a', 64)];
+    previewCheck(\Conquer\Auth\AdminAuth::login('PreviewAdmin', 'Fixture-Preview-123!'), 'Real admin login authenticates the preview fixture');
+    $_SESSION['admin_csrf'] = str_repeat('a', 64);
     $_GET = ['world_id' => 1, 'scope' => 'world', 'type' => 'monster', 'source' => $monsterKey];
     ob_start();
     \Conquer\Admin\AdminController::rewards();

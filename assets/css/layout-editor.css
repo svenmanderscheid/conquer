@@ -1,0 +1,28 @@
+#layout-editor{font-family:var(--ui-font);color:var(--ui-ink);min-width:0}
+#layout-editor .layout-toolbar{display:flex;gap:12px;align-items:end;flex-wrap:wrap;margin:14px 0}
+#layout-editor label{display:block;color:var(--ui-ink);margin:6px 0}
+#layout-editor :is(button,select,input:not([type=range])){min-height:44px;border-radius:10px;font:inherit}
+#layout-editor :is(input,select){background:var(--ui-card-light);color:var(--ui-ink);border:1px solid var(--ui-line);max-width:100%;box-sizing:border-box}
+#layout-editor button{background:var(--ui-primary-dark);color:var(--ui-card-light);border:1px solid var(--ui-frame);padding:8px 12px;cursor:pointer}
+#layout-editor button.secondary{background:var(--ui-card);color:var(--ui-ink)}
+#layout-editor button:disabled{background:var(--ui-disabled);color:var(--ui-muted);cursor:default;opacity:1}
+#layout-editor :focus-visible{outline:3px solid var(--ui-primary);outline-offset:2px}
+.layout-workspace{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:18px;align-items:start}
+.layout-viewport{min-width:0;overflow:auto;background:var(--ui-inset);border:2px solid var(--ui-frame);border-radius:16px;padding:10px;box-sizing:border-box;max-height:900px}
+#layout-frame-space{position:relative;margin:auto}
+#layout-frame{display:block;position:absolute;left:0;top:0;border:0;transform-origin:top left;background:var(--ui-paper)}
+.layout-controls{background:var(--ui-paper);border:1px solid var(--ui-line);border-radius:14px;padding:14px;min-width:0}
+.layout-controls :is(select,input[type=search]){width:100%}
+#layout-screen-width,#layout-screen-height{width:100px;display:block}
+#layout-selection-status{font-size:13px;padding:8px;background:var(--ui-inset);border-radius:8px}
+.layout-controls fieldset{padding:0;border:0;margin:0;min-width:0}
+.layout-controls fieldset button{width:100%;margin-top:8px}
+.layout-input-pair{display:grid;grid-template-columns:minmax(0,1fr) 76px;gap:8px;align-items:center}
+.layout-input-pair input{width:100%;min-width:0}.layout-input-pair input[type=range]{min-height:44px;accent-color:var(--ui-primary)}
+#layout-default-note,.layout-controls p{font-size:14px;line-height:1.45}
+#layout-warnings:empty{display:none}#layout-warnings{background:var(--ui-gold-soft);padding:10px;border-radius:10px}
+#layout-save-form{margin-top:16px;padding:14px;background:var(--ui-card);border-radius:14px;border:1px solid var(--ui-line)}
+#layout-save-form input[name=reason]{display:block;width:100%;margin-top:6px}
+#layout-status{padding:12px;background:var(--ui-paper);border:1px solid var(--ui-line);border-radius:10px}
+@media(max-width:1100px){.layout-workspace{grid-template-columns:minmax(0,1fr)}.layout-controls{max-width:none}}
+@media(max-width:480px){#layout-editor .layout-toolbar{align-items:stretch;flex-direction:column}#layout-editor select{width:100%}.layout-viewport{padding:4px}}

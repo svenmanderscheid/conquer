@@ -62,46 +62,6 @@
       "source_reference": "LOK/Treasures/chisel.png"
     },
     {
-      "code": 60100004,
-      "name": "Coin Purse",
-      "grade": "normal",
-      "slot_type": "any",
-      "description": "Ein verzauberter Lederbeutel steigert die laufende Goldproduktion.",
-      "stats": [
-        {
-          "type": "gold_production",
-          "base_value": 2.0,
-          "per_level": 0.5
-        }
-      ],
-      "max_level": 10,
-      "fragments_per_level": 10,
-      "name_de": "Münzbeutel",
-      "icon": "pouch.svg",
-      "icon_framed": false,
-      "source_reference": null
-    },
-    {
-      "code": 60100005,
-      "name": "Leather Strap",
-      "grade": "normal",
-      "slot_type": "any",
-      "description": "Der runenverstärkte Lederriemen schützt die Infanterie und stärkt ihre Verteidigung.",
-      "stats": [
-        {
-          "type": "infantry_defense",
-          "base_value": 1.5,
-          "per_level": 0.4
-        }
-      ],
-      "max_level": 10,
-      "fragments_per_level": 10,
-      "name_de": "Lederriemen",
-      "icon": "strap.svg",
-      "icon_framed": false,
-      "source_reference": null
-    },
-    {
       "code": 60100006,
       "name": "Feathered Cap",
       "grade": "normal",
@@ -407,26 +367,6 @@
       "source_reference": "LOK/Treasures/steel hammer.png"
     },
     {
-      "code": 60200005,
-      "name": "Scholar's Tome",
-      "grade": "rare",
-      "slot_type": "any",
-      "description": "Gesammeltes Wissen beschleunigt die Forschung in der Akademie.",
-      "stats": [
-        {
-          "type": "research_speed",
-          "base_value": 4.0,
-          "per_level": 1.0
-        }
-      ],
-      "max_level": 10,
-      "fragments_per_level": 20,
-      "name_de": "Gelehrtenbuch",
-      "icon": "book.svg",
-      "icon_framed": false,
-      "source_reference": null
-    },
-    {
       "code": 60200006,
       "name": "Drillmaster's Horn",
       "grade": "legendary",
@@ -441,7 +381,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 20,
-      "name_de": "Kriegshorn",
+      "name_de": "Feldhorn",
       "icon": "treasures/war-horn.png",
       "icon_framed": true,
       "source_reference": "LOK/Treasures/war horn.png"
@@ -490,7 +430,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 20,
-      "name_de": "Gesegnete Zweige",
+      "name_de": "Zauberzweige",
       "description": "Gesegnetes Holz fördert die Ernte und beschleunigt Sammelmärsche.",
       "icon": "treasures/blessed-branches.png",
       "icon_framed": true,
@@ -540,7 +480,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 20,
-      "name_de": "Magischer Meißel",
+      "name_de": "Zaubermeißel",
       "description": "Der verzauberte Meißel steigert die Steinproduktion und verkürzt Bauarbeiten.",
       "icon": "treasures/magic-chisel.png",
       "icon_framed": true,
@@ -565,7 +505,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 20,
-      "name_de": "Magische Spitzhacke",
+      "name_de": "Zauberhacke",
       "description": "Die verzauberte Spitze steigert die Goldproduktion und beschleunigt Sammelmärsche.",
       "icon": "treasures/magic-pick.png",
       "icon_framed": true,
@@ -590,7 +530,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 20,
-      "name_de": "Magischer Pflug",
+      "name_de": "Zauberpflug",
       "description": "Der verzauberte Pflug steigert die Nahrungsproduktion und beschleunigt Sammelmärsche.",
       "icon": "treasures/magic-plow.png",
       "icon_framed": true,
@@ -615,7 +555,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 20,
-      "name_de": "Magische Säge",
+      "name_de": "Zaubersäge",
       "description": "Die verzauberte Säge steigert die Holzproduktion und verkürzt Bauarbeiten.",
       "icon": "treasures/magic-saw.png",
       "icon_framed": true,
@@ -635,7 +575,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 20,
-      "name_de": "Trank der Stärke",
+      "name_de": "Krafttrank",
       "description": "Als dauerhaft angelegtes Relikt verleiht die unversiegende Essenz allen Truppen zusätzliche Angriffskraft.",
       "icon": "treasures/potion-of-strength.png",
       "icon_framed": true,
@@ -660,7 +600,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 20,
-      "name_de": "Trank der Schnelligkeit",
+      "name_de": "Tempotrank",
       "description": "Als dauerhaft angelegtes Relikt beschleunigt die unversiegende Essenz Armee- und Sammelmärsche.",
       "icon": "treasures/potion-of-swiftness.png",
       "icon_framed": true,
@@ -685,7 +625,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 20,
-      "name_de": "Trank der Widerstandskraft",
+      "name_de": "Schutztrank",
       "description": "Als dauerhaft angelegtes Relikt stärkt die unversiegende Essenz Verteidigung und Lebenspunkte aller Truppen.",
       "icon": "treasures/potion-of-toughness.png",
       "icon_framed": true,
@@ -736,7 +676,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 40,
-      "name_de": "Himmlischer Schild",
+      "name_de": "Drachenschild",
       "icon": "treasures/celestial-shield.png",
       "icon_framed": true,
       "source_reference": "LOK/Treasures/celestial shield.png"
@@ -761,7 +701,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 40,
-      "name_de": "Drachenzahnbogen",
+      "name_de": "Feuerbogen",
       "icon": "treasures/dragon-tooth-bow.png",
       "icon_framed": true,
       "source_reference": "LOK/Treasures/Dragon Tooth Bow.png"
@@ -786,7 +726,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 40,
-      "name_de": "Verfluchtes Schwert",
+      "name_de": "Schattenklinge",
       "icon": "treasures/cursed-sword.png",
       "icon_framed": true,
       "source_reference": "LOK/Treasures/cursed sword.png"
@@ -811,7 +751,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 40,
-      "name_de": "Verderbter Stab",
+      "name_de": "Magierstab",
       "icon": "treasures/corrupted-staff.png",
       "icon_framed": true,
       "source_reference": "LOK/Treasures/corrupted staff.png"
@@ -861,7 +801,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 40,
-      "name_de": "Goldene Ähre",
+      "name_de": "Goldähre",
       "icon": "treasures/golden-grain.png",
       "icon_framed": true,
       "source_reference": "LOK/Treasures/golden grain.png"
@@ -885,7 +825,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 40,
-      "name_de": "Amulett des Lebens",
+      "name_de": "Lebensamulett",
       "description": "Ein pulsierender Lebensstein stärkt die Lebenspunkte der Armee und schafft Platz für Verwundete.",
       "icon": "treasures/amulet-of-life.png",
       "icon_framed": true,
@@ -1010,7 +950,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 40,
-      "name_de": "Golemfragment",
+      "name_de": "Golemstein",
       "description": "Die steinernen Runen stärken die Infanterieverteidigung und die Steinproduktion.",
       "icon": "treasures/fragment-of-golem.png",
       "icon_framed": true,
@@ -1031,12 +971,22 @@
           "type": "hospital_capacity",
           "base_value": 600.0,
           "per_level": 150.0
+        },
+        {
+          "type": "all_defense",
+          "base_value": 3.0,
+          "per_level": 0.7
+        },
+        {
+          "type": "infantry_hp",
+          "base_value": 3.0,
+          "per_level": 0.7
         }
       ],
       "max_level": 10,
       "fragments_per_level": 40,
-      "name_de": "Lebensjuwel",
-      "description": "Der pulsierende Kristall stärkt die Lebenspunkte aller Truppen und erweitert das Hospital.",
+      "name_de": "Lebensstein",
+      "description": "Der pulsierende Kristall stärkt Lebenspunkte und Verteidigung, schützt die Infanterie und erweitert das Hospital.",
       "icon": "treasures/gem-of-vital.png",
       "icon_framed": true,
       "source_reference": "LOK/Treasures/gem of vital.png"
@@ -1060,7 +1010,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 40,
-      "name_de": "Geschenk der Zwerge",
+      "name_de": "Zwergenschatz",
       "description": "Zwergische Handwerkskunst steigert die Steinproduktion und verkürzt Bauarbeiten.",
       "icon": "treasures/gift-of-dwarf.png",
       "icon_framed": true,
@@ -1160,7 +1110,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 40,
-      "name_de": "Hammer der Zerstörung",
+      "name_de": "Kriegshammer",
       "description": "Die schwere Waffe stärkt den Armeeangriff und den Kampf gegen Monster.",
       "icon": "treasures/hammer-of-destruction.png",
       "icon_framed": true,
@@ -1185,7 +1135,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 40,
-      "name_de": "Zeichen des Kriegers",
+      "name_de": "Kriegerzeichen",
       "description": "Das Ehrenzeichen beschleunigt die Ausbildung und stärkt den Angriff der Armee.",
       "icon": "treasures/mark-of-warrior.png",
       "icon_framed": true,
@@ -1260,7 +1210,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 40,
-      "name_de": "Anhänger der Göttin",
+      "name_de": "Goldanhänger",
       "description": "Der schützende Anhänger stärkt Lebenspunkte und Verteidigung der Armee.",
       "icon": "treasures/pendant-of-goddess.png",
       "icon_framed": true,
@@ -1310,7 +1260,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 40,
-      "name_de": "Schriftrolle der Zehrung",
+      "name_de": "Fluchrolle",
       "description": "Das gebundene Siegel stärkt die Lebenspunkte der Armee und ihren Angriff gegen Monster.",
       "icon": "treasures/scroll-of-drain.png",
       "icon_framed": true,
@@ -1331,12 +1281,22 @@
           "type": "march_speed",
           "base_value": 3.0,
           "per_level": 0.7
+        },
+        {
+          "type": "vs_monster_attack",
+          "base_value": 4.0,
+          "per_level": 1.0
+        },
+        {
+          "type": "all_attack",
+          "base_value": 2.0,
+          "per_level": 0.5
         }
       ],
       "max_level": 10,
       "fragments_per_level": 40,
       "name_de": "Leuchtender Pfeil",
-      "description": "Der leuchtende Pfeil stärkt Fernkämpfer und beschleunigt Märsche.",
+      "description": "Der Sonnenfalkenpfeil stärkt Fernkämpfer und alle Truppen, beschleunigt Märsche und erhöht den Schaden gegen Monster.",
       "icon": "treasures/shining-arrow.png",
       "icon_framed": true,
       "source_reference": "LOK/Treasures/shining arrow.png"
@@ -1360,7 +1320,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 40,
-      "name_de": "Kriegspike",
+      "name_de": "Kriegsspeer",
       "description": "Die lange Kriegspike stärkt den Angriff der Reiterei und die Infanterieverteidigung.",
       "icon": "treasures/war-pike.png",
       "icon_framed": true,
@@ -1397,36 +1357,6 @@
       "source_reference": "LOK/Treasures/hand of vampire.png"
     },
     {
-      "code": 60400002,
-      "name": "Celestial Compass",
-      "grade": "legendary",
-      "slot_type": "any",
-      "description": "Der Himmelskompass beschleunigt Armee- und Sammelmärsche und vergrößert die Truppenzahl je Marsch.",
-      "stats": [
-        {
-          "type": "march_speed",
-          "base_value": 8.0,
-          "per_level": 2.0
-        },
-        {
-          "type": "march_capacity",
-          "base_value": 1000,
-          "per_level": 300
-        },
-        {
-          "type": "gathering_speed",
-          "base_value": 6.0,
-          "per_level": 1.5
-        }
-      ],
-      "max_level": 10,
-      "fragments_per_level": 80,
-      "name_de": "Himmelskompass",
-      "icon": "compass.svg",
-      "icon_framed": false,
-      "source_reference": null
-    },
-    {
       "code": 60400003,
       "name": "Oracle's Eye",
       "grade": "mythic",
@@ -1451,7 +1381,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 80,
-      "name_de": "Spiegel der Wahrheit",
+      "name_de": "Zauberspiegel",
       "icon": "treasures/mirror-of-truth.png",
       "icon_framed": true,
       "source_reference": "LOK/Treasures/Mirror of Truth.png"
@@ -1510,7 +1440,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 80,
-      "name_de": "Segen der Göttin",
+      "name_de": "Göttersegen",
       "description": "Der goldene Segen stärkt Lebenspunkte und Verteidigung der Armee und erweitert das Hospital.",
       "icon": "treasures/blessing-of-goddess.png",
       "icon_framed": true,
@@ -1590,7 +1520,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 80,
-      "name_de": "Kraft der Natur",
+      "name_de": "Naturkraft",
       "description": "Lebendige Wurzeln fördern Nahrung und Holz und stärken die Lebenspunkte der Armee.",
       "icon": "treasures/force-of-nature.png",
       "icon_framed": true,
@@ -1725,7 +1655,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 80,
-      "name_de": "Juwel der Harmonie",
+      "name_de": "Harmoniejuwel",
       "description": "Das harmonische Licht beschleunigt Forschung, Bauarbeiten und Truppenausbildung.",
       "icon": "treasures/jewel-of-harmony.png",
       "icon_framed": true,
@@ -1750,7 +1680,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 80,
-      "name_de": "Klinge des Verderbens",
+      "name_de": "Fluchklinge",
       "description": "Die strahlende Klinge stärkt den Armeeangriff und den Schaden gegen Monster.",
       "icon": "treasures/perdition-s-blade.png",
       "icon_framed": true,
@@ -1775,7 +1705,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 80,
-      "name_de": "Peitsche des Feldwebels",
+      "name_de": "Kriegspeitsche",
       "description": "Das Kommandorelikt beschleunigt die Ausbildung und vergrößert die Truppenzahl je Marsch.",
       "icon": "treasures/sergeant-s-whip.png",
       "icon_framed": true,
@@ -1805,7 +1735,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 80,
-      "name_de": "Hand des Meisters",
+      "name_de": "Meisterhand",
       "description": "Meisterliches Wissen beschleunigt Bauarbeiten, Forschung und Truppenausbildung.",
       "icon": "treasures/touch-of-master.png",
       "icon_framed": true,
@@ -1830,46 +1760,11 @@
       ],
       "max_level": 10,
       "fragments_per_level": 80,
-      "name_de": "Schwingen des Mutes",
+      "name_de": "Flügelschuhe",
       "description": "Die geflügelten Stiefel beschleunigen Märsche und erhöhen die mögliche Truppenzahl je Marsch.",
       "icon": "treasures/wing-of-valor.png",
       "icon_framed": true,
       "source_reference": "LOK/Treasures/wing of valor.png"
-    },
-    {
-      "code": 60500001,
-      "name": "Eternal Flame Crown",
-      "grade": "mythic",
-      "slot_type": "any",
-      "description": "Die flammende Krone stärkt Angriff, Verteidigung und Lebenspunkte der Armee und vergrößert ihre Märsche.",
-      "stats": [
-        {
-          "type": "all_attack",
-          "base_value": 15.0,
-          "per_level": 3.0
-        },
-        {
-          "type": "all_defense",
-          "base_value": 10.0,
-          "per_level": 2.5
-        },
-        {
-          "type": "all_hp",
-          "base_value": 8.0,
-          "per_level": 2.0
-        },
-        {
-          "type": "march_capacity",
-          "base_value": 2000,
-          "per_level": 500
-        }
-      ],
-      "max_level": 10,
-      "fragments_per_level": 150,
-      "name_de": "Krone der Ewigen Flamme",
-      "icon": "prestige.svg",
-      "icon_framed": false,
-      "source_reference": null
     },
     {
       "code": 60500002,
@@ -1901,7 +1796,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 150,
-      "name_de": "Drachenschuppenpanzer",
+      "name_de": "Drachenpanzer",
       "icon": "treasures/dragon-scale-mail.png",
       "icon_framed": true,
       "source_reference": "LOK/Treasures/dragon scale mail.png"
@@ -1930,7 +1825,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 150,
-      "name_de": "Uralter Armreif",
+      "name_de": "Alter Armreif",
       "description": "Der uralte Armreif stärkt Angriff und Lebenspunkte der Armee und vergrößert ihre Märsche.",
       "icon": "treasures/ancient-bracelet.png",
       "icon_framed": true,
@@ -1960,7 +1855,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 150,
-      "name_de": "Dämonenbann",
+      "name_de": "Dämonenklinge",
       "description": "Die leuchtende Klinge stärkt Angriffe gegen Monster, den Armeeangriff und die Lebenspunkte der Infanterie.",
       "icon": "treasures/demonbane.png",
       "icon_framed": true,
@@ -1990,7 +1885,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 150,
-      "name_de": "Orichalkumdolch",
+      "name_de": "Zauberdolch",
       "description": "Die leichte Klinge stärkt den Armeeangriff, beschleunigt Märsche und verbessert den Kampf gegen Monster.",
       "icon": "treasures/orichalcum-dagger.png",
       "icon_framed": true,
@@ -2020,7 +1915,7 @@
       ],
       "max_level": 10,
       "fragments_per_level": 150,
-      "name_de": "Zepter des Urteils",
+      "name_de": "Richterzepter",
       "description": "Das alte Zepter beschleunigt die Forschung und stärkt Angriff und Verteidigung der Armee.",
       "icon": "treasures/scepter-of-judgement.png",
       "icon_framed": true,

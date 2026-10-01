@@ -37,15 +37,14 @@ final class LandProgressService
             $db->execute('INSERT IGNORE INTO world_land_rules(world_id,settings_json,revision)VALUES(?,?,1)',[$worldId,json_encode($defaults,JSON_THROW_ON_ERROR)]);
             foreach(['outer','middle','center'] as $zone)
                 $db->execute("INSERT IGNORE INTO world_land_zones(world_id,zone_key,status,opened_at,opened_reason,rule_revision)VALUES(?,?,'open',UTC_TIMESTAMP(),?,1)",[$worldId,$zone,$legacy?'legacy':'initial']);
-            // Keep deployments safe even when the SQL migration has not been run yet:
-            // the first request for an existing world permanently opens every zone.
-            $db->execute("UPDATE world_land_zones SET status='open',opened_at=COALESCE(opened_at,UTC_TIMESTAMP()),opened_reason=? WHERE world_id=? AND status<>'open'",[$legacy?'legacy':'initial',$worldId]);
-            $mapSize=(int)$world['map_size'];$expected=LandGeometry::dimensions($mapSize)['columns']**2;
+            // New zones default to open. Existing explicit locks are authoritative;
+            // the one-time opening of legacy worlds belongs to migration 0109.
+            $profile=WorldMapProfile::forWorld($worldId);$mapSize=$profile['width'];$mapHeight=$profile['height'];$dimensions=LandGeometry::dimensions($mapSize,$mapHeight);$expected=$dimensions['columns']*$dimensions['rows'];
             $existing=(int)$db->query('SELECT COUNT(*) FROM world_land_parts WHERE world_id=? AND geometry_version=?',[$worldId,LandGeometry::VERSION])->fetchColumn();
             if($existing<$expected){
                 $batch=[];
-                foreach(LandGeometry::all($mapSize) as $parcel){
-                    [$dry,$anchor]=self::terrainStats($parcel);
+                foreach(LandGeometry::all($mapSize,$mapHeight) as $parcel){
+                    [$dry,$anchor]=self::terrainStats($parcel,$worldId);
                     $batch[]=[$worldId,LandGeometry::VERSION,$parcel['parcel_x'],$parcel['parcel_y'],$parcel['zone'],$parcel['initial_level'],$parcel['initial_level'],$dry,$anchor?1:0];
                     if(count($batch)>=128){self::insertParts($db,$batch);$batch=[];}
                 }
@@ -68,10 +67,10 @@ final class LandProgressService
     public static function at(int $worldId,int $x,int $y): ?array
     {
         if(!self::available())return null;self::ensureWorld($worldId);$world=self::world($worldId);
-        $geometry=LandGeometry::at($world['map_size'],$x,$y);$parts=self::partCache($worldId);
+        $geometry=LandGeometry::at($world['map_size'],$x,$y,$world['map_height']);$parts=self::partCache($worldId);
         $row=$parts[$geometry['parcel_x'].':'.$geometry['parcel_y']]??null;
         if(!$row)return null;
-        return ['id'=>(int)$row['id'],'level'=>(int)$row['current_level'],'zone'=>$row['zone_key'],'open'=>$row['zone_status']==='open',
+        return ['id'=>(int)$row['id'],'level'=>(int)$row['current_level'],'zone'=>$row['zone_key'],'open'=>WorldMapProfile::isLuxembourg($worldId)||$row['zone_status']==='open',
             'initial_level'=>(int)$row['initial_level'],'rule_revision'=>(int)LandRules::get($worldId)['revision']];
     }
 
@@ -80,15 +79,15 @@ final class LandProgressService
         if(!self::available())return ['available'=>false,'geometry'=>null,'zones'=>[],'lands'=>[]];
         self::ensureWorld($worldId);LandUnlockService::evaluate($worldId);$world=self::world($worldId);$rules=LandRules::get($worldId);
         $city=Connection::getInstance()->query('SELECT coord_x,coord_y FROM cities WHERE world_id=? AND player_id=?',[$worldId,$playerId])->fetch();
-        $own=$city?LandGeometry::at($world['map_size'],(int)$city['coord_x'],(int)$city['coord_y']):null;$lands=[];
+        $own=$city?LandGeometry::at($world['map_size'],(int)$city['coord_x'],(int)$city['coord_y'],$world['map_height']):null;$lands=[];
         foreach(self::partCache($worldId) as $row){
-            $g=LandGeometry::parcel($world['map_size'],(int)$row['parcel_x'],(int)$row['parcel_y']);$level=(int)$row['current_level'];$threshold=LandRules::threshold($rules,$level);$points=$level>=9?0:(int)$row['progress_points'];
+            $g=LandGeometry::parcel($world['map_size'],(int)$row['parcel_x'],(int)$row['parcel_y'],$world['map_height']);$level=(int)$row['current_level'];$threshold=LandRules::threshold($rules,$level);$points=$level>=9?0:(int)$row['progress_points'];
             $lands[]=['id'=>(int)$row['id'],'parcel_x'=>(int)$row['parcel_x'],'parcel_y'=>(int)$row['parcel_y'],'bounds'=>$g['bounds'],'center'=>$g['center'],
                 'zone'=>$row['zone_key'],'initial_level'=>(int)$row['initial_level'],'level'=>$level,'points'=>$points,'next_threshold'=>$threshold,
-                'progress_pct'=>$threshold===null?100:round(min(100,$points*100/max(1,$threshold)),1),'open'=>$row['zone_status']==='open',
+                'progress_pct'=>$threshold===null?100:round(min(100,$points*100/max(1,$threshold)),1),'open'=>WorldMapProfile::isLuxembourg($worldId)||$row['zone_status']==='open',
                 'developable'=>(bool)$row['has_spawn_anchor'],'own_land'=>$own!==null&&(int)$row['parcel_x']===$own['parcel_x']&&(int)$row['parcel_y']===$own['parcel_y']];
         }
-        return ['available'=>true,'geometry'=>LandGeometry::dimensions($world['map_size']),'zones'=>LandUnlockService::status($worldId),'lands'=>$lands,'rules_revision'=>(int)$rules['revision']];
+        return ['available'=>true,'geometry'=>LandGeometry::dimensions($world['map_size'],$world['map_height']),'zones'=>LandUnlockService::status($worldId),'lands'=>$lands,'rules_revision'=>(int)$rules['revision']];
     }
 
     public static function detail(int $worldId,int $playerId,int $landId): array
@@ -97,7 +96,7 @@ final class LandProgressService
         self::ensureWorld($worldId);$db=Connection::getInstance();$rules=LandRules::get($worldId);
         $row=$db->query('SELECT p.*,z.status AS zone_status FROM world_land_parts p JOIN world_land_zones z ON z.world_id=p.world_id AND z.zone_key=p.zone_key WHERE p.id=? AND p.world_id=?',[$landId,$worldId])->fetch();
         if(!$row)throw new \DomainException('Landteil nicht gefunden.',404);
-        $world=self::world($worldId);$g=LandGeometry::parcel($world['map_size'],(int)$row['parcel_x'],(int)$row['parcel_y']);$level=(int)$row['current_level'];$threshold=LandRules::threshold($rules,$level);
+        $world=self::world($worldId);$g=LandGeometry::parcel($world['map_size'],(int)$row['parcel_x'],(int)$row['parcel_y'],$world['map_height']);$level=(int)$row['current_level'];$threshold=LandRules::threshold($rules,$level);
         $sources=$db->query('SELECT source_type AS source,COALESCE(SUM(credited_points),0) AS points,COUNT(*) AS event_count FROM land_progress_events WHERE world_id=? AND land_part_id=? GROUP BY source_type ORDER BY source_type',[$worldId,$landId])->fetchAll();
         foreach($sources as &$source){$source['points']=(int)$source['points'];$source['event_count']=(int)$source['event_count'];}unset($source);
         $recent=$db->query('SELECT id,source_type AS source,credited_points AS points,level_before,level_after,created_at FROM land_progress_events WHERE world_id=? AND land_part_id=? ORDER BY id DESC LIMIT 30',[$worldId,$landId])->fetchAll();
@@ -113,7 +112,7 @@ final class LandProgressService
         if($row['zone_status']==='open'&&class_exists($regional)&&method_exists($regional,'availableMonsters'))$monsters=$regional::availableMonsters($worldId,(int)floor($g['center']['x']),(int)floor($g['center']['y']));
         return ['id'=>(int)$row['id'],'parcel_x'=>(int)$row['parcel_x'],'parcel_y'=>(int)$row['parcel_y'],'bounds'=>$g['bounds'],'center'=>$g['center'],'zone'=>$row['zone_key'],
             'initial_level'=>(int)$row['initial_level'],'level'=>$level,'points'=>$level>=9?0:(int)$row['progress_points'],'next_threshold'=>$threshold,
-            'progress_pct'=>$threshold===null?100:round(min(100,(int)$row['progress_points']*100/max(1,$threshold)),1),'open'=>$row['zone_status']==='open',
+            'progress_pct'=>$threshold===null?100:round(min(100,(int)$row['progress_points']*100/max(1,$threshold)),1),'open'=>WorldMapProfile::isLuxembourg($worldId)||$row['zone_status']==='open',
             'developable'=>(bool)$row['has_spawn_anchor'],'revision'=>(int)$row['revision'],'can_donate'=>$hasCity&&$row['zone_status']==='open'&&(bool)$row['has_spawn_anchor']&&$level<9,
             'sources'=>$sources,'own_daily'=>$daily,'recent_events'=>$recent,'donation'=>$donation,'monsters'=>array_values(is_array($monsters)?$monsters:[])];
     }
@@ -180,7 +179,7 @@ final class LandProgressService
         if(!self::available())return ['available'=>false,'credited_points'=>0,'duplicate'=>false];$db=Connection::getInstance();$hash=self::hash($payload);
         $work=function()use($db,$worldId,$x,$y,$source,$sourceId,$eventKey,$playerId,$rawPoints,$rawAmount,$resource,$payload,$dailyDamping,$hash):array{
             self::ensureWorld($worldId);$old=self::existingEvent($worldId,$eventKey,$hash);if($old){$old['duplicate']=true;return $old;}
-            $world=self::world($worldId);$g=LandGeometry::at($world['map_size'],$x,$y);
+            $world=self::world($worldId);$g=LandGeometry::at($world['map_size'],$x,$y,$world['map_height']);
             $land=$db->query('SELECT p.*,z.status AS zone_status FROM world_land_parts p JOIN world_land_zones z ON z.world_id=p.world_id AND z.zone_key=p.zone_key WHERE p.world_id=? AND p.geometry_version=? AND p.parcel_x=? AND p.parcel_y=? FOR UPDATE',[$worldId,LandGeometry::VERSION,$g['parcel_x'],$g['parcel_y']])->fetch();
             if(!$land)throw new \DomainException('Landteil nicht gefunden.',404);
             return self::creditLocked($worldId,$land,$source,$sourceId,$eventKey,$playerId,$rawPoints,$rawAmount,$resource,$payload,$hash,$dailyDamping);
@@ -227,7 +226,7 @@ final class LandProgressService
     {
         $db=Connection::getInstance();$key=spl_object_id($db->getPdo()).':'.$worldId;if(isset(self::$worlds[$key]))return self::$worlds[$key];
         $row=$db->query('SELECT id,map_size,created_at,started_at FROM worlds WHERE id=?',[$worldId])->fetch();if(!$row)throw new \DomainException('Welt nicht gefunden.',404);
-        $row['id']=(int)$row['id'];$row['map_size']=(int)$row['map_size'];return self::$worlds[$key]=$row;
+        $row['id']=(int)$row['id'];$profile=WorldMapProfile::forWorld($worldId);$row['map_size']=$profile['width'];$row['map_height']=$profile['height'];return self::$worlds[$key]=$row;
     }
 
     private static function partCache(int $worldId): array
@@ -237,12 +236,12 @@ final class LandProgressService
         return self::$parts[$key]=$parts;
     }
 
-    private static function terrainStats(array $parcel): array
+    private static function terrainStats(array $parcel,int $worldId): array
     {
         $dry=0;$anchor=false;$b=$parcel['bounds'];
         for($y=$b['y_min'];$y<=$b['y_max'];$y++)for($x=$b['x_min'];$x<=$b['x_max'];$x++){
-            if(!WorldTerrain::isWater($x,$y))$dry++;
-            if(!$anchor&&WorldTerrain::isDryRectangle($x,$y,$x,$y))$anchor=true;
+            if(!WorldTerrain::isWater($x,$y,$worldId))$dry++;
+            if(!$anchor&&WorldTerrain::isDryRectangle($x,$y,$x,$y,$worldId))$anchor=true;
         }
         return [$dry,$anchor];
     }

@@ -1,4 +1,5 @@
 'use strict';
+require('./fixtures/browser_locale.cjs')('de'); // This suite asserts the explicit German UI.
 const assert=require('node:assert/strict'),path=require('node:path'),net=require('node:net'),{spawn}=require('node:child_process');
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const root=path.resolve(__dirname,'..');
@@ -12,8 +13,11 @@ const root=path.resolve(__dirname,'..');
   const page=await browser.newPage({viewport:{width:390,height:844},hasTouch:true});page.setDefaultTimeout(10000);
   await page.addInitScript(()=>window.__nativeRandomUuid=crypto.randomUUID);
   page.on('pageerror',e=>errors.push(e.message));const base='http://conquer-http.test:'+port;
-  await page.goto(base+'/?zugang=login');await page.locator('[name=username]').fill('PreviewPlayer');await page.locator('[name=password]').fill('PreviewFixture!2026');
-  await Promise.all([page.waitForURL('**/city'),page.locator('#auth-submit').click()]);
+  // The marketing host intentionally offers a waitlist. Authenticate this HTTP
+  // test origin with the real session/CSRF form endpoint, then test the game UI.
+  await page.goto(base+'/');const csrf=await page.locator('[name=csrf]').first().inputValue();
+  const login=await page.evaluate(async({csrf})=>{const response=await fetch('/auth/local',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({csrf,mode:'login',identifier:'PreviewPlayer',password:'PreviewFixture!2026'})});return {status:response.status,url:response.url};},{csrf});
+  assert.equal(login.status,200);assert(login.url.endsWith('/city'));
   await page.goto(base+'/city#army');await page.locator('.training-school').waitFor();
   assert.equal(await page.locator('#train-count').inputValue(),await page.locator('#train-count').getAttribute('max'),'Training starts with the maximum affordable amount');
   assert.equal(await page.evaluate(()=>isSecureContext),false,'Exercise a real HTTP origin, not trusted localhost');

@@ -50,10 +50,10 @@ try {
     if (!preg_match('/^[a-zA-Z0-9_]+$/D',$source)) { throw new RuntimeException('Invalid source database name.'); }
     $admin = new PDO('mysql:host='.$cfg['host'].';port='.($cfg['port']??3306).';charset=utf8mb4',$cfg['username'],$cfg['password'],[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]);
     $admin->exec('CREATE DATABASE `'.$name.'` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
-    foreach (['worlds','players','cities','field_objects','field_monsters','marches','rallies','rally_participants','expedition_missions','frontier_spawns','shrines','map_charms'] as $table) {
+    foreach (['worlds','players','cities','neutral_villages','field_objects','field_monsters','marches','rallies','rally_participants','expedition_missions','frontier_spawns','shrines','map_charms'] as $table) {
         $admin->exec('CREATE TABLE `'.$name.'`.`'.$table.'` LIKE `'.$source.'`.`'.$table.'`');
     }
-    $admin->exec('INSERT INTO `'.$name.'`.worlds SELECT * FROM `'.$source.'`.worlds WHERE id=1');
+    $admin->exec("INSERT INTO `".$name."`.worlds(id,name,slug,status,map_size,map_seed) VALUES(1,'Placement fixture','placement-fixture','running',256,42)");
     mkdir($root.'/config',0700,true);
     $cfg['database'] = $name;
     file_put_contents($root.'/config/database.php',"<?php\nreturn ".var_export($cfg,true).";\n");

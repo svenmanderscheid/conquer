@@ -53,7 +53,7 @@ Alle Pfade in der Spalte „Original“ beziehen sich auf `LOK/Treasures/`. `nam
 | 60300105 | Flammenblüte | `Flame flower.png` | epic | 40 | Armeeangriff +3% (+0.7 Prozentpunkte/Stufe); Monsterangriff +4% (+1 Prozentpunkte/Stufe) |
 | 60400104 | Kraft der Natur | `force of nature.png` | legendary | 80 | Nahrungsproduktion +8% (+2 Prozentpunkte/Stufe); Holzproduktion +8% (+2 Prozentpunkte/Stufe); Armee-Lebenspunkte +3% (+0.7 Prozentpunkte/Stufe) |
 | 60300106 | Golemfragment | `fragment of golem.png` | epic | 40 | Infanterieverteidigung +5% (+1 Prozentpunkte/Stufe); Steinproduktion +4% (+1 Prozentpunkte/Stufe) |
-| 60300107 | Lebensjuwel | `gem of vital.png` | epic | 40 | Armee-Lebenspunkte +4% (+1 Prozentpunkte/Stufe); Hospitalplätze +600 (+150/Stufe) |
+| 60300107 | Vitalis-Smaragd | `gem of vital.png` | epic | 40 | Armee-Lebenspunkte +4% (+1 Prozentpunkt/Stufe); Hospitalplätze +600 (+150/Stufe); Armeeverteidigung +3% (+0.7 Prozentpunkte/Stufe); Infanterie-Lebenspunkte +3% (+0.7 Prozentpunkte/Stufe) |
 | 60300108 | Geschenk der Zwerge | `gift of dwarf.png` | epic | 40 | Steinproduktion +5% (+1 Prozentpunkte/Stufe); Baugeschwindigkeit +4% (+1 Prozentpunkte/Stufe) |
 | 60300109 | Goldene Axt | `golden axe.png` | epic | 40 | Holzproduktion +6% (+1.5 Prozentpunkte/Stufe); Sammelmarschtempo +3% (+0.7 Prozentpunkte/Stufe) |
 | 60300006 | Goldene Ähre | `golden grain.png` | epic | 40 | Nahrungsproduktion +6% (+1.5 Prozentpunkte/Stufe); Sammelmarschtempo +4% (+1 Prozentpunkte/Stufe) |
@@ -92,7 +92,7 @@ Alle Pfade in der Spalte „Original“ beziehen sich auf `LOK/Treasures/`. `nam
 | 60500104 | Zepter des Urteils | `Scepter of Judgement.png` | mythic | 150 | Forschungsgeschwindigkeit +10% (+2.5 Prozentpunkte/Stufe); Armeeangriff +8% (+2 Prozentpunkte/Stufe); Armeeverteidigung +6% (+1.5 Prozentpunkte/Stufe) |
 | 60300118 | Schriftrolle der Zehrung | `scroll of drain.png` | epic | 40 | Armee-Lebenspunkte +3% (+0.7 Prozentpunkte/Stufe); Monsterangriff +5% (+1.2 Prozentpunkte/Stufe) |
 | 60400111 | Peitsche des Feldwebels | `sergeant's whip.png` | legendary | 80 | Ausbildungsgeschwindigkeit +8% (+2 Prozentpunkte/Stufe); Truppen je Marsch +800 (+200/Stufe) |
-| 60300119 | Leuchtender Pfeil | `shining arrow.png` | epic | 40 | Fernkampfangriff +6% (+1.5 Prozentpunkte/Stufe); Marschtempo +3% (+0.7 Prozentpunkte/Stufe) |
+| 60300119 | Pfeil des Sonnenfalken | `shining arrow.png` | epic | 40 | Fernkampfangriff +6% (+1.5 Prozentpunkte/Stufe); Marschtempo +3% (+0.7 Prozentpunkte/Stufe); Monsterangriff +4% (+1 Prozentpunkt/Stufe); Armeeangriff +2% (+0.5 Prozentpunkte/Stufe) |
 | 60100104 | Kurzschwert | `shot sword.png` | normal | 10 | Armeeangriff +1.5% (+0.4 Prozentpunkte/Stufe) |
 | 60100105 | Schaufel | `shovel.png` | normal | 10 | Steinproduktion +2% (+0.5 Prozentpunkte/Stufe); Sammelmarschtempo +1% (+0.25 Prozentpunkte/Stufe) |
 | 60200111 | Silberapfel | `silver apple.png` | rare | 20 | Nahrungsproduktion +4% (+1 Prozentpunkte/Stufe); Armee-Lebenspunkte +2% (+0.5 Prozentpunkte/Stufe) |

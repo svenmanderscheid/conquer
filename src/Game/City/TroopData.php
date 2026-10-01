@@ -10,10 +10,11 @@ namespace Conquer\Game\City;
  */
 final class TroopData
 {
+    public const MAX_TIER = 5;
     private function __construct() {}
 
     /**
-     * Returns the supported T1–T10 troops indexed by code.
+     * Returns the active T1–T5 troops indexed by stable internal code.
      *
      * @return array<int, array<string, mixed>>
      */
@@ -38,7 +39,30 @@ final class TroopData
      */
     public static function get(int $code): ?array
     {
-        return self::all()[$code] ?? null;
+        if (isset(self::all()[$code])) return self::all()[$code];
+        // Historical reports and orders can still resolve their original identity.
+        // These archived definitions never unlock for new training or promotion.
+        static $history = null;
+        if ($history === null) {
+            $data = json_decode((string)file_get_contents(ROOT_DIR.'/data/balance-history/troops-t10-20260929.json'), true, 512, JSON_THROW_ON_ERROR);
+            $history = array_column($data['troops'], null, 'code');
+        }
+        return $history[$code] ?? null;
+    }
+
+    public static function isActive(int $code): bool { return isset(self::all()[$code]); }
+
+    /** Preserve troop counts when an old T6–T10 order returns after the transition. */
+    public static function activeCode(int $code): int
+    {
+        $unit = self::get($code);
+        return $unit && (int)$unit['tier'] > self::MAX_TIER
+            ? 50000001 + (int)$unit['type'] * 100000 + self::MAX_TIER * 100 : $code;
+    }
+
+    public static function researchLevels(int $playerId, int $worldId): array
+    {
+        return \Conquer\Db\Connection::getInstance()->query('SELECT research_code,level FROM player_research WHERE player_id=? AND world_id=?', [$playerId,$worldId])->fetchAll(\PDO::FETCH_KEY_PAIR);
     }
 
     /**
@@ -84,13 +108,14 @@ final class TroopData
     }
 
     /**
-     * Unlocks depend only on the troop's own school and the town center (castle).
+     * Original troop research and academy requirements are authoritative.
      */
-    public static function isUnlocked(int $code, int $buildingLevel, int $castleLevel): bool
+    public static function isUnlocked(int $code, int $buildingLevel, int $castleLevel, int $academyLevel = 0, array $research = []): bool
     {
         $t = self::get($code);
-        if ($t === null) return false;
-        return $buildingLevel >= (int)$t['unlock_building'] && $castleLevel >= (int)$t['unlock_castle'];
+        if ($t === null || !self::isActive($code)) return false;
+        return $buildingLevel >= (int)$t['unlock_building'] && $castleLevel >= (int)$t['unlock_castle']
+            && ($t['unlock_research'] === null || ($academyLevel >= (int)$t['unlock_academy'] && (int)($research[$t['unlock_research']] ?? 0) >= 1));
     }
 
     public static function buildingFor(int $code): string
@@ -113,7 +138,7 @@ final class TroopData
             $level=(int)($state['buildings'][$building]['level'] ?? 0);
             $troop['training_building']=$building;
             $troop['barrack_slot']=self::slotFor($code);
-            $troop['unlocked']=self::isUnlocked($code,$level,(int)($state['buildings']['castle']['level']??0));
+            $troop['unlocked']=self::isUnlocked($code,$level,(int)($state['buildings']['castle']['level']??0),(int)($state['buildings']['academy']['level']??0),$research);
             $troop['training']=\Conquer\Game\Research\ResearchEffects::training($code,$buffs,$boost*$plotMultiplier);
             $result[]=$troop;
         }

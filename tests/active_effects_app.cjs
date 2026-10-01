@@ -1,4 +1,5 @@
 'use strict';
+require('./fixtures/browser_locale.cjs')('de'); // This suite asserts the explicit German UI.
 // Run with tools/preview-feature-fixture.php --port=18964 --effects --hud --chat.
 const fs=require('fs'),path=require('path'),os=require('os'),assert=require('assert/strict');
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
@@ -20,9 +21,9 @@ const output=fs.mkdtempSync(path.join(os.tmpdir(),'conquer-active-effects-'));
    }
    await route.fulfill({response,json});
   });
-  await page.goto(base);await page.locator('[data-mode="login"]').click();
-  await page.locator('[name="username"]').fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');
-  await Promise.all([page.waitForURL('**/city'),page.locator('#auth-submit').click()]);
+  await page.goto(base);await page.goto(new URL('?zugang=login', page.url()).href);
+  await page.locator("[name=identifier], [name=username]").fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');
+  await Promise.all([page.waitForURL('**/city'),page.locator("form[action$=\"/auth/local\"] button[type=\"submit\"]").click()]);
   const up=page.locator('#hud-bonuses'),down=page.locator('#hud-debuffs'),drawer=page.locator('#active-effects-drawer'),dialog=page.locator('#game-dialog');
   await up.waitFor();await down.waitFor();
   assert.match(await up.getAttribute('aria-label'),/\(2\)/);assert.match(await down.getAttribute('aria-label'),/\(1\)/);

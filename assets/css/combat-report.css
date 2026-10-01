@@ -109,6 +109,10 @@ body.mobile-game #game-dialog.combat-report-dialog #dialog-content { padding:0; 
 .monster-report .mr-boost-list span { display:flex; align-items:center; gap:7px; }
 .monster-report .mr-boost-list i { color:var(--ui-blue-dark); font-style:normal; }
 .monster-report .mr-boost-list b { white-space:nowrap; color:var(--ui-primary-dark); }
+.cr-stat-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 24px; margin:0; padding:6px 12px 10px; }
+.cr-stat-list>div { display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:32px; border-bottom:1px solid var(--ui-line); }
+.cr-stat-list dt { color:var(--ui-muted); }
+.cr-stat-list dd { margin:0; color:var(--ui-primary-dark); font:700 13px var(--ui-font-number); white-space:nowrap; }
 .cr-footer { display:flex; align-items:stretch; justify-content:center; gap:6px; padding:6px 10px max(6px,env(safe-area-inset-bottom)); border-top:2px solid var(--ui-line); background:var(--ui-inset); flex-shrink:0; }
 .cr-button { display:inline-flex; align-items:center; justify-content:center; gap:5px; min-height:44px; border:1px solid var(--ui-line); border-bottom:3px solid var(--ui-frame); border-radius:9px; padding:8px 18px; background:var(--ui-card); color:var(--ui-ink); font:700 14px var(--ui-font); cursor:pointer; }
 .cr-button:disabled { background:var(--ui-disabled); border-color:var(--ui-line); color:var(--ui-muted); cursor:default; }
@@ -200,6 +204,7 @@ body.mobile-game #game-dialog.combat-report-dialog #dialog-content { padding:0; 
   .monster-report .mr-troop-overview>div+div { border-left:0; border-top:1px solid var(--ui-line); }
   .monster-report .mr-equipment-list { grid-template-columns:repeat(3,minmax(0,1fr)); }
   .monster-report .mr-boost-list { columns:1; }
+  .cr-stat-list { grid-template-columns:1fr; padding:5px 9px 8px; }
   .cr-footer { gap:4px; padding-left:6px; padding-right:6px; }
   .cr-footer .cr-button { min-width:44px; padding:7px 8px; font-size:13px; }
   .cr-footer .cr-report-arrow { flex-basis:44px; padding:3px; }

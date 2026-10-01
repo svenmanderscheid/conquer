@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS ui_layout_settings (
+    id TINYINT UNSIGNED NOT NULL PRIMARY KEY,
+    revision INT UNSIGNED NOT NULL DEFAULT 0,
+    settings_json TEXT NOT NULL,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+INSERT IGNORE INTO ui_layout_settings(id,revision,settings_json) VALUES(1,0,'{}');

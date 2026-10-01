@@ -1,5 +1,6 @@
 <?php declare(strict_types=1);
 $descriptions=[
+    'layout_editor'=>'Chat, Navigation und Ressourcen für Handy und Desktop anpassen.',
     'dashboard'=>'Die wichtigsten Bereiche deines Königreichs, an einem Ort.',
     'analytics'=>'Aktivität, Wirtschaft und Kämpfe mit belastbaren Zeiträumen auswerten.',
     'rewards'=>'Lege fest, welche Belohnungen deine Spieler erhalten.',
@@ -15,35 +16,36 @@ $descriptions=[
     'bug_reports'=>'Meldungen deiner Spieler prüfen, priorisieren und abschließen.',
     'audit'=>'Nachsehen, wer welche Einstellung geändert hat.'
 ];
-$globalPage=in_array($activePage,['items','alpha_keys','alpha_waitlist','world_create'],true)||($activePage==='rewards'&&($_GET['scope']??'global')!=='world');
+$globalPage=in_array($activePage,['layout_editor','items','alpha_keys','alpha_waitlist','world_create'],true)||($activePage==='rewards'&&($_GET['scope']??'global')!=='world');
 $newBugCount=(int)$db->query("SELECT COUNT(*) FROM bug_reports WHERE world_id=? AND status='new'",[$selectedWorld])->fetchColumn();
 ?>
 <!doctype html>
 <html lang="<?= htmlspecialchars(\Conquer\Game\Locale::current(),ENT_QUOTES) ?>"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title><?= ah($pageTitle) ?> · Conquer Verwaltung</title>
+<title><?= ah($pageTitle) ?> · Union of Kingdoms Verwaltung</title>
 <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR.'/assets/css/fantasy-fonts.css') ?>">
 <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/admin-backoffice.css?v=<?= filemtime(ROOT_DIR.'/assets/css/admin-backoffice.css') ?>">
-<link rel="icon" href="<?= APP_BASE ?>/assets/icons/conquer.svg">
+<?php if($activePage==='layout_editor'): ?><link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/layout-editor.css?v=<?= filemtime(ROOT_DIR.'/assets/css/layout-editor.css') ?>"><?php endif ?>
 <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/village-theme.css?v=<?= filemtime(ROOT_DIR.'/assets/css/village-theme.css') ?>">
 <?php require ROOT_DIR.'/views/partials/localization-head.php'; ?>
 <script src="<?= APP_BASE ?>/assets/js/admin-backoffice.js?v=<?= filemtime(ROOT_DIR.'/assets/js/admin-backoffice.js') ?>" defer></script>
 </head><body class="admin-village" data-i18n-scope>
 <a class="skip-link" href="#main">Zum Inhalt</a>
 <aside class="sidebar">
-    <a class="brand" href="<?= APP_BASE ?>/admin"><?= adminIcon('hud/city.svg','brand-mark') ?><span>CONQUER<small>Deine Verwaltung</small></span></a>
+    <a class="brand" href="<?= APP_BASE ?>/admin"><?= adminIcon('hud/city.svg','brand-mark') ?><span>UNION OF KINGDOMS<small>Deine Verwaltung</small></span></a>
     <div data-locale-controls data-locale-compact="true" data-locale-install="false"></div>
     <button type="button" class="secondary mobile-menu" aria-expanded="false" aria-controls="admin-nav">☰ Menü</button>
     <nav id="admin-nav" aria-label="Verwaltung">
     <?php foreach([
         'Start'=>['dashboard'=>['','Übersicht','hud/city.svg'],'analytics'=>['/analytics','Statistiken','hud/reports.svg']],
         'Spielinhalte'=>['rewards'=>['/rewards','Beute & Drops','items/chest-gold.svg'],'items'=>['/items','Gegenstände','hud/inventory.svg'],'world_create'=>['/world-create','Welt erstellen','hud/city.svg'],'world'=>['/world','Welten & Spawns','hud/world.svg'],'lands'=>['/lands','Länder & Entwicklung','hud/world.svg']],
-        'Gemeinschaft'=>array_merge(['alpha_keys'=>['/alpha-keys','Alpha-Keys','items/scroll.svg']],$canEdit?['alpha_waitlist'=>['/alpha-waitlist','Alpha-E-Mails','hud/reports.svg']]:[],['players'=>['/players','Spieler & Geschenke','knight.png'],'alliances'=>['/alliances','Allianzen','hud/alliance.svg'],'chat'=>['/chat','Chatprotokoll','hud/reports.svg'],'bug_reports'=>['/bug-reports','Bugmeldungen'.($newBugCount?' · '.$newBugCount:''),'hud/quest.svg']]),
+        'Gemeinschaft'=>array_merge(['alpha_keys'=>['/alpha-keys','Alpha-Keys','items/scroll.svg']],$canEdit?['alpha_waitlist'=>['/alpha-waitlist','Alpha-E-Mails','hud/reports.svg']]:[],['players'=>['/players','Spieler & Geschenke','knight.png'],'alliances'=>['/alliances','Allianzen','hud/alliance.svg'],'chat'=>['/chat','Chatprotokoll','hud/reports.svg'],'bug_reports'=>['/bug-reports','Bugmeldungen'.($newBugCount?' · '.$newBugCount:''),'menu-icons/bug-report.png']]),
+        'Oberfläche'=>['layout_editor'=>['/layout','Layout-Editor','hud/city.svg']],
         'Verlauf'=>['audit'=>['/audit','Änderungsprotokoll','hud/quest.svg']]
     ] as $group=>$links): ?><div class="nav-caption"><?= ah($group) ?></div>
         <?php foreach($links as $key=>[$path,$label,$icon]): ?><a <?= $activePage===$key?'class="active" aria-current="page"':'' ?> href="<?= APP_BASE ?>/admin<?= $path ?>?world_id=<?= $selectedWorld ?>"><?= adminIcon($icon) ?><span><?= ah($label) ?></span></a><?php endforeach ?>
     <?php endforeach ?>
     </nav>
-    <div class="sidebar-bottom"><strong><?= ah($adminSession['username']) ?></strong><small><?= $canEdit?'Administrator · voller Zugriff':'Moderator · Lesezugriff' ?></small><a href="<?= APP_BASE ?>/admin/logout">Abmelden →</a></div>
+    <div class="sidebar-bottom"><strong data-user-content><?= ah($adminSession['username']) ?></strong><small><?= ah(\Conquer\Game\Locale::text($canEdit?'Administrator · voller Zugriff':'Moderator · Lesezugriff')) ?></small><form method="post" action="<?= APP_BASE ?>/admin/logout"><input type="hidden" name="csrf_token" value="<?= ah($csrf) ?>"><button type="submit" class="secondary">Abmelden →</button></form></div>
 </aside>
 <div class="shell">
 <header class="topbar"><span><?= $globalPage?'🌐 Spielinhalte · alle Welten':'Verwaltung deiner Welt' ?></span>
@@ -57,7 +59,7 @@ $newBugCount=(int)$db->query("SELECT COUNT(*) FROM bug_reports WHERE world_id=? 
 <noscript><div class="notice">Bitte aktiviere JavaScript für die Bildauswahl und das Hinzufügen von Beuteeinträgen.</div></noscript>
 <?= $content ?>
 </main>
-<footer><span>Conquer · Verwaltung</span><span>Änderungen sind im Verlauf nachvollziehbar. Zeitangaben in UTC.</span></footer>
+<footer><span>Union of Kingdoms · Verwaltung</span><span>Änderungen sind im Verlauf nachvollziehbar. Zeitangaben in UTC.</span></footer>
 </div>
 <?php if($usesItemPicker): ?><dialog id="item-picker-dialog" aria-labelledby="item-picker-title">
     <div class="picker-header"><div><h2 id="item-picker-title">Gegenstand auswählen</h2><p>Suche nach Name oder Gegenstandsnummer.</p></div><button type="button" class="secondary" data-picker-close aria-label="Auswahl schließen">✕</button></div>

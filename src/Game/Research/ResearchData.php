@@ -82,7 +82,7 @@ final class ResearchData
         return self::$nodes;
     }
 
-    /** Historical definitions for settlement only; never available for research. */
+    /** Historical definitions, excluding troop unlocks restored to active research. */
     public static function retiredTroopUnlocks(): array
     {
         static $nodes = null;
@@ -90,7 +90,7 @@ final class ResearchData
             $data = json_decode((string)file_get_contents(ROOT_DIR.'/data/retired-troop-research.json'), true, 512, JSON_THROW_ON_ERROR);
             $nodes = array_column($data['nodes'], null, 'code');
         }
-        return $nodes;
+        return array_diff_key($nodes, self::allNodes());
     }
 
     /**

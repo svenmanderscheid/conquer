@@ -81,9 +81,29 @@ try{
     $m=M::dispatchReinforce(1,1,0,0,95,40,3,3,[50100101=>20]);$db->execute('UPDATE cities SET coord_x=96 WHERE id=3');arriveD($m);checkD(rowD('marches',$m)['state']==='returning','city relocation in transit returns reinforcement without corrupting target');homeD($m);$db->execute('UPDATE cities SET coord_x=95 WHERE id=3');
     $m=M::dispatchReinforce(1,1,0,0,95,40,3,3,[50100101=>20]);D::recallMarch(1,$m);checkD(stockD(1)===$before-20,'normal recall preserves its outgoing army until return');homeD($m);homeD($m);checkD(stockD(1)===$before,'normal recall no longer deletes or duplicates troops');
     D::action(1,['action'=>'formation.save','slot'=>1,'name'=>'Mixed army','troops'=>[50100101=>600,50300501=>200]]);checkD(stockD(1)===$before,'saving future troop presets never reserves troops');
-    rejectD(fn()=>D::action(1,['action'=>'formation.save','slot'=>5,'name'=>'Bad','troops'=>[50100101=>1]]),'formation slot range is enforced');rejectD(fn()=>D::action(1,['action'=>'formation.save','slot'=>1,'name'=>'Bad','troops'=>[50100101=>'2']]),'formation counts must be integers');
-    D::action(3,['action'=>'formation.delete','slot'=>1]);checkD((int)$db->query('SELECT COUNT(*) FROM troop_formations WHERE player_id=1')->fetchColumn()===1,'players cannot delete another player formation');D::action(1,['action'=>'formation.delete','slot'=>1]);
-    rejectD(fn()=>D::promote(1,1,50100101,10),'promotion requires school and town center levels');$db->execute("UPDATE city_buildings SET level=30 WHERE city_id=1 AND building_code IN ('castle','barrack')");
+    foreach([5,6] as $slot){
+        D::action(1,['action'=>'formation.save','city_id'=>1,'slot'=>$slot,'name'=>'Army '.$slot,'troops'=>[50100101=>600+$slot,50300501=>200]]);
+        $saved=array_column(D::state(1)['formations'],null,'slot');
+        checkD($saved[$slot]['name']==='Army '.$slot&&$saved[$slot]['troops']===[50100101=>600+$slot,50300501=>200],'formation slot '.$slot.' saves and reloads its complete composition');
+        D::action(1,['action'=>'formation.save','slot'=>$slot,'name'=>'Updated '.$slot,'troops'=>[50100101=>$slot]]);
+        $saved=array_column(D::state(1)['formations'],null,'slot');
+        checkD($saved[$slot]['name']==='Updated '.$slot&&$saved[$slot]['troops']===[50100101=>$slot],'formation slot '.$slot.' overwrites its previous composition');
+    }
+    checkD(D::state(1)['formation_slots']===6&&stockD(1)===$before,'all six formation slots are advertised and saving never reserves troops');
+    foreach([0,7] as $slot){
+        rejectD(fn()=>D::action(1,['action'=>'formation.save','slot'=>$slot,'name'=>'Bad','troops'=>[50100101=>1]]),'formation save rejects slot '.$slot);
+        rejectD(fn()=>D::action(1,['action'=>'formation.delete','slot'=>$slot]),'formation delete rejects slot '.$slot);
+    }
+    rejectD(fn()=>D::action(1,['action'=>'formation.save','slot'=>1,'name'=>'Bad','troops'=>[50100101=>'2']]),'formation counts must be integers');
+    $ownFormations=D::state(1)['formations'];
+    D::action(3,['action'=>'formation.save','slot'=>6,'name'=>'Own army','troops'=>[50100101=>10]]);
+    checkD(count(D::state(3)['formations'])===1&&D::state(3)['formations'][0]['name']==='Own army','formations read only the current owner even for the same slot');
+    foreach([1,5,6] as $slot)D::action(3,['action'=>'formation.delete','slot'=>$slot]);
+    checkD(D::state(1)['formations']===$ownFormations,'players cannot overwrite or delete another player formation');
+    foreach([1,5,6] as $slot)D::action(1,['action'=>'formation.delete','slot'=>$slot]);
+    checkD(D::state(1)['formations']===[]&&stockD(1)===$before,'all saved slots delete without reserving or returning troops');
+    rejectD(fn()=>D::promote(1,1,50100101,10),'promotion requires school and town center levels');$db->execute("UPDATE city_buildings SET level=30 WHERE city_id=1 AND building_code IN ('castle','barrack','academy')");
+    $db->execute("INSERT INTO player_research(player_id,world_id,research_code,level) VALUES(1,1,'warrior',1)");
     $before=stockD(1);$p=D::promote(1,1,50100101,10);checkD(stockD(1)===$before-10&&stockD(1,50100201)===0,'promotion deducts source troops while next tier trains');
     rejectD(fn()=>D::promote(1,1,50100101,1),'promotion respects shared single training slot');rejectD(fn()=>D::cancelPromotion(3,$p['promotion_id']),'foreign promotion cannot be cancelled');
     $funds=rowD('cities',1);D::cancelPromotion(1,$p['promotion_id']);$refund=rowD('cities',1);checkD(stockD(1)===$before&&(int)$refund['food']-(int)$funds['food']===$p['cost']['food'],'promotion cancellation returns source troops and actual cost');rejectD(fn()=>D::cancelPromotion(1,$p['promotion_id']),'promotion cannot be refunded twice');
@@ -92,12 +112,13 @@ try{
     $protected=D::protectedResources(rowD('cities',2),BuffEngine::getBuffs(2));$m=M::dispatchPlayerAttack(1,1,0,0,80,40,[50100101=>100]);arriveD($m);$haul=json_decode(rowD('marches',$m)['haul_json'],true);checkD(($haul['loot']['food']??-1)===(int)floor((1000-$protected['food'])*.2),'actual PvP loot applies researched resource protection');checkD((int)rowD('cities',2)['wall_hp_current']===13500,'successful PvP battle actually damages wall HP');homeD($m);
     $db->execute('UPDATE cities SET wall_hp_current=1,wall_last_update=UTC_TIMESTAMP() WHERE id=2');$m=M::dispatchPlayerAttack(1,1,0,0,80,40,[50100101=>10]);arriveD($m);$moved=rowD('cities',2);checkD(((int)$moved['coord_x']!==80||(int)$moved['coord_y']!==40)&&(int)$moved['wall_hp_current']===15000,'wall break relocates city and restores its current maximum');checkD(\Conquer\Game\Map\WorldPlacement::canPlace($db,1,'city',(int)$moved['coord_x'],(int)$moved['coord_y'],2),'wall break reserves a dry legal city footprint');homeD($m);
     $db->execute('UPDATE city_troops SET count=0 WHERE city_id=5');$m=WorldContext::run(2,fn()=>M::dispatchPlayerAttack(4,4,0,0,290,40,[50100101=>10]));checkD((int)rowD('marches',$m)['world_id']===2,'city marches use actual world and support coordinates beyond 255');arriveD($m);checkD((int)$db->query('SELECT world_id FROM battle_reports WHERE march_id=? LIMIT 1',[$m])->fetchColumn()===2,'combat reports preserve origin world');homeD($m);
-    $state=D::state(1);checkD(count($state['troops'])===30&&$state['city_id']===1&&count($state['targets'])===2,'defense state supplies all thirty units and same-world targets');
+    $state=D::state(1);checkD(count($state['troops'])===15&&$state['city_id']===1&&count($state['targets'])===2,'defense state supplies all fifteen units and same-world targets');
     require __DIR__.'/Support/lower_world_cases.php';
     $token=bin2hex(random_bytes(32));$csrfToken=bin2hex(random_bytes(32));$db->execute("INSERT INTO sessions(player_id,token,csrf_token,ip_address,user_agent,expires_at) VALUES(1,?,?,'127.0.0.1','defense fixture',DATE_ADD(UTC_TIMESTAMP(),INTERVAL 1 HOUR))",[$token,$csrfToken]);
     $router="<?php declare(strict_types=1); define('ROOT_DIR',".var_export(ROOT_DIR,true).");require ROOT_DIR.'/src/Autoloader.php';(new \\Conquer\\Autoloader(ROOT_DIR.'/src'))->register();date_default_timezone_set('UTC');\\Conquer\\Db\\Connection::init(__DIR__);\\Conquer\\Logger::init(__DIR__.'/http.log');\n";
     $router.='if(preg_match("~^/api/(build|train|research)/cancel/(\\d+)$~",parse_url($_SERVER["REQUEST_URI"],PHP_URL_PATH),$m)){ $p=["queue_id"=>(int)$m[2]];match($m[1]){"build"=>\\Conquer\\Api\\Handlers\\CityHandler::cancelBuild($p),"train"=>\\Conquer\\Api\\Handlers\\TroopHandler::cancelTrain($p),"research"=>\\Conquer\\Api\\Handlers\\ResearchHandler::cancel($p)};exit;}';
-    $router.='switch(parse_url($_SERVER["REQUEST_URI"],PHP_URL_PATH)){case "/api/player/me":\\Conquer\\Api\\Handlers\\PlayerHandler::me([]);break;case "/api/player/profile/1":\\Conquer\\Api\\Handlers\\PlayerHandler::profile(["id"=>1]);break;case "/api/progression/state":\\Conquer\\Api\\Handlers\\ProgressionHandler::state([]);break;case "/api/progression/action":\\Conquer\\Api\\Handlers\\ProgressionHandler::action([]);break;case "/api/defense/state":\\Conquer\\Api\\Handlers\\DefenseHandler::state([]);break;case "/api/defense/action":\\Conquer\\Api\\Handlers\\DefenseHandler::action([]);break;case "/api/research/start":\\Conquer\\Api\\Handlers\\ResearchHandler::start([]);break;case "/api/march/reinforce":\\Conquer\\Api\\Handlers\\MarchHandler::dispatchReinforce([]);break;default:http_response_code(404);echo "{}";}';
+    $router.='if(preg_match("~^/api/player/formations/(\\d+)$~",parse_url($_SERVER["REQUEST_URI"],PHP_URL_PATH),$m)){\\Conquer\\Api\\Handlers\\PlayerHandler::saveFormation(["slot"=>(int)$m[1]]);exit;}';
+    $router.='switch(parse_url($_SERVER["REQUEST_URI"],PHP_URL_PATH)){case "/api/player/formations":\\Conquer\\Api\\Handlers\\PlayerHandler::formations([]);break;case "/api/player/me":\\Conquer\\Api\\Handlers\\PlayerHandler::me([]);break;case "/api/player/profile/1":\\Conquer\\Api\\Handlers\\PlayerHandler::profile(["id"=>1]);break;case "/api/progression/state":\\Conquer\\Api\\Handlers\\ProgressionHandler::state([]);break;case "/api/progression/action":\\Conquer\\Api\\Handlers\\ProgressionHandler::action([]);break;case "/api/defense/state":\\Conquer\\Api\\Handlers\\DefenseHandler::state([]);break;case "/api/defense/action":\\Conquer\\Api\\Handlers\\DefenseHandler::action([]);break;case "/api/research/start":\\Conquer\\Api\\Handlers\\ResearchHandler::start([]);break;case "/api/march/reinforce":\\Conquer\\Api\\Handlers\\MarchHandler::dispatchReinforce([]);break;default:http_response_code(404);echo "{}";}';
     file_put_contents($temp.'/router.php',$router);$socket=stream_socket_server('tcp://127.0.0.1:0',$err,$message);if(!$socket)throw new RuntimeException('No local HTTP port');$address=stream_socket_get_name($socket,false);fclose($socket);$url='http://'.$address;
     $server=proc_open([PHP_BINARY,'-S',$address,'-t',$temp,$temp.'/router.php'],[0=>['pipe','r'],1=>['file',$temp.'/server.log','a'],2=>['file',$temp.'/server.log','a']],$pipes,$temp,null,['bypass_shell'=>true]);if(!is_resource($server))throw new RuntimeException('HTTP fixture could not start');fclose($pipes[0]);usleep(200000);
     checkD(httpD('/api/defense/state',null,false)['status']===401,'defense read requires an authenticated session');
@@ -106,6 +127,12 @@ try{
     checkD(httpD('/api/defense/action',['action'=>'promotion.start','troop_code'=>50100101,'count'=>1.5])['status']===422,'HTTP defense action rejects fractional counts');
     checkD(httpD('/api/defense/state?city_id=4')['status']===403,'HTTP defense read cannot expose another city');
     checkD(httpD('/api/defense/state')['status']===200,'authenticated defense read returns a usable state');
+    $formationTroops=[50100101=>6];
+    checkD(httpD('/api/player/formations/6',['troops'=>$formationTroops])['status']===200,'legacy formation API saves slot six');
+    $legacyFormations=httpD('/api/player/formations')['json']['data']['formations'];
+    checkD(count($legacyFormations)===6&&$legacyFormations[6]===$formationTroops,'legacy formation API reloads all six slots');
+    foreach([0,7] as $slot)checkD(httpD('/api/player/formations/'.$slot,['troops'=>$formationTroops])['status']===400,'legacy formation API rejects slot '.$slot);
+    checkD(httpD('/api/defense/action',['action'=>'formation.delete','city_id'=>1,'slot'=>6])['status']===200,'shared defense API deletes legacy slot six');
     $before=stockD(1);$http=httpD('/api/march/reinforce',['target_player_id'=>3,'troops'=>[50100101=>10]]);checkD($http['status']===200&&stockD(1)===$before-10,'legacy reinforcement route accepts real city troop read model');$m=(int)$http['json']['data']['march_id'];D::recallMarch(1,$m);homeD($m);
     $db->execute("INSERT INTO building_queue(city_id,building_code,level_to,started_at,finishes_at) VALUES(101,'farm',2,UTC_TIMESTAMP(),DATE_ADD(UTC_TIMESTAMP(),INTERVAL 1 HOUR))");$bq=$db->lastInsertId();
     $db->execute("INSERT INTO troop_queue(city_id,troop_code,count,barrack_slot,started_at,finishes_at) VALUES(101,50100101,1,1,UTC_TIMESTAMP(),DATE_ADD(UTC_TIMESTAMP(),INTERVAL 1 HOUR))");$tq=$db->lastInsertId();

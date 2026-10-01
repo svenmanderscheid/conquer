@@ -16,23 +16,18 @@ Die Basisheilzeiten gelten für alle drei Truppengattungen gleichermaßen:
 
 | Tier | Sekunden pro Truppe | 1.000 Verwundete ohne Boni |
 |---|---:|---:|
-| T1 | 1 | 00:16:40 |
-| T2 | 2 | 00:33:20 |
-| T3 | 3 | 00:50:00 |
-| T4 | 4 | 01:06:40 |
-| T5 | 5 | 01:23:20 |
-| T6 | 7 | 01:56:40 |
-| T7 | 9 | 02:30:00 |
-| T8 | 11 | 03:03:20 |
-| T9 | 13 | 03:36:40 |
-| T10 | 15 | 04:10:00 |
+| T1 | 0,5 | 00:08:20 |
+| T2 | 1 | 00:16:40 |
+| T3 | 2 | 00:33:20 |
+| T4 | 3 | 00:50:00 |
+| T5 | 4 | 01:06:40 |
 
-Die Staffel ist ein Ausgangspunkt für Spieltests. T10 orientiert sich am Durchschnitt des gelieferten Screenshots (3.006 Verwundete, 12:31:30 ursprüngliche Heilzeit); die niedrigeren Stufen sind eigene Balancewerte. Die Tabelle liegt in `data/troops.json`.
+Seit dem 29. September 2026 gelten die Originalzeiten aus `data/balance-source/troop.json`. Aktiv sind T1–T5; frühere Aufträge behalten ihre gespeicherten Endzeiten.
 
 Die Zeiten aller ausgewählten Truppen werden summiert. Zeitreduktionsboni und Heilgeschwindigkeit wirken vor der einmaligen Aufrundung des gesamten Auftrags auf Sekunden:
 
 `Dauer = ceil(Summe(Anzahl × Basiszeit) × max(0.05, 1 − Zeitreduktion) / max(1, 1 + Heilgeschwindigkeit))`
 
-Beispiel: 1.000 T10 benötigen bei +100 % Heilgeschwindigkeit 01:06:40. Heilung kostet je nach Tier 10 bis 45 % der Ausbildungskosten, je Ressource und Truppe aufgerundet. Der Start bezahlt Ressourcen genau einmal. Nur Heilungs- und allgemeine Speedups verkürzen einen laufenden Auftrag. Neue Verwundete warten separat. Bereits laufende Behandlungen behalten ihre gespeicherte Endzeit.
+Beispiel: 1.000 T5 benötigen bei +100 % Heilgeschwindigkeit 00:33:20. Heilung kostet je nach Tier 10 bis 22 % (historische höhere Stufen bis 45 %) der Ausbildungskosten, je Ressource und Truppe aufgerundet. Der Start bezahlt Ressourcen genau einmal. Nur Heilungs- und allgemeine Speedups verkürzen einen laufenden Auftrag. Neue Verwundete warten separat. Bereits laufende Behandlungen behalten ihre gespeicherte Endzeit.
 
 Prüfungen: `tests/hospital_healing.php`, `tests/hospital_app.cjs`, `tests/crystal_economy.php`, `tests/trading_shop.php`, `tests/daily_chests.php` und `tests/march_skins.php`.

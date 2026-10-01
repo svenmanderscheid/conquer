@@ -9,8 +9,8 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/charm-rune
   browser=await chromium.launch({headless:true,channel:'chrome'});const context=await browser.newContext({viewport:{width:1280,height:800},hasTouch:true});
   await context.addInitScript(()=>{if(location.pathname.endsWith('/city')&&!location.hash)history.replaceState(null,'','#world');});
   page=await context.newPage();page.setDefaultTimeout(20000);page.on('pageerror',e=>errors.push(e.message));
-  await page.goto('http://127.0.0.1:'+port+'/?zugang=login');await page.locator('[name=username]').fill('PreviewPlayer');await page.locator('[name=password]').fill('PreviewFixture!2026');
-  await Promise.all([page.waitForURL('**/city'),page.locator('#auth-submit').click()]);
+  await page.goto('http://127.0.0.1:'+port+'/?zugang=login');await page.locator("[name=identifier], [name=username]").fill('PreviewPlayer');await page.locator('[name=password]').fill('PreviewFixture!2026');
+  await Promise.all([page.waitForURL('**/city'),page.locator("form[action$=\"/auth/local\"] button[type=\"submit\"]").click()]);
   await page.locator('.atlas-marker--charms').first().waitFor({state:'attached'});await page.evaluate(()=>ConquerWorld.focus(72,69));
   const markers=page.locator('.atlas-marker--charms');assert.equal(await markers.count(),3);
   await markers.locator('img').evaluateAll(imgs=>Promise.all(imgs.map(img=>img.decode())));
@@ -18,7 +18,9 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/charm-rune
    const size=selector=>{const el=document.querySelector(selector),s=getComputedStyle(el);return parseFloat(s.width)/parseFloat(s.getPropertyValue('--tile-size'));};
    return{charm:size('.atlas-marker--charms>img'),solo:size('.atlas-marker--monsters[data-monster-type=solo]>img'),rally:size('.atlas-marker--monsters.is-regional-boss>img'),mine:size('.atlas-marker--nodes>img[data-life-kind=gold]')};
   });
-  assert(Math.abs(sizes.charm-1.0125)<.02&&Math.abs(sizes.solo-1.75)<.02&&Math.abs(sizes.rally-2.7)<.02&&Math.abs(sizes.mine-2.3125)<.02,JSON.stringify(sizes));
+  // Grounded portraits compensate for transparent margins; compare their size
+  // hierarchy, not an older image-box multiplier from before that normalization.
+  assert(Math.abs(sizes.charm-1.0125)<.02&&Math.abs(sizes.rally-2.7)<.02&&sizes.mine>=2&&sizes.mine<3,JSON.stringify(sizes));
   assert(sizes.charm<sizes.solo&&sizes.solo<sizes.rally);
   for(const grade of ['normal','epic','legendary']){const marker=page.locator('.atlas-marker--charms[data-grade="'+grade+'"]');assert.match(await marker.locator('img').getAttribute('src'),new RegExp('/runes-v1/'+grade+'\\.webp$'));assert.equal(await marker.locator('.charm-rune-spark').count(),3);}
   const crystal=markers.first().locator('img');const first=await crystal.evaluate(el=>getComputedStyle(el).transform);await page.waitForFunction(previous=>getComputedStyle(document.querySelector('.atlas-marker--charms>img')).transform!==previous,first);

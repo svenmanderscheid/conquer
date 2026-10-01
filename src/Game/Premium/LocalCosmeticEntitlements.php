@@ -23,7 +23,7 @@ final class LocalCosmeticEntitlements
         $syncKey = spl_object_id($db->getPdo()) . ':' . $playerId;
         if (isset(self::$synced[$syncKey])) return true;
 
-        $marchSkins = array_keys(MarchSkinService::catalog());
+        $marchSkins = MarchSkinService::ACTIVE_IDS;
         $premiumSkins = array_values(array_filter($marchSkins, static fn(string $id): bool => $id !== 'default'));
         self::insertAll($db, 'player_march_skins', 'skin_code', $playerId, $marchSkins);
         self::insertAll($db, 'player_castle_skins', 'skin_code', $playerId, $premiumSkins);

@@ -281,6 +281,10 @@ final class CityHandler
                     'UPDATE building_queue SET is_processed = 1, finishes_at = UTC_TIMESTAMP() WHERE id = ?',
                     [$queueId],
                 );
+                \Conquer\Game\Notification\NotificationService::pushCityCompletion(
+                    $cityId, \Conquer\Game\Notification\NotificationService::TYPE_BUILD_COMPLETE,
+                    ['building_code'=>$buildCode, 'queue_id'=>$queueId, 'level'=>$levelTo],
+                );
             } else {
                 // Reduce the timer.
                 $db->execute(

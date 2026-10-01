@@ -17,7 +17,15 @@ const fixture=require('./fixtures/world_life.cjs'),root=path.resolve(__dirname,'
   assert((await marker('monsters:13').locator('img').getAttribute('src')).includes('daemmerhorn'),'Deathkar replacement uses Dämmerhorn illustration');
   assert.equal(await marker('monsters:13').getAttribute('data-footprint'),'2','Dämmerhorn is a two-by-two rally target');
   const before=await orc.boundingBox(),pictureA=await orc.screenshot();await page.waitForTimeout(560);const pictureB=await orc.screenshot();assert(!pictureA.equals(pictureB),'monster parts visibly animate');assert.deepEqual(await orc.boundingBox(),before,'monster hitbox stays fixed');
-  const cropA=await farm.screenshot();await page.waitForTimeout(520);assert(!cropA.equals(await farm.screenshot()),'farm parts visibly animate');
+  // Free workplaces stay calm; work begins only with an active gathering march.
+  const farmCanvas=farm.locator('.atlas-painted-motion');await farmCanvas.waitFor({state:'visible'});
+  assert.equal(await farmCanvas.getAttribute('data-working'),'false');
+  const idleFarm=await farmCanvas.evaluate(canvas=>canvas.toDataURL());await page.waitForTimeout(520);assert.equal(await farmCanvas.evaluate(canvas=>canvas.toDataURL()),idleFarm,'free farm stays still');
+  await page.evaluate(()=>{Object.assign(fixtureState.nodes[0],{gatherer_march_id:9001,is_own_gathering:true});ConquerWorld.render(fixtureOptions);});
+  await page.waitForFunction(()=>document.querySelector('[data-atlas-target="nodes:1"] .atlas-painted-motion[data-working="true"][data-work-ready="true"]'));
+  const workingFarm=await farmCanvas.evaluate(canvas=>canvas.toDataURL());
+  // The farmer deliberately holds poses during the 3.2-second work cycle.
+  await page.waitForFunction(previous=>document.querySelector('[data-atlas-target="nodes:1"] .atlas-painted-motion').toDataURL()!==previous,workingFarm,{timeout:4500});
   const offscreenFarm=marker('nodes:3');assert((await offscreenFarm.locator('img').getAttribute('src')).includes('.png'),'offscreen farms use still artwork');
   await page.evaluate(()=>{window.groundPaints=0;const ground=ConquerLandscape.ground;ConquerLandscape.ground=(...args)=>{groundPaints++;return ground(...args);};});
   const waterA=await page.locator('.atlas-atmosphere').evaluate(el=>el.toDataURL());await page.waitForTimeout(550);const waterB=await page.locator('.atlas-atmosphere').evaluate(el=>el.toDataURL());assert.notEqual(waterA,waterB,'water lights move');assert.equal(await page.evaluate(()=>groundPaints),0,'ambient animation does not repaint terrain or minimap');
@@ -26,6 +34,7 @@ const fixture=require('./fixtures/world_life.cjs'),root=path.resolve(__dirname,'
   const stillSources=await page.locator('.atlas-marker img[data-life-kind]').evaluateAll(els=>els.map(el=>el.src));assert(stillSources.length>0&&stillSources.every(src=>src.includes('.png')),'OS reduced motion switches all creatures and farms to still images');
   await page.emulateMedia({reducedMotion:'no-preference'});await page.locator('#preview-motion').click();await page.waitForFunction(()=>[...document.querySelectorAll('.atlas-marker img[data-life-kind]')].every(img=>img.src.includes('.png')&&img.complete&&img.naturalWidth));await page.waitForTimeout(240);
   const stillOrc=await orc.screenshot();await page.waitForTimeout(400);assert(stillOrc.equals(await orc.screenshot()),'in-game reduced motion freezes monster');await page.locator('#preview-motion').click();
+  await page.evaluate(()=>{delete fixtureState.nodes[0].gatherer_march_id;delete fixtureState.nodes[0].is_own_gathering;ConquerWorld.render(fixtureOptions);});
   await page.evaluate(()=>ConquerWorld.focus(255,128));await page.waitForTimeout(120);
   const edgeColors=await page.locator('.atlas-terrain').evaluate(canvas=>{const c=canvas.getContext('2d'),ratio=canvas.width/canvas.clientWidth,left=-parseFloat(canvas.style.left||0),start=Math.round((innerWidth*.58+left)*ratio),end=Math.round((innerWidth-8+left)*ratio),data=c.getImageData(start,0,Math.max(1,end-start),canvas.height).data,colors=new Set();for(let i=0;i<data.length;i+=64)if(data[i+3]>200)colors.add(`${data[i]>>4}:${data[i+1]>>4}:${data[i+2]>>4}`);return colors.size;});
   await page.screenshot({path:path.join(output,'1440-world-edge.png')});
@@ -46,6 +55,6 @@ const fixture=require('./fixtures/world_life.cjs'),root=path.resolve(__dirname,'
    await page.evaluate(()=>ConquerWorld.focus(74,70));const orcArt=await orc.locator('img').boundingBox();await page.mouse.click(orcArt.x+orcArt.width/2,orcArt.y+orcArt.height*.18);assert(await actions.getByRole('button',{name:'Angreifen',exact:true}).isVisible());await page.screenshot({path:path.join(output,`${size.width}-monster.png`)});await page.keyboard.press('Escape');
    const daemmerhorn=marker('monsters:13');await page.evaluate(()=>ConquerWorld.focus(82.5,76.5));await daemmerhorn.click();assert(await actions.getByRole('button',{name:'Rally starten',exact:true}).isVisible());assert.match(await daemmerhorn.getAttribute('aria-label'),/Dämmerhorn.*Rally.*2 mal 2 Felder/);await page.screenshot({path:path.join(output,`${size.width}-daemmerhorn.png`)});await page.keyboard.press('Escape');
   }
-  assert.deepEqual(errors,[]);assert(!requests.some(url=>url.startsWith('/api/')));console.log('PASS encounter identity, visible motion, stable hitboxes, OS/game motion settings, cached ground and responsive actions');console.log('Screenshots '+output);
+  assert.deepEqual(errors,[]);assert(!requests.some(url=>url.startsWith('/api/')));console.log('PASS encounter identity, calm free workplaces, active work and monster motion, stable hitboxes, OS/game motion settings, cached ground and responsive actions');console.log('Screenshots '+output);
  }finally{if(browser)await browser.close();await new Promise(resolve=>server.close(resolve));}
 })().catch(e=>{console.error(e);console.error('QA output '+output);process.exitCode=1;});

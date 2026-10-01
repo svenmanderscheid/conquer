@@ -1,114 +1,32 @@
-/* Geometry for the hospital; materials use the shared village theme. */
-body.mobile-game #panel-dialog[data-hospital=true] #content { overflow:hidden; }
-.hospital-shell { display:flex; flex:1; flex-direction:column; min-height:0; gap:16px; width:100%; max-width:740px; margin:0 auto; }
-.hospital-summary { display:flex; flex:none; align-items:center; gap:18px; padding:14px 18px; border:2px solid var(--ui-line); border-radius:16px; background:var(--ui-inset); }
-.hospital-emblem { display:grid; place-items:center; flex:none; width:60px; height:60px; font-size:42px; line-height:1; border-radius:18px; background:var(--ui-green-soft); border:2px solid var(--ui-green); }
-.hospital-capacity { flex:1; min-width:0; }
-.hospital-capacity h2 { font-size:16px; margin:0 0 5px; }
-.hospital-capacity strong { font-size:28px; }
-.hospital-capacity span { font-size:14px; }
-.hospital-capacity progress { display:block; width:100%; height:9px; margin-top:9px; border:0; border-radius:8px; overflow:hidden; appearance:none; background:var(--ui-card); color:var(--ui-green); }
-.hospital-capacity progress::-webkit-progress-bar { background:var(--ui-card); }
-.hospital-capacity progress::-webkit-progress-value { background:var(--ui-green); border-radius:8px; }
-.hospital-capacity progress::-moz-progress-bar { background:var(--ui-green); border-radius:8px; }
-.hospital-active-note { display:flex; align-items:center; gap:6px; margin-top:8px; padding:6px 9px; border:1px solid var(--ui-green); border-radius:9px; background:var(--ui-green-soft); color:var(--ui-green-dark); font-size:12px; }
-.hospital-active-note>span { display:grid; place-items:center; width:20px; height:20px; flex:none; border-radius:50%; background:var(--ui-green); color:var(--ui-card-light); }
-.hospital-capacity .hospital-active-note strong { flex:1; font-size:13px; line-height:1.2; }
-.hospital-active-note time { font:700 12px var(--ui-font-number); white-space:nowrap; }
-.hospital-shell .hospital-info { flex:none; min-height:44px; width:44px; padding:0; font-size:23px; }
-.hospital-list { flex:1; min-height:0; overflow:auto; overscroll-behavior:contain; display:flex; flex-direction:column; gap:12px; padding:3px; scrollbar-gutter:stable; }
-.hospital-unit { flex:none; display:flex; align-items:center; gap:16px; padding:10px 14px; border:2px solid var(--ui-line); border-radius:14px; background:var(--ui-card); }
-.hospital-portrait { position:relative; flex:none; width:64px; height:68px; background:var(--ui-inset); border:2px solid var(--ui-line); border-radius:12px; }
-.hospital-portrait img { width:100%; height:100%; object-fit:cover; border-radius:10px; }
-.hospital-portrait span { position:absolute; bottom:-5px; left:50%; transform:translateX(-50%); padding:3px 9px; border:1px solid var(--ui-line); border-radius:7px; background:var(--ui-gold-soft); font-size:11px; font-weight:bold; }
-.hospital-unit.is-in-treatment { border-color:var(--ui-green); background:linear-gradient(90deg,var(--ui-green-soft),var(--ui-card) 42%); }
-.hospital-treatment-mark { position:absolute; top:-7px; right:-7px; display:grid; place-items:center; width:24px; height:24px; border:2px solid var(--ui-card); border-radius:50%; background:var(--ui-green); color:var(--ui-card-light); font-size:15px; line-height:1; }
-.hospital-unit-body { flex:1; min-width:0; }
-.hospital-unit-heading { display:flex; align-items:baseline; justify-content:space-between; gap:6px 12px; flex-wrap:wrap; }
-.hospital-unit-heading h3 { margin:0; font-size:16px; overflow-wrap:anywhere; }
-.hospital-unit-heading>span { font-size:12px; white-space:nowrap; }
-.hospital-quantity { display:grid; grid-template-columns:minmax(0,1fr) 88px; align-items:center; gap:14px; }
-.hospital-shell .hospital-quantity input[type=number] { box-sizing:border-box; width:100%; min-width:0; min-height:44px; height:44px; margin:4px 0; padding:5px; border-radius:9px; text-align:center; font:700 16px var(--ui-font); }
-.hospital-shell .hospital-quantity input[type=range] { --hospital-fill:100%; appearance:none; box-sizing:border-box; width:100%; height:44px; min-height:44px; margin:0; padding:0; border:0; background:transparent; box-shadow:none; cursor:pointer; }
-.hospital-quantity input[type=range]::-webkit-slider-runnable-track { height:13px; border:1px solid var(--ui-line); border-radius:8px; background:linear-gradient(to right,var(--ui-green) var(--hospital-fill),var(--ui-inset) var(--hospital-fill)); }
-.hospital-quantity input[type=range]::-webkit-slider-thumb { appearance:none; width:25px; height:34px; margin-top:-11px; border:2px solid var(--ui-blue-dark); border-radius:9px; background:var(--ui-blue-light); box-shadow:inset 0 0 0 3px var(--ui-blue); }
-.hospital-quantity input[type=range]::-moz-range-track { height:13px; border:1px solid var(--ui-line); border-radius:8px; background:var(--ui-inset); }
-.hospital-quantity input[type=range]::-moz-range-progress { height:13px; border-radius:8px; background:var(--ui-green); }
-.hospital-quantity input[type=range]::-moz-range-thumb { width:23px; height:32px; border:2px solid var(--ui-blue-dark); border-radius:9px; background:var(--ui-blue-light); }
-.hospital-recovery { display:block; font-size:11px; }
-.hospital-footer { flex:none; border-top:2px solid var(--ui-line); padding:12px 3px max(3px,env(safe-area-inset-bottom)); }
-.hospital-selection { display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:13px; margin-bottom:8px; }
-.hospital-selection .button { min-height:40px; }
-.hospital-resources { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
-.hospital-resource { display:flex; align-items:center; gap:6px; min-width:0; padding:6px; border:1px solid var(--ui-line); border-radius:9px; background:var(--ui-inset); font-size:12px; }
-.hospital-resource img { width:25px; height:25px; object-fit:contain; flex:none; }
-.hospital-resource strong,.hospital-resource small { display:block; overflow-wrap:anywhere; }
-.hospital-resource small { font-size:10px; margin-top:2px; }
-.hospital-resource.is-missing { border-color:var(--ui-red); background:var(--ui-red-soft); }
-.hospital-treatment-label { display:flex; align-items:center; gap:5px; margin-top:12px; padding:8px; border:1px solid var(--ui-green); background:var(--ui-green-soft); color:var(--ui-green-dark); border-radius:8px; font-size:12px; }
-.hospital-running { display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:13px; }
-.hospital-running time { font-weight:bold; font-size:20px; font-variant-numeric:tabular-nums; }
-.hospital-treatment-progress { width:100%; height:10px; margin-top:8px; accent-color:var(--ui-green); }
-.hospital-feedback { margin:8px 0; font-size:12px; min-height:16px; }
-.hospital-actions { display:grid; grid-template-columns:1fr; gap:12px; }
-body.mobile-game #panel-dialog[data-hospital=true] .hospital-actions .button { min-height:52px; padding:7px 10px; }
-.hospital-actions .hospital-heal { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; font-size:16px; }
-.hospital-actions small { font-size:12px; }
-.hospital-empty { margin:auto; text-align:center; max-width:340px; padding:20px 8px; }
-.hospital-empty>span { font-size:54px; }
-.hospital-empty h3 { margin:12px 0 8px; }
-.hospital-empty p { font-size:14px; }
-@media(max-width:600px) {
- .hospital-shell { gap:10px; }
- .hospital-summary { padding:12px; gap:10px; }
- .hospital-emblem { width:48px; height:56px; border-radius:14px; font-size:35px; }
- .hospital-capacity h2 { font-size:13px; }
- .hospital-capacity strong { font-size:23px; }
- .hospital-capacity span { font-size:12px; }
- .hospital-unit { padding:10px 8px; gap:10px; }
- .hospital-portrait { width:49px; height:64px; }
- .hospital-unit-heading { gap:2px; }
- .hospital-unit-heading h3 { font-size:14px; width:100%; }
- .hospital-quantity { grid-template-columns:minmax(0,1fr) 65px; gap:9px; }
- .hospital-list { gap:10px; padding:2px; scrollbar-gutter:auto; }
- .hospital-actions { gap:8px; }
- .hospital-actions .button { font-size:13px; }
- .hospital-resource { font-size:11px; padding:5px; }
- .hospital-feedback { font-size:11px; }
-}
-@media(max-height:500px) and (min-width:500px) {
- .hospital-shell { display:grid; grid-template-columns:210px minmax(0,1fr); grid-template-rows:minmax(0,1fr) auto; gap:8px 14px; }
- .hospital-summary { position:relative; grid-column:1; grid-row:1; gap:7px; padding:6px; align-self:start; }
- .hospital-emblem { width:38px; height:46px; font-size:29px; border-radius:12px; }
- .hospital-capacity h2 { font-size:12px; line-height:1.1; padding-right:32px; margin:0 0 2px; }
- .hospital-capacity strong { font-size:21px; }
- .hospital-capacity>div { display:flex; align-items:baseline; gap:4px; line-height:1; }
- .hospital-capacity span { font-size:10px; }
- .hospital-capacity progress { margin-top:4px; height:6px; }
- .hospital-capacity>.hospital-active-note { display:none; }
- .hospital-shell .hospital-info { position:absolute; top:0; right:0; background:transparent; border:0; box-shadow:none; }
- .hospital-list { grid-column:2; grid-row:1 / 3; height:100%; }
- .hospital-unit { padding:9px; gap:10px; }
- .hospital-portrait { width:44px; height:62px; }
- .hospital-unit-heading h3 { font-size:13px; width:100%; }
- .hospital-unit-heading>span { font-size:11px; }
- .hospital-quantity { grid-template-columns:minmax(0,1fr) 62px; gap:8px; }
- .hospital-footer { grid-column:1; grid-row:2; padding:6px 0 0; }
- .hospital-selection { font-size:11px; margin-bottom:4px; }
- .hospital-selection .button { font-size:10px; min-height:32px; padding:4px; }
- .hospital-resource { font-size:10px; gap:3px; padding:3px; }
- .hospital-resource img { width:18px; height:18px; }
- .hospital-resource small { font-size:9px; }
- .hospital-resource :is(.hospital-resource-name,.hospital-stock-label) { display:none; }
- .hospital-resource strong { white-space:nowrap; }
- .hospital-resources { gap:4px; }
- .hospital-running { flex-direction:column; align-items:flex-start; gap:3px; }
- .hospital-feedback { font-size:10px; margin:4px 0; line-height:1.2; }
- .hospital-actions { grid-template-columns:1fr; gap:6px; }
- .hospital-actions .button { font-size:12px; min-height:44px; padding:5px; }
- body.mobile-game #panel-dialog[data-hospital=true] .hospital-actions .button { min-height:44px; padding:5px 3px; font-size:11px; line-height:1.15; }
- body.mobile-game #panel-dialog[data-hospital=true] .hospital-actions :is(span,small) { font-size:11px; line-height:1.15; white-space:nowrap; }
- body.mobile-game #panel-dialog[data-hospital=true] .hospital-selection .button { min-height:32px; height:32px; font-size:10px; line-height:1.1; padding:4px; }
- body.mobile-game #panel-dialog[data-hospital=true] .hospital-resource { box-sizing:border-box; height:30px; font-size:10px; line-height:1.1; }
- body.mobile-game #panel-dialog[data-hospital=true] .hospital-resource :is(strong,small) { line-height:1.1; margin:0; }
-}
+/* Hospital stage mirrors training while keeping healing controls and state distinct. */
+body.mobile-game #panel-dialog[data-hospital=true] #content{overflow:hidden}
+.hospital-shell{display:flex;flex:1;flex-direction:column;min-height:0;gap:10px;width:100%;font-family:var(--ui-font);color:var(--ui-ink)}
+.hospital-shell *{box-sizing:border-box}.hospital-shell [hidden]{display:none!important}
+.hospital-summary{display:flex;flex:none;align-items:center;gap:12px;padding:8px 12px;border:2px solid var(--ui-line);border-radius:16px;background:linear-gradient(145deg,var(--ui-card-light),var(--ui-card));box-shadow:inset 1px 1px #fff,0 4px 0 #a58e67,0 8px 16px #44354920}
+.hospital-emblem,.hospital-cross{display:grid;place-items:center;flex:none;background:var(--ui-green-soft);border:2px solid var(--ui-green);color:var(--ui-green-dark)}
+.hospital-emblem{width:48px;height:48px;border-radius:14px;font-size:32px}.hospital-capacity{flex:1;min-width:0}.hospital-capacity h2{font-size:13px;margin:0 0 2px;color:var(--ui-primary-dark)}
+.hospital-capacity>div:not(.hospital-active-note){display:flex;align-items:baseline;gap:3px}.hospital-capacity strong{font:700 22px var(--ui-font-number)}.hospital-capacity span{font-size:11px}
+.hospital-capacity progress,.hospital-treatment-progress{display:block;width:100%;height:7px;border:0;border-radius:8px;overflow:hidden;appearance:none;background:var(--ui-inset);color:var(--ui-green);accent-color:var(--ui-green)}
+.hospital-capacity progress{margin-top:5px}.hospital-capacity progress::-webkit-progress-bar{background:var(--ui-inset)}.hospital-capacity progress::-webkit-progress-value{background:var(--ui-green)}.hospital-capacity progress::-moz-progress-bar{background:var(--ui-green)}
+.hospital-active-note{display:flex;align-items:center;gap:6px;margin-top:5px;color:var(--ui-green-dark);font-size:11px}.hospital-active-note>span{display:none}.hospital-active-note strong{font-size:11px!important}.hospital-active-note time{margin-left:auto;font:700 11px var(--ui-font-number)}
+.hospital-shell .hospital-info{flex:none;width:40px;min-height:40px;padding:0;font-size:20px}
+.hospital-workspace{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);grid-template-rows:minmax(118px,.76fr) minmax(210px,1.24fr);gap:10px 18px;padding:0 1px 5px}
+.hospital-showcase{grid-column:1;grid-row:1/3;display:flex;flex-direction:column;min-width:0;min-height:0;padding:12px;border:2px solid var(--ui-line);border-radius:22px;background:linear-gradient(145deg,var(--ui-card-light),var(--ui-card) 55%,#eadbc0);box-shadow:inset 2px 2px #fff9,inset -3px -3px #b79f7652,0 5px 0 #9e875e,0 10px 20px #4435492b}
+.hospital-showcase-heading{display:flex;align-items:center;gap:9px;flex:none;min-width:0}.hospital-showcase-heading>div{flex:1;min-width:0}.hospital-showcase-heading h3{margin:0;font-size:22px;line-height:1.1;overflow-wrap:anywhere}.hospital-showcase-heading p{margin:3px 0 0;color:var(--ui-muted);font-size:11px}.hospital-showcase-heading>strong{display:grid;place-items:center;width:52px;height:38px;border:2px solid var(--ui-gold);border-radius:13px;background:linear-gradient(#fffaf0,var(--ui-gold-soft));box-shadow:0 3px 0 #9c814b;font:700 17px var(--ui-font-number)}
+.hospital-cross{width:42px;height:42px;border-radius:12px;font-size:27px}.hospital-hero{position:relative;flex:1;min-height:180px;margin:10px 3px 8px;overflow:hidden;border:3px solid #9b8baa;border-radius:22px;background:radial-gradient(circle at 50% 38%,#fffef9 0 38%,#f4ead7 72%,#dfcfae 100%);box-shadow:inset 0 0 34px #80658f24,inset 2px 2px #fff,0 4px 0 #6c5578,0 8px 16px #44354930}
+.hospital-hero img{position:absolute;inset:3%;width:94%;height:88%;object-fit:contain;filter:drop-shadow(0 8px 7px #44354938)}.hospital-hero>span{position:absolute;left:8px;right:8px;bottom:7px;padding:5px;border-radius:9px;background:#fff9;text-align:center;color:var(--ui-muted);font-size:11px}
+.hospital-showcase-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px 5px 2px;border-top:1px solid var(--ui-line)}.hospital-showcase-stats>span{display:flex;justify-content:space-between;align-items:baseline;gap:5px}.hospital-showcase-stats small{color:var(--ui-muted)}.hospital-showcase-stats strong{font:700 14px var(--ui-font-number)}
+.hospital-showcase-empty{grid-column:1/-1;align-items:center;justify-content:center;text-align:center}.hospital-showcase-empty+.hospital-list{display:none}.hospital-showcase-empty .hospital-cross{width:64px;height:64px;font-size:42px}.hospital-showcase-empty h3{margin:14px 0 5px}.hospital-showcase-empty p{margin:0;color:var(--ui-muted)}
+.hospital-list{grid-column:2;grid-row:1;min-height:0;overflow:auto;overscroll-behavior:contain;display:flex;gap:8px;padding:7px 8px 11px;border:2px solid var(--ui-line);border-radius:16px;background:linear-gradient(145deg,var(--ui-card-light),var(--ui-card));box-shadow:inset 1px 1px #fff,0 5px 0 #a58e67,0 10px 18px #44354924;scrollbar-gutter:stable}
+.hospital-unit{position:relative;flex:0 0 154px;display:flex;flex-direction:column;align-items:stretch;gap:3px;min-width:0;padding:5px;border:2px solid var(--ui-line);border-radius:14px;background:linear-gradient(#fffdf8,var(--ui-card));box-shadow:inset 0 1px #fff,0 4px 0 var(--troop-tier-rim,#9c814b)}.hospital-unit.is-in-treatment{border-color:var(--ui-green);background:linear-gradient(#f7fff2,var(--ui-green-soft))}
+.hospital-portrait{position:relative;width:100%;height:54px;border-radius:9px;background:color-mix(in srgb,var(--troop-tier-color) 24%,var(--ui-card));overflow:visible}.hospital-portrait img{width:100%;height:100%;object-fit:contain;border-radius:8px}.hospital-portrait>span{position:absolute;right:3px;bottom:3px;padding:2px 5px;border-radius:6px;background:#fffde8dd;font:700 10px var(--ui-font-number)}.hospital-treatment-mark{position:absolute;top:-7px;left:-7px;display:grid;place-items:center;width:23px;height:23px;border:2px solid white;border-radius:50%;background:var(--ui-green);color:white}
+.hospital-unit-body{display:flex;flex:1;flex-direction:column;min-width:0}.hospital-unit-heading{display:flex;align-items:baseline;justify-content:space-between;gap:3px}.hospital-unit-heading h3{margin:0;max-width:88px;font-size:12px;line-height:1.1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.hospital-unit-heading>span{font-size:9px;white-space:nowrap}
+.hospital-quantity{display:grid;grid-template-columns:minmax(0,1fr) 45px;align-items:center;gap:4px;margin-top:auto}.hospital-shell .hospital-quantity input[type=number]{width:100%;height:32px;min-width:0;margin:0;padding:2px;border:1px solid var(--ui-line);border-radius:8px;background:var(--ui-card-light);text-align:center;font:700 12px var(--ui-font-number)}.hospital-shell .hospital-quantity input[type=range]{--hospital-fill:100%;appearance:none;width:100%;height:32px;margin:0;padding:0;border:0;background:transparent;box-shadow:none}.hospital-quantity input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:6px;background:linear-gradient(to right,var(--ui-green) var(--hospital-fill),var(--ui-inset) var(--hospital-fill))}.hospital-quantity input[type=range]::-webkit-slider-thumb{appearance:none;width:18px;height:25px;margin-top:-9px;border:2px solid var(--ui-primary-dark);border-radius:7px;background:var(--ui-primary-light)}.hospital-quantity input[type=range]::-moz-range-track{height:8px;background:var(--ui-inset)}.hospital-quantity input[type=range]::-moz-range-progress{height:8px;background:var(--ui-green)}.hospital-quantity input[type=range]::-moz-range-thumb{width:16px;height:23px;border:2px solid var(--ui-primary-dark);border-radius:7px;background:var(--ui-primary-light)}
+.hospital-treatment-label{margin-top:auto;padding:5px;border-radius:7px;background:var(--ui-green-soft);color:var(--ui-green-dark);font-size:9px}.hospital-treatment-label span{display:none}
+.hospital-footer{grid-column:2;grid-row:2;display:flex;flex-direction:column;min-height:0;padding:9px 12px 12px;border:2px solid var(--ui-line);border-radius:18px;background:linear-gradient(145deg,var(--ui-card-light),var(--ui-card));box-shadow:inset 1px 1px #fff,0 5px 0 #a58e67,0 10px 18px #44354924}.hospital-footer::before{content:"Behandlungsauftrag";margin-bottom:7px;color:var(--ui-primary-dark);font-size:16px;font-weight:bold}
+.hospital-selection{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;margin-bottom:6px}.hospital-selection .button{min-height:34px;padding:4px 9px}
+.hospital-resources{display:grid;grid-template-columns:1fr 1fr;gap:4px 8px;padding:6px 8px;border:1px solid var(--ui-line);border-radius:12px;background:color-mix(in srgb,var(--ui-inset) 58%,var(--ui-card))}.hospital-resource{display:flex;align-items:center;gap:6px;min-width:0;padding:2px;font-size:11px}.hospital-resource img{width:23px;height:23px;object-fit:contain;flex:none}.hospital-resource strong,.hospital-resource small{display:block}.hospital-resource small{font-size:9px;color:var(--ui-muted)}.hospital-resource.is-missing{color:var(--ui-red)}
+.hospital-feedback{margin:6px 0;min-height:14px;color:var(--ui-green-dark);font-size:10px}.hospital-actions{display:grid;grid-template-columns:1fr;margin-top:auto}.hospital-actions .hospital-heal{display:flex;align-items:center;justify-content:space-between;min-height:46px!important;padding:7px 16px!important;border:2px solid var(--ui-green-dark);border-radius:12px;background:var(--ui-green);color:white;box-shadow:0 3px 0 var(--ui-green-dark);font-size:17px}.hospital-actions small{font:700 13px var(--ui-font-number)}.hospital-actions .hospital-heal:disabled{background:var(--ui-disabled);color:var(--ui-muted);border-color:var(--ui-line);box-shadow:none}
+.hospital-running{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:auto 0 8px}.hospital-running time{font:700 23px var(--ui-font-number);color:var(--ui-blue-dark)}.hospital-treatment-progress{height:9px}
+@media(max-width:650px) and (min-height:501px){.hospital-shell{gap:6px}.hospital-summary{padding:5px 7px}.hospital-emblem{width:38px;height:38px;font-size:25px}.hospital-capacity h2{font-size:11px}.hospital-capacity strong{font-size:18px}.hospital-workspace{display:flex;flex-direction:column;gap:6px}.hospital-showcase{flex:0 0 175px;padding:5px 7px;border-radius:18px}.hospital-showcase-heading h3{font-size:17px}.hospital-cross{width:34px;height:34px;font-size:22px}.hospital-showcase-heading>strong{width:38px;height:32px;font-size:14px}.hospital-hero{min-height:88px;margin:5px 2px}.hospital-showcase-stats{padding:3px}.hospital-list{flex:0 0 118px;padding:5px 6px 8px}.hospital-unit{flex-basis:132px}.hospital-portrait{height:44px}.hospital-footer{flex:1;padding:7px 9px 9px}.hospital-footer::before{display:none}.hospital-resources{padding:3px 6px}.hospital-feedback{margin:3px 0}.hospital-actions .hospital-heal{min-height:43px!important}}
+@media(max-height:500px) and (min-width:500px){.hospital-shell{gap:6px}.hospital-summary{padding:4px 8px}.hospital-emblem{width:34px;height:34px;font-size:23px}.hospital-capacity h2{display:none}.hospital-capacity strong{font-size:17px}.hospital-capacity progress{margin-top:2px}.hospital-workspace{grid-template-columns:minmax(190px,.78fr) minmax(0,1.22fr);grid-template-rows:minmax(92px,.75fr) minmax(130px,1.25fr);gap:6px 10px}.hospital-showcase{padding:5px 7px;border-radius:16px}.hospital-showcase-heading h3{font-size:15px}.hospital-showcase-heading p{display:none}.hospital-cross{width:32px;height:32px;font-size:20px}.hospital-showcase-heading>strong{width:35px;height:30px;font-size:13px}.hospital-hero{min-height:80px;margin:4px 2px}.hospital-showcase-stats{padding:3px;font-size:9px}.hospital-list{padding:4px 5px 7px}.hospital-unit{flex-basis:125px;padding:3px}.hospital-portrait{height:39px}.hospital-unit-heading h3{font-size:10px}.hospital-footer{padding:5px 8px 8px}.hospital-footer::before{display:none}.hospital-selection{margin-bottom:2px}.hospital-resources{padding:2px 4px;gap:1px 5px}.hospital-resource{padding:0}.hospital-resource img{width:18px;height:18px}.hospital-feedback{margin:2px 0;font-size:9px}.hospital-actions .hospital-heal{min-height:38px!important;padding:4px 12px!important}.hospital-running{margin:0 0 4px}.hospital-running time{font-size:18px}}

@@ -1,4 +1,5 @@
 'use strict';
+require('./fixtures/browser_locale.cjs')('de'); // This suite asserts the explicit German UI.
 // Run against tools/preview-feature-fixture.php --scout-reports --port=18983.
 const fs=require('fs'),path=require('path'),assert=require('assert/strict');
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'C:/Users/svenm/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
@@ -11,8 +12,8 @@ const output=path.resolve('artifacts/scout-report');fs.mkdirSync(output,{recursi
   const context=await browser.newContext({viewport:{width:1280,height:900},hasTouch:true});
   await context.addInitScript(()=>{if(location.pathname.endsWith('/city')&&!location.hash)history.replaceState(null,'','#world');});
   const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(20000);
-  await page.goto(base+'/?zugang=login');await page.locator('[name="username"]').fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');
-  await Promise.all([page.waitForURL(url=>url.pathname==='/city'),page.locator('#auth-submit').click()]);
+  await page.goto(base+'/?zugang=login');await page.locator("[name=identifier], [name=username]").fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');
+  await Promise.all([page.waitForURL(url=>url.pathname==='/city'),page.locator("form[action$=\"/auth/local\"] button[type=\"submit\"]").click()]);
   await page.locator('#navigation [data-id="reports"]').click();await page.locator('.mail-open').first().waitFor();
   const open=async index=>{await page.locator('.mail-open').nth(index).click();await page.locator('.scout-report').waitFor();await page.waitForFunction(()=>!document.querySelector('[data-action="mailbox-detail-star"]')?.disabled);};
   const close=async()=>{await page.locator('[data-action="mailbox-back"]').click();await page.waitForFunction(()=>!document.querySelector('#game-dialog').open&&!history.state?.conquerScoutReport);};
@@ -32,8 +33,8 @@ const output=path.resolve('artifacts/scout-report');fs.mkdirSync(output,{recursi
     const issues=[],root=document.querySelector('.scout-report'),scroll=root.querySelector('.sr-scroll');
     for(const el of [root,scroll,...root.querySelectorAll('.sr-section,.sr-resource,.sr-overview')])if(el.scrollWidth>el.clientWidth+1)issues.push('Horizontal overflow: '+el.className);
     if(scroll.clientHeight<100)issues.push('Too little reading space');
-    for(const el of document.querySelectorAll('#game-dialog .dialog-close,.sr-footer button')){
-     const r=el.getBoundingClientRect(),hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);
+    for(const el of document.querySelectorAll('#game-dialog .dialog-close,#game-dialog .mobile-page-back,.sr-footer button')){
+     if(!el.checkVisibility())continue;const r=el.getBoundingClientRect(),hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);
      if(r.x<0||r.y<0||r.right>innerWidth||r.bottom>innerHeight)issues.push('Action outside viewport');
      if(hit&&!el.contains(hit))issues.push('Action covered');
     }

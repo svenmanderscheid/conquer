@@ -5,16 +5,11 @@ declare(strict_types=1);
  * Conquer — Front Controller
  *
  * Every request enters here. Bootstrap initializes the application,
- * then a stub router dispatches to the appropriate handler.
- *
- * Sprint 1: Router is a stub — API returns 501, everything else gets
- * the landing page. Real routing lands in Task 1.6.
+ * then routing dispatches public, authenticated game/API and admin requests.
+ * Shared security checks run before protected game handlers.
  */
 
 define('ROOT_DIR', __DIR__);
-
-require_once ROOT_DIR . '/src/Bootstrap.php';
-\Conquer\Bootstrap::init(ROOT_DIR);
 
 // ---------------------------------------------------------------------------
 // Normalize request path — strip app sub-directory prefix (e.g. /conquer/)
@@ -34,11 +29,55 @@ if ($_scriptDir !== '' && $_scriptDir !== '/' && str_starts_with($_rawPath, $_sc
 $_normalizedPath = '/' . ltrim($_rawPath, '/');
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
+// Public, content-versioned editorial assets need neither a database nor a session.
+// Keep this strict allowlist before application bootstrap and every authenticated route.
+if ($_normalizedPath === '/locale-assets' || str_starts_with($_normalizedPath, '/locale-assets/')) {
+    require_once ROOT_DIR . '/src/Game/Locale.php';
+    $_localeResponse = \Conquer\Game\Locale::assetResponse($_normalizedPath, $method, (string) ($_SERVER['HTTP_IF_NONE_MATCH'] ?? ''));
+    http_response_code($_localeResponse['status']);
+    foreach ($_localeResponse['headers'] as $_header => $_value) header($_header . ': ' . $_value);
+    echo $_localeResponse['body'];
+    exit;
+}
+
+// Discord signs its own requests. Verify before session or database bootstrap.
+if ($_normalizedPath === '/api/discord/interactions') {
+    require_once ROOT_DIR . '/src/Autoloader.php';
+    (new \Conquer\Autoloader(ROOT_DIR . '/src'))->register();
+    \Conquer\Discord\DiscordHandler::interactions();
+}
+
+require_once ROOT_DIR . '/src/Bootstrap.php';
+\Conquer\Bootstrap::init(ROOT_DIR);
+
 // Public discovery endpoints stay available without the game database.
 // Authentication and every private game route continue below the DB guard.
 $_appConfig = \Conquer\Bootstrap::getConfig();
 $_configuredOrigin = rtrim((string) ($_appConfig['base_url'] ?? ''), '/');
 $_requestHost = strtolower((string) parse_url('http://' . ($_SERVER['HTTP_HOST'] ?? ''), PHP_URL_HOST));
+// Local installations use the game login directly, without leaving localhost.
+$_useGameLogin = in_array($_requestHost, ['play.unionofkingdoms.com', 'localhost', '127.0.0.1', '[::1]', '::1'], true);
+// Credentials belong to the game origin. Old website links start a fresh
+// game login; 303 deliberately drops POST bodies and host-bound OAuth state.
+if (in_array($_requestHost, ['unionofkingdoms.com', 'www.unionofkingdoms.com'], true)) {
+    $_legacyMode = $_GET['zugang'] ?? $_GET['mode'] ?? '';
+    if (str_starts_with($_normalizedPath, '/auth/') || ($_normalizedPath === '/' && in_array($_legacyMode, ['login', 'register'], true))) {
+        $_gamePath = '/';
+        $_gameQuery = [];
+        if ($_legacyMode === 'register' || ($_normalizedPath === '/auth/local' && ($_POST['mode'] ?? '') === 'register')) {
+            $_gameQuery['mode'] = 'register';
+        }
+        if ($method === 'GET' && in_array($_normalizedPath, ['/auth/recover', '/auth/reset', '/auth/verify-email'], true)) {
+            $_gamePath = $_normalizedPath;
+            foreach (['token', 'backup'] as $_key) {
+                if (is_string($_GET[$_key] ?? null)) $_gameQuery[$_key] = $_GET[$_key];
+            }
+        }
+        header('Cache-Control: private, no-store');
+        header('Location: https://play.unionofkingdoms.com' . $_gamePath . ($_gameQuery ? '?' . http_build_query($_gameQuery, '', '&', PHP_QUERY_RFC3986) : ''), true, 303);
+        exit;
+    }
+}
 if (in_array($_requestHost, ['unionofkingdoms.com', 'www.unionofkingdoms.com', 'play.unionofkingdoms.com'], true)) {
     // The public website and game login share one deployment, but each keeps
     // its own canonical host for links, metadata, robots and the sitemap.
@@ -80,7 +119,7 @@ if (($_normalizedPath === '/' && $method === 'GET') || $_normalizedPath === '/al
     header('Content-Security-Policy: ' . $_landingCsp);
     // The page embeds a session-bound CSRF token; never let a shared cache reuse it.
     header('Cache-Control: private, no-store');
-    if ($_normalizedPath === '/' && $_requestHost === 'play.unionofkingdoms.com') {
+    if ($_normalizedPath === '/' && $_useGameLogin) {
         if (\Conquer\Auth\Session::current() !== null) {
             header('Location: ' . APP_BASE . '/city');
             exit;
@@ -95,7 +134,6 @@ if (($_normalizedPath === '/' && $method === 'GET') || $_normalizedPath === '/al
             header('Allow: POST');
             exit;
         }
-        $accessMode = 'waitlist';
         $waitlistSuccess = false;
         $waitlistError = \Conquer\Auth\AlphaWaitlist::submit();
     }
@@ -117,7 +155,7 @@ if (!\Conquer\Db\Connection::isInitialized()) {
         $localHint = in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1'], true)
             ? '<p>Öffne XAMPP und klicke bei <strong>MySQL</strong> auf <strong>Start</strong>. Lade danach diese Seite neu.</p>' : '';
         echo '<!doctype html><html lang="de"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
-            . '<title>Conquer – kurz nicht erreichbar</title><body style="margin:0;background:#173e33;color:#fff5dd;font:18px/1.6 system-ui;padding:8vw">'
+            . '<title>Union of Kingdoms – kurz nicht erreichbar</title><body style="margin:0;background:#173e33;color:#fff5dd;font:18px/1.6 system-ui;padding:8vw">'
             . '<main style="max-width:620px;margin:auto"><h1>Dein Königreich wartet auf dich.</h1>'
             . '<p>Die Spieldatenbank ist gerade nicht erreichbar.</p>' . $localHint
             . '<p><a href="" style="color:#ffda79">Erneut versuchen</a></p></main></body></html>';
@@ -151,6 +189,10 @@ if (str_starts_with($_normalizedPath, '/admin')) {
             => \Conquer\Admin\AdminController::dashboard(),
         $adminUri === '/admin/analytics'
             => \Conquer\Admin\AdminController::analytics(),
+        $adminUri === '/admin/layout'
+            => \Conquer\Admin\AdminController::layoutEditor(),
+        $adminUri === '/admin/layout-data'
+            => \Conquer\Admin\AdminController::layoutData(),
         $adminUri === '/admin/players'
             => \Conquer\Admin\AdminController::players(),
         $adminUri === '/admin/alpha-keys'
@@ -243,7 +285,8 @@ if ($path === '/auth/local') {
     $loginError = \Conquer\Auth\PasswordAuth::submit();
     $landingCspNonce = $_landingCspNonce;
     header('Content-Security-Policy: ' . $_landingCsp);
-    require ROOT_DIR . ($_requestHost === 'play.unionofkingdoms.com' ? '/views/play_login.php' : '/views/welcome.php');
+    header('Cache-Control: private, no-store');
+    require ROOT_DIR . '/views/play_login.php';
     exit;
 }
 
@@ -286,7 +329,7 @@ if (str_starts_with($path, '/api/')) {
         $session['active_world_id']=(int)$fresh['active_world_id'];
     }
     if(\Conquer\Game\World\WorldContext::id()!==1&&$method==='GET'
-        &&preg_match('#^/api/(map/(?!marches)|alliance/|chat/|player/|world-chat$|conquest/)#',$path)){
+        &&preg_match('#^/api/(alliance/|chat/|player/|world-chat$|conquest/)#',$path)){
         \Conquer\Api\Response::error(410,'LEGACY_WORLD_API','Verwende die aktuelle Spielansicht für diese Welt.');
     }
     // An old browser tab must never spend from the newly selected world.
@@ -298,17 +341,29 @@ if (str_starts_with($path, '/api/')) {
             && !in_array($path,['/api/worlds/action','/api/auth/logout'],true)) {
             $input=json_decode(file_get_contents('php://input')?:'{}',true);
             if(is_array($input))\Conquer\Game\World\WorldContext::current($input['expected_world_id']??null);
-            $account=$path==='/api/bug-reports'||($path==='/api/progression/action'&&in_array($input['action']??'',['password.change','recovery.generate','sessions.revoke'],true))
+            $account=$path==='/api/discord/account-action'||$path==='/api/bug-reports'||($path==='/api/progression/action'&&in_array($input['action']??'',['password.change','recovery.generate','sessions.revoke'],true))
                 ||($path==='/api/kingdom/action'&&($input['action']??'')==='theme_bundle.checkout');
-            $returning=in_array($path,['/api/march/recall','/api/march/recall-reinforce'],true)||preg_match('#^/api/shrines/\d+/recall$#',$path);
+            $returning=in_array($path,['/api/march/recall','/api/march/recall-reinforce'],true)||preg_match('#^/api/shrines/\d+/recall$#',$path)
+                ||($path==='/api/territory/action'&&in_array($input['action']??'',['recall','cancel','claim'],true));
             $worldRule='WORLD_UNAVAILABLE';
             if(!$account&&!$returning)\Conquer\Game\World\WorldContext::assertActionAvailable();
         }
     }catch(\DomainException $e){\Conquer\Api\Response::error(409,$worldRule,$e->getMessage());}
-    if($path==='/api/game/state')\Conquer\Game\Conquest\EventService::tick(\Conquer\Game\World\WorldContext::id());
+    if($path==='/api/game/state'&&!\Conquer\Game\World\WorldMapProfile::isLuxembourg(\Conquer\Game\World\WorldContext::id()))\Conquer\Game\Conquest\EventService::tick(\Conquer\Game\World\WorldContext::id());
+    $router->post('/api/discord/account-action', [\Conquer\Discord\DiscordHandler::class, 'accountAction']);
+    $router->get('/api/territory/state', [\Conquer\Api\Handlers\TerritoryHandler::class, 'state']);
+    $router->get('/api/item-sources', [\Conquer\Api\Handlers\ItemSourceHandler::class, 'search']);
+    $router->get('/api/territory/target', [\Conquer\Api\Handlers\TerritoryHandler::class, 'target']);
+    $router->post('/api/territory/action', [\Conquer\Api\Handlers\TerritoryHandler::class, 'action']);
     $router->get('/api/worlds/state', [\Conquer\Api\Handlers\WorldHandler::class, 'state']);
     $router->post('/api/worlds/action', [\Conquer\Api\Handlers\WorldHandler::class, 'action']);
     $router->get('/api/community/state', [\Conquer\Api\Handlers\CommunityHandler::class, 'state']);
+    $router->get('/api/community/social', [\Conquer\Api\Handlers\SocialHandler::class, 'state']);
+    $router->post('/api/community/social-action', [\Conquer\Api\Handlers\SocialHandler::class, 'action']);
+    $router->get('/api/community/history', [\Conquer\Api\Handlers\SocialHandler::class, 'history']);
+    $router->get('/api/community/alliance', [\Conquer\Api\Handlers\AllianceCommunityHandler::class, 'state']);
+    $router->post('/api/community/alliance-action', [\Conquer\Api\Handlers\AllianceCommunityHandler::class, 'action']);
+    $router->get('/api/community/news', [\Conquer\Api\Handlers\CommunityNewsHandler::class, 'state']);
     $router->get('/api/mailbox/state', [\Conquer\Api\Handlers\MailboxHandler::class, 'state']);
     $router->get('/api/mailbox/message', [\Conquer\Api\Handlers\MailboxHandler::class, 'message']);
     $router->get('/api/community/chat', [\Conquer\Api\Handlers\CommunityHandler::class, 'chat']);
@@ -336,9 +391,6 @@ if (str_starts_with($path, '/api/')) {
     $router->post('/api/dungeons/action', static fn(array $p) => \Conquer\Api\Handlers\DungeonHandler::action($p));
     $router->get('/api/market/state', [\Conquer\Api\Handlers\MarketHandler::class, 'state']);
     $router->post('/api/market/action', [\Conquer\Api\Handlers\MarketHandler::class, 'action']);
-    $router->get('/api/city3d/state', [\Conquer\Api\Handlers\City3dHandler::class, 'snapshot']);
-    $router->post('/api/city3d/plot', [\Conquer\Api\Handlers\City3dHandler::class, 'plot']);
-    $router->post('/api/city3d/upgrade', [\Conquer\Api\Handlers\City3dHandler::class, 'upgrade']);
 
     // Auth
     $router->get('/api/auth/me',      [\Conquer\Api\Handlers\AuthHandler::class, 'me']);
@@ -365,6 +417,8 @@ if (str_starts_with($path, '/api/')) {
     $router->post('/api/march/dispatch-charm',   [\Conquer\Api\Handlers\MarchHandler::class, 'dispatchCharm']);
     $router->post('/api/march/dispatch-player',  [\Conquer\Api\Handlers\MarchHandler::class, 'dispatchPlayer']);
     $router->post('/api/march/dispatch-scout',   [\Conquer\Api\Handlers\MarchHandler::class, 'dispatchScout']);
+    $router->post('/api/march/dispatch-neutral-village', [\Conquer\Api\Handlers\MarchHandler::class, 'dispatchNeutralVillage']);
+    $router->post('/api/march/scout-neutral-village', [\Conquer\Api\Handlers\MarchHandler::class, 'scoutNeutralVillage']);
     $router->post('/api/march/dispatch-gather',  fn() => \Conquer\Api\Handlers\MarchHandler::dispatchGather($session));
     $router->post('/api/march/dispatch-field-attack', fn() => \Conquer\Api\Handlers\MarchHandler::dispatchGather($session,true));
     $router->post('/api/march/recall',            fn() => \Conquer\Api\Handlers\MarchHandler::recall($session));
@@ -533,6 +587,12 @@ if (preg_match('#^/auth/(google|discord)/callback$#', $path, $m)) {
 }
 
 if ($path === '/auth/logout') {
+    if ($method !== 'POST') { http_response_code(405); header('Allow: POST'); exit; }
+    $logoutSession = \Conquer\Auth\Session::current();
+    $logoutToken = $_POST['csrf_token'] ?? '';
+    if (!$logoutSession || !is_string($logoutToken) || !hash_equals((string)$logoutSession['csrf_token'], $logoutToken)) {
+        http_response_code(403); exit;
+    }
     \Conquer\Auth\Session::destroy();
     header('Location: ' . APP_BASE . '/');
     exit;
@@ -621,7 +681,7 @@ if ($path === '/map') {
 // City view (Task 1.7)
 // ---------------------------------------------------------------------------
 
-if ($path === '/city' || $path === '/city/3d') {
+if ($path === '/city') {
     $session = \Conquer\Auth\Session::current();
     if ($session === null) {
         header('Location: ' . APP_BASE . '/');
@@ -635,7 +695,7 @@ if ($path === '/city' || $path === '/city/3d') {
         exit;
     }
 
-    require ROOT_DIR . ($path === '/city/3d' && ($_GET['embed'] ?? '') === '1' ? '/views/city3d.php' : '/views/game.php');
+    require ROOT_DIR . '/views/game.php';
     exit;
 }
 
@@ -710,7 +770,8 @@ $authError = match ($_GET['auth_error'] ?? '') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#5c4270">
-    <title>Conquer — Coming Soon</title>
+    <title>Union of Kingdoms — Coming Soon</title>
+    <?php require ROOT_DIR.'/views/partials/brand-head.php'; ?>
     <link rel="stylesheet" href="<?= htmlspecialchars(APP_BASE, ENT_QUOTES) ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR.'/assets/css/fantasy-fonts.css') ?>">
     <link rel="stylesheet" href="<?= htmlspecialchars(APP_BASE, ENT_QUOTES) ?>/assets/css/village-theme.css?v=<?= filemtime(ROOT_DIR.'/assets/css/village-theme.css') ?>">
     <style>
@@ -765,7 +826,7 @@ $authError = match ($_GET['auth_error'] ?? '') {
 </head>
 <body>
     <div class="container">
-        <h1>Conquer</h1>
+        <h1>Union of Kingdoms</h1>
         <div class="codename">working codename — final name TBD</div>
 
         <p>
@@ -778,7 +839,8 @@ $authError = match ($_GET['auth_error'] ?? '') {
             <div class="status" style="background:var(--ui-green-soft);border-color:var(--ui-green-dark);color:var(--ui-green-dark)">
                 Logged in as <strong><?= htmlspecialchars($session['username']) ?></strong>
             </div>
-            <form method="post" action="/auth/logout" style="margin-top:1.5rem">
+            <form method="post" action="<?= APP_BASE ?>/auth/logout" style="margin-top:1.5rem">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($session['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
                 <button type="submit" style="background:var(--ui-card);border:1px solid var(--ui-line);color:var(--ui-ink);padding:.4rem 1rem;border-radius:8px;cursor:pointer">
                     Log out
                 </button>

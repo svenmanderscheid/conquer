@@ -14,6 +14,7 @@ try{
   for($level=1;$level<=10;$level++){
    $code=WorldSpawnService::regionalMonsterCode(20200500+$level,$x,$y);$def=MonsterData::get($code);
    checkBoss($code===$base+$level&&$def['type']==='rally'&&$def['biome']===$biome&&$def['level']===$level,"$biome level $level has distinct rally definition");
+   checkBoss($def['name']===ucfirst($art)&&$def['art']==='monsters/storybook-v2/'.$art,"$biome level $level preserves its own name and portrait");
    checkBoss(($def['footprint']??1)===2&&WorldPlacement::monsterKind($code)==='boss',"$biome level $level reserves 2 x 2 tiles");
    checkBoss($def['stats']['hp']>0&&$def['stats']['attack']>0&&$def['stats']['defense']>0&&$def['source_amount']>=$def['amount']&&!empty($def['drops'])&&$def['action_point_cost']===25,"$biome level $level keeps regional stats, playable amount and usable rewards");
   }
@@ -40,7 +41,7 @@ try{
   checkBoss($shore!==null&&!WorldPlacement::canPlace($db,1,'boss',...$shore),'Boss rejects a dry anchor when another footprint tile is water');
   $db->execute('DELETE FROM field_monsters WHERE id=?',[$id]);
  });
- $cfg=WorldSettings::defaults();$cfg['resource_limit']=0;$cfg['monster_limit']=100;$cfg['batch_limit']=100;
+ $cfg=WorldSettings::defaults();$cfg['resource_limit']=0;$cfg['village_limit']=0;$cfg['monster_limit']=100;$cfg['batch_limit']=100;
  foreach($cfg['monster_weights'] as $key=>$value)$cfg['monster_weights'][$key]=$key==='Deathkar'?100:0;
  $db->execute('INSERT INTO world_spawn_settings(world_id,settings_json) VALUES(1,?)',[json_encode($cfg)]);
  $result=WorldSpawnService::tick(1,true,'test');checkBoss($result[1]['monsters_spawned']===100,'Spawn worker fills bounded mid-tier population');

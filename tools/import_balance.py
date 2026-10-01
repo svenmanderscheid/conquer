@@ -11,15 +11,17 @@ import pathlib
 import re
 import shutil
 import sys
+from economy_balance import apply_costs
+from research_time_balance import apply_times
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 ARCHIVE = ROOT / 'data/balance-source'
-ARGS = [arg for arg in sys.argv[1:] if arg != '--research-only']
+ARGS = [arg for arg in sys.argv[1:] if arg not in ('--research-only', '--costs-only', '--research-times-only')]
 SOURCE = pathlib.Path(ARGS[0]) if ARGS else ARCHIVE
 BUILDINGS = 'academy barrack castle farm gold_mine hall_of_alliance hospital lumber_camp quarry storage trading_post treasure_house wall watch_tower'.split()
-FILES = [name + '.json' for name in BUILDINGS + ['battle', 'production', 'advanced', 'field_monster', 'field_object']] + ['enum.py']
+FILES = [name + '.json' for name in BUILDINGS + ['battle', 'production', 'advanced', 'field_monster', 'field_object', 'troop']] + ['enum.py']
 
-# The supplied tables are the authoritative source for costs, power and
+# The supplied tables are the authoritative baseline for costs, power and
 # prerequisites.  Their last ten building durations belong to a different
 # progression economy (for example Castle 30 takes more than 160 days), so
 # Conquer intentionally applies its own late-game time curve after import.
@@ -27,20 +29,22 @@ FILES = [name + '.json' for name in BUILDINGS + ['battle', 'production', 'advanc
 # become a real end-game goal without making the first twenty levels slower.
 DAY = 86_400
 BUILD_TIME_CURVES = {
-    # Castle and Academy both end at exactly thirty days at level 30.
+    # Castle L30: 35 days; each preceding late-game level divides by 1.2.
+    'castle': [round(35*DAY / 1.2**(30-level)) for level in range(21, 31)],
+    # Academy remains separately balanced at thirty days at level 30.
     'major': [4*DAY, 5*DAY, 6*DAY, 8*DAY, 10*DAY, 13*DAY, 17*DAY, 21*DAY, 25*DAY, 30*DAY],
     # Alliance, defensive and treasury structures are deliberately close to
     # the major curve because they gate collective and storage progression.
     'infrastructure': [4*DAY, 5*DAY, 6*DAY, 8*DAY, 10*DAY, 12*DAY, 15*DAY, 18*DAY, 22*DAY, 26*DAY],
     # Capacity and scouting must remain meaningful past city level 20.
     'capacity': [2*DAY, 3*DAY, 4*DAY, 5*DAY, 7*DAY, 9*DAY, 12*DAY, 16*DAY, 21*DAY, 26*DAY],
-    # Troop schools grow noticeably after T7/T8, while Castle 30 remains the
-    # primary end-game gate for T10.
+    # Troop schools retain their late-game capacity curve; Academy 30 gates T5.
     'military': [18*3600, DAY, 32*3600, 42*3600, 54*3600, 3*DAY, 4*DAY, 5*DAY, 7*DAY, 10*DAY],
     'resource': [16*3600, 22*3600, 30*3600, 42*3600, 54*3600, 3*DAY, 4*DAY, 5*DAY, 7*DAY, 10*DAY],
 }
 BUILD_TIME_GROUPS = {
-    'major': {'castle', 'academy'},
+    'castle': {'castle'},
+    'major': {'academy'},
     'infrastructure': {'hall_of_alliance', 'hospital', 'trading_post', 'treasure_house', 'wall'},
     'capacity': {'storage', 'watch_tower'},
     'military': {'barrack'},
@@ -74,6 +78,29 @@ def apply_conquer_build_times(buildings):
 
 
 def main():
+    time_policy = read(ROOT / 'data/research_time_balance.json')
+    if '--research-times-only' in sys.argv:
+        if any(arg in sys.argv for arg in ('--research-only', '--costs-only')) or SOURCE.resolve() != ARCHIVE.resolve():
+            raise ValueError('--research-times-only uses the archived source and cannot be combined with another mode')
+        research = {tree: read(ROOT / 'data/research' / (tree + '.json')) for tree in ('production', 'battle', 'advanced')}
+        apply_times(research, ARCHIVE, time_policy)
+        for tree, catalog in research.items():
+            write(ROOT / 'data/research' / (tree + '.json'), catalog)
+        print('Updated only research base times; costs, bonuses, prerequisites and saved queues remain intact.')
+        return
+    policy = read(ROOT / 'data/economy_balance.json')
+    if '--costs-only' in sys.argv:
+        if '--research-only' in sys.argv or SOURCE.resolve() != ARCHIVE.resolve():
+            raise ValueError('--costs-only uses the archived source and cannot be combined with --research-only')
+        catalog = read(ROOT / 'data/buildings.json')
+        research = {tree: read(ROOT / 'data/research' / (tree + '.json')) for tree in ('production', 'battle', 'advanced')}
+        apply_costs(catalog['buildings'], research, ARCHIVE, policy)
+        write(ROOT / 'data/buildings.json', catalog)
+        for tree, entries in research.items():
+            write(ROOT / 'data/research' / (tree + '.json'), entries)
+        print('Updated only building and research resource costs; source, troops, monsters and saved games remain intact.')
+        return
+
     # Parse literal declarations only. Imports, calls and bot instructions are never run.
     symbols = {}
     for entry in ast.parse((SOURCE / 'enum.py').read_text(encoding='utf-8-sig')).body:
@@ -136,7 +163,7 @@ def main():
         return match['code']
 
     # Material identifiers are symbolic in the building tables; enum.py supplies no numeric codes.
-    materials = {'golden_pillar': (119000001, 'Goldene Säule'), 'alliance_badge': (119000002, 'Allianzabzeichen')}
+    materials = {'alliance_badge': (119000002, 'Allianzabzeichen')}
     buildings = {}
     for name in BUILDINGS:
         rows = read(SOURCE / (name + '.json'))
@@ -147,6 +174,9 @@ def main():
             costs = {}
             for cost in row['resources']:
                 key, value = cost['type'], integer(cost['value'])
+                # The source game's crystal-shop pillar is not part of Union of Kingdoms.
+                if key == 'golden_pillar':
+                    continue
                 if key in resources:
                     resources[key] += value
                 else:
@@ -159,6 +189,13 @@ def main():
             levels[level] = {'resources': resources, 'items': costs, 'time': integer(row['time']), 'power': integer(row['power']),
                              'requirements': {r['type']: integer(r['level']) for r in row['requirements']}, 'valid': row['valid']}
         buildings[name] = levels
+
+    # Badge payouts are governed by MonsterRewardRules at runtime so the source
+    # monster tables cannot overwrite the level-based rally reward. Keep the
+    # inventory metadata aligned for both existing and newly created materials.
+    for item in items:
+        if item['code'] == materials['alliance_badge'][0]:
+            item['loot_sources'] = list(dict.fromkeys([*item.get('loot_sources', []), 'rally_monster']))
 
     apply_conquer_build_times(buildings)
 
@@ -187,15 +224,20 @@ def main():
     for row in read(SOURCE / 'field_object.json'):
         fields.append({k: row[k] for k in ['code', 'name', 'level', 'production', 'gathering', 'asset']} | {'drops': drops(row, 'drop', 'rate', 3)})
 
-    # Research already has semantic metadata and intentionally retired troop unlocks.
+    # Restore original troop unlocks while retaining semantic metadata and saved IDs.
     # Reimport numeric source values and requirements while preserving saved IDs.
     research = {}
     retired = {n['code']: n for n in read(ROOT / 'data/retired-troop-research.json')['nodes']}
     for tree in ['production', 'battle', 'advanced']:
         raw = read(SOURCE / (tree + '.json'))
         catalog = read(ROOT / 'data/research' / (tree + '.json'))
+        if tree == 'battle':
+            existing = {node['code'] for node in catalog['nodes']}
+            catalog['nodes'].extend(node for code, node in retired.items() if code not in existing)
+            order = {code: index for index, code in enumerate(raw)}
+            catalog['nodes'].sort(key=lambda node: order[node.get('source_code', node['code'])])
         aliases = {n.get('source_code', n['code']): n['code'] for n in catalog['nodes']}
-        assert set(raw) == set(aliases) | (set(retired) if tree == 'battle' else set())
+        assert set(raw) == set(aliases)
         for node in catalog['nodes']:
             source_code = node.get('source_code', node['code'])
             levels = []
@@ -205,8 +247,6 @@ def main():
                     code = req['type']
                     if code == 'academy':
                         requirements.append({'type': 'academy', 'level': integer(req['level'])})
-                    elif code in retired:
-                        requirements.extend(r for r in retired[code]['levels'][0]['requirements'] if r['type'] == 'research')
                     else:
                         requirements.append({'type': 'research', 'level': integer(req['level']), 'code': aliases.get(code, code)})
                 resources = dict.fromkeys(['food', 'lumber', 'stone', 'gold'], 0)
@@ -226,10 +266,18 @@ def main():
             for req in level['requirements']:
                 assert req['type'] == 'academy' or (req['code'] in nodes and req['level'] <= nodes[req['code']]['max_level']), req
 
+    apply_costs(buildings, research, SOURCE, policy)
+    apply_times(research, SOURCE, time_policy)
+
     if '--research-only' in sys.argv:
         for tree, catalog in research.items():
             write(ROOT / 'data/research' / (tree + '.json'), catalog)
-        print(f'Imported {len(nodes)} research nodes, preserving saved IDs and retired troop unlocks.')
+        manifest = read(ARCHIVE / 'manifest.json')
+        manifest['research_nodes'] = len(nodes)
+        manifest['research_levels'] = sum(n['max_level'] for n in nodes.values())
+        manifest['files']['troop.json'] = hashlib.sha256((ARCHIVE / 'troop.json').read_bytes()).hexdigest()
+        write(ARCHIVE / 'manifest.json', manifest)
+        print(f'Imported {len(nodes)} research nodes, including T2–T5 unlocks and preserving saved IDs.')
         return
 
     # Fill out levels that were absent from the previous normal-world catalogue.
@@ -277,24 +325,26 @@ def main():
         return base
 
     solo_difficulty = {'Treasure Goblin': .65, 'Orc': .75, 'Skeleton': .82, 'Golem': .90}
-    regional = {'Deathkar', 'Frostgrimm', 'Sandmaul', 'Glutramm', 'Grumwald'}
-    endgame = {'Green Dragon': (.85, [8, 9, 10]), 'Red Dragon': (.95, [8, 9, 10]),
-               'Gold Dragon': (1.05, [8, 9, 10]), 'Magdar': (1.15, [8, 9, 10])}
+    regional = {'Deathkar', 'Dämmerhorn', 'Frostgrimm', 'Sandmaul', 'Glutramm', 'Grumwald'}
+    endgame = {'Green Dragon': .85, 'Red Dragon': .95, 'Gold Dragon': 1.05, 'Magdar': 1.15}
+    # Keep the repeatable full import aligned with MonsterPower::profile().
+    castles = {1: 1, 2: 6, 3: 10, 4: 13, 5: 16, 6: 20, 7: 23, 8: 26, 9: 30, 10: 30}
     for monster in catalogue['monsters']:
         name, level = monster['name'], integer(monster['level'])
         if name == 'Ork-Späher' or (name == 'Orc' and level == 0):
             continue
-        tier, difficulty, capacity = level, None, None
+        tier, difficulty, capacity = (max(1, min(10, level)) + 1) // 2, None, None
+        harder_level = 1.25 if level % 2 == 0 else 1
         if name in solo_difficulty:
-            difficulty = solo_difficulty[name]
-            capacity = march_capacity(tiers[tier]['castle'])
+            difficulty = solo_difficulty[name] * harder_level
+            capacity = march_capacity(castles[max(1, min(10, level))])
         elif name in regional:
-            difficulty = .90
-            capacity = rally_capacity(tiers[tier]['castle'])
+            difficulty = .90 * harder_level
+            capacity = rally_capacity(castles[max(1, min(10, level))])
         elif name in endgame:
-            difficulty, tier_map = endgame[name]
-            tier = tier_map[level - 1]
-            capacity = rally_capacity(tiers[tier]['castle'])
+            difficulty = endgame[name] * {1: 1.15, 2: 1.5, 3: 2.0}[max(1, min(3, level))]
+            tier = 5
+            capacity = rally_capacity(30)
         else:
             continue
         monster.setdefault('source_amount', monster['amount'])
@@ -307,7 +357,7 @@ def main():
                                 'combat_amounts': 'Playable amount is derived from matching troop tiers and real solo/rally capacity; source_amount preserves imported NPC counts.',
                                 'solo_target': 'Treasure Goblin 65%, Orc 75%, Skeleton 82%, Golem 90% of an unbuffed full mixed march.',
                                 'regional_rally_target': 'Regional bosses use 90% of an unbuffed full mixed rally at the matching progression tier.',
-                                'endgame_target': 'Green/Red/Gold/Magdar use 85%/95%/105%/115% of T8-T10 endgame rallies.'}
+                                'endgame_target': 'Green/Red/Gold/Magdar use 85%/95%/105%/115% of T5 endgame rallies; apply tools/rebalance-monsters.php after import.'}
     ARCHIVE.mkdir(parents=True, exist_ok=True)
     if SOURCE.resolve() != ARCHIVE.resolve():
         for name in FILES:
