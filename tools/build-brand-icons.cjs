@@ -1,23 +1,30 @@
 'use strict';
-// Export the repository's SVG emblem; no external artwork or browser is needed.
+// Export the approved painted master; no browser or external service is needed.
 const fs = require('node:fs');
 const path = require('node:path');
 const sharp = require('sharp');
 const root = path.resolve(__dirname, '..');
 const iconDir = path.join(root, 'assets', 'icons');
-const source = fs.readFileSync(path.join(iconDir, 'conquer.svg'), 'utf8');
-async function png(svg, size, opaque = false) {
-  let image = sharp(Buffer.from(svg), { density: 384 }).resize(size, size);
-  if (opaque) image = image.flatten({ background: '#5c4270' });
-  return image.png().toBuffer();
+const source = fs.readFileSync(path.join(iconDir, 'union-of-kingdoms-painted-master.png'));
+const background = '#5c4270';
+async function png(size, opaque = false) {
+  let image = sharp(source).resize(size, size);
+  if (opaque) image = image.flatten({ background });
+  return image.png({ compressionLevel: 9 }).toBuffer();
 }
 (async () => {
+  const master = await sharp(source).metadata();
+  if (!master.width || master.width !== master.height) throw new Error('The approved icon master must be square.');
   const sizes = [16, 32, 48, 192, 512];
   const images = new Map();
-  for (const size of sizes) images.set(size, await png(source, size));
+  for (const size of sizes) images.set(size, await png(size));
   for (const size of [16, 32, 192, 512]) fs.writeFileSync(path.join(iconDir, `conquer-${size}.png`), images.get(size));
-  fs.writeFileSync(path.join(root, 'apple-touch-icon.png'), await png(source, 180, true));
-  fs.writeFileSync(path.join(iconDir, 'conquer-maskable-512.png'), await png(source.replace('rx="92"', 'rx="0"'), 512, true));
+  fs.writeFileSync(path.join(root, 'apple-touch-icon.png'), await png(180, true));
+  // This separately framed master keeps the whole motif in the launcher safe area.
+  const maskable = await sharp(path.join(iconDir, 'union-of-kingdoms-painted-maskable-master.png'))
+    .resize(512, 512).flatten({ background })
+    .png({ compressionLevel: 9 }).toBuffer();
+  fs.writeFileSync(path.join(iconDir, 'conquer-maskable-512.png'), maskable);
   // ICO supports PNG frames; keep actual 16/32/48-pixel renditions for small tabs.
   const frames = [16, 32, 48];
   const header = Buffer.alloc(6 + frames.length * 16);

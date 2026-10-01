@@ -14,7 +14,7 @@ const server=http.createServer((req,res)=>{
         res.setHeader('Content-Type','application/manifest+json');res.end(execFileSync(process.env.PHP_BINARY||'php',['-r',php]));return;
     }
     if(['api/state','admin','admin/players','auth/local'].includes(relative)){res.setHeader('Content-Type','application/json');res.setHeader('Cache-Control','no-store');res.end(JSON.stringify({secret:'PRIVATE_API_TOKEN'}));return;}
-    const allowed=['favicon.ico','apple-touch-icon.png','assets/icons/conquer-32.png','assets/icons/conquer-maskable-512.png','service-worker.js','offline.html','assets/js/localization.js','assets/css/localization.css','assets/icons/conquer.svg','assets/icons/conquer-192.png','assets/icons/conquer-512.png'];
+    const allowed=['favicon.ico','apple-touch-icon.png','assets/icons/conquer-32.png','assets/icons/conquer-maskable-512.png','service-worker.js','offline.html','assets/js/localization.js','assets/css/localization.css','assets/icons/conquer-192.png','assets/icons/conquer-512.png'];
     if(allowed.includes(relative)){
         const ext=path.extname(relative),types={'.ico':'image/x-icon','.js':'application/javascript','.css':'text/css','.html':'text/html','.png':'image/png','.svg':'image/svg+xml'};res.setHeader('Content-Type',types[ext]||'text/plain');
         if(url.searchParams.get('v')==='private')res.setHeader('Cache-Control','private, no-store');
