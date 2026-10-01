@@ -12,7 +12,7 @@ declare(strict_types=1);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Conquer — World Map</title>
+    <title>Union of Kingdoms — World Map</title>
     <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR.'/assets/css/fantasy-fonts.css') ?>">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1881,7 +1881,7 @@ function mapApp() {
 
         fmtDateTime(dt) {
             if (!dt) return '—';
-            return new Date(dt.replace(' ', 'T') + 'Z').toLocaleString('de-DE', {
+            return new Date(dt.replace(' ', 'T') + 'Z').toLocaleString(window.ConquerLocale?.locale||'en', {
                 hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit',
             });
         },

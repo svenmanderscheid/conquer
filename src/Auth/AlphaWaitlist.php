@@ -27,7 +27,8 @@ final class AlphaWaitlist
                 http_response_code(429);
                 return 'waitlist.error_rate';
             }
-            self::join($_POST, Locale::current());
+            // The public English page supplies its language without changing game preferences.
+            self::join($_POST, Locale::normalize($_POST['locale'] ?? Locale::current()));
             $_SESSION['alpha_waitlist_success'] = true;
             header('Location: ' . APP_BASE . '/?zugang=waitlist#zugang', true, 303);
             exit;

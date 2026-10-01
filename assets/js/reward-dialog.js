@@ -38,7 +38,7 @@ window.ConquerRewards = (() => {
         }
         function save(value){pending=value;try{value?sessionStorage.setItem(scope,JSON.stringify(value)):sessionStorage.removeItem(scope);}catch{}}
         function begin(){if(entry||closingHistory)return;entry={token:history.state?.conquerRewards||crypto.randomUUID(),url:location.href};if(!history.state?.conquerRewards)history.pushState({...history.state,conquerRewards:entry.token},'',location.href);}
-        function show(title,body){begin();document.querySelector('#toast')?.classList.remove('visible');openDialog(`<h2>${esc(title)}</h2>${body}`,{focusHeading:true});dialog.classList.add('reward-dialog');}
+        function show(title,body){begin();document.querySelector('#toast')?.classList.remove('visible');openDialog(`<h2>${esc(title)}</h2>${body}`,{focusHeading:true,historyManaged:true});dialog.classList.add('reward-dialog');}
         function recovery(){
             show('Verwendung prüfen',`<section class="reward-recovery" data-operation-key="${esc(pending.operation_key)}"><p>Die letzte Verwendung wurde noch nicht bestätigt. Prüfe denselben Vorgang, um das Ergebnis sicher abzurufen.</p><button type="button" class="button wide" data-action="reward-retry">Verwendung prüfen</button></section>`);
         }

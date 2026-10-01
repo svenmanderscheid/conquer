@@ -26,14 +26,19 @@ const near=(a,b,label)=>assert(Math.abs(a-b)<.1,`${label}: ${a} vs ${b}`);
  await new Promise(r=>server.listen(0,'127.0.0.1',r));let browser;
  try{
   browser=await chromium.launch({headless:true,channel:process.env.PLAYWRIGHT_CHANNEL||'chrome'});
-  for(const viewport of [{width:1280,height:720},{width:741,height:1045},{width:390,height:844},{width:320,height:740}]){
+  const selectedViewports=process.env.WORLD_FOOTPRINT_VIEWPORTS?.split(','),viewports=[{width:1280,height:720},{width:741,height:1045},{width:390,height:844},{width:320,height:740}].filter(viewport=>!selectedViewports||selectedViewports.includes(`${viewport.width}x${viewport.height}`));
+  assert(viewports.length,'No reviewed footprint viewport selected');
+  for(const viewport of viewports){
    const page=await browser.newPage({viewport}),errors=[];page.on('pageerror',e=>errors.push(e.message));
    await page.goto(`http://127.0.0.1:${server.address().port}`);await page.waitForFunction(()=>[...document.querySelectorAll('.atlas-marker img')].every(i=>i.complete&&i.naturalWidth));
    const home=page.locator('.atlas-marker[data-atlas-target="home"]'),vp=page.locator('.atlas-viewport'),box=await home.boundingBox();
    near(box.width,132,'three-tile hitbox width');near(box.height,132,'three-tile hitbox height');near(box.x+box.width/2,viewport.width/2,'home centered on its anchor');near(box.y+box.height/2,viewport.height/2,'home vertical center');
    const art=await home.locator('img').evaluate(el=>({w:parseFloat(getComputedStyle(el).width),h:parseFloat(getComputedStyle(el).height),max:getComputedStyle(el).maxWidth}));
    near(art.w,44*2.75*1.35,'castle art width enlarged35%');near(art.h,44*2.8*1.35,'castle art height enlarged35%');assert.equal(art.max,'none');
-   const rally=page.locator('.atlas-marker[data-atlas-target="monsters:5"]'),rallyBox=await rally.boundingBox();assert.equal(await rally.getAttribute('data-footprint'),'2','every rally monster uses a 2x2 footprint even without catalogue metadata');near(rallyBox.width,88,'rally hitbox width');near(rallyBox.height,88,'rally hitbox height');
+   const rally=page.locator('.atlas-marker[data-atlas-target="monsters:5"]');let rallyBox=await rally.boundingBox(),focusedRally=false;
+   if(!rallyBox){await page.evaluate(()=>{const target=options.state.monsters.find(monster=>monster.id===5);ConquerWorld.focus(target.coord_x+1,target.coord_y+1);});await rally.waitFor({state:'visible'});rallyBox=await rally.boundingBox();focusedRally=true;}
+   assert.equal(await rally.getAttribute('data-footprint'),'2','every rally monster uses a 2x2 footprint even without catalogue metadata');near(rallyBox.width,88,'rally hitbox width');near(rallyBox.height,88,'rally hitbox height');
+   if(focusedRally){await vp.press('Home');const restored=await home.boundingBox();near(restored.x,box.x,'inspecting an offscreen rally restores the home anchor');near(restored.y,box.y,'inspecting an offscreen rally restores the home vertical anchor');}
    for(let y=0;y<3;y++)for(let x=0;x<3;x++){
     await page.mouse.click(box.x+22+x*44,box.y+22+y*44);
     assert.equal(await home.getAttribute('aria-pressed'),'true','each occupied tile selects the same city');
@@ -52,7 +57,9 @@ const near=(a,b,label)=>assert(Math.abs(a-b)<.1,`${label}: ${a} vs ${b}`);
    await page.getByRole('button',{name:'Koordinaten und Weltübersicht öffnen',exact:true}).focus();await page.keyboard.press('Enter');
    const alignment=await page.evaluate(()=>({canvas:document.querySelector('.atlas-terrain').getBoundingClientRect().toJSON(),ground:ground.filter(x=>x[3]==='phoenix').at(-1),mini:miniRects.filter(x=>x[4]==='#f9db7b').at(-1),routes:[...document.querySelectorAll('.atlas-routes line')].map(l=>['x1','y1','x2','y2'].map(n=>Number(l.getAttribute(n))))}));
    await page.keyboard.press('Escape');
-   near(alignment.ground[0]+alignment.canvas.x,viewport.width/2,'settlement ground screen x');near(alignment.ground[1]+alignment.canvas.y,viewport.height/2,'settlement ground screen y');const ratio=160/255;near(alignment.mini[0]+alignment.mini[2]/2,83*ratio,'minimap visual center x');near(alignment.mini[1]+alignment.mini[3]/2,70*ratio,'minimap visual center y');near(alignment.mini[2],3*ratio,'minimap three-tile footprint');
+   near(alignment.ground[0]+alignment.canvas.x,viewport.width/2,'settlement ground screen x');near(alignment.ground[1]+alignment.canvas.y,viewport.height/2,'settlement ground screen y');const ratio=160/255;near(alignment.mini[0]+alignment.mini[2]/2,83*ratio,'minimap visual center x');near(alignment.mini[1]+alignment.mini[3]/2,70*ratio,'minimap visual center y');
+   // Small minimap targets retain a two-pixel visibility floor; world footprints stay exact.
+   near(alignment.mini[2],Math.max(2,3*ratio),'minimap three-tile footprint width');near(alignment.mini[3],Math.max(2,3*ratio),'minimap three-tile footprint height');
    for(const [i,expected] of [[0,[0,0,220,0]],[1,[0,132,0,0]],[2,[0,0,748,0]],[3,[0,0,132,0]]])for(let n=0;n<4;n++)near(alignment.routes[i][n],expected[n]+(n%2?viewport.height:viewport.width)/2,'march endpoint '+i+':'+n);
    assert.equal(await page.locator('.atlas-march-party').first().locator('.atlas-party-type').count(),3,'mixed marching army retained');
    await page.locator('.atlas-marker[data-atlas-target="monsters:4"]').click();assert.equal(await page.locator('.atlas-target-actions [data-action="expedition"]').getAttribute('data-kind'),'monsters','adjacent monster remains clickable');await vp.press('Escape');
@@ -64,7 +71,12 @@ const near=(a,b,label)=>assert(Math.abs(a-b)<.1,`${label}: ${a} vs ${b}`);
    if(viewport.width===741){
     await page.mouse.click(610,700);assert.match(await page.locator('.atlas-actions-heading span').innerText(),/^Freies Feld · /);
     const actionBox=await page.locator('.atlas-target-actions').boundingBox(),railBox=await page.getByRole('button',{name:'Feldzüge öffnen'}).boundingBox();
-    assert(actionBox.width<=190&&actionBox.height<=105,`empty-field actions stay compact: ${JSON.stringify(actionBox)}`);
+    const compact=await page.locator('.atlas-target-actions').evaluate(menu=>{const heading=menu.querySelector('.atlas-actions-heading').getBoundingClientRect(),row=menu.querySelector('.atlas-actions-buttons').getBoundingClientRect();return {headingHeight:heading.height,rowHeight:row.height,buttons:[...menu.querySelectorAll('.atlas-action')].map(button=>{const rect=button.getBoundingClientRect(),hit=document.elementFromPoint(rect.x+rect.width/2,rect.y+rect.height/2);return {x:rect.x,y:rect.y,right:rect.right,bottom:rect.bottom,width:rect.width,height:rect.height,hit:button===hit||button.contains(hit)};})};});
+    assert(actionBox.width<=190&&actionBox.height<=compact.headingHeight+compact.rowHeight+24,`empty-field actions retain one heading and one compact action row: ${JSON.stringify({actionBox,compact})}`);
+    assert.equal(compact.buttons.length,2,'An empty field keeps only its two secondary actions');
+    assert(Math.abs(compact.buttons[0].y-compact.buttons[1].y)<=1,'Empty-field actions stay beside one another');
+    assert(compact.buttons.every(button=>button.width>=44&&button.height>=44&&button.hit&&button.x>=actionBox.x&&button.right<=actionBox.x+actionBox.width&&button.y>=actionBox.y&&button.bottom<=actionBox.y+actionBox.height),'Empty-field actions remain fully visible, unobscured touch targets');
+    assert(actionBox.x>=0&&actionBox.y>=0&&actionBox.x+actionBox.width<=viewport.width&&actionBox.y+actionBox.height<=viewport.height,'Empty-field menu stays inside the viewport');
     assert(actionBox.x+actionBox.width<=railBox.x-9,`empty-field actions overlap right HUD rail: ${JSON.stringify({actionBox,railBox})}`);await vp.press('Escape');
    }
    await vp.focus();await vp.press('ArrowRight');near((await home.boundingBox()).x,box.x-44,'keyboard moves exactly one tile from half-tile center');await vp.press('Home');near((await home.boundingBox()).x,box.x,'home restores center');

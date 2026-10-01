@@ -12,7 +12,7 @@ window.options={host:document.querySelector('#map'),base:'',esc:s=>String(s).rep
  city:{id:1,world_id:1,name:'Teststadt',coord_x:80,coord_y:80,castle_level:3,city_skin:'default'},player:{name:'Tester'},
  players:[],nodes:[],monsters:[],charms:[],marches:[],troop_defs:[],
  alliance_structures:[
-  {id:1,alliance_id:1,alliance_name:'Hüter des Tals',alliance_tag:'HDT',structure_type:'center',name:'Allianzzentrum',coord_x:84,coord_y:80,radius:12},
+  {id:1,alliance_id:1,alliance_name:'Hüter des Tals',alliance_tag:'HDT',structure_type:'center',name:'Allianzzentrum',coord_x:84,coord_y:80,radius:24,can_garrison:true},
   {id:2,alliance_id:1,alliance_name:'Hüter des Tals',alliance_tag:'HDT',structure_type:'outpost',name:'Außenposten',coord_x:78,coord_y:85,radius:6}
  ]
 }};ConquerWorld.render(options);
@@ -35,8 +35,14 @@ window.options={host:document.querySelector('#map'),base:'',esc:s=>String(s).rep
    const center=page.locator('[data-atlas-target="alliance_center:1"]'),outpost=page.locator('[data-atlas-target="outpost:2"]');
    if(await center.count()===0)throw new Error('Map did not render alliance structures: '+errors.join(' | '));
    assert.equal(await center.getAttribute('data-footprint'),'5');assert.equal(await outpost.getAttribute('data-footprint'),'3');
+   assert.ok((await center.locator('img').boundingBox()).width>=180,'Alliance center illustration must remain readable across its five-tile footprint');
+   assert.ok((await outpost.locator('img').boundingBox()).width>=115,'Alliance outpost illustration must remain readable across its three-tile footprint');
    assert.equal(await center.locator('img').evaluate(i=>i.complete&&i.naturalWidth>0),true);assert.equal(await outpost.locator('img').evaluate(i=>i.complete&&i.naturalWidth>0),true);
-   await center.click();await page.locator('.atlas-target-actions [data-atlas="details"]').click();const details=await page.locator('.atlas-detail').innerText();assert.match(details,/Radius 12/i);assert.match(details,/Produktion und Sammeltempo/i);
+   assert.match(await center.locator('.atlas-marker-name').innerText(),/Hüter des Tals/);assert.equal(await center.locator('.atlas-marker-level').isHidden(),true);
+   const artBox=await center.locator('img').boundingBox(),nameBox=await center.locator('.atlas-marker-name').boundingBox();assert.ok(nameBox.y<=artBox.y+artBox.height+6,'Alliance name must sit immediately below the castle');
+   await center.click();const actions=page.locator('.atlas-target-actions');assert.equal(await actions.locator('.atlas-action').count(),3);assert.equal(await actions.locator('[data-action="alliance-center-garrison"]').innerText(),'Verteidigen');
+   const actionBox=await actions.boundingBox();assert.ok(actionBox.y>=nameBox.y+nameBox.height-1,'Actions must be placed below the alliance name instead of over the castle');
+   await actions.locator('[data-atlas="details"]').click();const details=await page.locator('.atlas-detail').innerText();assert.match(details,/Radius 24/i);assert.match(details,/Produktion und Sammeltempo/i);
    await page.screenshot({path:path.join(out,`${viewport.width}x${viewport.height}.png`)});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);assert.deepEqual(errors,[]);
    await page.close();console.log(`PASS ${viewport.width}x${viewport.height}: center/outpost footprints, details and responsive map.`);
   }

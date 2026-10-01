@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Conquer\Game\Notification;
 
 use Conquer\Db\Connection;
+use Conquer\Game\World\WorldContext;
 
 /**
  * In-game notification inbox.
@@ -39,6 +40,8 @@ final class NotificationService
 
     /** Maximum notifications returned per poll call. */
     private const POLL_LIMIT = 50;
+    // Notifications predating multi-world support belong to the original world.
+    private const WORLD_FILTER = "COALESCE(CAST(JSON_UNQUOTE(JSON_EXTRACT(data_json,'$.world_id')) AS UNSIGNED),1)=?";
 
     // -------------------------------------------------------------------------
     // Write
@@ -85,10 +88,10 @@ final class NotificationService
         $rows = $db->query(
             'SELECT id, type, data_json, created_at
              FROM   notifications
-             WHERE  player_id = ? AND read_at IS NULL
+             WHERE  player_id = ? AND read_at IS NULL AND ' . self::WORLD_FILTER . '
              ORDER  BY created_at DESC
              LIMIT  ' . self::POLL_LIMIT,
-            [$playerId],
+            [$playerId,WorldContext::id()],
         )->fetchAll();
 
         return array_map(
@@ -123,8 +126,8 @@ final class NotificationService
         $row = $db->query(
             'SELECT COUNT(*) AS cnt
              FROM   notifications
-             WHERE  player_id = ? AND read_at IS NULL',
-            [$playerId],
+             WHERE  player_id = ? AND read_at IS NULL AND ' . self::WORLD_FILTER,
+            [$playerId,WorldContext::id()],
         )->fetch();
 
         return $row !== false ? (int) $row['cnt'] : 0;
@@ -164,8 +167,8 @@ final class NotificationService
              SET    read_at = UTC_TIMESTAMP()
              WHERE  player_id = ?
                AND  read_at  IS NULL
-               AND  id IN (' . $placeholders . ')',
-            [$playerId, ...$cleanIds],
+               AND  id IN (' . $placeholders . ') AND ' . self::WORLD_FILTER,
+            [$playerId, ...$cleanIds,WorldContext::id()],
         );
     }
 
@@ -193,6 +196,7 @@ final class NotificationService
     public static function poll(int $playerId, int $cityId): array
     {
         $db = Connection::getInstance();
+        if(!$db->query('SELECT id FROM cities WHERE id=? AND player_id=? AND world_id=?',[$cityId,$playerId,WorldContext::id()])->fetchColumn())throw new \DomainException('Die Stadt gehört nicht zu deinem aktiven Königreich.',403);
 
         // ---- 1. Pending notifications ----------------------------------------
         $notifications = self::getPending($playerId);
@@ -201,12 +205,12 @@ final class NotificationService
         $brRow = $db->query(
             'SELECT COUNT(*) AS cnt
              FROM   battle_reports
-             WHERE  attacker_id = ? AND attacker_read = 0
+             WHERE  attacker_id = ? AND attacker_read = 0 AND world_id = ?
              UNION ALL
              SELECT COUNT(*) AS cnt
              FROM   battle_reports
-             WHERE  defender_id = ? AND defender_read = 0',
-            [$playerId, $playerId],
+             WHERE  defender_id = ? AND defender_read = 0 AND world_id = ?',
+            [$playerId,WorldContext::id(),$playerId,WorldContext::id()],
         )->fetchAll();
 
         $unreadBattleReports = 0;
@@ -243,9 +247,10 @@ final class NotificationService
                     GREATEST(0, TIMESTAMPDIFF(SECOND, UTC_TIMESTAMP(), finishes_at)) AS secs_remaining
              FROM   research_queue
              WHERE  player_id    = ?
+               AND  world_id = ?
                AND  is_processed = 0
              ORDER  BY finishes_at ASC',
-            [$playerId],
+            [$playerId,WorldContext::id()],
         )->fetchAll();
 
         $activeResearch = array_map(
@@ -261,15 +266,16 @@ final class NotificationService
 
         // ---- 5. Active marches -----------------------------------------------
         $marchRows = $db->query(
-            'SELECT id, march_type, state, target_x, target_y, arrives_at, returns_at,
+            'SELECT id, march_type, state, target_x, target_y, arrival_time AS arrives_at, return_time AS returns_at,
                     GREATEST(0, TIMESTAMPDIFF(SECOND, UTC_TIMESTAMP(),
-                        CASE state WHEN \'marching\' THEN arrives_at ELSE returns_at END
+                        CASE state WHEN \'marching\' THEN arrival_time ELSE return_time END
                     )) AS secs_remaining
              FROM   marches
              WHERE  player_id = ?
+               AND  world_id = ?
                AND  state     IN (\'marching\', \'returning\')
              ORDER  BY id ASC',
-            [$playerId],
+            [$playerId,WorldContext::id()],
         )->fetchAll();
 
         $marches = array_map(

@@ -101,15 +101,13 @@ final class BuffEngine
         }
 
         $aliases = ['all_attack'=>'troops_atk', 'all_defense'=>'troops_def', 'all_hp'=>'troops_hp',
-            'infantry_attack'=>'infantry_atk', 'infantry_defense'=>'infantry_def',
-            'ranged_attack'=>'ranged_atk', 'cavalry_attack'=>'cavalry_atk'];
-        foreach (\Conquer\Game\Treasure\TreasureService::getEquippedStats($playerId, $worldId) as $key => $value) {
-            if (in_array($key, ['march_capacity','hospital_capacity'], true)) {
-                $result[$key.'_flat'] = ($result[$key.'_flat'] ?? 0) + (int)$value;
-                continue;
-            }
+            'all_speed'=>'troops_spd', 'all_load'=>'troops_load',
+            'infantry_attack'=>'infantry_atk', 'infantry_defense'=>'infantry_def', 'infantry_speed'=>'infantry_spd',
+            'ranged_attack'=>'ranged_atk', 'ranged_defense'=>'ranged_def', 'ranged_speed'=>'ranged_spd',
+            'cavalry_attack'=>'cavalry_atk', 'cavalry_defense'=>'cavalry_def', 'cavalry_speed'=>'cavalry_spd'];
+        foreach (\Conquer\Game\Treasure\TreasureService::getEquippedBuffs($playerId, $worldId) as $key => $value) {
             $key = $aliases[$key] ?? $key;
-            $result[$key] = ($result[$key] ?? 0.0) + (float) $value / 100;
+            $result[$key] = ($result[$key] ?? 0.0) + (float) $value;
         }
         $direct=array_values(array_unique(array_merge(\Conquer\Game\Kingdom\KingdomInventory::DIRECT_BOOSTS,array_keys(\Conquer\Game\Charm\CharmEffects::KEYS))));
         $charms = Connection::getInstance()->query('SELECT stat_category,bonus_pct FROM player_charms_active WHERE player_id=? AND (source_map_charm_id IS NULL OR world_id=?) AND expires_at>UTC_TIMESTAMP() AND stat_category IN ('.implode(',',array_fill(0,count($direct),'?')).')',[$playerId,$worldId,...$direct])->fetchAll();

@@ -17,7 +17,7 @@ final class RegionalSpawns
     public static function candidates(int $worldId,string $family,int $x,int $y,int $legacyMin=0,int $legacyMax=10,bool $keepEasy=false): array
     {
         if(in_array($family,['dragon','Magdar','Green Dragon','Gold Dragon','Red Dragon'],true))return [];
-        $biome=WorldTerrain::biomeAt($x,$y);
+        $biome=WorldTerrain::biomeAt($x,$y,$worldId);
         if($family==='Deathkar'||$family==='regional'){
             // The historical Deathkar weight now represents the complete rally-boss
             // pool. Dämmerhorn appears across the world; the other four remain native

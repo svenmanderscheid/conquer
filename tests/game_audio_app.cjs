@@ -4,15 +4,15 @@ const {spawn}=require('node:child_process'),{chromium}=require(process.env.PLAYW
 const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/audio-2026-09-20');fs.mkdirSync(out,{recursive:true});
 (async()=>{
  const port=await new Promise(resolve=>{const s=net.createServer();s.listen(0,'127.0.0.1',()=>{const p=s.address().port;s.close(()=>resolve(p));});});
- const fixture=spawn(process.env.PHP_BINARY||'C:/xampp/php/php.exe',[root+'/tools/preview-feature-fixture.php','--port='+port],{cwd:root,stdio:['pipe','pipe','pipe'],windowsHide:true});
+ const fixture=spawn(process.env.PHP_BINARY||'C:/xampp/php/php.exe',[root+'/tools/preview-feature-fixture.php','--appearance','--port='+port],{cwd:root,stdio:['pipe','pipe','pipe'],windowsHide:true});
  let browser,log='',page;const errors=[],checks=[];let downloads=0;
  try{
   await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error(log||'Preview timeout')),60000);fixture.stdout.on('data',d=>{log+=d;if(log.includes('Synthetic preview ready')){clearTimeout(timer);resolve();}});fixture.stderr.on('data',d=>log+=d);fixture.on('error',reject);fixture.on('exit',()=>{clearTimeout(timer);reject(Error(log));});});
   browser=await chromium.launch({headless:true,executablePath:process.env.BROWSER_EXECUTABLE_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe'});
   const context=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,locale:'de-DE'}),base='http://127.0.0.1:'+port;
   page=await context.newPage();page.setDefaultTimeout(20000);page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(r.url().endsWith('.wav'))downloads++;});
-  await page.goto(base+'/?zugang=login');await page.locator('[name=username]').fill('PreviewPlayer');await page.locator('[name=password]').fill('PreviewFixture!2026');
-  await Promise.all([page.waitForURL('**/city'),page.locator('#auth-submit').click()]);
+  await page.goto(base+'/?zugang=login');await page.locator("[name=identifier], [name=username]").fill('PreviewPlayer');await page.locator('[name=password]').fill('PreviewFixture!2026');
+  await Promise.all([page.waitForURL('**/city'),page.locator("form[action$=\"/auth/local\"] button[type=\"submit\"]").click()]);
   await page.goto(base+'/city#settings');await page.locator('.audio-settings').waitFor();
   const status=()=>page.evaluate(()=>ConquerAudio.status());
   assert.equal((await status()).context,'idle');assert.equal(downloads,0,'no audio download or context before a game gesture');
@@ -25,9 +25,10 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/audio-2026
    await page.locator('[data-audio-start]').scrollIntoViewIfNeeded();await page.screenshot({path:path.join(out,`settings-${width}x${height}.png`)});
   }
   await page.setViewportSize({width:390,height:844});
-  for(const kind of ['confirm','training','building','reward']){await page.locator(`[data-audio-demo=${kind}]`).tap();assert.equal((await status()).lastSound,kind);await page.waitForFunction(()=>ConquerAudio.status().voices===0);}
+  for(const kind of ['confirm','training','building','reward','rally']){await page.locator(`[data-audio-demo=${kind}]`).tap();assert.equal((await status()).lastSound,kind);await page.waitForFunction(()=>ConquerAudio.status().voices===0);}
   const setVolume=async(key,value)=>{await page.locator(`[data-audio-setting=${key}]`).evaluate((el,value)=>{el.value=value;el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));},value);};
   await setVolume('musicVolume',13);await setVolume('effectsVolume',34);
+  await page.locator('[data-audio-setting=rallyAlerts]').uncheck();assert.equal((await status()).settings.rallyAlerts,false);
   await page.locator('[data-audio-setting=effects]').uncheck();assert(await page.locator('[data-audio-demo=training]').isDisabled());await page.locator('[data-audio-setting=effects]').check();
   // App lifecycle suspends the native audio graph and resumes the existing buffer.
   await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,value:true});document.dispatchEvent(new Event('visibilitychange'));});
@@ -42,11 +43,12 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/audio-2026
   await page.evaluate(()=>window.dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true})));await page.waitForFunction(()=>ConquerAudio.status().musicPlaying);
   await page.locator('[data-audio-mute]').tap();await page.waitForFunction(()=>ConquerAudio.status().context==='suspended');assert.equal((await status()).musicPlaying,false);
   await page.reload();await page.locator('.audio-settings').waitFor();assert.equal((await status()).context,'idle');assert.equal((await status()).settings.muted,true);assert.equal((await status()).settings.musicVolume,13);assert.equal((await status()).settings.effectsVolume,34);assert.equal(downloads,1);
+  assert.equal(await page.locator('[data-audio-setting=rallyAlerts]').isChecked(),false,'Rally alert preference survives reload');
   await page.locator('[data-audio-mute]').tap();await page.waitForFunction(()=>ConquerAudio.status().musicPlaying);
   // Resource details remain tappable beside the task HUD on small screens.
-  await page.keyboard.press('Escape');await page.evaluate(()=>location.hash='city');
+  await page.keyboard.press('Escape');await page.evaluate(()=>location.hash='city');await page.waitForFunction(()=>document.body.classList.contains('city-mode')&&!document.querySelector('#panel-dialog').open);await page.locator('.painted-village').waitFor();
   for(const [width,height]of [[390,844],[320,568],[568,320]]){
-   await page.setViewportSize({width,height});await page.locator('[data-action=resource][data-id=food]').tap();await page.locator('[data-action=building][data-id=farm]').waitFor();await page.keyboard.press('Escape');
+   await page.setViewportSize({width,height});await page.locator('[data-action=resource][data-id=food]').tap();await page.locator('#game-dialog [data-action=building][data-id=farm]').waitFor();await page.keyboard.press('Escape');
   }
   await page.setViewportSize({width:390,height:844});
   // Real training: no success cue while the server response is pending.
@@ -55,7 +57,7 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/audio-2026
   const before=(await status()).playedCount;await page.locator('#train-confirm').tap();assert.equal((await status()).playedCount,before);
   await page.waitForFunction(()=>ConquerAudio.status().lastSound==='training');assert.equal(trainingPosts,1);await page.waitForFunction(()=>ConquerAudio.status().voices===0);
   // Real building order through the existing game controls.
-  await page.keyboard.press('Escape');await page.evaluate(()=>location.hash='city');await page.locator('[data-action=resource][data-id=food]').tap();await page.locator('[data-action=building][data-id=farm]').tap();
+  await page.keyboard.press('Escape');await page.evaluate(()=>location.hash='city');await page.waitForFunction(()=>document.body.classList.contains('city-mode')&&!document.querySelector('#panel-dialog').open);await page.locator('.painted-village').waitFor();await page.locator('[data-action=resource][data-id=food]').tap();await page.locator('#game-dialog [data-action=building][data-id=farm]').tap();
   await page.locator('[data-action=upgrade][data-id=farm]').tap();await page.waitForFunction(()=>ConquerAudio.status().lastSound==='building');await page.waitForFunction(()=>ConquerAudio.status().voices===0);
   assert.equal((await status()).playedCount,before+2,'exactly one successful cue for each accepted order');
   // Settings remain translated after dynamic state updates and reloads.
@@ -63,6 +65,7 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/audio-2026
   for(const [locale,title,reward]of [['en','Music & sounds','Reward'],['fr','Musique et sons','Récompense'],['de','Musik & Klänge','Belohnung']]){
    await page.evaluate(locale=>ConquerLocale.setLocale(locale),locale);await page.waitForFunction(title=>document.querySelector('.audio-settings h2')?.textContent===title,title);
    assert.equal(await page.locator('[data-audio-demo=reward]').textContent(),reward);
+   assert.equal(await page.locator('[data-audio-demo=rally]').textContent(),await page.evaluate(()=>ConquerLocale.t('audio.rally')));
   }
   checks.push({gesture:true,downloads,lifecycle:true,savedMute:true,trainingPosts,confirmedOrders:true,locales:['de','en','fr']});
   // Isolated engine exercises completion snapshots, exclusions and failure recovery.

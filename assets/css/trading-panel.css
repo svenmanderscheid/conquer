@@ -5,8 +5,8 @@ body.mobile-game #panel-dialog[data-panel="market"] #content{padding:0!important
 .trading-tabs{display:flex;align-items:stretch;gap:5px;flex:0 0 54px;padding:6px 12px;background:#e6e7eb;border-bottom:4px solid #1b2638}
 .trading-tabs button{min-width:120px;padding:5px 20px;border:0;color:#7c8189;background:#d6d8dd;text-transform:uppercase;font-weight:900;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 100%,8px 100%)}
 .trading-tabs button.active{background:linear-gradient(#656dc5 0 48%,#3e4eb7 49% 90%,#272e7a 91%);color:#fff;text-shadow:0 2px #152440}
-.trading-tabs.shop-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));height:auto}
-.trading-tabs.shop-tabs button{min-width:0;padding-inline:8px;white-space:nowrap}
+.trading-tabs.shop-tabs{display:flex;flex:0 0 auto;min-width:0;height:auto;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain}
+.trading-tabs.shop-tabs button{flex:1 0 auto;min-width:max-content;min-height:44px;padding-inline:10px;white-space:nowrap;overflow:visible;text-overflow:clip}
 .trading-level{display:flex;align-items:center;margin-left:auto;font-weight:800;white-space:nowrap;color:#3d4759;padding:0 9px}
 .trading-summary{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-shrink:0;background:#25334a;border-bottom:3px solid #202b3c;padding:17px 24px}
 .trading-summary h2{margin:0 0 4px;font:900 21px/1.1 'Segoe UI',system-ui,sans-serif;color:#f6f8ff}.trading-summary p{margin:0;color:#b9cbe5;font-size:12px}
@@ -59,5 +59,5 @@ body.mobile-game #panel-dialog .trading-card h3{color:#263247!important;text-sha
 @media(max-width:650px){.trading-tools{display:block;padding:6px 7px}.trading-view-switch{width:max-content;max-width:100%;margin-bottom:5px}.trading-view-switch button,.trading-categories button{min-height:34px;padding:4px 9px;font-size:11px}.trading-level-group{margin-bottom:12px}.trading-level-group>h3{margin-bottom:6px;padding:5px 7px;font-size:14px}}
 @media(max-height:440px) and (min-width:500px){.trading-tools{display:flex;padding:4px 7px;gap:6px}.trading-view-switch{margin-bottom:0}.trading-view-switch button,.trading-categories button{min-height:30px;padding:3px 8px;font-size:10px}.trading-level-group{margin-bottom:10px}.trading-level-group>h3{padding:3px 6px;font-size:12px}}
 @media(max-width:900px){.shop-merchant-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:420px){.trading-tabs.shop-tabs button{padding-inline:2px;font-size:10px}.trading-summary>div:first-child>.trading-upgrade small{display:none}.shop-merchant-card{padding:9px;gap:6px}.shop-merchant-reward{grid-template-rows:64px auto auto;min-height:112px;padding:6px}.shop-merchant-reward strong{font-size:13px}.shop-merchant-card h3{font-size:13px}.shop-merchant-balance{display:block}.shop-merchant-balance strong{display:block;text-align:left}.shop-merchant-action{padding-inline:6px}.shop-merchant-cost small{display:none}}
+@media(max-width:420px){.trading-tabs.shop-tabs button{font-size:13px}.trading-summary>div:first-child>.trading-upgrade small{display:none}.shop-merchant-card{padding:9px;gap:6px}.shop-merchant-reward{grid-template-rows:64px auto auto;min-height:112px;padding:6px}.shop-merchant-reward strong{font-size:13px}.shop-merchant-card h3{font-size:13px}.shop-merchant-balance{display:block}.shop-merchant-balance strong{display:block;text-align:left}.shop-merchant-action{padding-inline:6px}.shop-merchant-cost small{display:none}}
 @media(max-height:440px) and (min-width:500px){.shop-merchant-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}

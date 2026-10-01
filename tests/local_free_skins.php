@@ -41,19 +41,19 @@ try {
     foreach ([1,2] as $playerId) {
         localSkinCheck(LocalCosmeticEntitlements::sync($playerId,$enabled,['host'=>'127.0.0.1','database'=>$testDatabase]), 'local grant is enabled');
         localSkinCheck(LocalCosmeticEntitlements::sync($playerId,$enabled,['host'=>'127.0.0.1','database'=>$testDatabase]), 'local grant is idempotent');
-        localSkinCheck((int)$db->query('SELECT COUNT(*) FROM player_march_skins WHERE player_id=?',[$playerId])->fetchColumn()===18, 'all march skins are owned');
-        localSkinCheck((int)$db->query('SELECT COUNT(*) FROM player_castle_skins WHERE player_id=?',[$playerId])->fetchColumn()===17, 'all premium castle skins are owned');
-        localSkinCheck((int)$db->query('SELECT COUNT(*) FROM player_name_frames WHERE player_id=?',[$playerId])->fetchColumn()===17, 'all premium name frames are owned');
+        localSkinCheck((int)$db->query('SELECT COUNT(*) FROM player_march_skins WHERE player_id=?',[$playerId])->fetchColumn()===count(MarchSkinService::ACTIVE_IDS), 'all march skins are owned');
+        localSkinCheck((int)$db->query('SELECT COUNT(*) FROM player_castle_skins WHERE player_id=?',[$playerId])->fetchColumn()===count(MarchSkinService::ACTIVE_IDS)-1, 'all premium castle skins are owned');
+        localSkinCheck((int)$db->query('SELECT COUNT(*) FROM player_name_frames WHERE player_id=?',[$playerId])->fetchColumn()===count(MarchSkinService::ACTIVE_IDS)-1, 'only active premium name frames are owned');
     }
 
-    $march = MarchSkinService::equip(1,'eclipse');
-    $frame = NameFrameService::equip(1,'eclipse');
-    localSkinCheck($march['march_skin']==='eclipse' && $frame['name_frame']==='eclipse', 'granted march skin and name frame can be equipped');
-    localSkinCheck(count(array_filter(MarchSkinService::state(1)['entries'],static fn(array $entry):bool=>$entry['owned']))===18, 'march state exposes all granted skins');
+    $march = MarchSkinService::equip(1,'forest');
+    $frame = NameFrameService::equip(1,'forest');
+    localSkinCheck($march['march_skin']==='forest' && $frame['name_frame']==='forest', 'granted march skin and active name frame can be equipped');
+    localSkinCheck(count(array_filter(MarchSkinService::state(1)['entries'],static fn(array $entry):bool=>$entry['owned']))===count(MarchSkinService::ACTIVE_IDS), 'march state exposes all granted skins');
     $gemsBefore = (int)$db->query('SELECT gems FROM players WHERE id=1')->fetchColumn();
-    $freeRetry = MarchSkinService::buy(1,'dragon');
+    $freeRetry = MarchSkinService::buy(1,'fire');
     localSkinCheck($freeRetry['charged_gems']===0 && (int)$db->query('SELECT gems FROM players WHERE id=1')->fetchColumn()===$gemsBefore, 'local premium march skins never charge gems');
-    localSkinCheck(count(array_filter(ThemeBundleService::state(1)['entries'],static fn(array $entry):bool=>$entry['cosmetic_owned']))===51, 'bundle shop recognizes every locally free cosmetic');
+    localSkinCheck(count(array_filter(ThemeBundleService::state(1)['entries'],static fn(array $entry):bool=>$entry['cosmetic_owned']))===0, 'development grants do not revive archived offers');
     echo "PASS {$checks} local free-skin checks: guards, existing/new accounts, idempotency and equip verified.\n";
 } finally {
     $fixture->close();

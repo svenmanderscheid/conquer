@@ -44,8 +44,8 @@ final class ThemeBundleCatalog
                 ];
             }
         }
-        $expected=array_values(array_filter(array_keys(MarchSkinService::catalog()),static fn(string$id):bool=>$id!=='default'));
-        if(array_keys($themes)!==$expected)throw new \RuntimeException('Paketkatalog muss dieselben Premium-Skin-IDs wie der Marschkatalog enthalten.');
+        $marchSkins=MarchSkinService::catalog();
+        foreach(array_keys($themes) as $themeId)if(!isset($marchSkins[$themeId]))throw new \RuntimeException('Paketkatalog enthält eine unbekannte Premium-Skin-ID.');
         return self::$data=['currency'=>$currency,'entries'=>$entries];
     }
 

@@ -1,5 +1,6 @@
-(() => {
+(async () => {
     'use strict';
+    if(window.ConquerLocale?.ready)await window.ConquerLocale.ready;
     const base = window.CONQUER_BASE;
     const sound=window.ConquerAudio?.create({base});
     const $ = selector => document.querySelector(selector);
@@ -15,9 +16,17 @@
     const resourceNames = {food:t('common.food'),lumber:t('common.lumber'),stone:t('common.stone'),gold:t('common.gold')};
     const descriptions = Object.fromEntries(['watch_tower','castle','farm','lumber_camp','quarry','gold_mine','barrack','archery_range','stable','academy','wall','storage','hospital','treasure_house','trading_post','hall_of_alliance'].map(code=>[code,t('building.description.'+code)]));
     const researchNames = Object.fromEntries(['food_production','lumber_production','wood_production','stone_production','gold_production','infantry_hp','infantry_atk','infantry_def','ranged_def','ranged_atk','cavalry_def','cavalry_atk','ranged_hp','cavalry_hp','construction_speed','research_speed','gathering_speed'].map(code=>[code,t('research.name.'+code)]));
-    const monsterArt = m => /^(?:monsters\/)?[a-z0-9-]+$/.test(m.definition?.art||'') ? m.definition.art : /skeleton/i.test(m.definition?.name) ? 'skeleton' : /golem/i.test(m.definition?.name) ? 'golem' : 'orc';
+    const monsterArt = m => {
+        const art=String(m.definition?.art||'');
+        const identity=`${art} ${m.definition?.name||''}`;
+        const regional=identity.match(/grumwald|frostgrimm|sandmaul|glutramm/i);
+        if(regional)return `monsters/storybook-v2/${regional[0].toLowerCase()}`;
+        const kind=/treasure goblin|schatzgoblin/i.test(identity)?'treasure-goblin':/magdar/i.test(identity)?'magdar':/green dragon|grüner drache/i.test(identity)?'green-dragon':/red dragon|roter drache/i.test(identity)?'red-dragon':/gold dragon|golddrache/i.test(identity)?'gold-dragon':/skeleton|skelett/i.test(identity)?'skeleton':/golem/i.test(identity)?'golem':/^(orc|ork)?$/i.test(art)||/orc|ork/i.test(m.definition?.name||'')?'orc':null;
+        const file=kind==='treasure-goblin'?'treasure-goblin-turquoise':kind;
+        return file?`monsters/2.5d/bright-v2/${file}`:/^monsters\/[a-z0-9-]+$/.test(art)?art:/^[a-z0-9-]+$/.test(art)?art:'monsters/2.5d/bright-v2/orc';
+    };
     const iconPaths = {treasures:'M3 10V7l3-4h12l3 4v13H3V10Zm0 0h18M10 8h4v5h-4V8Z',city:'M3 21V9h5V4l4-2 4 2v5h5v12H3Zm6 0v-6h6v6M8 9h8M5 12v2m14-2v2',world:'m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2V5Zm6-2v16m6-14v16',army:'m4 3 7 7-2 2-7-7 2-2Zm16 0-7 7 2 2 7-7-2-2ZM8 14l-5 5m13-5 5 5M5 13l6 6m2 0 6-6',research:'M3 4h7l2 2 2-2h7v15h-7l-2 2-2-2H3V4Zm9 2v15',reports:'M5 3h14v18H5V3Zm3 5h8m-8 4h8m-8 4h5'};
-    const navs = Object.fromEntries(['worlds','community','defense','events','mastery','account','city','expeditions','dungeons','world','land','alliance','army','research','quests','inventory','treasures','reports','profile','rankings','arena','market','settings','help','bugreport'].map(code=>[code,t('nav.'+code)]));
+    const navs = Object.fromEntries(['worlds','community','alliance-community','alliance-tools','defense','events','mastery','account','city','expeditions','dungeons','world','land','alliance','army','research','quests','inventory','treasures','reports','profile','rankings','arena','market','settings','help','bugreport'].map(code=>[code,t('nav.'+code)]));
     Object.assign(iconPaths,{
         worlds:'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm0 0c-5 5-5 13 0 18 5-5 5-13 0-18ZM3 12h18',
         community:'M8 4a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm8 1a3 3 0 1 1 0 6M2 20v-3a6 6 0 0 1 12 0v3Zm14-6a5 5 0 0 1 6 5v1h-5',
@@ -36,17 +45,27 @@
         arena:'m4 3 7 7-2 2-7-7 2-2Zm16 0-7 7 2 2 7-7-2-2ZM8 14l-5 5m13-5 5 5M5 13l6 6m2 0 6-6',
         market:'M3 9h18l-2-6H5L3 9Zm1 0v12h16V9m-11 12v-7h6v7M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0',
         settings:'M4 6h16M4 12h16M4 18h16M8 3v6m8 0v6m-6 0v6',
-        help:'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM9 9a3 3 0 1 1 5 2c-2 1-2 2-2 3m0 3v1',
-        bugreport:'M6 8h12v7a6 6 0 0 1-12 0V8Zm3 0V5h6v3M2 11h4m12 0h4M2 17h4m12 0h4M7 4 5 2m12 2 2-2m-7 8v10'
+        help:'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM9 9a3 3 0 1 1 5 2c-2 1-2 2-2 3m0 3v1'
     });
     const navIcons = {};
-    const svg = key => `<span class="nav-emblem">${iconPaths[key] ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${iconPaths[key]}"/></svg>` : `<span class="nav-symbol" aria-hidden="true">${navIcons[key] || '✦'}</span>`}</span>`;
-    let state, kingdom, expeditions, market, current = Object.hasOwn(navs, location.hash.slice(1)) ? location.hash.slice(1) : 'city', filter = 'monsters', busy = false, polling = null, offset = 0, toastTimer, lastSignature = '', dialogTrigger=null, teleportSelection=null;
+    const menuIconKeys = new Set(['profile','quests','army','research','inventory','treasures','mastery','market','community','alliance','defense','events','expeditions','rankings','arena','worlds','reports','settings','account','help','bug-report']);
+    const menuIconKey = key => key==='bugreport'?'bug-report':key;
+    const svg = key => {
+        const artKey=menuIconKey(key);
+        const icon=menuIconKeys.has(artKey)
+            ? `<img class="nav-art" src="${base}/assets/art/menu-icons/${artKey}.png" alt="">`
+            : iconPaths[key]
+                ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${iconPaths[key]}"/></svg>`
+                : `<span class="nav-symbol" aria-hidden="true">${navIcons[key] || '✦'}</span>`;
+        return `<span class="nav-emblem">${icon}</span>`;
+    };
+    let state, kingdom, expeditions, market, allianceRallies=[], publicMarches=[], current = Object.hasOwn(navs, location.hash.slice(1)) ? location.hash.slice(1) : 'city', filter = 'monsters', busy = false, polling = null, offset = 0, toastTimer, lastSignature = '', dialogTrigger=null, teleportSelection=null;
     const loadErrors = {};
     let apiRetryAt=0;
+    let rallyRequestSequence=0,rallyAppliedSequence=0,rallyDataScope='';
     let dialogVersion=0;
     const viewPositions=new Map();
-    const scrollAreas=['.quest-list','.guide-body','.inventory-overview-scroll','.inventory-scroll-board','.inventory-scroll-list','.inventory-inspector','.rt-scroll','.hospital-list'];
+    const scrollAreas=['.quest-list','.guide-body','.inventory-overview-scroll','.inventory-scroll-board','.inventory-scroll-list','.inventory-inspector','.rt-scroll','.hospital-list','.trading-scroll','.treasury-scroll','.treasury-bonus-scroll','.mail-list','.skin-scroll-grid'];
     function rememberView(){if(isPlayfield(current)||!panelDialog.open||panelDialog.dataset.panel!==current)return;viewPositions.set(current,{top:panelHost.scrollTop,areas:scrollAreas.map(selector=>[selector,panelHost.querySelector(selector)?.scrollTop||0])});}
     let armyTier=1;
     let playfield=current==='world'?'world':'city';
@@ -57,8 +76,9 @@
     const toastElement=$('#toast');
     let panelTrigger=null;
     let sceneHosts=null;
-    let sceneTransitionToken=0,sceneTransitionTimer=0;
+    let sceneTransitionToken=0,sceneTransitionTimer=0,sceneCommitPending=false,navigationVersion=0;
     const isPlayfield=tab=>tab==='city'||tab==='world';
+    const mobilePages=window.ConquerMobilePages?.({navigate,getRoute:()=>current,getPlayfield:()=>playfield,closeChat:()=>worldChat?.close()});
     const now = () => Date.now() + offset;
     const commands=window.ConquerCommandReceipts({scope:()=>`${base}:${state?.city.player_id||state?.player.name}:${state?.city.world_id||window.CONQUER_WORLD||1}`});
     function commandRecovery(){
@@ -66,7 +86,7 @@
         openDialog('<h2>Auftrag prüfen</h2><p>Die Antwort auf deinen letzten Auftrag fehlt. Setze denselben Auftrag sicher fort, bevor du einen weiteren startest. Bereits ausgeführte Aufträge werden nur bestätigt; ein noch nicht ausgeführter Auftrag wird dabei gestartet. Truppen werden nicht doppelt abgezogen.</p><button type="button" class="button" data-action="command-retry">Auftrag sicher fortsetzen</button>',{focusHeading:true});
     }
     function placeToast() { const host=$('#game-dialog').open?$('#game-dialog'):panelDialog.open?panelDialog:document.body;if(toastElement.parentElement!==host)host.append(toastElement); }
-    function toast(message) { placeToast();toastElement.textContent=message;toastElement.classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toastElement.classList.remove('visible'),3200); }
+    function toast(message) { placeToast();toastElement.textContent=i18n?.text(message)??message;toastElement.classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toastElement.classList.remove('visible'),3200); }
     async function api(path, payload) {
         if(!payload&&Date.now()<apiRetryAt)throw new Error('Bitte warte einen Moment und versuche es erneut.');
         let response;
@@ -78,7 +98,7 @@
         catch(e){if(command)commandRecovery();throw new Error(t(e.name==='TimeoutError'?'error.network_timeout':'error.no_connection'));}
         if(response.status===429){const seconds=Number(response.headers.get('Retry-After'));apiRetryAt=Math.max(apiRetryAt,Date.now()+Math.max(1,Number.isFinite(seconds)?seconds:10)*1000);}
         let body; try { body = await response.json(); } catch { if(command)commandRecovery();throw new Error(t('error.server_unavailable')); }
-        if (!body.ok || !response.ok) { if(command){if(response.headers.get('X-Operation-Rejected')==='1'){commands.complete(command);if($('#game-dialog [data-action="command-retry"]'))$('#game-dialog').close();}else commandRecovery();}if (response.status === 401) location.href = base + '/'; if(body.error?.code==='WORLD_CHANGED'){location.reload();} const code=body.error?.code||null,errorKey=code?'error.'+String(code).toLowerCase():'';const error=new Error(errorKey&&i18n?.has(errorKey)?t(errorKey):(body.message || body.error?.message || (typeof body.error==='string'?body.error:null) || t('error.action_failed')));error.code=code;error.definite=response.status>=400&&response.status<500&&response.status!==408;throw error; }
+        if (!body.ok || !response.ok) { if(command){if(response.headers.get('X-Operation-Rejected')==='1'){commands.complete(command);if($('#game-dialog [data-action="command-retry"]'))$('#game-dialog').close();}else commandRecovery();}if (response.status === 401) location.href = base + '/'; if(body.error?.code==='WORLD_CHANGED'){location.reload();} const code=body.error?.code||null,errorKey=code?'error.'+String(code).toLowerCase():'',serverMessage=body.message||body.error?.message||(typeof body.error==='string'?body.error:null);const error=new Error(serverMessage||(errorKey&&i18n?.has(errorKey)?t(errorKey):t('error.action_failed')));error.code=code;error.definite=response.status>=400&&response.status<500&&response.status!==408;throw error; }
         if(command)commands.complete(command);
         sound?.confirmed(path,payload,body.data);
         return body.data;
@@ -91,6 +111,28 @@
         if(!response.ok||!body.ok)throw new Error(body.error?.message||'Das Profilfoto konnte nicht verarbeitet werden.');
         toast(body.data?.message||'Profilfoto gespeichert.');return body.data;
     }
+    function rallyContext() {
+        return {worldId:Number(state?.city?.world_id||window.CONQUER_WORLD||1),playerId:Number(state?.player?.id||state?.city?.player_id||0),allianceId:kingdom?Number(kingdom.alliance?.id||0):null};
+    }
+    function beginRallyRequest() {return {...rallyContext(),sequence:++rallyRequestSequence};}
+    function syncRallyScope() {
+        const scope=JSON.stringify(rallyContext());
+        if(rallyDataScope&&rallyDataScope!==scope){allianceRallies=[];rallyPanel.sync(allianceRallies);marchPanel.updateRallies?.(allianceRallies);}
+        rallyDataScope=scope;
+    }
+    function acceptRallies(data, request) {
+        syncRallyScope();
+        const context=rallyContext();
+        if(request.sequence<=rallyAppliedSequence||request.worldId!==context.worldId
+            ||(request.playerId&&request.playerId!==context.playerId)
+            ||(request.allianceId!==null&&request.allianceId!==context.allianceId))return false;
+        rallyAppliedSequence=request.sequence;
+        allianceRallies=(Array.isArray(data?.rallies)?data.rallies:[]).filter(r=>context.allianceId!==0
+            &&(!r.world_id||Number(r.world_id)===context.worldId)
+            &&(!r.result?.alliance_id||context.allianceId===null||Number(r.result.alliance_id)===context.allianceId));
+        rallyPanel.sync(allianceRallies);marchPanel.updateRallies?.(allianceRallies);
+        return true;
+    }
     async function refresh(renderPage = true) {
         if (polling) return polling;
         polling = (async()=>{
@@ -98,30 +140,40 @@
                 const center=playfield==='world'?window.ConquerWorld.getCenter():null,returnSince=comfort.since();
                 const query=new URLSearchParams(center?{map_x:center.x,map_y:center.y,map_radius:center.radius||30}:{});
                 if(returnSince)query.set('return_since',returnSince);
-                const results=await Promise.allSettled([api('game/state'+(query.size?'?'+query:'')),api('kingdom/state'),api('expeditions/state'),current==='market'?api('market/state'):Promise.resolve(market)]);
+                const rallyRequest=beginRallyRequest();
+                const results=await Promise.allSettled([api('game/state'+(query.size?'?'+query:'')),api('kingdom/state'),api('expeditions/state'),current==='market'?api('market/state'):Promise.resolve(market),api('rally/list'),playfield==='world'?api('map/marches'):Promise.resolve({marches:publicMarches})]);
                 if(results[0].status==='rejected')throw results[0].reason;
                 state=results[0].value;offset=state.server_time*1000-Date.now();
                 state.research_defs.forEach(node=>{researchNames[node.code]=window.ConquerResearch.title(node);});
                 ['kingdom','expeditions','market'].forEach((name,i)=>{const r=results[i+1];if(!r)return;if(r.status==='fulfilled'){if(name==='kingdom')kingdom=r.value;if(name==='expeditions')expeditions=r.value;if(name==='market')market=r.value;delete loadErrors[name];}else{loadErrors[name]=r.reason.message;}});
+                // Keep supplementary HUD data through a brief outage only within the same
+                // player/world/alliance, and never replace a newer event refresh with an old poll.
+                syncRallyScope();
+                if(results[4]?.status==='fulfilled'&&acceptRallies(results[4].value,rallyRequest)&&results[1]?.status==='fulfilled')sound?.observeRallies?.(allianceRallies,{playerId:state.player?.id||state.city?.player_id,worldId:state.city?.world_id,allianceId:kingdom?.alliance?.id||0,serverTime:now()/1000});
+                if(results[5]?.status==='fulfilled')publicMarches=results[5].value?.marches||[];
+                state.public_marches=publicMarches;
                 $('#save-state').textContent=Object.keys(loadErrors).length?'Ein Bereich ist derzeit nicht erreichbar':'Fortschritt gespeichert';
                 $('#save-state').classList.toggle('error',Object.keys(loadErrors).length>0);
                 document.body.classList.toggle('reduced-motion',Boolean(kingdom?.settings?.reduced_motion));
                 renderHud();
                 mailboxPanel.refresh();
-                const signature=JSON.stringify([state.buildings,state.troops,state.build_queue,state.troop_queue,state.research,state.research_queue,state.research_duration_factor,state.research_defs.map(n=>canAfford(n.levels.find(l=>l.level===Number(state.research[n.code]||0)+1)?.resources||{})),state.marches,state.reports,state.monsters,state.charms,state.nodes,state.players,state.congress,state.shrines,state.land_progression,state.map_center,kingdom?.profile,kingdom?.march_skins,kingdom?.name_frames,kingdom?.theme_bundles,kingdom?.skin_bundles,kingdom?.alliance,kingdom?.inventory,kingdom?.quests,kingdom?.hospital,kingdom?.treasures,[kingdom?.trading?.rotation,kingdom?.trading?.offers,kingdom?.trading?.vip],[kingdom?.chests?.free_silver_remaining,kingdom?.chests?.free_silver_available,kingdom?.chests?.free_gold_available],kingdom?.rankings,kingdom?.arena,expeditions?.expeditions,market]);
+                const signature=JSON.stringify([state.buildings,state.troops,state.build_queue,state.troop_queue,state.research,state.research_queue,state.research_duration_factor,state.research_defs.map(n=>canAfford(n.levels.find(l=>l.level===Number(state.research[n.code]||0)+1)?.resources||{})),state.marches,state.public_marches,state.reports,state.monsters,state.charms,state.nodes,state.players,state.congress,state.shrines,state.land_progression,state.territory,state.world?.map_profile,state.map_center,kingdom?.profile,kingdom?.march_skins,kingdom?.name_frames,kingdom?.theme_bundles,kingdom?.skin_bundles,kingdom?.alliance,kingdom?.inventory,kingdom?.quests,kingdom?.hospital,kingdom?.treasures,[kingdom?.trading?.rotation,kingdom?.trading?.offers,kingdom?.trading?.vip],[kingdom?.chests?.free_silver_remaining,kingdom?.chests?.free_silver_available,kingdom?.chests?.free_gold_available],kingdom?.rankings,kingdom?.arena,expeditions?.expeditions,market]);
                 const editing=current!=='world'&&($('#content').dataset.dirty==='true'||($('#content').contains(document.activeElement)&&document.activeElement.matches('input,textarea,select')));
                 if(renderPage&&!editing&&!$('#game-dialog').open&&signature!==lastSignature){render();lastSignature=signature;}
                 panels.updateHospital();
                 trainingPanel.update();
                 inventoryOverview.update();
+                itemSources.update();
                 monsterReports.update(state.reports);
                 if(current==='help')beginnerGuide.render();
                 beginnerGuide.maybeWelcome(current);
                 comfort.update();
                 sound?.observe(state);
+                return true;
             } catch(e) {
                 $('#save-state').textContent='Verbindung unterbrochen';$('#save-state').classList.add('error');
                 if(!state)$('#content').innerHTML=`<div class="empty"><span class="empty-icon">♜</span><h3>Dein Reich ist kurz außer Reichweite.</h3><p>${esc(e.message)}</p><button class="button" data-action="retry">Erneut versuchen</button></div>`;
+                return false;
             }
         })();
         try{return await polling;}finally{polling=null;}
@@ -142,13 +194,13 @@
             const result=await api(path,payload);if(!receipt&&version===dialogVersion)$('#game-dialog').close();delete $('#content').dataset.dirty;
             if(!receipt||!result?.result?.drops?.length)toast(result?.message||message||'Gespeichert.');
             if(path==='kingdom/action'&&result?.state)kingdom=result.state;if(path==='expeditions/action'&&result?.state)expeditions=result.state;
-            await refresh(false);render();lastSignature='';$('#city-frame')?.contentWindow?.postMessage({type:'conquer:refresh'},location.origin);
+            await refresh(false);render();lastSignature='';
             if(receipt)rewards.success(result,payload);
             return result;
         } catch(e){sound?.play('error');if(receipt)rewards.failure(e);toast(e.message);return null;}
         finally{busy=false;buttons.forEach(b=>{if(b.isConnected)b.disabled=false;});if(trigger?.isConnected){trigger.innerHTML=triggerHtml;trigger.removeAttribute('aria-busy');}}
     }
-    function openDialog(html,{focusHeading=false}={}) {
+    function openDialog(html,{focusHeading=false,historyManaged=false}={}) {
         dialogVersion++;
         const dialog=$('#game-dialog'),content=$('#dialog-content');
         if(!dialog.open)dialogTrigger=document.activeElement;
@@ -160,13 +212,16 @@
         const heading=content.querySelector('h2');
         if(heading){
             heading.id='dialog-title';heading.tabIndex=-1;dialog.setAttribute('aria-labelledby','dialog-title');
-            if(!content.querySelector('.march-command')){
+            if(!content.querySelector('.march-command,.territory-shell')){
                 if(heading.previousElementSibling?.classList.contains('card-icon'))heading.previousElementSibling.remove();
                 const header=document.createElement('header');header.className='popup-heading';header.append(heading);
                 dialog.insertBefore(header,content);dialog.classList.add('has-popup-heading');
             }
         }else dialog.removeAttribute('aria-labelledby');
-        if(!dialog.open)dialog.showModal();placeToast();sendPreferences();dialog.scrollTop=0;
+        mobilePages?.syncDialog();
+        // Reports, receipts and the inventory overview already own a history
+        // entry. Adding another mobile entry leaves a stale report behind on Back.
+        if(!dialog.open){dialog.showModal();if(!historyManaged)mobilePages?.opened('dialog');}placeToast();dialog.scrollTop=0;
         const firstInput=dialog.querySelector('input:not([disabled]):not([type=radio]),select:not([disabled]),textarea:not([disabled])');
         ((focusHeading?heading:firstInput)||heading||$('.dialog-close')).focus({preventScroll:true});
     }
@@ -186,10 +241,10 @@
             if(token!==sceneTransitionToken)return;
             commit();
             const renderedAt=performance.now();
-            let revealed=false,maxWait=0;
+            let revealed=false;
             const reveal=()=>{
                 if(revealed||token!==sceneTransitionToken)return;
-                revealed=true;clearTimeout(maxWait);
+                revealed=true;
                 if(token!==sceneTransitionToken)return;
                 veil.classList.remove('is-covering');
                 veil.classList.add('is-revealing');
@@ -203,28 +258,42 @@
                 const remaining=Math.max(0,420-(performance.now()-renderedAt));
                 sceneTransitionTimer=setTimeout(()=>requestAnimationFrame(()=>requestAnimationFrame(reveal)),remaining);
             };
-            const frame=tab==='city'?$('#city-frame'):null;
-            let frameReady=false;
-            try{frameReady=Boolean(frame&&frame.contentWindow?.location.href!=='about:blank'&&frame.contentDocument?.readyState==='complete');}catch{}
-            if(frame&&!frameReady){
-                frame.addEventListener('load',revealAfterMinimum,{once:true});
-                maxWait=setTimeout(reveal,1600);
-            }else revealAfterMinimum();
+            revealAfterMinimum();
         },260);
     }
-    function navigate(tab,{focusTitle=true}={}) {
+    function navigate(tab,{focusTitle=true,fromHistory=false,afterCommit=null}={}) {
         if(!Object.hasOwn(navs,tab))return;
-        if($('#scene-transition')?.classList.contains('is-active')&&tab===current)return;
-        const changesScene=isPlayfield(tab)&&playfield!==tab;
+        const changesScene=isPlayfield(tab)&&(playfield!==tab||sceneCommitPending);
+        const version=++navigationVersion,worldId=Number(state?.city.world_id);
+        const isCurrent=()=>version===navigationVersion&&current===tab&&Number(state?.city.world_id)===worldId;
+        // Superseded scene commits must not redraw a newer route or reopen its target.
+        ++sceneTransitionToken;clearTimeout(sceneTransitionTimer);sceneCommitPending=changesScene;
+        if(!changesScene){const veil=$('#scene-transition');veil?.classList.remove('is-active','is-covering','is-revealing');if(veil)delete veil.dataset.target;}
         rememberView();
+        const mobileHistory=mobilePages?.route(tab,fromHistory);
         if(tab!=='world')teleportSelection=null;
         if($('#game-dialog').open)$('#game-dialog').close();
         if(!isPlayfield(tab)&&!panelDialog.open){const trigger=document.activeElement;panelTrigger={node:trigger,id:trigger?.id,tab:trigger?.closest('[data-id]')?.dataset.id};}
         delete $('#content').dataset.dirty;current=tab;if(isPlayfield(tab))playfield=tab;
-        location.hash=tab;
-        const commit=()=>{render();const position=viewPositions.get(tab);panelHost.scrollTop=position?.top||0;for(const [selector,top]of position?.areas||[]){const area=panelHost.querySelector(selector);if(area)area.scrollTop=top;}if(!isPlayfield(tab)&&focusTitle)$('#page-title').focus({preventScroll:true});};
+        if(!mobileHistory)location.hash=tab;
+        const commit=()=>{if(!isCurrent())return;sceneCommitPending=false;render();const position=viewPositions.get(tab);panelHost.scrollTop=position?.top||0;for(const [selector,top]of position?.areas||[]){const area=panelHost.querySelector(selector);if(area)area.scrollTop=top;}if(!isPlayfield(tab)&&focusTitle)$('#page-title').focus({preventScroll:true});afterCommit?.(isCurrent);};
         if(changesScene)transitionScene(tab,commit);else commit();
         if(tab==='market')refresh();
+    }
+    function openWorldTarget({x,y,kind,id},worldId=Number(state?.city.world_id),onMissing=null) {
+        if(Number(state?.city.world_id)!==Number(worldId)||!Number.isFinite(Number(x))||!Number.isFinite(Number(y)))return;
+        navigate('world',{focusTitle:false,afterCommit:async isCurrent=>{
+            // A coalesced poll may describe the old viewport. Drain it before moving
+            // the mounted map, then explicitly request the destination viewport.
+            if(polling)await refresh(false);
+            if(!isCurrent())return;
+            window.ConquerWorld.focus(Number(x),Number(y));
+            const updated=await refresh();
+            if(!isCurrent()||!updated)return;
+            const rows=state[kind]||[],found=rows.some(row=>Number(row.id)===Number(id)&&Number(row.coord_x??row.x)===Number(x)&&Number(row.coord_y??row.y)===Number(y));
+            if(found){window.ConquerWorld.locate(Number(x),Number(y),[kind],Number(id));}
+            else onMissing?.();
+        }});
     }
     function costHtml(cost,illustrated=true) { return `<div class="costs">${Object.entries(cost).filter(([k,v]) => resourceIcons[k] && v > 0).map(([k,v]) => `<span class="${state.city[k] < v ? 'insufficient':''}" title="${resourceNames[k]}">${illustrated?`<img class="research-cost-icon" src="${base}/assets/art/ui-resources/${k}.png" alt="${resourceNames[k]}">`:resourceIcons[k]} ${fmt(v)}</span>`).join('')}</div>`; }
     function canAfford(cost) { return Object.entries(cost).every(([k,v]) => !resourceIcons[k] || state.city[k] >= v); }
@@ -234,11 +303,19 @@
         return `<section class="levelup-resource-list" aria-label="Benötigte Rohstoffe"><div class="levelup-section-title"><h3>Rohstoffe</h3><span>${entries.filter(([key,value])=>Number(state.city[key])>=Number(value)).length} / ${entries.length} bereit</span></div>${entries.map(([key,value])=>{const owned=Number(state.city[key]||0),needed=Number(value),met=owned>=needed;return `<div class="levelup-resource-row ${met?'is-ready':'is-missing'}"><span class="levelup-check" aria-hidden="true">${met?'✓':'!'}</span><img src="${base}/assets/art/ui-resources/${key}.png" alt=""><strong>${resourceNames[key]}</strong><span class="levelup-resource-values"><b>${fmt(owned)}</b><i>/</i>${fmt(needed)}</span></div>`;}).join('')}</section>`;
     }
     function levelupStat(label,current,next) {
-        return `<div class="levelup-stat"><span>${esc(label)}</span><strong>${esc(current)}</strong>${next!==undefined&&next!==null?`<span class="levelup-stat-arrow" aria-hidden="true">→</span><b>${esc(next)}</b>`:''}</div>`;
+        return `<div class="levelup-stat"><span>${esc(label)}</span><strong title="${esc(t('upgrade.effect.current'))}">${esc(current)}</strong>${next!==undefined&&next!==null?`<span class="levelup-stat-arrow" aria-hidden="true">→</span><b title="${esc(t('upgrade.effect.next'))}">${esc(next)}</b>`:''}</div>`;
+    }
+    function allianceHallCapacity(building) {
+        const capacity=building.rally_capacity,tx=(key,params={})=>esc(t('hall.capacity.'+key,params));
+        if(!capacity||![capacity.base,capacity.total,capacity.research_bonus].every(Number.isFinite))return `<p class="hall-capacity-unavailable">${tx('unavailable')}</p>`;
+        const next=building.level<30&&Number.isFinite(capacity.next_base)&&Number.isFinite(capacity.next_total);
+        const bonus=Intl.NumberFormat(i18n?.locale||'en',{style:'percent',maximumFractionDigits:2}).format(capacity.research_bonus);
+        const levels=Array.isArray(capacity.levels)?capacity.levels.filter(row=>[row.level,row.base,row.total].every(Number.isFinite)):[];
+        return `<section class="hall-capacity" aria-label="${tx('title')}"><h3>${tx('title')}</h3><div class="levelup-effect-caption"><span>${esc(t('upgrade.effect.current'))}</span>${next?`<span>${esc(t('upgrade.effect.next'))}</span>`:''}</div><div data-hall-capacity-stat="base">${levelupStat(t('hall.capacity.base'),fmt(capacity.base),next?fmt(capacity.next_base):null)}</div><div class="hall-capacity-bonus"><span>${tx('research')}</span><strong data-hall-capacity-stat="bonus">+${esc(bonus)}</strong></div><div class="hall-capacity-total" data-hall-capacity-stat="total">${levelupStat(t('hall.capacity.total'),fmt(capacity.total),next?fmt(capacity.next_total):null)}</div><p class="hall-capacity-hint">${tx('scope')}</p>${levels.length?`<details class="hall-capacity-levels"><summary>${tx('levels')}</summary><p>${tx('table_hint',{bonus})}</p><table><thead><tr><th scope="col">${tx('level')}</th><th scope="col">${tx('base_short')}</th><th scope="col">${tx('total_short')}</th></tr></thead><tbody>${levels.map(row=>`<tr${row.level===building.level?' class="is-current" aria-current="true"':''}><th scope="row">${fmt(row.level)}${row.level===building.level?`<span class="hall-capacity-current">${esc(t('upgrade.effect.current'))}</span>`:''}</th><td>${fmt(row.base)}</td><td>${fmt(row.total)}</td></tr>`).join('')}</tbody></table></details>`:''}</section>`;
     }
     function countdown(end) { return `<span data-end="${esc(end)}">${duration((date(end)-now())/1000)}</span>`; }
     function renderHud() {
-        const compact=n=>kingdom?.settings?.compact_numbers||Number(n)>=1000000?Intl.NumberFormat('de-DE',{notation:'compact',maximumFractionDigits:1}).format(Number(n)||0):fmt(n);
+        const compact=n=>kingdom?.settings?.compact_numbers||Number(n)>=1000000?Intl.NumberFormat(window.ConquerLocale?.locale??'en',{notation:'compact',maximumFractionDigits:1}).format(Number(n)||0):fmt(n);
         $('#resources').innerHTML = Object.keys(resourceIcons).map(k => `<button class="resource" data-action="resource" data-id="${k}" aria-label="${resourceNames[k]}: ${fmt(state.city[k])}, Details öffnen" title="${resourceNames[k]}: ${fmt(state.city[k])}"><span class="resource-icon" aria-hidden="true"><img src="${base}/assets/art/ui-resources/${k}.png" alt=""></span><span><strong>${compact(state.city[k])}</strong><small>${resourceNames[k]}</small></span></button>`).join('');
         $('#player-hud-name').textContent=kingdom?.profile?.display_name||state.player.name;
         $('#hud-power-value').textContent=fmt(kingdom?.profile?.power||state.city.power);
@@ -289,11 +366,13 @@
         document.body.classList.toggle('popup-mode',hasPanel);
         const focusedNav=document.activeElement?.closest('#navigation [data-id]')?.dataset.id;
         const sceneTab=playfield==='world'?'city':'world';
-        const dock=[['quests','Aufgaben','quest','tab'],['inventory','Inventar','inventory','tab'],['reports','Post','reports','tab'],['chat','Chat','chat','chat-open'],['shop','Shop','shop','shop-open'],['alliance','Allianz','alliance','tab'],[sceneTab,sceneTab==='city'?'Dorf':'Welt',sceneTab,'tab']];
+        const dock=[['quests',t('nav.quests_short'),'quest','tab'],['inventory',t('nav.inventory_short'),'inventory','tab'],['reports','Post','reports','tab'],['chat','Chat','chat','chat-open'],['shop',t('nav.market'),'shop','shop-open'],['alliance','Allianz','alliance','tab'],[sceneTab,sceneTab==='city'?'Dorf':'Welt',sceneTab,'tab']];
         $('#navigation').innerHTML=dock.map(([key,name,art,act])=>{
-            const icon=art==='chat'?'<span class="dock-icon dock-glyph" aria-hidden="true">💬</span>':art==='shop'?`<img class="dock-icon" src="${base}/assets/art/items/pouch.svg" alt="">`:`<img class="dock-icon" src="${base}/assets/art/hud/${art}.svg" alt="">`;
+            const dockMenuArt={quests:'quests',inventory:'inventory',reports:'reports',chat:'chat',shop:'market',alliance:'alliance',city:'village',world:'world-map'}[key];
+            const icon=dockMenuArt?`<img class="dock-icon dock-menu-art" src="${base}/assets/art/menu-icons/${dockMenuArt}.png" alt="">`:`<img class="dock-icon" src="${base}/assets/art/hud/${art}.svg" alt="">`;
             const badge=key==='quests'?'<span class="dock-badge" aria-hidden="true" hidden></span>':key==='chat'?'<span class="dock-badge chat-dock-badge" aria-hidden="true" hidden></span>':'';
-            return `<button class="game-dock-item ${key===sceneTab?'hud-scene-switch':''} ${current===key?'current':''}" data-action="${act}" data-id="${key}" aria-label="${name} öffnen" ${current===key?'aria-current="page"':''}>${icon}<span class="dock-label">${name}</span>${badge}</button>`;
+            const labelKey={quests:'nav.quests_short',inventory:'nav.inventory_short',shop:'nav.market'}[key];
+            return `<button class="game-dock-item ${key===sceneTab?'hud-scene-switch':''} ${current===key?'current':''}" data-action="${act}" data-id="${key}" aria-label="${name} öffnen" ${current===key?'aria-current="page"':''}>${icon}<span class="dock-label" ${labelKey?`data-i18n="${labelKey}"`:''}>${name}</span>${badge}</button>`;
         }).join('');
         updateQuestBadge();
         mailboxPanel.badge();
@@ -312,11 +391,10 @@
         if(hasPanel){
             panelDialog.dataset.panel=current;
             if(!panelDialog.open){panelDialog.showModal();$('#page-title').focus({preventScroll:true});}
-            if(current==='bugreport')bugReports.render();else if(current==='treasures')treasurePanel.render();else if(current==='market')tradingPanel.render();else if(current==='dungeons')dungeonPanel.render(current);else if(current==='community')communityPanel.render(current);else if(current==='defense')defensePanel.render();else if(landPanel.render(current)||worldPanel.render(current)||progressionPanel.render(current)){}else if(native[current])native[current]();else panels.render(current);
+            if(current==='bugreport')bugReports.render();else if(current==='treasures')treasurePanel.render();else if(current==='market')tradingPanel.render();else if(current==='dungeons')dungeonPanel.render(current);else if(current==='community')socialHub.render(current);else if(current==='alliance-tools')communityPanel.render(current);else if(current==='alliance-community')allianceCommunity.render(current);else if(current==='defense')defensePanel.render();else if(landPanel.render(current)||worldPanel.render(current)||progressionPanel.render(current)){}else if(native[current])native[current]();else panels.render(current);
             if(current==='settings')$('#content').insertAdjacentHTML('afterbegin','<p><button class="button secondary" data-action="tab" data-id="account">Passwort & Wiederherstellung</button></p>');
         }
         if(current==='army'&&panels.armyMode!=='hospital'){$('#content > .subtabs')?.remove();$('#content').insertAdjacentHTML('afterbegin',panels.armyHeader());}
-        if(playfield==='city'){const frame=$('#city-frame');if(!frame.dataset.bridgeReady){frame.dataset.bridgeReady='true';frame.addEventListener('load',sendPreferences);}sendPreferences();}
         if(hasPanel){
             panelHost.scrollTop=panelScroll;
         }else{
@@ -329,7 +407,7 @@
         sound?.updateControls();
     }
     function renderCity(host=playfieldHost) {
-        if(!$('#city-frame'))host.innerHTML=`<div class="city-playfield"><iframe id="city-frame" class="city-frame" src="${base}/city/3d?embed=1" title="Dein Königreich – wähle ein Gebäude zum Ausbau"></iframe><button class="city-building-tool" data-action="buildings" aria-label="Gebäudeübersicht öffnen" title="Gebäude"><span aria-hidden="true">♜</span><small>Gebäude</small></button></div>`;
+        return window.ConquerPaintedCity.render({host,base,state,labels,esc,countdown,citySkin:kingdom?.profile?.city_skin||'default'});
     }
     function compactGuide() {
         const next = state.buildings.castle.level < 2 ? ['Baue deine Burg auf Stufe 2 aus.','building','castle'] : state.trained_total < 20 ? ['Bilde deine ersten 20 Truppen aus.','tab','army'] : !state.reports.length ? ['Besiege einen Ork-Späher in deiner Nähe.','tab','world'] : !Object.keys(state.research).length ? ['Entdecke deine erste Forschung.','tab','research'] : ['Dein Reich ist bereit für neue Abenteuer.','tab','world'];
@@ -353,22 +431,25 @@
         const entries=Object.entries(requirements||{}).map(([code,needed])=>({code,needed:Number(needed),current:Number(state.buildings[code]?.level||0)}));
         if(!entries.length)return '';
         const met=entries.filter(r=>r.current>=r.needed).length;
-        return `<section class="research-requirements building-requirements" aria-label="Bauvoraussetzungen"><div class="research-requirements-heading"><h3>Voraussetzungen</h3><span>${met} / ${entries.length} erfüllt</span></div><div class="research-requirement-grid">${entries.map(r=>{const fulfilled=r.current>=r.needed,name=labels[r.code]||r.code;return `<button type="button" class="research-requirement ${fulfilled?'requirement-met':'requirement-missing'}" data-action="building" data-id="${esc(r.code)}" aria-label="${esc(name)}, Stufe ${r.needed} benötigt, aktuell Stufe ${r.current}. ${fulfilled?'Erfüllt':'Noch nicht erfüllt'}. Ausbaumenü öffnen"><img class="building-requirement-icon" src="${buildingImage(r.code)}" alt=""><span class="research-requirement-copy"><strong>${esc(name)}</strong><span>Benötigt: Stufe ${r.needed}</span><small><span aria-hidden="true">${fulfilled?'✓':'↑'}</span> ${fulfilled?'Erfüllt':'Ausbauen'} · aktuell Stufe ${r.current}</small></span><span class="building-requirement-arrow" aria-hidden="true">›</span></button>`;}).join('')}</div></section>`;
+        return `<section class="research-requirements building-requirements" aria-label="Bauvoraussetzungen"><div class="research-requirements-heading"><h3>Voraussetzungen</h3><span>${met} / ${entries.length} erfüllt</span></div><div class="research-requirement-grid">${entries.map(r=>{const fulfilled=r.current>=r.needed,name=labels[r.code]||r.code;return `<button type="button" class="research-requirement ${fulfilled?'requirement-met':'requirement-missing'}" data-action="building" data-id="${esc(r.code)}" aria-label="${esc(name)}, Stufe ${r.needed} benötigt, aktuell Stufe ${r.current}. ${fulfilled?'Erfüllt':'Noch nicht erfüllt'}. Ausbaumenü öffnen"><img class="building-requirement-icon" src="${buildingImage(r.code)}" alt=""><span class="research-requirement-copy"><strong>${esc(name)}</strong><span class="building-requirement-level"><b>${r.current}</b><i aria-hidden="true">/</i><b>${r.needed}</b><small>Aktuell / benötigt</small></span></span><span class="building-requirement-arrow" aria-hidden="true">›</span></button>`;}).join('')}</div></section>`;
     }
     function buildingDialog(code,{recommended=false}={}) {
         const b = state.buildings[code], q = state.build_queue.find(q=>q.building_code===code),resource={farm:'food',lumber_camp:'lumber',quarry:'stone',gold_mine:'gold'}[code];
+        const previousHall=code==='hall_of_alliance'&&$('#game-dialog').open&&$('#game-dialog').dataset.building===code?{scroll:$('#game-dialog .levelup-scroll')?.scrollTop||0,expanded:!!$('#game-dialog .hall-capacity-levels')?.open,focused:document.activeElement?.matches('.hall-capacity-levels>summary')}:null;
         const requirements = Object.entries(b.requirements).filter(([k,v]) => state.buildings[k].level < v);
-        const locked = (b.item_requirements||[]).some(item=>!item.met) || requirements.length || state.build_queue.length >= (state.vip.level >= 4 ? 2 : 1) || !canAfford(b.cost) || b.level >= 30;
-        const stats=[b.progression?levelupStat(b.progression.label,fmt(b.progression.current),b.level<30?fmt(b.progression.next):null):'',b.production?levelupStat('Produktionslager',fmt(state.storage_caps?.[resource])):'',b.production?levelupStat('Produktion je Stunde',fmt(b.production)):'' ].join('');
+        const slotsFull = state.build_queue.length >= (state.vip.building_slots ?? (state.vip.level >= 4 ? 2 : 1));
+        const locked = (b.item_requirements||[]).some(item=>!item.met) || requirements.length || slotsFull || !canAfford(b.cost) || b.level >= 30;
+        const stats=code==='hall_of_alliance'?allianceHallCapacity(b):[b.progression?levelupStat(b.progression.label,fmt(b.progression.current),b.level<30?fmt(b.progression.next):null):'',b.production?levelupStat('Produktionslager',fmt(state.storage_caps?.[resource])):'',b.production?levelupStat('Produktion je Stunde',fmt(b.production)):'' ].join('');
         const itemRows=(b.item_requirements||[]).map(item=>`<div class="levelup-item-row ${item.met?'is-ready':'is-missing'}"><span class="levelup-check" aria-hidden="true">${item.met?'✓':'!'}</span><strong>${esc(item.name)}</strong><span>${fmt(item.owned)} / ${fmt(item.count)}</span></div>`).join('');
-        const queueBusy=!q&&state.build_queue.length?'<p class="levelup-warning">Alle Bauplätze sind gerade belegt.</p>':'';
-        openDialog(`<h2>${q?'Ausbau läuft':b.level>=30?'Maximalstufe erreicht':'Stufe erhöhen'}</h2><div class="levelup-shell"><section class="levelup-overview"><div class="levelup-art"><img src="${buildingImage(code)}" alt=""><span>${esc(labels[code])}</span></div><div class="levelup-levels"><span>Stufe ${b.level}</span><i aria-hidden="true">➜</i><strong>${b.level<30?'Stufe '+(q?q.level_to:b.level+1):'Maximum'}</strong></div><p>${esc(descriptions[code])}</p><div class="levelup-stats">${stats||levelupStat('Gebäudestufe',b.level,b.level<30?b.level+1:null)}</div></section><section class="levelup-needs"><div class="levelup-section-title levelup-main-title"><h3>${q?'Aktiver Ausbau':'Voraussetzungen'}</h3><span>${recommended&&!q?'Empfohlen':''}</span></div>${q?`<div class="levelup-running"><strong>Stufe ${q.level_to} wird gebaut</strong><span>Noch ${countdown(q.finishes_at)}</span></div>`:`${requirementResources(b.cost)}${itemRows}${b.level<30?buildingRequirements(b.requirements):''}${queueBusy}`}</section><footer class="levelup-footer"><div class="levelup-time"><span>${q?'Restzeit':'Bauzeit'}</span><strong>${q?countdown(q.finishes_at):duration(b.seconds)}</strong></div>${q?`<button class="button levelup-secondary" data-action="cancel-build" data-id="${q.id}">Abbrechen</button><button class="button levelup-primary" data-action="queue-speedups" data-type="building" data-id="${q.id}">Beschleunigen</button>`:`<button class="button levelup-primary" data-action="upgrade" data-id="${code}" ${locked?'disabled':''}>${b.level>=30?'Vollständig ausgebaut':'Ausbau auf Stufe '+(b.level+1)+' starten'}</button>`}</footer></div>${['barrack','archery_range','stable','academy'].includes(code)?`<button class="levelup-link" data-action="${code==='academy'?'dialog-tab':'training-building'}" data-id="${code==='academy'?'research':code}">${code==='academy'?'Zur Forschung':'Zur Truppenausbildung'} →</button>`:''}`);
+        const queueBusy=!q&&slotsFull?'<p class="levelup-warning">Alle Bauplätze sind gerade belegt.</p>':'';
+        openDialog(`<h2>${q?'Ausbau läuft':b.level>=30?'Maximalstufe erreicht':'Stufe erhöhen'}</h2><div class="levelup-shell levelup-vivid"><div class="levelup-scroll"><section class="levelup-overview"><div class="levelup-art"><img src="${buildingImage(code)}" alt=""><span>${esc(labels[code])}</span></div><div class="levelup-levels"><span>Stufe ${b.level}</span><i aria-hidden="true">➜</i><strong>${b.level<30?'Stufe '+(q?q.level_to:b.level+1):'Maximum'}</strong></div><p>${esc(descriptions[code])}</p><div class="levelup-stats">${stats||levelupStat('Gebäudestufe',b.level,b.level<30?b.level+1:null)}</div></section><section class="levelup-needs"><div class="levelup-section-title levelup-main-title"><h3>${q?'Aktiver Ausbau':'Voraussetzungen'}</h3><span>${recommended&&!q?'Empfohlen':''}</span></div>${q?`<div class="levelup-running"><strong>Stufe ${q.level_to} wird gebaut</strong><span>Noch ${countdown(q.finishes_at)}</span></div>`:`${requirementResources(b.cost)}${itemRows}${b.level<30?buildingRequirements(b.requirements):''}${queueBusy}`}</section></div><footer class="levelup-footer"><div class="levelup-time"><span>${q?'Restzeit':'Bauzeit'}</span><strong>${q?countdown(q.finishes_at):duration(b.seconds)}</strong></div>${q?`<button class="button levelup-secondary" data-action="cancel-build" data-id="${q.id}">Abbrechen</button><button class="button levelup-primary" data-action="queue-speedups" data-type="building" data-id="${q.id}">Beschleunigen</button>`:`<button class="button levelup-primary" data-action="upgrade" data-id="${code}" ${locked?'disabled':''}>${b.level>=30?'Vollständig ausgebaut':'Ausbau auf Stufe '+(b.level+1)+' starten'}</button>`}</footer></div>${['barrack','archery_range','stable','academy'].includes(code)?`<button class="levelup-link" data-action="${code==='academy'?'dialog-tab':'training-building'}" data-id="${code==='academy'?'research':code}">${code==='academy'?'Zur Forschung':'Zur Truppenausbildung'} →</button>`:''}`);
         $('#game-dialog').classList.add('levelup-dialog-window');
         $('#game-dialog').dataset.building = code;
         if(recommended&&!q)$('#game-dialog').dataset.buildingRecommendation='true';
         if(!q&&!canAfford(b.cost)){const missing=Object.entries(b.cost).filter(([key,value])=>resourceNames[key]&&Number(state.city[key])<Number(value)).map(([key,value])=>`${fmt(Number(value)-Number(state.city[key]))} ${resourceNames[key]}`);$('#dialog-content .button.gold')?.insertAdjacentHTML('beforebegin',`<p class="insufficient">Es fehlen noch ${missing.join(', ')}.</p>`);}
-        const destinations={hospital:['army-hospital','', 'Hospital öffnen'],treasure_house:['treasures-tab','','Schatzkammer öffnen'],hall_of_alliance:['dialog-tab','alliance','Allianz öffnen'],trading_post:['dialog-tab','market','Zum Handelsposten']};
-        if(destinations[code]){const [act,id,label]=destinations[code];$('#dialog-content .levelup-footer .levelup-primary')?.insertAdjacentHTML('beforebegin',`<button class="button levelup-destination" data-action="${act}" data-id="${id}">${label} →</button>`);}
+        const destinations={hospital:['army-hospital','', 'copy.d80242675cb8f034'],treasure_house:['treasures-tab','','copy.a0a7f76300a1e377'],hall_of_alliance:['dialog-tab','alliance','ui.open_alliance'],trading_post:['dialog-tab','market','copy.c90962416e9925e8']};
+        if(destinations[code]){const [act,id,label]=destinations[code];$('#dialog-content .levelup-footer .levelup-primary')?.insertAdjacentHTML('beforebegin',`<button class="button levelup-destination" data-action="${act}" data-id="${id}"><span data-i18n="${label}">${esc(i18n.t(label))}</span> <span aria-hidden="true">→</span></button>`);}
+        if(previousHall){const levels=$('#game-dialog .hall-capacity-levels');if(levels)levels.open=previousHall.expanded;const scroll=$('#game-dialog .levelup-scroll');if(scroll)scroll.scrollTop=previousHall.scroll;if(previousHall.focused)levels?.querySelector('summary')?.focus({preventScroll:true});}
     }
     function buildingsDialog(trigger) {
         const fromBuildSlot=trigger?.id==='hud-build'||trigger?.id==='hud-build-second';
@@ -385,7 +466,7 @@
         if(panels.armyMode==='hospital'){panels.renderHospital();return;}
         trainingPanel.render();
     }
-    function unitName(t) { return t.name_de || t.name; }
+    function unitName(t) { const name=t.name_de||t.name;return i18n?.text(name)??name; }
     function trainDialog(code) {
         trainingPanel.selectTroop(Number(code));panels.onClick('army-troops',{dataset:{}});
     }
@@ -405,18 +486,20 @@
     function researchDialog(code) {
         const n=state.research_defs.find(n=>n.code===code);if(!n)return;
         const lv=Number(state.research[code]||0),next=n.levels.find(l=>l.level===lv+1),benefit=window.ConquerResearch.bonus(n,next||n.levels.find(l=>l.level===lv));
-        const bonusHtml=`<div class="detail-row"><span>${esc(benefit.label)}</span><strong>${esc(benefit.value)}</strong></div>${benefit.note?`<p class="muted">${esc(benefit.note)}</p>`:''}`;
+        const currentBenefit=window.ConquerResearch.bonus(n,n.levels.find(l=>l.level===lv));
+        const currentValue=n.type==='unlock'?t(lv?'upgrade.effect.unlocked':'upgrade.effect.unresearched'):currentBenefit.value;
+        const bonusHtml=`${levelupStat(benefit.label,currentValue,next?benefit.value:null)}${next?`<p class="levelup-effect-caption"><span>${esc(t('upgrade.effect.current'))}</span><span aria-hidden="true">→</span><span>${esc(t('upgrade.effect.next'))}</span></p>`:''}${benefit.note?`<p class="muted">${esc(benefit.note)}</p>`:''}`;
         const title=window.ConquerResearch.title(n),art=window.ConquerResearch.nodeArt(n,base,esc);
-        if(!next) {openDialog(`<h2>Forschung abgeschlossen</h2><div class="levelup-shell"><section class="levelup-overview"><div class="levelup-art research-art">${art}<span>${esc(title)}</span></div><div class="levelup-levels"><span>Stufe ${lv}</span><strong>Maximum</strong></div><div class="levelup-stats">${bonusHtml}</div></section><section class="levelup-needs"><div class="levelup-section-title levelup-main-title"><h3>Alle Stufen erforscht</h3><span>✓</span></div><p>Diese Forschung ist vollständig abgeschlossen.</p></section><footer class="levelup-footer"><button class="button levelup-primary" data-action="close-dialog">Zurück zum Forschungsbaum</button></footer></div>`);$('#game-dialog').classList.add('levelup-dialog-window');return;}
+        if(!next) {openDialog(`<h2>Forschung abgeschlossen</h2><div class="levelup-shell levelup-vivid research-detail"><div class="levelup-scroll"><section class="levelup-overview"><div class="levelup-art research-art">${art}<span>${esc(title)}</span></div><div class="levelup-levels"><span>Stufe ${lv}</span><strong>Maximum</strong></div><div class="levelup-stats">${bonusHtml}</div></section><section class="levelup-needs"><div class="levelup-section-title levelup-main-title"><h3>Alle Stufen erforscht</h3><span>✓</span></div><p>Diese Forschung ist vollständig abgeschlossen.</p></section></div><footer class="levelup-footer"><button class="button levelup-primary" data-action="close-dialog">Zurück zum Forschungsbaum</button></footer></div>`);$('#game-dialog').classList.add('levelup-dialog-window');return;}
         const running=state.research_queue.find(q=>(q.research_code||q.code)===code);
         if(running){
-            openDialog(`<h2>Forschung läuft</h2><div class="levelup-shell research-detail"><section class="levelup-overview"><div class="levelup-art research-art">${art}<span>${esc(title)}</span></div><div class="levelup-levels"><span>Stufe ${lv}</span><i aria-hidden="true">➜</i><strong>Stufe ${running.level_to}</strong></div><div class="levelup-stats">${bonusHtml}</div></section><section class="levelup-needs"><div class="levelup-section-title levelup-main-title"><h3>Aktive Forschung</h3><span>⚗</span></div><div class="levelup-running"><strong>Stufe ${running.level_to} wird erforscht</strong><span>Noch ${countdown(running.finishes_at)}</span></div></section><footer class="levelup-footer"><div class="levelup-time"><span>Restzeit</span><strong>${countdown(running.finishes_at)}</strong></div><button class="button levelup-primary" data-action="queue-speedups" data-type="research" data-id="${running.id}">Beschleunigen</button></footer></div>`);
+            openDialog(`<h2>Forschung läuft</h2><div class="levelup-shell levelup-vivid research-detail"><div class="levelup-scroll"><section class="levelup-overview"><div class="levelup-art research-art">${art}<span>${esc(title)}</span></div><div class="levelup-levels"><span>Stufe ${lv}</span><i aria-hidden="true">➜</i><strong>Stufe ${running.level_to}</strong></div><div class="levelup-stats">${bonusHtml}</div></section><section class="levelup-needs"><div class="levelup-section-title levelup-main-title"><h3>Aktive Forschung</h3><span>⚗</span></div><div class="levelup-running"><strong>Stufe ${running.level_to} wird erforscht</strong><span>Noch ${countdown(running.finishes_at)}</span></div></section></div><footer class="levelup-footer"><div class="levelup-time"><span>Restzeit</span><strong>${countdown(running.finishes_at)}</strong></div><button class="button levelup-primary" data-action="queue-speedups" data-type="research" data-id="${running.id}">Beschleunigen</button></footer></div>`);
             $('#game-dialog').classList.add('levelup-dialog-window');
             $('#game-dialog').dataset.research=code;return;
         }
         const missing=(next.requirements||[]).filter(r=>r.type==='academy'?state.buildings.academy.level<r.level:r.type==='research'?(state.research[r.code]||0)<r.level:false);
         const researchSeconds=Math.max(1,Math.ceil(next.time*(state.research_duration_factor??1)));
-        openDialog(`<h2>Forschung verbessern</h2><div class="levelup-shell research-detail"><section class="levelup-overview"><div class="levelup-art research-art">${art}<span>${esc(title)}</span></div><div class="levelup-levels"><span>Stufe ${lv}</span><i aria-hidden="true">➜</i><strong>Stufe ${lv+1}</strong></div><div class="levelup-stats">${bonusHtml}</div></section><section class="levelup-needs"><div class="levelup-section-title levelup-main-title"><h3>Voraussetzungen</h3><span>${missing.length?'Offen':'Bereit'}</span></div>${requirementResources(next.resources)}${window.ConquerResearch.renderRequirements({requirements:next.requirements,state,base,esc,researchNames})}${state.research_queue.length?'<p class="levelup-warning">In deiner Akademie läuft bereits eine Forschung.</p>':''}</section><footer class="levelup-footer"><div class="levelup-time"><span>Forschungszeit</span><strong>${duration(researchSeconds)}</strong></div><button class="button levelup-primary" data-action="research" data-id="${code}" ${missing.length||state.research_queue.length||!canAfford(next.resources)?'disabled':''}>Forschung auf Stufe ${lv+1} starten</button></footer></div>`);
+        openDialog(`<h2>Forschung verbessern</h2><div class="levelup-shell levelup-vivid research-detail"><div class="levelup-scroll"><section class="levelup-overview"><div class="levelup-art research-art">${art}<span>${esc(title)}</span></div><div class="levelup-levels"><span>Stufe ${lv}</span><i aria-hidden="true">➜</i><strong>Stufe ${lv+1}</strong></div><div class="levelup-stats">${bonusHtml}</div></section><section class="levelup-needs"><div class="levelup-section-title levelup-main-title"><h3>Voraussetzungen</h3><span>${missing.length?'Offen':'Bereit'}</span></div>${requirementResources(next.resources)}${window.ConquerResearch.renderRequirements({requirements:next.requirements,state,base,esc,researchNames})}${state.research_queue.length?'<p class="levelup-warning">In deiner Akademie läuft bereits eine Forschung.</p>':''}</section></div><footer class="levelup-footer"><div class="levelup-time"><span>Forschungszeit</span><strong>${duration(researchSeconds)}</strong></div><button class="button levelup-primary" data-action="research" data-id="${code}" ${missing.length||state.research_queue.length||!canAfford(next.resources)?'disabled':''}>Forschung auf Stufe ${lv+1} starten</button></footer></div>`);
         $('#game-dialog').classList.add('levelup-dialog-window');
     }
     function revealFocusedResearch() {
@@ -425,7 +508,7 @@
         if(node.top<body.top||node.bottom>body.bottom)panelHost.scrollTop+=node.top-body.top-(panelHost.clientHeight-node.height)/2;
     }
     function renderWorld(host=playfieldHost) {
-        state.city.city_skin=kingdom?.profile?.city_skin||'default';state.city.name_frame=kingdom?.profile?.name_frame||window.ConquerNameFrames.normalizeState(kingdom?.name_frames,state.city.city_skin).equipped;window.ConquerWorld.render({host,state,base,esc,monsterArt,now,teleport:teleportSelection,searchMap:query=>api('map/search'+(query?'?'+new URLSearchParams(query):'')),onMonsterAttack:id=>expeditionDialog(id,'monsters'),onMarchRecall:id=>action('march/recall',{march_id:id},'Die Truppen sind auf dem Heimweg.')});
+        state.city.city_skin=kingdom?.profile?.city_skin||'default';state.city.name_frame=kingdom?.profile?.name_frame||window.ConquerNameFrames.normalizeState(kingdom?.name_frames,state.city.city_skin).equipped;window.ConquerWorld.render({host,state,alliance:kingdom?.alliance,base,esc,monsterArt,now,teleport:teleportSelection,searchMap:query=>api('map/search'+(query?'?'+new URLSearchParams(query):'')),onTerritory:id=>territoryPanel.open(id),onGather:(id,kind='nodes')=>expeditionDialog(id,kind),onMonsterAttack:id=>expeditionDialog(id,'monsters'),onAllianceGarrison:target=>marchPanel.open(target.id,'alliance-center-garrison',{target}),onMarchRecall:id=>String(id).startsWith('territory-garrison:')?territoryPanel.recall(String(id).split(':')[1]):action('march/recall',{march_id:id},'Die Truppen sind auf dem Heimweg.')});
     }
     async function locateMonsterReport(report) {
         const charm=report?.outcome==='attacker_wins'?report.details?.charm:null,x=Number(charm?.x??report?.target_x),y=Number(charm?.y??report?.target_y);
@@ -435,26 +518,24 @@
     }
     function expeditionDialog(id,kind) { marchPanel.open(id,kind); }
     function renderReports() {
-        $('#content').innerHTML = state.reports.length?state.reports.map(r=>`<div class="report"><span><strong>${r.outcome==='attacker_wins'?'✦ Sieg!':'⚔ Gefecht beendet'} · ${r.target_x}, ${r.target_y}</strong><small>${new Date(date(r.created_at)).toLocaleString('de-DE')}</small></span><button class="button secondary" data-action="report" data-id="${r.id}">Ansehen →</button></div>`).join(''):'<div class="empty"><h3>Deine Geschichte ist noch ungeschrieben.</h3><p>Nach deinem ersten Monsterkampf findest du hier das Ergebnis, deine Verwundeten und deine Beute.</p><button class="button" data-action="tab" data-id="world">Welt erkunden →</button></div>';
+        $('#content').innerHTML = state.reports.length?state.reports.map(r=>`<div class="report"><span><strong>${r.outcome==='attacker_wins'?'✦ Sieg!':'⚔ Gefecht beendet'} · ${r.target_x}, ${r.target_y}</strong><small>${new Date(date(r.created_at)).toLocaleString(window.ConquerLocale?.locale??'en')}</small></span><button class="button secondary" data-action="report" data-id="${r.id}">Ansehen →</button></div>`).join(''):'<div class="empty"><h3>Deine Geschichte ist noch ungeschrieben.</h3><p>Nach deinem ersten Monsterkampf findest du hier das Ergebnis, deine Verwundeten und deine Beute.</p><button class="button" data-action="tab" data-id="world">Welt erkunden →</button></div>';
     }
     function reportDialog(id,page=0) {
         const r=state.reports.find(r=>Number(r.id)===Number(id));if(!r)return;
-        if(['city','rally'].includes(r.details?.battle_kind)){combatReport.open(r);return;}
+        if(['city','rally','territory'].includes(r.details?.battle_kind)){combatReport.open(r);return;}
         if(window.ConquerMonsterReport.isMonster(r))return monsterReports.open(r);
-        if(r.details?.type==='scout')return scoutReports.open(r);
-        const d=r.details||{},pvp=['city','rally'].includes(d.battle_kind),units=d.troops||[],size=innerHeight<540?1:innerHeight<700?2:3,pages=Math.max(1,Math.ceil(units.length/size));
+        if(['scout','neutral_village_scout'].includes(r.details?.type))return scoutReports.open(r);
+        const d=r.details||{},pvp=['city','rally','neutral_village'].includes(d.battle_kind),units=d.troops||[],size=innerHeight<540?1:innerHeight<700?2:3,pages=Math.max(1,Math.ceil(units.length/size));
         page=Math.max(0,Math.min(pages-1,Number(page)||0));
         const summary=`<section>${d.lord_xp>0?`<p class="notice">+${fmt(d.lord_xp)} Jagd-XP für deinen Hunter</p>`:''}<p class="muted">Gefecht bei ${r.target_x}, ${r.target_y}</p><div class="detail-row"><span>Gegner</span><strong>${esc(d.target_name||d.monster_name||'Monster')}</strong></div>${!pvp&&d.army_power!=null?`<div class="detail-row"><span>${d.type==='monster_rally'?'Rally-Macht':'Armeemacht'}</span><strong>${fmt(d.army_power)} / ${fmt(d.required_power)} benötigt</strong></div>`:`<div class="detail-row"><span>${pvp?'Angriffsstärke':d.type==='monster_rally'?'Schaden der Rally':'Schaden'}</span><strong>${fmt(d.attacker_damage)}</strong></div>`}<div class="detail-row"><span>${pvp?'Verteidigung':'Gegner-HP übrig'}</span><strong>${fmt(pvp?d.defender_strength:d.monster_hp_after)}</strong></div></section>`;
         const troops=`<section><h3>Deine Truppen</h3><div class="battle-units">${units.slice(page*size,(page+1)*size).map(t=>`<div class="battle-unit"><strong>${esc(unitName(state.troop_defs.find(u=>Number(u.code)===Number(t.code))||t))}</strong><small>${fmt(t.sent)} entsandt · ${fmt(t.survived)} überlebt<br>${fmt(t.injured)} verwundet${pvp?' · '+fmt(t.dead)+' gefallen':''}</small></div>`).join('')}</div>${pages>1?`<nav class="panel-pagination"><button class="button secondary" data-action="report-page" data-id="${r.id}" data-page="${page-1}" ${page===0?'disabled':''}>‹</button><span>Truppen ${page+1} / ${pages}</span><button class="button secondary" data-action="report-page" data-id="${r.id}" data-page="${page+1}" ${page+1===pages?'disabled':''}>›</button></nav>`:''}</section>`;
         const loot=d.resources_lost||d.loot||{};
         openDialog(`<h2>${r.outcome==='attacker_wins'?'Sieg für dein Reich':'Gefecht beendet'}</h2><div class="battle-report">${summary}${troops}<section class="battle-report-loot"><h3>${d.perspective==='defender'?'Verlorene Ressourcen':'Deine Beute'}</h3>${Object.keys(loot).length?costHtml(loot,true):'<p class="muted">Keine Ressourcen übertragen.</p>'}${(d.item_rewards||[]).map(item=>`<div class="detail-row"><span>${esc(item.name)}</span><strong>${fmt(item.count)}</strong></div>`).join('')}</section><p class="muted battle-report-note">${d.perspective==='defender'?'Überlebende Verteidiger bleiben in deiner Stadt. Verwundete findest du im Hospital.':'Überlebende Truppen und Beute kommen nach dem Rückmarsch an.'}</p></div>`);
     }
-    function sendPreferences(){const frame=$('#city-frame')?.contentWindow;if(!frame)return;const graphics=window.ConquerGraphicsQuality?.state?.()||{requested:'auto',effective:'normal'};frame.postMessage({type:'conquer:preferences',reduced_motion:Boolean(kingdom?.settings?.reduced_motion),city_skin:kingdom?.profile?.city_skin||'default',graphics_quality:graphics.requested,graphics_effective:graphics.effective},location.origin);frame.postMessage({type:'conquer:visibility',visible:!document.hidden&&current==='city'&&!$('#game-dialog').open&&!panelDialog.open},location.origin);}
-    window.addEventListener('message',event=>{const frame=$('#city-frame')?.contentWindow;if(event.origin!==location.origin||event.source!==frame||event.data?.type!=='conquer:graphics-performance')return;if(window.ConquerGraphicsQuality?.degrade?.()){sendPreferences();toast('Grafik wurde für eine flüssigere Darstellung auf Leicht angepasst.');}});
     function menuDialog() {
         const groups=[['Königreich',['quests','army','research','treasures','mastery','market','defense']],['Gemeinsam',['land','dungeons','expeditions','community','events','rankings','arena']],['Mein Spiel',['settings','worlds','account','help','bugreport']]];
         openDialog('<h2>Spielmenü</h2><div class="menu-groups">'+groups.map(([title,keys])=>'<section><h3>'+title+'</h3><div class="menu-grid">'+keys.map(key=>'<button class="menu-link '+(current===key?'selected':'')+'" data-action="'+(key==='bugreport'?'bug-report-open':'dialog-tab')+'" data-id="'+key+'" '+(current===key?'aria-current="page"':'')+'>'+svg(key)+'<span>'+navs[key]+'</span></button>').join('')+'</div></section>').join('')+'</div>');
-        $('#dialog-content .menu-grid').insertAdjacentHTML('beforeend','<button class="menu-link" data-action="vip-open"><span class="nav-emblem">♛</span><span>VIP</span></button>');
+        $('#dialog-content .menu-grid').insertAdjacentHTML('beforeend',`<button class="menu-link" data-action="vip-open"><span class="nav-emblem"><img class="nav-art" src="${base}/assets/art/ui-hud/vip.svg" alt=""></span><span>VIP</span></button>`);
         $('#game-dialog').classList.add('menu-dialog');
     }
     function shopDialog() {
@@ -463,39 +544,63 @@
     }
     const reportShare=window.ConquerReportShare({api,toast,esc,getState:()=>state});
     const combatReport=window.ConquerCombatReport({base,esc,fmt,openDialog,toast,unitName,getState:()=>state,openReport:id=>reportDialog(id),shareReport:(text,id)=>reportShare.open(text,id)});
-    const marchPanel=window.ConquerMarch({base,esc,fmt,openDialog,action,toast,api,getState:()=>state,getKingdom:()=>kingdom,getProfile:()=>kingdom?.profile,unitName,loadFormations:()=>defensePanel.refresh().then(s=>s.formations),shareTarget:(text)=>reportShare.open(text,0,{title:'Ziel teilen',prompt:'In welchem Chat möchtest du dieses Ziel teilen?',destinationLabel:'Chat für das Ziel',success:'Ziel geteilt.'})});
-    const rallyPanel=window.ConquerRallies({api,esc,fmt,date,duration,openDialog,action,toast,marchPanel,getState:()=>state});
-    window.addEventListener('conquer-rally-updated',()=>rallyPanel.list());
+    const marchPanel=window.ConquerMarch({base,esc,fmt,now,openDialog,action,toast,api,getState:()=>state,getKingdom:()=>kingdom,getProfile:()=>kingdom?.profile,unitName,loadFormations:()=>defensePanel.refresh().then(s=>s.formations),shareTarget:(text)=>reportShare.open(text,0,{title:'Ziel teilen',prompt:'In welchem Chat möchtest du dieses Ziel teilen?',destinationLabel:'Chat für das Ziel',success:'Ziel geteilt.'})});
+    const rallyPanel=window.ConquerRallies({base,api,esc,fmt,date,duration,now,openDialog,action,toast,marchPanel,unitName,openTerritory:id=>territoryPanel.open(id),getState:()=>state});
+    window.addEventListener('conquer-rally-updated',async()=>{const request=beginRallyRequest();try{acceptRallies(await api('rally/list'),request);overlay.update();}catch{syncRallyScope();overlay.update();}});
     const congressPanel=window.ConquerCongress({base,esc,fmt,duration,openDialog,getState:()=>state,marchPanel,action,toast});
     const villageMenu=window.ConquerVillage({base,esc,fmt,getState:()=>state,getKingdom:()=>kingdom,openDialog,navigate,action,toast,marchPanel});
     window.addEventListener('conquer-village-menu',e=>villageMenu.open(e.detail));
     let worldChat;
-    const panels=window.ConquerPanels({base,esc,fmt,date,duration,countdown,openDialog,action,api,navigate,refresh,toast,costHtml,now,labels,researchNames,render,sendPreferences,uploadProfileImage:file=>profileImageRequest(file),removeProfileImage:()=>profileImageRequest(),beginTeleport:item=>{const mode=item.teleport_mode,allianceCenters=mode==='alliance'?(kingdom?.alliance?.members||[]).filter(member=>Number.isFinite(Number(member.coord_x))&&Number.isFinite(Number(member.coord_y))).map(member=>({x:Number(member.coord_x),y:Number(member.coord_y)})):[];teleportSelection={item_code:Number(item.item_code),mode,origin_x:Number(state.city.coord_x),origin_y:Number(state.city.coord_y),alliance_centers:allianceCenters,max_distance:mode==='alliance'?12:null};navigate('world',{focusTitle:false});toast(mode==='alliance'?'Wähle einen Platz nahe einer verbündeten Stadt.':'Wähle einen freien Platz auf der Weltkarte.');},openSpeedups:(...args)=>queueSpeedups.show(...args),openPrivateChat:(id,name)=>{if($('#game-dialog').open)$('#game-dialog').close();worldChat?.openPrivate(id,name);navigate(playfield);},getState:()=>state,getKingdom:()=>kingdom,getExpeditions:()=>expeditions,getMarket:()=>market,getErrors:()=>loadErrors,renderGuide:()=>beginnerGuide.render(),audioControls:()=>sound?.controls()||''});
-    const featureContext={base,esc,fmt,date,duration,t,locale:()=>i18n?.locale||'de',countdown,openDialog,action,api,navigate,refresh,toast,costHtml,getState:()=>state,getKingdom:()=>kingdom,openShrine:(id,garrison=false)=>marchPanel.open(Number(id),garrison?'shrine-garrison':'shrine')};
+    const panels=window.ConquerPanels({base,esc,fmt,date,duration,countdown,openDialog,action,api,navigate,refresh,toast,costHtml,now,labels,researchNames,render,uploadProfileImage:file=>profileImageRequest(file),removeProfileImage:()=>profileImageRequest(),beginTeleport:item=>{const mode=item.teleport_mode,allianceCenters=mode==='alliance'?(kingdom?.alliance?.members||[]).filter(member=>Number.isFinite(Number(member.coord_x))&&Number.isFinite(Number(member.coord_y))).map(member=>({x:Number(member.coord_x),y:Number(member.coord_y)})):[];teleportSelection={item_code:Number(item.item_code),mode,origin_x:Number(state.city.coord_x),origin_y:Number(state.city.coord_y),alliance_centers:allianceCenters,max_distance:mode==='alliance'?12:null};navigate('world',{focusTitle:false});toast(mode==='alliance'?'Wähle einen Platz nahe einer verbündeten Stadt.':'Wähle einen freien Platz auf der Weltkarte.');},openSpeedups:(...args)=>queueSpeedups.show(...args),openPrivateChat:(id,name)=>{if($('#game-dialog').open)$('#game-dialog').close();navigate(playfield);worldChat?.openPrivate(id,name);},getState:()=>state,getKingdom:()=>kingdom,getExpeditions:()=>expeditions,getMarket:()=>market,getErrors:()=>loadErrors,renderGuide:()=>beginnerGuide.render(),audioControls:()=>sound?.controls()||''});
+    const featureContext={base,esc,fmt,date,duration,t,locale:()=>i18n?.locale||'en',countdown,openDialog,action,api,navigate,openWorldTarget,refresh,toast,costHtml,getState:()=>state,getKingdom:()=>kingdom,openShrine:(id,garrison=false)=>marchPanel.open(Number(id),garrison?'shrine-garrison':'shrine')};
     const scoutReports=window.ConquerScoutReport({...featureContext,unitName});
     const rewards=window.ConquerRewards.create(featureContext);
     const monsterReports=window.ConquerMonsterReport.create({...featureContext,openReport:id=>reportDialog(id),shareReport:(text,id)=>reportShare.open(text,id),locateReport:locateMonsterReport});
     const openSharedReport=async shareId=>{
         const result=await api(`community/shared-report/${Number(shareId)}?world_id=${Number(state.city.world_id)}`),report=result.report;
-        if(['city','rally'].includes(report?.details?.battle_kind)){combatReport.open(report);return;}
+        if(['city','rally','territory'].includes(report?.details?.battle_kind)){combatReport.open(report);return;}
         if(window.ConquerMonsterReport.isMonster(report)){monsterReports.open(report);return;}
         throw new Error('Dieser geteilte Bericht wird nicht unterstützt.');
     };
     const openSharedLocation=async location=>{
         const x=Number(location?.x),y=Number(location?.y),targetWorld=Number(location?.world);
-        if(!Number.isInteger(x)||!Number.isInteger(y)||x<0||x>255||y<0||y>255)throw new Error('Diese Koordinaten sind ungültig.');
+        if(!Number.isInteger(x)||!Number.isInteger(y)||x<0||x>Number(state.world?.map_profile?.width||256)-1||y<0||y>Number(state.world?.map_profile?.height||256)-1)throw new Error('Diese Koordinaten sind ungültig.');
         if(targetWorld!==Number(state.city.world_id))throw new Error('Dieses Ziel liegt auf einer anderen Welt.');
         navigate('world',{focusTitle:false});window.ConquerWorld.focus(x,y);await refresh();
         if(!window.ConquerWorld.locate(x,y,['monsters']))toast('Das Monster ist nicht mehr vorhanden. Die letzte Position wird gezeigt.');
     };
-    const overlay=window.ConquerOverlay({...featureContext,now,labels});
+    const overlay=window.ConquerOverlay({...featureContext,now,labels,getRallies:()=>allianceRallies});
     const activeEffects=window.ConquerActiveEffects({...featureContext,now});
     const inventoryOverview=window.ConquerInventoryOverview.create(featureContext);
+    const itemSources=window.ConquerItemSources.create({...featureContext,
+        onTarget:async(target,worldId)=>{
+            if(Number(state.city.world_id)!==worldId)return;
+            const monster=target.data;
+            if(target.kind!=='monsters'||!monster)return;
+            openWorldTarget({x:monster.coord_x,y:monster.coord_y,kind:'monsters',id:monster.id},worldId,()=>toast(t('sources.changed')));
+        },
+        onOpenDestination:async destination=>{
+            const worldId=Number(state.city.world_id);
+            if(destination.tab==='treasures')treasurePanel.selectTab(destination.section||'chests');
+            if(destination.tab==='market')tradingPanel.selectTab(destination.mode||'caravan');
+            navigate(destination.tab);
+            const version=navigationVersion;
+            if(destination.tab==='inventory'&&destination.item_code)panels.showInventoryItem(destination.item_code);
+            if(destination.tab==='market'){
+                tradingPanel.onClick('trading-category',{dataset:{id:'all'}});
+                if(destination.mode==='vip')tradingPanel.onClick('trading-view',{dataset:{id:'all'}});
+                if(destination.offer_id)document.querySelector(`[data-action="trading-buy"][data-id="${CSS.escape(String(destination.offer_id))}"]`)?.closest('.trading-card')?.scrollIntoView({block:'nearest'});
+            }
+            if(destination.tab==='dungeons'&&destination.dungeon_code){
+                await dungeonPanel.refresh();
+                if(version===navigationVersion&&Number(state.city.world_id)===worldId&&current==='dungeons')dungeonPanel.showSource(destination.dungeon_code);
+            }
+        }});
     const trainingPanel=window.ConquerTraining({...featureContext,now,unitName,getHost:()=>panelHost,armyHeader:()=>panels.armyHeader()});
     const queueSpeedups=window.ConquerQueueSpeedups({...featureContext,now,labels,researchNames,render,canUseTrainingSpeedups:()=>trainingPanel.canUseSpeedups()});
     const trainingHud=window.ConquerTrainingHud({getState:()=>state,now,refresh});
     const vipPanel=window.ConquerVip(featureContext);
-    const treasurePanel=window.ConquerTreasures({...featureContext,now,onUpgrade:()=>buildingDialog('treasure_house'),navigate:tab=>{navigate(tab);if(tab==='inventory')panels.onClick('inventory-category',{dataset:{id:'other'}});}});
+    const treasurePanel=window.ConquerTreasures({...featureContext,now,mobilePages,onUpgrade:()=>buildingDialog('treasure_house'),navigate:tab=>{navigate(tab);if(tab==='inventory')panels.onClick('inventory-category',{dataset:{id:'other'}});}});
     const tradingPanel=window.ConquerTrading({...featureContext,now,getMarket:()=>market,onUpgrade:()=>buildingDialog('trading_post')});
     const mailboxPanel=window.ConquerMailbox({...featureContext,openScoutReport:(...args)=>scoutReports.open(...args),openPlayerReport:report=>combatReport.open(report),openMonsterReport:mail=>{
         const cached=state.reports.find(r=>Number(r.id)===Number(mail.source_id));
@@ -503,30 +608,35 @@
         if(!window.ConquerMonsterReport.isMonster(report))return false;
         monsterReports.open(report);return true;
     }});
-    const communityPanel=window.ConquerCommunity({...featureContext,openSharedReport,openSharedLocation,openMailbox:()=>{navigate('reports');mailboxPanel.select('private');}});
+    const territoryPanel=window.ConquerTerritory({...featureContext,unitName,marchPanel});
+    const communityPanel=window.ConquerCommunity({...featureContext,openSharedReport,openSharedLocation,openStructureLocation:async location=>{navigate('world',{focusTitle:false});window.ConquerWorld.focus(location.x,location.y);await refresh();if(!window.ConquerWorld.locate(location.x,location.y,[location.kind],location.id))toast('Das Allianzgebäude ist an dieser Position nicht mehr vorhanden.');},beginStructurePlacement:structureType=>{const center=structureType==='center';teleportSelection={kind:'alliance-structure',structure_type:center?'center':'outpost',footprint:center?5:3,label:center?'Allianzzentrum':'Außenposten',art:center?'alliance-center-v3.webp':'alliance-outpost'};navigate('world',{focusTitle:false});toast(`${teleportSelection.label} auf einen freien Platz ziehen.`);},openMailbox:()=>{navigate('reports');mailboxPanel.select('private');}});
+    const socialHub=window.ConquerSocialHub({...featureContext,openPublicProfile:id=>panels.onClick('public-profile',{dataset:{id:String(id)}}),openPrivate:(id,name)=>{navigate(playfield);worldChat?.openPrivate(id,name);},openChat:channel=>{navigate(playfield);worldChat?.openChannel(channel);},chatChanged:()=>worldChat?.refresh(),openMailbox:()=>{navigate('reports');mailboxPanel.select('private');}});
+    const allianceCommunity=window.ConquerAllianceCommunity(featureContext);
     const dungeonPanel=window.ConquerDungeons({...featureContext,unitName});
-    worldChat=window.ConquerWorldChat({...featureContext,openSharedReport,openSharedLocation});
+    worldChat=window.ConquerWorldChat({...featureContext,openSharedReport,openSharedLocation,openPublicProfile:id=>panels.onClick('public-profile',{dataset:{id:String(id)}}),onOpen:()=>mobilePages?.opened('chat'),onClose:()=>mobilePages?.closed('chat')});
     const defensePanel=window.ConquerDefense(featureContext);
     const progressionPanel=window.ConquerProgression(featureContext);
     const worldPanel=window.ConquerWorldPanel(featureContext);
     const landPanel=window.ConquerLand(featureContext);
-    const beginnerGuide=window.ConquerBeginnerGuide({...featureContext,getHost:()=>panelHost,labels,buildingImage,buildingDialog,buildingFunction});
+    const beginnerGuide=window.ConquerBeginnerGuide({...featureContext,getHost:()=>panelHost,labels,buildingImage,buildingDialog,buildingFunction,openCommunity:tab=>communityPanel.onClick('community-open',{dataset:{action:'community-open',id:tab}})});
     const comfort=window.ConquerGameComfort({...featureContext,labels,nextGoal:()=>beginnerGuide.nextGoal(),openGoal:()=>beginnerGuide.openNextGoal()});
     document.addEventListener('click',event=>{if(event.target.closest('[data-action="show-goal-hint"]')){comfort.showGoal();toast('Der Zielhinweis ist wieder eingeblendet.');}});
     const bugReports=window.ConquerBugReports(featureContext);
-    document.addEventListener('submit',async e=>{const form=e.target.closest('form[data-form]');if(!form)return;e.preventDefault();if(busy||!form.reportValidity())return;try{if(await bugReports.onSubmit(form))return;if(mailboxPanel.onSubmit(form)||dungeonPanel.onSubmit(form)||communityPanel.onSubmit(form)||defensePanel.onSubmit(form))return;if(await landPanel.onSubmit(form))return;if(await progressionPanel.onSubmit(form))return;await panels.onSubmit(form);}catch(err){toast(err.message);}});
-    document.addEventListener('input',e=>{if($('#content').contains(e.target)&&e.target.matches('input,textarea,select')&&!e.target.matches('[data-hospital-count]'))$('#content').dataset.dirty='true';});
+    document.addEventListener('submit',async e=>{const form=e.target.closest('form[data-form]');if(!form)return;e.preventDefault();if(busy||!form.reportValidity())return;try{if(await bugReports.onSubmit(form))return;if(territoryPanel.onSubmit(form))return;if(socialHub.onSubmit(form)||allianceCommunity.onSubmit(form)||mailboxPanel.onSubmit(form)||dungeonPanel.onSubmit(form)||communityPanel.onSubmit(form)||defensePanel.onSubmit(form))return;if(await landPanel.onSubmit(form))return;if(await progressionPanel.onSubmit(form))return;await panels.onSubmit(form);}catch(err){toast(err.message);}});
+    document.addEventListener('input',e=>{if($('#content').contains(e.target)&&e.target.matches('input,textarea,select')&&!e.target.matches('[data-hospital-count],[data-transient-input]'))$('#content').dataset.dirty='true';});
     document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='research-search'){e.preventDefault();window.ConquerResearch.setSearch(e.target.value);delete $('#content').dataset.dirty;renderResearch(true);}});
-    window.addEventListener('message',e=>{const frame=$('#city-frame');if(e.origin!==location.origin||e.source!==frame?.contentWindow||!e.data)return;if(e.data.type==='conquer:building-panel'&&['treasures','market'].includes(e.data.tab)){if(e.data.tab==='treasures')treasurePanel.selectTab(e.data.panel);else tradingPanel.selectTab(e.data.panel);navigate(e.data.tab);return;}if(e.data.type==='conquer:village-menu')villageMenu.open({kind:'home'});if(e.data.type==='conquer:building-function'&&Object.hasOwn(state?.buildings||{},e.data.code))buildingFunction(e.data.code,e.data.troopCode);if(e.data.type==='conquer:building'&&Object.hasOwn(state?.buildings||{},e.data.code))buildingDialog(e.data.code);if(e.data.type==='conquer:navigate'&&Object.hasOwn(navs,e.data.tab))navigate(e.data.tab);});
     document.addEventListener('click',e=>{
         const b=e.target.closest('[data-action]'); if(!b || b.disabled) return;
         const {action:act,id,kind}=b.dataset;
         if(act==='command-retry'){const pending=commands.pending();if(pending)action(pending.path,pending.body,'Auftrag bestätigt.');return;}
         if(rewards.onClick(act))return;
         if(monsterReports.onClick(act,b))return;
+        if(itemSources.onClick(act,b))return;
         if(act==='gather-recall')return action('march/recall',{march_id:Number(id)},'Die Sammler sind auf dem Heimweg.');
         if(act==='teleport-cancel'){teleportSelection=null;renderWorld();toast('Zielwahl beendet.');return;}
         if(act==='teleport-confirm'&&teleportSelection){const selection=teleportSelection;(async()=>{const result=await action('kingdom/action',{action:'inventory.use',item_code:selection.item_code,target_x:Number(b.dataset.x),target_y:Number(b.dataset.y)});if(result){teleportSelection=null;renderWorld();}})();return;}
+        if(act==='structure-confirm'&&teleportSelection?.kind==='alliance-structure'){const selection=teleportSelection,x=Number(b.dataset.x),y=Number(b.dataset.y);(async()=>{const result=await communityPanel.placeStructure(selection.structure_type,x,y);if(result){teleportSelection=null;renderWorld();window.ConquerWorld.locate(x,y,[selection.structure_type==='center'?'alliance_center':'outpost'],result.id);}})();return;}
+        if(act==='alliance-center-garrison'){const target=state.alliance_structures?.find(entry=>Number(entry.id)===Number(b.dataset.id));if(target?.can_garrison)marchPanel.open(target.id,'alliance-center-garrison',{target});return;}
         if(act==='retry') return refresh(); if(!state)return;
         if(act==='close-dialog'){$('#game-dialog').close();return;}
         if(act==='bug-report-open'){const dialogTitle=$('#game-dialog').open?$('#dialog-content h2,h3')?.textContent.trim():'';bugReports.begin({path:location.pathname+'#'+current,label:dialogTitle?navs[current]+' – '+dialogTitle:navs[current]});return;}
@@ -535,14 +645,14 @@
         if(overlay.onClick(act,b)||vipPanel.onClick(act,b))return;
         if(['army-hospital','army-troops','treasures-tab'].includes(act))$('#game-dialog').close();
         if(act==='treasures-tab')return navigate('treasures');
-        if(queueSpeedups.onClick(act,b,e)||trainingPanel.onClick(act,b)||mailboxPanel.onClick(act,b)||dungeonPanel.onClick(act,b)||treasurePanel.onClick(act,b)||tradingPanel.onClick(act,b)||landPanel.onClick(act,b)||worldPanel.onClick(act,b)||communityPanel.onClick(act,b)||defensePanel.onClick(act,b)||progressionPanel.onClick(act,b)||congressPanel.onClick(act,b)||rallyPanel.onClick(act,b)||villageMenu.onClick(act,b)||marchPanel.onClick(act,b)||panels.onClick(act,b))return;
+        if(socialHub.onClick(act,b)||allianceCommunity.onClick(act,b)||territoryPanel.onClick(act,b)||queueSpeedups.onClick(act,b,e)||trainingPanel.onClick(act,b)||mailboxPanel.onClick(act,b)||dungeonPanel.onClick(act,b)||treasurePanel.onClick(act,b)||tradingPanel.onClick(act,b)||landPanel.onClick(act,b)||worldPanel.onClick(act,b)||communityPanel.onClick(act,b)||defensePanel.onClick(act,b)||progressionPanel.onClick(act,b)||congressPanel.onClick(act,b)||rallyPanel.onClick(act,b)||villageMenu.onClick(act,b)||marchPanel.onClick(act,b)||panels.onClick(act,b))return;
         if(act==='menu-more')return menuDialog();
         if(act==='chat-open')return worldChat?.open();
         if(act==='shop-open')return shopDialog();
         if(act==='shop-section'){
             $('#game-dialog').close();tradingPanel.selectTab(id);return navigate('market');
         }
-        if(act==='return-playfield')return navigate(playfield);
+        if(act==='return-playfield')return mobilePages?.isMobile()?mobilePages.back():navigate(playfield);
         if(act==='research-branch'){if(window.ConquerResearch.selectBranch(id)){delete $('#content').dataset.dirty;renderResearch(true);}return;}
         if(act==='research-group'){window.ConquerResearch.setGroup(id);delete $('#content').dataset.dirty;renderResearch(true);return;}
         if(act==='research-search'||act==='research-clear'){window.ConquerResearch.setSearch(act==='research-clear'?'':$('#research-search')?.value||'');delete $('#content').dataset.dirty;renderResearch(true);return;}
@@ -567,14 +677,17 @@
         if(act==='logout') { api('auth/logout',{}).then(()=>location.href=base+'/').catch(e=>toast(e.message)); }
     });
     $('.dialog-close').addEventListener('click',()=>$('#game-dialog').close());
-    $('#game-dialog').addEventListener('close',()=>{placeToast();sendPreferences();if(dialogTrigger?.isConnected&&(!panelDialog.open||panelDialog.contains(dialogTrigger)))dialogTrigger.focus({preventScroll:true});else if(panelDialog.open&&!panelDialog.contains(document.activeElement))$('#page-title').focus({preventScroll:true});else if(!panelDialog.open)$('#navigation [aria-current="page"]')?.focus({preventScroll:true});dialogTrigger=null;});
+    $('#game-dialog').addEventListener('close',()=>{if(!$('#game-dialog').open)mobilePages?.closed('dialog');});
+    $('#game-dialog').addEventListener('close',()=>{placeToast();if(dialogTrigger?.isConnected&&(!panelDialog.open||panelDialog.contains(dialogTrigger)))dialogTrigger.focus({preventScroll:true});else if(panelDialog.open&&!panelDialog.contains(document.activeElement))$('#page-title').focus({preventScroll:true});else if(!panelDialog.open)$('#navigation [aria-current="page"]')?.focus({preventScroll:true});dialogTrigger=null;});
     $('#game-dialog').addEventListener('click',e=>{if(e.target===$('#game-dialog')){const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.target.close();}});
     $('#lord-talent-button').addEventListener('click',()=>{if(state)navigate('mastery');});
     $('#account-button').addEventListener('click',()=>{if(state)navigate('profile');});
+    $('.hud-profile').addEventListener('click',event=>{if(state&&!event.target.closest('button'))navigate('profile');});
 
-    panelDialog.addEventListener('cancel',e=>{e.preventDefault();navigate(playfield);});
+    panelDialog.addEventListener('cancel',e=>{e.preventDefault();if(mobilePages?.isMobile())mobilePages.back();else navigate(playfield);});
     panelDialog.addEventListener('click',e=>{if(e.target!==panelDialog)return;const r=panelDialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)navigate(playfield);});
-    panelDialog.addEventListener('close',()=>{sendPreferences();
+    panelDialog.addEventListener('close',()=>{
+        if(panelDialog.open)return;
         if(!isPlayfield(current))navigate(playfield);
         const trigger=panelTrigger;panelTrigger=null;
         const target=trigger?.node?.isConnected?trigger.node:trigger?.id?document.getElementById(trigger.id):trigger?.tab?$('#navigation')?.querySelector(`[data-id="${CSS.escape(trigger.tab)}"]`):null;
@@ -582,7 +695,7 @@
     });
 
     window.addEventListener('conquer-world-moved',()=>{if(current==='world'&&!busy&&!$('#game-dialog').open)refresh();});
-    window.addEventListener('hashchange',()=>{const t=location.hash.slice(1);if(Object.hasOwn(navs,t)&&t!==current)navigate(t);});
+    window.addEventListener('hashchange',()=>{const t=location.hash.slice(1);if(Object.hasOwn(navs,t)&&t!==current)navigate(t,{fromHistory:true});});
     let panelResizeTimer,panelNeedsResize=false;
     function resizePanel(){
         clearTimeout(panelResizeTimer);
@@ -595,7 +708,7 @@
     window.addEventListener('resize',()=>{panelNeedsResize=true;resizePanel();});
     panelHost.addEventListener('focusout',resizePanel);
     $('#game-dialog').addEventListener('close',resizePanel);
-    setInterval(()=>{if(document.hidden)return;queueSpeedups.update();activeEffects.update();treasurePanel.updateTime();tradingPanel.updateTime();panels.updateHospitalTime();document.querySelectorAll('[data-end]').forEach(el=>{const text=duration((date(el.dataset.end)-now())/1000);if(el.textContent!==text)el.textContent=text;});},1000);
+    setInterval(()=>{if(document.hidden)return;rallyPanel.updateTime();marchPanel.update();queueSpeedups.update();activeEffects.update();treasurePanel.updateTime();tradingPanel.updateTime();panels.updateHospitalTime();document.querySelectorAll('[data-end]').forEach(el=>{const text=duration((date(el.dataset.end)-now())/1000);if(el.textContent!==text)el.textContent=text;});},1000);
     window.ConquerPolling({delay:()=>Math.max(apiRetryAt-Date.now(),current==='world'||state?.marches?.length||state?.build_queue?.length||state?.troop_queue?.length||state?.research_queue?.length?5000:15000),refresh:async()=>{
         if(busy) return;
         const dialog=$('#game-dialog');
@@ -606,8 +719,7 @@
         if(dialog.open&&dialog.dataset.research&&state&&!state.research_queue.some(q=>(q.research_code||q.code)===dialog.dataset.research))researchDialog(dialog.dataset.research);
         if(dialog.open && dialog.dataset.building && before!==JSON.stringify([state?.buildings,state?.build_queue])) buildingDialog(dialog.dataset.building,{recommended:dialog.dataset.buildingRecommendation==='true'});
     }});
-    document.addEventListener('visibilitychange',sendPreferences);
-    window.addEventListener('conquer:locale',()=>location.reload());
+    document.addEventListener('conquer:locale',()=>location.reload());
     const entry=location.hash.slice(1).split('?');if(['treasures','market'].includes(entry[0])&&entry[1]){current=entry[0];const section=new URLSearchParams(entry[1]).get('section');if(current==='treasures')treasurePanel.selectTab(section);else tradingPanel.selectTab(section);history.replaceState(null,'','#'+current);}
     refresh().then(async()=>{
         if(state&&comfort.since())await refresh(false);
@@ -621,7 +733,7 @@
         const reportId=startupParams.get('combat_report');
         if(!reportId||!/^\d+$/.test(reportId)||!state)return;
         const url=new URL(location.href);url.searchParams.delete('combat_report');history.replaceState(history.state,'',url);
-        try{const result=await api('battle/report/'+reportId);const report=result.report;if(['city','rally'].includes(report?.details?.battle_kind))combatReport.open(report);}
+        try{const result=await api('battle/report/'+reportId);const report=result.report;if(['city','rally','territory'].includes(report?.details?.battle_kind))combatReport.open(report);}
         catch(error){toast(error.message);}
     });
 })();

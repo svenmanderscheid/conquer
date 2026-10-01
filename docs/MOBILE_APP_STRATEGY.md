@@ -2,7 +2,7 @@
 
 ## Ziel
 
-Conquer soll später aus einer gemeinsamen Codebasis als Web-App, iOS-App und Android-App angeboten werden. Das vorhandene Frontend aus HTML, CSS, JavaScript und Three.js wird dafür weiterverwendet und voraussichtlich mit Capacitor in native App-Projekte eingebettet. Das PHP-/MySQL-System bleibt das zentrale Online-Backend für Anmeldung, Spielregeln und gespeicherte Spielstände.
+Conquer soll später aus einer gemeinsamen Codebasis als Web-App, iOS-App und Android-App angeboten werden. Das vorhandene Frontend aus HTML, CSS und JavaScript wird dafür weiterverwendet und voraussichtlich mit Capacitor in native App-Projekte eingebettet. Das PHP-/MySQL-System bleibt das zentrale Online-Backend für Anmeldung, Spielregeln und gespeicherte Spielstände.
 
 ## Zeitpunkt
 
@@ -38,13 +38,13 @@ Vorgangskennungen müssen auch beim lokalen Handytest über eine HTTP-LAN-Adress
 
 ### Leistung
 
-- 3D-Szenen, Texturen und Animationen werden regelmäßig in typischen Handyformaten geprüft.
-- Auflösung, Schatten, Partikeleffekte und Animationsdichte müssen bei Bedarf abhängig von der Geräteleistung reduziert werden können.
-- Große Assets werden komprimiert, nur bei Bedarf geladen und nach Möglichkeit wiederverwendet oder instanziert.
+- Gezeichnete Spielansichten, Bilder und Animationen werden regelmäßig in typischen Handyformaten geprüft.
+- Bildauflösung, Effekte und Animationsdichte müssen bei Bedarf abhängig von der Geräteleistung reduziert werden können.
+- Große Assets werden komprimiert, nur bei Bedarf geladen und nach Möglichkeit wiederverwendet .
 - Lange Aufgaben dürfen die Bedienung nicht blockieren; Speicherverbrauch und Wiederaufnahme nach App-Wechsel sind bei größeren Funktionen mitzudenken.
 
 ## Späte App-Phase
 
-Wenn das Spiel stabil genug ist, folgt ein kleiner technischer Prototyp mit Capacitor für beide Plattformen. Dabei werden zuerst Anmeldung, Stadt, Weltkarte, 3D-Ansicht, Sitzungswiederaufnahme und ein kompletter schreibender Spielablauf auf echten Geräten geprüft. Erst nach diesem Durchstich folgen Push-Nachrichten und weitere native Funktionen.
+Wenn das Spiel stabil genug ist, folgt ein kleiner technischer Prototyp mit Capacitor für beide Plattformen. Dabei werden zuerst Anmeldung, gezeichnete Stadt, Weltkarte, Sitzungswiederaufnahme und ein kompletter schreibender Spielablauf auf echten Geräten geprüft. Erst nach diesem Durchstich folgen Push-Nachrichten und weitere native Funktionen.
 
 Swift für iOS und Kotlin für Android werden nur für begrenzte native Anpassungen verwendet. Die gemeinsame Spiellogik und Oberfläche bleiben in JavaScript, damit Fehlerbehebungen und neue Funktionen nicht dreimal umgesetzt werden müssen.

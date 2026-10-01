@@ -9,6 +9,9 @@ use Conquer\Game\City\{BuildingData,CityState,TroopData};
 use Conquer\Game\March\MarchTick;
 use Conquer\Game\Research\{ResearchData,ResearchProcessor};
 use Conquer\Game\Shrine\CongressService;
+use Conquer\Game\World\WorldMapProfile;
+use Conquer\Game\Territory\TerritoryService;
+use Conquer\Game\Rally\RallyCapacity;
 
 /** Compact read model for the illustrated game client. All actions use the game services. */
 final class GameHandler
@@ -18,9 +21,11 @@ final class GameHandler
         $session = Session::current();
         if (!$session) { Response::error(401, 'UNAUTHENTICATED', 'Bitte melde dich an.'); }
         $pid = (int) $session['player_id'];
+        $activeWorldId=\Conquer\Game\World\WorldContext::id();
         $returnSince = isset($_GET['return_since']) ? filter_var($_GET['return_since'], FILTER_VALIDATE_INT, ['options'=>['min_range'=>1,'max_range'=>time()]]) : null;
         if ($returnSince === false) { Response::error(400, 'INVALID_TIME', 'Ungültiger Zeitpunkt für die Rückkehrübersicht.'); }
         \Conquer\Game\Dungeon\DungeonService::tick($pid);
+        TerritoryService::tick($activeWorldId);
         MarchTick::runForPlayer($pid);
         \Conquer\Game\Rally\RallyService::tick();
         ResearchProcessor::processQueue($pid);
@@ -30,10 +35,12 @@ final class GameHandler
         $city = $state['city'];
         $worldId=(int)$city['world_id'];
         $buffs=\Conquer\Game\Research\BuffEngine::getBuffs($pid,$worldId);
-        $world=$db->query('SELECT speed_factor,gather_factor,map_size FROM worlds WHERE id=?',[$worldId])->fetch();
-        $mapMax=(int)$world['map_size']-1;
-        $mapX = filter_var($_GET['map_x'] ?? $city['coord_x'], FILTER_VALIDATE_INT, ['options'=>['min_range'=>0,'max_range'=>$mapMax]]);
-        $mapY = filter_var($_GET['map_y'] ?? $city['coord_y'], FILTER_VALIDATE_INT, ['options'=>['min_range'=>0,'max_range'=>$mapMax]]);
+        $world=$db->query('SELECT id,name,slug,status,speed_factor,gather_factor,haul_factor,map_size FROM worlds WHERE id=?',[$worldId])->fetch();
+        $mapProfile=WorldMapProfile::forWorld($worldId);
+        $mapMaxX=(int)$mapProfile['width']-1;
+        $mapMaxY=(int)$mapProfile['height']-1;
+        $mapX = filter_var($_GET['map_x'] ?? $city['coord_x'], FILTER_VALIDATE_INT, ['options'=>['min_range'=>0,'max_range'=>$mapMaxX]]);
+        $mapY = filter_var($_GET['map_y'] ?? $city['coord_y'], FILTER_VALIDATE_INT, ['options'=>['min_range'=>0,'max_range'=>$mapMaxY]]);
         $mapRadius=filter_var($_GET['map_radius']??30,FILTER_VALIDATE_INT,['options'=>['min_range'=>12,'max_range'=>60]]);
         if ($mapX === false || $mapY === false || $mapRadius === false) { Response::error(400, 'INVALID_COORDINATES', 'Ungültige Kartenkoordinaten.'); }
         \Conquer\Game\Map\FrontierService::refresh($pid, $city);
@@ -50,6 +57,14 @@ final class GameHandler
                 $future=\Conquer\Game\City\BuildingProgression::atLevels([$code=>$next]);
                 $building['progression']=['label'=>$label,'current'=>$current[$key],'next'=>$future[$key]];
             }
+            if($code==='hall_of_alliance'){
+                $researchBonus=(float)($buffs['rally_attack_amount']??0);
+                $building['rally_capacity']=RallyCapacity::describe((int)$building['level'],$researchBonus);
+                $building['rally_capacity']['levels']=array_map(static function(int $level)use($researchBonus):array{
+                    $capacity=RallyCapacity::describe($level,$researchBonus);
+                    return ['level'=>$level,'base'=>$capacity['base'],'total'=>$capacity['total']];
+                },range(1,30));
+            }
             $building['production'] = $state['production_rates'][$code] ?? 0;
             $building['requirements'] = BuildingData::getUpgradeRequirements($code, $next);
         }
@@ -65,13 +80,14 @@ final class GameHandler
             WHERE c.world_id=? AND c.player_id<>? AND c.is_hidden=0
             AND c.coord_x BETWEEN ? AND ? AND c.coord_y BETWEEN ? AND ?
             ORDER BY POW(c.coord_x-?,2)+POW(c.coord_y-?,2),p.id LIMIT 80",
-            [$worldId,$pid,max(0,$mapX-$mapRadius),min($mapMax,$mapX+$mapRadius),max(0,$mapY-$mapRadius),min($mapMax,$mapY+$mapRadius),$mapX,$mapY])->fetchAll();
-        $monsters = $db->query('SELECT id,monster_code,coord_x,coord_y,hp_current FROM field_monsters WHERE world_id = ? AND hp_current > 0 AND coord_x BETWEEN ? AND ? AND coord_y BETWEEN ? AND ? ORDER BY POW(coord_x - ?,2)+POW(coord_y - ?,2) LIMIT 80', [$worldId,max(0,$mapX-$mapRadius),min($mapMax,$mapX+$mapRadius),max(0,$mapY-$mapRadius),min($mapMax,$mapY+$mapRadius),$mapX,$mapY])->fetchAll();
+            [$worldId,$pid,max(0,$mapX-$mapRadius),min($mapMaxX,$mapX+$mapRadius),max(0,$mapY-$mapRadius),min($mapMaxY,$mapY+$mapRadius),$mapX,$mapY])->fetchAll();
+        $monsters = $db->query('SELECT id,monster_code,coord_x,coord_y,hp_current FROM field_monsters WHERE world_id = ? AND hp_current > 0 AND coord_x BETWEEN ? AND ? AND coord_y BETWEEN ? AND ? ORDER BY POW(coord_x - ?,2)+POW(coord_y - ?,2) LIMIT 80', [$worldId,max(0,$mapX-$mapRadius),min($mapMaxX,$mapX+$mapRadius),max(0,$mapY-$mapRadius),min($mapMaxY,$mapY+$mapRadius),$mapX,$mapY])->fetchAll();
         foreach ($monsters as &$monster) {
             $monster = \Conquer\Game\Map\MonsterData::mapData($monster);
         }
         unset($monster);
-        $nodes = $db->query('SELECT id,coord_x,coord_y,object_type,level,resource_amount,gatherer_march_id FROM field_objects WHERE world_id = ? AND resource_amount > 0 AND (expires_at > UTC_TIMESTAMP() OR gatherer_march_id IS NOT NULL) AND coord_x BETWEEN ? AND ? AND coord_y BETWEEN ? AND ? ORDER BY POW(coord_x - ?,2)+POW(coord_y - ?,2) LIMIT 80', [$worldId,max(0,$mapX-$mapRadius),min($mapMax,$mapX+$mapRadius),max(0,$mapY-$mapRadius),min($mapMax,$mapY+$mapRadius),$mapX,$mapY])->fetchAll();
+        $nodes = $db->query('SELECT id,coord_x,coord_y,object_type,level,resource_amount,gatherer_march_id FROM field_objects WHERE world_id = ? AND resource_amount > 0 AND (expires_at > UTC_TIMESTAMP() OR gatherer_march_id IS NOT NULL) AND coord_x BETWEEN ? AND ? AND coord_y BETWEEN ? AND ? ORDER BY POW(coord_x - ?,2)+POW(coord_y - ?,2) LIMIT 80', [$worldId,max(0,$mapX-$mapRadius),min($mapMaxX,$mapX+$mapRadius),max(0,$mapY-$mapRadius),min($mapMaxY,$mapY+$mapRadius),$mapX,$mapY])->fetchAll();
+        $villages = \Conquer\Game\Map\NeutralVillageService::mapRows($worldId,$mapX,$mapY,$mapRadius);
         $nodes=\Conquer\Game\Map\FieldObjectService::withOccupations($nodes,$worldId,$pid);
         $research = $db->query('SELECT research_code,level FROM player_research WHERE player_id = ? AND world_id = ?', [$pid,$worldId])->fetchAll(\PDO::FETCH_KEY_PAIR);
         foreach($nodes as &$node){$resource=\Conquer\Game\Map\FieldObjectService::RESOURCE_BY_TYPE[(int)$node['object_type']];$node['gather_rate']=\Conquer\Game\March\GatherService::rate($resource,(int)$node['level'],$buffs,(float)$world['gather_factor']);}unset($node);
@@ -85,6 +101,19 @@ final class GameHandler
         $troopDefs=[];
         foreach(TroopData::forCity($state,$buffs,$research,$trainingBoost) as $troop){
             $code=(int)$troop['code'];
+            $troopType=\Conquer\Game\Research\ResearchEffects::troopType($code);
+            $attackMultiplier=\Conquer\Game\Research\BuffEngine::effectiveMultiplier($buffs,$troopType,'atk');
+            $defenseMultiplier=\Conquer\Game\Research\BuffEngine::effectiveMultiplier($buffs,$troopType,'def');
+            $hpMultiplier=\Conquer\Game\Research\BuffEngine::effectiveMultiplier($buffs,$troopType,'hp');
+            $speedMultiplier=\Conquer\Game\Research\BuffEngine::effectiveMultiplier($buffs,$troopType,'spd');
+            $bonusValue=static fn(float $base,float $multiplier):int=>max(0,(int)round($base*max(0.0,$multiplier-1.0)));
+            $troop['stat_bonuses']=[
+                'power'=>$bonusValue((float)($troop['power']??0),($attackMultiplier+$defenseMultiplier+$hpMultiplier)/3),
+                'attack'=>$bonusValue((float)($troop['attack']??0),$attackMultiplier),
+                'defense'=>$bonusValue((float)($troop['defense']??0),$defenseMultiplier),
+                'hp'=>$bonusValue((float)($troop['hp']??0),$hpMultiplier),
+                'march_speed'=>$bonusValue((float)($troop['march_speed']??0),$speedMultiplier),
+            ];
             // Keep the server's full precision so the client can choose the true
             // minimum that reaches the exact threshold used by BattleEngine.
             $troop['monster_power']=\Conquer\Game\March\ArmyPower::unit($troop,$monsterMixed);
@@ -100,24 +129,29 @@ final class GameHandler
         $researchQueue = $db->query('SELECT id,research_code,level_to,started_at,finishes_at FROM research_queue WHERE player_id = ? AND world_id = ? AND is_processed = 0', [$pid,$worldId])->fetchAll();
         $reports = \Conquer\Game\March\BattleReportService::list($pid);
         $marches = \Conquer\Game\March\MarchDispatcher::listActive($pid);
+        $publicMarches = \Conquer\Game\March\MarchDispatcher::listAllActive($pid);
         $rallyMarches=\Conquer\Game\Rally\RallyService::activeMarchesForPlayer($pid);
-        $marches=array_merge($marches,$rallyMarches);
+        $marches=array_merge($marches,$rallyMarches,\Conquer\Game\Territory\TerritoryGarrison::activeMarches($pid,$worldId));
         // Permanent world landmarks must be part of every map snapshot. They
         // deliberately ignore the current viewport so navigation can always
         // reach the Congress and all four elemental shrines.
-        $congress=CongressService::state($pid);
-        $shrines=CongressService::eventShrines($pid);
-        $allianceStructures=\Conquer\Game\Alliance\AllianceTerritoryService::worldStructures($worldId);
+        $congress=$mapProfile['key']==='luxembourg'?null:CongressService::state($pid);
+        $shrines=$mapProfile['key']==='luxembourg'?[]:CongressService::eventShrines($pid);
+        $allianceStructures=\Conquer\Game\Alliance\AllianceTerritoryService::worldStructures($worldId,$pid);
         $openTarget=static fn(array $row):bool=>\Conquer\Game\World\LandAccessPolicy::isOpen($worldId,(int)($row['coord_x']??$row['x']),(int)($row['coord_y']??$row['y']));
         $monsters=array_values(array_filter($monsters,static fn(array $row):bool=>$openTarget($row)&&\Conquer\Game\Map\MonsterData::isActive((int)$row['monster_code'])));
         $nodes=array_values(array_filter($nodes,$openTarget));
+        $villages=array_values(array_filter($villages,$openTarget));
         $players=array_values(array_filter($players,$openTarget));
         $charms=array_values(array_filter(\Conquer\Game\Charm\CharmQueryService::inBounds($worldId,$pid,$mapX,$mapY,$mapRadius),$openTarget));
         $land=\Conquer\Game\World\LandProgressService::at($worldId,(int)$city['coord_x'],(int)$city['coord_y']);
-        $zoneBounds=\Conquer\Game\World\LandGeometry::zoneBounds((int)$world['map_size']);
-        $zones=array_map(static fn(array $zone):array=>$zone+['bounds'=>$zoneBounds[$zone['key']]??null],\Conquer\Game\World\LandUnlockService::status($worldId));
-        $landState=['parcel_size'=>8,'map_size'=>(int)$world['map_size'],'zones'=>$zones,'current'=>$land?array_intersect_key($land,array_flip(['id','level','zone','open'])):null];
+        $zoneBounds=$mapProfile['key']==='luxembourg'?[]:\Conquer\Game\World\LandGeometry::zoneBounds((int)$world['map_size']);
+        $zones=$mapProfile['key']==='luxembourg'?[]:array_map(static fn(array $zone):array=>$zone+['bounds'=>$zoneBounds[$zone['key']]??null],\Conquer\Game\World\LandUnlockService::status($worldId));
+        $landState=['parcel_size'=>8,'map_size'=>(int)$world['map_size'],'width'=>$mapProfile['width'],'height'=>$mapProfile['height'],'zones'=>$zones,'current'=>$land?array_intersect_key($land,array_flip(['id','level','zone','open'])):null];
         Response::ok($state + [
+            'world'=>$world+['map_profile'=>$mapProfile,'width'=>$mapProfile['width'],'height'=>$mapProfile['height']],
+            'territory'=>TerritoryService::compactState($pid,$worldId),
+            'beginner_journey'=>\Conquer\Game\Tutorial\BeginnerJourney::state($pid,$worldId),
             'return_summary'=>$returnSince === null ? null : \Conquer\Game\City\ReturnSummary::since($city, $returnSince),
             'active_effects'=>\Conquer\Game\Buff\ActiveEffectService::forPlayer($pid,$worldId),
             'building_plots'=>\Conquer\Game\City\BuildingPlotService::snapshot($state),
@@ -128,12 +162,13 @@ final class GameHandler
                 'name_frame'=>(string)($db->query("SELECT COALESCE(name_frame,'default') FROM kingdom_profiles WHERE player_id=?",[$pid])->fetchColumn()?:'default')],
             'active_rally_count'=>count($rallyMarches),
             'map_center'=>['x'=>$mapX,'y'=>$mapY,'radius'=>$mapRadius],
-            'server_time' => time(), 'monsters' => $monsters, 'nodes' => $nodes, 'players'=>$players, 'charms'=>$charms,'land_progression'=>$landState,
+            'server_time' => time(), 'monsters' => $monsters, 'nodes' => $nodes, 'neutral_villages'=>$villages, 'players'=>$players, 'charms'=>$charms,'land_progression'=>$landState,
             'training_promotions'=>$db->query("SELECT id,source_code,target_code,count,started_at,finishes_at FROM defense_promotions WHERE city_id=? AND state='training'",[$city['id']])->fetchAll(),
             'troop_defs' => $troopDefs, 'army_limits'=>\Conquer\Game\Research\ResearchEffects::limits($buffs), 'building_progression'=>\Conquer\Game\City\BuildingProgression::forPlayer($pid,$worldId), 'research' => $research,
             // Locked and advanced technologies must remain visible in the full tree.
             'research_defs' => array_values(ResearchData::allNodes()), 'research_queue' => $researchQueue,
-            'reports' => $reports, 'marches' => $marches,
+            'research_duration_factor' => \Conquer\Game\Research\ResearchEffects::durationFactor($buffs, \Conquer\Game\Buff\ActiveBuffService::getMultiplier($pid, 'research_boost')),
+            'reports' => $reports, 'marches' => $marches, 'public_marches' => $publicMarches,
             'congress' => $congress, 'shrines' => $shrines, 'alliance_structures'=>$allianceStructures,
         ]);
     }

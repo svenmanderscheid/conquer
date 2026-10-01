@@ -10,6 +10,10 @@ Die Originale enthalten echte Transparenz. `tools/prepare-march-skin-art.cjs` ve
 
 Die 15 neuen Kreaturen besitzen derzeit acht gezeichnete Schlüsselposen als animierte WebP-Datei. Phönix und Drache werden bereits aus gegliederten Three.js-Modellen mit 30 Bildern pro Sekunde offline gerendert. Die Prüfung vom 14. September 2026 empfiehlt dieselbe formstabile Rig-Pipeline für die übrigen Kreaturen; Einzelbefunde und Zielbildraten stehen in `docs/MARCH_ANIMATION_AUDIT_2026-09-14.md`.
 
+## Elementkollektion
+
+Waldläufer, Glutstürmer, Wellenreiter und Wolkengreif verwenden jeweils eine transparente Schleife mit 24 Bildern bei 384 × 384 Pixeln. Ihre Bewegung und Spur folgen dem Element: Blätter und Galopp, Glut und schwerer Schritt, Wasserblasen und Schwimmen sowie Luftstriche und Flug. Beim Waldläufer und Glutstürmer bewegen sich Vorder- und Hinterbeine gegenphasig; Kopf, Geweih beziehungsweise Hörner und Rüstung bleiben dabei ruhig. Die vier passenden Burgen besitzen ruhige 20-Bild-Schleifen mit fallenden Blättern, aufsteigender Glut, Wasserlauf beziehungsweise drehendem Windrad. `tools/build-elemental-skin-animations.py` erzeugt die WebP-Dateien reproduzierbar aus den statischen, für reduzierte Bewegung verwendeten Bildern und kann optional einzelne Skin-IDs als Argument erhalten.
+
 ## Eigenständig animierter Phönix
 
 Die Phönixgarde nutzt nun `flight-phoenix.webp` und `flight-phoenix.png` anstelle ihrer bisherigen Gardistenillustration. Das eigene Toon-Modell in `assets/city3d/march-creatures.js` wird mit `tools/render-march-creatures.cjs` gerendert; es verwendet keine extrahierten Bilder aus der Videoreferenz. Die 36 unterschiedlichen Posen bilden einen nahtlosen Flugzyklus von 1,2 Sekunden. Die animierte Datei hat 384 × 384 Pixel und benötigt etwa 350 KB; für reduzierte Bewegung wird das PNG verwendet. `flight-phoenix-poses.jpg` zeigt vier Posen zur Sichtprüfung.

@@ -2,7 +2,10 @@
 const fs=require('fs'),path=require('path'),vm=require('vm'),assert=require('assert/strict');
 const root=path.resolve(__dirname,'..'),sandbox={window:{}};vm.createContext(sandbox);
 vm.runInContext(fs.readFileSync(path.join(root,'assets/js/march-skins.js'),'utf8'),sandbox);
-const catalog=sandbox.window.ConquerMarchSkins,articulated=[
+const catalog=sandbox.window.ConquerMarchSkins;
+assert.deepEqual(Array.from(catalog.ids),['default','forest','fire','water','wind']);
+const articulated=[
+ 'forest','fire','water','wind',
  'ironkeep','rosehall','sandspire','tidewatch','winterhold','jadecourt','emberforge','ravenloft',
  'clockwork','sapphire','astral','leviathan','yggdrasil','tempest','eclipse'
 ];
@@ -11,8 +14,8 @@ assert.equal(catalog.motionImage('/conquer','default'),catalog.image('/conquer',
 for(const id of articulated){
  assert.equal(catalog.hasMotion(id),true,`${id}: catalog must advertise articulated motion`);
  assert.equal(catalog.hasFlightLayout(id),false,`${id}: ordinary creature must keep the normal map footprint`);
- assert.equal(catalog.motionImage('/conquer',id),`/conquer/assets/art/marches/animated-march-${id}.webp?v=1`,`${id}: motion path contract changed`);
- assert.equal(catalog.image('/conquer',id),`/conquer/assets/art/marches/march-${id}.webp?v=3`,`${id}: static fallback contract changed`);
+ assert.equal(catalog.motionImage('/conquer',id),`/conquer/assets/art/marches/animated-march-${id}.webp?v=2`,`${id}: motion path contract changed`);
+ assert.equal(catalog.image('/conquer',id),`/conquer/assets/art/marches/march-${id}.webp?v=${catalog.ids.includes(id)?4:3}`,`${id}: static fallback contract changed`);
 }
 for(const id of ['phoenix','dragon']){
  assert.equal(catalog.hasMotion(id),true,`${id}: legacy articulated asset lost motion support`);

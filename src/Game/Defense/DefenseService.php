@@ -13,6 +13,8 @@ use Conquer\Game\Research\{BuffEngine,ResearchEffects};
 /** City defense and army tools. Every mutation validates ownership on the server. */
 final class DefenseService
 {
+    public const FORMATION_SLOTS = 6;
+
     public static function state(int $playerId,?int $cityId=null): array
     {
         return self::locked($playerId,function()use($playerId,$cityId):array{
@@ -21,13 +23,14 @@ final class DefenseService
             $city=self::syncWall($cityId);ResourceTick::persist($city,self::buildings($cityId));$city=self::city($playerId,$cityId);
             $shield=$db->query('SELECT beginner_shield_until FROM players WHERE id=?',[$playerId])->fetch();
             $buffs=BuffEngine::getBuffs($playerId,$world);$buildings=self::buildings($cityId);
+            $research=TroopData::researchLevels($playerId,$world);
             $available=array_map('intval',$db->query('SELECT troop_code,count FROM city_troops WHERE city_id=?',[$cityId])->fetchAll(\PDO::FETCH_KEY_PAIR));
             $troops=[];
             foreach(TroopData::all() as $code=>$def){
                 $next=TroopData::get($code+100);$promotion=null;
-                if($next && (int)$next['type']===(int)$def['type']){
+                if($next && TroopData::isActive((int)$next['code']) && (int)$next['type']===(int)$def['type']){
                     $quote=self::promotionQuote($code,1,$buffs,\Conquer\Game\Buff\ActiveBuffService::getMultiplier($playerId,'training_boost'));
-                    $promotion=$quote+['unlocked'=>self::unlocked($next,$buildings),'building_level'=>max(TroopData::PROMOTION_BUILDING_LEVEL,(int)$next['unlock_building']),'castle_level'=>max(TroopData::PROMOTION_BUILDING_LEVEL,(int)$next['unlock_castle'])];
+                    $promotion=$quote+['unlocked'=>self::unlocked($next,$buildings,$research),'building_level'=>max(TroopData::PROMOTION_BUILDING_LEVEL,(int)$next['unlock_building']),'castle_level'=>max(TroopData::PROMOTION_BUILDING_LEVEL,(int)$next['unlock_castle']),'academy_level'=>(int)$next['unlock_academy'],'research_code'=>$next['unlock_research']];
                 }
                 $troops[]=['code'=>$code,'name'=>$def['name_de']??$def['name'],'type'=>(int)$def['type'],'training_building'=>TroopData::buildingFor($code),'tier'=>(int)$def['tier'],'available'=>$available[$code]??0,'promotion'=>$promotion];
             }
@@ -37,7 +40,7 @@ final class DefenseService
             foreach($reinforcements as &$r){$r['troops']=json_decode($r['troops_json'],true)?:[];$r['can_recall']=(int)$r['sender_id']===$playerId;unset($r['troops_json']);}unset($r);
             return ['city_id'=>$cityId,'world_id'=>$world,'wall'=>self::wallStats($city,$buildings),'shield'=>['active'=>WorldRules::shieldActive($city+$shield),'expires_at'=>$city['shield_expires_at'],'beginner_until'=>$shield['beginner_shield_until']],
                 'anti_spy'=>['active'=>!empty($city['anti_spy_until']) && strtotime($city['anti_spy_until'].' UTC')>time(),'expires_at'=>$city['anti_spy_until']??null],
-                'protected_resources'=>self::protectedResources($city,$buffs),'protection_fraction'=>self::protectionFraction($buffs),'troops'=>$troops,'formations'=>$formations,'limits'=>ResearchEffects::limits($buffs),
+                'protected_resources'=>self::protectedResources($city,$buffs),'protection_fraction'=>self::protectionFraction($buffs),'troops'=>$troops,'formations'=>$formations,'formation_slots'=>self::FORMATION_SLOTS,'limits'=>ResearchEffects::limits($buffs),
                 'reinforcements'=>$reinforcements,'promotions'=>$db->query("SELECT id,source_code,target_code,count,finishes_at FROM defense_promotions WHERE city_id=? AND state='training' ORDER BY id",[$cityId])->fetchAll(),
                 'training_busy'=>(bool)$db->query('SELECT id FROM troop_queue WHERE city_id=? AND is_processed=0 LIMIT 1',[$cityId])->fetchColumn(),
                 'training_slots'=>array_map('intval',$db->query('SELECT DISTINCT barrack_slot FROM troop_queue WHERE city_id=? AND is_processed=0',[$cityId])->fetchAll(\PDO::FETCH_COLUMN)),
@@ -54,7 +57,7 @@ final class DefenseService
             return match($body['action']??''){
                 'wall.repair'=>self::repairWall($playerId,$id,self::integer($body,'hp_amount',1,100000000)),
                 'formation.save'=>self::saveFormation($playerId,$city,$body),
-                'formation.delete'=>self::deleteFormation($playerId,self::integer($body,'slot',1,4)),
+                'formation.delete'=>self::deleteFormation($playerId,self::integer($body,'slot',1,self::FORMATION_SLOTS)),
                 'promotion.start'=>self::promote($playerId,$id,self::integer($body,'troop_code'),self::integer($body,'count',1,50000)),
                 'promotion.cancel'=>self::cancelPromotion($playerId,self::integer($body,'promotion_id')),
                 'reinforcement.recall'=>self::recallReinforcement($playerId,self::integer($body,'reinforcement_id')),
@@ -75,7 +78,7 @@ final class DefenseService
             $db=Connection::getInstance();$city=$db->query('SELECT * FROM cities WHERE id=? AND player_id=? FOR UPDATE',[$cityId,$playerId])->fetch();
             if(!$city)throw new \DomainException('Diese Stadt gehört dir nicht.',403);
             $hostile=$db->query("SELECT id FROM marches WHERE player_id=? AND world_id=? AND march_type IN (7,8,15) AND state IN ('marching','resolving') LIMIT 1",[$playerId,(int)$city['world_id']])->fetchColumn();
-            $rally=$db->query("SELECT r.id FROM rallies r WHERE r.world_id=? AND r.target_player_id IS NOT NULL AND r.status IN ('gathering','marching') AND (r.leader_player_id=? OR EXISTS(SELECT 1 FROM rally_participants rp WHERE rp.rally_id=r.id AND rp.player_id=? AND rp.status IN ('pending','marching'))) LIMIT 1",[(int)$city['world_id'],$playerId,$playerId])->fetchColumn();
+            $rally=$db->query("SELECT r.id FROM rallies r WHERE r.world_id=? AND r.target_player_id IS NOT NULL AND r.status IN ('gathering','marching') AND (r.leader_player_id=? OR EXISTS(SELECT 1 FROM rally_participants rp WHERE rp.rally_id=r.id AND rp.player_id=? AND rp.status IN ('joining','pending','marching'))) LIMIT 1",[(int)$city['world_id'],$playerId,$playerId])->fetchColumn();
             if($hostile!==false||$rally!==false)throw new \DomainException('Rufe zuerst deine ausgehenden Stadtangriffe und Späher zurück.');
             $expires=gmdate('Y-m-d H:i:s',max(time(),empty($city['shield_expires_at'])?0:(int)strtotime($city['shield_expires_at'].' UTC'))+$seconds);
             $db->execute('UPDATE cities SET is_shielded=1,shield_expires_at=? WHERE id=?',[$expires,$cityId]);
@@ -132,7 +135,7 @@ final class DefenseService
     public static function promotionQuote(int $sourceCode,int $count,array $buffs,float $boost=1): array
     {
         $source=TroopData::get($sourceCode);$target=TroopData::get($sourceCode+100);
-        if(!$source||!$target||(int)$source['type']!==(int)$target['type']||$count<1||$count>50000)throw new \DomainException('Diese Truppen können nicht weiter befördert werden.');
+        if(!$source||!$target||!TroopData::isActive($sourceCode)||!TroopData::isActive($sourceCode+100)||(int)$source['type']!==(int)$target['type']||$count<1||$count>50000)throw new \DomainException('Diese Truppen können nicht weiter befördert werden.');
         $training=ResearchEffects::training($sourceCode+100,$buffs,$boost);
         return ['source_code'=>$sourceCode,'target_code'=>$sourceCode+100,'name'=>$target['name_de']??$target['name'],'count'=>$count,'cost'=>array_map(fn($n)=>(int)ceil($n*$count*.7),$training['cost']),'duration_seconds'=>max(1,(int)ceil(TroopData::trainingSeconds($sourceCode+100,$count)*.5/$training['speed_multiplier'])),'max_count'=>$training['max_count']];
     }
@@ -140,12 +143,13 @@ final class DefenseService
     public static function promote(int $playerId,int $cityId,int $sourceCode,int $count): array
     {
         $owned=WorldRules::origin($playerId,$cityId);WorldContext::assertActionAvailable((int)$owned['world_id']);
+        \Conquer\Game\Research\ResearchProcessor::processQueue($playerId,(int)$owned['world_id']);
         self::processPromotions($cityId);TroopTrainer::processQueue(Connection::getInstance(),$cityId);
         return self::atomic(function()use($playerId,$cityId,$sourceCode,$count):array{
             $db=Connection::getInstance();$city=$db->query('SELECT * FROM cities WHERE id=? AND player_id=? FOR UPDATE',[$cityId,$playerId])->fetch();if(!$city)throw new \DomainException('Diese Stadt gehört dir nicht.',403);
             $world=(int)$city['world_id'];$buildings=self::buildings($cityId);$quote=self::promotionQuote($sourceCode,$count,BuffEngine::getBuffs($playerId,$world),\Conquer\Game\Buff\ActiveBuffService::getMultiplier($playerId,'training_boost'));
             ResourceTick::persist($city,$buildings);
-            if(!self::unlocked(TroopData::get($quote['target_code']),$buildings))throw new \DomainException('Beförderungen benötigen Ausbildungsgebäude und Stadtzentrum ab Stufe 13 sowie die Gebäudestufen der Zieltruppe.');
+            if(!self::unlocked(TroopData::get($quote['target_code']),$buildings,TroopData::researchLevels($playerId,$world)))throw new \DomainException('Beförderungen benötigen Ausbildungsgebäude und Stadtzentrum ab Stufe 13 sowie Akademie und Forschung der Zieltruppe.');
             if($count>$quote['max_count'])throw new \DomainException('Zu viele Truppen für einen Ausbildungsauftrag.');
             if($db->query('SELECT id FROM troop_queue WHERE city_id=? AND barrack_slot=? AND is_processed=0 LIMIT 1 FOR UPDATE',[$cityId,TroopData::slotFor($sourceCode)])->fetchColumn()!==false||self::hasPromotion($cityId,TroopData::slotFor($sourceCode)))throw new \DomainException('Dieses Ausbildungsgebäude ist bereits beschäftigt.');
             $cost=$quote['cost'];
@@ -220,23 +224,23 @@ final class DefenseService
 
     private static function saveFormation(int $playerId,array $city,array $body): array
     {
-        $slot=self::integer($body,'slot',1,4);$name=$body['name']??'';
+        $slot=self::integer($body,'slot',1,self::FORMATION_SLOTS);$name=$body['name']??'';
         if(!is_string($name)||mb_strlen(trim($name))<1||mb_strlen(trim($name))>48)throw new \DomainException('Ein Formationsname mit 1 bis 48 Zeichen ist erforderlich.');
         $troops=MarchArmy::clean($body['troops']??null,ResearchEffects::limits(BuffEngine::getBuffs($playerId,(int)$city['world_id']))['march_capacity']);
         Connection::getInstance()->execute('INSERT INTO troop_formations(player_id,slot,name,troops_json) VALUES(?,?,?,?) ON DUPLICATE KEY UPDATE name=VALUES(name),troops_json=VALUES(troops_json)',[$playerId,$slot,trim($name),json_encode($troops)]);
         return ['slot'=>$slot,'message'=>'Formation gespeichert. Die Truppen werden erst beim Marsch reserviert.'];
     }
     private static function deleteFormation(int $playerId,int $slot): array {Connection::getInstance()->execute('DELETE FROM troop_formations WHERE player_id=? AND slot=?',[$playerId,$slot]);return ['message'=>'Formation gelöscht.'];}
-    private static function unlocked(array $troop,array $buildings): bool
+    private static function unlocked(array $troop,array $buildings,array $research): bool
     {
         $level=(int)($buildings[TroopData::buildingFor((int)$troop['code'])]['level']??0);
         $castle=(int)($buildings['castle']['level']??0);
         return $level>=TroopData::PROMOTION_BUILDING_LEVEL && $castle>=TroopData::PROMOTION_BUILDING_LEVEL
-            && TroopData::isUnlocked((int)$troop['code'],$level,$castle);
+            && TroopData::isUnlocked((int)$troop['code'],$level,$castle,(int)($buildings['academy']['level']??0),$research);
     }
     private static function buildings(int $cityId): array {$result=[];foreach(Connection::getInstance()->query('SELECT building_code,level FROM city_buildings WHERE city_id=?',[$cityId])->fetchAll() as $row)$result[$row['building_code']]=['level'=>(int)$row['level']];return $result;}
     private static function city(int $playerId,?int $cityId=null): array {$city=WorldContext::city($playerId);if($cityId!==null&&(int)$city['id']!==$cityId)throw new \DomainException('Diese Stadt gehört nicht zur aktiven Welt.',403);return $city;}
-    private static function creditTroops(int $cityId,array $troops): void {foreach($troops as $code=>$count)Connection::getInstance()->execute('INSERT INTO city_troops(city_id,troop_code,count) VALUES(?,?,?) ON DUPLICATE KEY UPDATE count=count+VALUES(count)',[$cityId,$code,$count]);}
+    private static function creditTroops(int $cityId,array $troops): void {foreach($troops as $code=>$count)Connection::getInstance()->execute('INSERT INTO city_troops(city_id,troop_code,count) VALUES(?,?,?) ON DUPLICATE KEY UPDATE count=count+VALUES(count)',[$cityId,TroopData::activeCode((int)$code),$count]);}
     private static function integer(array $body,string $key,int $min=1,int $max=2147483647): int {if(!isset($body[$key])||!is_int($body[$key])||$body[$key]<$min||$body[$key]>$max)throw new \DomainException('Ungültiger Wert für '.$key.'.');return $body[$key];}
     private static function atomic(callable $fn): mixed {$db=Connection::getInstance();return $db->getPdo()->inTransaction()?$fn():$db->transaction($fn);}
     private static function locked(int $playerId,callable $fn): mixed {$db=Connection::getInstance();$lock='conquer-player-'.$playerId;if((int)$db->query('SELECT GET_LOCK(?,5)',[$lock])->fetchColumn()!==1)throw new \DomainException('Deine Armee wird gerade aktualisiert.');try{return $fn();}finally{$db->query('SELECT RELEASE_LOCK(?)',[$lock]);}}

@@ -6,6 +6,10 @@ A browser-based 4X strategy MMO inspired by League of Kingdoms (sunsetting May 2
 
 ## Status
 
+**Abnahme vom 26. September 2026:** [Ergebnisse und offene Launchpunkte](docs/ALPHA_LAUNCH_REVIEW_2026-09-26.md), [44-Pakete-Funktionsmatrix](docs/ALPHA_FEATURE_MATRIX_2026-09-26.md) und [GitHub-/Hostinger-/Mobile-Leitfaden](docs/ALPHA_RELEASE_GUIDE_2026-09-26.md). Der aktuelle Stand hat noch keine vollständige Alpha-Freigabe.
+
+**Alpha-Bereinigung (26. September 2026):** Die gezeichnete Stadt und Weltkarte sind die einzigen Spielansichten. Die frühere Three.js-/3D-/2,5D-Szene und ihre gesonderten Endpunkte wurden entfernt; Oberflächentiefe und aktive Illustrationen bleiben erhalten. [Löschmanifest und Begründung](docs/REMOVED_3D_2026-09-26.md). Die späteren iOS-/Android-Apps verwenden dieselbe Web-Codebasis mit Capacitor.
+
 **Spielsysteme und Backoffice (11. September 2026):** Welten- und Spielerverwaltung unter `/admin`, konfigurierbare Spawns, Geschenke, Weltenauswahl, Gemeinschaft, Verteidigung, zusätzliche Feldzüge, Ereignisse, Meisterschaft und Kontowiederherstellung sind integriert. [Aktueller Umfang, Hintergrundbetrieb und Prüfungen](docs/FEATURE_PACK_STATUS.md). Dieser Stand ergänzt und ersetzt die älteren Umfangsangaben unten.
 
 **PvE-MVP (10. September 2026):** The current development direction is cooperative city building with two-alliance boss expeditions, a unified game interface, persistent profiles, inventory, quests, market trading and voluntary arena duels. See [the PvE MVP scope and verification status](docs/PVE_MVP_STATUS.md) for current setup, tests and gameplay. This supersedes the historical scope and roadmap below.

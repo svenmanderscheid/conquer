@@ -9,7 +9,7 @@ final class AccountService
     public const RESET_MESSAGE='Wenn die E-Mail-Adresse zu einem Konto gehört, wurde ein Wiederherstellungslink versendet.';
     public static function state(int $playerId): array
     {
-        $db=Connection::getInstance();$profile=$db->query('SELECT email,email_verified_at FROM players WHERE id=?',[$playerId])->fetch()?:[];return ['has_password'=>(bool)$db->query('SELECT password_hash FROM players WHERE id=?',[$playerId])->fetchColumn(),
+        $db=Connection::getInstance();$profile=$db->query('SELECT email,email_verified_at FROM players WHERE id=?',[$playerId])->fetch()?:[];return ['discord'=>\Conquer\Discord\MinigameService::accountState($playerId),'has_password'=>(bool)$db->query('SELECT password_hash FROM players WHERE id=?',[$playerId])->fetchColumn(),
             'email'=>str_ends_with((string)($profile['email']??''),'@accounts.invalid')?'':(string)($profile['email']??''),
             'email_verified'=>(bool)($profile['email_verified_at']??null),
             'has_recovery_code'=>(bool)$db->query('SELECT id FROM account_recovery_codes WHERE player_id=? AND used_at IS NULL',[$playerId])->fetchColumn(),
@@ -32,9 +32,13 @@ final class AccountService
                     if(strlen($email)>254||!filter_var($email,FILTER_VALIDATE_EMAIL))throw new \DomainException('Bitte gib eine gültige E-Mail-Adresse ein.');
                     if($db->query('SELECT id FROM players WHERE email=? AND id<>?',[$email,$playerId])->fetchColumn())throw new \DomainException('Diese E-Mail-Adresse wird bereits verwendet.');
                     $db->execute('UPDATE players SET email=?,email_verified_at=NULL WHERE id=?',[$email,$playerId]);
+                    self::invalidateResetTokens($db,$playerId);
+                    $db->execute('UPDATE email_verification_tokens SET used_at=UTC_TIMESTAMP() WHERE player_id=? AND used_at IS NULL',[$playerId]);
                     return ['message'=>'E-Mail-Adresse gespeichert. Bitte bestätige sie über den zugesandten Link.','send_verification'=>true];
                 case 'password.change':
                     $new=self::password($body['new_password']??null);$db->execute('UPDATE players SET password_hash=? WHERE id=?',[password_hash($new,PASSWORD_DEFAULT),$playerId]);
+                    self::invalidateResetTokens($db,$playerId);
+                    $db->execute('UPDATE account_recovery_codes SET used_at=UTC_TIMESTAMP() WHERE player_id=? AND used_at IS NULL',[$playerId]);
                     $db->execute('DELETE FROM sessions WHERE player_id=? AND token<>?',[$playerId,$_COOKIE[Session::COOKIE_NAME]??'']);
                     return ['message'=>'Passwort geändert. Andere Sitzungen wurden abgemeldet.'];
                 case 'recovery.generate':
@@ -68,6 +72,7 @@ final class AccountService
             $r=$p?$db->query('SELECT id FROM account_recovery_codes WHERE player_id=? AND code_hash=? AND used_at IS NULL FOR UPDATE',[$p['id'],hash('sha256',$code)])->fetch():false;
             if(!$p||$p['is_banned']||!$r)throw new \DomainException('Name oder Wiederherstellungscode stimmt nicht.');
             $db->execute('UPDATE players SET password_hash=? WHERE id=?',[password_hash($new,PASSWORD_DEFAULT),$p['id']]);
+            self::invalidateResetTokens($db,(int)$p['id']);
             $db->execute('UPDATE account_recovery_codes SET used_at=UTC_TIMESTAMP() WHERE player_id=?',[$p['id']]);$db->execute('DELETE FROM sessions WHERE player_id=?',[$p['id']]);
         });
     }
@@ -82,11 +87,14 @@ final class AccountService
         $db=Connection::getInstance();$player=$db->query("SELECT id,email FROM players WHERE email=? AND email NOT LIKE '%@accounts.invalid' AND is_banned=0 LIMIT 1",[$email])->fetch();
         if(!$player)return;
         $token=bin2hex(random_bytes(32));$hash=hash('sha256',$token);
-        $db->transaction(function()use($db,$player,$hash):void{
+        $created=$db->transaction(function()use($db,$player,$hash):bool{
+            $current=$db->query('SELECT email,is_banned FROM players WHERE id=? FOR UPDATE',[$player['id']])->fetch();
+            if(!$current||$current['is_banned']||$current['email']!==$player['email'])return false;
             $db->execute('UPDATE password_reset_tokens SET used_at=UTC_TIMESTAMP() WHERE player_id=? AND used_at IS NULL',[$player['id']]);
             $db->execute('INSERT INTO password_reset_tokens(player_id,token_hash,expires_at) VALUES(?,?,DATE_ADD(UTC_TIMESTAMP(),INTERVAL 30 MINUTE))',[$player['id'],$hash]);
+            return true;
         });
-        AccountMailer::passwordReset((string)$player['email'],$token);
+        if($created)AccountMailer::passwordReset((string)$player['email'],$token);
     }
 
     public static function resetWithToken(string $token,mixed $new): void
@@ -94,10 +102,13 @@ final class AccountService
         if(!preg_match('/^[a-f0-9]{64}$/D',$token))throw new \DomainException('Der Wiederherstellungslink ist ungültig oder abgelaufen.');
         $new=self::password($new);$db=Connection::getInstance();$hash=hash('sha256',$token);
         $db->transaction(function()use($db,$hash,$new):void{
+            $owner=$db->query('SELECT player_id FROM password_reset_tokens WHERE token_hash=?',[$hash])->fetchColumn();
+            $player=$owner?$db->query('SELECT id,is_banned FROM players WHERE id=? FOR UPDATE',[$owner])->fetch():false;
             $row=$db->query('SELECT id,player_id FROM password_reset_tokens WHERE token_hash=? AND used_at IS NULL AND expires_at>UTC_TIMESTAMP() FOR UPDATE',[$hash])->fetch();
-            if(!$row)throw new \DomainException('Der Wiederherstellungslink ist ungültig oder abgelaufen.');
-            $db->execute('UPDATE players SET password_hash=? WHERE id=?',[password_hash($new,PASSWORD_DEFAULT),$row['player_id']]);
+            if(!$player||$player['is_banned']||!$row)throw new \DomainException('Der Wiederherstellungslink ist ungültig oder abgelaufen.');
+            $db->execute('UPDATE players SET password_hash=?,email_verified_at=COALESCE(email_verified_at,UTC_TIMESTAMP()) WHERE id=?',[password_hash($new,PASSWORD_DEFAULT),$row['player_id']]);
             $db->execute('UPDATE password_reset_tokens SET used_at=UTC_TIMESTAMP() WHERE player_id=? AND used_at IS NULL',[$row['player_id']]);
+            $db->execute('UPDATE account_recovery_codes SET used_at=UTC_TIMESTAMP() WHERE player_id=? AND used_at IS NULL',[$row['player_id']]);
             $db->execute('DELETE FROM sessions WHERE player_id=?',[$row['player_id']]);
         });
     }
@@ -107,11 +118,14 @@ final class AccountService
         $db=Connection::getInstance();$player=$db->query("SELECT email,email_verified_at FROM players WHERE id=? AND email NOT LIKE '%@accounts.invalid'",[$playerId])->fetch();
         if(!$player||$player['email_verified_at'])return;
         $token=bin2hex(random_bytes(32));$hash=hash('sha256',$token);
-        $db->transaction(function()use($db,$playerId,$hash):void{
+        $created=$db->transaction(function()use($db,$playerId,$player,$hash):bool{
+            $current=$db->query('SELECT email,email_verified_at FROM players WHERE id=? FOR UPDATE',[$playerId])->fetch();
+            if(!$current||$current['email_verified_at']||$current['email']!==$player['email'])return false;
             $db->execute('UPDATE email_verification_tokens SET used_at=UTC_TIMESTAMP() WHERE player_id=? AND used_at IS NULL',[$playerId]);
             $db->execute('INSERT INTO email_verification_tokens(player_id,token_hash,expires_at) VALUES(?,?,DATE_ADD(UTC_TIMESTAMP(),INTERVAL 24 HOUR))',[$playerId,$hash]);
+            return true;
         });
-        AccountMailer::verification((string)$player['email'],$token);
+        if($created)AccountMailer::verification((string)$player['email'],$token);
     }
 
     public static function verifyEmail(string $token): bool
@@ -119,6 +133,8 @@ final class AccountService
         if(!preg_match('/^[a-f0-9]{64}$/D',$token))return false;
         $db=Connection::getInstance();$hash=hash('sha256',$token);
         return $db->transaction(function()use($db,$hash):bool{
+            $owner=$db->query('SELECT player_id FROM email_verification_tokens WHERE token_hash=?',[$hash])->fetchColumn();
+            if(!$owner||!$db->query('SELECT id FROM players WHERE id=? FOR UPDATE',[$owner])->fetchColumn())return false;
             $row=$db->query('SELECT id,player_id FROM email_verification_tokens WHERE token_hash=? AND used_at IS NULL AND expires_at>UTC_TIMESTAMP() FOR UPDATE',[$hash])->fetch();
             if(!$row)return false;
             $db->execute('UPDATE players SET email_verified_at=UTC_TIMESTAMP() WHERE id=?',[$row['player_id']]);
@@ -131,5 +147,10 @@ final class AccountService
     {
         // Bcrypt processes at most 72 bytes; never silently truncate a new password.
         if(!is_string($value)||strlen($value)<10||strlen($value)>72)throw new \DomainException('Das Passwort benötigt mindestens 10 Zeichen und darf höchstens 72 UTF-8-Bytes lang sein.');return $value;
+    }
+
+    private static function invalidateResetTokens(Connection $db,int $playerId): void
+    {
+        $db->execute('UPDATE password_reset_tokens SET used_at=UTC_TIMESTAMP() WHERE player_id=? AND used_at IS NULL',[$playerId]);
     }
 }

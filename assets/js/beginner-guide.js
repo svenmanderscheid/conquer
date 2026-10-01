@@ -2,6 +2,7 @@
 window.ConquerBeginnerGuide = function(ctx) {
     'use strict';
     const {base,esc,fmt,getState,getKingdom,getHost,navigate,openDialog,buildingDialog,buildingFunction,labels,buildingImage}=ctx;
+    const local=text=>window.ConquerLocale?.text(text)??text;
     const tabs = {start:'Einstieg',buildings:'Gebäude',goals:'Ziele',knowledge:'Wissen'};
     const groups = {all:'Alle Gebäude',city:'Stadt & Schutz',economy:'Rohstoffe & Handel',army:'Truppen & Wissen',alliance:'Gemeinschaft'};
     const buildings = [
@@ -54,15 +55,84 @@ window.ConquerBeginnerGuide = function(ctx) {
     }
     function save() { try { localStorage.setItem(key,JSON.stringify(saved)); } catch {} }
     function button(text,action,id='',primary=false) { return `<button type="button" class="guide-button${primary?' guide-primary':''}" data-action="${action}" data-id="${esc(id)}">${esc(text)}</button>`; }
+    function journey() {
+        const s=getState(),j=s.beginner_journey;
+        return j&&Number(j.player_id)===Number(s.city?.player_id)&&Number(j.world_id)===Number(s.city?.world_id)?j:null;
+    }
     function goals() {
-        const s=getState(),k=getKingdom(),level=code=>Number(s.buildings[code]?.level||0);
-        return [
+        const s=getState(),k=getKingdom(),j=journey(),level=code=>Number(s.buildings[code]?.level||0);
+        const progress=id=>j&&typeof j.progress?.[id]==='boolean'?Number(j.progress[id]):null;
+        const items=[
             {id:'castle',title:'Burg auf Stufe 2',text:'Prüfe die Voraussetzungen und baue das Herz deiner Stadt aus.',value:level('castle'),target:2,action:['Burg ansehen','guide-building','castle']},
             {id:'production',title:'Vier Rohstoffgebäude auf Stufe 2',text:'Sorge mit Bauernhof, Sägewerk, Steinbruch und Goldmine für Nachschub.',value:['farm','lumber_camp','quarry','gold_mine'].filter(c=>level(c)>=2).length,target:4,action:['Gebäude ansehen','guide-tab','buildings']},
             {id:'training',title:'20 Truppen ausbilden',text:'Schließe Ausbildungsaufträge für insgesamt 20 Truppen ab.',value:Number(s.trained_total||0),target:20,action:['Ausbildung öffnen','guide-function','barrack']},
+            {id:'gather',title:'Deine erste Sammelbeute nach Hause bringen',text:'Finde mit der Lupe ein freies Rohstofffeld, entsende Truppen und warte auf ihre Rückkehr mit Beute.',value:progress('gather'),target:1,action:['Rohstofffeld finden','guide-world','nodes']},
+            {id:'monster',title:'Dein erstes Monster besiegen',text:'Suche ein passendes Solomonster. Prüfe die Kampfprognose und bestätige den Angriff selbst. Erst ein Sieg zählt.',value:progress('monster'),target:1,action:['Monster finden','guide-world','monsters']},
+            {id:'charm',title:'Deinen ersten Charm einsammeln',text:'Nach einem Monstersieg erscheint ein Charm auf der Weltkarte. Sammle ihn mit einem eigenen Marsch ein, um seinen zeitweiligen Bonus zu aktivieren.',value:progress('charm'),target:1,action:['Charms ansehen','guide-world','charms']},
             {id:'research',title:'Eine Forschung abschließen',text:'Wähle in der Akademie einen ersten dauerhaften Bonus.',value:Object.values(s.research||{}).filter(v=>Number(v)>0).length,target:1,action:['Forschung öffnen','guide-nav','research']},
-            {id:'alliance',title:'Teil einer Allianz sein',text:'Finde Mitspieler für Hilfe, Austausch und gemeinsame Abenteuer.',value:k?(k.alliance?1:0):null,target:1,action:['Allianz öffnen','guide-nav','alliance']},
+            {id:'alliance',title:'Teil einer Allianz sein',text:'Finde Mitspieler für Hilfe, Austausch und gemeinsame Abenteuer.',value:j?Number(j.alliance_member):k?(k.alliance?1:0):null,target:1,action:['Allianz öffnen','guide-nav','alliance']},
+            {id:'alliance_help',title:'Einem Allianzmitglied wirklich helfen',text:'Öffne die Allianz-Hilfe und verkürze einen offenen Auftrag eines anderen Mitglieds. Eine Mitgliedschaft allein zählt hier noch nicht.',value:progress('alliance_help'),target:1,action:['Allianz-Hilfe öffnen','guide-community','help']},
         ];
+        return items.map(g=>({...g,...availability(g,s,j)}));
+    }
+    // Advice only: the existing action endpoints remain authoritative for every cost and rule.
+    function availability(goal,s,j) {
+        if(goal.value===null)return {ready:false,reason:'Spielstand derzeit nicht verfügbar'};
+        if(goal.value>=goal.target)return {ready:false,reason:''};
+        if(s.world&&!['open','running'].includes(s.world.status))return {ready:false,reason:'Diese Welt ist gerade pausiert.'};
+        const ready={ready:true,reason:'Jetzt möglich'},waiting={ready:false,reason:'Ein passender Auftrag läuft bereits.'};
+        const affordable=cost=>cost&&Object.entries(cost).every(([resource,amount])=>Number(s.city?.[resource]||0)>=Number(amount));
+        if(['castle','production'].includes(goal.id)){
+            const queued=s.build_queue||[],slots=Number(s.vip?.building_slots??(Number(s.vip?.level)>=4?2:1));
+            if(queued.length+(s.plot_queue||[]).length>=slots)return waiting;
+            const candidate=(code,visited=new Set())=>{
+                const b=s.buildings[code];if(!b||visited.has(code)||queued.some(q=>q.building_code===code))return null;
+                visited.add(code);
+                const missing=Object.entries(b.requirements||{}).filter(([id,n])=>Number(s.buildings[id]?.level||0)<Number(n));
+                if(missing.length){for(const [id]of missing){const found=candidate(id,new Set(visited));if(found)return found;}return null;}
+                return affordable(b.cost)&&!(b.item_requirements||[]).some(item=>!item.met)&&Number(b.level)<30?code:null;
+            };
+            const targets=goal.id==='castle'?['castle']:['farm','lumber_camp','quarry','gold_mine'].filter(code=>Number(s.buildings[code]?.level)<2);
+            const code=targets.map(code=>candidate(code)).find(Boolean);
+            return code?{...ready,action:['Ausbau ansehen','guide-building',code],stepTitle:`${local(labels[code]||code)} · ${local('Ausbau möglich')}`}:{ready:false,reason:'Für den nächsten Ausbau fehlen noch Vorräte oder Voraussetzungen.'};
+        }
+        if(goal.id==='training'){
+            const troops=(s.troop_defs||[]).filter(t=>t.unlocked),available=troops.find(t=>!(s.troop_queue||[]).some(q=>Number(q.barrack_slot)===Number(t.barrack_slot))&&affordable(t.training?.cost)&&Number(t.training?.max_count)>0);
+            return available?{...ready,action:['Ausbildung öffnen','guide-function',available.training_building]}:(s.troop_queue||[]).length?waiting:{ready:false,reason:'Für die Ausbildung fehlen noch Vorräte oder Voraussetzungen.'};
+        }
+        if(goal.id==='research'){
+            if((s.research_queue||[]).length)return waiting;
+            const available=(s.research_defs||[]).some(node=>{const row=node.levels?.find(row=>Number(row.level)===Number(s.research?.[node.code]||0)+1);return row&&affordable(row.resources)&&(row.requirements||[]).every(r=>r.type==='academy'?Number(s.buildings.academy?.level)>=Number(r.level):r.type==='research'?Number(s.research?.[r.code]||0)>=Number(r.level):false);});
+            return available?ready:{ready:false,reason:'Für die Forschung fehlen noch Vorräte oder Voraussetzungen.'};
+        }
+        if(goal.id==='alliance')return ready;
+        if(goal.id==='alliance_help')return j?.help_available?ready:{ready:false,reason:j?.alliance_member?'Gerade braucht kein erreichbarer Allianzauftrag deine Hilfe.':'Tritt zuerst einer Allianz bei.'};
+        const marches=s.marches||[],kind={gather:9,monster:5,charm:6}[goal.id];
+        if(marches.some(m=>Number(m.march_type)===kind))return waiting;
+        if(!Object.values(s.troops||{}).some(n=>Number(n)>0))return {ready:false,reason:'Bilde zuerst Truppen aus oder warte auf ihre Rückkehr.'};
+        const slots=Number(s.army_limits?.march_slots||3),gatherSlots=Number(s.army_limits?.gather_march_slots||0),gathering=marches.filter(m=>Number(m.march_type)===9).length;
+        if(marches.length>=slots+gatherSlots||goal.id!=='gather'&&marches.length-gathering>=slots)return {ready:false,reason:'Deine Marschplätze sind gerade belegt.'};
+        if(goal.id==='charm'&&!(s.charms||[]).some(c=>c.collectible!==false))return {ready:false,reason:'In diesem Kartenausschnitt ist gerade kein Charm sichtbar.'};
+        if(goal.id==='monster'){
+            const ap=Number(getKingdom()?.profile?.action_points??s.city?.action_points??0);
+            const candidates=(s.monsters||[]).filter(m=>m.monster_type!=='rally'&&m.definition?.type!=='rally'&&Number(m.hp_current)>0);
+            if(candidates.length&&!candidates.some(m=>Number(m.definition?.action_point_cost??10)<=ap)||!candidates.length&&ap<10)return {ready:false,reason:'Warte auf neue Aktionspunkte.'};
+        }
+        return ready;
+    }
+    function nextGoal() {
+        const remaining=goals().filter(g=>g.value!==null&&g.value<g.target);
+        const next=remaining.find(g=>g.ready);
+        if(next)return {...next,title:next.stepTitle||next.title};
+        return remaining.length?{...remaining[0],action:['Meine Ziele ansehen','guide-tab','goals']}:null;
+    }
+    function openWorldGoal(kind) {
+        const s=getState(),ap=Number(getKingdom()?.profile?.action_points??s.city?.action_points??0);
+        const targets=(s[kind]||[]).filter(t=>kind==='monsters'?t.monster_type!=='rally'&&t.definition?.type!=='rally'&&Number(t.hp_current)>0&&Number(t.definition?.action_point_cost??10)<=ap:kind==='nodes'?Number(t.resource_amount)>0&&!t.gatherer_march_id:kind==='charms'?t.collectible!==false:true);
+        const distance=t=>Math.hypot(Number(t.coord_x??t.x)-Number(s.city.coord_x),Number(t.coord_y??t.y)-Number(s.city.coord_y));
+        const target=targets.slice().sort((a,b)=>(kind==='monsters'?Number(a.effective_monster_level??a.definition?.level??1)-Number(b.effective_monster_level??b.definition?.level??1):0)||distance(a)-distance(b))[0];
+        if(target)ctx.openWorldTarget({x:Number(target.coord_x??target.x),y:Number(target.coord_y??target.y),kind,id:target.id},Number(s.city.world_id));
+        else navigate('world');
     }
     function start() {
         const c=chapters[chapter],read=saved.read.includes(chapter);
@@ -72,18 +142,19 @@ window.ConquerBeginnerGuide = function(ctx) {
             <div class="guide-lesson-footer">${chapter>0?button('Zurück','guide-chapter',chapter-1):'<span></span>'}${button(chapter===chapters.length-1?(read?'Zu meinen Zielen':'Gelesen · zu den Zielen'):(read?'Weiter':'Gelesen · weiter'),'guide-next','',true)}</div><p>${button('Zielhinweis wieder einblenden','show-goal-hint')}</p>`;
     }
     function buildingList() {
-        return `<h2 tabindex="-1" id="guide-heading">Deine ${buildings.length} Gebäude</h2><p>Wofür sie da sind, wann sie helfen und wo es weitergeht. Die Stufen entsprechen deinem aktuellen Spielstand.</p><div class="guide-filters" role="group" aria-label="Gebäude filtern">${Object.entries(groups).map(([id,name])=>`<button type="button" class="guide-button" data-action="guide-filter" data-id="${id}" aria-pressed="${group===id}">${name}</button>`).join('')}</div><div class="guide-building-list">${buildings.filter(b=>group==='all'||b[1]===group).map(([code,category,purpose,tip,target,label])=>`<article class="guide-building" data-guide-building="${code}"><div class="guide-building-heading"><img src="${esc(buildingImage(code))}" alt="" loading="lazy"><div><small>${groups[category]}</small><h3>${esc(labels[code])}</h3></div><span class="guide-level" data-guide-level="${code}"></span></div><p>${purpose}</p><p class="guide-building-tip">${tip}</p><div class="guide-actions">${button('Ausbau ansehen','guide-building',code)}${target?button(label+' öffnen',target==='function'?'guide-function':'guide-nav',target==='function'?code:target):''}</div></article>`).join('')}</div>`;
+        return `<h2 tabindex="-1" id="guide-heading">Deine ${buildings.length} Gebäude</h2><p>Wofür sie da sind, wann sie helfen und wo es weitergeht. Die Stufen entsprechen deinem aktuellen Spielstand.</p><div class="guide-filters" role="group" aria-label="Gebäude filtern">${Object.entries(groups).map(([id,name])=>`<button type="button" class="guide-button" data-action="guide-filter" data-id="${id}" aria-pressed="${group===id}">${name}</button>`).join('')}</div><div class="guide-building-list">${buildings.filter(b=>group==='all'||b[1]===group).map(([code,category,purpose,tip,target,label])=>`<article class="guide-building" data-guide-building="${code}"><div class="guide-building-heading"><img src="${esc(buildingImage(code))}" alt="" loading="lazy"><div><small>${groups[category]}</small><h3>${esc(labels[code])}</h3></div><span class="guide-level" data-guide-level="${code}"></span></div><p>${purpose}</p><p class="guide-building-tip">${tip}</p><div class="guide-actions">${button('Ausbau ansehen','guide-building',code)}${target?button((window.ConquerLocale?.text(label)??label)+' öffnen',target==='function'?'guide-function':'guide-nav',target==='function'?code:target):''}</div></article>`).join('')}</div>`;
     }
     function goalList() {
-        return `<h2 tabindex="-1" id="guide-heading">Dein nächster Schritt</h2><p>Diese Meilensteine begleiten deinen Einstieg. Du bestimmst die Reihenfolge. Sie zeigen deinen Spielstand und vergeben keine zusätzliche Belohnung.</p><p class="guide-tip" data-guide-goal-summary></p><div class="guide-goals">${goals().map(g=>`<article class="guide-goal" data-guide-goal="${g.id}"><h3>${g.title}</h3><span class="guide-goal-status"></span><p>${g.text}</p><progress max="${g.target}" value="0" aria-label="${g.title}"></progress>${button(...g.action)}</article>`).join('')}</div><h3>Danach wächst dein Abenteuer weiter</h3><div class="guide-paths">${[
+        return `<h2 tabindex="-1" id="guide-heading">Dein nächster Schritt</h2><p>Diese Meilensteine begleiten deinen Einstieg. Du bestimmst die Reihenfolge. Sie zeigen deinen Spielstand und vergeben keine zusätzliche Belohnung.</p><p class="guide-tip" data-guide-goal-summary></p><div class="guide-goals">${goals().map(g=>`<article class="guide-goal" data-guide-goal="${g.id}"><h3>${g.title}</h3><span class="guide-goal-status"></span><p>${g.text}</p><progress max="${g.target}" value="0" aria-label="${g.title}"></progress><p class="guide-tip" data-guide-availability></p>${button(...g.action)}</article>`).join('')}</div><h3>Danach wächst dein Abenteuer weiter</h3><div class="guide-paths">${[
             ['Dein Reich stärken','Höhere Gebäudestufen, neue Truppenränge und dauerhafte Forschung eröffnen weitere Möglichkeiten.','research','Forschung'],
             ['Die Welt erkunden','Sammle Rohstoffe, jage passende Monster und entwickle dein Land.','world','Weltkarte'],
             ['Gemeinsam bestehen','Plane Rallies und Feldzüge mit Verbündeten oder stelle eine Dungeongruppe zusammen.','expeditions','Feldzüge'],
             ['Deinen Spielstil finden','Stimme Talente und Relikte auf Aufbau, Sammeln, Jagd oder Kampf ab.','mastery','Talente'],
-        ].map(([title,text,target,label])=>`<article class="guide-path"><h3>${title}</h3><p>${text}</p>${button(label+' öffnen','guide-nav',target)}</article>`).join('')}</div>`;
+        ].map(([title,text,target,label])=>`<article class="guide-path"><h3>${title}</h3><p>${text}</p>${button((window.ConquerLocale?.text(label)??label)+' öffnen','guide-nav',target)}</article>`).join('')}</div>`;
     }
     function reference() { return `<h2 tabindex="-1" id="guide-heading">Gut zu wissen</h2><p>Die wichtigsten Spielregeln zum Nachschlagen.</p><div class="guide-reference">${knowledge.map(([title,text,target,label])=>`<details><summary>${title}</summary><p>${text}</p>${button(label,'guide-nav',target)}</details>`).join('')}</div>`; }
     function sync() {
+        const reading=host().querySelector('.guide-body'),readingTop=reading?.scrollTop;
         host().querySelectorAll('[data-guide-level]').forEach(el=>{const level=getState().buildings[el.dataset.guideLevel]?.level;el.textContent=level==null?'Stufe unbekannt':`Stufe ${fmt(level)}`;});
         const items=goals();
         for(const g of items){
@@ -92,9 +163,12 @@ window.ConquerBeginnerGuide = function(ctx) {
             card.classList.toggle('is-complete',done);
             card.querySelector('.guide-goal-status').textContent=g.value===null?'Spielstand derzeit nicht verfügbar':`${done?'✓ Erreicht':'Noch offen'} · ${fmt(Math.min(g.value,g.target))} / ${fmt(g.target)}`;
             card.querySelector('progress').value=Math.min(g.value||0,g.target);
+            const availability=card.querySelector('[data-guide-availability]');availability.textContent=local(g.reason);availability.hidden=done;
+            const action=card.querySelector('button');action.textContent=local(g.action[0]);action.dataset.action=g.action[1];action.dataset.id=g.action[2];
         }
         const summary=host().querySelector('[data-guide-goal-summary]');
         if(summary)summary.textContent=`${items.filter(g=>g.value!==null&&g.value>=g.target).length} von ${items.length} Einstiegszielen erreicht · aus deinem aktuellen Spielstand`;
+        if(reading)reading.scrollTop=readingTop;
     }
     function render(force=false) {
         load();
@@ -107,6 +181,14 @@ window.ConquerBeginnerGuide = function(ctx) {
     function redraw(focusSelector='#guide-heading') {
         render(true);host().scrollTop=0;
         host().querySelector(focusSelector)?.focus({preventScroll:true});
+        const strip=host().querySelector('.guide-tabs');
+        requestAnimationFrame(()=>{
+            if(!strip?.isConnected)return;
+            const active=strip.querySelector('[aria-pressed="true"]');if(!active)return;
+            const a=active.getBoundingClientRect(),b=strip.getBoundingClientRect();
+            if(a.left<b.left)strip.scrollLeft+=a.left-b.left;
+            else if(a.right>b.right)strip.scrollLeft+=a.right-b.right;
+        });
     }
     function onClick(act,b) {
         if(!act.startsWith('guide-'))return false;
@@ -123,6 +205,8 @@ window.ConquerBeginnerGuide = function(ctx) {
         if(act==='guide-building'&&getState().buildings[id])buildingDialog(id);
         if(act==='guide-function'&&getState().buildings[id])buildingFunction(id);
         if(act==='guide-nav')navigate(id);
+        if(act==='guide-world')openWorldGoal(id);
+        if(act==='guide-community'){if(ctx.openCommunity)ctx.openCommunity(id);else navigate('community');}
         return true;
     }
     function maybeWelcome(current) {
@@ -131,5 +215,5 @@ window.ConquerBeginnerGuide = function(ctx) {
         welcomed=true;saved.welcomed=true;save();
         openDialog(`<h2>Willkommen in deinem Königreich!</h2><div class="guide-welcome"><img src="${base}/assets/art/map/castle.svg" alt=""><p>Aus einem kleinen Dorf wird dein eigenes Reich. Lerne die Gebäude kennen, sichere deinen Nachschub und finde dein erstes Ziel.</p><p>Sechs kurze Kapitel begleiten deinen Start. Du kannst jederzeit unterbrechen und den Anfangsguide im Hauptmenü wieder öffnen.</p><div class="guide-actions">${button('Guide starten','guide-open','',true)}${button('Später entdecken','close-dialog')}</div></div>`,{focusHeading:true});
     }
-    return {render,onClick,maybeWelcome,nextGoal:()=>goals().find(g=>g.value!==null&&g.value<g.target),openNextGoal(){const goal=goals().find(g=>g.value!==null&&g.value<g.target);if(goal)onClick(goal.action[1],{dataset:{id:goal.action[2]}});}};
+    return {render,onClick,maybeWelcome,nextGoal,openNextGoal(){const goal=nextGoal();if(goal)onClick(goal.action[1],{dataset:{id:goal.action[2]}});}};
 };

@@ -3,7 +3,7 @@ window.ConquerCongress=function({base,esc,fmt,duration,openDialog,getState,march
     const current=()=>shrineId===null?getState()?.congress:getState()?.shrines?.find(s=>Number(s.id)===shrineId);
     const stamp=s=>new Date(/(?:Z|[+-]\d\d:\d\d)$/.test(s||'')?s:String(s||'').replace(' ','T')+'Z');
     const eventActive=g=>!g.event||(g.event.active&&stamp(g.event.starts_at)<=Date.now()&&stamp(g.event.ends_at)>Date.now());
-    const when=s=>new Intl.DateTimeFormat('de-DE',{weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZoneName:'short'}).format(stamp(s));
+    const when=s=>new Intl.DateTimeFormat(window.ConquerLocale?.locale??'en',{weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZoneName:'short'}).format(stamp(s));
     function open(){
         const g=current();if(!g){toast('Der Kongress wird noch geladen.');return;}
         const own=Number(g.alliance_id)>0&&Number(g.alliance_id)===Number(g.own_alliance_id);

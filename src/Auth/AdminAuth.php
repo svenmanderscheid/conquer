@@ -17,6 +17,8 @@ use Conquer\Db\Connection;
 final class AdminAuth
 {
     private const SESSION_KEY     = 'admin';
+    private const IDLE_SECONDS = 1800;
+    private const ABSOLUTE_SECONDS = 43200;
 
     // -------------------------------------------------------------------------
     // Login / Logout
@@ -63,6 +65,9 @@ final class AdminAuth
             'username' => $row['username'],
             'role'     => $row['role'],
             'must_change_password' => (bool) $row['must_change_password'],
+            'credential_version' => hash('sha256', (string) $row['password_hash']),
+            'authenticated_at' => time(),
+            'last_seen_at' => time(),
         ];
 
         self::log((int) $row['id'], 'admin.login');
@@ -107,12 +112,12 @@ final class AdminAuth
      */
     public static function requireAuth(): array
     {
-        if (!self::isLoggedIn()) {
+        $admin = self::current();
+        if ($admin === null) {
             header('Location: ' . APP_BASE . '/admin/login');
             exit;
         }
 
-        $admin = $_SESSION[self::SESSION_KEY];
         if (!empty($admin['must_change_password'])) {
             header('Location: ' . APP_BASE . '/admin/change-password');
             exit;
@@ -126,20 +131,39 @@ final class AdminAuth
      */
     public static function isLoggedIn(): bool
     {
-        return isset($_SESSION[self::SESSION_KEY])
-            && is_array($_SESSION[self::SESSION_KEY])
-            && !empty($_SESSION[self::SESSION_KEY]['id']);
+        return self::current() !== null;
     }
 
     /** Return the active session without applying the password-change redirect. */
     public static function current(): ?array
     {
-        return self::isLoggedIn() ? $_SESSION[self::SESSION_KEY] : null;
+        $session = $_SESSION[self::SESSION_KEY] ?? null;
+        if (!is_array($session) || empty($session['id'])) return null;
+        $now = time();
+        if (!is_int($session['authenticated_at'] ?? null) || !is_int($session['last_seen_at'] ?? null)
+            || $now - $session['authenticated_at'] >= self::ABSOLUTE_SECONDS
+            || $now - $session['last_seen_at'] >= self::IDLE_SECONDS) {
+            unset($_SESSION[self::SESSION_KEY], $_SESSION['admin_csrf']);
+            return null;
+        }
+        $row = Connection::getInstance()->query('SELECT id,username,role,password_hash,must_change_password FROM admin_users WHERE id=?', [(int)$session['id']])->fetch();
+        if (!$row || !is_string($session['credential_version'] ?? null)
+            || !hash_equals(hash('sha256', (string)$row['password_hash']), $session['credential_version'])
+            || !in_array($row['role'], ['superadmin','moderator'], true)) {
+            unset($_SESSION[self::SESSION_KEY], $_SESSION['admin_csrf']);
+            return null;
+        }
+        // Re-read privileges on every request: deleting/demoting an admin takes effect immediately.
+        $session['username'] = $row['username'];
+        $session['role'] = $row['role'];
+        $session['must_change_password'] = (bool)$row['must_change_password'];
+        $session['last_seen_at'] = $now;
+        return $_SESSION[self::SESSION_KEY] = $session;
     }
 
     public static function mustChangePassword(): bool
     {
-        return !empty($_SESSION[self::SESSION_KEY]['must_change_password']);
+        return !empty(self::current()['must_change_password']);
     }
 
     /** Replace an initial password and unlock the remaining admin area. */
@@ -159,6 +183,7 @@ final class AdminAuth
         $hash = password_hash($newPassword, PASSWORD_ARGON2ID);
         $db->execute('UPDATE admin_users SET password_hash = ?, must_change_password = 0 WHERE id = ?', [$hash, (int) $admin['id']]);
         $_SESSION[self::SESSION_KEY]['must_change_password'] = false;
+        $_SESSION[self::SESSION_KEY]['credential_version'] = hash('sha256', $hash);
         session_regenerate_id(true);
         self::log((int) $admin['id'], 'admin.password_changed');
     }

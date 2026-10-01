@@ -206,6 +206,8 @@ All balance numbers live in `/data/*.json`. PHP loads them at request time (cach
 
 The JSON files in `/data/` are the **source of truth** for game balance. The data we have today (extracted from LoK) seeds the project. Every value will be tuned over time.
 
+**Cost policy, 2026-09-30:** New building and research orders use reduced resource prices generated from the archived originals and `data/economy_balance.json`. See `docs/BALANCE_IMPORT.md` for the active curves and repeatable `--costs-only` import. This supersedes earlier building/research price assumptions in this specification. Troop prices, production, gathering, timers and stored building cost receipts retain their existing rules.
+
 ### 2.5 Why no framework
 
 The owner explicitly chose to write his own thin MVC layer rather than learn Laravel. Reasons:
@@ -413,7 +415,7 @@ Per-level costs, build times, and power values come from `/data/buildings/<build
 - `power` is the power contribution at that level (cumulative when summed across all levels achieved)
 - `requirements` are AND-conditions (all must be met)
 
-At Castle Level 30, a final upgrade requires `golden_pillar: 1` — a special item (acquired from S-Shrine Conquest Event victory or Mythic monster drop).
+Golden pillars are excluded from Union of Kingdoms (decision: 30 September 2026). Level 30 upgrades require their normal resources and building prerequisites, with alliance badges additionally required by the alliance hall.
 
 ### 4.3 Upgrade rules
 
@@ -436,7 +438,7 @@ Examples (selected key levels):
 | L15 | Wall L14, Academy L14 |
 | L20 | Wall L19, Hospital L19 |
 | L25 | Wall L24, Storage L24 |
-| L30 | Wall L29, Treasure House L29 + 1 golden_pillar |
+| L30 | Wall L29, Treasure House L29 |
 
 This means **Castle leveling is gated by deep specialization in support buildings**, encouraging breadth.
 
@@ -2071,24 +2073,70 @@ A **Rally** is a coordinated attack where multiple alliance members join troops 
 - **Initiator** (Rally Captain) clicks "Start Rally" on a target (Shrine garrison or Rally-only monster).
 - Initiator's troops form the core of the rally, plus AP cost applies to initiator only.
 - Other alliance members can **join** the rally with their own troops within a fixed window (e.g. 30 minutes [DEFAULT]).
-- **Rally Capacity** is determined by the initiator's **Hall of Alliance** level (and Alliance Tree research).
+- **Rally Capacity** is determined by the initiator's **Hall of Alliance** level and their rally-capacity research in the current world.
 - When the join window expires, the rally launches: combined troops march to target.
 - Battle resolves with all rally participants' troops combined; Rally bonuses (Advanced Tree) apply.
 - Surviving troops return to their respective owner's cities with proportional shares of any plundered resources / drops.
 
 ### 14.9 Rally Capacity
 
+User-approved progression, 1 October 2026. These are base capacities before research:
+
 | Hall of Alliance Level | Rally Capacity Cap (troops) |
 |---|---|
-| 1 | 20,000 |
-| 5 | 50,000 |
-| 10 | 100,000 |
-| 20 | 250,000 |
-| 30 | 500,000 |
+| 1 | 50,000 |
+| 2 | 75,000 |
+| 3 | 100,000 |
+| 4 | 125,000 |
+| 5 | 150,000 |
+| 6 | 175,000 |
+| 7 | 200,000 |
+| 8 | 225,000 |
+| 9 | 250,000 |
+| 10 | 300,000 |
+| 11 | 350,000 |
+| 12 | 400,000 |
+| 13 | 450,000 |
+| 14 | 500,000 |
+| 15 | 550,000 |
+| 16 | 600,000 |
+| 17 | 700,000 |
+| 18 | 800,000 |
+| 19 | 900,000 |
+| 20 | 1,000,000 |
+| 21 | 1,100,000 |
+| 22 | 1,200,000 |
+| 23 | 1,300,000 |
+| 24 | 1,400,000 |
+| 25 | 1,500,000 |
+| 26 | 1,600,000 |
+| 27 | 1,700,000 |
+| 28 | 1,800,000 |
+| 29 | 1,900,000 |
+| 30 | 2,500,000 |
 
-[DEFAULT — to be tuned. The cap is the total troops across all participants, not per-participant.]
+The cap includes the leader and every active participant. Personal march capacity remains a separate limit on each player's contribution.
 
-Alliance Tree `Rally Size` research can extend this cap further.
+`total = floor(base × (1 + rally_attack_amount))`. The existing research provides up to +40%, yielding 3,500,000 troops at Hall level 30. Research from another world or from joining players does not increase the leader's capacity.
+
+`RallyCapacity` is the authoritative capacity model. New monster, territory and player-city rallies save their total capacity at creation. Later building/research changes do not resize a gathering or travelling rally. Legacy city rallies without a stored capacity retain their previous behaviour. Existing monster difficulty uses its own unchanged reference curve and does not scale automatically with the enlarged Hall capacity.
+
+The Hall upgrade view displays base capacity, research bonus and total capacity, the next completed level's values, and an expandable table of all 30 levels. All values come from the authenticated game state. Construction in progress does not grant the new capacity early.
+
+#### Alliance badges from monster rallies
+
+User-approved on 1 October 2026: rally monsters at levels 1–10 have a 50% chance per victorious participant to award Alliance Badges (`119000002`) in addition to their existing rewards. These are the Hall upgrade material, separate from Alliance Coins (`10300005`).
+
+| Monster level | Badges per successful drop |
+|---|---:|
+| 1–3 | 2 |
+| 4–6 | 3 |
+| 7–9 | 4 |
+| 10 | 5 |
+
+The captain and every army that actually participates in the victory roll independently at 50%. A successful roll awards the full amount; a failed roll awards no badges. The amount is not divided between participants. Earned badges enter each player's inventory once their army returns. Defeats, cancelled rallies and armies that arrive too late grant none. Solo monsters and levels above 10 do not gain badges from this rule. Existing global and world reward overrides retain priority, and already-started rallies retain their saved reward pool.
+
+The default reward rule is shared by combat, map previews and the item source finder. The level-dependent quantity is applied after selecting the monster's reward family, so regional bosses receive it as well. Hall upgrade prices and construction durations remain unchanged.
 
 ### 14.10 Drop Economy Overview
 

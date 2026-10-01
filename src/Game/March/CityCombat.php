@@ -37,6 +37,7 @@ final class CityCombat
         $garrison=array_map('intval',$db->query('SELECT troop_code,count FROM city_troops WHERE city_id=? AND count>0 ORDER BY troop_code FOR UPDATE',[$targetCityId])->fetchAll(\PDO::FETCH_KEY_PAIR));
         $defenders=[['player_id'=>$defender,'city_id'=>$targetCityId,'troops'=>$garrison]];
         foreach($db->query("SELECT * FROM reinforcements WHERE target_city_id=? AND state='active' ORDER BY id FOR UPDATE",[$targetCityId])->fetchAll() as $row){$defenders[]=['player_id'=>(int)$row['sender_id'],'city_id'=>(int)$row['sender_city_id'],'troops'=>json_decode($row['troops_json'],true)?:[],'reinforcement_id'=>(int)$row['id']];}
+        $hasDefendingTroops=array_sum(array_map(static fn(array $army):int=>array_sum(array_map('intval',$army['troops'])),$defenders))>0;
         $attackScore=0.0;$defenseScore=0.0;
         $attackSnapshots=[];$defenseSnapshots=[];
         foreach($armies as $army){
@@ -79,7 +80,10 @@ final class CityCombat
         $lootPool=[];foreach(['food','lumber','stone','gold'] as $resource)$lootPool[$resource]=$wins?(int)floor(max(0,(float)$city[$resource]-$protected[$resource])*.20):0;
         $totalTroops=array_sum(array_map(fn($army)=>array_sum($army['troops']),$armies));$looted=array_fill_keys(array_keys($lootPool),0);
         foreach($armies as $index=>$army){
-            $loss=self::losses($army['troops'],$wins?.10:.30);$buffs=BuffEngine::getBuffs((int)$army['player_id'],$world);$capacity=0;
+            // An empty city cannot inflict troop casualties. Its wall still loses
+            // durability and its unprotected resources can still be plundered.
+            $attackerLossRate=$hasDefendingTroops?($wins?.10:.30):0.0;
+            $loss=self::losses($army['troops'],$attackerLossRate);$buffs=BuffEngine::getBuffs((int)$army['player_id'],$world);$capacity=0;
             foreach($loss['survivors'] as $code=>$count)$capacity+=$count*ResearchEffects::carryPerTroop((int)$code,$buffs);
             $share=array_sum($army['troops'])/max(1,$totalTroops);$loot=[];
             foreach($lootPool as $resource=>$amount){$loot[$resource]=(int)min($capacity,floor($amount*$share));$capacity-=$loot[$resource];$looted[$resource]+=$loot[$resource];}
@@ -87,7 +91,7 @@ final class CityCombat
             $settled=$army+$loss+['loot'=>$loot];$result['armies'][]=$settled;
             $attackSnapshots[$index]=CombatReport::settle($attackSnapshots[$index],$loss);
         }
-        $combat=['version'=>2,'outcome'=>$result['outcome'],'luck_percent'=>$luckPercent,
+        $combat=['version'=>3,'outcome'=>$result['outcome'],'unopposed'=>!$hasDefendingTroops,'luck_percent'=>$luckPercent,
             'attacker_score_before_luck'=>(int)round($attackScoreBeforeLuck),
             'attacker'=>CombatReport::side($attackSnapshots,$result['attacker_score']),
             'defender'=>CombatReport::side($defenseSnapshots,$result['defender_score']),

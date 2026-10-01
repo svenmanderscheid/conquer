@@ -6,12 +6,14 @@ $base=defined('APP_BASE')?(string)APP_BASE:rtrim(str_replace('\\','/',dirname(is
 if($base!==''&&!preg_match('#^/(?:[A-Za-z0-9._~%+-]+/?)+$#D',$base))$base='';
 $root=$base.'/';
 header('Content-Type: application/manifest+json; charset=utf-8');
-header('Cache-Control: public, max-age=3600');
+// Browsers cache Web App Manifests aggressively. Revalidate every request so
+// branding changes reach the install prompt without waiting for an old TTL.
+header('Cache-Control: no-cache, must-revalidate');
 header('X-Content-Type-Options: nosniff');
 echo json_encode([
-    'id'=>$root,'name'=>'Conquer · Chroniken eines Königreichs','short_name'=>'Conquer',
-    'description'=>'Baue dein Königreich und erlebe gemeinsame Abenteuer.',
-    'lang'=>'de','start_url'=>$root.'?source=pwa','scope'=>$root,
+    'id'=>$root,'name'=>'Union of Kingdoms','short_name'=>'Union of Kingdoms',
+    'description'=>'Build your kingdom and embark on adventures together.',
+    'lang'=>'en','start_url'=>$root.'?source=pwa','scope'=>$root,
     'display'=>'standalone','orientation'=>'any','background_color'=>'#e9dfcf','theme_color'=>'#5c4270',
     'categories'=>['games','entertainment'],
     'icons'=>[

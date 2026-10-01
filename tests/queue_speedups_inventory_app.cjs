@@ -1,4 +1,5 @@
 'use strict';
+require('./fixtures/browser_locale.cjs')('de'); // This suite asserts the explicit German UI.
 const assert=require('node:assert/strict'),path=require('node:path'),net=require('node:net'),{spawn}=require('node:child_process');
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const root=path.resolve(__dirname,'..');
@@ -11,16 +12,16 @@ const root=path.resolve(__dirname,'..');
   browser=await chromium.launch({headless:true,executablePath:process.env.BROWSER_EXECUTABLE_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe'});
   const page=await browser.newPage({viewport:{width:390,height:844},hasTouch:true}),errors=[];
   page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(15000);
-  await page.goto('http://127.0.0.1:'+port);await page.locator('[data-mode=login]').click();
-  await page.locator('[name=username]').fill('PreviewPlayer');await page.locator('[name=password]').fill('PreviewFixture!2026');
-  await Promise.all([page.waitForURL('**/city'),page.locator('#auth-submit').click()]);
+  await page.goto('http://127.0.0.1:'+port);await page.goto(new URL('?zugang=login', page.url()).href);
+  await page.locator("[name=identifier], [name=username]").fill('PreviewPlayer');await page.locator('[name=password]').fill('PreviewFixture!2026');
+  await Promise.all([page.waitForURL('**/city'),page.locator("form[action$=\"/auth/local\"] button[type=\"submit\"]").click()]);
   await page.waitForFunction(()=>document.querySelector('#player-hud-name')?.textContent.includes('PreviewPlayer'));
   const api=p=>page.evaluate(async p=>(await(await fetch('/api/'+p)).json()).data,p),state=await api('kingdom/state');
   const item=type=>state.inventory.find(i=>i.category==='speedup'&&i.subcategory===type&&i.duration_seconds===60);
   await page.locator('#navigation [data-id=inventory]').click();await page.locator('[data-action=inventory-category][data-id=speedup]').click();
   const openItem=async type=>{const card=page.locator(`[data-action=inventory-item][data-id="${item(type).item_code}"]`);await card.click();assert.equal(await page.locator('#game-dialog').evaluate(d=>d.open),false,'Item details stay in the inventory');};
   const choose=async queue=>{if(queue)await page.locator('#inventory-queue').selectOption(queue);await page.locator('#inventory-details button[type=submit]').click();};
-  const close=()=>page.locator('#game-dialog>.dialog-close').click();
+  const close=()=>page.locator("#game-dialog>.dialog-close:visible, #game-dialog .mobile-page-back:visible").first().click();
   await openItem('research');
   await choose();
   assert.equal(await page.locator('.queue-speedup-picker').getAttribute('data-type'),'research');

@@ -1,4 +1,5 @@
 'use strict';
+require('./fixtures/browser_locale.cjs')('de'); // This suite asserts the explicit German UI.
 // Actual app and HTTP handlers on automatically disposed synthetic storage.
 const assert=require('assert/strict'),fs=require('fs'),path=require('path'),net=require('net');
 const {spawn}=require('child_process');
@@ -12,42 +13,38 @@ fs.mkdirSync(out,{recursive:true});
  let browser,log='';const errors=[],badAssets=[],report=[];
  try{
   await new Promise((resolve,reject)=>{const timeout=setTimeout(()=>reject(Error(log||'Preview startup timed out')),60000);fixture.stdout.on('data',d=>{log+=d;if(log.includes('Synthetic preview ready')){clearTimeout(timeout);resolve();}});fixture.stderr.on('data',d=>log+=d);fixture.on('error',reject);fixture.on('exit',()=>{clearTimeout(timeout);reject(Error(log));});});
-  browser=await chromium.launch({headless:true,executablePath:process.env.BROWSER_EXECUTABLE_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe'});
+  browser=await chromium.launch({headless:true,executablePath:process.env.BROWSER_EXECUTABLE_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe',args:['--host-resolver-rules=MAP conquer-marketing.test 127.0.0.1','--no-proxy-server']});
   const context=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,deviceScaleFactor:2});
   const page=await context.newPage(),base='http://127.0.0.1:'+port;
   page.setDefaultTimeout(25000);page.on('pageerror',e=>errors.push(e.message));
   page.on('response',r=>{if(r.url().includes('/assets/')&&r.status()>=400)badAssets.push(r.url());});
-  await page.goto(base+'/?zugang=login');
-  await page.locator('[name=username]').fill('PreviewPlayer');await page.locator('[name=password]').fill('PreviewFixture!2026');
-  await Promise.all([page.waitForURL('**/city'),page.locator('#auth-submit').click()]);
+  await page.goto(base+'/?zugang=login',{waitUntil:'networkidle'});
+  await page.locator('[name=identifier], [name=username]').first().fill('PreviewPlayer');await page.locator('[name=password]').fill('PreviewFixture!2026');
+  const loginForm=page.locator('form[action$="/auth/local"]');
+  assert(await loginForm.evaluate(form=>form.checkValidity()),'Synthetic mobile login form is valid before submit');
+  await Promise.all([page.waitForURL('**/city'),loginForm.locator('button[type=submit]').click()]);
   await page.locator('#hud-menu').waitFor();
-  await page.locator('#city-frame').waitFor();
-  const frame=await (await page.locator('#city-frame').elementHandle()).contentFrame();
-  assert(frame,'embedded city loaded');await frame.waitForFunction(()=>window.conquer3D?.getState().ready);
-  const performanceState=await frame.evaluate(()=>conquer3D.getState());
-  assert.equal(performanceState.frameLimit,30);assert(performanceState.pixelRatio<=1.2);
+  await page.locator('.painted-village').waitFor();
+  const performanceState={renderer:'painted',embeddedFrames:await page.locator('#city-frame').count()};assert.equal(performanceState.embeddedFrames,0);
   for(const [width,height]of [[1280,800],[390,844],[320,568],[844,390],[568,320]]){
    await page.setViewportSize({width,height});
    await page.locator('#hud-menu').click();await page.locator('.menu-grid').first().waitFor();
    assert.equal(await page.locator('.menu-link .nav-symbol').count(),0,'every menu uses a defined vector icon');
-   await frame.waitForFunction(()=>!conquer3D.getState().framePending);
+
    await page.screenshot({path:path.join(out,`menu-${width}x${height}.png`)});
-   await page.keyboard.press('Escape');await frame.waitForFunction(()=>conquer3D.getState().framePending);
-   for(const selector of ['.realm-hud','#resource-bar','.realm-nav','.city-footer'])assert.equal(await frame.locator(selector).isVisible(),false,'no duplicate embedded HUD '+selector);
+   await page.keyboard.press('Escape');
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
    await page.screenshot({path:path.join(out,`city-${width}x${height}.png`)});
   }
   await page.setViewportSize({width:1280,height:800});
-  await frame.evaluate(()=>{window.dispatchEvent(new CustomEvent('conquer-focus-building',{detail:{code:'farm'}}));document.querySelector('#zoomIn').click();document.querySelector('#zoomIn').click();});
-  const a=await frame.evaluate(()=>conquer3D.getState().wheelAngle);await page.waitForTimeout(400);const b=await frame.evaluate(()=>conquer3D.getState().wheelAngle);assert.notEqual(a,b,'scene animation remains live');
   await page.screenshot({path:path.join(out,'city-close.png')});
   let getCalls=0;page.on('request',r=>{if(r.method()==='GET'&&r.url().includes('/api/'))getCalls++;});
   await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});document.dispatchEvent(new Event('visibilitychange'));});
-  await frame.waitForFunction(()=>!conquer3D.getState().framePending);await page.waitForTimeout(1000);
+  await page.waitForTimeout(1000);
   const hiddenCalls=getCalls;await page.waitForTimeout(5600);assert.equal(getCalls,hiddenCalls,'no background API polling');
   await page.evaluate(()=>{delete document.hidden;document.dispatchEvent(new Event('visibilitychange'));});
   await page.waitForResponse(r=>r.url().includes('/api/game/state')&&r.status()===200);
-  await frame.waitForFunction(()=>conquer3D.getState().framePending);
+
   const read=async()=>{const r=await context.request.get(base+'/api/game/state?map_x=90&map_y=65&map_radius=40');assert.equal(r.status(),200);return(await r.json()).data;};
   const state=await read(),monster=state.monsters.find(m=>m.definition?.type==='solo');assert(monster);
   assert.deepEqual(state.players.map(p=>Number(p.id)).sort(),[2,3],'map includes visible neighbours only, excluding own/hidden/foreign/outside cities');
@@ -68,6 +65,12 @@ fs.mkdirSync(out,{recursive:true});
    const pos=await marker.evaluate(el=>{const r=el.getBoundingClientRect();for(const [fx,fy]of [[.5,.5],[.5,.9],[.1,.9],[.9,.9],[.1,.1]]){const x=r.width*fx,y=r.height*fy;if(el.contains(document.elementFromPoint(r.x+x,r.y+y)))return{x,y};}return null;});
    assert(pos,'monster reachable by touch');await marker.click({position:pos});await page.locator('[data-action=march-preview]').waitFor();
   };
+  await page.evaluate(()=>{
+   window.__previewNavigation=[];
+   const record=event=>{const dialog=document.querySelector('#game-dialog');__previewNavigation.push({event:event.type,target:event.target?.id||event.target?.className||'window',width:innerWidth,url:location.href,history:structuredClone(history.state),parentOpen:dialog?.open,previewOpen:Boolean(document.querySelector('.battle-preview-dialog[open]'))});};
+   for(const name of ['popstate','hashchange'])window.addEventListener(name,record,true);
+   for(const name of ['close','cancel'])document.addEventListener(name,record,true);
+  });
   await openMonster();
   await page.locator('[data-action=march-clear]').click();await page.locator('#march-unit-50100101').fill('100');
   for(const [width,height]of [[1280,800],[390,844],[320,568],[844,390],[568,320]]){
@@ -78,7 +81,7 @@ fs.mkdirSync(out,{recursive:true});
    const geometry=await page.locator('.battle-preview-dialog').evaluate(el=>{const r=el.getBoundingClientRect(),close=el.querySelector('[data-preview-close]').getBoundingClientRect();return{fits:r.left>=0&&r.top>=0&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1,overflow:el.scrollWidth-el.clientWidth,close:close.height>=44&&close.bottom<=innerHeight};});
    assert(geometry.fits&&geometry.overflow<=1&&geometry.close);report.push({width,height,...geometry});
    await page.screenshot({path:path.join(out,`battle-${width}x${height}.png`)});
-   if(width===390)await page.goBack();else await page.keyboard.press('Escape');await page.waitForFunction(()=>!history.state?.conquerBattlePreview);assert(await page.locator('#game-dialog').isVisible(),'closing calculation retains march selection');assert.equal(await page.locator('#march-unit-50100101').inputValue(),'100');
+   if(width===390)await page.goBack();else await page.keyboard.press('Escape');await page.waitForFunction(()=>!history.state?.conquerBattlePreview);assert(await page.locator('#game-dialog').isVisible(),'closing calculation retains march selection '+JSON.stringify(await page.evaluate(()=>({width:innerWidth,height:innerHeight,history:history.state,events:window.__previewNavigation,dialog:{open:document.querySelector('#game-dialog').open,display:getComputedStyle(document.querySelector('#game-dialog')).display}}))));assert.equal(await page.locator('#march-unit-50100101').inputValue(),'100');
   }
   await page.keyboard.press('Escape');
   const after=await read();assert.deepEqual(after.troops,state.troops);assert.equal(after.marches.length,state.marches.length);
@@ -100,16 +103,17 @@ fs.mkdirSync(out,{recursive:true});
   await page.screenshot({path:path.join(out,'battle-pvp-320.png')});
   await page.keyboard.press('Escape');await page.waitForFunction(()=>!history.state?.conquerBattlePreview);
   const waitContext=await browser.newContext(),waitPage=await waitContext.newPage();
-  await waitPage.goto(base+'/?zugang=waitlist');
+  await waitPage.goto('http://conquer-marketing.test:'+port+'/?zugang=waitlist');
   await waitPage.locator('input[name=first_name]').fill('Alpha');await waitPage.locator('input[name=last_name]').fill('Tester');
   await waitPage.locator('[data-access-panel=waitlist] input[name=email]').fill('alpha-final@tests.invalid');
   await waitPage.locator('input[name=consent]').check();
   await waitPage.locator('[data-access-panel=waitlist] button[type=submit]').click();
-  await waitPage.locator('[data-i18n="waitlist.success"]').waitFor();
+  await waitPage.locator('.lp-waitlist-success[role="status"]').waitFor();
+  assert.match(await waitPage.locator('.lp-waitlist-success').textContent(),/Anfrage wurde gespeichert/);
   await waitContext.close();
   assert.deepEqual(errors,[]);assert.deepEqual(badAssets,[]);
   fs.writeFileSync(path.join(out,'report.json'),JSON.stringify({performanceState,report,errors,badAssets},null,2));
-  console.log('PASS actual app: calculator + authenticated HTTP, 5 viewports, menu icons, mobile GPU limits, hidden polling, resume, animated overview/close-up and no duplicate HUD');
+  console.log('PASS actual app: calculator + authenticated HTTP, 5 viewports, menu icons, hidden polling, resume, painted city and no embedded HUD');
  }catch(error){console.error({errors,badAssets});if(browser)for(const c of browser.contexts())for(const [i,p]of c.pages().entries()){console.error(await p.locator('dialog').allTextContents().catch(()=>[]));await p.screenshot({path:path.join(out,`failure-${i}.png`)}).catch(()=>{});}throw error;}
  finally{if(browser)await browser.close();if(fixture.exitCode===null){fixture.stdin.end('\n');await new Promise(resolve=>fixture.once('exit',resolve));}}
 })().catch(e=>{console.error(e);process.exitCode=1;});

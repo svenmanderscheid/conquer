@@ -1,0 +1,68 @@
+<?php
+declare(strict_types=1);
+if(PHP_SAPI!=='cli')exit(1);
+define('ROOT_DIR',dirname(__DIR__));
+require ROOT_DIR.'/src/Autoloader.php';(new \Conquer\Autoloader(ROOT_DIR.'/src'))->register();
+require __DIR__.'/Support/FeatureDatabase.php';
+use Conquer\Db\Connection;
+use Conquer\Game\Rewards\{ItemSourceService as S,RewardCatalog};
+use Conquer\Game\World\{WorldContext,LandAccessPolicy,LandProgressService};
+use Conquer\Game\Dungeon\DungeonRules;
+use Conquer\Game\Trading\TradingShopService;
+function sourceCheck(bool $ok,string $label):void {if(!$ok)throw new RuntimeException($label);echo "PASS $label\n";}
+$fixture=new \ConquerTests\FeatureDatabase();
+try{
+    $db=Connection::getInstance();WorldContext::bind(1,1);
+    $db->execute("INSERT INTO players(id,username,email,password_hash)VALUES(1,'Sources','sources@tests.invalid','unused')");
+    $db->execute("INSERT INTO cities(id,player_id,world_id,name,coord_x,coord_y,castle_level)VALUES(1,1,1,'Sources city',10,10,1)");
+    $db->execute("INSERT INTO worlds(id,name,slug,status,map_size)VALUES(2,'Other world','item-sources-other','running',256)");
+    $db->execute("INSERT INTO admin_users(id,username,password_hash,role)VALUES(1,'SourcesAdmin','unused','superadmin')");
+    $config=RewardCatalog::defaults('monster','20209901');$config['drops']=[['item_code'=>10103001,'count'=>7,'probability'=>.4]];
+    $db->execute("INSERT INTO reward_world_overrides(world_id,source_type,source_key,config_json,revision,updated_by)VALUES(1,'monster','20209901',?,1,1)",[json_encode($config)]);RewardCatalog::resetCache();
+    $db->execute("INSERT INTO field_monsters(world_id,monster_code,coord_x,coord_y,hp_current,expires_at)VALUES(1,20209901,14,10,100,NULL),(1,20209901,11,10,0,NULL),(1,20209901,12,10,100,DATE_SUB(UTC_TIMESTAMP(),INTERVAL 1 DAY)),(2,20209901,10,11,100,NULL)");
+    $snapshot=static function()use($db):string{$all=[];foreach(['players','cities','player_inventory','player_chests','world_land_zones','world_land_parts','dungeon_runs','expeditions','trading_shop_purchases']as$table)$all[$table]=$db->query('SELECT * FROM '.$table)->fetchAll();return json_encode($all);};
+    $before=$snapshot();$result=S::search(1,['item_code'=>10103001]);
+    sourceCheck($snapshot()===$before,'lookup creates no chest or land rows, advances no activities and spends nothing');
+    $monsters=array_values(array_filter($result['sources'],static fn($s)=>$s['type']==='monster'&&$s['destination']!==null));
+    sourceCheck(count($monsters)===1&&(int)$monsters[0]['destination']['target']['data']['coord_x']===14,'nearest live target excludes defeated, expired and foreign-world monsters');
+    sourceCheck($monsters[0]['rewards'][0]['quantity']===7&&$monsters[0]['rewards'][0]['chance']===.4,'effective world reward override is authoritative');
+    sourceCheck($result['query']===['item_code'=>10103001]&&$result['world_id']===1,'unowned inventory lookup is scoped to current world');
+    sourceCheck(!array_filter(S::search(1,['item_code'=>10201001])['sources'],static fn($s)=>$s['type']==='monster'&&$s['level']<1),'historical zero-based monster aliases use the displayed minimum level one');
+    try{S::search(1,['item_code'=>10103001,'expected_world_id'=>2]);throw new RuntimeException('Stale world accepted');}catch(DomainException $e){sourceCheck($e->getCode()===409,'stale world navigation is rejected');}
+    LandProgressService::ensureWorld(1);
+    $size=(int)$db->query('SELECT map_size FROM worlds WHERE id=1')->fetchColumn();$center=intdiv($size,2);
+    $db->execute("UPDATE world_land_zones SET status='locked' WHERE world_id=1 AND zone_key='center'");LandProgressService::invalidate(1);
+    $db->execute('UPDATE field_monsters SET hp_current=0 WHERE world_id=1');
+    $db->execute('INSERT INTO field_monsters(world_id,monster_code,coord_x,coord_y,hp_current)VALUES(1,20209901,?,?,100)',[$center,$center]);
+    sourceCheck(!LandAccessPolicy::isOpenReadOnly(1,$center,$center)&&!LandAccessPolicy::isOpen(1,$center,$center),'read-only land gate agrees with combat restrictions');
+    $locked=S::search(1,['item_code'=>10103001]);
+    sourceCheck(!array_filter($locked['sources'],static fn($s)=>$s['type']==='monster'&&$s['destination']!==null),'locked land never reveals a target or coordinates');
+    $fragments=S::search(1,['treasure_code'=>60100001]);$silver=array_values(array_filter($fragments['sources'],static fn($s)=>$s['id']==='chest:silver'));
+    sourceCheck(count($silver)===1&&$silver[0]['status']==='unavailable'&&$silver[0]['reason']['key']==='sources.house','free chest is locked without a Treasure House');
+    $db->execute("INSERT INTO city_buildings(city_id,building_code,level)VALUES(1,'treasure_house',1)");
+    $fragments=S::search(1,['treasure_code'=>60100001]);$silver=array_values(array_filter($fragments['sources'],static fn($s)=>$s['id']==='chest:silver'));
+    sourceCheck($silver[0]['status']==='available'&&(int)$db->query('SELECT COUNT(*) FROM player_chests')->fetchColumn()===0,'first free chest appears without initializing or claiming it');
+    $db->execute("INSERT INTO city_buildings(city_id,building_code,level)VALUES(1,'trading_post',1)");
+    $shop=TradingShopService::state(1);$offer=$shop['offers'][0];$offerQuery=isset($offer['item_code'])?['item_code'=>(int)$offer['item_code']]:['treasure_code'=>(int)$offer['treasure_code']];
+    $trade=array_values(array_filter(S::search(1,$offerQuery)['sources'],static fn($s)=>$s['id']==='shop:caravan:'.$offer['id']));
+    sourceCheck(count($trade)===1&&$trade[0]['status']==='available'&&$trade[0]['destination']['offer_id']===$offer['id'],'finder links an actual current personalized caravan offer');
+    $db->execute("INSERT INTO trading_shop_purchases(player_id,scope_world_id,shop_mode,rotation,offer_id,quantity)VALUES(1,1,'caravan',?,?,?)",[$shop['rotation'],$offer['id'],$offer['limit']]);
+    $trade=array_values(array_filter(S::search(1,$offerQuery)['sources'],static fn($s)=>$s['id']==='shop:caravan:'.$offer['id']));
+    sourceCheck($trade[0]['status']==='unavailable'&&$trade[0]['reason']['key']==='sources.sold_out','current rotation stock is respected');
+    $dungeon=DungeonRules::weeklyRotation()['available'][0];
+    $dungeons=S::search(1,['treasure_code'=>$dungeon['treasure_code']]);$row=array_values(array_filter($dungeons['sources'],static fn($s)=>$s['id']==='dungeon:'.$dungeon['dungeon_code']))[0];
+    sourceCheck($row['status']==='unavailable'&&$row['reason']['key']==='sources.talent','dungeon advertises real specialization prerequisite');
+    $itemCodes=$dungeon['item_codes'];$selected=$itemCodes[1%count($itemCodes)];
+    $dungeonItems=S::search(1,['item_code'=>$selected]);
+    sourceCheck((bool)array_filter($dungeonItems['sources'],static fn($s)=>$s['id']==='dungeon:'.$dungeon['dungeon_code']),'default dungeon item follows account-specific reward selection');
+    if(count($itemCodes)>1&&$itemCodes[0]!==$selected){$other=S::search(1,['item_code'=>$itemCodes[0]]);sourceCheck(!array_filter($other['sources'],static fn($s)=>$s['id']==='dungeon:'.$dungeon['dungeon_code']),'finder does not promise another account\'s deterministic dungeon item');}
+    $db->execute("UPDATE worlds SET status='paused' WHERE id=1");
+    sourceCheck(!array_filter(S::search(1,['treasure_code'=>60100001])['sources'],static fn($s)=>$s['status']==='available'),'paused worlds cannot advertise currently available rewards');
+    $token=str_repeat('a',64);$db->execute("INSERT INTO sessions(player_id,token,csrf_token,ip_address,user_agent,expires_at,active_world_id)VALUES(1,?,?,'127.0.0.1','sources',DATE_ADD(UTC_TIMESTAMP(),INTERVAL 1 HOUR),1)",[$token,str_repeat('b',64)]);
+    $base=$fixture->serve('\\Conquer\\Api\\Handlers\\ItemSourceHandler::search([]);');
+    $http=static function(string $query,bool $auth=true)use($base,$token):array{$curl=curl_init($base.'/?'.$query);curl_setopt_array($curl,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_TIMEOUT=>30,CURLOPT_HTTPHEADER=>$auth?['Cookie: conquer_session='.$token]:[]]);$raw=curl_exec($curl);$code=curl_getinfo($curl,CURLINFO_HTTP_CODE);curl_close($curl);return [$code,json_decode((string)$raw,true,512,JSON_THROW_ON_ERROR)];};
+    sourceCheck($http('item_code=10103001',false)[0]===401,'HTTP lookup requires a player session');
+    sourceCheck($http('item_code[]=10103001')[0]===422,'HTTP lookup rejects malformed item input');
+    sourceCheck($http('treasure_code=60100001')[0]===200,'authenticated HTTP lookup permits relics with zero fragments');
+    echo "ALL ITEM SOURCE INTEGRATION CHECKS PASSED\n";
+}finally{$fixture->close();}

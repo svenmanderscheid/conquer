@@ -1,111 +1,56 @@
 # Truppenausbildung
 
-Stand: 20. September 2026.
+Stand: 29. September 2026.
 
-## Gebäude und Ablauf
+## Aktiver Umfang und Originalwerte
 
-| Gebäude | Interner Schlüssel | Truppenart | Ausbildungsplatz |
-|---|---|---|---|
-| Kaserne | `barrack` | Infanterie | 1 |
-| Schützenlager | `archery_range` | Bogenschützen | 2 |
-| Reiterhof | `stable` | Kavallerie | 3 |
+Union of Kingdoms verwendet T1–T5 für Infanterie, Bogenschützen und Kavallerie: insgesamt 15 Einheiten. T6–T10 sind für spätere Inhalte archiviert und können weder neu ausgebildet noch durch Beförderung freigeschaltet werden.
 
-Jedes Gebäude bildet unabhängig aus. Eine Beförderung belegt nur das Gebäude ihrer Truppenart. Die Gebäudeauswahl, Timer und Abschlussmeldungen öffnen denselben Ausbildungsbereich der Haupt-App unter `/city#army`.
+`data/balance-source/troop.json` ist die unveränderte Quelle für Angriff, Verteidigung, Lebenspunkte, Stärke, Tempo, Traglast, Rohstoffkosten und Heilzeit. `tools/update-training-catalog.py` erzeugt daraus `data/troops.json`. Quellcodes werden ausdrücklich auf die bestehenden internen IDs abgebildet; Bruchwerte wie 1,5 Traglast und 0,5 Sekunden Heilzeit bleiben erhalten. Die Quelle definiert keinen separaten Tödlichkeitswert.
 
-Das Menü bietet zehn Stufen je Truppenart, eine drehbare animierte Figur, sieben Grundwerte, Bestandszahlen, Rohstoffbedarf, Anzahl mit Schieberegler und Zahleneingabe, Ausbildungsdauer und passende Inventar-Beschleuniger. Beim Öffnen und beim Einheitenwechsel wird die maximal leistbare Ausbildungsmenge vorausgewählt. Figur, Stufenwahl und Hauptaktion passen ohne Scrollen ins Fenster. Die zehn Stufen sind in zwei feste Fünfergruppen mit Vor-/Zurück-Knöpfen aufgeteilt. Auf Handys steht die Figur oben, im Querformat neben den Bedienelementen. Eine laufende Ausbildung ersetzt das Eingabeformular durch Restzeit und Beschleuniger. Große Rohstoffzahlen werden kompakt angezeigt; Antippen öffnet die genauen Werte. Gesperrte Stufen zeigen die fehlenden Gebäudeanforderungen. T11 ist ausdrücklich noch nicht enthalten. Ein Sofortkauf mit Edelsteinen ist nicht Teil dieses Ausbaus.
+## Freischaltung und Ausbildung
 
-## Werte und Freischaltung
+Kaserne, Schützenlager und Reiterhof bilden unabhängig voneinander aus. T1 benötigt das jeweilige Gebäude und Stadtzentrum auf Stufe 1. T2–T5 benötigen zusätzlich die passende abgeschlossene Truppenforschung und Akademiestufe. Die Forschung hat die originalen Voraussetzungen aus `battle.json`.
 
-`data/troops.json` enthält 30 Einheiten. Stärke, Angriff, Verteidigung, Lebenspunkte, Tödlichkeit, Tempo und Traglast wurden aus den bereitgestellten Kingshot-Screenshots übertragen. `tools/update-training-catalog.py` dokumentiert die Transkription und erzeugt den Katalog erneut.
+| Tier | Akademie und Stadtzentrum | Sekunden je Einheit | 2.000 Einheiten ohne Boni |
+|---|---:|---:|---|
+| T1 | 1 (keine Akademie nötig) | 3 | 1 Std. 40 Min. |
+| T2 | 10 | 5 | 2 Std. 46 Min. 40 Sek. |
+| T3 | 16 | 9 | 5 Std. |
+| T4 | 23 | 16 | 8 Std. 53 Min. 20 Sek. |
+| T5 | 30 | 27 | **15 Std.** |
 
-Die Freischaltung erfolgt für alle drei Truppenarten ausschließlich über das eigene Ausbildungsgebäude und das Stadtzentrum. Die Akademie und Truppenforschungen sind keine Voraussetzung mehr.
+Die Ausbildungszeiten sind die bewusste Abweichung von der Originalquelle. Anzeige und Server verwenden `ceil(Sekunden × Anzahl / Ausbildungstempo)`. Forschungs-, VIP-, Relikt-, aktive Ausbildungs- und Kasernenboni wirken weiterhin. Beförderungen benötigen Ausbildungsgebäude und Stadtzentrum ab Stufe 13 sowie die freigeschaltete Zieltruppe; sie kosten 70 % der Zielausbildung und verwenden deren halbe Zeit.
 
-| Truppenstufe | Ausbildungsgebäude | Stadtzentrum |
-|---|---:|---:|
-| T1 | 1 | 1 |
-| T2 | 4 | 4 |
-| T3 | 7 | 7 |
-| T4 | 11 | 11 |
-| T5 | 13 | 13 |
-| T6 | 16 | 16 |
-| T7 | 19 | 19 |
-| T8 | 22 | 22 |
-| T9 | 26 | 26 |
-| T10 | 30 | 30 |
+Die Forschungsgrundzeiten pro Truppenart betragen T2: 20 Stunden, T3: 4 Tage, T4: 21 Tage und T5: 45 Tage. VIP 10 allein reduziert sie auf 16 Stunden, 3 Tage 4 Stunden 48 Minuten, 16 Tage 19 Stunden 12 Minuten und 36 Tage. Vorforschungen kommen hinzu. Die übrigen Forschungsstufen sind nach Akademiestufe auf maximal 14 Tage begrenzt; Details und Importregel stehen in `docs/BALANCE_IMPORT.md`.
 
-Seit dem Import der Gebäudetabellen benötigt der Ausbau eines Ausbildungsgebäudes auf Stufe 4 Stadtzentrum 4 und Bauernhof 4; alle weiteren Ausbaustufen folgen den Voraussetzungen der gelieferten Kaserne (`docs/BALANCE_IMPORT.md`). Beförderungen stehen ab Ausbildungsgebäude und Stadtzentrum 13 zur Verfügung; zusätzlich muss die Zielstufe freigeschaltet sein. Bereits vorhandene Truppen und laufende Ausbildungen bleiben erhalten.
+Die zwölf Truppenforschungen sind wieder aktiv. Es gibt 129 Technologien mit 963 Stufen; Militär umfasst 55 Technologien mit 318 Stufen. Bestehende abgeschlossene Freischaltungen zählen in ihrer jeweiligen Welt, laufende Forschungsaufträge werden regulär abgeschlossen.
 
-Die zwölf bisherigen Truppenfreischaltungen sind aus dem Militärforschungsbaum entfernt. Ihre Nachfolger hängen direkt an den weiterhin vorhandenen Vorstufen. Militär bietet damit 43 Forschungen; insgesamt bleiben 117 Technologien mit 951 Forschungsstufen. Abgeschlossene alte Forschungen bleiben als historische Einträge gespeichert. Noch offene Truppenfreischaltungen werden beim nächsten Forschungs-/Spielstandabruf einmalig mit voller Rohstofferstattung beendet und geben den Forschungsplatz frei; die archivierten Kosten stehen in `data/retired-troop-research.json`. Andere Forschungen und ihre Boni bleiben bestehen.
+Ausbildungskosten entsprechen der Quelle einschließlich Stein. Beispiel: 2.000 T4-Infanteristen kosten ohne Boni 360.000 Nahrung, 720.000 Stein und 180.000 Gold. Forschungsrabatte werden vor der abschließenden Aufrundung des Gesamtauftrags angewendet.
 
-### Rohstoffkosten ab 20. September 2026
+Die originalen Heilzeiten betragen 0,5 / 1 / 2 / 3 / 4 Sekunden je Einheit. Bezahlt wird weiterhin der bestehende tierabhängige Anteil der Ausbildungskosten. Kristallheilung bleibt gemäß `CRYSTAL_ECONOMY.md` ausgeschlossen.
 
-Die neue Conquer-Kostenkurve ersetzt die starken Sprünge bei T2–T5 und die frühere exponentielle Fortschreibung. T1 bleibt unverändert. Die folgenden Kosten gelten je Einheit ohne Forschungsrabatte; Stein wird für die Ausbildung weiterhin nicht benötigt.
+## Monster und Progression
 
-| Stufe | Faktor gegenüber T1 | Infanterie: Nahrung / Holz | Bogenschützen: Nahrung / Holz / Gold | Kavallerie: Nahrung / Gold |
-|---|---:|---:|---:|---:|
-| T1 | 1 | 50 / 30 | 40 / 20 / 10 | 60 / 20 |
-| T2 | 1,6 | 80 / 48 | 64 / 32 / 16 | 96 / 32 |
-| T3 | 2,5 | 125 / 75 | 100 / 50 / 25 | 150 / 50 |
-| T4 | 4 | 200 / 120 | 160 / 80 / 40 | 240 / 80 |
-| T5 | 6 | 300 / 180 | 240 / 120 / 60 | 360 / 120 |
-| T6 | 8,5 | 425 / 255 | 340 / 170 / 85 | 510 / 170 |
-| T7 | 11,5 | 575 / 345 | 460 / 230 / 115 | 690 / 230 |
-| T8 | 15 | 750 / 450 | 600 / 300 / 150 | 900 / 300 |
-| T9 | 19 | 950 / 570 | 760 / 380 / 190 | 1.140 / 380 |
-| T10 | 24 | 1.200 / 720 | 960 / 480 / 240 | 1.440 / 480 |
+`MonsterPower::profile()` verbindet Monsterstufe, Truppenstufe und Marschkapazität. Je zwei normale Monsterstufen gehören zu einer Truppenstufe; die zweite verlangt eine größere bzw. besser erforschte Armee. Die Mengen werden durch `php tools/rebalance-monsters.php --apply` angepasst, originale Monsterwerte und `source_amount` bleiben erhalten. Regionale Bosse verwenden Rallykapazitäten, Drachen und Magdar T5-Endspielrallys mit steigenden Anforderungen. Die Kurve ist eine Grundlage für weitere Spieltests, keine Garantie für ein bestimmtes Fortschrittstempo.
 
-Beispiel: 2.000 T4-Infanteristen kosten 400.000 Nahrung und 240.000 Holz statt 3,6 Mio. Nahrung und 2 Mio. Holz. Die drei Rollen behalten ihre bisherigen Rohstoffprofile. Forschungsrabatte wirken weiterhin auf den Gesamtauftrag; erst dessen Endbetrag wird aufgerundet.
+## Bestehende Spielstände
 
-Neue Beförderungen kosten weiterhin 70 % der Zieltruppen-Ausbildung, neue Heilungen den bestehenden tierabhängigen Anteil. Beide nutzen dadurch ebenfalls die günstigeren Grundkosten. Bereits bezahlte Aufträge werden nicht erneut berechnet oder rückwirkend erstattet. Ein Abbruch verwendet weiterhin den gespeicherten tatsächlichen Kostenbeleg. Der Kataloggenerator verwendet feste T1-Ausgangskosten und dieselben Stufenfaktoren; wiederholtes Generieren senkt die Kosten nicht erneut.
+Vor einer Umstellung auf einer weiteren Installation zunächst `php tools/migrate-five-tiers.php` ausführen und die Vorschau prüfen. `--apply` sichert alle betroffenen Zeilen unter `data/balance-history/local-five-tiers-backup-*.json`, führt die Änderung in einer Transaktion aus und setzt einen einmaligen Marker.
 
-### Ausbildungszeiten ab 20. September 2026
+Vorhandene T6–T10 werden mit gleicher Anzahl zu T5 derselben Truppenart. Das umfasst Armeen unterwegs, Garnisonen und gespeicherte Formationen. Laufende Ausbildung und Beförderung behalten bezahlte Kosten, Anzahl und Endzeit; ihr Ergebnis wird T5. Verwundete und laufende Heilaufträge behalten ihre Einträge und Timer, werden bei Heilungsabschluss als T5 gutgeschrieben. Historische Truppendefinitionen bleiben für alte Berichte verfügbar. Lebende Monster behalten ihren prozentualen Gesundheitszustand auf der neuen Kurve.
 
-Die neue Conquer-Staffel gilt gleichermaßen für Infanterie, Bogenschützen und Kavallerie. Die frühere Kurve (T4: 120 Sekunden, T10: 1.114 Sekunden je Einheit) blockierte schon mittlere Aufträge mehrere Tage. Die neue Kurve hält 2.000 T4 ohne Boni unter acht Stunden und lässt höhere Stufen gleichmäßig ansteigen.
+Alle neuen Aufträge prüfen Welt, Besitz, Forschung, Ressourcen und Kapazität serverseitig. Wiederholte Anfragen mit demselben `operation_key` buchen nicht doppelt. Bereits bezahlte Aufträge behalten ihren Kostenbeleg für Abbrucherstattungen und werden zeitlich nicht rückwirkend verändert.
 
-| Stufe | Sekunden je Einheit | 2.000 Einheiten ohne Boni |
-|---|---:|---:|
-| T1 | 3 | 1 Std. 40 Min. |
-| T2 | 5 | 2 Std. 46 Min. 40 Sek. |
-| T3 | 9 | 5 Std. |
-| T4 | 14 | 7 Std. 46 Min. 40 Sek. |
-| T5 | 20 | 11 Std. 6 Min. 40 Sek. |
-| T6 | 27 | 15 Std. |
-| T7 | 35 | 19 Std. 26 Min. 40 Sek. |
-| T8 | 44 | 24 Std. 26 Min. 40 Sek. |
-| T9 | 54 | 30 Std. |
-| T10 | 65 | 36 Std. 6 Min. 40 Sek. |
+## Oberfläche und Prüfung
 
-Anzeige und Server verwenden dieselben Sekunden aus `data/troops.json`: `ceil(Sekunden × Anzahl / Ausbildungstempo)`. Forschungs-, VIP-, Relikt-, aktive Ausbildungs- und zusätzliche Kasernenboni wirken weiterhin. Beförderungen verwenden weiterhin die halbe Ausbildungszeit der Zielstufe. Gebäudegrenzen, Kapazitäten und Kampfwerte ändern sich nicht.
+Die Haupt-App unter `/city#city` verwendet vorhandene gezeichnete Truppenporträts, fünf Stufenkarten und sechs Grundwerte. Gesperrte Stufen führen zur Akademie bzw. zur benötigten Forschung. Die drei Ausbildungsgebäude bleiben unabhängig bedienbar. Desktop, schmale Handys und Querformat verwenden dieselben Spielregeln.
 
-Die Staffel gilt für neu gestartete Ausbildungen und Beförderungen. Bereits gespeicherte Aufträge behalten ihre Endzeit und bereits angewendete Beschleuniger. Es gibt keine nachträgliche Neuberechnung beim Laden oder Neustarten. `tools/update-training-catalog.py` enthält dieselbe neue Staffel, damit ein erneuter Katalogimport die alten Zeiten nicht wiederherstellt.
+- `tests/five_tier_sources.php`: Originalwerte, ID-Abbildung und 15-Stunden-Ziel.
+- `tests/five_tier_transition.php`: Bestände, Aufträge, Gesundheit, Sicherung und einmalige Gutschriften in einer isolierten Datenbank.
+- `tests/training_unlocks.php`, `training_buildings.php`, `training_costs.php`, `training_durations.php`: echte Freischaltungen, Weltgrenzen, parallele Gebäude, Preise, Boni und alte Timer.
+- `tests/research_catalog.js`, `research_snapshot.php`, `research_effects.php`, `research_combat.php`, `research_live_services.php`: Forschungsbaum und tatsächliche Wirkungen.
+- `tests/monster_balance.php`, `hospital_healing.php`: Monsterprogression und Heilung.
+- `tests/training_app.cjs`, `training_mobile_layout.cjs`, `training_layout.cjs`, `research_app.cjs`: Browserabläufe und responsive Darstellung mit wegwerfbaren Testkonten.
 
-Angriff, Verteidigung, Lebenspunkte, Stärke und Traglast fließen in die vorhandenen Spielberechnungen ein. **Tödlichkeit ist zunächst ein angezeigter Katalogwert; die bestehende Kampfformel wurde nicht um einen neuen Tödlichkeitsfaktor erweitert.** Das angezeigte Tempo 11 ist vom Feld `march_speed` getrennt: Die etablierte Weltkarten-Geschwindigkeit von T1–T5 bleibt erhalten, T6–T10 führen diese mit acht zusätzlichen Geschwindigkeitspunkten je Stufe fort. Forschung und aktive Boni werden weiterhin serverseitig angewendet. Die veränderten Kampf- und Traglastwerte sind keine vollständige Neubalancierung der Monster und Weltkarte.
-
-## Server und bestehende Spielstände
-
-`TroopData::forCity()` liefert gemeinsam genutzte Definitionen, Freischaltungen und Kosten. Der Server leitet das Ausbildungsgebäude aus dem Truppencode ab und lehnt fremde Ausbildungsplätze ab. Authentifizierung, aktive Welt, CSRF, Ressourcen, Kapazität und Belegung werden serverseitig geprüft. Stadt-Sperre, Ressourcenabzug und Queue-Eintrag verhindern parallele Doppelbuchungen.
-
-Die Haupt-App sendet einen `operation_key` für Ausbildung und Ausbildungs-Beschleuniger. Unbestätigte Aktionen werden mit demselben Schlüssel in `sessionStorage` je Stadt/Welt aufbewahrt. Nach einem Netzwerkfehler oder Neuladen kann der Benutzer genau diesen Auftrag erneut prüfen. Ein bereits abgeschlossener Auftrag startet dadurch keine neue Ausbildung und verbraucht keinen weiteren Gegenstand. Abgeschlossene Queues werden nur einmal gutgeschrieben. Ein Abbruch erstattet anteilig die am Auftrag gespeicherten Kosten; alte Aufträge ohne Kostenbeleg verwenden den bisherigen Katalog-Fallback.
-
-Migration `0090_training_buildings.sql` ergänzt Schützenlager und Reiterhof für bestehende Städte mit deren bisheriger Kasernenstufe, ordnet laufende Aufträge ihrer Truppenart zu und ergänzt den Kostenbeleg. Truppenbestände und gespeicherte Endzeiten bleiben bestehen. Neue Städte beginnen mit drei Gebäuden auf Stufe 1. Die Migration ist lokal bereits angewendet; weitere Installationen können den Status mit `php tools/migrate-training.php` prüfen und mit `--apply` aktualisieren.
-
-## Darstellung und Mobilbetrieb
-
-`assets/js/training-panel.js` und `assets/css/training-panel.css` verwenden die gemeinsame Oberfläche aus `village-theme.css`. `training-unit.js` erzeugt eigene Chibi-Modelle; es werden keine Figuren aus den Referenzbildern ausgeschnitten. Die 30 kleinen WebP-Porträts stammen aus diesen Modellen und benötigen zusammen etwa 158 KiB. Neugenerierung: `node tools/render-training-icons.cjs`, danach `python tools/encode-training-icons.py` mit Playwright beziehungsweise Pillow.
-
-Die Figur rendert höchstens 30 Bilder pro Sekunde mit begrenzter Pixeldichte; unsichtbare Ansichten pausieren und geschlossene Ansichten geben ihre WebGL-Ressourcen frei. Reduzierte Bewegung wird berücksichtigt. Die Haupt-App und Stadt verwenden dieselbe versionierte Import-Map für die 3D-Module. Wiederholte Zaun- und Tierdetails der neuen Stadtgebäude sind instanziert. Die Höfe besitzen freie Zugänge zu den Stadtwegen.
-
-## Prüfung
-
-- `php tests/training_costs.php`: alle 30 Kostenprofile, tatsächlicher T4-Großauftrag und Rabatt, Ablehnung bei Rohstoffmangel, Beförderung/Heilung sowie Abbruch mit altem Kostenbeleg in einer isolierten Datenbank.
-- `php tests/training_durations.php`: Staffel aller 30 Einheiten, T4-Großauftrag, Anzeige/Server mit Boni, Beförderungsquote, alte Endzeiten, Beschleuniger und einmaliger Abschluss in einer isolierten Datenbank.
-- `php tests/training_unlocks.php`: alle 30 Stufen an beiden Gebäudegrenzen, echte Ausbildung ohne Forschung, Beförderung ab Stufe 13, Gebäudeausbau und einmalige Erstattung alter Forschungsaufträge.
-- `php tests/training_buildings.php`: drei parallele Queues, Freischaltungen, T10-Werte, ungültige Plätze/T11, wiederholte Aufträge, genau eine Gutschrift, Beschleuniger, Beförderung und Abbrucherstattung in einer isolierten Datenbank.
-- `php tests/research_effects.php`, `php tests/research_combat.php`, `php tests/defense_lifecycle.php`: Forschungswirkung, Kampfwerte, Beförderung und bestehende Welt-/Verteidigungsabläufe mit dem erweiterten Katalog.
-- `node tests/training_layout.cjs`: kein Scrollen oder verdeckte Bedienelemente in fünf Bildschirmformaten, beiden Ansichten sowie bei gesperrten, laufenden, unbezahlbaren und unbestätigten Aufträgen.
-- `php tests/city3d_importmap.php`: konsistenter Modulgraph.
-- `php tools/preview-feature-fixture.php --port=19321 --training`, danach `node tests/training_app.cjs`: echte Browserabläufe mit einem wegwerfbaren Testkonto. Der Vorschauprozess wird mit Enter beendet.
-
-Browserprüfung: 1280×800, 390×844, 320×568, 844×390 und 568×320; zusätzlich Stadtübersicht, Nahansichten, Gebäudenamen und eingebettete Haupt-App ohne doppeltes HUD. Bilder liegen unter `artifacts/training/`. Tests auf physischen iOS-/Android-Geräten stehen noch aus.
-
-Zusätzlicher Befund außerhalb der Ausbildung: `tests/hospital_healing.php` besteht seine Prüfungen für Heilungsstart, Wiederholung und Inventar-Beschleuniger, scheitert aber anschließend an der Sofortheilung mit Kristallen. `CrystalEconomy` sperrt diesen Kauf derzeit; diese separate Regel wurde hier nicht geändert.
+Browserformate: 1280×800, 390×844, 320×568, 844×390 und 568×320. Prüfungen auf physischen iOS-/Android-Geräten stehen noch aus.

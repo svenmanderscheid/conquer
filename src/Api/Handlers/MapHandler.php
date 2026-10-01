@@ -6,7 +6,7 @@ namespace Conquer\Api\Handlers;
 use Conquer\Api\Response;
 use Conquer\Auth\Session;
 use Conquer\Db\Connection;
-use Conquer\Game\World\{LandAccessPolicy, LandProgressService, WorldContext};
+use Conquer\Game\World\{LandAccessPolicy, LandProgressService, WorldContext, WorldMapProfile, LuxembourgGeography};
 
 /**
  * Handles /api/map/* endpoints.
@@ -45,6 +45,9 @@ final class MapHandler
             'world_id' => (int) $world['id'],
             'map_seed' => (int) $world['map_seed'],
             'map_size' => (int) $world['map_size'],
+            'map_width' => $world['map_profile']['width'],
+            'map_height' => $world['map_profile']['height'],
+            'map_profile' => $world['map_profile'],
             'my_city'  => $city !== false ? [
                 'x'    => (int) $city['coord_x'],
                 'y'    => (int) $city['coord_y'],
@@ -70,7 +73,7 @@ final class MapHandler
         $db       = Connection::getInstance();
         $world = self::world();
         $worldId = (int) $world['id'];
-        [$xMin, $yMin, $xMax, $yMax] = self::viewport((int) $world['map_size']);
+        [$xMin, $yMin, $xMax, $yMax] = self::viewport($world['map_profile']['width'],$world['map_profile']['height']);
         $entities = [];
 
         // Player cities — includes alliance tag + active emoji
@@ -83,8 +86,8 @@ final class MapHandler
             FROM cities c
             JOIN players p ON c.player_id = p.id
             LEFT JOIN kingdom_profiles k ON k.player_id = p.id
-            LEFT JOIN alliance_members am ON am.player_id = p.id
-            LEFT JOIN alliances a ON a.id = am.alliance_id
+            LEFT JOIN alliance_members am ON am.player_id = p.id AND am.world_id = c.world_id
+            LEFT JOIN alliances a ON a.id = am.alliance_id AND a.world_id = c.world_id
             LEFT JOIN player_emojis pe ON pe.player_id = p.id
             WHERE c.world_id = :world
               AND c.coord_x BETWEEN :x1 AND :x2
@@ -164,6 +167,7 @@ final class MapHandler
         }
 
         // Shrines
+        if($world['map_profile']['key']!=='luxembourg'){
         $rows = $db->query('
             SELECT coord_x, coord_y, shrine_code, tier, owner_alliance_id
             FROM shrines
@@ -182,6 +186,11 @@ final class MapHandler
                 'tier'             => $row['tier'],
                 'owner_alliance_id'=> $row['owner_alliance_id'],
             ];
+        }
+        }
+
+        if($world['map_profile']['key']==='luxembourg'){
+            foreach(\Conquer\Game\Territory\TerritoryService::mapTargets($worldId,['x_min'=>$xMin,'y_min'=>$yMin,'x_max'=>$xMax,'y_max'=>$yMax])as$target)$entities[]=$target+['type'=>'territory'];
         }
 
         // Uncollected charms (table may not exist on older installs)
@@ -266,8 +275,10 @@ final class MapHandler
         $db  = Connection::getInstance();
         $world = self::world();
         $worldId = (int) $world['id'];
-        $x = self::tileCoordinate($params['x'] ?? null, (int) $world['map_size']);
-        $y = self::tileCoordinate($params['y'] ?? null, (int) $world['map_size']);
+        $x = self::tileCoordinate($params['x'] ?? null, $world['map_profile']['width']);
+        $y = self::tileCoordinate($params['y'] ?? null, $world['map_profile']['height']);
+        $geography=$world['map_profile']['key']==='luxembourg'?LuxembourgGeography::at($x,$y):null;
+        if(!WorldMapProfile::contains($worldId,$x,$y))Response::ok(['x'=>$x,'y'=>$y,'occupant'=>null,'accessible'=>false,'land'=>null,'geography'=>null]);
         $land = LandProgressService::available() ? LandProgressService::at($worldId, $x, $y) : null;
         if ($land !== null && !$land['open']) {
             Response::ok(['x'=>$x, 'y'=>$y, 'occupant'=>null, 'accessible'=>false, 'land'=>$land]);
@@ -284,8 +295,8 @@ final class MapHandler
             FROM cities c
             JOIN players p ON c.player_id = p.id
             LEFT JOIN kingdom_profiles k ON k.player_id = p.id
-            LEFT JOIN alliance_members am ON am.player_id = p.id
-            LEFT JOIN alliances a ON a.id = am.alliance_id
+            LEFT JOIN alliance_members am ON am.player_id = p.id AND am.world_id = c.world_id
+            LEFT JOIN alliances a ON a.id = am.alliance_id AND a.world_id = c.world_id
             LEFT JOIN player_emojis pe ON pe.player_id = p.id
             WHERE c.world_id = ? AND c.coord_x = ? AND c.coord_y = ? AND c.is_hidden = 0
         ', [$worldId, $x, $y])->fetch();
@@ -371,7 +382,7 @@ final class MapHandler
             }
         }
 
-        if ($occ === null) {
+        if ($occ === null && $world['map_profile']['key']!=='luxembourg') {
             $shrine = $db->query(
                 'SELECT shrine_code, tier, owner_alliance_id FROM shrines WHERE world_id = ? AND coord_x = ? AND coord_y = ?',
                 [$worldId, $x, $y]
@@ -418,7 +429,11 @@ final class MapHandler
             }
         }
 
-        Response::ok(['x'=>$x, 'y'=>$y, 'occupant'=>$occ, 'accessible'=>true, 'land'=>$land]);
+        if($occ===null&&$world['map_profile']['key']==='luxembourg'){
+            $targets=\Conquer\Game\Territory\TerritoryService::mapTargets($worldId,['x_min'=>$x,'y_min'=>$y,'x_max'=>$x,'y_max'=>$y]);
+            $occ=isset($targets[0])?$targets[0]+['type'=>'territory']:null;
+        }
+        Response::ok(['x'=>$x, 'y'=>$y, 'occupant'=>$occ, 'accessible'=>true, 'land'=>$land,'geography'=>$geography]);
     }
 
     /**
@@ -498,17 +513,19 @@ final class MapHandler
         catch (\DomainException $e) { Response::error(409, 'WORLD_MISMATCH', $e->getMessage()); }
         $world = Connection::getInstance()->query('SELECT id,map_seed,map_size FROM worlds WHERE id=?', [$worldId])->fetch();
         if ($world === false) Response::error(404, 'WORLD_NOT_FOUND', 'Welt nicht gefunden.');
+        $world['map_profile']=WorldMapProfile::forWorld($worldId);
         return $world;
     }
 
     /** @return array{int,int,int,int} */
-    private static function viewport(int $mapSize): array
+    private static function viewport(int $mapSize,?int $mapHeight=null): array
     {
         $last = max(0, $mapSize - 1);
+        $lastY=max(0,($mapHeight??$mapSize)-1);
         $xMin = max(0, min($last, (int)($_GET['x_min'] ?? 0)));
-        $yMin = max(0, min($last, (int)($_GET['y_min'] ?? 0)));
+        $yMin = max(0, min($lastY, (int)($_GET['y_min'] ?? 0)));
         $xMax = max($xMin, min($last, (int)($_GET['x_max'] ?? min(50, $last))));
-        $yMax = max($yMin, min($last, (int)($_GET['y_max'] ?? min(50, $last))));
+        $yMax = max($yMin, min($lastY, (int)($_GET['y_max'] ?? min(50, $lastY))));
         if ($xMax - $xMin > 100) $xMax = $xMin + 100;
         if ($yMax - $yMin > 100) $yMax = $yMin + 100;
         return [$xMin, $yMin, $xMax, $yMax];

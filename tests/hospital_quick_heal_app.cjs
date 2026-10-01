@@ -1,4 +1,5 @@
 'use strict';
+require('./fixtures/browser_locale.cjs')('de'); // This suite asserts the explicit German UI.
 const assert=require('assert/strict');
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const base=process.env.HOSPITAL_FIXTURE_URL||'http://127.0.0.1:19318';
@@ -9,9 +10,9 @@ assert(/^http:\/\/127\.0\.0\.1:\d+$/.test(base));
  try{
   page=await browser.newPage({viewport:{width:390,height:844},hasTouch:true});page.setDefaultTimeout(20000);
   const errors=[];page.on('pageerror',e=>errors.push(e.stack));
-  await page.goto(base);await page.locator('[data-auth-target="login"]').first().click();
-  await page.locator('[name="username"]').fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');
-  await Promise.all([page.waitForURL('**/city'),page.locator('#auth-submit').click()]);
+  await page.goto(base+'/?zugang=login');
+  await page.locator("[name=identifier], [name=username]").fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');
+  await Promise.all([page.waitForURL('**/city'),page.locator("form[action$=\"/auth/local\"] button[type=\"submit\"]").click()]);
   await page.locator('#navigation [data-id="world"]').click();await page.waitForFunction(()=>document.body.classList.contains('world-mode'));
   const trigger=page.locator('#hud-healing');await trigger.waitFor();
   assert.equal(await trigger.getAttribute('data-action'),'hospital-quick-heal');

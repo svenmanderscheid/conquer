@@ -74,8 +74,8 @@ final class BuildingData
     /**
      * Returns build time in seconds for upgrading to the given level.
      *
-     * @param array<string, int> $vipBonuses Optional VIP bonus array from VipService::bonuses().
-     *                                        If provided, the construction_speed bonus (%) reduces build time.
+     * @param array<string, int|float> $vipBonuses Combined city bonuses: construction_speed
+     *        in percent, talent_construction_speed as a separate fractional speed bonus.
      */
     public static function getBuildTime(string $code, int $toLevel, array $vipBonuses = []): int
     {
@@ -83,12 +83,9 @@ final class BuildingData
         if ($row === null) return 0;
         $base = (int)$row['time'];
 
-        $speedBonus = (float) ($vipBonuses['construction_speed'] ?? 0);
-        if ($speedBonus > 0) {
-            $base = (int) round($base * (1 - $speedBonus / 100));
-        }
-
-        return max(1, (int)round($base / (1+max(0,(float)($vipBonuses['talent_construction_speed']??0)))));
+        $speed = 1 + max(0.0, (float) ($vipBonuses['construction_speed'] ?? 0)) / 100;
+        $talent = 1 + max(0.0, (float) ($vipBonuses['talent_construction_speed'] ?? 0));
+        return max(1, (int) ceil($base / ($speed * $talent)));
     }
 
     // -------------------------------------------------------------------------

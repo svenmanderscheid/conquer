@@ -65,6 +65,7 @@ try {
     copy(ROOT_DIR.'/index.php',$root.'/index.php');
     file_put_contents($root.'/router.php',"<?php\n\$_SERVER['SCRIPT_NAME']='/index.php';require __DIR__.'/index.php';\n");
     $db=Connection::init($root);
+    \Conquer\Db\MigrationSql::apply($db->getPdo(),(string)file_get_contents(ROOT_DIR.'/migrations/0113_rally_join_travel.sql'));
     // These combat fixtures predate progressive zones and require all targets open.
     \Conquer\Game\World\LandProgressService::ensureWorld(1,true);
     $player=random_int(400000000,450000000);$other=$player+1;
@@ -97,6 +98,14 @@ try {
     $db->execute('INSERT INTO city_troops(city_id,troop_code,count)VALUES(?,50100101,10)',[$other]);
     $db->execute('UPDATE cities SET food=20000,lumber=20000,stone=20000,gold=20000 WHERE id=?',[$other]);
     $before=troops($player);
+    $empty=$player+4;
+    $db->execute("INSERT INTO players(id,username,email,password_hash)VALUES(?,'EmptyCity','empty-city@invalid.test','unused')",[$empty]);
+    $db->execute("INSERT INTO cities(id,player_id,world_id,name,coord_x,coord_y,food,lumber,stone,gold)VALUES(?,?,1,'Empty fixture',58,50,20000,20000,20000,20000)",[$empty,$empty]);
+    foreach(\Conquer\Game\City\CityState::BUILDING_CODES as $code)$db->execute('INSERT INTO city_buildings(city_id,building_code,level)VALUES(?,?,1)',[$empty,$code]);
+    $emptyFight=$db->transaction(fn()=>\Conquer\Game\March\CityCombat::resolve([['player_id'=>$player,'city_id'=>$player,'troops'=>[50100101=>10]]],$empty,58,50));
+    verify($emptyFight['outcome']==='attacker_wins'&&array_sum($emptyFight['armies'][0]['dead'])===0&&array_sum($emptyFight['armies'][0]['wounded'])===0&&array_sum($emptyFight['armies'][0]['survivors'])===10,'unopposed empty city causes no attacker casualties');
+    $emptyReport=json_decode($db->query('SELECT data_json FROM battle_reports WHERE attacker_id=? AND target_id=? ORDER BY id DESC LIMIT 1',[$player,$empty])->fetchColumn(),true);
+    verify($emptyReport['combat']['unopposed']===true&&$emptyReport['combat']['defender']['totals']['sent']===0,'empty-city report records the battle as unopposed');
     rejected(fn()=>MarchDispatcher::dispatchPlayerAttack($stranger,$player,50,50,51,50,[50100101=>5]),'solo service rejects foreign origin ownership');
     rejected(fn()=>MarchDispatcher::dispatchPlayerAttack($player,$player,50,50,50,50,[50100101=>5]),'solo rejects own city');
     rejected(fn()=>MarchDispatcher::dispatchPlayerAttack($player,$player,50,50,54,50,[50100101=>5]),'solo rejects alliance member');
@@ -151,12 +160,14 @@ try {
     $afterLeader=troops($player);rejected(fn()=>\Conquer\Game\Rally\RallyService::join($stranger,$stranger,$rally,[50100101=>10]),'only same-alliance armies may join');
     rejected(fn()=>\Conquer\Game\Rally\RallyService::join($friend,$player,$rally,[50100101=>10]),'rally joining cannot debit a foreign city');
     \Conquer\Game\Rally\RallyService::join($friend,$friend,$rally,[50100101=>20]);$afterFriend=troops($friend);
-    $rallyMarch=\Conquer\Game\Rally\RallyService::activeMarchesForPlayer($friend)[0];verify($rallyMarch['state']==='gathering'&&$rallyMarch['origin_x']===50&&json_decode($rallyMarch['troops_json'],true)[50100101]===40,'rally map snapshot shows actual combined army at leader origin');
+    $rallyMarch=\Conquer\Game\Rally\RallyService::activeMarchesForPlayer($friend)[0];verify($rallyMarch['state']==='marching'&&$rallyMarch['march_type']==='rally_join'&&$rallyMarch['origin_x']===54&&$rallyMarch['target_x']===50&&json_decode($rallyMarch['troops_json'],true)[50100101]===20,'joining army map snapshot travels from member city to rally leader');
     rejected(fn()=>\Conquer\Game\Rally\RallyService::join($friend,$friend,$rally,[50100101=>20]),'duplicate joining rejected');
     verify(troops($friend)===$afterFriend,'duplicate join preserves garrison');
     rejected(fn()=>\Conquer\Game\Rally\RallyService::launch($rally,$friend),'only captain may launch');
     $list=request('/api/rally/list');verify($list['status']===200&&count($list['json']['data']['rallies'][0]['participants'])===1,'HTTP rally list exposes participant and troop contract');
     $detail=request('/api/rally/'.$rally);verify($detail['status']===200&&$detail['json']['data']['rally']['troops'][50100101]===20,'HTTP detail preserves leader composition');
+    $db->execute("UPDATE rally_participants SET arrival_time=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 1 SECOND) WHERE rally_id=? AND status='joining'",[$rally]);
+    $joinedRally=\Conquer\Game\Rally\RallyService::activeMarchesForPlayer($friend)[0];verify($joinedRally['state']==='gathering'&&$joinedRally['march_type']==='rally'&&$joinedRally['target_x']===51&&json_decode($joinedRally['troops_json'],true)[50100101]===20,'arrived participant keeps the gathering rally in the march list');
     verify(request('/api/rally/'.$rally.'/launch','{}')['status']===200,'HTTP captain launches rally');
     rejected(fn()=>\Conquer\Game\Rally\RallyService::join($friend,$friend,$rally,[50100101=>1]),'late joining rejected');
     $db->execute("UPDATE rallies SET arrival_time=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 1 SECOND),return_time=DATE_ADD(UTC_TIMESTAMP(),INTERVAL 1 MINUTE) WHERE id=?",[$rally]);

@@ -1,4 +1,5 @@
 'use strict';
+require('./fixtures/browser_locale.cjs')('de'); // This suite asserts the explicit German UI.
 const fs=require('fs'),path=require('path'),assert=require('assert');
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const base=process.env.MAP_SEARCH_FIXTURE_URL||'http://127.0.0.1:18957';
@@ -9,9 +10,12 @@ const output=path.resolve(__dirname,'../artifacts/map-search');fs.mkdirSync(outp
  const errors=[];let checks=0;
  try{
   const page=await browser.newPage({viewport:{width:1280,height:800}});page.on('pageerror',e=>{errors.push(e.stack);console.error(e.stack);});
+  const searchTrace=[];
+  for(const event of ['request','requestfailed','response'])page.on(event,item=>{if(item.url().includes('/api/map/search'))searchTrace.push({event,at:Date.now(),url:item.url(),status:event==='response'?item.status():undefined,failure:event==='requestfailed'?item.failure():undefined});});
+  await page.addInitScript(()=>{window.searchPointerTrace=[];for(const event of ['pointerdown','pointerup','click'])document.addEventListener(event,e=>{const b=e.target.closest?.('[data-atlas="search-next"]');if(b)searchPointerTrace.push({event,at:performance.now(),disabled:b.disabled,text:b.textContent});},true);});
   await page.addInitScript(()=>{window.mapHistoryLog=[];for(const name of ['pushState','replaceState','back']){const original=history[name].bind(history);history[name]=(...args)=>{mapHistoryLog.push([name,args[0],location.hash]);return original(...args);};}window.addEventListener('popstate',()=>mapHistoryLog.push(['popstate',history.state,location.hash]));});
-  await page.goto(base);await page.locator('[data-mode="login"]').click();await page.locator('[name="username"]').fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');
-  await Promise.all([page.waitForURL('**/city'),page.locator('#auth-submit').click()]);
+  await page.goto(base);await page.goto(new URL('?zugang=login', page.url()).href);await page.locator("[name=identifier], [name=username]").fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');
+  await Promise.all([page.waitForURL('**/city'),page.locator("form[action$=\"/auth/local\"] button[type=\"submit\"]").click()]);
   await page.waitForFunction(()=>document.querySelector('#player-hud-name')?.textContent.includes('PreviewPlayer'));
   await page.locator('#navigation [data-id="world"]').click();
   const panel=page.locator('#atlas-search-panel'),open=async()=>{if(!await panel.isVisible())await page.getByRole('button',{name:'Kartensuche öffnen',exact:true}).click();await panel.waitFor({state:'visible'});await page.waitForFunction(()=>document.querySelector('.atlas-search-level-value').textContent!=='–');};
@@ -42,8 +46,14 @@ const output=path.resolve(__dirname,'../artifacts/map-search');fs.mkdirSync(outp
    for(let i=0;i<3;i++){
     const next=page.locator('.atlas-target-actions [data-atlas="search-next"]');await next.waitFor({state:'visible'});
     assert(await next.evaluate(el=>{const r=el.getBoundingClientRect();return r.x>=0&&r.y>=0&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1&&el.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2));}),`${width}x${height}: next search button reachable`);checks++;
-    const response=page.waitForResponse(r=>r.url().includes('/api/map/search?'));
-    await next.click();const httpResponse=await response,body=await httpResponse.json();assert(body.ok,JSON.stringify(body));const result=body.data;
+    searchTrace.push({event:'next-click-start',width,height,iteration:i,at:Date.now()});
+    let httpResponse;
+    try{[httpResponse]=await Promise.all([page.waitForResponse(r=>r.url().includes('/api/map/search?')),next.click().then(()=>searchTrace.push({event:'next-click-finished',at:Date.now()}))]);}
+    catch(error){
+     fs.writeFileSync(path.join(output,'search-failure.json'),JSON.stringify({width,height,iteration:i,searchTrace,browser:await page.evaluate(()=>({pointers:searchPointerTrace,history:mapHistoryLog,state:history.state,actions:document.querySelector('.atlas-target-actions')?.outerHTML,busy:document.querySelector('.atlas-object-search')?.getAttribute('aria-busy')}))},null,2));
+     await page.screenshot({path:path.join(output,'search-failure.png')});throw error;
+    }
+    const body=await httpResponse.json();assert(body.ok,JSON.stringify(body));const result=body.data;
     assert(result.target&&result.cursor);const id=Number(result.target.data.id);
     const distance=row=>(Number(row.coord_x)-65)**2+(Number(row.coord_y)-65)**2;
     if(i<2){assert(!seen.has(id),'repeat click selects a different object');assert(distance(result.target.data)>=distance(previous.target.data),'results stay ordered from the city');seen.add(id);}
@@ -63,7 +73,9 @@ const output=path.resolve(__dirname,'../artifacts/map-search');fs.mkdirSync(outp
    await panel.getByRole('button',{name:/^(Nächstes Ziel|Weiter suchen)$/}).click();await panel.waitFor({state:'hidden'});
    await page.locator('.atlas-target-actions [data-action="expedition"]').click();await page.locator('#game-dialog').waitFor({state:'visible'});
    if(category==='rally')assert.equal(await page.locator('#game-dialog .is-monster-rally').count(),1);
-   await page.locator('#game-dialog').getByRole('button',{name:'Fenster schließen',exact:true}).click();checks++;
+   // Compact detail pages expose Back; desktop windows expose Close.
+   await page.locator('#game-dialog > .dialog-close:visible, #game-dialog .mobile-page-back:visible').first().click();
+   await page.waitForFunction(()=>!document.querySelector('#game-dialog').open&&!history.state?.conquerMobilePage?.overlay);checks++;
   }
   for(const category of ['lumber','stone','gold','gems']){
    await open();await panel.locator(`[data-search-category="${category}"]`).click();await panel.locator('#atlas-object-level').fill('1');
@@ -86,12 +98,9 @@ const output=path.resolve(__dirname,'../artifacts/map-search');fs.mkdirSync(outp
   assert.equal(await panel.locator('.atlas-nearby-row').count(),0);checks++;
   await panel.locator('.map-search-collapse').click();await page.waitForFunction(()=>!history.state?.conquerMapSearch);
   await page.locator('#navigation [data-id="city"]').click();
-  await page.frameLocator('#city-frame').locator('#world canvas').waitFor();const frame=page.frames().find(f=>f.url().includes('/city/3d'));await frame.waitForFunction(()=>window.conquer3D?.getState().ready,{},{timeout:120000});
-  for(const selector of ['.realm-hud','#resource-bar','.realm-nav','.city-footer']){assert(!await frame.locator(selector).isVisible());checks++;}
+  await page.locator('.painted-village').waitFor();assert.equal(await page.locator('#city-frame').count(),0);checks++;
   await page.screenshot({path:path.join(output,'embedded-city.png')});
   await page.setViewportSize({width:1280,height:800});await page.screenshot({path:path.join(output,'city-overview.png')});
-  const angle=await frame.evaluate(()=>conquer3D.getState().wheelAngle);await frame.waitForFunction(previous=>conquer3D.getState().wheelAngle!==previous,angle);checks++;
-  await frame.evaluate(()=>window.dispatchEvent(new CustomEvent('conquer-focus-building',{detail:{code:'lumber_camp'}})));await frame.locator('#zoomIn').click();await page.screenshot({path:path.join(output,'city-close.png')});
   assert.deepEqual(errors,[]);console.log(`PASS ${checks} map-search app checks; screenshots: ${output}`);
  }finally{await browser.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;});

@@ -1,4 +1,5 @@
 'use strict';
+require('./fixtures/browser_locale.cjs')('de'); // This suite asserts the explicit German UI.
 // Read-only game checks on the disposable preview; no real account or city is changed.
 // php tools/preview-feature-fixture.php --port=18976 --hud --chat
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
@@ -11,10 +12,10 @@ const output=path.resolve(__dirname,'../artifacts/beginner-guide');fs.mkdirSync(
  try {
   const page=await browser.newPage({viewport:{width:1280,height:800},hasTouch:true}),errors=[],writes=[];
   page.on('pageerror',e=>{errors.push(e.message);console.error('Browser:',e.message);});page.setDefaultTimeout(20000);
-  await page.goto(base);await page.locator('[data-mode="login"]').click();
-  await page.locator('[name="username"]').fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');
-  await Promise.all([page.waitForURL('**/city'),page.locator('#auth-submit').click()]);
-  await page.locator('#city-frame').waitFor();
+  await page.goto(base);await page.goto(new URL('?zugang=login', page.url()).href);
+  await page.locator("[name=identifier], [name=username]").fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');
+  await Promise.all([page.waitForURL('**/city'),page.locator("form[action$=\"/auth/local\"] button[type=\"submit\"]").click()]);
+  await page.locator('.painted-village').waitFor();
   const snapshot=await page.evaluate(async()=> (await (await fetch('/api/game/state')).json()).data);
   assert(Number(snapshot.buildings.castle.level)>1);
   page.on('request',r=>{if(r.method()==='POST'&&r.url().includes('/api/'))writes.push(r.url());});
@@ -54,7 +55,7 @@ const output=path.resolve(__dirname,'../artifacts/beginner-guide');fs.mkdirSync(
   for(const code of Object.keys(snapshot.buildings)){
    await page.locator(`[data-guide-building="${code}"] [data-action="guide-building"]`).click();
    await page.waitForFunction(code=>document.querySelector('#game-dialog').open&&document.querySelector('#game-dialog').dataset.building===code,code);
-   await page.locator('.dialog-close').click();
+   await page.locator("#game-dialog .dialog-close:visible, #game-dialog .mobile-page-back:visible").first().click();
    assert.equal(await page.locator('.beginner-guide').count(),1,'Closing building returns to guide');
   }
   await select('knowledge');await page.locator('.guide-reference summary').first().click();
@@ -102,11 +103,11 @@ const output=path.resolve(__dirname,'../artifacts/beginner-guide');fs.mkdirSync(
    await page.screenshot({path:path.join(output,`welcome-${width}x${height}.png`)});
   }
   await page.locator('.guide-welcome [data-action="close-dialog"]').click();
-  await page.reload();await page.locator('#city-frame').waitFor();await page.waitForTimeout(700);
+  await page.reload();await page.locator('.painted-village').waitFor();await page.waitForTimeout(700);
   assert.equal(await page.locator('#game-dialog').evaluate(e=>e.open),false,'Dismissal survives reload');
   await page.locator('#hud-menu').click();await page.locator('[data-action="dialog-tab"][data-id="help"]').click();
   await page.locator('.beginner-guide').waitFor();
-  await page.keyboard.press('Escape');await page.reload();await page.locator('#city-frame').waitFor();
+  await page.keyboard.press('Escape');await page.reload();await page.locator('.painted-village').waitFor();
   assert.equal(await page.locator('#game-dialog').evaluate(e=>e.open),false,'Reading the guide does not trigger another welcome');
   // Start from the welcome button, with storage unavailable; navigation must still work.
   await page.addInitScript(()=>{Storage.prototype.getItem=()=>{throw new Error('Storage unavailable');};Storage.prototype.setItem=()=>{throw new Error('Storage unavailable');};});

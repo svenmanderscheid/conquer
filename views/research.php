@@ -435,7 +435,7 @@ $isEmbed = isset($_GET['embed']);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conquer — Forschung</title>
+    <title>Union of Kingdoms — Forschung</title>
     <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR.'/assets/css/fantasy-fonts.css') ?>">
     <link rel="stylesheet" href="/assets/css/main.css">
     <?php if ($isEmbed): ?>
@@ -1159,6 +1159,7 @@ const RES_DATA = <?= json_encode([
         'finishes_at' => $queueRow['finishes_at'],
     ] : null,
     'buffs'        => $buffs,
+    'research_duration_factor' => \Conquer\Game\Research\ResearchEffects::durationFactor($buffs, \Conquer\Game\Buff\ActiveBuffService::getMultiplier($playerId, 'research_boost')),
     'academyLevel' => $academyLevel,
     'city'         => $cityRow,
     'csrf'         => $session['csrf_token'],
@@ -1187,6 +1188,7 @@ const ADVANCED_CONNECTIONS   = <?= json_encode($advancedConnections, JSON_THROW_
 let research     = Object.assign({}, RES_DATA.research);
 let queue        = RES_DATA.queue ? Object.assign({}, RES_DATA.queue) : null;
 let academyLevel = RES_DATA.academyLevel;
+let researchDurationFactor = RES_DATA.research_duration_factor;
 let selectedCode = null;
 let activeTab    = 'battle';
 
@@ -1351,7 +1353,7 @@ function renderDetailPanel(code) {
             statsEl.innerHTML = `<div class="rm-stat-row"><span>${node.name}</span><span class="rm-stat-val">${effectText}</span></div>`;
 
             // Research time
-            timeValEl.textContent = fmtSec(entry.time ?? 0);
+            timeValEl.textContent = fmtSec(Math.max(1, Math.ceil((entry.time ?? 0) * researchDurationFactor)));
             timeRowEl.style.display = '';
         } else {
             statsEl.innerHTML = '';
@@ -1597,6 +1599,7 @@ async function pollState() {
         research     = j.data.research ?? research;
         queue        = j.data.queue    ?? null;
         academyLevel = j.data.academy_level ?? academyLevel;
+        researchDurationFactor = j.data.research_duration_factor ?? researchDurationFactor;
         updateBanner();
         refreshNodeCards();
         if (selectedCode) renderDetailPanel(selectedCode);

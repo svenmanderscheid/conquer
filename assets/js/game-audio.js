@@ -4,12 +4,15 @@
     let active=null;
     function create({base=''}) {
         const storageKey=`conquer:audio:v1:${base}`;
-        const defaults={music:true,effects:true,muted:false,musicVolume:20,effectsVolume:45};
+        const defaults={music:true,effects:true,rallyAlerts:true,muted:false,musicVolume:20,effectsVolume:45};
         let settings={...defaults};
         try{const saved=JSON.parse(localStorage.getItem(storageKey));for(const key of Object.keys(defaults)){if(typeof defaults[key]==='boolean'&&typeof saved?.[key]==='boolean')settings[key]=saved[key];else if(typeof defaults[key]==='number'&&Number.isFinite(saved?.[key]))settings[key]=Math.max(0,Math.min(100,saved[key]));}}catch{}
         const Context=window.AudioContext||window.webkitAudioContext;
         let context=null,musicGain=null,effectsGain=null,musicBuffer=null,musicSource=null,loading=null,controller=null,resuming=null;
         let unlocked=false,loadFailed=false,previous=null,lastEffect=-Infinity,lastSound=null,playedCount=0,destroyed=false,pageActive=true,musicOffset=0,musicStartedAt=0;
+        let rallySnapshot=null,rallyBaseline=true;
+        const escape=value=>String(value).replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+        const text=(key,fallback)=>window.ConquerLocale?.has?.(key)?window.ConquerLocale.t(key):fallback;
         const voices=new Set();
         const allowed=()=>!destroyed&&pageActive&&!document.hidden&&!settings.muted;
         const wantsMusic=()=>allowed()&&settings.music&&settings.musicVolume>0;
@@ -81,6 +84,7 @@
                 complete:[[74,0,.28],[78,.15,.32],[81,.30,.45]],
                 trained:[[69,0,.22],[74,.14,.30],[78,.28,.42]],
                 reward:[[74,0,.25],[78,.10,.28],[81,.20,.35],[86,.32,.45,.16]],
+                rally:[[57,0,.22,.16,'triangle'],[64,.16,.26,.15,'triangle'],[69,.34,.38,.14,'triangle']],
                 error:[[64,0,.15,.12],[62,.12,.22,.10]],
             };
             const notes=sequences[kind];if(!notes)return false;
@@ -106,10 +110,32 @@
             }
             previous=snapshot;
         }
+        function observeRallies(rows,{playerId,worldId,allianceId,serverTime=Date.now()/1000}={}){
+            if(destroyed||!Array.isArray(rows)||!Number(playerId)||!Number(worldId)||!Number.isFinite(Number(allianceId)))return false;
+            const time=Date.now(),scope=`${Number(playerId)}:${Number(worldId)}:${Number(allianceId)}`;
+            const previousRallies=rallySnapshot?.scope===scope?rallySnapshot:null;
+            const highestId=Math.max(previousRallies?.highestId||0,...rows.map(row=>Number(row.id)||0));
+            // Consume every successful snapshot, even while sound is unavailable. There is
+            // never a deferred alert after unmuting, unlocking audio or returning to the app.
+            rallySnapshot={scope,time,highestId};
+            const baseline=rallyBaseline||!previousRallies||time-previousRallies.time>90000;
+            rallyBaseline=false;
+            if(baseline||!Number(allianceId)||!settings.rallyAlerts||!allowed())return false;
+            const fresh=rows.some(row=>{
+                if(Number(row.id)<=previousRallies.highestId||row.status!=='gathering'||Number(row.leader_player_id)===Number(playerId))return false;
+                if((row.participants||[]).some(participant=>Number(participant.player_id)===Number(playerId)))return false;
+                // The server supplies UTC creation time; ignore delayed old records.
+                const raw=String(row.created_at||'').replace(' ','T');
+                const created=Date.parse(/[zZ]|[+-]\d\d:\d\d$/.test(raw)?raw:raw+'Z')/1000;
+                return Number.isFinite(created)&&Number(serverTime)-created>=-5&&Number(serverTime)-created<=90;
+            });
+            return fresh?play('rally'):false;
+        }
         function controls(){
             return `<section class="panel audio-settings" aria-label="Musik und Klänge"><div class="audio-heading"><h2>Musik & Klänge</h2><button type="button" class="button secondary" data-audio-mute aria-pressed="${settings.muted}">${settings.muted?'Ton einschalten':'Alles stummschalten'}</button></div>
                 ${[['music','Hintergrundmusik','Sanfte Dorfmusik mit Harfe und Flöte.'],['effects','Spieleffekte','Bestätigungen, Ausbildung, Ausbau und Belohnungen.']].map(([key,title,description])=>`<label class="setting-row"><span><strong>${title}</strong><small>${description}</small></span><input type="checkbox" data-audio-setting="${key}" ${settings[key]?'checked':''}></label><label class="audio-volume"><span>${key==='music'?'Musiklautstärke':'Effektlautstärke'}</span><input type="range" min="0" max="100" step="1" data-audio-setting="${key}Volume" value="${settings[key+'Volume']}" aria-label="${key==='music'?'Musiklautstärke':'Effektlautstärke'}"><output data-audio-value="${key}Volume">${Math.round(settings[key+'Volume'])} %</output></label>`).join('')}
-                <div class="audio-demos" aria-label="Klänge ausprobieren"><button type="button" class="button secondary" data-audio-start>Musik starten</button>${[['confirm','Bestätigung'],['training','Ausbildung'],['building','Ausbau'],['reward','Belohnung']].map(([key,label])=>`<button type="button" class="button secondary" data-audio-demo="${key}" ${settings.muted||!settings.effects||settings.effectsVolume===0?'disabled':''}>${label}</button>`).join('')}</div><p data-audio-status role="status"></p><small>Deine Toneinstellungen bleiben auf diesem Gerät gespeichert. Im Hintergrund pausiert der Ton.</small></section>`;
+                <label class="setting-row"><span><strong data-i18n="audio.rally_alerts">${escape(text('audio.rally_alerts','New rally alerts'))}</strong><small data-i18n="audio.rally_alerts_description">${escape(text('audio.rally_alerts_description','Play a short sound when an ally opens a rally while you are playing.'))}</small></span><input type="checkbox" data-audio-setting="rallyAlerts" ${settings.rallyAlerts?'checked':''}></label>
+                <div class="audio-demos" aria-label="Klänge ausprobieren"><button type="button" class="button secondary" data-audio-start>Musik starten</button>${[['confirm','Bestätigung'],['training','Ausbildung'],['building','Ausbau'],['reward','Belohnung'],['rally',escape(text('audio.rally','Rally call'))]].map(([key,label])=>`<button type="button" class="button secondary" data-audio-demo="${key}" ${key==='rally'?'data-i18n="audio.rally"':''} ${settings.muted||!settings.effects||settings.effectsVolume===0?'disabled':''}>${label}</button>`).join('')}</div><p data-audio-status role="status"></p><small>Deine Toneinstellungen bleiben auf diesem Gerät gespeichert. Im Hintergrund pausiert der Ton.</small></section>`;
         }
         function input(event){const field=event.target.closest('[data-audio-setting]');if(!field)return;const key=field.dataset.audioSetting;if(!Object.hasOwn(defaults,key))return;settings[key]=field.type==='checkbox'?field.checked:Math.max(0,Math.min(100,Number(field.value)||0));if(event.type==='change')save();unlock();}
         function click(event){
@@ -118,13 +144,13 @@
             else if(button.hasAttribute('data-audio-start')){settings.music=true;settings.muted=false;loadFailed=false;save();unlock();}
             else{unlock();Promise.resolve(resuming).then(()=>play(button.dataset.audioDemo));}
         }
-        function leave(){pageActive=false;stopEffects();stopMusic();controller?.abort();if(context&&context.state==='running')context.suspend().catch(()=>{});}
-        function enter(){pageActive=true;sync();}
-        function message(event){if(!unlocked&&event.origin===location.origin&&event.source===document.querySelector('#city-frame')?.contentWindow&&navigator.userActivation?.hasBeenActive)unlock();}
+        function leave(){rallyBaseline=true;pageActive=false;stopEffects();stopMusic();controller?.abort();if(context&&context.state==='running')context.suspend().catch(()=>{});}
+        function enter(){rallyBaseline=true;pageActive=true;sync();}
+        function visibility(){rallyBaseline=true;sync();}
         document.addEventListener('pointerdown',gesture,{capture:true,passive:true});document.addEventListener('keydown',gesture,{capture:true});
         document.addEventListener('click',click);document.addEventListener('input',input);document.addEventListener('change',input);
-        document.addEventListener('visibilitychange',sync);window.addEventListener('pagehide',leave);window.addEventListener('pageshow',enter);window.addEventListener('message',message);
-        const instance={play,confirmed,observe,controls,status,updateControls,destroy(){destroyed=true;leave();context?.removeEventListener('statechange',updateControls);context?.close().catch(()=>{});document.removeEventListener('pointerdown',gesture,true);document.removeEventListener('keydown',gesture,true);document.removeEventListener('click',click);document.removeEventListener('input',input);document.removeEventListener('change',input);document.removeEventListener('visibilitychange',sync);window.removeEventListener('pagehide',leave);window.removeEventListener('pageshow',enter);window.removeEventListener('message',message);}};
+        document.addEventListener('visibilitychange',visibility);window.addEventListener('pagehide',leave);window.addEventListener('pageshow',enter);
+        const instance={play,confirmed,observe,observeRallies,controls,status,updateControls,destroy(){destroyed=true;leave();context?.removeEventListener('statechange',updateControls);context?.close().catch(()=>{});document.removeEventListener('pointerdown',gesture,true);document.removeEventListener('keydown',gesture,true);document.removeEventListener('click',click);document.removeEventListener('input',input);document.removeEventListener('change',input);document.removeEventListener('visibilitychange',visibility);window.removeEventListener('pagehide',leave);window.removeEventListener('pageshow',enter);}};
         active=instance;return instance;
     }
     window.ConquerAudio={create,status:()=>active?.status()};

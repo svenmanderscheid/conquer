@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="de">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Weltkarte · Stiltest</title>
+<link rel="stylesheet" href="../css/fantasy-fonts.css">
+<link rel="stylesheet" href="preview.css">
+<link rel="stylesheet" href="../css/village-theme.css">
+<body>
+<header><h1>Weltkarte · Stiltest</h1><span>Lokale Vorschau · kein Spielstand</span></header>
+<main id="viewport">
+ <canvas id="map" tabindex="0" aria-label="Testkarte. Ziehen zum Verschieben, Mausrad oder zwei Finger zum Zoomen. Objekte auch über die unteren Schaltflächen auswählen."></canvas>
+ <div id="loading" role="status">Karte wird geladen …</div>
+ <nav class="zoom" aria-label="Kartenansicht"><button id="out" aria-label="Verkleinern">−</button><output id="scale">100 %</output><button id="in" aria-label="Vergrößern">+</button><button id="reset">Übersicht</button></nav>
+ <aside id="detail" hidden aria-live="polite"><button id="close" aria-label="Auswahl schließen">×</button><h2 id="name"></h2><p id="description"></p><small>Nur Ansichtstest – keine Spielaktion.</small></aside>
+</main>
+<footer><div class="preview-actions"><button id="animation" aria-pressed="true">Animation pausieren</button><button id="alliance" aria-pressed="false">Allianz-Nachbarn testen</button></div><nav id="objects" aria-label="Testobjekte"></nav><p>Objektliste seitlich wischen · Antippen für Nahansicht · Nur Vorschau-Effekte</p></footer>
+<script type="module" src="preview.js?v=11"></script>
+</body></html>

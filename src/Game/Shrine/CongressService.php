@@ -9,6 +9,7 @@ use Conquer\Game\Research\{BuffEngine,ResearchEffects};
 use Conquer\Game\Hospital\HospitalService;
 use Conquer\Game\WorldRules;
 use Conquer\Game\World\WorldContext;
+use Conquer\Game\World\WorldMapProfile;
 
 /** Real shrine marches, persistent attrition and alliance occupation, sharing existing tables. */
 final class CongressService
@@ -19,6 +20,7 @@ final class CongressService
 
     public static function state(int $playerId): ?array
     {
+        if(WorldMapProfile::isLuxembourg(WorldContext::id()))return null;
         self::tick();
         $id=Connection::getInstance()->query("SELECT id FROM shrines WHERE world_id=? AND shrine_code='CONGRESS'",[WorldContext::id()])->fetchColumn();
         return $id===false?null:self::detail((int)$id,$playerId);
@@ -27,12 +29,14 @@ final class CongressService
     /** Exactly the four event landmarks, independent of the current map viewport. */
     public static function eventShrines(int $playerId): array
     {
+        if(WorldMapProfile::isLuxembourg(WorldContext::id()))return [];
         $rows=Connection::getInstance()->query("SELECT id FROM shrines WHERE world_id=? AND shrine_code IN ('SHRINE_FOREST','SHRINE_ICE','SHRINE_SAND','SHRINE_LAVA') ORDER BY FIELD(shrine_code,'SHRINE_FOREST','SHRINE_ICE','SHRINE_SAND','SHRINE_LAVA')",[WorldContext::id()])->fetchAll(\PDO::FETCH_COLUMN);
         return array_values(array_filter(array_map(static fn($id)=>self::detail((int)$id,$playerId),$rows)));
     }
 
     public static function detail(int $id,int $playerId): ?array
     {
+        if(WorldMapProfile::isLuxembourg(WorldContext::id()))return null;
         $shrine=ShrineService::getShrine($id);if(!$shrine||(int)$shrine['world_id']!==WorldContext::id())return null;
         if(!\Conquer\Game\World\LandAccessPolicy::isOpen(WorldContext::id(),(int)$shrine['coord_x'],(int)$shrine['coord_y']))return null;
         $alliance=WorldRules::alliance($playerId);$own=$alliance!==null&&$alliance===$shrine['alliance_id'];
@@ -59,6 +63,7 @@ final class CongressService
 
     public static function dispatch(int $playerId,int $shrineId,mixed $input,bool $garrison=false): array
     {
+        if(WorldMapProfile::isLuxembourg(WorldContext::id()))throw new \DomainException('Diese Welt verwendet Communes, Shrines und Royal Castle.',409);
         self::tick();
         return self::atomic(function(Connection $db)use($playerId,$shrineId,$input,$garrison): array{
             // The city row serializes stock/slot checks even for service callers without API advisory locks.
@@ -110,8 +115,8 @@ final class CongressService
     public static function tick(): void
     {
         $db=Connection::getInstance();
-        $due=$db->query("SELECT id FROM marches WHERE march_type IN (13,14) AND ((state='marching' AND arrival_time<=UTC_TIMESTAMP()) OR (state='returning' AND return_time<=UTC_TIMESTAMP())) ORDER BY COALESCE(return_time,arrival_time),id LIMIT 100")->fetchAll(\PDO::FETCH_COLUMN);
-        foreach($due as $id)self::resolveMarch((int)$id);
+        $due=$db->query("SELECT id,world_id FROM marches WHERE march_type IN (13,14) AND ((state='marching' AND arrival_time<=UTC_TIMESTAMP()) OR (state='returning' AND return_time<=UTC_TIMESTAMP())) ORDER BY COALESCE(return_time,arrival_time),id LIMIT 100")->fetchAll();
+        foreach($due as $row)if(!WorldMapProfile::isLuxembourg((int)$row['world_id']))self::resolveMarch((int)$row['id']);
         ShrineService::checkSecured();
     }
 
@@ -120,11 +125,12 @@ final class CongressService
         self::atomic(function(Connection $db)use($marchId):void{
             $march=$db->query('SELECT m.*,o.alliance_id AS order_alliance_id,o.buffs_json,o.event_instance FROM marches m LEFT JOIN shrine_march_orders o ON o.march_id=m.id WHERE m.id=? FOR UPDATE',[$marchId])->fetch();
             if(!$march||!in_array((int)$march['march_type'],[self::ATTACK,self::GARRISON],true))return;
+            if(WorldMapProfile::isLuxembourg((int)$march['world_id']))return;
             $troops=json_decode($march['troops_json'],true)?:[];
             if($march['state']==='returning'){
                 if(strtotime($march['return_time'].' UTC')>self::now())return;
                 $haul=json_decode($march['haul_json']??'{}',true)?:[];
-                foreach($haul['survivors']??$troops as $code=>$count)if($count>0)$db->execute('INSERT INTO city_troops(city_id,troop_code,count) VALUES(?,?,?) ON DUPLICATE KEY UPDATE count=count+VALUES(count)',[$march['origin_city_id'],(int)$code,(int)$count]);
+                foreach($haul['survivors']??$troops as $code=>$count)if($count>0)$db->execute('INSERT INTO city_troops(city_id,troop_code,count) VALUES(?,?,?) ON DUPLICATE KEY UPDATE count=count+VALUES(count)',[$march['origin_city_id'],\Conquer\Game\City\TroopData::activeCode((int)$code),(int)$count]);
                 $db->execute("UPDATE marches SET state='complete' WHERE id=?",[$marchId]);return;
             }
             if($march['state']!=='marching'||strtotime($march['arrival_time'].' UTC')>self::now())return;

@@ -301,7 +301,7 @@ final class ExpeditionService
                     $db->execute("UPDATE expedition_missions SET status='returned' WHERE id=?", [(int) $mission['id']]);
                     $troops = json_decode($mission['troops_json'], true, 32, JSON_THROW_ON_ERROR);
                     foreach ($troops as $code => $count) {
-                        $db->execute('INSERT INTO city_troops(city_id,troop_code,count) VALUES(?,?,?) ON DUPLICATE KEY UPDATE count=count+VALUES(count)', [(int) $mission['city_id'], (int) $code, (int) $count]);
+                        $db->execute('INSERT INTO city_troops(city_id,troop_code,count) VALUES(?,?,?) ON DUPLICATE KEY UPDATE count=count+VALUES(count)', [(int) $mission['city_id'], \Conquer\Game\City\TroopData::activeCode((int)$code), (int) $count]);
                     }
                 }
             });

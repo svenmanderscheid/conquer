@@ -18,7 +18,8 @@ final class FeatureDatabase
         $socket=stream_socket_server('tcp://127.0.0.1:0',$errno,$error);
         if(!$socket)throw new \RuntimeException('No fixture HTTP port.');
         $address=stream_socket_get_name($socket,false);fclose($socket);
-        $this->server=proc_open(array_merge([PHP_BINARY],$phpOptions,['-S',$address,'-t',$this->directory,$this->directory.'/router.php']),[0=>['pipe','r'],1=>['file',$this->directory.'/server.log','a'],2=>['file',$this->directory.'/server.log','a']],$pipes,$this->directory,null,['bypass_shell'=>true]);
+        $localOptions=['-d','session.save_path='.$this->directory,'-d','upload_tmp_dir='.$this->directory,'-d','sys_temp_dir='.$this->directory];
+        $this->server=proc_open(array_merge([PHP_BINARY],$localOptions,$phpOptions,['-S',$address,'-t',$this->directory,$this->directory.'/router.php']),[0=>['pipe','r'],1=>['file',$this->directory.'/server.log','a'],2=>['file',$this->directory.'/server.log','a']],$pipes,$this->directory,null,['bypass_shell'=>true]);
         if(!is_resource($this->server))throw new \RuntimeException('Fixture server did not start.');
         fclose($pipes[0]);usleep(200000);return 'http://'.$address;
     }
@@ -32,7 +33,9 @@ final class FeatureDatabase
         $this->admin->exec('CREATE DATABASE `'.$this->name.'` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
         try{
             foreach($this->admin->query('SHOW TABLES FROM `'.$source.'`')->fetchAll(\PDO::FETCH_COLUMN)as$t){if(!preg_match('/^[A-Za-z0-9_]+$/D',$t))throw new \RuntimeException('Invalid table.');$this->admin->exec('CREATE TABLE `'.$this->name.'`.`'.$t.'` LIKE `'.$source.'`.`'.$t.'`');}
-            $this->admin->exec('INSERT INTO `'.$this->name.'`.worlds SELECT * FROM `'.$source.'`.worlds WHERE id=1');
+            // The source contributes schema only. Its first world may use a
+            // different map profile or tuning, so never inherit that live row.
+            $this->admin->exec("INSERT INTO `".$this->name."`.worlds(id,name,slug,status,map_size,map_seed) VALUES(1,'Fixture Realm','fixture-realm','running',256,42)");
             mkdir($this->directory.'/config',0700,true);$cfg['database']=$this->name;file_put_contents($this->directory.'/config/database.php',"<?php return ".var_export($cfg,true).';');
             \Conquer\Db\Connection::init($this->directory);
             // Bring the disposable schema up to the feature contracts, even while
@@ -41,17 +44,28 @@ final class FeatureDatabase
                 $path=ROOT_DIR.'/migrations/'.$migration;
                 if(is_file($path))\Conquer\Db\MigrationSql::apply(\Conquer\Db\Connection::getInstance()->getPdo(),(string)file_get_contents($path));
             }
+            \Conquer\Db\MigrationSql::apply(\Conquer\Db\Connection::getInstance()->getPdo(), (string)file_get_contents(ROOT_DIR.'/migrations/0117_ui_layout.sql'));
+            \Conquer\Db\MigrationSql::apply(\Conquer\Db\Connection::getInstance()->getPdo(), (string)file_get_contents(ROOT_DIR.'/migrations/0118_oauth_identity_verification.sql'));
             \Conquer\Db\MigrationSql::apply(\Conquer\Db\Connection::getInstance()->getPdo(), (string)file_get_contents(ROOT_DIR.'/migrations/0103_security_rate_limits.sql'));
             \Conquer\Db\MigrationSql::apply(\Conquer\Db\Connection::getInstance()->getPdo(), (string)file_get_contents(ROOT_DIR.'/migrations/0104_api_receipts_and_activity.sql'));
             \Conquer\Db\MigrationSql::apply(\Conquer\Db\Connection::getInstance()->getPdo(), (string)file_get_contents(ROOT_DIR.'/migrations/0105_admin_password_change.sql'));
             \Conquer\Db\MigrationSql::apply(\Conquer\Db\Connection::getInstance()->getPdo(), (string)file_get_contents(ROOT_DIR.'/migrations/0106_alpha_waitlist.sql'));
-            \Conquer\Db\MigrationSql::apply(\Conquer\Db\Connection::getInstance()->getPdo(), (string)file_get_contents(ROOT_DIR.'/migrations/0107_bug_report_ideas_and_screenshots.sql'));
+            \Conquer\Db\MigrationSql::apply(\Conquer\Db\Connection::getInstance()->getPdo(), (string)file_get_contents(ROOT_DIR.'/migrations/0113_rally_join_travel.sql'));
+            foreach(['0119_world_map_profiles.sql','0120_territory_conquest.sql','0121_community_social.sql','0122_alliance_community.sql','0123_community_news.sql'] as $migration){
+                \Conquer\Db\MigrationSql::apply(\Conquer\Db\Connection::getInstance()->getPdo(),(string)file_get_contents(ROOT_DIR.'/migrations/'.$migration));
+            }
+            // The cloned source may already contain 0107. Replay its additive
+            // columns independently in this disposable schema, not in the user DB.
+            foreach(["report_type ENUM('bug','idea') NOT NULL DEFAULT 'bug' AFTER world_id",'screenshot MEDIUMBLOB NULL AFTER client_context',"screenshot_mime VARCHAR(32) NOT NULL DEFAULT '' AFTER screenshot"] as $column){
+                \Conquer\Db\MigrationSql::apply(\Conquer\Db\Connection::getInstance()->getPdo(),'ALTER TABLE bug_reports ADD COLUMN IF NOT EXISTS '.$column.';');
+            }
         }catch(\Throwable $e){$this->close();throw $e;}
     }
     public function close(): void
     {
         if(is_resource($this->server)){proc_terminate($this->server);proc_close($this->server);$this->server=null;}
         foreach(['router.php','http.log','server.log'] as $name){$path=$this->directory.'/'.$name;if(is_file($path))unlink($path);}
+        foreach(glob($this->directory.'/sess_*')?:[] as $path)if(is_file($path))unlink($path);
         if(preg_match('/^conquer_feature_test_[a-f0-9]{12}$/D',$this->name))$this->admin->exec('DROP DATABASE IF EXISTS `'.$this->name.'`');
         $file=$this->directory.'/config/database.php';if(is_file($file))unlink($file);if(is_dir($this->directory.'/config'))rmdir($this->directory.'/config');if(is_dir($this->directory))rmdir($this->directory);
     }

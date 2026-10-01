@@ -31,7 +31,7 @@ final class WorldSpawnService
     }
     private static function run(Connection $db,int $worldId,bool $force,string $source): array
     {
-        $size=WorldPlacement::lockWorld($db,$worldId);
+        $size=WorldPlacement::lockWorld($db,$worldId);$profile=WorldMapProfile::forWorld($worldId);$width=$profile['width'];$height=$profile['height'];$area=$width*$height;
         $world=$db->query('SELECT status FROM worlds WHERE id=?',[$worldId])->fetch();
         $state=WorldSettings::get($worldId);$cfg=$state['settings'];$now=time();
         if(!$cfg['enabled']||!in_array($world['status'],['open','running'],true))return ['status'=>'paused'];
@@ -46,18 +46,22 @@ final class WorldSpawnService
                 AND NOT EXISTS(SELECT 1 FROM marches m WHERE m.world_id=f.world_id AND m.state IN ('marching','resolving','returning') AND ((m.target_type=? AND m.target_id=f.id) OR (m.target_x=f.coord_x AND m.target_y=f.coord_y)))
                 AND NOT EXISTS(SELECT 1 FROM rallies r WHERE r.world_id=f.world_id AND r.status IN ('gathering','marching','returning') AND r.target_x=f.coord_x AND r.target_y=f.coord_y)",[$worldId,$targetType]);
         }
-        $result=['status'=>'completed','resources_spawned'=>0,'monsters_spawned'=>0,'expired_removed'=>$removed,'placement_misses'=>0,'chance_skipped'=>0];
+        $result=['status'=>'completed','resources_spawned'=>0,'monsters_spawned'=>0,'villages_spawned'=>0,'expired_removed'=>$removed,'placement_misses'=>0,'chance_skipped'=>0];
         $budget=(int)$cfg['batch_limit'];
         $deficits=[];
         foreach(['resource'=>'field_objects','monster'=>'field_monsters']as$kind=>$table){
-            $target=min((int)$cfg[$kind.'_limit'],(int)floor($size*$size*$cfg[$kind.'_density_pct']/100));
+            $target=min((int)$cfg[$kind.'_limit'],(int)floor($area*$cfg[$kind.'_density_pct']/100));
             $existing=(int)$db->query('SELECT COUNT(*) FROM '.$table.' WHERE world_id=?',[$worldId])->fetchColumn();
             $deficits[$kind]=max(0,$target-$existing);
         }
+        $villageTarget=min((int)$cfg['village_limit'],(int)floor($area*$cfg['village_density_pct']/100));
+        $villageExisting=(int)$db->query('SELECT COUNT(*) FROM neutral_villages WHERE world_id=?',[$worldId])->fetchColumn();
+        $villageBudget=min((int)ceil($budget*.20),max(0,$villageTarget-$villageExisting));
+        $budget-=$villageBudget;
         foreach(['resource','monster'] as $kind) {
             $table=$kind==='resource'?'field_objects':'field_monsters';
             $existing=(int)$db->query('SELECT COUNT(*) FROM '.$table.' WHERE world_id=?',[$worldId])->fetchColumn();
-            $target=min((int)$cfg[$kind.'_limit'],(int)floor($size*$size*$cfg[$kind.'_density_pct']/100));
+            $target=min((int)$cfg[$kind.'_limit'],(int)floor($area*$cfg[$kind.'_density_pct']/100));
             $count=min($budget,max(0,$target-$existing));$result[$kind.'_target']=$target;
             // Both populations receive attempts in the same pass; a large mine
             // deficit must not starve monsters for several scheduled intervals.
@@ -73,7 +77,7 @@ final class WorldSpawnService
                 $type=self::weighted($weights);
                 $placed=false;
                 for($attempt=0;$attempt<30;$attempt++) {
-                    $x=random_int(1,$size-2);$y=random_int(1,$size-2);
+                    $x=random_int(1,$width-2);$y=random_int(1,$height-2);
                     if($kind==='resource'&&!WorldPlacement::canPlace($db,$worldId,$kind,$x,$y))continue;
                     if($kind==='monster'){
                         $candidates=RegionalSpawns::candidates($worldId,$type,$x,$y,$cfg['monster_level_min'],$cfg['monster_level_max'],random_int(1,10)===1);
@@ -99,6 +103,20 @@ final class WorldSpawnService
                 }
                 if(!$placed)$result['placement_misses']++;
             }
+        }
+        $result['village_target']=$villageTarget;
+        for($i=0;$i<$villageBudget;$i++){
+            if(random_int(1,100000)>$cfg['village_chance_pct']*1000){$result['chance_skipped']++;continue;}
+            $placed=false;
+            for($attempt=0;$attempt<30;$attempt++){
+                $x=random_int(1,$width-3);$y=random_int(1,$height-3);
+                if(!WorldPlacement::canPlace($db,$worldId,'neutral_village',$x,$y))continue;
+                $level=random_int(1,10);$stock=\Conquer\Game\Map\NeutralVillageService::initialStock($level);
+                $names=['Eichenfurt','Grauweiler','Mühlenhain','Steinwacht','Dämmerhof','Goldquell'];$name=$names[array_rand($names)];
+                $db->execute('INSERT INTO neutral_villages(world_id,coord_x,coord_y,level,name,garrison_json,food,lumber,stone,gold) VALUES(?,?,?,?,?,?,?,?,?,?)',[$worldId,$x,$y,$level,$name,json_encode(\Conquer\Game\Map\NeutralVillageService::garrison($level),JSON_THROW_ON_ERROR),$stock['food'],$stock['lumber'],$stock['stone'],$stock['gold']]);
+                $result['villages_spawned']++;$placed=true;break;
+            }
+            if(!$placed)$result['placement_misses']++;
         }
         $next=WorldSettings::nextWindow($cfg,$now+$cfg['interval_minutes']*60);
         $db->execute('UPDATE world_spawn_settings SET next_run_at=?,last_run_at=UTC_TIMESTAMP() WHERE world_id=?',[gmdate('Y-m-d H:i:s',$next),$worldId]);

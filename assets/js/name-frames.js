@@ -2,8 +2,16 @@
 // without changing the HUD or world-map renderers.
 window.ConquerNameFrames = (() => {
     'use strict';
+    // Keep this catalog paired with the currently active castle-skin catalog.
     const definitions = [
-        ['default','Grenzlandrahmen','common','#2a72c9','#70472f','<path d="M12 2.5 19 6v5.5c0 4.4-2.8 7.7-7 10-4.2-2.3-7-5.6-7-10V6l7-3.5Z"/><path d="M8.5 9.5h7v5h-7z"/>'],
+        ['default','Grenzlandrahmen','common','#477fb3','#70472f','<path d="M12 2.5 19 6v5.5c0 4.4-2.8 7.7-7 10-4.2-2.3-7-5.6-7-10V6l7-3.5Z"/><path d="M8 9h8v6H8zM4 7 1.8 5.5v8L5 12"/>'],
+        ['forest','Waldhain-Rahmen','legendary','#56814c','#65462f','<path d="M12 21V10m0 4-5-4m5 1 5-5m-8 15h6"/><path d="M4 8c0-3 3-5 6-3 2-4 7-3 7 1 4 0 4 6 0 7H7C3 13 2 10 4 8Z"/><path d="M8 7C5 4 5 2 5 1m11 6c3-2 3-4 3-6"/>'],
+        ['fire','Glutwacht-Rahmen','legendary','#d86432','#70402d','<path d="M4 16h16l-3 5H7l-3-5Z"/><path d="M7 16V8l3-3 2 3 2-3 3 3v8M7 11h10"/><path d="M12 14c-3-2-3-5 0-9 0 3 4 4 2 7-.5 1-1 2-2 2Z"/>'],
+        ['water','Gezeiten-Rahmen','legendary','#309caf','#466e76','<path d="M4 17c2-2 4-2 6 0s4 2 6 0 4-2 5-1M3 21c3-2 5-2 8 0s5 2 9 0"/><path d="M12 3c4 3 6 6 6 9-4 2-8 2-12 0 0-3 2-6 6-9Z"/><path d="M8 11c1-3 2-5 4-8 2 3 3 5 4 8M12 3v9M6 12h12"/><circle cx="12" cy="15" r="1.5"/>'],
+        ['wind','Himmels-Rahmen','legendary','#67a8c6','#665777','<path d="M4 16c-3 0-3-5 1-5 1-4 7-4 8 0 3-1 5 1 5 3 3 0 4 4 1 5H6"/><circle cx="12" cy="9" r="1.6"/><path d="m12 7 1-5 2 5m-1.6 3.2 4.6 2-5 .2m-2.4-2.2-4.6 2 5 .2M12 10.6 11 16l-2-5"/>']
+    ];
+    const entries = Object.freeze(definitions.map(([id,name,rarity,accent,edge,motif]) => Object.freeze({id,name,rarity,accent,edge,motif})));
+    const legacyDefinitions = [
         ['ironkeep','Zinnenrahmen','legendary','#71879a','#70472f','<path d="M4 20V7h4v3h3V7h3v3h3V7h3v13Z"/><path d="M8 20v-5h8v5M6 5h12"/>'],
         ['rosehall','Rosenrahmen','legendary','#d97798','#70472f','<path d="M12 12c-5-1-5-7-1-8 1-4 7-2 6 2 4 1 3 7-1 7-1 4-7 5-8 1-4-1-3-7 1-7"/><path d="M9 16c-2 1-3 3-3 5m5-4c2 1 3 2 4 4"/>'],
         ['sandspire','Sonnenrahmen','legendary','#d49a35','#70472f','<circle cx="12" cy="12" r="4"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4M5 5l3 3m8 8 3 3M19 5l-3 3M8 16l-3 3"/>'],
@@ -22,9 +30,11 @@ window.ConquerNameFrames = (() => {
         ['eclipse','Finstersonnenrahmen','mythic','#965bcc','#70472f','<circle cx="12" cy="12" r="8"/><path d="M16 5a8 8 0 0 0 0 14 8 8 0 1 1 0-14Z"/><path d="M12 1v2m0 18v2M1 12h2m18 0h2"/>'],
         ['dragon','Drachenrahmen','mythic','#c88735','#70472f','<path d="M12 18c-4-5-7-8-10-8 2 5 4 8 9 11M12 18c4-5 7-8 10-8-2 5-4 8-9 11"/><path d="M9 15 6 8l5 3 1-8 1 8 5-3-3 7M10 18h4"/>']
     ];
-    const entries = Object.freeze(definitions.map(([id,name,rarity,accent,edge,motif]) => Object.freeze({id,name,rarity,accent,edge,motif})));
+    const legacyEntries=Object.freeze(legacyDefinitions.map(([id,name,rarity,accent,edge,motif])=>Object.freeze({id,name,rarity,accent,edge,motif,legacy:true})));
+    const allEntries=Object.freeze([...entries,...legacyEntries]);
+    const allIds=Object.freeze(allEntries.map(entry=>entry.id));
     const ids = Object.freeze(entries.map(entry => entry.id));
-    const byId = new Map(entries.map(entry => [entry.id,entry]));
+    const byId = new Map(allEntries.map(entry => [entry.id,entry]));
     const safeId = value => {
         if(value && typeof value === 'object')value=value.id??value.name_frame??value.frame_id??value.skin_id;
         const id=typeof value==='string'?value.trim().toLowerCase():'';
@@ -49,7 +59,7 @@ window.ConquerNameFrames = (() => {
         const equipped=resolve(source,marked||fallback);
         return Object.freeze({
             equipped,
-            entries:Object.freeze(entries.map(entry=>Object.freeze({...entry,owned:entry.id==='default'||Boolean(supplied.get(entry.id)?.owned),equipped:entry.id===equipped})))
+            entries:Object.freeze([...entries,...legacyEntries.filter(entry=>supplied.get(entry.id)?.owned)].map(entry=>Object.freeze({...entry,owned:entry.id==='default'||Boolean(supplied.get(entry.id)?.owned),equipped:entry.id===equipped})))
         });
     };
     const ornament = entry => `<span class="name-frame-ornament" data-name-frame-ornament aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${entry.motif}</svg></span>`;
@@ -63,7 +73,7 @@ window.ConquerNameFrames = (() => {
         const entry=get(value);
         node.querySelectorAll(':scope > [data-name-frame-ornament]').forEach(child=>child.remove());
         node.classList.add('name-frame');
-        for(const id of ids)node.classList.remove(`name-frame--${id}`);
+        for(const {id} of allEntries)node.classList.remove(`name-frame--${id}`);
         node.classList.add(`name-frame--${entry.id}`);node.dataset.nameFrame=entry.id;
         node.insertAdjacentHTML('afterbegin',ornament(entry));node.insertAdjacentHTML('beforeend',ornament(entry));
         return entry;
@@ -75,5 +85,5 @@ window.ConquerNameFrames = (() => {
         if(typeof window.CustomEvent==='function')window.dispatchEvent(new CustomEvent('conquer:name-frame-changed',{detail:state}));
         return state;
     };
-    return Object.freeze({entries,ids,get,resolve,normalizeState,markup,apply,syncSelf});
+    return Object.freeze({entries,legacyEntries,ids,allIds,get,resolve,normalizeState,markup,apply,syncSelf});
 })();

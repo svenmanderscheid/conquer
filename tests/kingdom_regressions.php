@@ -10,6 +10,8 @@ use Conquer\Game\Kingdom\KingdomService;
 require __DIR__.'/Support/FeatureDatabase.php';$fixture=new \ConquerTests\FeatureDatabase();$db=Connection::getInstance();$pid=0;$city=0;$aid=0;$eid=0;$failed=false;
 function expectKingdom(bool $ok,string $label): void { if(!$ok) { throw new RuntimeException($label); } echo "PASS $label\n"; }
 try {
+    // The disposable schema does not copy the source world's optional map profile.
+    $db->execute("UPDATE worlds SET status='running',map_size=256 WHERE id=1");
     $name='KingdomReg'.bin2hex(random_bytes(4));
     $pid=$db->transaction(static function(Connection $db) use($name): int {
         $db->execute('INSERT INTO players(username,email,password_hash) VALUES(?,?,?)',[$name,$name.'@tests.invalid',password_hash(bin2hex(random_bytes(16)),PASSWORD_DEFAULT)]);
@@ -63,12 +65,13 @@ try {
     expectKingdom($claimed['state']['quests']!==[],'completed derived daily quest can be claimed normally');
     try { KingdomService::action($pid,['action'=>'quest.claim','quest_code'=>'train_troops_100']);throw new RuntimeException('double reward accepted'); }
     catch(DomainException) { expectKingdom(true,'derived quest reward remains one-time'); }
-    $unsupported=60500002;
+    $unsupported=60500101;
     \Conquer\Game\Treasure\TreasureService::addFragments($pid,$unsupported,1000);
+    \Conquer\Game\Treasure\TreasureService::upgradeEffect($pid,$unsupported,4);
     $items=array_column(KingdomService::state($pid)['treasures']['items'],null,'treasure_code');
     expectKingdom($items[$unsupported]['is_usable'] && !isset($items[$unsupported]['unsupported_stats']['hospital_capacity']) && isset($items[$unsupported]['stats_at_level']['hospital_capacity']),'hospital relic effect is enabled in the catalog');
     $equipped=KingdomService::action($pid,['action'=>'treasure.equip','treasure_code'=>$unsupported,'slot'=>1]);
-    expectKingdom(isset($equipped['state']['treasures']['bonuses']['food_production']) && isset($equipped['state']['treasures']['bonuses']['hospital_capacity']),'mixed relic grants both production and hospital effects');
+    expectKingdom(abs($equipped['state']['treasures']['bonuses']['healing_speed']-3)<.000001 && abs($equipped['state']['treasures']['bonuses']['hospital_capacity']-2.5)<.000001,'current relic grants its unlocked healing and hospital percentage effects');
     echo "ALL KINGDOM REGRESSIONS PASSED\n";
 } catch(Throwable $e) {
     $failed=true;fwrite(STDERR,'FAIL '.$e->getMessage()."\n");

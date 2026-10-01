@@ -74,14 +74,17 @@ try{
  rejected(fn()=>CongressService::recall(2,71),'duplicate recall cannot mint troops');
  $db->execute("INSERT INTO alliance_members(alliance_id,player_id,role) VALUES(1,2,'member')");
  $g=CongressService::dispatch(2,71,[50100101=>100],true);arrive($db,$g['march_id']);
- $rival=CongressService::dispatch(3,71,[50100101=>1000]);arrive($db,$rival['march_id']);$s=CongressService::state(3);
+ // Current T1 attack 1 versus HP+defense 12 needs more than 1200 attackers for 100 guards.
+ $rival=CongressService::dispatch(3,71,[50100101=>2000]);arrive($db,$rival['march_id']);$s=CongressService::state(3);
  checkCongress($s['alliance_id']===2&&$s['state']==='contested'&&$s['can_garrison'],'rival victory transfers Congress and starts a fresh hold');
  $retreat=$db->query("SELECT id,haul_json FROM marches WHERE player_id=2 AND state='returning' ORDER BY id DESC LIMIT 1")->fetch();
  checkCongress(CongressService::state(2)['my_garrison']['total']===0&&json_decode($retreat['haul_json'],true)['survivors'][50100101]===50,'defeated garrison survivors retreat instead of being silently deleted');
  finish($db,(int)$retreat['id']);checkCongress(countAt($db,2)===199950,'retreat returns surviving defenders exactly once');
  checkCongress((int)$db->query('SELECT COUNT(*) FROM battle_reports')->fetchColumn()===3,'actual battles each produce one persisted attacker report');
  // The generic march tick must recognize the new types, including delayed offline settlement.
- $db->execute("UPDATE marches SET state='complete'");$off=CongressService::dispatch(1,71,[50100101=>5000]);
+ $db->execute("UPDATE marches SET state='complete'");$db->execute('INSERT INTO city_troops(city_id,troop_code,count) VALUES(1,50100501,5000)');
+ // A veteran army fits the actual 5000 march cap and beats the surviving rival garrison.
+ $off=CongressService::dispatch(1,71,[50100501=>5000]);
  $db->execute('UPDATE marches SET departure_time=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 6 SECOND),arrival_time=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 1 SECOND) WHERE id=?',[$off['march_id']]);
  MarchTick::runForPlayer(1);checkCongress(ShrineService::getShrine(71)['alliance_id']===1,'shared MarchTick resolves Congress instead of unsupported-type return');
  // A fresh world with no central structure also receives one stable Congress.

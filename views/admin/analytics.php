@@ -2,9 +2,14 @@
 declare(strict_types=1);
 $days=in_array((int)($_GET['days']??7),[1,7,30,90],true)?(int)($_GET['days']??7):7;
 $since=gmdate('Y-m-d H:i:s',time()-$days*86400);
+$alpha=\Conquer\Admin\AlphaPlaytestAnalytics::snapshot((int)$selectedWorld,$days);
 $onlineNow=(int)$db->query('SELECT COUNT(DISTINCT s.player_id) FROM sessions s JOIN cities c ON c.player_id=s.player_id AND c.world_id=? WHERE s.last_active>=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 5 MINUTE) AND s.expires_at>UTC_TIMESTAMP()',[$selectedWorld])->fetchColumn();
-$activePlayers=(int)$db->query('SELECT COUNT(DISTINCT player_id) FROM player_activity_minutes WHERE world_id=? AND minute_slot>=?',[$selectedWorld,$since])->fetchColumn();
-$onlineMinutes=(int)$db->query('SELECT COUNT(*) FROM player_activity_minutes WHERE world_id=? AND minute_slot>=?',[$selectedWorld,$since])->fetchColumn();
+$activityAvailable=(bool)$db->query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name='player_activity_minutes'")->fetchColumn();
+$activePlayers=null;$onlineMinutes=null;
+if($activityAvailable){
+    $activePlayers=(int)$db->query('SELECT COUNT(DISTINCT player_id) FROM player_activity_minutes WHERE world_id=? AND minute_slot>=?',[$selectedWorld,$since])->fetchColumn();
+    $onlineMinutes=(int)$db->query('SELECT COUNT(*) FROM player_activity_minutes WHERE world_id=? AND minute_slot>=?',[$selectedWorld,$since])->fetchColumn();
+}
 $kills=(int)$db->query('SELECT COUNT(*) FROM monster_kill_receipts WHERE world_id=? AND created_at>=?',[$selectedWorld,$since])->fetchColumn();
 $killRows=$db->query('SELECT reward_snapshot_json FROM monster_kill_receipts WHERE world_id=? AND created_at>=?',[$selectedWorld,$since])->fetchAll(PDO::FETCH_COLUMN);
 $dropUnits=0;$dropKinds=0;foreach($killRows as $json){$reward=json_decode((string)$json,true)?:[];foreach($reward as $value){if(is_numeric($value)&&$value>0){$dropUnits+=(float)$value;$dropKinds++;}elseif(is_array($value))foreach($value as $amount)if(is_numeric($amount)&&$amount>0){$dropUnits+=(float)$amount;$dropKinds++;}}}
@@ -14,10 +19,12 @@ $attacks=(int)$db->query('SELECT COUNT(*) FROM battle_reports WHERE world_id=? A
 $messages=(int)$db->query('SELECT (SELECT COUNT(*) FROM world_chat WHERE world_id=? AND created_at>=?)+(SELECT COUNT(*) FROM private_chat_messages WHERE world_id=? AND created_at>=?)',[$selectedWorld,$since,$selectedWorld,$since])->fetchColumn();
 $top=$db->query('SELECT p.id,p.username,COUNT(*) kills FROM monster_kill_receipts m JOIN players p ON p.id=m.winner_player_id WHERE m.world_id=? AND m.created_at>=? GROUP BY p.id,p.username ORDER BY kills DESC,p.username LIMIT 10',[$selectedWorld,$since])->fetchAll();
 ?>
+<?php require __DIR__.'/alpha_playtest.php'; ?>
+<?php if(!$activityAvailable): ?><div class="notice error">Aktive Spieler und Spielzeit sind noch nicht verfügbar. Bitte führe die ausstehende Datenbankmigration <strong>0110_admin_analytics.sql</strong> aus.</div><?php endif ?>
 <form method="get" class="analytics-filter card"><input type="hidden" name="world_id" value="<?= $selectedWorld ?>"><label>Zeitraum<select name="days"><?php foreach([1=>'24 Stunden',7=>'7 Tage',30=>'30 Tage',90=>'90 Tage'] as $value=>$label): ?><option value="<?= $value ?>" <?= $days===$value?'selected':'' ?>><?= ah($label) ?></option><?php endforeach ?></select></label><button type="submit">Auswerten</button><span class="subtle">UTC · ab <?= ah($since) ?></span></form>
 <div class="stats analytics-stats">
 <?php foreach([
- ['Jetzt online',$onlineNow,'in den letzten 5 Minuten'],['Aktive Spieler',$activePlayers,$days.' Tage'],['Spielzeit',round($onlineMinutes/60,1).' h','protokollierte aktive Minuten'],['Monster getötet',$kills,'bestätigte Abschlüsse'],['Farmmärsche',count($gathers),'abgeschlossene Rückkehr'],['PvP-Angriffe',$attacks,'mit Spieler als Verteidiger'],['Nachrichten',$messages,'Welt- und Privatnachrichten'],['Ø Dropmenge',$kills?number_format($dropUnits/$kills,2,',','.'):'—','Einheiten je Monster']
+ ['Jetzt online',$onlineNow,'in den letzten 5 Minuten'],['Aktive Spieler',$activePlayers??'—',$activityAvailable?$days.' Tage':'Migration ausstehend'],['Spielzeit',$onlineMinutes===null?'—':round($onlineMinutes/60,1).' h',$activityAvailable?'protokollierte aktive Minuten':'Migration ausstehend'],['Monster getötet',$kills,'bestätigte Abschlüsse'],['Farmmärsche',count($gathers),'abgeschlossene Rückkehr'],['PvP-Angriffe',$attacks,'mit Spieler als Verteidiger'],['Nachrichten',$messages,'Welt- und Privatnachrichten'],['Ø Dropmenge',$kills?number_format($dropUnits/$kills,2,',','.'):'—','Einheiten je Monster']
 ] as [$label,$value,$sub]): ?><div class="stat"><small><?= ah($label) ?></small><strong><?= ah($value) ?></strong><span><?= ah($sub) ?></span></div><?php endforeach ?>
 </div>
 <div class="grid"><section class="card"><h2>Gefarmte Ressourcen</h2><p>Aus der tatsächlichen Beute abgeschlossener Sammelmärsche.</p><?php foreach(['food'=>'Nahrung','lumber'=>'Holz','stone'=>'Stein','gold'=>'Gold','gems'=>'Kristalle'] as $key=>$label): ?><div class="split"><span><?= ah($label) ?></span><strong><?= an($farmed[$key]) ?></strong></div><?php endforeach ?></section>

@@ -1,4 +1,5 @@
 'use strict';
+require('./fixtures/browser_locale.cjs')('de'); // This suite asserts the explicit German UI.
 // Real map against tools/preview-feature-fixture.php --monster-health.
 const assert=require('assert/strict'),fs=require('fs'),path=require('path');
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'C:/Users/svenm/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
@@ -10,13 +11,13 @@ const output=path.resolve('artifacts/monster-health-review');fs.mkdirSync(output
  try{
   const page=await browser.newPage({viewport:{width:1280,height:800},hasTouch:true}),errors=[];
   page.on('pageerror',e=>{errors.push(e.stack||e.message);console.error(e.stack||e.message);});page.setDefaultTimeout(25000);
-  await page.goto(base);await page.locator('[data-mode="login"]').click();
-  await page.locator('[name="username"]').fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');
-  await Promise.all([page.waitForURL('**/city'),page.locator('#auth-submit').click()]);
+  await page.goto(base);await page.goto(new URL('?zugang=login', page.url()).href);
+  await page.locator("[name=identifier], [name=username]").fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');
+  await Promise.all([page.waitForURL('**/city'),page.locator("form[action$=\"/auth/local\"] button[type=\"submit\"]").click()]);
   await page.waitForFunction(()=>document.querySelector('#player-hud-name')?.textContent.includes('PreviewPlayer'));
   const sceneSwitch=page.locator('#navigation .hud-scene-switch');await sceneSwitch.waitFor();if(await sceneSwitch.getAttribute('data-id')==='world')await sceneSwitch.click();
   const data=await page.evaluate(async()=>(await(await fetch('/api/game/state')).json()).data);
-  const half=data.monsters.find(m=>+m.hp_current/+m.hp_max===.5),healthy=data.monsters.find(m=>+m.hp_current===+m.hp_max),low=data.monsters.find(m=>+m.hp_current===1),boss=data.monsters.find(m=>m.definition.type==='rally'&&+m.hp_current/+m.hp_max===.25);
+  const half=data.monsters.find(m=>+m.hp_current/+m.hp_max===.5),healthy=data.monsters.find(m=>+m.hp_current===+m.hp_max),low=data.monsters.find(m=>+m.hp_current===1),boss=data.monsters.find(m=>m.definition.type==='rally'&&+m.hp_current===Math.floor(+m.hp_max*.25));
   assert(half&&healthy&&low&&boss,'Four health fixtures in world payload');
   for(const m of [half,healthy,low,boss])assert.equal(+m.hp_max,Math.round(m.definition.stats.hp*m.definition.amount));
   const search=await page.evaluate(async()=>(await(await fetch('/api/map/search?category=solo&level=1')).json()).data.target.data);
@@ -44,9 +45,9 @@ const output=path.resolve('artifacts/monster-health-review');fs.mkdirSync(output
     await page.screenshot({path:path.join(output,`${width}x${height}-${m===boss?'boss':'monster'}.png`)});
     const position=await marker.evaluate(el=>{const r=el.getBoundingClientRect();for(const [fx,fy] of [[.5,.5],[.5,.9],[.1,.9],[.9,.9],[.1,.1],[.9,.1]]){const x=r.width*fx,y=r.height*fy;if(el.contains(document.elementFromPoint(r.x+x,r.y+y)))return{x,y};}return null;});
     assert(position,'Monster remains reachable by touch');await marker.click({position});
-    const card=page.locator('.atlas-target-actions');await card.waitFor({state:'visible'});
-    assert.deepEqual(await card.locator('progress').evaluate(el=>[el.value,el.max]),[+m.hp_current,+m.hp_max],'Target menu uses the same current/maximum HP');
-    await page.keyboard.press('Escape');await card.waitFor({state:'hidden'});
+    const card=page.locator('#game-dialog');await card.waitFor({state:'visible'});
+    assert.deepEqual(await card.locator('.march-target-health').evaluate(el=>[+el.getAttribute('aria-valuenow'),+el.getAttribute('aria-valuemax')]),[+m.hp_current,+m.hp_max],'Target menu uses the same current/maximum HP');
+    assert(Math.abs(await card.locator('.march-target-health span').evaluate(el=>parseFloat(el.style.width))-100*Number(m.hp_current)/Number(m.hp_max))<.01,'Target health bar preserves damaged percentage');await page.keyboard.press('Escape');await card.waitFor({state:'hidden'});
    }
    console.log(`PASS health and touch targets ${width}x${height}`);
   }

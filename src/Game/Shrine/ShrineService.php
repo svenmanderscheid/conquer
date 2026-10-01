@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace Conquer\Game\Shrine;
 
 use Conquer\Db\Connection;
+use Conquer\Game\World\WorldMapProfile;
 
 /** Existing shrine catalog and the shared one-hour conquest rules. */
 final class ShrineService
@@ -23,6 +24,7 @@ final class ShrineService
 
     public static function getAllShrines(int $worldId): array
     {
+        if(WorldMapProfile::isLuxembourg($worldId))return [];
         $rows=Connection::getInstance()->query(self::selectSql().' WHERE s.world_id=? ORDER BY s.id',[$worldId])->fetchAll();
         return array_map(self::decorate(...),$rows);
     }
@@ -30,6 +32,7 @@ final class ShrineService
     public static function getShrine(int $shrineId): ?array
     {
         $row=Connection::getInstance()->query(self::selectSql().' WHERE s.id=?',[$shrineId])->fetch();
+        if($row&&WorldMapProfile::isLuxembourg((int)$row['world_id']))return null;
         return $row?self::decorate($row):null;
     }
 
@@ -59,14 +62,16 @@ final class ShrineService
     public static function checkSecured(): void
     {
         $db=Connection::getInstance();
-        $db->execute('UPDATE shrine_captures SET secured_at=contested_until WHERE contested_until<=UTC_TIMESTAMP() AND secured_at IS NULL AND alliance_id IS NOT NULL');
-        $db->execute('UPDATE shrines s JOIN shrine_captures c ON c.shrine_id=s.id SET s.owner_alliance_id=IF(c.secured_at IS NULL,NULL,c.alliance_id),s.contesting_alliance_id=IF(c.secured_at IS NULL,c.alliance_id,NULL),s.captured_at=c.captured_at,s.secured_at=c.secured_at,s.contest_started_at=IF(c.secured_at IS NULL,c.captured_at,NULL)');
+        $worlds=array_filter(array_map('intval',$db->query('SELECT id FROM worlds')->fetchAll(\PDO::FETCH_COLUMN)),static fn($id)=>!WorldMapProfile::isLuxembourg($id));
+        if(!$worlds)return;$scope=implode(',',$worlds);
+        $db->execute('UPDATE shrine_captures c JOIN shrines s ON s.id=c.shrine_id SET c.secured_at=c.contested_until WHERE c.contested_until<=UTC_TIMESTAMP() AND c.secured_at IS NULL AND c.alliance_id IS NOT NULL AND s.world_id IN ('.$scope.')');
+        $db->execute('UPDATE shrines s JOIN shrine_captures c ON c.shrine_id=s.id SET s.owner_alliance_id=IF(c.secured_at IS NULL,NULL,c.alliance_id),s.contesting_alliance_id=IF(c.secured_at IS NULL,c.alliance_id,NULL),s.captured_at=c.captured_at,s.secured_at=c.secured_at,s.contest_started_at=IF(c.secured_at IS NULL,c.captured_at,NULL) WHERE s.world_id IN ('.$scope.')');
     }
 
     public static function getAllianceBonuses(int $allianceId): array
     {
-        $rows=Connection::getInstance()->query("SELECT s.tier FROM shrine_captures c JOIN shrines s ON s.id=c.shrine_id WHERE c.alliance_id=? AND c.secured_at IS NOT NULL AND s.shrine_code NOT IN ('CONGRESS','SHRINE_FOREST','SHRINE_ICE','SHRINE_SAND','SHRINE_LAVA')",[$allianceId])->fetchAll();
-        $totals=[];foreach($rows as $row)foreach(self::SHRINE_BONUSES[$row['tier']]??[] as $key=>$value)$totals[$key]=($totals[$key]??0)+$value;
+        $rows=Connection::getInstance()->query("SELECT s.tier,s.world_id FROM shrine_captures c JOIN shrines s ON s.id=c.shrine_id WHERE c.alliance_id=? AND c.secured_at IS NOT NULL AND s.shrine_code NOT IN ('CONGRESS','SHRINE_FOREST','SHRINE_ICE','SHRINE_SAND','SHRINE_LAVA')",[$allianceId])->fetchAll();
+        $totals=[];foreach($rows as $row){if(WorldMapProfile::isLuxembourg((int)$row['world_id']))continue;foreach(self::SHRINE_BONUSES[$row['tier']]??[] as $key=>$value)$totals[$key]=($totals[$key]??0)+$value;}
         return $totals;
     }
 }

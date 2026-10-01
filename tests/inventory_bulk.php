@@ -59,7 +59,7 @@ try {
         checkBulk(stockBulk($code)===0 && (int)$db->query("SELECT $field FROM players WHERE id=1")->fetchColumn()===$before+$amount, 'full '.$field.' stack is credited');
     }
 
-    foreach (['construction_speed','city_shield','anti_spy'] as $type) {
+    foreach (['gathering_speed','city_shield','anti_spy'] as $type) {
         $def=findBulk('boost',$type);$code=(int)$def['code'];InventoryService::addItems(1,$code,3);
         $start=time();$result=useBulk($code,'bulk_boost_'.$type);
         $expires=$type==='city_shield'?$db->query('SELECT shield_expires_at FROM cities WHERE id=1')->fetchColumn():($type==='anti_spy'?$db->query('SELECT anti_spy_until FROM cities WHERE id=1')->fetchColumn():$db->query('SELECT expires_at FROM player_charms_active WHERE player_id=1 AND stat_category=?',[$type])->fetchColumn());
@@ -86,10 +86,14 @@ try {
     checkBulk(useBulk(10105001,'bulk_chest_same_drop')===$result && stockBulk(10105001)===18, 'chest retry keeps the exact aggregated reward');
     InventoryService::addItems(1,10105002,4);
     $before=(int)$db->query('SELECT COALESCE(SUM(fragments),0) FROM player_treasures WHERE player_id=1')->fetchColumn();
+    $unlockedBefore=(int)$db->query('SELECT COUNT(*) FROM player_treasure_effects WHERE player_id=1 AND effect_index=0 AND parts>=1')->fetchColumn();
     $result=useBulk(10105002,'bulk_chest_fragments');
     checkBulk(array_sum(array_column($result['drops'],'quantity'))===40 && stockBulk(10105002)===0, 'every chest roll grants fragments');
-    checkBulk((int)$db->query('SELECT SUM(fragments) FROM player_treasures WHERE player_id=1')->fetchColumn()===$before+40, 'fragment totals match actual credit');
+    $fragmentBalance=(int)$db->query('SELECT SUM(fragments) FROM player_treasures WHERE player_id=1')->fetchColumn();
+    $unlockedAfter=(int)$db->query('SELECT COUNT(*) FROM player_treasure_effects WHERE player_id=1 AND effect_index=0 AND parts>=1')->fetchColumn();
+    checkBulk($fragmentBalance+10*($unlockedAfter-$unlockedBefore)===$before+40, 'all 40 fragments are either retained or spent on a ten-fragment first-star unlock');
     checkBulk(useBulk(10105002,'bulk_chest_fragments')===$result, 'fragment retries preserve random picks');
+    checkBulk((int)$db->query('SELECT SUM(fragments) FROM player_treasures WHERE player_id=1')->fetchColumn()===$fragmentBalance&&(int)$db->query('SELECT COUNT(*) FROM player_treasure_effects WHERE player_id=1 AND effect_index=0 AND parts>=1')->fetchColumn()===$unlockedAfter,'fragment retry neither credits again nor unlocks twice');
     InventoryService::addItems(1,10105003,2);
     rejectBulk(fn()=>useBulk(10105003,'bulk_invalid_loot'), 'invalid loot fails atomically');
     checkBulk(stockBulk(10105003)===2, 'failed chest bulk preserves stock');

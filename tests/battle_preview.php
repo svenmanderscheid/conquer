@@ -25,8 +25,10 @@ BuffEngine::getBuffs(1,1);$before=$snapshot();
 foreach([1,8,10,100,5000] as $count){
     $body=array_replace($base,['troops'=>[50100101=>$count]]);
     $preview=BattlePreview::calculate(1,$body);
-    $real=BattleEngine::resolveMonster($body['troops'],['monster_code'=>20209901,'hp_current'=>10],MonsterData::get(20209901),BuffEngine::getBuffs(1,1));
-    checkPreview($preview['outcome']===$real['outcome']&&$preview['monster_hp_after']===$real['new_monster_hp']&&$preview['attacker']['wounded']===array_sum($real['attacker_losses']),'preview matches actual monster engine for '.$count.' troops');
+    $real=BattleEngine::previewMonster($body['troops'],['monster_code'=>20209901,'hp_current'=>10],MonsterData::get(20209901),BuffEngine::getBuffs(1,1));
+    checkPreview($preview['outcome']===$real['outcome']&&$preview['monster_hp_after']===$real['new_monster_hp']&&$preview['attacker']['wounded']===array_sum($real['attacker_losses']),'preview matches zero-luck engine reference for '.$count.' troops');
+    checkPreview($preview['luck_percent']===0.0&&$preview['luck_range']===[-10.0,10.0]&&str_contains($preview['notice'],'0 % Kampfglück'),'reference explicitly discloses luck assumptions');
+    $repeated=BattlePreview::calculate(1,$body+['luck_percent'=>10,'seed'=>42]);unset($repeated['calculated_at']);$stable=$preview;unset($stable['calculated_at']);checkPreview($repeated===$stable,'client luck and seed never alter the reference');
     checkPreview(array_sum($preview['attacker'])===$count,'preview conserves every troop');
 }
 checkPreview($snapshot()===$before,'calculations never spend, dispatch, damage or create reports');
@@ -43,4 +45,5 @@ foreach([['defender_bonus'=>-1],['wall_bonus'=>1001],['wall_bonus'=>'20'],['defe
 checkPreview(!PvpRules::attackerWins(100,100),'ties favor the defender');
 foreach([1,2,3,7,10,101,50000] as $count)foreach([.1,.3] as $rate)checkPreview(array_sum(array_map('array_sum',PvpRules::losses([50100101=>$count],$rate)))===$count,'PvP rounding conserves troops');
 checkPreview($snapshot()===$before,'PvP also leaves armies, resources and reports untouched');
-echo "PASS battle calculator rules, world isolation and side-effect checks\n";
+require __DIR__.'/battle_preview_http_cases.php';
+echo "PASS battle calculator rules, world isolation, side-effect and authenticated HTTP checks\n";

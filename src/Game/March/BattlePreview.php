@@ -13,6 +13,7 @@ final class BattlePreview
 {
     public static function calculate(int $playerId, array $input): array
     {
+        WorldContext::assertExpected($input['expected_world_id'] ?? null);
         $world = WorldContext::id();
         $db = Connection::getInstance();
         $city = $db->query('SELECT id FROM cities WHERE player_id=? AND world_id=?', [$playerId,$world])->fetch();
@@ -45,15 +46,16 @@ final class BattlePreview
             $rally=($definition['type']??'solo')==='rally'||($monster['monster_type']??'solo')==='rally';
             if ($rally!==($kind==='monster-rally')) throw new \DomainException('Die Kampfart passt nicht zu diesem Monster.',422);
             $result=$rally
-                ? BattleEngine::resolveMonsterArmies([['troops'=>$troops,'buffs'=>$buffs]],$monster,$definition)
-                : BattleEngine::resolveMonster($troops,$monster,$definition,$buffs);
-            return ['kind'=>$kind,'calculated_at'=>time(),'outcome'=>$result['outcome'],
+                ? BattleEngine::previewMonsterArmies([['troops'=>$troops,'buffs'=>$buffs]],$monster,$definition)
+                : BattleEngine::previewMonster($troops,$monster,$definition,$buffs);
+            return ['kind'=>$kind,'calculated_at'=>time(),'luck_percent'=>0.0,'luck_range'=>[-10.0,10.0],'outcome'=>$result['outcome'],
                 'attacker'=>self::totals(['survivors'=>$result['attacker_survivors'],'wounded'=>$result['attacker_losses'],'dead'=>[]]),
                 'troops'=>$result['report']['troops'],'army_power'=>$result['report']['army_power'],
                 'required_power'=>$result['report']['required_power'],'monster_hp_before'=>(int)$monster['hp_current'],
                 'monster_hp_after'=>$result['new_monster_hp'],
                 'assumptions'=>$rally?'Nur dein Beitrag, ohne weitere Rally-Mitglieder.':'Aktuelle Monster-LP und deine derzeitigen Boni.',
-                'notice'=>'Bei Ankunft können sich Ziel und Boni geändert haben. Verwundete benötigen freie Hospitalbetten.'];
+                'notice'=>'Referenzrechnung mit 0 % Kampfglück. Im echten Kampf wird serverseitig zwischen −10 % und +10 % gewürfelt; Ausgang und Verluste können abweichen. Bei Ankunft können sich Ziel und Boni geändert haben. Verwundete benötigen freie Hospitalbetten.']
+                + (isset($result['report']['boss_mechanic']) ? ['boss_mechanic'=>$result['report']['boss_mechanic']] : []);
         }
         // Opposing troops are deliberately user supplied. Never reveal an unscouted garrison.
         $defenders=MarchArmy::clean($input['defender_troops']??null,500000);
@@ -69,12 +71,12 @@ final class BattlePreview
         foreach ($defenders as $code=>$count) $defense+=PvpRules::strength($code,$count,$enemyBuffs);
         $defense*=1.1*(1+$wall/100);
         $won=PvpRules::attackerWins($attack,$defense);
-        return ['kind'=>$kind,'calculated_at'=>time(),'outcome'=>$won?'attacker_wins':'defender_wins',
+        return ['kind'=>$kind,'calculated_at'=>time(),'luck_percent'=>0.0,'luck_range'=>[-10.0,10.0],'outcome'=>$won?'attacker_wins':'defender_wins',
             'attacker_score'=>(int)round($attack),'defender_score'=>(int)round($defense),
             'attacker'=>self::totals(PvpRules::losses($troops,$won?.1:.3)),
             'defender'=>self::totals(PvpRules::losses($defenders,$won?.3:.1)),
             'assumptions'=>'Beispielrechnung mit deinen eingegebenen Gegnertruppen, einem gemeinsamen Gegnerbonus und Mauerbonus. Keine echten Gegnerdaten.',
-            'notice'=>'Weitere Rally-Mitglieder, Verstärkungen und spezielle Verteidigertalente sind nicht enthalten. Verwundete benötigen freie Hospitalbetten.'];
+            'notice'=>'Referenzrechnung mit 0 % Kampfglück. Im echten Kampf wird serverseitig zwischen −10 % und +10 % gewürfelt; Ausgang und Verluste können abweichen. Weitere Rally-Mitglieder, Verstärkungen und spezielle Verteidigertalente sind nicht enthalten. Verwundete benötigen freie Hospitalbetten.'];
     }
 
     private static function totals(array $loss): array

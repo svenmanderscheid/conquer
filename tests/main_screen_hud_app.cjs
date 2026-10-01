@@ -12,10 +12,10 @@ const { chromium } = require('playwright');
     page.on('pageerror', error => errors.push(`${name}: ${error.message}`));
     page.on('console', message => { if (message.type() === 'error') errors.push(`${name}: ${message.text()}`); });
     await page.goto(base, { waitUntil: 'networkidle' });
-    await page.locator('[data-mode="login"]').click();
-    await page.locator('[name="username"]').fill('PreviewPlayer');
+    await page.goto(new URL('?zugang=login', page.url()).href);
+    await page.locator("[name=identifier], [name=username]").fill('PreviewPlayer');
     await page.locator('[name="password"]').fill('PreviewFixture!2026');
-    await Promise.all([page.waitForURL('**/city'), page.locator('#auth-submit').click()]);
+    await Promise.all([page.waitForURL('**/city'), page.locator("form[action$=\"/auth/local\"] button[type=\"submit\"]").click()]);
     await page.locator('#navigation .game-dock-item').first().waitFor();
     await page.locator('.world-chat-preview-message').first().waitFor();
     return page;
@@ -65,7 +65,7 @@ const { chromium } = require('playwright');
       if ((await page.locator('.trading-summary h2').innerText()).trim() !== heading) throw new Error(`${name} shop tab ${id} did not open`);
     }
     await page.screenshot({ path: `${shotDir}\\conquer-shop-${name}.png`, fullPage: true });
-    await page.locator('#panel-dialog .panel-close').click();
+    await page.locator("#panel-dialog .panel-close:visible, #panel-dialog .mobile-page-back:visible").first().click();
 
     await page.locator('.hud-right-tools [data-id="events"]').click();
     await page.locator('.event-reference-calendar').waitFor();

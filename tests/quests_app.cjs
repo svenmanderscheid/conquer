@@ -1,19 +1,23 @@
 'use strict';
-// Run against tools/preview-feature-fixture.php --port=18958 --hud --chat.
+require('./fixtures/browser_locale.cjs')('de'); // This suite asserts the explicit German UI.
+// Starts a disposable --hud --chat fixture; QUEST_FIXTURE_URL may target an existing one.
 // Only the disposable PreviewPlayer account may be changed by this test.
-const fs=require('fs'),path=require('path'),os=require('os'),assert=require('assert/strict');
+const fs=require('fs'),path=require('path'),os=require('os'),net=require('net'),assert=require('assert/strict'),{spawn}=require('child_process');
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
-const base=process.env.QUEST_FIXTURE_URL||'http://127.0.0.1:18958';
-assert(/^http:\/\/127\.0\.0\.1:\d+$/.test(base),'Disposable local preview required');
-const output=fs.mkdtempSync(path.join(os.tmpdir(),'conquer-quests-app-'));
+let base=process.env.QUEST_FIXTURE_URL;
+const output=process.env.QUEST_OUTPUT?path.resolve(__dirname,'..',process.env.QUEST_OUTPUT):fs.mkdtempSync(path.join(os.tmpdir(),'conquer-quests-app-'));fs.mkdirSync(output,{recursive:true});
+async function startFixture(){const server=net.createServer();await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const port=server.address().port;await new Promise(resolve=>server.close(resolve));base='http://127.0.0.1:'+port;const fixture=spawn(process.env.PHP_BINARY||'C:/xampp/php/php.exe',['tools/preview-feature-fixture.php','--port='+port,'--hud','--chat'],{cwd:path.resolve(__dirname,'..'),stdio:['pipe','pipe','pipe'],windowsHide:true});let log='';fixture.stdout.on('data',data=>log+=data);fixture.stderr.on('data',data=>log+=data);await new Promise((resolve,reject)=>{const timer=setTimeout(()=>{clearInterval(poll);reject(Error(log||'Preview fixture timeout'));},60000),poll=setInterval(()=>{if(log.includes('Synthetic preview ready')){clearTimeout(timer);clearInterval(poll);resolve();}else if(fixture.exitCode!==null){clearTimeout(timer);clearInterval(poll);reject(Error(log));}},100);fixture.on('error',reject);});return fixture;}
 (async()=>{
+ const fixture=base?null:await startFixture();
+ assert(/^http:\/\/127\.0\.0\.1:\d+$/.test(base),'Disposable local preview required');
  const browser=await chromium.launch({headless:true,executablePath:process.env.BROWSER_EXECUTABLE_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe'});
+ let activePage;
  try{
-  const page=await browser.newPage({viewport:{width:1280,height:800},hasTouch:true}),errors=[],failures=[];
-  page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(15000);
-  await page.goto(base);await page.locator('[data-mode="login"]').click();
-  await page.locator('[name="username"]').fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');
-  await Promise.all([page.waitForURL('**/city'),page.locator('#auth-submit').click()]);
+  const page=await browser.newPage({viewport:{width:1280,height:800},hasTouch:true}),errors=[],failures=[];activePage=page;
+  page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(20000);page.setDefaultNavigationTimeout(45000);
+  await page.goto(base+'/?zugang=login',{waitUntil:'domcontentloaded'});
+  await page.locator("[name=identifier], [name=username]").fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');
+  await Promise.all([page.waitForURL('**/city'),page.locator("form[action$=\"/auth/local\"] button[type=\"submit\"]").click()]);
   const button=page.locator('#navigation [data-id="quests"]'),badge=button.locator('.dock-badge');
   await button.waitFor();
   const kingdom=await page.evaluate(async()=> (await (await fetch('/api/kingdom/state')).json()).data);
@@ -43,6 +47,10 @@ const output=fs.mkdtempSync(path.join(os.tmpdir(),'conquer-quests-app-'));
    assert.equal(await page.locator('.quest-row').first().getAttribute('data-quest-code'),ready[0].quest_code);
    assert.equal(await page.locator('.quest-row.ready').count(),1);
    assert.equal(await page.locator('.quest-row').count(),kingdom.quests.filter(q=>!q.claimed).length);
+   for(const row of await page.locator('.quest-row').all()){await row.scrollIntoViewIfNeeded();await row.locator('.quest-illustration').evaluate(img=>img.decode());const action=row.locator('button.quest-action');if(await action.count()){const reachable=await action.evaluate(button=>{const r=button.getBoundingClientRect();return button.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2));});assert(reachable,'Every quest action is reachable after scrolling');}}
+   await page.locator('.quest-list').evaluate(list=>list.scrollTop=0);
+   const questLayout=await page.locator('.quest-list').evaluate(list=>{const rows=[...list.querySelectorAll('.quest-row')];return {sideways:list.scrollWidth>list.clientWidth+2,missingText:/quests\.progress/.test(list.innerText),images:rows.every(row=>{const img=row.querySelector('.quest-illustration');return img&&img.complete&&img.naturalWidth>0&&img.getBoundingClientRect().width>=50;}),actions:rows.every(row=>{const button=row.querySelector('button.quest-action');return !button||button.getBoundingClientRect().height>=43;}),progress:rows.every(row=>row.querySelector('.quest-progress [role="progressbar"]')&&row.querySelector('.quest-progress strong'))};});
+   assert.deepEqual(questLayout,{sideways:false,missingText:false,images:true,actions:true,progress:true},'Illustrated quests retain legible progress and touch actions without horizontal scrolling');
    const rewards=page.locator('.quest-row').first().locator('.quest-reward-item');
    assert.equal(await rewards.count(),2,'Every quest reward is shown');
    const expectedItem=kingdom.inventory_catalog.find(i=>Number(i.item_code)===Number(ready[0].rewards.find(r=>r.item_code).item_code));
@@ -54,16 +62,20 @@ const output=fs.mkdtempSync(path.join(os.tmpdir(),'conquer-quests-app-'));
    const stackedItem=kingdom.inventory_catalog.find(i=>Number(i.item_code)===10103002);
    assert(stackedItem&&(await stacked.locator('img').first().getAttribute('src')).includes(stackedItem.icon),'Generic speedups use their catalogue artwork');
    await page.screenshot({path:path.join(output,`${width}x${height}-quests.png`)});
-   await page.locator('.panel-close').click();
+   await page.locator("#panel-dialog .panel-close:visible, #panel-dialog .mobile-page-back:visible").first().click();
+   console.log('PASS illustrated quest layout '+width+'x'+height);
   }
   await page.setViewportSize({width:1280,height:800});
-  await button.click();await page.locator('.quest-row.ready [data-action="quest-claim"]').click();
+  await button.click();const [claimResponse]=await Promise.all([page.waitForResponse(response=>response.url().endsWith('/api/kingdom/action')&&response.request().method()==='POST'),page.locator('.quest-row.ready [data-action="quest-claim"]').click()]);const claimResult=await claimResponse.json();assert(claimResult.ok,JSON.stringify(claimResult));
   await page.waitForFunction(()=>document.querySelector('#navigation .dock-badge')?.hidden);
   assert.equal(await page.locator('.quest-row.ready').count(),0);
   await page.locator('[data-group="quests"][data-id="claimed"]').click();
   assert.equal(await page.locator('.quest-row.claimed').count(),1);
   assert.equal(await page.locator('.quest-row.claimed button').count(),0);
-  await page.locator('.panel-close').click();
+  assert.equal(await page.locator('.quest-row.claimed').evaluate(el=>getComputedStyle(el).opacity),'1','Claimed quest text retains full readability');
+  assert.equal(await page.locator('.quest-row.claimed .quest-copy').evaluate(el=>getComputedStyle(el).opacity),'1','Claimed quest description retains full readability');
+  await page.screenshot({path:path.join(output,'claimed-quest.png')});
+  await page.locator("#panel-dialog .panel-close:visible, #panel-dialog .mobile-page-back:visible").first().click();
   // Polling must refresh the badge even while a dialog suppresses page rendering.
   await page.route(base+'/api/kingdom/state',async route=>{
    const response=await route.fetch(),json=await response.json();
@@ -74,7 +86,7 @@ const output=fs.mkdtempSync(path.join(os.tmpdir(),'conquer-quests-app-'));
   await page.waitForFunction(()=>document.querySelector('#navigation .dock-badge')?.textContent==='2');
   assert.equal(await badge.isVisible(),true);
   assert.match(await button.getAttribute('aria-label'),/2 Aufgaben abholbereit/);
-  await page.locator('.dialog-close').click();
+  await page.locator("#game-dialog .dialog-close:visible, #game-dialog .mobile-page-back:visible").first().click();
   await page.unroute(base+'/api/kingdom/state');
   await page.waitForFunction(()=>document.querySelector('#navigation .dock-badge')?.hidden);
   await page.locator('#navigation [data-id="world"]').click();
@@ -83,5 +95,5 @@ const output=fs.mkdtempSync(path.join(os.tmpdir(),'conquer-quests-app-'));
   assert.deepEqual(errors,[],'No browser errors');
   assert.deepEqual(failures,[],JSON.stringify(failures));
   console.log('PASS quest navigation, ready-first ordering, real reward claim, 0/1/2 badges, dialog polling, city/world and six responsive layouts. '+output);
- }finally{await browser.close()}
+ }catch(error){if(activePage){await activePage.screenshot({path:path.join(output,'quests-failure.png')}).catch(()=>{});fs.writeFileSync(path.join(output,'quests-failure.json'),JSON.stringify({message:error.message,text:await activePage.locator('body').innerText().catch(()=>''),badge:await activePage.locator('#navigation .dock-badge').evaluateAll(nodes=>nodes.map(node=>({text:node.textContent,hidden:node.hidden})))},null,2));}throw error;}finally{await browser.close();if(fixture&&fixture.exitCode===null){fixture.stdin.write('\n');await new Promise(resolve=>fixture.exitCode!==null?resolve():fixture.once('exit',resolve));}}
 })().catch(e=>{console.error(e);console.error('Screenshots: '+output);process.exitCode=1});

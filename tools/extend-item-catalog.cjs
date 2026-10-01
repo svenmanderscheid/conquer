@@ -5,7 +5,9 @@ const file=path.join(root,'data/items.json'),catalog=JSON.parse(fs.readFileSync(
 const res={food:'Nahrung',lumber:'Holz',stone:'Stein',gold:'Gold',gems:'Edelsteine'};
 const format=n=>n.toLocaleString('de-DE');
 const duration=s=>s%86400===0?`${s/86400} ${s===86400?'Tag':'Tage'}`:s%3600===0?`${s/3600} ${s===3600?'Stunde':'Stunden'}`:`${s/60} Minuten`;
-const used=new Set(items.map(i=>i.code));
+const retired=new Set([10102021,10102031,10202010,10202011]);
+for(let index=items.length-1;index>=0;index--)if(retired.has(items[index].code))items.splice(index,1);
+const used=new Set([...items.map(i=>i.code),...retired]);
 function add(base,match,values){if(items.some(match))return;while(used.has(base))base++;used.add(base);items.push({code:base,...values});}
 for(const resource of Object.keys(res))for(const amount of resource==='gems'?[10,100,500,1000,5000,10000]:[1000,5000,10000,50000,100000,500000,1000000,5000000,10000000])add(10201001,i=>i.category==='resource_pack'&&i.resource===resource&&i.amount===amount,{name:`${format(amount)} ${res[resource]}`,category:'resource_pack',subcategory:resource,resource,amount});
 for(const subcategory of ['generic','building','research','training','healing'])for(const duration_seconds of [...[60,300,600,1800,3600,10800,28800,86400,259200,604800],...(subcategory==='generic'?[2592000]:[])])add(10203001,i=>i.category==='speedup'&&i.subcategory===subcategory&&i.duration_seconds===duration_seconds,{name:'Beschleuniger',category:'speedup',subcategory,duration_seconds});
@@ -13,7 +15,7 @@ const bonusNames={resource_production:'Rohstoffproduktion',food_production:'Nahr
 const boostIcons={resource_production:'production.svg',food_production:'production-food.svg',lumber_production:'production-lumber.svg',stone_production:'production-stone.svg',gold_production:'production-gold.svg',gathering_speed:'gathering.svg',construction_speed:'hammer.svg',research_speed:'research.svg',training_speed:'helmet.svg',troops_atk:'attack.svg',troops_def:'defense.svg',troops_hp:'hp.svg',march_size:'army.svg',march_speed:'march.svg',vs_monster_attack:'attack.svg',anti_spy:'anti-spy.svg',city_shield:'shield.svg'};
 function boost(type,bonus,hours){add(10202001,i=>i.category==='boost'&&i.boost_type===type&&Number(i.bonus_pct||0)===bonus&&i.duration_seconds===hours*3600,{name:bonusNames[type]||type,category:'boost',subcategory:type,boost_type:type,...(bonus?{bonus_pct:bonus}:{}),duration_seconds:hours*3600});}
 for(const r of ['food','lumber','stone','gold'])for(const h of [8,24])boost(r+'_production',25,h);
-for(const [type,pct] of [['gathering_speed',50],['construction_speed',25],['research_speed',25],['training_speed',25]])boost(type,pct,24);
+for(const [type,pct] of [['gathering_speed',50],['training_speed',25]])boost(type,pct,24);
 for(const type of ['troops_atk','troops_def','troops_hp','march_size','vs_monster_attack'])for(const pct of [10,20])boost(type,pct,1);
 for(const pct of [25,50])boost('march_speed',pct,1);
 boost('anti_spy',0,24);boost('city_shield',0,24);
@@ -22,7 +24,7 @@ for(const vip_points of [10,1000,5000,10000])add(10206001,i=>i.category==='vip_p
 const grades=['normal','rare','epic','legendary','mythic'];
 const gradeNames={normal:'Gewöhnlich',rare:'Selten',epic:'Episch',legendary:'Legendär',mythic:'Mythisch'};
 for(const [n,min,max] of [[1,1000,50000],[2,50000,100000],[3,100000,500000],[4,500000,1000000],[5,1000000,5000000]])add(10205001,i=>i.category==='resource_box'&&i.box_level===n,{name:`Rohstoffkiste Stufe ${n}`,category:'resource_box',subcategory:'resource_box',box_level:n,amount_min:min,amount_max:max,rarity:grades[Math.min(3,n-1)],icon:'resource-box.svg'});
-for(const [index,fragment_grade] of grades.entries())add(10207001,i=>i.category==='fragment_pack'&&i.subcategory==='fragments'&&i.fragment_grade===fragment_grade,{name:`Reliktfragmente · ${gradeNames[fragment_grade]}`,category:'fragment_pack',subcategory:'fragments',fragment_grade,fragment_amount:[10,10,10,5,3][index],rarity:fragment_grade,icon:'fragment.svg'});
+for(const [index,fragment_grade] of grades.entries())add(10207001,i=>i.category==='fragment_pack'&&i.subcategory==='fragments'&&i.fragment_grade===fragment_grade,{name:`Reliktfragmente · ${gradeNames[fragment_grade]}`,category:'fragment_pack',subcategory:'fragments',fragment_grade,fragment_amount:[10,10,10,5,3][index],rarity:fragment_grade,icon:`fragment-${fragment_grade}.svg`});
 for(const [kind,fragment_grade,fragment_amount] of [['green','rare',20],['red','epic',20],['gold','legendary',10]])add(10207021,i=>i.category==='fragment_pack'&&i.subcategory==='dragon_egg'&&i.fragment_grade===fragment_grade,{name:({green:'Smaragd-Drachenei',red:'Glut-Drachenei',gold:'Goldenes Drachenei'})[kind],category:'fragment_pack',subcategory:'dragon_egg',fragment_grade,fragment_amount,rarity:fragment_grade,icon:`egg-${kind}.svg`});
 for(const teleport_mode of ['nearby','random'])add(10208001,i=>i.category==='teleport'&&i.teleport_mode===teleport_mode,{name:teleport_mode==='nearby'?'Gebietsteleporter':'Zufallsteleporter',category:'teleport',subcategory:teleport_mode,teleport_mode,rarity:teleport_mode==='nearby'?'epic':'rare',icon:teleport_mode==='nearby'?'teleport-near.svg':'teleport.svg'});
 for(const i of items){
@@ -42,6 +44,7 @@ for(const i of items){
 catalog.version=3;items.sort((a,b)=>a.code-b.code);fs.writeFileSync(file,JSON.stringify(catalog,null,2)+'\n');
 // New variants are obtainable through the existing chests; no live grants.
 const dropsFile=path.join(root,'data/chest_drops.json'),drops=JSON.parse(fs.readFileSync(dropsFile));
+for(const chest of Object.values(drops.chests))chest.drop_table=chest.drop_table.filter(row=>!retired.has(row.item_code));
 for(const [type,chest]of Object.entries(drops.chests))for(const i of items.filter(i=>i.loot_sources.includes(type)))if(!chest.drop_table.some(d=>d.item_code===i.code))chest.drop_table.push({weight:i.rarity==='legendary'||i.rarity==='mythic'?1:2,item_code:i.code,quantity:1});
 fs.writeFileSync(dropsFile,JSON.stringify(drops,null,2)+'\n');
 console.log(JSON.stringify({items:items.length,categories:items.reduce((a,i)=>(a[i.category]=(a[i.category]||0)+1,a),{}),chestEntries:Object.fromEntries(Object.entries(drops.chests).map(([k,v])=>[k,v.drop_table.length]))},null,2));

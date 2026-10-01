@@ -34,8 +34,9 @@ window.ConquerBuildingOrder = Object.freeze({
 
 window.ConquerOverlay = function (ctx) {
     'use strict';
-    const {getState, getKingdom, now, date, esc, fmt, openDialog, countdown} = ctx;
+    const {getState, getKingdom, getRallies=()=>[], now, date, esc, fmt, openDialog, countdown} = ctx;
     const $ = id => document.getElementById(id);
+    const rallyText = (key, parameters = {}) => (ctx.t || window.ConquerLocale?.t)?.(key, parameters) ?? key;
     const clock = end => {
         const s = Math.max(0, Math.ceil((date(end) - now()) / 1000));
         return s >= 3600 ? `${Math.floor(s / 3600)}:${String(Math.floor(s % 3600 / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}` : `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
@@ -65,7 +66,25 @@ window.ConquerOverlay = function (ctx) {
         if(second){second.dataset.action=unlocked?'buildings':'vip-open';second.classList.toggle('is-locked',!unlocked);second.setAttribute('aria-label',unlocked?'Zweite Bauschleife öffnen':'Zweite Bauschleife wird mit VIP 4 freigeschaltet');}
         $('hud-march-status').textContent = `${state.marches?.length || 0} / ${(state.army_limits?.march_slots || 3)+(state.army_limits?.gather_march_slots || 0)}`;
         $('hud-marches')?.classList.toggle('has-activity',!!state.marches?.length);
+        rallyAlert();
         tick();
+    }
+    function rallyAlert(){
+        const button=$('hud-alliance-rallies');if(!button)return;
+        const state=getState(),kingdom=getKingdom(),playerId=Number(state?.player?.id||state?.city?.player_id),worldId=Number(state?.city?.world_id),allianceId=Number(kingdom?.alliance?.id||0);
+        const rallies=(getRallies()||[]).filter(r=>Number(r.leader_player_id)!==playerId&&['gathering','marching'].includes(r.status)
+            &&(!r.world_id||Number(r.world_id)===worldId)&&(!r.result?.alliance_id||Number(r.result.alliance_id)===allianceId));
+        button.hidden=!rallies.length;
+        $('hud-rally-count').textContent=String(rallies.length);
+        if(!rallies.length){$('hud-rally-status').textContent='';button.setAttribute('aria-label',rallyText('rally.hud.open'));button.title='';return;}
+        const gathering=rallies.filter(r=>r.status==='gathering'),marching=rallies.length-gathering.length;
+        const end=r=>r.status==='gathering'?r.launch_at:r.arrival_time;
+        const due=r=>end(r)&&Number.isFinite(date(end(r)))?date(end(r)):Infinity;
+        const soonest=[...(gathering.length?gathering:rallies)].sort((a,b)=>due(a)-due(b))[0];
+        const timed=Number.isFinite(due(soonest))&&due(soonest)>now();
+        $('hud-rally-status').textContent=timed?rallyText(soonest.status==='gathering'?'rally.hud.start':'rally.hud.arrival',{time:clock(end(soonest))}):rallyText('rally.hud.pending');
+        button.setAttribute('aria-label',rallyText('rally.hud.summary',{count:fmt(rallies.length),gathering:fmt(gathering.length),marching:fmt(marching)}));
+        button.title=button.getAttribute('aria-label');
     }
     function job(id, row, {label, locked = false, loading = false}) {
         const button = $(id);
@@ -115,6 +134,7 @@ window.ConquerOverlay = function (ctx) {
         job('hud-build-second', builds[1], {label:'Bauen II', locked:slots<2, loading:!Array.isArray(state.build_queue)});
         if ($('hud-build-second')) $('hud-build-second').dataset.action = slots>1 || builds[1] ? 'buildings' : 'vip-open';
         job('hud-research', research[0], {label:'Forschung', loading:!Array.isArray(state.research_queue)});
+        rallyAlert();
         marchActivity();
     }
     function marchActivity(){
@@ -146,7 +166,7 @@ window.ConquerOverlay = function (ctx) {
     }
     function marches() {
         const state = getState(), rows = state?.marches || [];
-        const types = {5:'Monsterangriff',6:'Kristall',7:'Angriff',8:'Spähtrupp',9:'Sammelzug',10:'Verstärkung',15:'Feldangriff',attack:'Angriff',gather:'Sammelzug',scout:'Spähtrupp',rally:'Rally'};
+        const types = {5:'Monsterangriff',6:'Kristall',7:'Angriff',8:'Spähtrupp',9:'Sammelzug',10:'Verstärkung',15:'Feldangriff',attack:'Angriff',gather:'Sammelzug',scout:'Spähtrupp',rally:'Rally',rally_join:'Zur Rally'};
         openDialog(`<h2>Deine Truppen unterwegs</h2><p class="muted">${rows.length} von ${fmt(state.army_limits?.march_slots || 3)} Marschplätzen belegt.</p>${rows.length ? rows.map(m => `<section class="panel"><h3>${esc(types[m.march_type] || 'Truppenmarsch')} · ${Number(m.target_x)} / ${Number(m.target_y)}</h3><p>${m.state === 'returning' ? 'Rückkehr' : m.state === 'resolving' ? 'Aktion wird abgeschlossen' : m.state === 'arrived' && Number(m.march_type)===9 ? 'Sammeln bis' : m.state==='gathering' ? 'Rally-Start' : 'Ankunft'}${m.state !== 'resolving' ? ': ' + countdown(m.state === 'returning' ? m.return_time : m.gathering_finishes_at || m.arrival_time) : ''}</p>${Number(m.march_type)===9&&['marching','arrived'].includes(m.state)?`<button type="button" class="button secondary" data-action="gather-recall" data-id="${Number(m.id)}">Sammler zurückrufen</button>`:''}</section>`).join('') : '<p class="notice">Deine Truppen sind in der Stadt. Wähle ein Ziel auf der Weltkarte, um einen Marsch vorzubereiten.</p>'}<button class="button gold wide" data-action="dialog-tab" data-id="army">Truppenübersicht öffnen</button>`);
     }
     function onClick(action) {if (action !== 'hud-marches') return false; marches(); return true;}

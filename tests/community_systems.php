@@ -40,7 +40,7 @@ try{
     $admin->exec('CREATE DATABASE `'.$name.'` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
     foreach($admin->query('SHOW TABLES FROM `'.$source.'`')->fetchAll(PDO::FETCH_COLUMN)as$table){if(!preg_match('/^[a-zA-Z0-9_]+$/D',$table))throw new RuntimeException('Invalid table.');$admin->exec('CREATE TABLE `'.$name.'`.`'.$table.'` LIKE `'.$source.'`.`'.$table.'`');}
     mkdir($temp.'/config',0700,true);$cfg['database']=$name;file_put_contents($temp.'/config/database.php',"<?php\nreturn ".var_export($cfg,true).";\n");$db=Connection::init($temp);
-    foreach(['0066_community_systems.sql','0068_progression_and_events.sql','0096_private_chat.sql','0098_shared_battle_reports.sql','0101_alliance_territory.sql']as$m)$db->getPdo()->exec(file_get_contents(ROOT_DIR.'/migrations/'.$m));
+    foreach(['0066_community_systems.sql','0068_progression_and_events.sql','0096_private_chat.sql','0098_shared_battle_reports.sql','0101_alliance_territory.sql','0121_community_social.sql']as$m)$db->getPdo()->exec(file_get_contents(ROOT_DIR.'/migrations/'.$m));
     $db->execute("INSERT INTO worlds(id,name,slug,status)VALUES(1,'Community Fixture','community-test','running'),(2,'Other Fixture','other-test','running')");
     for($id=1;$id<=38;$id++){
         $db->execute('INSERT INTO players(id,username,email,password_hash,vip_level)VALUES(?,?,?,?,0)',[$id,'Fixture'.$id,'fixture'.$id.'@invalid.test','unused']);
@@ -111,6 +111,8 @@ try{
     $centerBonus=\Conquer\Game\Alliance\AllianceTerritoryService::bonusesAt(2,1,52,50);$outpostBonus=\Conquer\Game\Alliance\AllianceTerritoryService::bonusesAt(2,1,80,80);
     checkCommunity(abs(($centerBonus['gathering_speed']??0)-.10)<.00001&&abs(($centerBonus['troops_atk']??0)-.05)<.00001,'alliance center grants its configured territorial effects');
     checkCommunity(abs(($outpostBonus['troops_hp']??0)-.05)<.00001&&abs(($outpostBonus['troops_def']??0)-.05)<.00001,'outpost grants attack, life and defense without stacking centers');
+    checkCommunity(isset(\Conquer\Game\Alliance\AllianceTerritoryService::bonusesAt(2,1,75,74)['gathering_speed']),'rectangular alliance radius includes the diagonal corner at full radius');
+    checkCommunity(!isset(\Conquer\Game\Alliance\AllianceTerritoryService::bonusesAt(2,1,76,74)['gathering_speed']),'rectangular alliance radius stops immediately beyond one axis');
 
     denyCommunity(fn()=>command(2,'treaty.propose',['alliance_id'=>2,'relation'=>'nap']),'ordinary members cannot offer treaties');
     denyCommunity(fn()=>command(1,'treaty.propose',['alliance_id'=>3,'relation'=>'nap']),'treaty target must share a world');

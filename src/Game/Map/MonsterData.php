@@ -37,6 +37,7 @@ final class MonsterData
         }
         $definition=$definitions[$code] ?? ['name'=>'Unbekanntes Monster','level'=>1,'type'=>'solo','stats'=>['hp'=>100,'attack'=>50,'defense'=>30],'amount'=>10];
         $definition=\Conquer\Game\Rewards\MonsterRewardRules::apply($definition);
+        $definition=\Conquer\Game\March\BossMechanics::currentDefinition($definition);
         $definition['spawn_code']=$code;
         $definition['required_power']=MonsterPower::required($definition);
         return $definition;
@@ -49,7 +50,7 @@ final class MonsterData
         $monster['hp_max'] = max(1, (int)$monster['hp_current'], (int)round((float)($definition['stats']['hp'] ?? 0) * (int)($definition['amount'] ?? 0)));
         $monster['required_power']=(int)$definition['required_power'];
         $monster['required_power_current']=MonsterPower::currentRequired($definition,(int)$monster['hp_current']);
-        $monster['definition'] = array_intersect_key($definition, array_flip(['name','title','biome','art','footprint','level','type','stats','amount','required_power','resource_reward','drops','gems_drop','action_point_cost']));
+        $monster['definition'] = array_intersect_key($definition, array_flip(['name','title','biome','art','footprint','level','type','stats','amount','required_power','resource_reward','drops','gems_drop','action_point_cost','boss_mechanic']));
         return $monster;
     }
 

@@ -107,7 +107,7 @@ img{max-width:100%}
 .badge.green{color:#a3e2bf;background:#23473f;border-color:#376b56}
 .badge.muted{color:#96a9c2;background:#25364b;border-color:#40536d}
 .scene-wrap{position:relative;overflow:hidden;border:1px solid #587391;border-bottom:3px solid #a68652;border-radius:11px;background:#517d7d;box-shadow:0 14px 38px #060d1e55}
-.city-frame{width:100%;height:510px;display:block;border:0;background:#6d9c93}
+
 .scene-label{position:absolute;top:18px;left:18px;background:#13253bdd;border:1px solid #8397a452;padding:11px 14px;border-radius:7px;pointer-events:none}
 .scene-label small{display:block;font-size:9px;letter-spacing:1.2px;color:#a2c7d4}
 .scene-label strong{display:block;font:normal 19px Georgia,serif;color:#ffe0a8;margin-top:3px}
@@ -337,7 +337,7 @@ body.world-mode{overflow:auto}
 .field-target small,.field-city small{font-size:11px}
 @keyframes emblem-pulse{50%{opacity:.45;transform:translateY(-3px)}
 }
-@media(min-width:1650px){.city-frame{height:620px}
+@media(min-width:1650px){
 .game-layout,.world-mode .game-layout{grid-template-columns:120px minmax(0,1fr) 290px}
 .journal{padding:30px 24px}
 .hero-expedition{grid-template-columns:minmax(0,1fr) 320px}
@@ -354,7 +354,7 @@ body.world-mode{overflow:auto}
 .resource,.world-mode .resource{padding:7px 9px;min-width:88px;gap:6px}
 .journal{padding:24px 14px}
 .heading-status .world-badge{display:none}
-.city-frame{height:460px}
+
 .quick-card{padding:14px 10px;gap:8px}
 .tile-icon{width:25px;font-size:25px}
 .quick-card strong{font-size:12px}
@@ -385,7 +385,7 @@ body.world-mode{overflow:auto}
 .resource,.world-mode .resource{min-width:82px;padding:7px 8px}
 .resource-icon,.resource-icon img{width:26px;height:29px}
 .resource strong,.world-mode .resource strong{font-size:13px}
-.city-frame{height:520px}
+
 .hero-expedition{grid-template-columns:minmax(0,1fr) 250px}
 .hero-art img{width:290px}
 .hero-copy h2{font-size:35px}
@@ -420,7 +420,7 @@ h1{font-size:28px}
 .eyebrow{font-size:8px;letter-spacing:1.4px}
 .heading-status{max-width:120px}
 .save-state{font-size:9px}
-.city-frame{height:440px}
+
 .scene-label{top:12px;left:12px;padding:8px 11px}
 .scene-label strong{font-size:16px}
 .scene-label small{font-size:8px}
@@ -513,7 +513,7 @@ dialog{padding:29px 24px}
 .resource small{font-size:8px}
 .resource-icon,.resource-icon img{width:22px;height:24px}
 #main,.world-mode #main{padding:20px 12px 95px}
-.city-frame{height:405px}
+
 .page-heading{align-items:flex-end}
 h1{font-size:25px}
 .heading-status{max-width:97px}

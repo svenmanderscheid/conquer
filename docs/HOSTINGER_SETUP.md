@@ -1,5 +1,7 @@
 # Hostinger Setup Guide — Conquer (Flat Layout)
 
+> Historical Sprint-0 reference. For the current alpha, migrations, backups, rollback and later Android/iOS packaging, use [the release guide dated 26 September 2026](ALPHA_RELEASE_GUIDE_2026-09-26.md). The setup and webhook claims below have not been reverified on the live host.
+
 Deployment configuration for `conquer.svenmanderscheid.lu`.
 
 ## Current setup

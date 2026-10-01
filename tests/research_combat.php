@@ -11,18 +11,18 @@ function combatCheck(bool $ok,string $label): void{if(!$ok)throw new RuntimeExce
 function maxResearchBuff(string $code): array{$n=ResearchData::get($code);if(!$n)throw new RuntimeException($code);return [ResearchData::buffKey($n)=>(float)$n['levels'][count($n['levels'])-1]['ability_value']];}
 $inf=50100101;$arch=50200101;$cav=50300101;
 $baseline=KingdomService::simulateArena([$inf=>10],[$inf=>10]);
-combatCheck($baseline['challenger_score']===82 && $baseline['opponent_score']===82 && $baseline['outcome']==='draw','unbuffed identical fighter armies tie at 82 points with the reference T1 stats');
+combatCheck($baseline['challenger_score']===1060 && $baseline['opponent_score']===1060 && $baseline['outcome']==='draw','unbuffed identical fighter armies tie at 1060 points with the original T1 stats');
 $oldCounter=KingdomService::simulateArena([$inf=>10],[$cav=>10]);
-combatCheck($oldCounter['challenger_score']===98,'the existing unbuffed twenty-percent type advantage is unchanged');
+combatCheck($oldCounter['challenger_score']===1272,'the existing unbuffed twenty-percent type advantage is unchanged');
 $normal=KingdomService::simulateArena([$inf=>10],[$inf=>10],['troops_atk'=>.2,'infantry_atk'=>.1]);
-combatCheck($normal['challenger_score']===85 && $normal['opponent_score']===82,'general and troop-type research both improve actual arena score');
+combatCheck($normal['challenger_score']===1195 && $normal['opponent_score']===1060,'general and troop-type research both improve actual arena score');
 $defender=KingdomService::simulateArena([$inf=>10],[$inf=>10],[],['infantry_hp'=>.5]);
-combatCheck($defender['opponent_score']===88 && $defender['outcome']==='opponent_wins','the accepting player receives their own HP research');
+combatCheck($defender['opponent_score']===1190 && $defender['outcome']==='opponent_wins','the accepting player receives their own HP research');
 $counter=maxResearchBuff('infantry_atk_against_archer');
 $full=KingdomService::simulateArena([$inf=>10],[$arch=>10],$counter);
 $half=KingdomService::simulateArena([$inf=>10],[$arch=>5,$inf=>5],$counter);
 $none=KingdomService::simulateArena([$inf=>10],[$inf=>10],$counter);
-combatCheck($full['challenger_score']===86 && $half['challenger_score']===84 && $none['challenger_score']===82,'counter research is weighted by the actual share of its target in the enemy army');
+combatCheck($full['challenger_score']===1240 && $half['challenger_score']===1150 && $none['challenger_score']===1060,'counter research is weighted by the actual share of its target in the enemy army');
 foreach ([[$inf,$arch,'infantry','archer'],[$arch,$cav,'archer','cavalry'],[$cav,$inf,'cavalry','infantry']] as [$own,$enemy,$source,$target]){
     foreach(['hp','def','atk'] as $stat){
         $key=$source.'_'.$stat.'_against_'.$target;
@@ -35,7 +35,7 @@ $composition=maxResearchBuff('infantrys_atk_when_composed_of_infantry_only');
 $pure=KingdomService::simulateArena([$inf=>10],[$inf=>10],$composition);
 $mixed=KingdomService::simulateArena([$inf=>5,$arch=>5],[$inf=>10],$composition);
 $mixedBase=KingdomService::simulateArena([$inf=>5,$arch=>5],[$inf=>10]);
-combatCheck($pure['challenger_score']===86 && $mixed===$mixedBase,'single-type composition research activates for a pure army and not a mixed army');
+combatCheck($pure['challenger_score']===1240 && $mixed===$mixedBase,'single-type composition research activates for a pure army and not a mixed army');
 combatCheck($pure['losses']===0 && $pure['resource_cost']===0,'research keeps consensual sparring free of troop and resource losses');
 $rally=maxResearchBuff('rally_attack_amount');$cap=ExpeditionRules::missionCapacity($rally);
 combatCheck($cap===7000 && ExpeditionRules::publicRules($rally)['max_troops_per_mission']===7000,'maximum rally research exposes the same 7000-troop cap used by expedition validation');

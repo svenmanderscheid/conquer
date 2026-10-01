@@ -1,10 +1,10 @@
 'use strict';
-// Real PHP shell and queue HUDs, deterministic server clock; no account or order is changed.
+// Real PHP shell with default layout and in-memory queue HUDs; no database or account is used.
 const fs=require('fs'),path=require('path'),os=require('os'),assert=require('assert/strict'),{execFileSync}=require('child_process');
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const root=path.resolve(__dirname,'..'),output=fs.mkdtempSync(path.join(os.tmpdir(),'conquer-hud-activity-'));
-const php=`define('ROOT_DIR',${JSON.stringify(root.replaceAll('\\','/'))});define('APP_BASE','');require ROOT_DIR.'/src/Autoloader.php';(new \\Conquer\\Autoloader(ROOT_DIR.'/src'))->register();$session=['username'=>'HUD Fixture'];require ROOT_DIR.'/views/game.php';`;
-const html=execFileSync(process.env.PHP_BINARY||'C:/xampp/php/php.exe',['-r',php],{encoding:'utf8'}).replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'');
+const php=`define('ROOT_DIR',${JSON.stringify(root.replaceAll('\\','/'))});define('APP_BASE','');require ROOT_DIR.'/src/Autoloader.php';(new \\Conquer\\Autoloader(ROOT_DIR.'/src'))->register();$session=['username'=>'HUD Fixture'];$uiLayoutProfiles=\\Conquer\\Game\\Ui\\LayoutSettings::defaults();if(\\Conquer\\Db\\Connection::isInitialized())throw new RuntimeException('Unexpected database initialization');require ROOT_DIR.'/views/game.php';if(\\Conquer\\Db\\Connection::isInitialized())throw new RuntimeException('Unexpected database initialization');`;
+const html=execFileSync(process.env.PHP_BINARY||'C:/xampp/php/php.exe',['-r',php],{encoding:'utf8',maxBuffer:8*1024*1024}).replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'');
 (async()=>{
  const browser=await chromium.launch({headless:true,channel:process.env.PLAYWRIGHT_CHANNEL||'chrome'});
  try{
@@ -16,9 +16,11 @@ const html=execFileSync(process.env.PHP_BINARY||'C:/xampp/php/php.exe',['-r',php
    return route.fulfill({path:file});
   });
   await page.goto('https://hud.fixture/');
+  await page.addScriptTag({content:require('./fixtures/isolated_locale.cjs')('de')});
+  await page.evaluate(require('./fixtures/hud_navigation.cjs'));
   for(const name of ['training-hud','game-overlay','world-chat'])await page.addScriptTag({content:fs.readFileSync(path.join(root,'assets/js',name+'.js'),'utf8')});
   await page.evaluate(()=>{
-   document.body.classList.add('city-mode');
+   document.body.classList.add('city-mode','playfield-mode');
    window.time=Date.parse('2030-01-01T12:00:00Z');
    window.state={player:{name:'Fixture'},city:{power:10,world_id:1},lord:{level:1},vip:{building_slots:1},buildings:{farm:{name:'Bauernhof'}},research_defs:[],build_queue:[],research_queue:[],troop_queue:[]};
    window.kingdom={profile:{display_name:'HUD Fixture',power:64007,avatar:'knight',lord_level:3,lord_max_level:60,lord_xp_into:125,lord_xp_next:500,action_points:130,action_points_max:200,gems:75},vip:{building_slots:1}};
@@ -68,18 +70,29 @@ const html=execFileSync(process.env.PHP_BINARY||'C:/xampp/php/php.exe',['-r',php
     const hud=[document.querySelector('.hud-profile'),document.querySelector('#resources'),document.querySelector('#hud-gems')].filter(e=>e.getClientRects().length),hudBad=[];
     const statusButtons=['hud-vip-button','lord-talent-button','hud-energy'].map(id=>rect(document.getElementById(id))),statusHeights=statusButtons.map(r=>r.height);
     if(Math.max(...statusHeights)-Math.min(...statusHeights)>1)hudBad.push('VIP, Hunter and AP do not have equal heights');
+    for(const e of document.querySelectorAll('#account-button,.hud-power,#hud-vip-button,#lord-talent-button,#hud-energy,#hud-gems,#resources .resource')){
+     const r=rect(e);if(r.width<43.5||r.height<43.5)hudBad.push((e.id||e.className)+' is smaller than the 44px touch target');
+    }
+    const [vip,hunter,energy]=statusButtons,account=rect(document.querySelector('#account-button'));
+    if(statusButtons.some(r=>Math.abs(r.y-vip.y)>1)||overlap(vip,hunter)||overlap(hunter,energy)||overlap(vip,energy))hudBad.push('Status actions do not share a separate, non-overlapping row');
+    if(account.bottom>vip.y+1)hudBad.push('Profile action overlaps the status row');
+    for(const e of document.querySelectorAll('#hud-energy strong,#hud-gems strong,#resources .resource strong'))if(parseFloat(getComputedStyle(e).fontSize)<13)hudBad.push((e.id||e.parentElement.id||e.textContent)+' value is below the readable HUD size');
+    for(const label of document.querySelectorAll('#navigation .dock-label')){
+     if(parseFloat(getComputedStyle(label).fontSize)<11)hudBad.push('Dock label is below the readable navigation size');
+     if(label.scrollWidth>label.clientWidth+1||label.scrollHeight>label.clientHeight+1)hudBad.push('Dock label clips '+label.textContent);
+    }
     for(const e of hud){const r=rect(e);if(r.x<0||r.y<0||r.right>innerWidth||r.bottom>innerHeight)hudBad.push((e.id||e.className)+' outside viewport');if(e.id!=='resources'&&(e.scrollWidth>e.clientWidth+2||e.scrollHeight>e.clientHeight+2))hudBad.push((e.id||e.className)+` overflows ${e.clientWidth}x${e.clientHeight} -> ${e.scrollWidth}x${e.scrollHeight}`);}
     for(let i=0;i<hud.length;i++)for(let j=i+1;j<hud.length;j++)if(overlap(rect(hud[i]),rect(hud[j])))hudBad.push((hud[i].id||hud[i].className)+' overlaps '+(hud[j].id||hud[j].className));
     for(const resource of document.querySelectorAll('#resources .resource'))for(const tool of document.querySelectorAll('.hud-right-tools button'))if(overlap(rect(resource),rect(tool)))hudBad.push('Resource overlaps '+(tool.id||tool.getAttribute('aria-label')));
     if(innerWidth<=600&&innerHeight>520){
-     const profile=rect(document.querySelector('.hud-profile')),vip=rect(document.querySelector('#hud-vip-button')),energy=rect(document.querySelector('#hud-energy')),hunter=rect(document.querySelector('#lord-talent-button'));
-     if(profile.height>104)hudBad.push('Mobile profile is taller than the compact two-row HUD');
-     if(!(vip.y<hunter.y&&hunter.y<energy.y))hudBad.push('VIP, Hunter and AP are not stacked in order');
+     const profile=rect(document.querySelector('.hud-profile')),resources=[...document.querySelectorAll('#resources .resource')].map(rect);
+     if(profile.height>account.height+Math.max(...statusHeights)+24)hudBad.push('Mobile profile exceeds two touch rows plus its frame and spacing');
+     if(resources.some(r=>r.y<profile.bottom||Math.abs(r.y-resources[0].y)>1))hudBad.push('Portrait resources do not share a separate row below the profile');
     }
     if(innerWidth>innerHeight&&innerHeight<=520){
      const profile=rect(document.querySelector('.hud-profile')),resourceRows=[...document.querySelectorAll('#resources .resource')].map(rect);
-     if(profile.height>76)hudBad.push('Landscape profile is taller than the compact status band');
-     if(resourceRows.some(r=>Math.abs(r.y-resourceRows[0].y)>1))hudBad.push('Landscape resources wrap to a second row');
+     if(profile.height>account.height+Math.max(...statusHeights)+24)hudBad.push('Landscape profile exceeds two touch rows plus its frame and spacing');
+     if(resourceRows.length!==4||Math.abs(resourceRows[0].y-resourceRows[1].y)>1||Math.abs(resourceRows[2].y-resourceRows[3].y)>1||resourceRows[2].y<resourceRows[0].bottom)hudBad.push('Landscape resources do not form two separate touch rows');
     }
     return hudBad.concat(jobs.flatMap(e=>{const r=rect(e),bad=[];
      if(r.x<0||r.y<0||r.right>innerWidth||r.bottom>innerHeight)bad.push(e.id+' outside viewport');
@@ -100,8 +113,16 @@ const html=execFileSync(process.env.PHP_BINARY||'C:/xampp/php/php.exe',['-r',php
    const chatResult=await page.evaluate(()=>{
     const chat=document.querySelector('#world-chat'),r=chat.getBoundingClientRect(),dock=document.querySelector('#navigation'),dr=dock.getBoundingClientRect(),bad=[];
     if(r.left<0||r.top<0||r.right>innerWidth||r.bottom>innerHeight)bad.push('Chat outside viewport');
-    if(dr.height&&Math.abs(r.height-dr.height)>3)bad.push(`Chat preview and dock differ in height (${r.height}px / ${dr.height}px)`);
-    if(dr.height&&r.bottom>dr.top+1)bad.push('Chat preview overlaps the dock');
+    const chatHeight=parseFloat(getComputedStyle(chat).getPropertyValue('--world-chat-height'));
+    if(!Number.isFinite(chatHeight)||Math.abs(r.height-chatHeight)>3)bad.push(`Chat preview must match its shared HUD clearance (${r.height}px / ${chatHeight}px)`);
+    // The dock frame includes transparent padding above its buttons; compare the
+    // actual targets and protruding artwork instead of that unused outer area.
+    for(const node of dock.querySelectorAll('button,.dock-icon,.dock-label')){
+     const target=node.getBoundingClientRect();
+     if(target.width&&target.height&&r.left<target.right-1&&r.right>target.left+1&&r.top<target.bottom-1&&r.bottom>target.top+1)bad.push('Chat preview overlaps dock '+(node.dataset.id||node.className));
+    }
+    const preview=chat.querySelector('.world-chat-preview'),previewRect=preview.getBoundingClientRect(),hit=document.elementFromPoint(previewRect.x+previewRect.width/2,previewRect.y+previewRect.height/2);
+    if(hit!==preview&&!preview.contains(hit))bad.push('Chat preview cannot be tapped');
     if(chat.querySelectorAll('.world-chat-preview-message').length>2)bad.push('Chat preview shows more than two messages');
     return bad;
    });
@@ -110,7 +131,7 @@ const html=execFileSync(process.env.PHP_BINARY||'C:/xampp/php/php.exe',['-r',php
    await page.locator('.world-chat-preview').click();
    assert.equal(await page.locator('#world-chat-body').isVisible(),true);
    assert.ok((await page.locator('#world-chat').boundingBox()).height<=height+1,'Full chat stays inside viewport');
-   await page.locator('[data-chat-close]').first().click();
+   await page.locator('[data-chat-close]:visible').click();
   }
   await page.evaluate(()=>{document.body.classList.remove('city-mode');document.body.classList.add('world-mode')});
   assert.equal(await page.locator('#hud-training').isVisible(),false);assert.equal(await page.locator('#hud-build').isVisible(),false);assert.equal(await page.locator('#hud-healing').isVisible(),true);

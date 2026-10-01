@@ -33,8 +33,7 @@ final class ResearchProcessor
         $worldId??=WorldContext::id();
         $db = Connection::getInstance();
 
-        // Troop tiers now unlock through buildings. Release an old research slot
-        // and return its paid resources in the original world, exactly once.
+        // Only genuinely retired definitions are settled; restored troop research runs normally.
         try {
             self::settleRetiredTroopUnlocks($playerId, $worldId);
             $finished = $db->query(
@@ -88,6 +87,7 @@ final class ResearchProcessor
     {
         $db = Connection::getInstance();
         $retired = ResearchData::retiredTroopUnlocks();
+        if (!$retired) return;
         $marks = implode(',', array_fill(0, count($retired), '?'));
         $rows = $db->query("SELECT id,research_code,level_to FROM research_queue WHERE player_id=? AND world_id=? AND is_processed=0 AND research_code IN ($marks)", [$playerId,$worldId,...array_keys($retired)])->fetchAll();
         foreach ($rows as $row) {

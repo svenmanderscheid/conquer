@@ -17,7 +17,7 @@ $pageUrl = static fn(int $page): string => APP_BASE.'/admin/alpha-waitlist?'.htt
         <td><a href="mailto:<?= ah($entry['email']) ?>"><?= ah($entry['email']) ?></a></td>
         <td><?= ah(strtoupper($entry['locale'])) ?></td><td><?= ah($entry['created_at']) ?></td>
         <td><span class="pill"><?= $entry['invited_at']===null?'Wartet':'Eingeladen' ?></span></td>
-        <td><?php adminForm('alpha-waitlist-update',0); ?><input type="hidden" name="entry_id" value="<?= (int)$entry['id'] ?>"><input type="hidden" name="reason" value="Alpha-Warteliste verwaltet"><select name="status" aria-label="Status für <?= ah($entry['email']) ?>"><option value="waiting" <?= $entry['invited_at']===null?'selected':'' ?>>Wartet</option><option value="invited" <?= $entry['invited_at']!==null?'selected':'' ?>>Eingeladen</option><option value="delete">Löschen</option></select><button type="submit" class="secondary">Speichern</button></fieldset></form></td>
+        <td><?php adminForm('alpha-waitlist-update',0); ?><input type="hidden" name="entry_id" value="<?= (int)$entry['id'] ?>"><input type="hidden" name="reason" value="Alpha-Warteliste verwaltet"><select name="status" aria-label="Status für <?= ah($entry['email']) ?>"><option value="waiting" <?= $entry['invited_at']===null?'selected':'' ?>>Wartet</option><option value="invited" <?= $entry['invited_at']!==null?'selected':'' ?>>Eingeladen</option><option value="delete">Löschen</option></select><button type="submit" class="secondary" data-i18n="common.save">Speichern</button></fieldset></form></td>
     </tr><?php endforeach ?>
     </tbody></table></div>
     <?php if(!$list['rows']): ?><p class="empty">Noch keine Alpha-Anmeldungen vorhanden.</p><?php endif ?>

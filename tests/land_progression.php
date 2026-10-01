@@ -24,11 +24,17 @@ try{
     landCheck(count(LandUnlockService::status(1))===3&&!in_array(false,array_column(LandUnlockService::status(1),'open'),true),'migration keeps every zone of an existing world open');
 
     $db->execute("INSERT INTO worlds(name,slug,status,map_size,map_seed,created_at,started_at)VALUES('Landtest','landtest','running',256,84,DATE_SUB(UTC_TIMESTAMP(),INTERVAL 30 DAY),DATE_SUB(UTC_TIMESTAMP(),INTERVAL 30 DAY))");$world=$db->lastInsertId();
-    foreach(['outer','middle','center'] as $zone)$db->execute("INSERT INTO world_land_zones(world_id,zone_key,status,opened_at,opened_reason,rule_revision)VALUES(?,?,'locked',NULL,NULL,1)",[$world,$zone]);
     LandProgressService::ensureWorld($world,false);$status=array_column(LandUnlockService::status($world),null,'key');
-    landCheck($status['outer']['open']&&$status['middle']['open']&&$status['center']['open'],'a new or previously locked world opens the complete map immediately');
+    landCheck($status['outer']['open']&&$status['middle']['open']&&$status['center']['open'],'a new world opens the complete map immediately');
     landCheck(LandAccessPolicy::isOpen($world,8,8)&&LandAccessPolicy::isOpen($world,128,128),'outer and central targets are accessible from the beginning');
     LandAccessPolicy::assertTargetOpen($world,128,128);
+    $db->execute("UPDATE world_land_zones SET status='locked',opened_at=NULL,opened_reason='admin' WHERE world_id=? AND zone_key='center'",[$world]);
+    LandProgressService::ensureWorld($world,true);LandUnlockService::invalidate($world);
+    landCheck(!LandAccessPolicy::isOpen($world,128,128),'reinitialization preserves an explicit existing zone lock');
+    landReject(fn()=>LandAccessPolicy::assertTargetOpen($world,128,128),'explicit central lock rejects new actions');
+    MigrationSql::apply($db->getPdo(),(string)file_get_contents(ROOT_DIR.'/migrations/0109_open_complete_world_map.sql'));
+    LandProgressService::invalidate($world);LandUnlockService::invalidate($world);
+    landCheck(LandAccessPolicy::isOpen($world,128,128),'the one-time complete-map migration opens legacy locks');
 
     $db->execute("INSERT INTO players(username,email,password_hash)VALUES('land_player','land@example.test','x')");$player=$db->lastInsertId();
     $db->execute("INSERT INTO cities(player_id,world_id,name,coord_x,coord_y,food,lumber,stone,gold)VALUES(?,?,'Landstadt',8,8,1000000,1000000,1000000,1000000)",[$player,$world]);

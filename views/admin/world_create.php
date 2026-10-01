@@ -19,7 +19,7 @@ $monsterLabels=['Orc'=>'Orks','Skeleton'=>'Skelette','Golem'=>'Golems','Treasure
     </div>
     <div class="world-create-facts" aria-label="Umfang der Einrichtung">
         <span><strong>1</strong><small>Vorgang</small></span>
-        <span><strong>256²</strong><small>Kartenfelder</small></span>
+        <span><strong>113</strong><small>Luxemburger Gebietsziele</small></span>
         <span><strong>2</strong><small>Spawnarten</small></span>
     </div>
 </div>
@@ -32,7 +32,7 @@ $monsterLabels=['Orc'=>'Orks','Skeleton'=>'Skelette','Golem'=>'Golems','Treasure
             <label>Weltname<input name="name" value="<?= ah($value('name','')) ?>" required minlength="2" maxlength="50" placeholder="z. B. Morgenrot" data-world-name></label>
             <label>Eindeutiges Kürzel<input name="slug" value="<?= ah($value('slug','')) ?>" required minlength="2" maxlength="20" pattern="[a-z0-9][a-z0-9-]{1,19}" placeholder="morgenrot" autocapitalize="none" spellcheck="false" data-world-slug><small>2–20 Kleinbuchstaben, Zahlen oder Bindestriche</small></label>
             <label>Weltstatus<select name="status"><?php foreach(['paused'=>'Pausiert · erst prüfen','open'=>'Offen · Beitritt möglich','running'=>'Laufend','closed'=>'Geschlossen'] as $key=>$label): ?><option value="<?= $key ?>" <?= $value('status','paused')===$key?'selected':'' ?>><?= ah($label) ?></option><?php endforeach ?></select></label>
-            <label>Kartengröße<select name="map_size" aria-describedby="map-size-hint"><option value="256" selected>256 × 256 Felder · Standard</option></select><small id="map-size-hint">Die gezeichnete Weltkarte und ihre fünf Schreine verwenden derzeit diese feste Größe.</small></label>
+            <label>Kartenvorlage<select name="map_profile" aria-describedby="map-size-hint"><?php foreach(['luxembourg'=>'Luxemburg · 768 × 1.100 Felder','legacy'=>'Bisherige Karte · 256 × 256 Felder'] as $key=>$label): ?><option value="<?= $key ?>" <?= $value('map_profile','luxembourg')===$key?'selected':'' ?>><?= ah($label) ?></option><?php endforeach ?></select><small id="map-size-hint">Luxemburg enthält 100 Communes, zwölf Shrines und das Royal Castle. Die Kartenvorlage wird beim Erstellen festgelegt.</small></label>
         </div>
     </section>
 
@@ -90,7 +90,7 @@ $monsterLabels=['Orc'=>'Orks','Skeleton'=>'Skelette','Golem'=>'Golems','Treasure
             </div>
             <?php endforeach ?>
         </div>
-        <p class="subtle">„Rallybosse“ erzeugt Dämmerhorn, Grumwald, Frostgrimm, Sandmaul oder Glutramm. Drachen und Magdar bleiben bis zu ihrer Aktivierung auf 0 %.</p>
+        <p class="subtle">„Rallybosse“ erzeugt Dämmerhorn oder Runenhorn. Drachen und die alte Magdar-Vorlage bleiben auf 0 %.</p>
     </section>
 
     <section class="card world-create-section">
@@ -99,7 +99,7 @@ $monsterLabels=['Orc'=>'Orks','Skeleton'=>'Skelette','Golem'=>'Golems','Treasure
             <?php adminNumber('Radius Allianzzentrum (Felder)','settings[alliance_center_radius]',$cfg['alliance_center_radius'],4,40); ?>
             <?php adminNumber('Radius Außenposten (Felder)','settings[alliance_outpost_radius]',$cfg['alliance_outpost_radius'],2,24); ?>
         </div>
-        <div class="world-create-review"><strong>Beim Erstellen werden angelegt:</strong><span>Weltkarte</span><span>Kongress & vier Schreine</span><span>Landentwicklung</span><span>Spawnplan</span></div>
+        <div class="world-create-review"><strong>Beim Erstellen werden angelegt:</strong><span>Gewählte Weltkarte</span><span>Gebietsziele der Kartenvorlage</span><span>Landentwicklung</span><span>Spawnplan</span></div>
         <label>Begründung für das Änderungsprotokoll<input name="reason" required minlength="3" maxlength="500" placeholder="z. B. Start der nächsten Spielrunde"></label>
         <button type="submit">Welt jetzt erstellen</button>
     </section>

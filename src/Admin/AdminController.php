@@ -23,7 +23,13 @@ final class AdminController
         }catch(\RuntimeException $e){$error='Anmeldung nicht möglich. Bitte versuche es später erneut.';}
         require ROOT_DIR.'/views/admin/login.php';
     }
-    public static function logout(): void {AdminAuth::logout();}
+    public static function logout(): void
+    {
+        if(($_SERVER['REQUEST_METHOD']??'GET')!=='POST'){http_response_code(405);header('Allow: POST');return;}
+        $token=$_POST['csrf_token']??'';
+        if(!is_string($token)||!hash_equals(self::getCsrfToken(),$token)){http_response_code(403);echo 'Ungültiger CSRF-Token.';return;}
+        AdminAuth::logout();
+    }
     public static function changePasswordPage(): void
     {
         $admin=AdminAuth::current();
@@ -47,6 +53,23 @@ final class AdminController
         require ROOT_DIR.'/views/admin/change_password.php';
     }
     public static function dashboard(): void {self::render('dashboard','Übersicht');}
+    public static function layoutEditor(): void {self::render('layout_editor','Layout-Editor');}
+    public static function layoutData(): void
+    {
+        $admin=AdminAuth::requireAuth();
+        header('Content-Type: application/json; charset=utf-8');
+        header('Cache-Control: private, no-store');
+        try {
+            if (($_SERVER['REQUEST_METHOD']??'GET')==='GET') {
+                echo json_encode(\Conquer\Game\Ui\LayoutSettings::read(),JSON_THROW_ON_ERROR);return;
+            }
+            if (($_SERVER['REQUEST_METHOD']??'')!=='POST') {http_response_code(405);header('Allow: GET, POST');echo '{"error":"Methode nicht erlaubt."}';return;}
+            if ($admin['role']!=='superadmin' || !is_string($_POST['csrf_token']??null) || !hash_equals(self::getCsrfToken(),$_POST['csrf_token'])) {http_response_code(403);echo '{"error":"Keine Berechtigung oder Sitzung abgelaufen."}';return;}
+            $result=AdminService::execute((int)$admin['id'],'layout-save',$_POST);
+            echo json_encode(['message'=>$result['message'],'revision'=>$result['after']['revision']],JSON_THROW_ON_ERROR);
+        } catch (\InvalidArgumentException|\DomainException $e) {http_response_code(409);echo json_encode(['error'=>$e->getMessage()]);}
+        catch (\Throwable $e) {error_log('Layout editor: '.$e->getMessage());http_response_code(500);echo '{"error":"Layout konnte nicht gespeichert werden. Bitte Verbindung und Migration prüfen."}';}
+    }
     public static function analytics(): void {self::render('analytics','Statistiken');}
     public static function rewards(): void {self::render('rewards','Beute & Drops');}
     public static function lands(): void {self::render('lands','Länder & Entwicklung');}
@@ -97,6 +120,7 @@ final class AdminController
         if($action==='world-create')$return='/admin/world-create';
         if($action==='land-rules-save')$return='/admin/lands';
         if($action==='bug-report-update')$return='/admin/bug-reports';
+        if(str_starts_with($action,'community-'))$return='/admin/chat';
         if($action==='alpha-waitlist-update')$return='/admin/alpha-waitlist';
         $alphaAction=in_array($action,['alpha-key-create','alpha-key-revoke'],true);
         if($alphaAction)$return='/admin/alpha-keys';

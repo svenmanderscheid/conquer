@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "description": "Usable Conquer inventory rewards per defeated rally monster. One shared pool; quantities are split among contributing armies. Legacy monster drop IDs are not inventory IDs.",
+  "description": "Usable Conquer inventory rewards per defeated rally monster. Every contributing player receives an independent roll with the listed quantities. Legacy monster drop IDs are not inventory IDs.",
   "deathkar": [
     {"item_code": 10201025, "count": 5, "probability": 1},
     {"item_code": 10203024, "count": 1, "probability": 1},

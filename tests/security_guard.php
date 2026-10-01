@@ -18,15 +18,16 @@ if (($argv[1] ?? '') === '--worker') {
     $root=$argv[2] ?? '';
     if (!preg_match('/^conquer_feature_test_[a-f0-9]{12}$/D', basename($root)) || realpath(dirname($root))!==realpath(sys_get_temp_dir())) exit(2);
     Connection::init($root);
-    \Conquer\Logger::init(ROOT_DIR.'/logs/security-test.log');
+    \Conquer\Logger::init($root.'/http.log');
     echo RateLimit::consume('concurrent','shared',3,3600)===0?'allowed':'denied';
     exit;
 }
 $fixture = new \ConquerTests\FeatureDatabase();
+$testLog = tempnam(sys_get_temp_dir(), 'conquer-security-guard-');
 try {
     $db = Connection::getInstance();
     \Conquer\Db\MigrationSql::apply($db->getPdo(), (string)file_get_contents(ROOT_DIR . '/migrations/0103_security_rate_limits.sql'));
-    \Conquer\Logger::init(ROOT_DIR . '/logs/security-test.log');
+    \Conquer\Logger::init($testLog);
     for ($i=0; $i<3; $i++) securityCheck(RateLimit::consume('test', 'a', 3, 60) === 0, 'bucket permits initial capacity');
     securityCheck(RateLimit::consume('test', 'a', 3, 60) > 0, 'bucket rejects excess');
     securityCheck(RateLimit::consume('test', 'b', 3, 60) === 0, 'other identity independent');
@@ -97,4 +98,4 @@ try {
     $r=$request('/api/auth/me','GET',$tokens[0]);
     securityCheck($r[0]===503 && $r[1]['error']['code']==='SECURITY_UNAVAILABLE','missing limiter storage fails closed');
     echo "ALL SECURITY GUARD CHECKS PASSED\n";
-} finally { $fixture->close(); }
+} finally { $fixture->close(); if (is_file($testLog)) unlink($testLog); }

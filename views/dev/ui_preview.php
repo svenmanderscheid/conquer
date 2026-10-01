@@ -22,7 +22,7 @@ if (file_exists(ROOT_DIR . '/config/app.php')) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Conquer — UI Preview (Dev)</title>
+<title>Union of Kingdoms — UI Preview (Dev)</title>
 <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR.'/assets/css/fantasy-fonts.css') ?>">
 <link rel="stylesheet" href="/conquer/assets/css/main.css">
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -61,7 +61,7 @@ code { background: var(--c-stone); padding: 2px 6px; border-radius: 4px; font-si
     }
 }">
 
-<h1 style="font-size:1.6rem;color:var(--c-wood-dark);margin-bottom:8px;">🎮 Conquer — Cozy Theme Preview</h1>
+<h1 style="font-size:1.6rem;color:var(--c-wood-dark);margin-bottom:8px;">🎮 Union of Kingdoms — Cozy Theme Preview</h1>
 <p style="color:var(--c-muted);margin-bottom:32px;">Dev-only. Zeigt alle UI-Komponenten des Cozy-Stardew Themes.</p>
 
 <!-- ── Color Palette ──────────────────────────────────────────────────── -->

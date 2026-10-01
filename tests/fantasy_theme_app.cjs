@@ -1,4 +1,5 @@
 'use strict';
+require('./fixtures/browser_locale.cjs')('de'); // This suite asserts the explicit German UI.
 // End-to-end appearance audit against an automatically disposed synthetic account/database.
 // Run: node tests/fantasy_theme_app.cjs (PLAYWRIGHT_MODULE may point to a bundled runtime).
 const fs = require('fs'), path = require('path'), net = require('net'), assert = require('assert');
@@ -61,7 +62,7 @@ async function actualFonts(page, selector) {
       for (const [width, height] of [[390, 844], [320, 568], [844, 390]]) {
         await page.setViewportSize({ width, height });
         await page.evaluate(() => document.fonts.ready);
-        const submit = page.locator(route ? 'form button' : '#auth-submit');
+        const submit = page.locator(route ? 'form button' : 'form[action$="/auth/local"] button[type="submit"], #auth-submit').first();
         await submit.scrollIntoViewIfNeeded();
         const geometry = await submit.evaluate(element => {
           const rect = element.getBoundingClientRect();
@@ -70,17 +71,20 @@ async function actualFonts(page, selector) {
             height: rect.height };
         });
         assert(geometry.overflow <= 2 && geometry.visible && geometry.height >= 44, 'Authentication remains touch-accessible: ' + route + ' ' + width);
-        if (await page.locator('.locale-install .button').count()) assert.equal(await page.locator('.locale-install .button').evaluate(element => getComputedStyle(element).backgroundColor), 'rgb(92, 66, 112)', 'Installation action shares violet accent');
+        if (await page.locator('.locale-install .button').count()) {
+          const color = await page.locator('.locale-install .button').evaluate(element => getComputedStyle(element).backgroundColor);
+          if (color !== 'rgb(92, 66, 112)') appearanceFailures.push(`auth ${route || 'welcome'} ${width}x${height}: installation accent ${color}`);
+        }
         report.push({ auth: route || 'welcome', width, height, ...geometry });
         await page.screenshot({ path: path.join(output, `${route ? 'recovery' : 'welcome'}-${width}x${height}.png`), fullPage: true });
       }
     }
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto(fixture.base, { waitUntil: 'networkidle' });
-    await page.locator('[data-auth-target="login"]').first().click();
-    await page.locator('[name="username"]').fill('PreviewPlayer');
+    if (await page.locator('[data-auth-target="login"]').count()) await page.locator('[data-auth-target="login"]').first().click();
+    await page.locator('[name="identifier"], [name="username"]').first().fill('PreviewPlayer');
     await page.locator('[name="password"]').fill('PreviewFixture!2026');
-    await Promise.all([page.waitForURL('**/city'), page.locator('#auth-submit').click()]);
+    await Promise.all([page.waitForURL('**/city'), page.locator('form[action$="/auth/local"] button[type="submit"], #auth-submit').first().click()]);
     await page.waitForFunction(() => document.querySelector('#player-hud-name')?.textContent.includes('PreviewPlayer'));
     await page.locator('#resources .resource strong').first().waitFor();
     await page.evaluate(async () => { await new Promise(requestAnimationFrame); await document.fonts.ready; });
@@ -103,7 +107,7 @@ async function actualFonts(page, selector) {
       await page.waitForLoadState('networkidle');
       const ready = {
         mastery: '.talent-node', defense: '.defense-body', land: '.land-shell',
-        dungeons: '.dungeon-shell[aria-busy="false"]', community: '.community-chat-log',
+        dungeons: '.dungeon-shell[aria-busy="false"]', community: '.social-hub .social-welcome',
         events: '.progression-content', account: '.progression-content', worlds: '.world-selector',
       }[id];
       if (ready) await page.locator('#content ' + ready).first().waitFor();
@@ -114,10 +118,11 @@ async function actualFonts(page, selector) {
         const dialog = document.querySelector('#panel-dialog[open]');
         const title = document.querySelector('#page-title');
         const heading = dialog.querySelector('.page-heading');
-        const close = dialog.querySelector('.panel-close');
+        const close = [...dialog.querySelectorAll('.panel-close,.mobile-page-back')].find(element => element.checkVisibility());
         const rect = dialog.getBoundingClientRect(), button = close.getBoundingClientRect();
         return {
           primary: getComputedStyle(heading).backgroundColor,
+          expectedPrimary: matchMedia('(max-width:700px), (max-width:1100px) and (max-height:520px) and (orientation:landscape)').matches ? 'rgb(68, 48, 82)' : 'rgb(92, 66, 112)',
           surface: getComputedStyle(dialog).backgroundColor,
           font: getComputedStyle(title).fontFamily,
           overflow: dialog.scrollWidth - dialog.clientWidth,
@@ -130,7 +135,7 @@ async function actualFonts(page, selector) {
       const contrast = await textContrast(page, '#panel-dialog[open]');
       report.push({ contrast: tag, ...contrast });
       appearanceFailures.push(...contrast.failures.map(sample => `${tag}: ${sample.selector} "${sample.text}" contrast ${sample.ratio} < ${sample.minimum}`));
-      if (data.primary !== 'rgb(92, 66, 112)') appearanceFailures.push(tag + ': violet header ' + data.primary);
+      if (data.primary !== data.expectedPrimary) appearanceFailures.push(tag + ': violet header ' + data.primary);
       if (data.surface !== 'rgb(233, 223, 207)') appearanceFailures.push(tag + ': beige surface ' + data.surface);
       if (!data.font.includes('Conquer UI')) appearanceFailures.push(tag + ': fantasy typography ' + data.font);
       if (data.outside || !data.closeVisible) appearanceFailures.push(tag + ': unreachable window/close action');
@@ -169,7 +174,7 @@ async function actualFonts(page, selector) {
     const admin = await context.newPage();
     admin.on('pageerror', error => errors.push(error.message));
     await admin.goto(fixture.base + '/admin/login');
-    await admin.locator('[name="username"]').fill('PreviewAdmin');
+    await admin.locator("[name=identifier], [name=username]").fill('PreviewAdmin');
     await admin.locator('[name="password"]').fill('PreviewFixture!2026');
     await Promise.all([admin.waitForURL(fixture.base + '/admin'), admin.getByRole('button', { name: 'Anmelden', exact: true }).click()]);
     for (const [width, height] of [[1280, 800], [390, 844]]) {
@@ -188,7 +193,7 @@ async function actualFonts(page, selector) {
     fs.writeFileSync(path.join(output, 'report.json'), JSON.stringify(report, null, 2));
     console.log('PASS fantasy theme: ' + (broad.length * sizes.length) + ' menu/viewport combinations, actual Almendra/Lora glyphs, tappable relics, world, welcome and backoffice. ' + output);
   } catch (error) {
-    fs.writeFileSync(path.join(output, 'report.json'), JSON.stringify({ report, errors, badAssets, badApis, failure: String(error) }, null, 2));
+    fs.writeFileSync(path.join(output, 'report.json'), JSON.stringify({ report, errors, badAssets, badApis, appearanceFailures, failure: String(error) }, null, 2));
     if (browser) for (const context of browser.contexts()) for (const [index, page] of context.pages().entries()) await page.screenshot({ path: path.join(output, `failure-${index}.png`) }).catch(() => {});
     throw error;
   } finally {

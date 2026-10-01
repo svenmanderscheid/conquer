@@ -22,7 +22,7 @@ $fixture = null;
 $exit = 0;
 try {
     $definitions = ResearchData::allNodes();
-    $expected = ['production' => [34, 245], 'battle' => [43, 306], 'advanced' => [40, 400]];
+    $expected = ['production' => [34, 245], 'battle' => [55, 318], 'advanced' => [40, 400]];
     foreach ($expected as $tree => [$technologies, $levels]) {
         $nodes = ResearchData::tree($tree);
         snapshotCheck(count($nodes) === $technologies && array_sum(array_map(static fn($node) => count($node['levels']), $nodes)) === $levels,
@@ -49,7 +49,7 @@ try {
         $visited[$key] = true;
     };
     foreach ($definitions as $node) { $visit($node['code'], $node['max_level']); }
-    snapshotCheck(count($visited) === 951, 'all 951 sequential upgrades and every prerequisite are reachable');
+    snapshotCheck(count($visited) === 963, 'all 963 sequential upgrades and every prerequisite are reachable');
 
     $fixture = new \ConquerTests\FeatureDatabase();
     $db = Connection::getInstance();
@@ -83,7 +83,7 @@ try {
     };
     $complete = static function (array $state) use ($definitions): void {
         $actual = array_column($state['research_defs'], null, 'code');
-        snapshotCheck(count($state['research_defs']) === 117 && count($actual) === 117, 'game API exposes all 117 technologies without duplicate IDs');
+        snapshotCheck(count($state['research_defs']) === 129 && count($actual) === 129, 'game API exposes all 129 technologies without duplicate IDs');
         // JSON preserves all semantic values; numeric 0.0 may become integer 0.
         snapshotCheck($actual == $definitions, 'game API retains every tree, level, cost, bonus and prerequisite from the source catalogue');
     };

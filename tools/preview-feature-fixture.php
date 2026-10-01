@@ -11,14 +11,16 @@ function removePreviewTree(string $path,string $base):void{$resolved=realpath($p
 $server=null;
 try{
  foreach(['src','views','data']as$part)copyPreviewTree(ROOT_DIR.'/'.$part,$dir.'/'.$part);copy(ROOT_DIR.'/index.php',$dir.'/index.php');
- foreach(['css','js','city3d']as$part)copyPreviewTree(ROOT_DIR.'/assets/'.$part,$dir.'/assets/'.$part);
+ foreach(['css','js']as$part)copyPreviewTree(ROOT_DIR.'/assets/'.$part,$dir.'/assets/'.$part);
+ mkdir($dir.'/assets/world-lux-preview',0700,true);
+ foreach(['game-geography.json','game-hydrology.json']as$geometryFile)copy(ROOT_DIR.'/assets/world-lux-preview/'.$geometryFile,$dir.'/assets/world-lux-preview/'.$geometryFile);
  copyPreviewTree(ROOT_DIR.'/assets/art/items',$dir.'/assets/art/items');
  foreach(['manifest.php','service-worker.js','offline.html']as$publicFile)copy(ROOT_DIR.'/'.$publicFile,$dir.'/'.$publicFile);
  // Visual audits deliberately open hundreds of menus faster than a player.
  // Only their disposable fixture gets a larger read budget; security tests use the default.
  $previewLimit=in_array('--appearance',$argv,true)?1000:120;
  file_put_contents($dir.'/config/app.php',"<?php return ['env'=>'development','log_level'=>'ERROR','rate_limit_per_minute'=>".$previewLimit."];");mkdir($dir.'/logs',0700,true);
- $router='<?php $uri=parse_url($_SERVER["REQUEST_URI"],PHP_URL_PATH);if(str_starts_with($uri,"/assets/")){$file=realpath('.var_export(ROOT_DIR,true).'.$uri);$base=realpath('.var_export(ROOT_DIR.'/assets',true).');$ext=strtolower(pathinfo($file?:"",PATHINFO_EXTENSION));if($file&&str_starts_with($file,$base.DIRECTORY_SEPARATOR)&&in_array($ext,["css","js","png","jpg","svg","gif","webp","json","glb","gltf","bin","woff2","wav"])){$mime=["css"=>"text/css","js"=>"text/javascript","svg"=>"image/svg+xml","png"=>"image/png","jpg"=>"image/jpeg","webp"=>"image/webp","json"=>"application/json","wav"=>"audio/wav"];header("Content-Type: ".($mime[$ext]??"application/octet-stream"));readfile($file);return;}http_response_code(404);return;}if(preg_match("#^/(src|views|config|data|logs|tests)/#",$uri)){http_response_code(403);return;}$_SERVER["SCRIPT_NAME"]="/index.php";require __DIR__."/index.php";';
+ $router='<?php $uri=parse_url($_SERVER["REQUEST_URI"],PHP_URL_PATH);if(str_starts_with($uri,"/assets/")){$file=realpath('.var_export(ROOT_DIR,true).'.$uri);$base=realpath('.var_export(ROOT_DIR.'/assets',true).');$ext=strtolower(pathinfo($file?:"",PATHINFO_EXTENSION));if($file&&str_starts_with($file,$base.DIRECTORY_SEPARATOR)&&in_array($ext,["css","js","mjs","png","jpg","svg","gif","webp","json","glb","gltf","bin","woff2","wav"])){$mime=["css"=>"text/css","js"=>"text/javascript","mjs"=>"text/javascript","svg"=>"image/svg+xml","png"=>"image/png","jpg"=>"image/jpeg","webp"=>"image/webp","json"=>"application/json","wav"=>"audio/wav"];header("Content-Type: ".($mime[$ext]??"application/octet-stream"));readfile($file);return;}http_response_code(404);return;}if(preg_match("#^/(src|views|config|data|logs|tests)/#",$uri)){http_response_code(403);return;}$_SERVER["SCRIPT_NAME"]="/index.php";require __DIR__."/index.php";';
  $publicRoutes='if(in_array($uri,["/manifest.php","/service-worker.js","/offline.html"],true)){if($uri==="/manifest.php"){$_SERVER["SCRIPT_NAME"]="/manifest.php";require __DIR__.$uri;}else{header("Content-Type: ".($uri==="/service-worker.js"?"text/javascript":"text/html"));readfile(__DIR__.$uri);}return;}';
  $router=str_replace('if(str_starts_with($uri,"/assets/"))',$publicRoutes.'if(str_starts_with($uri,"/assets/"))',$router);
  // Keep scripts/styles in the same snapshot as views and PHP. Serving live
@@ -27,6 +29,10 @@ try{
  file_put_contents($dir.'/router.php',$router);
  $db->execute('INSERT INTO admin_users(username,password_hash,role) VALUES(?,?,?)',['PreviewAdmin',password_hash('PreviewFixture!2026',PASSWORD_DEFAULT),'superadmin']);
  $db->execute('INSERT INTO players(id,username,email,password_hash) VALUES(1,?,?,?)',['PreviewPlayer','preview@tests.invalid',password_hash('PreviewFixture!2026',PASSWORD_DEFAULT)]);
+ if(in_array('--territory',$argv,true)){
+  \Conquer\Game\World\WorldMapProfile::configureEmptyWorld(1);
+  \Conquer\Game\World\WorldService::initializeWorld(1);
+ }
  if(in_array('--march-skins',$argv,true))$db->execute('UPDATE players SET gems=10000 WHERE id=1');
  $db->execute("INSERT INTO cities(id,player_id,world_id,name,coord_x,coord_y,castle_level,food,lumber,stone,gold) VALUES(1,1,1,'Vorschaukönigreich',65,65,12,100000,100000,100000,100000)");
  if(in_array('--charm-runes',$argv,true)){
@@ -34,6 +40,7 @@ try{
  }
  foreach(\Conquer\Game\City\CityState::BUILDING_CODES as$code)$db->execute('INSERT INTO city_buildings(city_id,building_code,level) VALUES(1,?,?)',[$code,$code==='castle'?12:7]);
  foreach([50100101,50200101,50300101]as$code)$db->execute('INSERT INTO city_troops(city_id,troop_code,count) VALUES(1,?,500)',[$code]);
+ if(in_array('--territory',$argv,true))require ROOT_DIR.'/tests/fixtures/territory_preview.php';
  if(in_array('--march-roster',$argv,true)){
   $troopCatalog=json_decode((string)file_get_contents(ROOT_DIR.'/data/troops.json'),true,512,JSON_THROW_ON_ERROR);
   foreach($troopCatalog['troops'] as $troop)$db->execute('INSERT INTO city_troops(city_id,troop_code,count) VALUES(1,?,?) ON DUPLICATE KEY UPDATE count=VALUES(count)',[(int)$troop['code'],5000+(int)$troop['tier']*123]);
@@ -56,13 +63,26 @@ try{
  if(in_array('--training',$argv,true)){
   $db->execute('UPDATE cities SET food=100000000,lumber=100000000,stone=100000000,gold=100000000,castle_level=30 WHERE id=1');
   $db->execute("UPDATE city_buildings SET level=30 WHERE city_id=1");
+  foreach(\Conquer\Game\City\TroopData::all() as $troop)if($troop['unlock_research'])$db->execute('INSERT INTO player_research(player_id,world_id,research_code,level) VALUES(1,1,?,1) ON DUPLICATE KEY UPDATE level=1',[$troop['unlock_research']]);
   \Conquer\Game\Inventory\InventoryService::addItems(1,10103003,10);
  }
  if(in_array('--balance-import',$argv,true)){
   $db->execute('UPDATE cities SET food=500000000,lumber=500000000,stone=500000000,gold=500000000,castle_level=30 WHERE id=1');
   $db->execute("UPDATE city_buildings SET level=30 WHERE city_id=1");
   $db->execute("UPDATE city_buildings SET level=29 WHERE city_id=1 AND building_code IN('academy','hall_of_alliance','watch_tower')");
-  foreach([119000001=>2,119000002=>4999,120601001=>3] as $code=>$count)\Conquer\Game\Inventory\InventoryService::addItems(1,$code,$count);
+  foreach([119000002=>4999,120601001=>3] as $code=>$count)\Conquer\Game\Inventory\InventoryService::addItems(1,$code,$count);
+ }
+ if(in_array('--speed-bonuses',$argv,true)){
+  // Historical rows must remain hidden and powerless without modifying real player data.
+  foreach([10102021,10102031,10202010,10202011] as $code)$db->execute('INSERT INTO player_inventory(player_id,item_code,quantity) VALUES(1,?,5) ON DUPLICATE KEY UPDATE quantity=5',[$code]);
+  foreach(['construction_speed'=>10102021,'research_speed'=>10102031] as $type=>$code)$db->execute("INSERT INTO player_charms_active(player_id,stat_category,grade,charm_code,bonus_pct,expires_at) VALUES(1,?,'normal',?,25,DATE_ADD(UTC_TIMESTAMP(),INTERVAL 8 HOUR))",[$type,$code]);
+  $db->execute("INSERT INTO active_buffs(player_id,buff_type,multiplier,expires_at) VALUES(1,'research_boost',1.25,DATE_ADD(UTC_TIMESTAMP(),INTERVAL 8 HOUR))");
+  $db->execute('UPDATE players SET vip_points=200000,vip_level=10 WHERE id=1');
+  \Conquer\Game\World\WorldContext::bind(1);
+  foreach([10102001] as $code){
+   \Conquer\Game\Inventory\InventoryService::addItems(1,$code,1);
+   \Conquer\Game\Kingdom\KingdomService::action(1,['action'=>'inventory.use','item_code'=>$code,'quantity'=>1,'expected_world_id'=>1]);
+  }
  }
  if(in_array('--queue-speedups',$argv,true)){
   foreach(['castle'=>13,'farm'=>8] as $code=>$level)$db->execute("INSERT INTO building_queue(city_id,building_code,level_to,started_at,finishes_at)VALUES(1,?,?,UTC_TIMESTAMP(),DATE_ADD(UTC_TIMESTAMP(),INTERVAL 2 HOUR))",[$code,$level]);
@@ -134,18 +154,34 @@ try{
   $db->execute("INSERT INTO research_queue(player_id,world_id,research_code,level_to,started_at,finishes_at) VALUES(1,1,'food_production',1,DATE_SUB(UTC_TIMESTAMP(),INTERVAL 20 MINUTE),DATE_ADD(UTC_TIMESTAMP(),INTERVAL 40 MINUTE))");
   $db->execute("INSERT INTO troop_queue(city_id,troop_code,count,started_at,finishes_at) VALUES(1,50100101,250,DATE_SUB(UTC_TIMESTAMP(),INTERVAL 10 MINUTE),DATE_ADD(UTC_TIMESTAMP(),INTERVAL 20 MINUTE))");
  }
- if(in_array('--chat',$argv,true)){
+ if(in_array('--chat',$argv,true)||in_array('--alliance-ranks',$argv,true)){
   $db->execute("INSERT INTO players(id,username,email,password_hash) VALUES(2,'Elara','elara@tests.invalid','unused')");
   $db->execute("INSERT INTO kingdom_profiles(player_id,display_name,avatar) VALUES(2,'Elara','archer')");
+  // Social search and private conversations require a real same-world city.
+  $db->execute("INSERT INTO cities(id,player_id,world_id,name,coord_x,coord_y,castle_level) VALUES(2,2,1,'Elara fixture',75,75,1)");
+  $db->execute("INSERT INTO city_buildings(city_id,building_code,level) VALUES(2,'castle',1)");
   $db->execute("INSERT INTO alliances(id,world_id,name,tag,leader_id) VALUES(1,1,'Die Morgenwacht','MW',1)");
   $db->execute("INSERT INTO alliance_members(alliance_id,player_id,world_id,role) VALUES(1,1,1,'leader')");
   foreach(['Willkommen in der Welt! Wer erkundet heute den Norden?','Rund um den Wald gibt es noch freie Rohstofffelder.','Wir sammeln uns am Feuerschrein. Kommt gerne dazu!']as$text)$db->execute("INSERT INTO world_chat(world_id,player_id,username,alliance_tag,message) VALUES(1,2,'Elara','MW',?)",[$text]);
   $db->execute("INSERT INTO alliance_messages(alliance_id,player_id,username,message) VALUES(1,2,'Elara','Unser nächster Sammelpunkt ist am Wald. Wer ist dabei?')");
  }
+ if(in_array('--alliance-ranks',$argv,true)){
+  $db->execute("INSERT INTO alliance_members(alliance_id,player_id,world_id,role,role_level) VALUES(1,2,1,'member',1)");
+  foreach([[3,'Rank veteran','veteran',2],[4,'Rank officer','officer',3],[5,'Rank deputy','vice_leader',4]] as [$id,$username,$role,$level]){
+   $db->execute('INSERT INTO players(id,username,email,password_hash) VALUES(?,?,?,?)',[$id,$username,'rank'.$id.'@tests.invalid',password_hash('PreviewFixture!2026',PASSWORD_DEFAULT)]);
+   $db->execute('INSERT INTO kingdom_profiles(player_id,display_name,avatar) VALUES(?,?,?)',[$id,$username,'knight']);
+   $db->execute("INSERT INTO cities(id,player_id,world_id,name,coord_x,coord_y,castle_level) VALUES(?,?,1,'Rank fixture',?,80,1)",[$id,$id,70+$id]);
+   $db->execute("INSERT INTO city_buildings(city_id,building_code,level) VALUES(?,'castle',1)",[$id]);
+   $db->execute('INSERT INTO alliance_members(alliance_id,player_id,world_id,role,role_level) VALUES(1,?,1,?,?)',[$id,$role,$level]);
+   $db->execute('INSERT INTO alliance_messages(alliance_id,player_id,username,message) VALUES(1,?,?,?)',[$id,$username,'Ready for the next alliance rally.']);
+  }
+  $db->execute('UPDATE alliances SET member_count=5 WHERE id=1');
+  \Conquer\Db\MigrationSql::apply($db->getPdo(),(string)file_get_contents(ROOT_DIR.'/migrations/0124_alliance_member_ranks.sql'));
+ }
  if(in_array('--guide',$argv,true)){
   $db->execute("INSERT INTO field_monsters(world_id,monster_code,coord_x,coord_y,hp_current,monster_type,expires_at) VALUES(1,20200501,75,75,1000,'rally',DATE_ADD(UTC_TIMESTAMP(),INTERVAL 1 DAY))");
  }
- if(in_array('--regional-bosses',$argv,true)){
+ if(in_array('--regional-bosses',$argv,true)||in_array('--boss-skills',$argv,true)){
   $db->transaction(static function($db){
    \Conquer\Game\Map\WorldPlacement::lockWorld($db,1);
    foreach([[1,54,60],[2,56,66],[3,59,71],[4,69,72],[5,72,66]] as [$type,$x,$y]){
@@ -164,6 +200,7 @@ try{
    });
   }
  }
+ if(in_array('--boss-skills',$argv,true))require ROOT_DIR.'/tests/fixtures/rally_boss_skills.php';
  if(in_array('--map-search',$argv,true)){
   foreach([[48,65],[43,65]] as [$x,$y])$db->transaction(static function($db)use($x,$y):void{
    \Conquer\Game\Map\WorldPlacement::lockWorld($db,1);
@@ -173,6 +210,7 @@ try{
   });
  }
  if(in_array('--mailbox',$argv,true)){require ROOT_DIR.'/tests/Support/MailboxFixture.php';\ConquerTests\MailboxFixture::seed();}
+ if(in_array('--rally-joining',$argv,true))require ROOT_DIR.'/tests/fixtures/rally_joining.php';
  if(in_array('--monster-reports',$argv,true))require ROOT_DIR.'/tests/fixtures/monster_reports.php';
  if(in_array('--scout-reports',$argv,true))require ROOT_DIR.'/tests/fixtures/scout_reports.php';
  if(in_array('--monster-health',$argv,true))require ROOT_DIR.'/tests/fixtures/monster_health.php';

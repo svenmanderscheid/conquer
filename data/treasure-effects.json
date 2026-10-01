@@ -1,0 +1,3338 @@
+{
+  "version": 1,
+  "source": "LOK_Items.xlsx",
+  "treasures": {
+    "60100001": {
+      "excel_row": 2,
+      "old_name": "manure",
+      "effects": [
+        {
+          "type": "food_production",
+          "label_de": "Nahrung Produktion",
+          "boost_max": 5,
+          "master_type": "food_production",
+          "master_label_de": "Nahrung Produktion",
+          "master_value": 5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "food_storage_capacity",
+          "label_de": "Nahrung Lager Kapazität",
+          "boost_max": 5,
+          "master_type": "gathering_speed",
+          "master_label_de": "Sammelgeschwindigkeit",
+          "master_value": 3,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60100002": {
+      "excel_row": 7,
+      "old_name": "axe",
+      "effects": [
+        {
+          "type": "lumber_gathering_speed",
+          "label_de": "Holz Sammeln Geschwindigkeit",
+          "boost_max": 5,
+          "master_type": "lumber_gathering_speed",
+          "master_label_de": "Holz Sammeln Geschwindigkeit",
+          "master_value": 5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "lumber_protection_capacity",
+          "label_de": "Holz Schutz Kapazität",
+          "boost_max": 5,
+          "master_type": "resource_production",
+          "master_label_de": "Rohstoffproduktion",
+          "master_value": 3,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60100003": {
+      "excel_row": 8,
+      "old_name": "chisel",
+      "effects": [
+        {
+          "type": "stone_gathering_speed",
+          "label_de": "Stein Sammeln Geschwindigkeit",
+          "boost_max": 5,
+          "master_type": "stone_gathering_speed",
+          "master_label_de": "Stein Sammeln Geschwindigkeit",
+          "master_value": 5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "stone_protection_capacity",
+          "label_de": "Stein Schutz Kapazität",
+          "boost_max": 5,
+          "master_type": "resource_production",
+          "master_label_de": "Rohstoffproduktion",
+          "master_value": 3,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60100006": {
+      "excel_row": 14,
+      "old_name": "acher hat",
+      "effects": [
+        {
+          "type": "ranged_load",
+          "label_de": "Fernkampf Traglast",
+          "boost_max": 3,
+          "master_type": "ranged_defense",
+          "master_label_de": "Fernkampf Verteidigung",
+          "master_value": 3,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_defense",
+          "label_de": "Fernkampf Verteidigung",
+          "boost_max": 3,
+          "master_type": "ranged_hp",
+          "master_label_de": "Fernkampf Lebenspunkte",
+          "master_value": 3,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60100101": {
+      "excel_row": 4,
+      "old_name": "hammer",
+      "effects": [
+        {
+          "type": "stone_production",
+          "label_de": "Stein Produktion",
+          "boost_max": 5,
+          "master_type": "stone_production",
+          "master_label_de": "Stein Produktion",
+          "master_value": 5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "stone_storage_capacity",
+          "label_de": "Stein Lager Kapazität",
+          "boost_max": 5,
+          "master_type": "gathering_speed",
+          "master_label_de": "Sammelgeschwindigkeit",
+          "master_value": 3,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60100102": {
+      "excel_row": 9,
+      "old_name": "pick",
+      "effects": [
+        {
+          "type": "gold_gathering_speed",
+          "label_de": "Gold Sammeln Geschwindigkeit",
+          "boost_max": 5,
+          "master_type": "gold_gathering_speed",
+          "master_label_de": "Gold Sammeln Geschwindigkeit",
+          "master_value": 5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "gold_protection_capacity",
+          "label_de": "Gold Schutz Kapazität",
+          "boost_max": 5,
+          "master_type": "resource_production",
+          "master_label_de": "Rohstoffproduktion",
+          "master_value": 3,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60100103": {
+      "excel_row": 6,
+      "old_name": "plow",
+      "effects": [
+        {
+          "type": "food_gathering_speed",
+          "label_de": "Nahrung Sammeln Geschwindigkeit",
+          "boost_max": 5,
+          "master_type": "food_gathering_speed",
+          "master_label_de": "Nahrung Sammeln Geschwindigkeit",
+          "master_value": 5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "food_protection_capacity",
+          "label_de": "Nahrung Schutz Kapazität",
+          "boost_max": 5,
+          "master_type": "resource_production",
+          "master_label_de": "Rohstoffproduktion",
+          "master_value": 3,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60100104": {
+      "excel_row": 10,
+      "old_name": "shot sword",
+      "effects": [
+        {
+          "type": "infantry_attack",
+          "label_de": "Infanterie Angriff",
+          "boost_max": 3,
+          "master_type": "ranged_attack",
+          "master_label_de": "Fernkampf Angriff",
+          "master_value": 3,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_speed",
+          "label_de": "Infanterie Geschwindigkeit",
+          "boost_max": 3,
+          "master_type": "infantry_load",
+          "master_label_de": "Infanterie Traglast",
+          "master_value": 3,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60100105": {
+      "excel_row": 5,
+      "old_name": "shovel",
+      "effects": [
+        {
+          "type": "gold_production",
+          "label_de": "Gold Produktion",
+          "boost_max": 5,
+          "master_type": "gold_production",
+          "master_label_de": "Gold Produktion",
+          "master_value": 5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "gold_storage_capacity",
+          "label_de": "Gold Lager Kapazität",
+          "boost_max": 5,
+          "master_type": "gathering_speed",
+          "master_label_de": "Sammelgeschwindigkeit",
+          "master_value": 3,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60100106": {
+      "excel_row": 12,
+      "old_name": "spear",
+      "effects": [
+        {
+          "type": "infantry_speed",
+          "label_de": "Infanterie Geschwindigkeit",
+          "boost_max": 3,
+          "master_type": "cavalry_speed",
+          "master_label_de": "Kavallerie Geschwindigkeit",
+          "master_value": 3,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_attack",
+          "label_de": "Kavallerie Angriff",
+          "boost_max": 3,
+          "master_type": "cavalry_load",
+          "master_label_de": "Kavallerie Traglast",
+          "master_value": 3,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60100107": {
+      "excel_row": 3,
+      "old_name": "water bucket",
+      "effects": [
+        {
+          "type": "lumber_production",
+          "label_de": "Holz Produktion",
+          "boost_max": 5,
+          "master_type": "lumber_production",
+          "master_label_de": "Holz Produktion",
+          "master_value": 5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "lumber_storage_capacity",
+          "label_de": "Holz Lager Kapazität",
+          "boost_max": 5,
+          "master_type": "gathering_speed",
+          "master_label_de": "Sammelgeschwindigkeit",
+          "master_value": 3,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60100108": {
+      "excel_row": 11,
+      "old_name": "wooden bow",
+      "effects": [
+        {
+          "type": "ranged_attack",
+          "label_de": "Fernkampf Angriff",
+          "boost_max": 3,
+          "master_type": "cavalry_attack",
+          "master_label_de": "Kavallerie Angriff",
+          "master_value": 3,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_speed",
+          "label_de": "Fernkampf Geschwindigkeit",
+          "boost_max": 3,
+          "master_type": "ranged_load",
+          "master_label_de": "Fernkampf Traglast",
+          "master_value": 3,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60100109": {
+      "excel_row": 13,
+      "old_name": "wooden shield",
+      "effects": [
+        {
+          "type": "infantry_load",
+          "label_de": "Infanterie Traglast",
+          "boost_max": 3,
+          "master_type": "infantry_defense",
+          "master_label_de": "Infanterie Verteidigung",
+          "master_value": 3,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_defense",
+          "label_de": "Infanterie Verteidigung",
+          "boost_max": 3,
+          "master_type": "infantry_hp",
+          "master_label_de": "Infanterie Lebenspunkte",
+          "master_value": 3,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60200001": {
+      "excel_row": 28,
+      "old_name": "kite shield",
+      "effects": [
+        {
+          "type": "infantry_load",
+          "label_de": "Infanterie Traglast",
+          "boost_max": 10,
+          "master_type": "all_defense",
+          "master_label_de": "Truppenverteidigung",
+          "master_value": 5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_defense",
+          "label_de": "Infanterie Verteidigung",
+          "boost_max": 8,
+          "master_type": "infantry_training_rate",
+          "master_label_de": "Infanterie Ausbildung Rate",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_hp",
+          "label_de": "Infanterie Lebenspunkte",
+          "boost_max": 8,
+          "master_type": "infantry_defense",
+          "master_label_de": "Infanterie Verteidigung",
+          "master_value": 7.0,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60200002": {
+      "excel_row": 29,
+      "old_name": "long bow",
+      "effects": [
+        {
+          "type": "ranged_attack",
+          "label_de": "Fernkampf Angriff",
+          "boost_max": 8,
+          "master_type": "all_attack",
+          "master_label_de": "Truppenangriff",
+          "master_value": 5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_load",
+          "label_de": "Fernkampf Traglast",
+          "boost_max": 10,
+          "master_type": "ranged_training_rate",
+          "master_label_de": "Fernkampf Ausbildung Rate",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_hp",
+          "label_de": "Fernkampf Lebenspunkte",
+          "boost_max": 8,
+          "master_type": "ranged_attack",
+          "master_label_de": "Fernkampf Angriff",
+          "master_value": 7.0,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60200003": {
+      "excel_row": 15,
+      "old_name": "saddle",
+      "effects": [
+        {
+          "type": "cavalry_load",
+          "label_de": "Kavallerie Traglast",
+          "boost_max": 3,
+          "master_type": "cavalry_defense",
+          "master_label_de": "Kavallerie Verteidigung",
+          "master_value": 3,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_defense",
+          "label_de": "Kavallerie Verteidigung",
+          "boost_max": 3,
+          "master_type": "cavalry_hp",
+          "master_label_de": "Kavallerie Lebenspunkte",
+          "master_value": 3,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60200004": {
+      "excel_row": 27,
+      "old_name": "steel hammer",
+      "effects": [
+        {
+          "type": "stone_gathering_speed",
+          "label_de": "Stein Sammeln Geschwindigkeit",
+          "boost_max": 8,
+          "master_type": "ranged_load",
+          "master_label_de": "Fernkampf Traglast",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "gold_gathering_speed",
+          "label_de": "Gold Sammeln Geschwindigkeit",
+          "boost_max": 10,
+          "master_type": "cavalry_load",
+          "master_label_de": "Kavallerie Traglast",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_load",
+          "label_de": "Infanterie Traglast",
+          "boost_max": 10,
+          "master_type": "all_load",
+          "master_label_de": "Truppentraglast",
+          "master_value": 5,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60200006": {
+      "excel_row": 64,
+      "old_name": "war horn",
+      "effects": [
+        {
+          "type": "infantry_attack",
+          "label_de": "Infanterie Angriff",
+          "boost_max": 20,
+          "master_type": "infantry_training_speed",
+          "master_label_de": "Infanterie Ausbildung Geschwindigkeit",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_hp",
+          "label_de": "Fernkampf Lebenspunkte",
+          "boost_max": 20,
+          "master_type": "cavalry_training_speed",
+          "master_label_de": "Kavallerie Ausbildung Geschwindigkeit",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_defense",
+          "label_de": "Kavallerie Verteidigung",
+          "boost_max": 20,
+          "master_type": "training_speed",
+          "master_label_de": "Ausbildungsgeschwindigkeit",
+          "master_value": 15,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "all_load",
+          "label_de": "Truppentraglast",
+          "boost_max": 20,
+          "master_type": "instant_return_3",
+          "master_label_de": "Sofort Rückkehr 3",
+          "master_value": 1,
+          "unit": "percent",
+          "master_unit": "flat"
+        },
+        {
+          "type": "ranged_training_speed",
+          "label_de": "Fernkampf Ausbildung Geschwindigkeit",
+          "boost_max": 20,
+          "master_type": "weakened_defense_3",
+          "master_label_de": "Schwächung Verteidigung 3",
+          "master_value": -15,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60200101": {
+      "excel_row": 30,
+      "old_name": "black horse",
+      "effects": [
+        {
+          "type": "cavalry_attack",
+          "label_de": "Kavallerie Angriff",
+          "boost_max": 8,
+          "master_type": "cavalry_hp",
+          "master_label_de": "Kavallerie Lebenspunkte",
+          "master_value": 7.0,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_speed",
+          "label_de": "Kavallerie Geschwindigkeit",
+          "boost_max": 8,
+          "master_type": "all_speed",
+          "master_label_de": "Truppengeschwindigkeit",
+          "master_value": 5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_load",
+          "label_de": "Kavallerie Traglast",
+          "boost_max": 10,
+          "master_type": "cavalry_training_rate",
+          "master_label_de": "Kavallerie Ausbildung Rate",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60200102": {
+      "excel_row": 16,
+      "old_name": "blessed branches",
+      "effects": [
+        {
+          "type": "food_production",
+          "label_de": "Nahrung Produktion",
+          "boost_max": 10,
+          "master_type": "stone_production",
+          "master_label_de": "Stein Produktion",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "gathering_speed",
+          "label_de": "Sammelgeschwindigkeit",
+          "boost_max": 5,
+          "master_type": "gold_production",
+          "master_label_de": "Gold Produktion",
+          "master_value": 8,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "lumber_production",
+          "label_de": "Holz Produktion",
+          "boost_max": 10,
+          "master_type": "instant_harvest_1",
+          "master_label_de": "Sofort Ernte 1",
+          "master_value": 6,
+          "unit": "percent",
+          "master_unit": "flat"
+        }
+      ]
+    },
+    "60200103": {
+      "excel_row": 24,
+      "old_name": "healing potion",
+      "effects": [
+        {
+          "type": "infantry_hp",
+          "label_de": "Infanterie Lebenspunkte",
+          "boost_max": 8,
+          "master_type": "all_hp",
+          "master_label_de": "Truppen-Lebenspunkte",
+          "master_value": 4,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_hp",
+          "label_de": "Fernkampf Lebenspunkte",
+          "boost_max": 8,
+          "master_type": "hp_boost_1",
+          "master_label_de": "Lebenspunkte Schub 1",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_hp",
+          "label_de": "Kavallerie Lebenspunkte",
+          "boost_max": 8,
+          "master_type": "infantry_hp",
+          "master_label_de": "Infanterie Lebenspunkte",
+          "master_value": 7.0,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60200104": {
+      "excel_row": 19,
+      "old_name": "magic chisel",
+      "effects": [
+        {
+          "type": "stone_production",
+          "label_de": "Stein Produktion",
+          "boost_max": 10,
+          "master_type": "gathering_boost_1",
+          "master_label_de": "Sammeln Schub 1",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "stone_gathering_speed",
+          "label_de": "Stein Sammeln Geschwindigkeit",
+          "boost_max": 10,
+          "master_type": "infantry_attack",
+          "master_label_de": "Infanterie Angriff",
+          "master_value": 5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "stone_protection_capacity",
+          "label_de": "Stein Schutz Kapazität",
+          "boost_max": 10,
+          "master_type": "stone_gathering_speed",
+          "master_label_de": "Stein Sammeln Geschwindigkeit",
+          "master_value": 8,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60200105": {
+      "excel_row": 20,
+      "old_name": "magic pick",
+      "effects": [
+        {
+          "type": "gold_production",
+          "label_de": "Gold Produktion",
+          "boost_max": 10,
+          "master_type": "gathering_boost_1",
+          "master_label_de": "Sammeln Schub 1",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "gold_gathering_speed",
+          "label_de": "Gold Sammeln Geschwindigkeit",
+          "boost_max": 10,
+          "master_type": "resource_production",
+          "master_label_de": "Rohstoffproduktion",
+          "master_value": 5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "gold_protection_capacity",
+          "label_de": "Gold Schutz Kapazität",
+          "boost_max": 10,
+          "master_type": "gold_gathering_speed",
+          "master_label_de": "Gold Sammeln Geschwindigkeit",
+          "master_value": 8,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60200106": {
+      "excel_row": 17,
+      "old_name": "magic plow",
+      "effects": [
+        {
+          "type": "food_production",
+          "label_de": "Nahrung Produktion",
+          "boost_max": 10,
+          "master_type": "gathering_boost_1",
+          "master_label_de": "Sammeln Schub 1",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "food_gathering_speed",
+          "label_de": "Nahrung Sammeln Geschwindigkeit",
+          "boost_max": 10,
+          "master_type": "cavalry_attack",
+          "master_label_de": "Kavallerie Angriff",
+          "master_value": 5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "food_protection_capacity",
+          "label_de": "Nahrung Schutz Kapazität",
+          "boost_max": 10,
+          "master_type": "food_gathering_speed",
+          "master_label_de": "Nahrung Sammeln Geschwindigkeit",
+          "master_value": 8,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60200107": {
+      "excel_row": 18,
+      "old_name": "magic saw",
+      "effects": [
+        {
+          "type": "lumber_production",
+          "label_de": "Holz Produktion",
+          "boost_max": 10,
+          "master_type": "gathering_boost_1",
+          "master_label_de": "Sammeln Schub 1",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "lumber_gathering_speed",
+          "label_de": "Holz Sammeln Geschwindigkeit",
+          "boost_max": 10,
+          "master_type": "ranged_attack",
+          "master_label_de": "Fernkampf Angriff",
+          "master_value": 5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "lumber_protection_capacity",
+          "label_de": "Holz Schutz Kapazität",
+          "boost_max": 10,
+          "master_type": "lumber_gathering_speed",
+          "master_label_de": "Holz Sammeln Geschwindigkeit",
+          "master_value": 8,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60200108": {
+      "excel_row": 22,
+      "old_name": "potion of strength",
+      "effects": [
+        {
+          "type": "infantry_attack",
+          "label_de": "Infanterie Angriff",
+          "boost_max": 8,
+          "master_type": "all_attack",
+          "master_label_de": "Truppenangriff",
+          "master_value": 4,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_attack",
+          "label_de": "Fernkampf Angriff",
+          "boost_max": 8,
+          "master_type": "attack_boost_1",
+          "master_label_de": "Angriff Schub 1",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_attack",
+          "label_de": "Kavallerie Angriff",
+          "boost_max": 8,
+          "master_type": "ranged_attack",
+          "master_label_de": "Fernkampf Angriff",
+          "master_value": 7.0,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60200109": {
+      "excel_row": 25,
+      "old_name": "potion of swiftness",
+      "effects": [
+        {
+          "type": "infantry_speed",
+          "label_de": "Infanterie Geschwindigkeit",
+          "boost_max": 8,
+          "master_type": "speed_boost_1",
+          "master_label_de": "Geschwindigkeit Schub 1",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_speed",
+          "label_de": "Fernkampf Geschwindigkeit",
+          "boost_max": 8,
+          "master_type": "all_speed",
+          "master_label_de": "Truppengeschwindigkeit",
+          "master_value": 4,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_speed",
+          "label_de": "Kavallerie Geschwindigkeit",
+          "boost_max": 8,
+          "master_type": "cavalry_speed",
+          "master_label_de": "Kavallerie Geschwindigkeit",
+          "master_value": 7.0,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60200110": {
+      "excel_row": 23,
+      "old_name": "potion of toughness",
+      "effects": [
+        {
+          "type": "infantry_defense",
+          "label_de": "Infanterie Verteidigung",
+          "boost_max": 8,
+          "master_type": "all_defense",
+          "master_label_de": "Truppenverteidigung",
+          "master_value": 4,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_defense",
+          "label_de": "Fernkampf Verteidigung",
+          "boost_max": 8,
+          "master_type": "defense_boost_1",
+          "master_label_de": "Verteidigung Schub 1",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_defense",
+          "label_de": "Kavallerie Verteidigung",
+          "boost_max": 8,
+          "master_type": "infantry_defense",
+          "master_label_de": "Infanterie Verteidigung",
+          "master_value": 7.0,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60200111": {
+      "excel_row": 26,
+      "old_name": "silver apple",
+      "effects": [
+        {
+          "type": "food_gathering_speed",
+          "label_de": "Nahrung Sammeln Geschwindigkeit",
+          "boost_max": 10,
+          "master_type": "ranged_speed",
+          "master_label_de": "Fernkampf Geschwindigkeit",
+          "master_value": 7.0,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "lumber_gathering_speed",
+          "label_de": "Holz Sammeln Geschwindigkeit",
+          "boost_max": 10,
+          "master_type": "cavalry_speed",
+          "master_label_de": "Kavallerie Geschwindigkeit",
+          "master_value": 7.0,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_speed",
+          "label_de": "Infanterie Geschwindigkeit",
+          "boost_max": 7.0,
+          "master_type": "all_speed",
+          "master_label_de": "Truppengeschwindigkeit",
+          "master_value": 5,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60300001": {
+      "excel_row": 59,
+      "old_name": "celestial shield",
+      "effects": [
+        {
+          "type": "stone_gathering_speed",
+          "label_de": "Stein Sammeln Geschwindigkeit",
+          "boost_max": 30,
+          "master_type": "infantry_hp",
+          "master_label_de": "Infanterie Lebenspunkte",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_attack",
+          "label_de": "Infanterie Angriff",
+          "boost_max": 20,
+          "master_type": "ranged_defense",
+          "master_label_de": "Fernkampf Verteidigung",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_speed",
+          "label_de": "Infanterie Geschwindigkeit",
+          "boost_max": 20,
+          "master_type": "cavalry_defense",
+          "master_label_de": "Kavallerie Verteidigung",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_load",
+          "label_de": "Infanterie Traglast",
+          "boost_max": 20,
+          "master_type": "all_defense",
+          "master_label_de": "Truppenverteidigung",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_defense",
+          "label_de": "Infanterie Verteidigung",
+          "boost_max": 20,
+          "master_type": "defense_boost_3",
+          "master_label_de": "Verteidigung Schub 3",
+          "master_value": 30,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60300002": {
+      "excel_row": 70,
+      "old_name": "dragon tooth bow",
+      "effects": [
+        {
+          "type": "ranged_attack",
+          "label_de": "Fernkampf Angriff",
+          "boost_max": 25,
+          "master_type": "ranged_hp_versus_cavalry",
+          "master_label_de": "Fernkampf Lebenspunkte gegen Kavallerie",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_speed",
+          "label_de": "Fernkampf Geschwindigkeit",
+          "boost_max": 25,
+          "master_type": "castle_defending_ranged_attack",
+          "master_label_de": "Burg Verteidigung Fernkampf Angriff",
+          "master_value": 30,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_load",
+          "label_de": "Fernkampf Traglast",
+          "boost_max": 30,
+          "master_type": "ranged_defense_versus_cavalry",
+          "master_label_de": "Fernkampf Verteidigung gegen Kavallerie",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_defense",
+          "label_de": "Fernkampf Verteidigung",
+          "boost_max": 15,
+          "master_type": "ranged_attack_against_cavalry",
+          "master_label_de": "Fernkampf Angriff Against Kavallerie",
+          "master_value": 30,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_hp",
+          "label_de": "Fernkampf Lebenspunkte",
+          "boost_max": 20,
+          "master_type": "ranged_ability_boost_3",
+          "master_label_de": "Fernkampf Fähigkeit Schub 3",
+          "master_value": 15,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60300003": {
+      "excel_row": 40,
+      "old_name": "cursed sword",
+      "effects": [
+        {
+          "type": "lumber_protection_capacity",
+          "label_de": "Holz Schutz Kapazität",
+          "boost_max": 15,
+          "master_type": "all_attack",
+          "master_label_de": "Truppenangriff",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_attack",
+          "label_de": "Infanterie Angriff",
+          "boost_max": 12,
+          "master_type": "all_load",
+          "master_label_de": "Truppentraglast",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_attack",
+          "label_de": "Fernkampf Angriff",
+          "boost_max": 12,
+          "master_type": "weakened_attack_1",
+          "master_label_de": "Schwächung Angriff 1",
+          "master_value": -5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_attack",
+          "label_de": "Kavallerie Angriff",
+          "boost_max": 12,
+          "master_type": "weakened_attack_2",
+          "master_label_de": "Schwächung Angriff 2",
+          "master_value": -10,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60300004": {
+      "excel_row": 44,
+      "old_name": "corrupted staff",
+      "effects": [
+        {
+          "type": "lumber_gathering_speed",
+          "label_de": "Holz Sammeln Geschwindigkeit",
+          "boost_max": 15,
+          "master_type": "ranged_hp",
+          "master_label_de": "Fernkampf Lebenspunkte",
+          "master_value": 12,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_speed",
+          "label_de": "Infanterie Geschwindigkeit",
+          "boost_max": 12,
+          "master_type": "reduced_resource_production_1",
+          "master_label_de": "Verringerung Rohstoff Produktion 1",
+          "master_value": -5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_attack",
+          "label_de": "Fernkampf Angriff",
+          "boost_max": 12,
+          "master_type": "ranged_training_speed",
+          "master_label_de": "Fernkampf Ausbildung Geschwindigkeit",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_attack",
+          "label_de": "Kavallerie Angriff",
+          "boost_max": 12,
+          "master_type": "reduced_resource_production_2",
+          "master_label_de": "Verringerung Rohstoff Produktion 2",
+          "master_value": -10,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60300005": {
+      "excel_row": 21,
+      "old_name": "war flag",
+      "effects": [
+        {
+          "type": "ranged_attack",
+          "label_de": "Fernkampf Angriff",
+          "boost_max": 5,
+          "master_type": "all_hp",
+          "master_label_de": "Truppen-Lebenspunkte",
+          "master_value": 4,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_defense",
+          "label_de": "Infanterie Verteidigung",
+          "boost_max": 5,
+          "master_type": "all_defense",
+          "master_label_de": "Truppenverteidigung",
+          "master_value": 4,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_hp",
+          "label_de": "Kavallerie Lebenspunkte",
+          "boost_max": 5,
+          "master_type": "all_attack",
+          "master_label_de": "Truppenangriff",
+          "master_value": 4,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60300006": {
+      "excel_row": 33,
+      "old_name": "golden grain",
+      "effects": [
+        {
+          "type": "food_production",
+          "label_de": "Nahrung Produktion",
+          "boost_max": 15,
+          "master_type": "food_protection_capacity",
+          "master_label_de": "Nahrung Schutz Kapazität",
+          "master_value": 15,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "food_storage_capacity",
+          "label_de": "Nahrung Lager Kapazität",
+          "boost_max": 15,
+          "master_type": "ranged_hp",
+          "master_label_de": "Fernkampf Lebenspunkte",
+          "master_value": 12,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "gathering_speed",
+          "label_de": "Sammelgeschwindigkeit",
+          "boost_max": 10,
+          "master_type": "all_hp",
+          "master_label_de": "Truppen-Lebenspunkte",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "food_gathering_speed",
+          "label_de": "Nahrung Sammeln Geschwindigkeit",
+          "boost_max": 15,
+          "master_type": "gathering_boost_2",
+          "master_label_de": "Sammeln Schub 2",
+          "master_value": 30,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60300101": {
+      "excel_row": 49,
+      "old_name": "amulet of life",
+      "effects": [
+        {
+          "type": "gathering_speed",
+          "label_de": "Sammelgeschwindigkeit",
+          "boost_max": 10,
+          "master_type": "resource_production_boost_1",
+          "master_label_de": "Rohstoff Produktion Schub 1",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "gold_gathering_speed",
+          "label_de": "Gold Sammeln Geschwindigkeit",
+          "boost_max": 15,
+          "master_type": "resource_production_boost_2",
+          "master_label_de": "Rohstoff Produktion Schub 2",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_load",
+          "label_de": "Infanterie Traglast",
+          "boost_max": 15,
+          "master_type": "resource_protection",
+          "master_label_de": "Rohstoffschutz",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "all_hp",
+          "label_de": "Truppen-Lebenspunkte",
+          "boost_max": 10,
+          "master_type": "all_hp",
+          "master_label_de": "Truppen-Lebenspunkte",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60300102": {
+      "excel_row": 41,
+      "old_name": "bone armor",
+      "effects": [
+        {
+          "type": "stone_protection_capacity",
+          "label_de": "Stein Schutz Kapazität",
+          "boost_max": 15,
+          "master_type": "all_defense",
+          "master_label_de": "Truppenverteidigung",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_defense",
+          "label_de": "Infanterie Verteidigung",
+          "boost_max": 12,
+          "master_type": "all_load",
+          "master_label_de": "Truppentraglast",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_defense",
+          "label_de": "Fernkampf Verteidigung",
+          "boost_max": 12,
+          "master_type": "weakened_defense_1",
+          "master_label_de": "Schwächung Verteidigung 1",
+          "master_value": -5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_defense",
+          "label_de": "Kavallerie Verteidigung",
+          "boost_max": 12,
+          "master_type": "weakened_defense_2",
+          "master_label_de": "Schwächung Verteidigung 2",
+          "master_value": -10,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60300103": {
+      "excel_row": 54,
+      "old_name": "dragon fang",
+      "effects": [
+        {
+          "type": "lumber_gathering_speed",
+          "label_de": "Holz Sammeln Geschwindigkeit",
+          "boost_max": 15,
+          "master_type": "all_attack",
+          "master_label_de": "Truppenangriff",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_attack",
+          "label_de": "Infanterie Angriff",
+          "boost_max": 10,
+          "master_type": "attack_boost_2",
+          "master_label_de": "Angriff Schub 2",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_attack",
+          "label_de": "Fernkampf Angriff",
+          "boost_max": 10,
+          "master_type": "cavalry_defense",
+          "master_label_de": "Kavallerie Verteidigung",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_hp",
+          "label_de": "Fernkampf Lebenspunkte",
+          "boost_max": 10,
+          "master_type": "ranged_attack",
+          "master_label_de": "Fernkampf Angriff",
+          "master_value": 12,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60300104": {
+      "excel_row": 55,
+      "old_name": "dragon soul",
+      "effects": [
+        {
+          "type": "food_gathering_speed",
+          "label_de": "Nahrung Sammeln Geschwindigkeit",
+          "boost_max": 15,
+          "master_type": "all_speed",
+          "master_label_de": "Truppengeschwindigkeit",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_attack",
+          "label_de": "Fernkampf Angriff",
+          "boost_max": 10,
+          "master_type": "hp_boost_2",
+          "master_label_de": "Lebenspunkte Schub 2",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_attack",
+          "label_de": "Kavallerie Angriff",
+          "boost_max": 10,
+          "master_type": "infantry_hp",
+          "master_label_de": "Infanterie Lebenspunkte",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_speed",
+          "label_de": "Kavallerie Geschwindigkeit",
+          "boost_max": 10,
+          "master_type": "cavalry_speed",
+          "master_label_de": "Kavallerie Geschwindigkeit",
+          "master_value": 12,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60300105": {
+      "excel_row": 56,
+      "old_name": "flame flower",
+      "effects": [
+        {
+          "type": "gathering_speed",
+          "label_de": "Sammelgeschwindigkeit",
+          "boost_max": 15,
+          "master_type": "speed_boost_2",
+          "master_label_de": "Geschwindigkeit Schub 2",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "resource_production",
+          "label_de": "Rohstoffproduktion",
+          "boost_max": 15,
+          "master_type": "resource_production",
+          "master_label_de": "Rohstoffproduktion",
+          "master_value": 15,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "resource_reserves",
+          "label_de": "Rohstoff Reserve",
+          "boost_max": 15,
+          "master_type": "resource_reserves",
+          "master_label_de": "Rohstoff Reserve",
+          "master_value": 15,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "resource_protection",
+          "label_de": "Rohstoffschutz",
+          "boost_max": 15,
+          "master_type": "resource_protection",
+          "master_label_de": "Rohstoffschutz",
+          "master_value": 15,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60300106": {
+      "excel_row": 43,
+      "old_name": "fragment of golem",
+      "effects": [
+        {
+          "type": "gold_protection_capacity",
+          "label_de": "Gold Schutz Kapazität",
+          "boost_max": 15,
+          "master_type": "all_speed",
+          "master_label_de": "Truppengeschwindigkeit",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_speed",
+          "label_de": "Infanterie Geschwindigkeit",
+          "boost_max": 12,
+          "master_type": "all_load",
+          "master_label_de": "Truppentraglast",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_speed",
+          "label_de": "Fernkampf Geschwindigkeit",
+          "boost_max": 12,
+          "master_type": "weakened_speed_1",
+          "master_label_de": "Schwächung Geschwindigkeit 1",
+          "master_value": -5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_speed",
+          "label_de": "Kavallerie Geschwindigkeit",
+          "boost_max": 12,
+          "master_type": "weakened_speed_2",
+          "master_label_de": "Schwächung Geschwindigkeit 2",
+          "master_value": -10,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60300107": {
+      "excel_row": 50,
+      "old_name": "gem of vital",
+      "effects": [
+        {
+          "type": "infantry_speed",
+          "label_de": "Infanterie Geschwindigkeit",
+          "boost_max": 12,
+          "master_type": "all_hp",
+          "master_label_de": "Truppen-Lebenspunkte",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_hp",
+          "label_de": "Infanterie Lebenspunkte",
+          "boost_max": 12,
+          "master_type": "cavalry_training_rate",
+          "master_label_de": "Kavallerie Ausbildung Rate",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_hp",
+          "label_de": "Fernkampf Lebenspunkte",
+          "boost_max": 12,
+          "master_type": "training_boost_1",
+          "master_label_de": "Ausbildung Schub 1",
+          "master_value": 5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_hp",
+          "label_de": "Kavallerie Lebenspunkte",
+          "boost_max": 12,
+          "master_type": "training_boost_2",
+          "master_label_de": "Ausbildung Schub 2",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60300108": {
+      "excel_row": 52,
+      "old_name": "gift of dwarf",
+      "effects": [
+        {
+          "type": "gathering_speed",
+          "label_de": "Sammelgeschwindigkeit",
+          "boost_max": 10,
+          "master_type": "stone_gathering_speed",
+          "master_label_de": "Stein Sammeln Geschwindigkeit",
+          "master_value": 15,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "lumber_production",
+          "label_de": "Holz Produktion",
+          "boost_max": 15,
+          "master_type": "construction_speed",
+          "master_label_de": "Baugeschwindigkeit",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "stone_production",
+          "label_de": "Stein Produktion",
+          "boost_max": 15,
+          "master_type": "construction_boost_1",
+          "master_label_de": "Bau Schub 1",
+          "master_value": 5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "lumber_gathering_speed",
+          "label_de": "Holz Sammeln Geschwindigkeit",
+          "boost_max": 15,
+          "master_type": "construction_boost_2",
+          "master_label_de": "Bau Schub 2",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60300109": {
+      "excel_row": 34,
+      "old_name": "golden axe",
+      "effects": [
+        {
+          "type": "gathering_speed",
+          "label_de": "Sammelgeschwindigkeit",
+          "boost_max": 10,
+          "master_type": "lumber_protection_capacity",
+          "master_label_de": "Holz Schutz Kapazität",
+          "master_value": 15,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "lumber_production",
+          "label_de": "Holz Produktion",
+          "boost_max": 15,
+          "master_type": "ranged_attack",
+          "master_label_de": "Fernkampf Angriff",
+          "master_value": 12,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "lumber_storage_capacity",
+          "label_de": "Holz Lager Kapazität",
+          "boost_max": 15,
+          "master_type": "all_attack",
+          "master_label_de": "Truppenangriff",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "lumber_gathering_speed",
+          "label_de": "Holz Sammeln Geschwindigkeit",
+          "boost_max": 15,
+          "master_type": "gathering_boost_2",
+          "master_label_de": "Sammeln Schub 2",
+          "master_value": 30,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60300110": {
+      "excel_row": 35,
+      "old_name": "golden hammer",
+      "effects": [
+        {
+          "type": "gathering_speed",
+          "label_de": "Sammelgeschwindigkeit",
+          "boost_max": 10,
+          "master_type": "stone_protection_capacity",
+          "master_label_de": "Stein Schutz Kapazität",
+          "master_value": 15,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "stone_production",
+          "label_de": "Stein Produktion",
+          "boost_max": 15,
+          "master_type": "infantry_attack",
+          "master_label_de": "Infanterie Angriff",
+          "master_value": 12,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "stone_storage_capacity",
+          "label_de": "Stein Lager Kapazität",
+          "boost_max": 15,
+          "master_type": "all_defense",
+          "master_label_de": "Truppenverteidigung",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "stone_gathering_speed",
+          "label_de": "Stein Sammeln Geschwindigkeit",
+          "boost_max": 15,
+          "master_type": "gathering_boost_2",
+          "master_label_de": "Sammeln Schub 2",
+          "master_value": 30,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60300111": {
+      "excel_row": 36,
+      "old_name": "golden pick",
+      "effects": [
+        {
+          "type": "gathering_speed",
+          "label_de": "Sammelgeschwindigkeit",
+          "boost_max": 10,
+          "master_type": "gold_protection_capacity",
+          "master_label_de": "Gold Schutz Kapazität",
+          "master_value": 15,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "gold_production",
+          "label_de": "Gold Produktion",
+          "boost_max": 15,
+          "master_type": "cavalry_attack",
+          "master_label_de": "Kavallerie Angriff",
+          "master_value": 12,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "gold_storage_capacity",
+          "label_de": "Gold Lager Kapazität",
+          "boost_max": 15,
+          "master_type": "all_attack",
+          "master_label_de": "Truppenangriff",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "gold_gathering_speed",
+          "label_de": "Gold Sammeln Geschwindigkeit",
+          "boost_max": 15,
+          "master_type": "gathering_boost_2",
+          "master_label_de": "Sammeln Schub 2",
+          "master_value": 30,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60300112": {
+      "excel_row": 48,
+      "old_name": "hammer of destruction",
+      "effects": [
+        {
+          "type": "stone_gathering_speed",
+          "label_de": "Stein Sammeln Geschwindigkeit",
+          "boost_max": 15,
+          "master_type": "all_attack",
+          "master_label_de": "Truppenangriff",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "gold_gathering_speed",
+          "label_de": "Gold Sammeln Geschwindigkeit",
+          "boost_max": 15,
+          "master_type": "ranged_training_rate",
+          "master_label_de": "Fernkampf Ausbildung Rate",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_attack",
+          "label_de": "Infanterie Angriff",
+          "boost_max": 12,
+          "master_type": "reduced_construction_speed_1",
+          "master_label_de": "Verringerung Bau Geschwindigkeit 1",
+          "master_value": -5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_hp",
+          "label_de": "Infanterie Lebenspunkte",
+          "boost_max": 12,
+          "master_type": "reduced_construction_speed_2",
+          "master_label_de": "Verringerung Bau Geschwindigkeit 2",
+          "master_value": -10,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60300113": {
+      "excel_row": 37,
+      "old_name": "mark of warrior",
+      "effects": [
+        {
+          "type": "stone_gathering_speed",
+          "label_de": "Stein Sammeln Geschwindigkeit",
+          "boost_max": 15,
+          "master_type": "infantry_defense",
+          "master_label_de": "Infanterie Verteidigung",
+          "master_value": 12,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_attack",
+          "label_de": "Infanterie Angriff",
+          "boost_max": 12,
+          "master_type": "infantry_hp",
+          "master_label_de": "Infanterie Lebenspunkte",
+          "master_value": 12,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_speed",
+          "label_de": "Infanterie Geschwindigkeit",
+          "boost_max": 12,
+          "master_type": "infantry_ability_boost_1",
+          "master_label_de": "Infanterie Fähigkeit Schub 1",
+          "master_value": 5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_load",
+          "label_de": "Infanterie Traglast",
+          "boost_max": 15,
+          "master_type": "infantry_ability_boost_2",
+          "master_label_de": "Infanterie Fähigkeit Schub 2",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60300114": {
+      "excel_row": 45,
+      "old_name": "obsidian plate",
+      "effects": [
+        {
+          "type": "food_production",
+          "label_de": "Nahrung Produktion",
+          "boost_max": 15,
+          "master_type": "cavalry_defense",
+          "master_label_de": "Kavallerie Verteidigung",
+          "master_value": 12,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "stone_gathering_speed",
+          "label_de": "Stein Sammeln Geschwindigkeit",
+          "boost_max": 15,
+          "master_type": "reduced_gathering_speed_1",
+          "master_label_de": "Verringerung Sammeln Geschwindigkeit 1",
+          "master_value": -5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_attack",
+          "label_de": "Fernkampf Angriff",
+          "boost_max": 12,
+          "master_type": "infantry_training_speed",
+          "master_label_de": "Infanterie Ausbildung Geschwindigkeit",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_defense",
+          "label_de": "Fernkampf Verteidigung",
+          "boost_max": 12,
+          "master_type": "reduced_gathering_speed_2",
+          "master_label_de": "Verringerung Sammeln Geschwindigkeit 2",
+          "master_value": -10,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60300115": {
+      "excel_row": 31,
+      "old_name": "orb of portal",
+      "effects": [
+        {
+          "type": "gold_gathering_speed",
+          "label_de": "Gold Sammeln Geschwindigkeit",
+          "boost_max": 15,
+          "master_type": "teleport_1",
+          "master_label_de": "Teleport 1",
+          "master_value": 200,
+          "unit": "percent",
+          "master_unit": "flat"
+        },
+        {
+          "type": "infantry_speed",
+          "label_de": "Infanterie Geschwindigkeit",
+          "boost_max": 15,
+          "master_type": "maximum_reinforcement_troop_size",
+          "master_label_de": "Maximal Verstärkung Truppen Größe",
+          "master_value": 15,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_speed",
+          "label_de": "Fernkampf Geschwindigkeit",
+          "boost_max": 15,
+          "master_type": "research_speed",
+          "master_label_de": "Forschungsgeschwindigkeit",
+          "master_value": 12,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_speed",
+          "label_de": "Kavallerie Geschwindigkeit",
+          "boost_max": 15,
+          "master_type": "teleport_2",
+          "master_label_de": "Teleport 2",
+          "master_value": 400,
+          "unit": "percent",
+          "master_unit": "flat"
+        }
+      ]
+    },
+    "60300116": {
+      "excel_row": 32,
+      "old_name": "pendant of goddess",
+      "effects": [
+        {
+          "type": "food_production",
+          "label_de": "Nahrung Produktion",
+          "boost_max": 15,
+          "master_type": "food_gathering_speed",
+          "master_label_de": "Nahrung Sammeln Geschwindigkeit",
+          "master_value": 15,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "lumber_production",
+          "label_de": "Holz Produktion",
+          "boost_max": 15,
+          "master_type": "lumber_gathering_speed",
+          "master_label_de": "Holz Sammeln Geschwindigkeit",
+          "master_value": 15,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "stone_production",
+          "label_de": "Stein Produktion",
+          "boost_max": 15,
+          "master_type": "instant_harvest_2",
+          "master_label_de": "Sofort Ernte 2",
+          "master_value": 12,
+          "unit": "percent",
+          "master_unit": "flat"
+        },
+        {
+          "type": "gold_production",
+          "label_de": "Gold Produktion",
+          "boost_max": 15,
+          "master_type": "resource_reserves",
+          "master_label_de": "Rohstoff Reserve",
+          "master_value": 15,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60300117": {
+      "excel_row": 51,
+      "old_name": "sage's hat",
+      "effects": [
+        {
+          "type": "gold_production",
+          "label_de": "Gold Produktion",
+          "boost_max": 12,
+          "master_type": "cavalry_load",
+          "master_label_de": "Kavallerie Traglast",
+          "master_value": 15,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "gold_storage_capacity",
+          "label_de": "Gold Lager Kapazität",
+          "boost_max": 12,
+          "master_type": "research_speed",
+          "master_label_de": "Forschungsgeschwindigkeit",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "gold_gathering_speed",
+          "label_de": "Gold Sammeln Geschwindigkeit",
+          "boost_max": 12,
+          "master_type": "research_boost_1",
+          "master_label_de": "Forschung Schub 1",
+          "master_value": 5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_load",
+          "label_de": "Fernkampf Traglast",
+          "boost_max": 15,
+          "master_type": "research_boost_2",
+          "master_label_de": "Forschung Schub 2",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60300118": {
+      "excel_row": 46,
+      "old_name": "scroll of drain",
+      "effects": [
+        {
+          "type": "lumber_production",
+          "label_de": "Holz Produktion",
+          "boost_max": 15,
+          "master_type": "cavalry_defense",
+          "master_label_de": "Kavallerie Verteidigung",
+          "master_value": 12,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "food_gathering_speed",
+          "label_de": "Nahrung Sammeln Geschwindigkeit",
+          "boost_max": 15,
+          "master_type": "reduced_training_speed_1",
+          "master_label_de": "Verringerung Ausbildung Geschwindigkeit 1",
+          "master_value": -5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_attack",
+          "label_de": "Kavallerie Angriff",
+          "boost_max": 12,
+          "master_type": "cavalry_training_speed",
+          "master_label_de": "Kavallerie Ausbildung Geschwindigkeit",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_speed",
+          "label_de": "Kavallerie Geschwindigkeit",
+          "boost_max": 12,
+          "master_type": "reduced_training_speed_2",
+          "master_label_de": "Verringerung Ausbildung Geschwindigkeit 2",
+          "master_value": -10,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60300119": {
+      "excel_row": 38,
+      "old_name": "shining arrow",
+      "effects": [
+        {
+          "type": "lumber_gathering_speed",
+          "label_de": "Holz Sammeln Geschwindigkeit",
+          "boost_max": 15,
+          "master_type": "ranged_defense",
+          "master_label_de": "Fernkampf Verteidigung",
+          "master_value": 12,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_attack",
+          "label_de": "Fernkampf Angriff",
+          "boost_max": 12,
+          "master_type": "ranged_hp",
+          "master_label_de": "Fernkampf Lebenspunkte",
+          "master_value": 12,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_speed",
+          "label_de": "Fernkampf Geschwindigkeit",
+          "boost_max": 12,
+          "master_type": "ranged_ability_boost_1",
+          "master_label_de": "Fernkampf Fähigkeit Schub 1",
+          "master_value": 5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_load",
+          "label_de": "Fernkampf Traglast",
+          "boost_max": 15,
+          "master_type": "ranged_ability_boost_2",
+          "master_label_de": "Fernkampf Fähigkeit Schub 2",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60300120": {
+      "excel_row": 39,
+      "old_name": "war pike",
+      "effects": [
+        {
+          "type": "food_gathering_speed",
+          "label_de": "Nahrung Sammeln Geschwindigkeit",
+          "boost_max": 15,
+          "master_type": "cavalry_defense",
+          "master_label_de": "Kavallerie Verteidigung",
+          "master_value": 12,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_attack",
+          "label_de": "Kavallerie Angriff",
+          "boost_max": 12,
+          "master_type": "cavalry_hp",
+          "master_label_de": "Kavallerie Lebenspunkte",
+          "master_value": 12,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_speed",
+          "label_de": "Kavallerie Geschwindigkeit",
+          "boost_max": 12,
+          "master_type": "cavalry_ability_boost_1",
+          "master_label_de": "Kavallerie Fähigkeit Schub 1",
+          "master_value": 5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_load",
+          "label_de": "Kavallerie Traglast",
+          "boost_max": 15,
+          "master_type": "cavalry_ability_boost_2",
+          "master_label_de": "Kavallerie Fähigkeit Schub 2",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60400001": {
+      "excel_row": 42,
+      "old_name": "hand of vampire",
+      "effects": [
+        {
+          "type": "food_protection_capacity",
+          "label_de": "Nahrung Schutz Kapazität",
+          "boost_max": 15,
+          "master_type": "all_hp",
+          "master_label_de": "Truppen-Lebenspunkte",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_hp",
+          "label_de": "Infanterie Lebenspunkte",
+          "boost_max": 12,
+          "master_type": "all_load",
+          "master_label_de": "Truppentraglast",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_hp",
+          "label_de": "Fernkampf Lebenspunkte",
+          "boost_max": 12,
+          "master_type": "weakened_hp_1",
+          "master_label_de": "Schwächung Lebenspunkte 1",
+          "master_value": -5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_hp",
+          "label_de": "Kavallerie Lebenspunkte",
+          "boost_max": 12,
+          "master_type": "weakened_hp_2",
+          "master_label_de": "Schwächung Lebenspunkte 2",
+          "master_value": -10,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60400003": {
+      "excel_row": 78,
+      "old_name": "mirror of truth",
+      "effects": [
+        {
+          "type": "gathering_speed",
+          "label_de": "Sammelgeschwindigkeit",
+          "boost_max": 40,
+          "master_type": "battle_cry_speed_1",
+          "master_label_de": "Schlachtruf Geschwindigkeit 1",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "research_speed",
+          "label_de": "Forschungsgeschwindigkeit",
+          "boost_max": 25,
+          "master_type": "battle_cry_attack_1",
+          "master_label_de": "Schlachtruf Angriff 1",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "construction_speed",
+          "label_de": "Baugeschwindigkeit",
+          "boost_max": 30,
+          "master_type": "dispel_3",
+          "master_label_de": "Bann 3",
+          "master_value": 1,
+          "unit": "percent",
+          "master_unit": "flat"
+        },
+        {
+          "type": "training_speed",
+          "label_de": "Ausbildungsgeschwindigkeit",
+          "boost_max": 35,
+          "master_type": "battle_cry_speed_2",
+          "master_label_de": "Schlachtruf Geschwindigkeit 2",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "troops_training_cost",
+          "label_de": "Truppen Ausbildung Kosten",
+          "boost_max": -25,
+          "master_type": "battle_cry_attack_2",
+          "master_label_de": "Schlachtruf Angriff 2",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60400004": {
+      "excel_row": 47,
+      "old_name": "dark crystal",
+      "effects": [
+        {
+          "type": "stone_production",
+          "label_de": "Stein Produktion",
+          "boost_max": 15,
+          "master_type": "all_load",
+          "master_label_de": "Truppentraglast",
+          "master_value": 12,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_defense",
+          "label_de": "Infanterie Verteidigung",
+          "boost_max": 12,
+          "master_type": "infantry_training_rate",
+          "master_label_de": "Infanterie Ausbildung Rate",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_hp",
+          "label_de": "Kavallerie Lebenspunkte",
+          "boost_max": 12,
+          "master_type": "reduced_research_speed_1",
+          "master_label_de": "Verringerung Forschung Geschwindigkeit 1",
+          "master_value": -5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "all_defense",
+          "label_de": "Truppenverteidigung",
+          "boost_max": 10,
+          "master_type": "reduced_research_speed_2",
+          "master_label_de": "Verringerung Forschung Geschwindigkeit 2",
+          "master_value": -10,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60400101": {
+      "excel_row": 62,
+      "old_name": "blessing of goddess",
+      "effects": [
+        {
+          "type": "food_production",
+          "label_de": "Nahrung Produktion",
+          "boost_max": 30,
+          "master_type": "ranged_hp",
+          "master_label_de": "Fernkampf Lebenspunkte",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "lumber_production",
+          "label_de": "Holz Produktion",
+          "boost_max": 30,
+          "master_type": "all_speed",
+          "master_label_de": "Truppengeschwindigkeit",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "stone_production",
+          "label_de": "Stein Produktion",
+          "boost_max": 30,
+          "master_type": "resource_reserves",
+          "master_label_de": "Rohstoff Reserve",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "gold_production",
+          "label_de": "Gold Produktion",
+          "boost_max": 30,
+          "master_type": "crystal_gathering_speed",
+          "master_label_de": "Kristall Sammeln Geschwindigkeit",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "resource_production",
+          "label_de": "Rohstoffproduktion",
+          "boost_max": 20,
+          "master_type": "instant_harvest_3",
+          "master_label_de": "Sofort Ernte 3",
+          "master_value": 24,
+          "unit": "percent",
+          "master_unit": "flat"
+        }
+      ]
+    },
+    "60400102": {
+      "excel_row": 67,
+      "old_name": "crystal flask",
+      "effects": [
+        {
+          "type": "food_production",
+          "label_de": "Nahrung Produktion",
+          "boost_max": 30,
+          "master_type": "gold_gathering_speed",
+          "master_label_de": "Gold Sammeln Geschwindigkeit",
+          "master_value": 30,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "gathering_speed",
+          "label_de": "Sammelgeschwindigkeit",
+          "boost_max": 15,
+          "master_type": "gold_protection_capacity",
+          "master_label_de": "Gold Schutz Kapazität",
+          "master_value": 30,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "gold_production",
+          "label_de": "Gold Produktion",
+          "boost_max": 30,
+          "master_type": "all_load",
+          "master_label_de": "Truppentraglast",
+          "master_value": 15,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "food_gathering_speed",
+          "label_de": "Nahrung Sammeln Geschwindigkeit",
+          "boost_max": 30,
+          "master_type": "research_speed",
+          "master_label_de": "Forschungsgeschwindigkeit",
+          "master_value": 15,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "resource_production",
+          "label_de": "Rohstoffproduktion",
+          "boost_max": 15,
+          "master_type": "research_boost_3",
+          "master_label_de": "Forschung Schub 3",
+          "master_value": 15,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60400103": {
+      "excel_row": 71,
+      "old_name": "dragon slayer",
+      "effects": [
+        {
+          "type": "infantry_attack",
+          "label_de": "Infanterie Angriff",
+          "boost_max": 15,
+          "master_type": "enemy_troop_hp_debuff",
+          "master_label_de": "Gegner Truppen Lebenspunkte Debuff",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_speed",
+          "label_de": "Infanterie Geschwindigkeit",
+          "boost_max": 15,
+          "master_type": "infantry_defense_when_participating_a_rally",
+          "master_label_de": "Infanterie Verteidigung bei Teilnahme A Sammelangriff",
+          "master_value": 25,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_load",
+          "label_de": "Infanterie Traglast",
+          "boost_max": 25,
+          "master_type": "enemy_troop_defense_debuff",
+          "master_label_de": "Gegner Truppen Verteidigung Debuff",
+          "master_value": 30,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_defense",
+          "label_de": "Infanterie Verteidigung",
+          "boost_max": 35,
+          "master_type": "enemy_troop_attack_debuff",
+          "master_label_de": "Gegner Truppen Angriff Debuff",
+          "master_value": 25,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_hp",
+          "label_de": "Infanterie Lebenspunkte",
+          "boost_max": 35,
+          "master_type": "infantry_ability_boost_3",
+          "master_label_de": "Infanterie Fähigkeit Schub 3",
+          "master_value": 15,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60400104": {
+      "excel_row": 63,
+      "old_name": "force of nature",
+      "effects": [
+        {
+          "type": "gathering_speed",
+          "label_de": "Sammelgeschwindigkeit",
+          "boost_max": 20,
+          "master_type": "cavalry_defense",
+          "master_label_de": "Kavallerie Verteidigung",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "food_gathering_speed",
+          "label_de": "Nahrung Sammeln Geschwindigkeit",
+          "boost_max": 30,
+          "master_type": "all_load",
+          "master_label_de": "Truppentraglast",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "lumber_gathering_speed",
+          "label_de": "Holz Sammeln Geschwindigkeit",
+          "boost_max": 30,
+          "master_type": "resource_protection",
+          "master_label_de": "Rohstoffschutz",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "stone_gathering_speed",
+          "label_de": "Stein Sammeln Geschwindigkeit",
+          "boost_max": 30,
+          "master_type": "crystal_gathering_speed",
+          "master_label_de": "Kristall Sammeln Geschwindigkeit",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "gold_gathering_speed",
+          "label_de": "Gold Sammeln Geschwindigkeit",
+          "boost_max": 30,
+          "master_type": "gathering_boost_3",
+          "master_label_de": "Sammeln Schub 3",
+          "master_value": 50,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60400105": {
+      "excel_row": 65,
+      "old_name": "heart of star",
+      "effects": [
+        {
+          "type": "lumber_production",
+          "label_de": "Holz Produktion",
+          "boost_max": 30,
+          "master_type": "cavalry_hp",
+          "master_label_de": "Kavallerie Lebenspunkte",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "stone_production",
+          "label_de": "Stein Produktion",
+          "boost_max": 30,
+          "master_type": "all_hp",
+          "master_label_de": "Truppen-Lebenspunkte",
+          "master_value": 15,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "gold_production",
+          "label_de": "Gold Produktion",
+          "boost_max": 40,
+          "master_type": "all_defense",
+          "master_label_de": "Truppenverteidigung",
+          "master_value": 15,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_attack",
+          "label_de": "Fernkampf Angriff",
+          "boost_max": 20,
+          "master_type": "all_load",
+          "master_label_de": "Truppentraglast",
+          "master_value": 15,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_defense",
+          "label_de": "Infanterie Verteidigung",
+          "boost_max": 20,
+          "master_type": "resource_production_boost_3",
+          "master_label_de": "Rohstoff Produktion Schub 3",
+          "master_value": 30,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60400106": {
+      "excel_row": 69,
+      "old_name": "heartseeker",
+      "effects": [
+        {
+          "type": "cavalry_attack",
+          "label_de": "Kavallerie Angriff",
+          "boost_max": 30,
+          "master_type": "cavalry_hp_when_composed_of_cavalry_only",
+          "master_label_de": "Kavallerie Lebenspunkte bei Formation Kavallerie",
+          "master_value": 25,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_speed",
+          "label_de": "Kavallerie Geschwindigkeit",
+          "boost_max": 30,
+          "master_type": "march_speedup_3",
+          "master_label_de": "Marsch Speedup 3",
+          "master_value": 1,
+          "unit": "percent",
+          "master_unit": "flat"
+        },
+        {
+          "type": "cavalry_load",
+          "label_de": "Kavallerie Traglast",
+          "boost_max": 30,
+          "master_type": "cavalry_defense_when_composed_of_cavalry_only",
+          "master_label_de": "Kavallerie Verteidigung bei Formation Kavallerie",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_defense",
+          "label_de": "Kavallerie Verteidigung",
+          "boost_max": 12,
+          "master_type": "cavalry_attack_when_composed_of_cavalry_only",
+          "master_label_de": "Kavallerie Angriff bei Formation Kavallerie",
+          "master_value": 35,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_hp",
+          "label_de": "Kavallerie Lebenspunkte",
+          "boost_max": 15,
+          "master_type": "cavalry_ability_boost_3",
+          "master_label_de": "Kavallerie Fähigkeit Schub 3",
+          "master_value": 15,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60400107": {
+      "excel_row": 61,
+      "old_name": "heavenly berry",
+      "effects": [
+        {
+          "type": "gold_gathering_speed",
+          "label_de": "Gold Sammeln Geschwindigkeit",
+          "boost_max": 30,
+          "master_type": "all_hp",
+          "master_label_de": "Truppen-Lebenspunkte",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_attack",
+          "label_de": "Fernkampf Angriff",
+          "boost_max": 20,
+          "master_type": "hp_boost_3",
+          "master_label_de": "Lebenspunkte Schub 3",
+          "master_value": 30,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_speed",
+          "label_de": "Kavallerie Geschwindigkeit",
+          "boost_max": 20,
+          "master_type": "infantry_hp",
+          "master_label_de": "Infanterie Lebenspunkte",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_defense",
+          "label_de": "Infanterie Verteidigung",
+          "boost_max": 20,
+          "master_type": "ranged_hp",
+          "master_label_de": "Fernkampf Lebenspunkte",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_hp",
+          "label_de": "Kavallerie Lebenspunkte",
+          "boost_max": 20,
+          "master_type": "cavalry_hp",
+          "master_label_de": "Kavallerie Lebenspunkte",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60400108": {
+      "excel_row": 57,
+      "old_name": "heroic spirit",
+      "effects": [
+        {
+          "type": "action_point",
+          "label_de": "Aktionspunkte",
+          "boost_max": 20,
+          "master_type": "summon_monster_2",
+          "master_label_de": "Beschwörung Monster 2",
+          "master_value": 3,
+          "unit": "flat",
+          "master_unit": "flat"
+        },
+        {
+          "type": "vs_monster_hp",
+          "label_de": "Vs Monster Lebenspunkte",
+          "boost_max": 25,
+          "master_type": "training_speed",
+          "master_label_de": "Ausbildungsgeschwindigkeit",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "vs_monster_defense",
+          "label_de": "Vs Monster Verteidigung",
+          "boost_max": 25,
+          "master_type": "training_speed",
+          "master_label_de": "Ausbildungsgeschwindigkeit",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "vs_monster_attack",
+          "label_de": "Vs Monster Angriff",
+          "boost_max": 25,
+          "master_type": "action_point_regeneration",
+          "master_label_de": "Aktionspunkte-Regeneration",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "healing_speed",
+          "label_de": "Heilung Geschwindigkeit",
+          "boost_max": 20,
+          "master_type": "action_point",
+          "master_label_de": "Aktionspunkte",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "flat"
+        }
+      ]
+    },
+    "60400109": {
+      "excel_row": 72,
+      "old_name": "jewel of harmony",
+      "effects": [
+        {
+          "type": "gathering_speed",
+          "label_de": "Sammelgeschwindigkeit",
+          "boost_max": 25,
+          "master_type": "all_load",
+          "master_label_de": "Truppentraglast",
+          "master_value": 25,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "all_hp",
+          "label_de": "Truppen-Lebenspunkte",
+          "boost_max": 12,
+          "master_type": "resource_reserves",
+          "master_label_de": "Rohstoff Reserve",
+          "master_value": 25,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "all_defense",
+          "label_de": "Truppenverteidigung",
+          "boost_max": 12,
+          "master_type": "dispel_2",
+          "master_label_de": "Bann 2",
+          "master_value": 1,
+          "unit": "percent",
+          "master_unit": "flat"
+        },
+        {
+          "type": "all_attack",
+          "label_de": "Truppenangriff",
+          "boost_max": 18,
+          "master_type": "hospital_capacity",
+          "master_label_de": "Lazarett Kapazität",
+          "master_value": 15,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "all_speed",
+          "label_de": "Truppengeschwindigkeit",
+          "boost_max": 20,
+          "master_type": "march_capacity",
+          "master_label_de": "Marschkapazität",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60400110": {
+      "excel_row": 60,
+      "old_name": "perdition's blade",
+      "effects": [
+        {
+          "type": "lumber_gathering_speed",
+          "label_de": "Holz Sammeln Geschwindigkeit",
+          "boost_max": 30,
+          "master_type": "ranged_load",
+          "master_label_de": "Fernkampf Traglast",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_attack",
+          "label_de": "Infanterie Angriff",
+          "boost_max": 20,
+          "master_type": "ranged_defense",
+          "master_label_de": "Fernkampf Verteidigung",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_attack",
+          "label_de": "Fernkampf Angriff",
+          "boost_max": 20,
+          "master_type": "ranged_hp",
+          "master_label_de": "Fernkampf Lebenspunkte",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_speed",
+          "label_de": "Fernkampf Geschwindigkeit",
+          "boost_max": 20,
+          "master_type": "all_attack",
+          "master_label_de": "Truppenangriff",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_attack",
+          "label_de": "Kavallerie Angriff",
+          "boost_max": 20,
+          "master_type": "attack_boost_3",
+          "master_label_de": "Angriff Schub 3",
+          "master_value": 30,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60400111": {
+      "excel_row": 66,
+      "old_name": "sergeant's whip",
+      "effects": [
+        {
+          "type": "food_production",
+          "label_de": "Nahrung Produktion",
+          "boost_max": 30,
+          "master_type": "all_attack",
+          "master_label_de": "Truppenangriff",
+          "master_value": 15,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "gold_production",
+          "label_de": "Gold Produktion",
+          "boost_max": 30,
+          "master_type": "all_speed",
+          "master_label_de": "Truppengeschwindigkeit",
+          "master_value": 15,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_attack",
+          "label_de": "Infanterie Angriff",
+          "boost_max": 20,
+          "master_type": "all_load",
+          "master_label_de": "Truppentraglast",
+          "master_value": 15,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_hp",
+          "label_de": "Fernkampf Lebenspunkte",
+          "boost_max": 20,
+          "master_type": "training_boost_3",
+          "master_label_de": "Ausbildung Schub 3",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_defense",
+          "label_de": "Kavallerie Verteidigung",
+          "boost_max": 20,
+          "master_type": "gold_production",
+          "master_label_de": "Gold Produktion",
+          "master_value": 40,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60400112": {
+      "excel_row": 68,
+      "old_name": "touch of master",
+      "effects": [
+        {
+          "type": "gathering_speed",
+          "label_de": "Sammelgeschwindigkeit",
+          "boost_max": 15,
+          "master_type": "lumber_protection_capacity",
+          "master_label_de": "Holz Schutz Kapazität",
+          "master_value": 30,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "lumber_production",
+          "label_de": "Holz Produktion",
+          "boost_max": 30,
+          "master_type": "stone_gathering_speed",
+          "master_label_de": "Stein Sammeln Geschwindigkeit",
+          "master_value": 30,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "stone_production",
+          "label_de": "Stein Produktion",
+          "boost_max": 30,
+          "master_type": "all_speed",
+          "master_label_de": "Truppengeschwindigkeit",
+          "master_value": 15,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "resource_production",
+          "label_de": "Rohstoffproduktion",
+          "boost_max": 15,
+          "master_type": "construction_speed",
+          "master_label_de": "Baugeschwindigkeit",
+          "master_value": 15,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "lumber_gathering_speed",
+          "label_de": "Holz Sammeln Geschwindigkeit",
+          "boost_max": 30,
+          "master_type": "construction_boost_3",
+          "master_label_de": "Bau Schub 3",
+          "master_value": 15,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60400113": {
+      "excel_row": 58,
+      "old_name": "wing of valor",
+      "effects": [
+        {
+          "type": "food_gathering_speed",
+          "label_de": "Nahrung Sammeln Geschwindigkeit",
+          "boost_max": 30,
+          "master_type": "cavalry_load",
+          "master_label_de": "Kavallerie Traglast",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_speed",
+          "label_de": "Infanterie Geschwindigkeit",
+          "boost_max": 20,
+          "master_type": "cavalry_defense",
+          "master_label_de": "Kavallerie Verteidigung",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_speed",
+          "label_de": "Fernkampf Geschwindigkeit",
+          "boost_max": 20,
+          "master_type": "cavalry_hp",
+          "master_label_de": "Kavallerie Lebenspunkte",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_attack",
+          "label_de": "Kavallerie Angriff",
+          "boost_max": 20,
+          "master_type": "all_speed",
+          "master_label_de": "Truppengeschwindigkeit",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_speed",
+          "label_de": "Kavallerie Geschwindigkeit",
+          "boost_max": 20,
+          "master_type": "speed_boost_3",
+          "master_label_de": "Geschwindigkeit Schub 3",
+          "master_value": 30,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60500002": {
+      "excel_row": 53,
+      "old_name": "dragon scale mail",
+      "effects": [
+        {
+          "type": "stone_gathering_speed",
+          "label_de": "Stein Sammeln Geschwindigkeit",
+          "boost_max": 15,
+          "master_type": "all_hp",
+          "master_label_de": "Truppen-Lebenspunkte",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_defense",
+          "label_de": "Infanterie Verteidigung",
+          "boost_max": 10,
+          "master_type": "defense_boost_2",
+          "master_label_de": "Verteidigung Schub 2",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_hp",
+          "label_de": "Infanterie Lebenspunkte",
+          "boost_max": 10,
+          "master_type": "cavalry_hp",
+          "master_label_de": "Kavallerie Lebenspunkte",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_defense",
+          "label_de": "Fernkampf Verteidigung",
+          "boost_max": 10,
+          "master_type": "infantry_defense",
+          "master_label_de": "Infanterie Verteidigung",
+          "master_value": 12,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60500101": {
+      "excel_row": 76,
+      "old_name": "ancient bracelet",
+      "effects": [
+        {
+          "type": "healing_speed",
+          "label_de": "Heilung Geschwindigkeit",
+          "boost_max": 30,
+          "master_type": "troop_health_when_defending",
+          "master_label_de": "Truppen Health bei Verteidigung",
+          "master_value": 60,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "enemy_troop_hp_debuff",
+          "label_de": "Gegner Truppen Lebenspunkte Debuff",
+          "boost_max": 40,
+          "master_type": "troop_attack_when_defending",
+          "master_label_de": "Truppen Angriff bei Verteidigung",
+          "master_value": 50,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "enemy_troop_defense_debuff",
+          "label_de": "Gegner Truppen Verteidigung Debuff",
+          "boost_max": 40,
+          "master_type": "defense_of_troops_when_defending",
+          "master_label_de": "Verteidigung Truppen bei Verteidigung",
+          "master_value": 60,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "enemy_troop_attack_debuff",
+          "label_de": "Gegner Truppen Angriff Debuff",
+          "boost_max": 30,
+          "master_type": "meteor_strike_1",
+          "master_label_de": "Meteor Schlag 1",
+          "master_value": 5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "hospital_capacity",
+          "label_de": "Lazarett Kapazität",
+          "boost_max": 25,
+          "master_type": "meteor_strike_2",
+          "master_label_de": "Meteor Schlag 2",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60500102": {
+      "excel_row": 75,
+      "old_name": "demonbane",
+      "effects": [
+        {
+          "type": "ranged_attack",
+          "label_de": "Fernkampf Angriff",
+          "boost_max": 45,
+          "master_type": "archer_attack_when_composed_of_archer_only",
+          "master_label_de": "Fernkampf Angriff bei Formation Fernkampf",
+          "master_value": 45,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_defense",
+          "label_de": "Fernkampf Verteidigung",
+          "boost_max": 50,
+          "master_type": "archer_hp_when_composed_of_archer_only",
+          "master_label_de": "Fernkampf Lebenspunkte bei Formation Fernkampf",
+          "master_value": 50,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "ranged_hp",
+          "label_de": "Fernkampf Lebenspunkte",
+          "boost_max": 50,
+          "master_type": "battle_cry_ranged_1",
+          "master_label_de": "Schlachtruf Fernkampf 1",
+          "master_value": 5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "all_attack",
+          "label_de": "Truppenangriff",
+          "boost_max": 30,
+          "master_type": "battle_cry_ranged_2",
+          "master_label_de": "Schlachtruf Fernkampf 2",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "march_capacity",
+          "label_de": "Marschkapazität",
+          "boost_max": 10,
+          "master_type": "ranged_hp",
+          "master_label_de": "Fernkampf Lebenspunkte",
+          "master_value": 40,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60500103": {
+      "excel_row": 73,
+      "old_name": "orichalcum dagger",
+      "effects": [
+        {
+          "type": "infantry_attack",
+          "label_de": "Infanterie Angriff",
+          "boost_max": 35,
+          "master_type": "all_hp",
+          "master_label_de": "Truppen-Lebenspunkte",
+          "master_value": 40,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_defense",
+          "label_de": "Infanterie Verteidigung",
+          "boost_max": 60,
+          "master_type": "battle_cry_infantry_1",
+          "master_label_de": "Schlachtruf Infanterie 1",
+          "master_value": 5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_hp",
+          "label_de": "Infanterie Lebenspunkte",
+          "boost_max": 55.0,
+          "master_type": "battle_cry_infantry_2",
+          "master_label_de": "Schlachtruf Infanterie 2",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_hp_when_participating_a_rally",
+          "label_de": "Infanterie Lebenspunkte bei Teilnahme A Sammelangriff",
+          "boost_max": 35,
+          "master_type": "march_capacity",
+          "master_label_de": "Marschkapazität",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "infantry_attack_when_participating_a_rally",
+          "label_de": "Infanterie Angriff bei Teilnahme A Sammelangriff",
+          "boost_max": 55.0,
+          "master_type": "infantry_attack",
+          "master_label_de": "Infanterie Angriff",
+          "master_value": 30,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60500104": {
+      "excel_row": 77,
+      "old_name": "scepter of judgement",
+      "effects": [
+        {
+          "type": "food_gathering_speed",
+          "label_de": "Nahrung Sammeln Geschwindigkeit",
+          "boost_max": 50,
+          "master_type": "maximum_troop_size_for_rally",
+          "master_label_de": "Maximal Truppen Größe für Sammelangriff",
+          "master_value": 20,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "all_hp",
+          "label_de": "Truppen-Lebenspunkte",
+          "boost_max": 50,
+          "master_type": "mortality_reduction",
+          "master_label_de": "Sterblichkeit Reduction",
+          "master_value": 15,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "all_defense",
+          "label_de": "Truppenverteidigung",
+          "boost_max": 40,
+          "master_type": "troop_dispatch_queue",
+          "master_label_de": "Truppen Entsendung Warteschlange",
+          "master_value": 1,
+          "unit": "percent",
+          "master_unit": "flat"
+        },
+        {
+          "type": "all_speed",
+          "label_de": "Truppengeschwindigkeit",
+          "boost_max": 30,
+          "master_type": "heavens_judgment_1",
+          "master_label_de": "Himmelsurteil 1",
+          "master_value": 2,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "march_capacity",
+          "label_de": "Marschkapazität",
+          "boost_max": 20,
+          "master_type": "heavens_judgment_2",
+          "master_label_de": "Himmelsurteil 2",
+          "master_value": 4,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    },
+    "60500105": {
+      "excel_row": 74,
+      "old_name": "stormbreaker",
+      "effects": [
+        {
+          "type": "cavalry_attack",
+          "label_de": "Kavallerie Angriff",
+          "boost_max": 40,
+          "master_type": "all_speed",
+          "master_label_de": "Truppengeschwindigkeit",
+          "master_value": 30,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_speed",
+          "label_de": "Kavallerie Geschwindigkeit",
+          "boost_max": 35,
+          "master_type": "battle_cry_cavalry_1",
+          "master_label_de": "Schlachtruf Kavallerie 1",
+          "master_value": 5,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_hp",
+          "label_de": "Kavallerie Lebenspunkte",
+          "boost_max": 40,
+          "master_type": "battle_cry_cavalry_2",
+          "master_label_de": "Schlachtruf Kavallerie 2",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_attack_when_composed_of_cavalry_only",
+          "label_de": "Kavallerie Angriff bei Formation Kavallerie",
+          "boost_max": 40,
+          "master_type": "march_capacity",
+          "master_label_de": "Marschkapazität",
+          "master_value": 10,
+          "unit": "percent",
+          "master_unit": "percent"
+        },
+        {
+          "type": "cavalry_speed_when_composed_of_cavalry_only",
+          "label_de": "Kavallerie Geschwindigkeit bei Formation Kavallerie",
+          "boost_max": 40,
+          "master_type": "cavalry_hp",
+          "master_label_de": "Kavallerie Lebenspunkte",
+          "master_value": 40,
+          "unit": "percent",
+          "master_unit": "percent"
+        }
+      ]
+    }
+  }
+}

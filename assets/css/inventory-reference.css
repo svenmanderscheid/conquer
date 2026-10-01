@@ -69,8 +69,8 @@ body.mobile-game #game-dialog .inventory-dialog :is(select,.button) { min-height
 body.mobile-game #game-dialog .inventory-use-footer { display:flex; flex-direction:column; gap:10px; margin-top:10px; }
 body.mobile-game #game-dialog .inventory-use-footer>span { color:var(--ui-muted); font-size:12px; text-align:center; }
 @media(max-width:699px) {
-  body.mobile-game #panel-dialog .inventory-backpack.inventory-paged .inventory-category-tabs { padding:7px 6px; gap:3px; }
-  body.mobile-game #panel-dialog .inventory-backpack .inventory-category-tabs button { font-size:clamp(10px,2.8vw,13px); }
+  body.mobile-game #panel-dialog .inventory-backpack.inventory-paged .inventory-category-tabs { display:flex; min-width:0; max-width:100%; overflow-x:auto; overscroll-behavior-x:contain; scrollbar-width:thin; padding:7px 6px; gap:3px; }
+  body.mobile-game #panel-dialog .inventory-backpack .inventory-category-tabs button { flex:1 0 auto; padding-inline:10px; white-space:nowrap; overflow-wrap:normal; word-break:normal; hyphens:none; font-size:13px; }
   body.mobile-game #panel-dialog :is(.inventory-scope-bar,.inventory-views) { padding:6px 9px; gap:4px; }
   body.mobile-game #panel-dialog :is(.inventory-scope-bar,.inventory-views) button { font-size:11px; padding:5px 9px; }
   body.mobile-game #panel-dialog .inventory-scope-bar>span { font-size:10px; }
@@ -86,7 +86,7 @@ body.mobile-game #game-dialog .inventory-use-footer>span { color:var(--ui-muted)
 }
 @media(max-height:539px) {
   body.mobile-game #panel-dialog .inventory-backpack.inventory-paged .inventory-category-tabs { padding:4px 8px; }
-  body.mobile-game #panel-dialog .inventory-backpack .inventory-category-tabs button { min-height:40px; }
+  body.mobile-game #panel-dialog .inventory-backpack .inventory-category-tabs button { min-height:44px; }
   body.mobile-game #panel-dialog :is(.inventory-scope-bar,.inventory-views) { padding:4px 8px; }
   body.mobile-game #panel-dialog .inventory-backpack.inventory-paged .inventory-page-grid { max-width:840px; gap:14px; }
   body.mobile-game #game-dialog .inventory-dialog-heading { grid-template-columns:64px minmax(0,1fr); margin-bottom:10px; }
@@ -183,6 +183,18 @@ body.mobile-game #game-dialog:has(.inventory-overview) {
   height:min(620px,calc(100dvh - 24px))!important;
 }
 body.mobile-game #game-dialog:has(.inventory-overview) #dialog-content { display:flex; padding:0; overflow:hidden; }
+/* Reserve both header actions; translated titles may grow to multiple lines. */
+body.mobile-game #game-dialog:has(.inventory-overview) > .popup-heading {
+  flex:0 0 auto; min-height:56px; padding:8px 108px 8px 12px;
+}
+body.mobile-game #game-dialog:has(.inventory-overview) > .popup-heading h2 {
+  min-width:0; white-space:normal; overflow-wrap:anywhere; line-height:1.25;
+}
+body.mobile-game #game-dialog:has(.inventory-overview) > :is(.dialog-close,.dialog-report-button) {
+  top:6px; width:44px; min-width:44px; height:44px; min-height:44px;
+}
+body.mobile-game #game-dialog:has(.inventory-overview) > .dialog-close { right:8px; }
+body.mobile-game #game-dialog:has(.inventory-overview) > .dialog-report-button { right:58px; }
 .inventory-overview { display:flex; flex-direction:column; flex:1; min-width:0; min-height:0; }
 .inventory-overview-tabs { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; padding:12px 14px 10px; flex:none; }
 .inventory-overview-tabs button { min-width:0; min-height:44px; font-size:15px; font-weight:800; padding:8px; }
@@ -203,9 +215,10 @@ body.mobile-game #game-dialog:has(.inventory-overview) #dialog-content { display
 .inventory-overview-note { margin:0; text-align:center; font-size:12px; line-height:1.45; }
 .inventory-overview-units { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin-bottom:10px; }
 .inventory-overview-units[hidden] { display:none; }
-.inventory-overview-units button { display:flex; align-items:center; justify-content:center; gap:7px; min-height:44px; padding:7px 5px; font-size:13px; font-weight:700; }
-.inventory-overview-units button span { display:grid; place-items:center; width:20px; height:20px; border:1px solid var(--ui-line); border-radius:5px; }
-.inventory-overview-units button:not(.active) span { font-size:0; }
+.inventory-overview-units button { display:flex; align-items:center; justify-content:center; gap:7px; min-width:0; min-height:44px; padding:7px 5px; font-size:13px; font-weight:700; }
+.inventory-overview-units button span[aria-hidden="true"] { display:grid; place-items:center; flex:0 0 20px; width:20px; height:20px; border:1px solid var(--ui-line); border-radius:5px; }
+.inventory-overview-units button:not(.active) span[aria-hidden="true"] { font-size:0; }
+.inventory-overview-units button span:not([aria-hidden]) { min-width:0;white-space:normal; }
 .inventory-overview-sr { position:absolute; width:1px; height:1px; margin:-1px; clip-path:inset(50%); overflow:hidden; white-space:nowrap; }
 @media(max-width:520px) {
   .inventory-overview-tabs { padding:8px 9px; gap:6px; }
@@ -221,9 +234,8 @@ body.mobile-game #game-dialog:has(.inventory-overview) #dialog-content { display
   .inventory-overview-units button { font-size:12px; gap:5px; }
 }
 @media(max-height:539px) {
-  body.mobile-game #game-dialog:has(.inventory-overview) .popup-heading { flex-basis:42px; min-height:42px; }
   .inventory-overview-tabs { padding:5px 10px; }
-  .inventory-overview-tabs button { min-height:40px; }
+  .inventory-overview-tabs button { min-height:44px; }
   .inventory-overview-table th,.inventory-overview-table td { padding:7px; }
   .inventory-overview-art { flex-basis:30px; width:30px; height:30px; }
   .inventory-overview-footer { padding:6px 12px; }

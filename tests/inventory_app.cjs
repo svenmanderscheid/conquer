@@ -1,4 +1,5 @@
 'use strict';
+require('./fixtures/browser_locale.cjs')('de'); // This suite asserts the explicit German UI.
 // Real app QA on the disposable tools/preview-feature-fixture.php account only.
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const net=require('node:net'),{spawn}=require('node:child_process');
@@ -18,12 +19,16 @@ const out=path.resolve(__dirname,'../artifacts/inventory-reference');fs.mkdirSyn
   browser=await chromium.launch({headless:true,executablePath:process.env.BROWSER_EXECUTABLE_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe'});
   const page=await browser.newPage({viewport:{width:1280,height:800},hasTouch:true}),errors=[];
   page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(15000);
-  await page.goto(base);await page.locator('[data-mode="login"]').click();
-  await page.locator('[name="username"]').fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');
-  await Promise.all([page.waitForURL('**/city'),page.locator('#auth-submit').click()]);
+  await page.context().addCookies([{name:'conquer_locale',value:'de',url:base}]);
+  await page.goto(base+'/?zugang=login',{waitUntil:'domcontentloaded'});
+  await page.locator("[name=identifier], [name=username]").fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');
+  await Promise.all([page.waitForURL('**/city'),page.locator("form[action$=\"/auth/local\"] button[type=\"submit\"]").click()]);
   await page.waitForFunction(()=>document.querySelector('#player-hud-name')?.textContent.includes('PreviewPlayer'));
   const state=await page.evaluate(async()=> (await (await fetch('/api/kingdom/state')).json()).data);
   assert.equal(state.profile.display_name,'PreviewPlayer');
+  const retired=new Set([10102021,10102031,10202010,10202011]);
+  assert(!state.inventory_catalog.some(item=>retired.has(Number(item.code??item.item_code))));
+  assert(!state.inventory.some(item=>retired.has(Number(item.item_code))));
   await page.locator('#navigation [data-id="inventory"]').click();
   await page.locator('[data-action="inventory-scope"][data-id="all"]').click();
   assert.deepEqual(await page.locator('.inventory-category-tabs button').evaluateAll(bs=>bs.map(b=>b.dataset.id)),['resource_pack','speedup','boost','treasures','other']);
@@ -36,12 +41,13 @@ const out=path.resolve(__dirname,'../artifacts/inventory-reference');fs.mkdirSyn
     await page.locator('.inventory-page-grid').evaluate(async el=>{await Promise.all([...el.querySelectorAll('img')].map(async i=>{i.loading='eager';await i.decode()}))});
     const metrics=await page.evaluate(()=>{
      const grid=document.querySelector('.inventory-page-grid'),board=document.querySelector('.inventory-scroll-board'),panel=document.querySelector('#panel-dialog'),r=panel.getBoundingClientRect();
-     const bad=[...document.querySelectorAll('.inventory-category-tabs button,.inventory-scope-bar button,.panel-close')].filter(b=>{const x=b.getBoundingClientRect();return x.left<0||x.right>innerWidth||x.top<0||x.bottom>innerHeight||b.scrollWidth>b.clientWidth+2}).map(b=>b.textContent);
+     const bad=[...document.querySelectorAll('.inventory-category-tabs button,.inventory-scope-bar button,.panel-close')].filter(b=>{const x=b.getBoundingClientRect(),scrollTab=b.closest('.inventory-category-tabs'),mustBeVisible=!scrollTab||b.getAttribute('aria-pressed')==='true';return (mustBeVisible&&(x.left<0||x.right>innerWidth||x.top<0||x.bottom>innerHeight))||b.scrollWidth>b.clientWidth+2}).map(b=>b.textContent);
      return {shell:document.querySelector('.inventory-shell').className,grid:grid.outerHTML.slice(0,250),columns:getComputedStyle(grid).gridTemplateColumns.split(' ').length,overflow:board.scrollWidth>board.clientWidth+2||panel.scrollWidth>panel.clientWidth+2,outside:r.left<0||r.right>innerWidth+1||r.top<0||r.bottom>innerHeight+1,bad};
     });
     await page.screenshot({path:path.join(out,`${width}x${height}-${category}.png`)});
     assert.equal(metrics.columns,width>=1000?5:width>=700?4:width>=540?3:4,JSON.stringify(metrics));assert.equal(metrics.overflow,false,JSON.stringify({width,height,category,metrics}));assert.equal(metrics.outside,false);assert.deepEqual(metrics.bad,[]);
     const tiles=page.locator('[data-action="inventory-item"]');
+    assert((await tiles.evaluateAll(nodes=>nodes.map(node=>Number(node.dataset.id)))).every(code=>!retired.has(code)),'Removed items never appear in the backpack');
     if(category==='treasures'){
      const relic=page.locator('.inventory-page-grid [data-action="treasure-dialog"]').last();
      if(await relic.count()){

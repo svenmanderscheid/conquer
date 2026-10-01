@@ -12,14 +12,14 @@ window.ConquerVip=function(ctx){
         const v=status(),el=document.querySelector('#hud-vip-button');if(!v||!el)return;
         const level=el.querySelector('[data-vip-level]');if(level)level.textContent=fmt(v.level);
         const claim=el.querySelector('[data-vip-claim]');if(claim)claim.hidden=Boolean(v.daily_claimed);
-        el.setAttribute('aria-label',`VIP ${v.level} öffnen${v.daily_claimed?'':', tägliche Punkte verfügbar'}`);
+        el.setAttribute('aria-label',window.ConquerLocale.t(v.daily_claimed?'hud.vip_open':'hud.vip_open_available',{level:v.level}));
         el.title=`VIP ${v.level} · ${fmt(v.points)} Punkte`;
     }
     function bonusList(v,next=null){
         return `<dl class="vip-bonuses">${Object.entries(names).map(([k,label])=>`<div><dt>${label}</dt><dd>${sign(k)}${fmt(v[k]||0)} %${next&&Number(next[k])!==Number(v[k])?` <span>→ ${sign(k)}${fmt(next[k])} %</span>`:''}</dd></div>`).join('')}</dl>`;
     }
     function overview(v){
-        const bonuses=v.passive_bonuses||v.bonuses,reset=new Date(v.daily_resets_at).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+        const bonuses=v.passive_bonuses||v.bonuses,reset=new Date(v.daily_resets_at).toLocaleTimeString(window.ConquerLocale?.locale??'en',{hour:'2-digit',minute:'2-digit'});
         return `<div class="vip-overview"><section class="vip-perks"><h3>Deine dauerhaften Vorteile</h3>${bonusList(bonuses,v.next_bonuses)}<div class="vip-slots"><span>Gleichzeitige Bauaufträge</span><strong>${fmt(v.building_slots||1)}${v.level<4?' <small>· 2 ab VIP 4</small>':''}</strong></div><p class="vip-note">Gilt in allen deinen Welten. Zeitboni gelten für neue Aufträge; laufende Aufträge behalten ihre Endzeit. Bau- und Forschungszeit bleiben mindestens 1 Sekunde.</p></section><section class="vip-daily"><span class="vip-section-label">TÄGLICHE BELOHNUNG</span><strong>+${fmt(v.daily_points)} <small>VIP-Punkte</small></strong>${v.daily_claimed?'<span class="vip-claimed">✓ Heute abgeholt</span>':button('Punkte abholen','daily')}<small>Wieder verfügbar um ${esc(reset)} Uhr · deine Ortszeit</small><p>Deine VIP-Stufe bleibt dauerhaft erhalten.</p></section></div><section class="vip-items"><div><h3>VIP-Punkte im Inventar</h3><p>Nutze gesammelte Prestigegegenstände für die nächste Stufe.</p></div>${items().length?`<div class="vip-item-list">${items().map(i=>`<div class="vip-item"><img src="${base}/assets/art/items/prestige.svg" alt=""><div><strong>+${fmt(i.vip_points)} VIP-Punkte</strong><small>${fmt(i.quantity)} vorhanden</small></div>${button('1 nutzen','item',`data-id="${Number(i.item_code)}"`)}</div>`).join('')}</div>`:'<div class="vip-empty">Noch keine VIP-Gegenstände vorhanden. Du kannst sie aus Belohnungen und Truhen erhalten.</div>'}</section>`;
     }
     function levels(v){

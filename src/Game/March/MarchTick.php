@@ -91,12 +91,18 @@ final class MarchTick
             try {
                 if (in_array($marchType, [13,14], true)) {
                     \Conquer\Game\Shrine\CongressService::resolveMarch($marchId);
+                } elseif ($marchType === 16) {
+                    \Conquer\Game\Alliance\AllianceTerritoryService::resolveGarrison($marchId);
                 } elseif ($marchType === 5) {
                     $monsterLock = 'conquer-monster-' . $monsterId;
                     if ((int) $db->query('SELECT GET_LOCK(?, 5)', [$monsterLock])->fetchColumn() !== 1) { return; }
                     try {
-                        self::resolveMonster($db, $log, $marchId, $playerId, $cityId,
+                        $resolve=fn()=>self::resolveMonster($db, $log, $marchId, $playerId, $cityId,
                             $targetX, $targetY, $monsterId, $intTroops, $march);
+                        // Regional treasury rewards touch ownership; acquire the same combat lock
+                        // before world/territory rows, matching conquest and rune teleport ordering.
+                        if(\Conquer\Game\Territory\TerritoryService::enabled((int)$march['world_id']))\Conquer\Game\WorldRules::combatLock($resolve);
+                        else $resolve();
                     } finally { $db->query('SELECT RELEASE_LOCK(?)', [$monsterLock]); }
                 } elseif ($marchType === 6) {
                     $collection=\Conquer\Game\Charm\CharmCollectionService::resolveDue((int)$march['world_id'],(int)$march['target_id']);
@@ -112,6 +118,8 @@ final class MarchTick
                     });
                 } elseif ($marchType === 8) {
                     self::resolveScout($db, $log, $marchId, $playerId, $cityId, $targetX, $targetY, (int)$march['target_id']);
+                } elseif (in_array($marchType,[11,12],true)) {
+                    \Conquer\Game\WorldRules::combatLock(function()use($db,$march,$marchType,$intTroops):void{$db->transaction(function()use($db,$march,$marchType,$intTroops):void{if($db->execute("UPDATE marches SET state='resolving' WHERE id=? AND state='marching'",[(int)$march['id']])!==1)return;if($marchType===12)\Conquer\Game\Map\NeutralVillageService::scout($db,$march);else \Conquer\Game\Map\NeutralVillageService::attack($db,$march,$intTroops);});});
                 } elseif (in_array($marchType,[9,GatherService::FIELD_ATTACK],true)) {
                     GatherService::resolveGather($db, $log, $marchId, $playerId, $cityId, $targetX, $targetY, (int)$march['target_id']);
                 } elseif ($marchType === 10) {
@@ -119,7 +127,7 @@ final class MarchTick
                 } else {
                     // Unsupported type — return immediately
                     $db->execute(
-                        "UPDATE marches SET state = 'returning', return_time = UTC_TIMESTAMP() WHERE id = ?",
+                        "UPDATE marches SET state='returning',return_time=DATE_ADD(UTC_TIMESTAMP(),INTERVAL GREATEST(5,TIMESTAMPDIFF(SECOND,departure_time,arrival_time)) SECOND) WHERE id=?",
                         [$marchId],
                     );
                 }
@@ -128,7 +136,7 @@ final class MarchTick
                 // Safety net: put back to returning so the march doesn't block forever
                 try {
                     $db->execute(
-                        "UPDATE marches SET state='returning', return_time=UTC_TIMESTAMP(), haul_json=? WHERE id=? AND state='resolving'",
+                        "UPDATE marches SET state='returning',return_time=DATE_ADD(UTC_TIMESTAMP(),INTERVAL GREATEST(5,TIMESTAMPDIFF(SECOND,departure_time,arrival_time)) SECOND),haul_json=? WHERE id=? AND state='resolving'",
                         [json_encode(['survivors'=>$intTroops,'loot'=>[]]), $marchId],
                     );
                 } catch (\Throwable) {}
@@ -175,7 +183,7 @@ final class MarchTick
                     'INSERT INTO city_troops (city_id, troop_code, count)
                      VALUES (?, ?, ?)
                      ON DUPLICATE KEY UPDATE count = count + ?',
-                    [$cityId, (int) $code, $count, $count],
+                    [$cityId, \Conquer\Game\City\TroopData::activeCode((int)$code), $count, $count],
                 );
             }
 
@@ -267,6 +275,7 @@ final class MarchTick
                     self::finalizeMarch($db,$marchId,$troops,[],'defender_wins');
                     return ['resolved'=>true,'monster_killed'=>false,'outcome'=>'defender_wins','already_settled'=>true];
                 }
+                $result['report']['regional_supply']=\Conquer\Game\Territory\TerritoryEconomy::regionalKill(WorldContext::id(),$playerId,$targetX,$targetY,'monster-march:'.$marchId,\Conquer\Game\Territory\TerritoryEconomy::regionalBaseResources($monsterDef),strtotime($march['arrival_time'].' UTC'));
                 \Conquer\Game\Hospital\HospitalService::addWounded($cityId,$result['attacker_losses']);
                 $result['report']['lord_xp']=\Conquer\Game\Player\LordLevel::addXp($playerId,$xp,WorldContext::id(),'monster-march:'.$marchId);
                 $result['report']['charm']=['id'=>$settlement['charm_id'],'world_id'=>WorldContext::id(),'x'=>(int)$monster['coord_x'],'y'=>(int)$monster['coord_y'],'guaranteed'=>true,'ownership'=>null,'exclusive_until'=>null];
@@ -352,7 +361,7 @@ final class MarchTick
         $db->execute(
             "UPDATE marches
              SET state       = 'returning',
-                 return_time = UTC_TIMESTAMP(),
+                 return_time = DATE_ADD(UTC_TIMESTAMP(),INTERVAL GREATEST(5,TIMESTAMPDIFF(SECOND,departure_time,arrival_time)) SECOND),
                  haul_json   = :haul
              WHERE id = :id",
             [

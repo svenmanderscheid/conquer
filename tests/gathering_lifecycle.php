@@ -37,6 +37,16 @@ try{
     checkG(rowG($b)['state']==='returning'&&(json_decode(rowG($b)['haul_json'],true)['reason']??'')==='field_occupied','later arriving gatherers return without combat');
     checkG((int)$db->query('SELECT COUNT(*) FROM battle_reports')->fetchColumn()===0&&json_decode(rowG($b)['troops_json'],true)[50100101]===100,'race causes neither battle reports nor troop losses');
     foreach([1,2,3] as $viewer){$node=F::withOccupations([nodeG($n)],1,$viewer)[0];checkG(array_key_exists('gathering_finishes_at',$node)===($viewer===1),'gathering timer private for viewer '.$viewer);checkG($node['can_attack']===($viewer===2),'field attack permission for viewer '.$viewer);}
+    foreach([1,2,3] as $viewer){
+        $node=F::withOccupations([array_replace(nodeG($n),['gathering_progress'=>['capacity'=>999]])],1,$viewer)[0];
+        checkG(isset($node['gathering_progress'])===($viewer===1),'gathering progress private for viewer '.$viewer);
+        if($viewer===1){
+            $p=$node['gathering_progress'];$march=rowG($a);$gather=json_decode($march['haul_json'],true)['gather'];
+            $elapsed=max(0,min(strtotime($p['sampled_at'].' UTC'),strtotime($march['gathering_finishes_at'].' UTC'))-strtotime($march['arrival_time'].' UTC'));
+            $expected=min((int)$node['resource_amount'],(int)$gather['capacity'],(int)floor($elapsed*$gather['rate']+1e-8));
+            checkG($p['amount']===$expected&&$p['capacity']===(int)$gather['capacity'],'progress matches actual gathered work and troop capacity');
+        }
+    }
     rejectG(fn()=>sendG(3,$n,10,true),'alliance member cannot attack the occupying army');
     rejectG(fn()=>sendG(1,$n,10,true),'owner cannot attack own army');
     rejectG(fn()=>sendG(2,$n,10),'ordinary gather dispatch cannot silently attack an occupied field');

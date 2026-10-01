@@ -2,6 +2,7 @@
 declare(strict_types=1);
 /** Integration of world reward rules, immutable versions and regional spawn snapshots. */
 if(PHP_SAPI!=='cli')exit(1);
+ob_start();session_name('conquer_regional_test');session_start();
 define('ROOT_DIR',dirname(__DIR__));define('APP_BASE','/conquer');
 require ROOT_DIR.'/src/Autoloader.php';(new \Conquer\Autoloader(ROOT_DIR.'/src'))->register();
 require __DIR__.'/Support/FeatureDatabase.php';
@@ -20,9 +21,13 @@ function saveR(int $world,string $scope,int $revision,int $count,string $action=
             'gems_chance'=>0,'gems_amount'=>0,'charms'=>['chance'=>0,'normal'=>100,'epic'=>0,'legendary'=>0]]]);
 }
 try{
-    $db->execute("INSERT INTO admin_users(id,username,password_hash,role)VALUES(1,'RegionalAdmin','unused','superadmin')");
+    $db->execute("INSERT INTO admin_users(id,username,password_hash,role)VALUES(1,'RegionalAdmin',?,'superadmin')",[password_hash('Fixture-Regional-123!',PASSWORD_DEFAULT)]);
     $db->execute("INSERT INTO worlds(id,name,slug,map_size,status)VALUES(2,'New land','new-land',256,'running')");
     LandProgressService::ensureWorld(1);LandProgressService::ensureWorld(2);
+    checkR(\Conquer\Game\World\LandAccessPolicy::isOpen(2,120,120),'new worlds have the complete map open by default');
+    // Exercise an explicit administrative restriction, not the retired phased default.
+    $db->execute("UPDATE world_land_zones SET status='locked',opened_at=NULL,opened_reason='admin' WHERE world_id=2 AND zone_key IN ('middle','center')");
+    LandProgressService::invalidate(2);\Conquer\Game\World\LandUnlockService::invalidate(2);
     saveR(1,'global',0,2);saveR(2,'world',0,7);
     checkR(RewardCatalog::effective('monster','20209901',1)['drops'][0]['count']===2,'world without override inherits global drops');
     checkR(RewardCatalog::effective('monster','20209901',2)['drops'][0]['count']===7,'world override wins without changing another world');
@@ -53,7 +58,7 @@ try{
     checkR(!$saved['duplicate']&&$replayed['duplicate']&&LandRules::get(2)['thresholds'][1]===1500&&LandRules::get(1)['thresholds'][1]===1000,'admin land rules are world-scoped and replay exactly once');
     checkR((int)$db->query('SELECT regional_point_value FROM field_monsters WHERE id=?',[$monster])->fetchColumn()===100,'changing land rules preserves existing monster point snapshots');
     foreach(['0084_land_progression.sql','0085_monster_charms.sql','0086_reward_world_revisions.sql'] as $migration)\Conquer\Db\MigrationSql::apply($db->getPdo(),(string)file_get_contents(ROOT_DIR.'/migrations/'.$migration));
-    checkR((int)$db->query("SELECT COUNT(*) FROM world_land_zones WHERE world_id=2 AND status='locked'")->fetchColumn()===2&&(int)$db->query('SELECT current_level FROM world_land_parts WHERE id=?',[$land['id']])->fetchColumn()===9,'repeated migrations preserve new-world locks and developed lands');
+    checkR((int)$db->query("SELECT COUNT(*) FROM world_land_zones WHERE world_id=2 AND status='locked'")->fetchColumn()===2&&(int)$db->query('SELECT current_level FROM world_land_parts WHERE id=?',[$land['id']])->fetchColumn()===9,'repeated additive migrations preserve explicit locks and developed lands');
     $gateForm=$form;$gateForm['operation_id']=bin2hex(random_bytes(16));$gateForm['revision']=LandRules::get(2)['revision'];
     $gateForm['rules']=['gates'=>['middle'=>['minimum_count'=>1,'ratio'=>.001,'not_before_days'=>0]]];
     AdminService::execute(1,'land-rules-save',$gateForm);
@@ -61,8 +66,9 @@ try{
     $db->execute("INSERT INTO map_charms(world_id,coord_x,coord_y,stat_category,grade,charm_code,expires_at)VALUES(1,30,30,'construction','normal',10700001,DATE_ADD(UTC_TIMESTAMP(),INTERVAL 1 HOUR))");
     $blocked=$db->transaction(static function($db){WorldPlacement::lockWorld($db,1);return !WorldPlacement::canPlace($db,1,'monster',30,30);});
     checkR($blocked,'an active charm reserves its original tile against respawn');
-    $_SESSION=['admin'=>['id'=>1,'username'=>'RegionalAdmin','role'=>'superadmin'],'admin_csrf'=>str_repeat('a',64)];$_GET=['world_id'=>2];
+    checkR(\Conquer\Auth\AdminAuth::login('RegionalAdmin','Fixture-Regional-123!'),'real regional admin login succeeds');
+    $_SESSION['admin_csrf']=str_repeat('a',64);$_GET=['world_id'=>2];
     ob_start();\Conquer\Admin\AdminController::lands();$html=ob_get_clean();
-    checkR(str_contains($html,'land-rules-save')&&str_contains($html,'1024 Landteile')&&!str_contains($html,'Ansicht konnte nicht geladen'),'land administration renders the real regional state');
+    checkR(str_contains($html,'land-rules-save')&&str_contains($html,'1024 Landteile')&&!str_contains($html,'<div class="notice error">Die Ansicht konnte nicht geladen'),'land administration renders the real regional state');
     echo "ALL $checks REGIONAL REWARD CHECKS PASSED\n";
 }finally{$fixture->close();}

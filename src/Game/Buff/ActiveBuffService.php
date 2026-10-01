@@ -19,6 +19,12 @@ final class ActiveBuffService
 {
     private function __construct() {}
 
+    /** Positive research multipliers belonged to the removed timed research items. */
+    public static function isRetired(string $type, float $multiplier): bool
+    {
+        return $type === 'research_boost' && $multiplier > 1.0;
+    }
+
     /**
      * Grants a new timed buff to a player.
      *
@@ -27,7 +33,7 @@ final class ActiveBuffService
      */
     public static function apply(int $playerId, string $type, float $multiplier, int $hours): void
     {
-        if ($multiplier <= 0.0 || $hours <= 0) {
+        if ($multiplier <= 0.0 || $hours <= 0 || self::isRetired($type, $multiplier)) {
             return;
         }
 
@@ -50,6 +56,7 @@ final class ActiveBuffService
                 'SELECT id, buff_type, multiplier, expires_at
                  FROM   active_buffs
                  WHERE  player_id = ? AND expires_at > UTC_TIMESTAMP()
+                   AND NOT (buff_type = \'research_boost\' AND multiplier > 1)
                  ORDER  BY buff_type, expires_at ASC',
                 [$playerId],
             )->fetchAll();
@@ -86,7 +93,7 @@ final class ActiveBuffService
         $combined = 1.0;
         foreach ($rows as $row) {
             $m = (float) $row['multiplier'];
-            if ($m > 0.0) {
+            if ($m > 0.0 && !self::isRetired($type, $m)) {
                 $combined *= $m;
             }
         }

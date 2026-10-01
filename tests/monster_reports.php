@@ -4,15 +4,29 @@ if(PHP_SAPI!=='cli')exit(1);
 define('ROOT_DIR',dirname(__DIR__));require ROOT_DIR.'/src/Autoloader.php';(new \Conquer\Autoloader(ROOT_DIR.'/src'))->register();
 require __DIR__.'/Support/FeatureDatabase.php';date_default_timezone_set('UTC');
 use Conquer\Db\Connection;
-use Conquer\Game\March\{BattleEngine,BattleReportService,MarchDispatcher,MarchTick};
+use Conquer\Game\City\TroopData;
+use Conquer\Game\March\{BattleEngine,BattleLuck,BattleReportService,MarchDispatcher,MarchTick};
+use Conquer\Game\Research\BuffEngine;
 use Conquer\Game\World\WorldContext;
 function mrCheck(bool $ok,string $label):void{if(!$ok)throw new RuntimeException($label);echo "PASS $label\n";}
 $troops=[50100101=>100,50200101=>80,50300101=>60];
-$definition=['name'=>'Orc','level'=>3,'stats'=>['attack'=>50,'defense'=>30,'hp'=>100],'amount'=>10,'required_power'=>800];
-$win=BattleEngine::resolveMonster($troops,['hp_current'=>1000],$definition,['troops_atk'=>.2,'infantry_atk'=>.3,'vs_monster_attack'=>.1]);
+$reportBuffs=['troops_atk'=>.2,'infantry_atk'=>.3,'vs_monster_attack'=>.1];
+$expectedAttack=0.0;$expectedPower=0.0;
+foreach($troops as $code=>$count){
+ $unit=TroopData::get($code);$type=[1=>'infantry',2=>'ranged',3=>'cavalry'][$unit['type']];
+ $attack=BuffEngine::effectiveMultiplier($reportBuffs,$type,'atk')*(1+$reportBuffs['vs_monster_attack']);
+ $expectedAttack+=$count*$unit['attack']*$attack;
+ $expectedPower+=$count*$unit['power']*($attack+BuffEngine::effectiveMultiplier($reportBuffs,$type,'def')+BuffEngine::effectiveMultiplier($reportBuffs,$type,'hp'))/3;
+}
+// This scenario must win even on the weakest server roll with current troop data.
+$definition=['name'=>'Orc','level'=>3,'stats'=>['attack'=>50,'defense'=>30,'hp'=>100],'amount'=>10,'required_power'=>(int)floor($expectedPower*BattleLuck::factor(-10))];
+$win=BattleEngine::resolveMonster($troops,['hp_current'=>1000],$definition,$reportBuffs);
 mrCheck($win['monster_killed']&&round($win['report']['combat_snapshot']['attack'])===$win['report']['attacker_damage'],'snapshot attack agrees with resolved damage');
+mrCheck(abs($win['report']['combat_snapshot']['attack']-$expectedAttack)<.000001&&$win['report']['army_power_before_luck']===round($expectedPower),'reported attack and base power match current troop data and applied bonuses');
 mrCheck($win['report']['army_power']>=$win['report']['required_power']&&$win['report']['power_ratio']>=1,'power threshold decides the victory');
 mrCheck(abs($win['report']['combat_snapshot']['bonuses']['infantry']['atk']-65)<.00001,'general, infantry and multiplicative monster bonuses are all captured');
+mrCheck($win['report']['combat_snapshot']['combat_modifiers']['vs_monster_attack']===10.0,'monster attack modifier is captured separately for the report');
+mrCheck($win['report']['combat_snapshot']['bonuses']['ranged']['def']===0.0,'zero troop bonuses are captured explicitly');
 mrCheck($win['report']['monster_snapshot']['count']===10&&$win['report']['monster_snapshot']['defense']===300.0,'monster counts and defense use the actual pre-battle pools');
 $loss=BattleEngine::resolveMonster([50100101=>10],['hp_current'=>1000],$definition);
 mrCheck(!$loss['monster_killed']&&array_sum($loss['attacker_losses'])>0&&array_sum($loss['attacker_survivors'])+array_sum($loss['attacker_losses'])===10,'defeat preserves troop accounting and partial monster HP');

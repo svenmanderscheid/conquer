@@ -26,8 +26,7 @@ final class WorldRules
     {
         $db=Connection::getInstance();
         $worldId??=WorldContext::id();
-        $size=(int)$db->query('SELECT map_size FROM worlds WHERE id=?',[$worldId])->fetchColumn();
-        if($targetX<0||$targetX>=$size||$targetY<0||$targetY>=$size)throw new \RuntimeException('Ungültige Zielkoordinaten.');
+        if(!\Conquer\Game\World\WorldMapProfile::contains($worldId,$targetX,$targetY))throw new \RuntimeException('Ungültige Zielkoordinaten.');
         \Conquer\Game\World\LandAccessPolicy::assertTargetOpen($worldId,$targetX,$targetY);
         $city=$db->query("SELECT c.*,p.beginner_shield_until,p.is_hidden AS player_hidden,COALESCE(k.display_name,p.username) AS display_name,COALESCE(k.name_frame,'default') AS name_frame FROM cities c JOIN players p ON p.id=c.player_id LEFT JOIN kingdom_profiles k ON k.player_id=p.id WHERE c.world_id=? AND c.coord_x=? AND c.coord_y=?".($db->getPdo()->inTransaction()?' FOR UPDATE':''),[$worldId,$targetX,$targetY])->fetch();
         if(!$city||($targetPlayerId!==null&&(int)$city['player_id']!==$targetPlayerId)||(int)$city['is_hidden']||(int)$city['player_hidden'])throw new \RuntimeException('Diese Zielstadt ist nicht mehr verfügbar.');

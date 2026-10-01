@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="de">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Eroberungsziele · Union of Kingdoms</title>
+<link rel="stylesheet" href="../../css/fantasy-fonts.css">
+<link rel="stylesheet" href="../../css/village-theme.css">
+<style>
+*{box-sizing:border-box}body{margin:0;padding:24px;background:var(--ui-paper);color:var(--ui-ink);font-family:var(--ui-font)}main{max-width:1180px;margin:auto}header{padding:22px 28px;background:var(--ui-primary);color:var(--ui-card-light);border-radius:18px;border:2px solid var(--ui-gold)}h1{font-size:32px;margin:4px 0 8px;font-weight:normal}p{margin:0;font-size:18px;line-height:1.4}header small{color:var(--ui-gold-soft);letter-spacing:.06em}section{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:18px}figure{margin:0;padding:14px;background:var(--ui-card);border:1px solid var(--ui-line);border-radius:16px;text-align:center}figure img{display:block;width:100%;height:auto;aspect-ratio:1;object-fit:contain}figcaption{padding-top:8px;font-size:23px}figcaption small{display:block;font-size:15px;color:var(--ui-muted);margin-top:4px}@media(max-width:700px){body{padding:12px}header{padding:18px}h1{font-size:26px}section{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}figure{padding:9px}figcaption{font-size:20px}}
+nav{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:18px}button{font:inherit;font-size:18px;min-height:44px;padding:8px 18px;border:1px solid var(--ui-line);border-radius:10px;background:var(--ui-card);color:var(--ui-ink);cursor:pointer}button[aria-pressed="true"]{background:var(--ui-primary);color:var(--ui-card-light)}button:focus-visible{outline:3px solid var(--ui-gold);outline-offset:2px}nav span{color:var(--ui-muted)}
+</style>
+<main><header><small>UNION OF KINGDOMS · LUXEMBOURG</small><h1>Mächtigere Eroberungsgebäude</h1><p>Befestigte Communes → regionale Festungen → Royal Castle</p></header>
+<nav aria-label="Bilder vergleichen"><button type="button" data-version="v1" aria-pressed="false">Vorher</button><button type="button" data-version="v2" aria-pressed="true">Nachher</button><span role="status">Neue, befestigte Motive</span></nav>
+<section aria-label="Die acht Eroberungsmotive">
+<figure><img src="commune-food.webp" width="512" height="512" alt="Kornlande"><figcaption>Kornlande<small>Commune</small></figcaption></figure>
+<figure><img src="commune-lumber.webp" width="512" height="512" alt="Waldvogtei"><figcaption>Waldvogtei<small>Commune</small></figcaption></figure>
+<figure><img src="commune-stone.webp" width="512" height="512" alt="Steinbruch"><figcaption>Steinbruch<small>Commune</small></figcaption></figure>
+<figure><img src="commune-gold.webp" width="512" height="512" alt="Handelsgemeinde"><figcaption>Handelsgemeinde<small>Commune</small></figcaption></figure>
+<figure><img src="commune-abbey.webp" width="512" height="512" alt="Abteigemeinde"><figcaption>Abteigemeinde<small>Commune</small></figcaption></figure>
+<figure><img src="commune-rune.webp" width="512" height="512" alt="Runenwacht"><figcaption>Runenwacht<small>Commune</small></figcaption></figure>
+<figure><img src="canton-fortress.webp" width="512" height="512" alt="Regionale Festung"><figcaption>Regionale Festung<small>Kanton</small></figcaption></figure>
+<figure><img src="crown-krounbuerg.webp" width="512" height="512" alt="Royal Castle"><figcaption>Royal Castle<small>Kontinentziel</small></figcaption></figure>
+</section></main>
+<script>
+document.querySelectorAll('[data-version]').forEach(button=>button.addEventListener('click',()=>{
+  document.querySelectorAll('[data-version]').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));
+  document.querySelectorAll('figure img').forEach(img=>{const file=img.getAttribute('src').split('/').pop();img.src='../territory-'+button.dataset.version+'/'+file;});
+  document.querySelector('[role="status"]').textContent=button.dataset.version==='v2'?'Neue, befestigte Motive':'Bisherige Motive';
+}));
+</script></html>

@@ -124,7 +124,7 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conquer — Kampfbericht #<?= $reportId ?></title>
+    <title>Union of Kingdoms — Kampfbericht #<?= $reportId ?></title>
     <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR.'/assets/css/fantasy-fonts.css') ?>">
     <link rel="stylesheet" href="/assets/css/main.css">
     <style>
@@ -730,13 +730,13 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
                 $injured = (int)($t['injured'] ?? $t['lost'] ?? 0);
                 $tier    = (int)($t['tier'] ?? 1);
                 $chipDef = TroopData::get((int)($t['code'] ?? 0));
-                $troopPortraitPrefix = [1 => 'infantry', 2 => 'archer', 3 => 'cavalry'][(int)($chipDef['type'] ?? 0)] ?? null;
+                $troopPortraitPrefix = [1 => 'guardian', 2 => 'fire-archer', 3 => 'shadow-rider'][(int)($chipDef['type'] ?? 0)] ?? null;
 
             ?>
             <div class="troop-chip">
                 <div class="troop-chip-icon troop-tier-frame" data-troop-tier="<?= $tier ?>">
                     <?php if ($troopPortraitPrefix && $tier >= 1 && $tier <= 10): ?>
-                        <img src="<?= htmlspecialchars(APP_BASE, ENT_QUOTES) ?>/assets/art/characters/tier-colors-v1/<?= $troopPortraitPrefix ?>-t<?= $tier ?>-report.webp" alt="">
+                        <img src="<?= htmlspecialchars(APP_BASE, ENT_QUOTES) ?>/assets/art/characters/fantasy-troops-v2/<?= $troopPortraitPrefix ?>-t<?= $tier ?>-ui.webp" alt="">
                     <?php else: ?>
                         <?= $troopEmoji($tier) ?>
                     <?php endif ?>
@@ -835,7 +835,7 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="5" style="color:var(--c-muted,#8b6f47);font-size:0.75rem">Gesamt</td>
+                    <td colspan="5" style="color:var(--c-muted,#8b6f47);font-size:0.75rem" data-i18n="common.total">Gesamt</td>
                     <td style="text-align:right"><?= $fmt($totalSent) ?></td>
                     <td style="text-align:right">
                         <?php if ($totalInjured > 0): ?>

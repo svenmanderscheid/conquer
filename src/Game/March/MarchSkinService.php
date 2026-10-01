@@ -8,6 +8,7 @@ use Conquer\Game\Premium\LocalCosmeticEntitlements;
 /** Server-owned march cosmetics, ownership and immutable dispatch bonuses. */
 final class MarchSkinService
 {
+    public const ACTIVE_IDS = ['default','forest','fire','water','wind'];
     private static ?array $catalog = null;
 
     /** @return array<string,array<string,mixed>> */
@@ -45,6 +46,8 @@ final class MarchSkinService
         $castleLevel = (int) $db->query('SELECT COALESCE(MAX(castle_level),0) FROM cities WHERE player_id=?', [$playerId])->fetchColumn();
         $entries = [];
         foreach (self::catalog() as $id => $entry) {
+            $entry['legacy'] = !in_array($id, self::ACTIVE_IDS, true);
+            if ($entry['legacy'] && !isset($owned[$id])) continue;
             $entry['owned'] = isset($owned[$id]);
             $entry['equipped'] = $equipped === $id;
             $entry['can_claim'] = !$entry['owned'] && $entry['price_gems'] === 0
@@ -82,6 +85,7 @@ final class MarchSkinService
         if ($db->query('SELECT 1 FROM player_march_skins WHERE player_id=? AND skin_code=? FOR UPDATE', [$playerId,$skin['id']])->fetchColumn() !== false) {
             return ['message'=>$skin['name'].' gehört dir bereits.', 'march_skin'=>$skin['id'], 'charged_gems'=>0];
         }
+        if (!in_array($skin['id'], self::ACTIVE_IDS, true)) throw new \DomainException('Dieser archivierte Marsch-Skin ist nicht mehr erhältlich.');
         if ((int) $player['gems'] < $price) throw new \DomainException('Nicht genug Juwelen für diesen Marsch-Skin.');
         if ($db->execute('UPDATE players SET gems=gems-? WHERE id=? AND gems>=?', [$price,$playerId,$price]) !== 1) {
             throw new \DomainException('Dein Juwelenstand hat sich geändert. Bitte versuche es erneut.');

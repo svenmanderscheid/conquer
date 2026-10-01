@@ -1,4 +1,5 @@
 'use strict';
+require('./fixtures/browser_locale.cjs')('de'); // This suite asserts the explicit German UI.
 // Run only against tools/preview-feature-fixture.php --dungeons --port=18946.
 const fs=require('fs'),path=require('path'),os=require('os'),assert=require('assert');
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
@@ -14,10 +15,10 @@ const output=fs.mkdtempSync(path.join(os.tmpdir(),'conquer-dungeon-app-'));
   page.on('pageerror',e=>errors.push(e.message));
   page.on('response',r=>{if(r.url().startsWith(base+'/api/')&&r.status()>=400)failures.push(r.status()+' '+r.url());});
   await page.goto(base,{waitUntil:'domcontentloaded'});
-  await page.locator('[data-mode="login"]').click();
-  await page.locator('[name="username"]').fill('PreviewPlayer');
+  await page.goto(new URL('?zugang=login', page.url()).href);
+  await page.locator("[name=identifier], [name=username]").fill('PreviewPlayer');
   await page.locator('[name="password"]').fill('PreviewFixture!2026');
-  await Promise.all([page.waitForURL('**/city'),page.locator('#auth-submit').click()]);
+  await Promise.all([page.waitForURL('**/city'),page.locator("form[action$=\"/auth/local\"] button[type=\"submit\"]").click()]);
   await page.locator('#hud-menu').waitFor();
   await page.waitForFunction(()=>document.querySelector('#player-hud-name')?.textContent.includes('PreviewPlayer'));
   await page.locator('#navigation [data-action="tab"]').first().waitFor();
@@ -64,10 +65,10 @@ const output=fs.mkdtempSync(path.join(os.tmpdir(),'conquer-dungeon-app-'));
   const guestContext=await browser.newContext(),guest=await guestContext.newPage();
   guest.on('pageerror',e=>errors.push(e.message));
   await guest.goto(base,{waitUntil:'domcontentloaded'});
-  await guest.locator('[data-mode="login"]').click();
-  await guest.locator('[name="username"]').fill('Dungeon3');
+  await guest.goto(new URL('?zugang=login', guest.url()).href);
+  await guest.locator("[name=identifier], [name=username]").fill('Dungeon3');
   await guest.locator('[name="password"]').fill('PreviewFixture!2026');
-  await Promise.all([guest.waitForURL('**/city'),guest.locator('#auth-submit').click()]);
+  await Promise.all([guest.waitForURL('**/city'),guest.locator("form[action$=\"/auth/local\"] button[type=\"submit\"]").click()]);
   await guest.goto(base+'/city#dungeons',{waitUntil:'domcontentloaded'});
   await guest.locator('[data-action="dungeon-tab"][data-id="parties"]').click();
   assert.equal(await guest.locator('[data-form="dungeon-join"]').count(),0,'Party browser does not embed join forms');checks++;
@@ -105,10 +106,10 @@ const output=fs.mkdtempSync(path.join(os.tmpdir(),'conquer-dungeon-app-'));
   await page.locator('[data-action="dungeon-tab"][data-id="overview"]').click();
   for(const [width,height] of [[1280,800],[390,844],[320,568],[740,360]]) {
    await page.setViewportSize({width,height});
-   await page.locator('#panel-dialog .panel-close').waitFor({state:'visible'});
+   await page.locator('#panel-dialog .panel-close:visible, #panel-dialog .mobile-page-back:visible').first().waitFor({state:'visible'});
    for(const tab of ['overview','parties','reports']) {
    await page.locator(`[data-action="dungeon-tab"][data-id="${tab}"]`).click();
-   await page.waitForFunction(()=>{const el=document.querySelector('.dungeon-tabs .active');return el&&getComputedStyle(el).backgroundColor==='rgb(42, 114, 201)';});checks++;
+   await page.waitForFunction(tab=>document.querySelector('.dungeon-tabs .active')?.dataset.id===tab,tab);checks++;
    await page.locator('.dungeon-shell img').evaluateAll(async images=>{await Promise.all(images.map(image=>{image.loading='eager';return image.decode();}));});
    const layout=await page.evaluate(()=>{
     const dialog=document.querySelector('#panel-dialog'),r=dialog.getBoundingClientRect();
@@ -120,21 +121,19 @@ const output=fs.mkdtempSync(path.join(os.tmpdir(),'conquer-dungeon-app-'));
    assert(layout.visible,`${width}: frame inside viewport`);assert.deepEqual(layout.overflow,[],`${width}: controls stay in frame: ${JSON.stringify(layout.overflow)}; screenshots ${output}`);checks+=2;
    }
   }
-  await page.locator('#panel-dialog .panel-close').click();
+  await page.locator("#panel-dialog .panel-close:visible, #panel-dialog .mobile-page-back:visible").first().click();
   assert(await page.locator('#panel-dialog').evaluate(el=>!el.open));checks++;
-  const frame=page.frameLocator('#city-frame');
-  await frame.locator('canvas').waitFor();
-  assert.equal(await frame.locator('body').evaluate(el=>el.classList.contains('embedded')),true,'Embedded city retains its app integration');checks++;
+  await page.locator('.painted-village').waitFor();
+  assert.equal(await page.locator('#city-frame').count(),0,'Painted city has no duplicated embedded HUD');checks++;
   for(const tab of ['profile','quests','army','research','inventory','treasures','mastery','market','community','defense','events','expeditions','rankings','arena','worlds','settings','account','help']) {
    await page.evaluate(tab=>{location.hash=tab;},tab);
    await page.locator(`#panel-dialog[data-panel="${tab}"]`).waitFor({state:'visible'});
    assert(await page.locator('#content').evaluate(el=>el.textContent.trim().length>0),`${tab} remains available`);checks++;
-   await page.locator('#panel-dialog .panel-close').click();
+   await page.locator("#panel-dialog .panel-close:visible, #panel-dialog .mobile-page-back:visible").first().click();
   }
   await page.locator('#hud-menu').click();
   assert(await page.locator('[data-action="dialog-tab"][data-id="dungeons"]').isVisible(),'Main menu still exposes Dungeons');checks++;
-  await page.locator('#game-dialog .dialog-close').click();
-  assert(await frame.locator('.realm-hud').evaluate(el=>getComputedStyle(el).display==='none'),'Embedded 3D HUD is hidden');checks++;
+  await page.locator("#game-dialog .dialog-close:visible, #game-dialog .mobile-page-back:visible").first().click();
   assert.deepEqual(errors,[],'No browser exceptions');assert.deepEqual(failures,[],'No failed game APIs');checks+=2;
   console.log(`${checks} actual-app checks passed; screenshots ${output}`);
  } finally {await browser.close();}

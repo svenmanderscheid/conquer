@@ -1,0 +1,13 @@
+# World map style study v1
+
+Built-in Imagegen, no CLI. Style reference: `village-selected-spacious.png`.
+Output: `world-map-style-v1.png`.
+
+Concept of a grassland region only, not integrated into the game, not an authoritative map or coordinate plan. No game geometry, object positions or rules changed. Performance has not been tested by generating this image. Other regions and interactive HUD remain outside this study.
+
+Visual review: three castles, food/wood/stone/gold/crystal nodes, orc group, golem and small blue troop group are visible. Palette and broad outlined forms follow village direction; open ground remains between points of interest. Tree density should be considered separately for final gameplay visibility.
+
+## Full prompt
+
+Use case: stylized-concept. Create a single landscape 1536x1024 WORLD MAP REGION SAMPLE for a fantasy strategy game. The supplied village is STYLE AND PALETTE reference only, not a composition to copy. Show open countryside at a high-angle orthographic 2.5D game camera, no horizon, NOT a walled village and NOT a continent map. Precisely match reference's simple hand-drawn cartoon shapes, clear soft dark brown outlines, broad matte two-tone shading, warm cream stone, blue roofs, sage/yellow-green grass, sandy paths and soft blue water. Spacious readable gameplay terrain, at least half open uncluttered meadow. A gently winding river passes along the left third with a small wooden bridge, scattered small groups of asymmetric pines and rounded deciduous trees, a low warm gray rocky ridge at upper right; terrain continues beyond edges. Three well-separated compact player castle markers with recognizable blue roof/ivory castle silhouettes, one larger near lower center-left and two smaller farther away. Spread readable resource nodes into separate clearings: small golden wheat plot, logging site with logs and axe, open stepped stone quarry with pickaxe, timber-entry gold mine with gold cart, and a small restrained purple crystal deposit. Two distinct small chibi enemy markers in distant separate clearings: green orc with club and chunky gray stone golem; one small marching group of three blue-clad chibi soldiers on an open path. Figures are map markers, not giant foreground mascots. Objects should appear integrated on terrain but have clean readable silhouettes and generous selection space around them. Keep coherent scale, calm colors, sparse details, no crowded flowers or glossy decorations. This is a representative grassland region visual study, not a final world layout. No UI panels, no labels or numbers, no text, no icons floating in badges, no grid, no compass, no frame, no photorealism, no shiny 3D, no neon, no dense texture noise.
+

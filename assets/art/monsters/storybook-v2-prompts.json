@@ -1,0 +1,23 @@
+{
+  "tool": "built-in image_gen",
+  "style_reference": "assets/art/village2.png",
+  "date": "2026-09-25",
+  "prompts": [
+    {
+      "name": "grumwald",
+      "prompt": "Use case: style-transfer. Production game sprite edit. Image 1 is the existing boss identity to redesign. Image 2 is the binding game art style reference (village2). Redraw ONLY the creature from image 1 in exactly the simple illustrated storybook style of image 2: bold warm dark-brown outlines, large soft rounded chunky shapes, oversized expressive head, short broad limbs, broad flat local color and only two or three cel shaded values. Reduce tiny texture detail strongly; matte, clean, hand drawn fantasy cartoon. NOT a glossy 3D render, no realistic surface texture, no dense grain, no dramatic lighting. Preserve creature identity and iconic equipment. Single full body, elevated three-quarter game camera, all extremities visible, centered with 8 percent clear padding. Genuine transparent RGBA background, absolutely no floor, no cast shadow, no backdrop, no halo, no glow outside silhouette, no text or border. Square 1024px image. Readable when scaled to 100px on a game map. Grumwald: sage-green woodland troll, chunky root antlers, just a few large leaf clumps and orange mushrooms on shoulders, brown bark skirt, blue rune belt buckle, oversized simple wooden log club. Preserve the original pose and facing."
+    },
+    {
+      "name": "frostgrimm",
+      "prompt": "Use case: style-transfer. Production game sprite edit. Image 1 is the existing boss identity to redesign. Image 2 is the binding game art style reference (village2). Redraw ONLY the creature from image 1 in exactly the simple illustrated storybook style of image 2: bold warm dark-brown outlines, large soft rounded chunky shapes, oversized expressive head, short broad limbs, broad flat local color and only two or three cel shaded values. Reduce tiny texture detail strongly; matte, clean, hand drawn fantasy cartoon. NOT a glossy 3D render, no realistic surface texture, no dense grain, no dramatic lighting. Preserve creature identity and iconic equipment. Single full body, elevated three-quarter game camera, all extremities visible, centered with 8 percent clear padding. Genuine transparent RGBA background, absolutely no floor, no cast shadow, no backdrop, no halo, no glow outside silhouette, no text or border. Square 1024px image. Readable when scaled to 100px on a game map. Frostgrimm: squat ivory-white yeti, blue face and hands, curved turquoise ice horns, two ivory tusks, simple blue rune belt, chunky ice-and-stone hammer. Fur consists of a FEW broad scalloped tufts, no individual strands. Preserve pose and facing."
+    },
+    {
+      "name": "sandmaul",
+      "prompt": "Use case: style-transfer. Production game sprite edit. Image 1 is the existing boss identity to redesign. Image 2 is the binding game art style reference (village2). Redraw ONLY the creature from image 1 in exactly the simple illustrated storybook style of image 2: bold warm dark-brown outlines, large soft rounded chunky shapes, oversized expressive head, short broad limbs, broad flat local color and only two or three cel shaded values. Reduce tiny texture detail strongly; matte, clean, hand drawn fantasy cartoon. NOT a glossy 3D render, no realistic surface texture, no dense grain, no dramatic lighting. Preserve creature identity and iconic equipment. Single full body, elevated three-quarter game camera, all extremities visible, centered with 8 percent clear padding. Genuine transparent RGBA background, absolutely no floor, no cast shadow, no backdrop, no halo, no glow outside silhouette, no text or border. Square 1024px image. Readable when scaled to 100px on a game map. Sandmaul: low wide ochre sandstone tortoise dragon, large rounded sandstone shell plates, a few green sprouts, turquoise forehead gem, friendly fierce face with tusks, broad digging claws and club tail. Preserve quadruped pose and facing. NO haze or background."
+    },
+    {
+      "name": "glutramm",
+      "prompt": "Restyle the fantasy stone ram in the first reference to match the simple hand-drawn village illustration in the second reference. Preserve its four-legged pose, curled horns, amber eyes, gray stone body and orange seams. Use large rounded shapes, clean dark brown outlines, flat colors and simple cel shading. Friendly storybook mobile game sprite, entire creature visible, centered with margin. Transparent background, no ground, no text, no shadow outside the character. No realistic texture or glossy rendering."
+    }
+  ]
+}

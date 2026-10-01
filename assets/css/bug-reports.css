@@ -24,6 +24,8 @@
   color: var(--ui-card-light);
   font: 700 30px/1 var(--ui-font);
 }
+.bug-report-intro .bug-report-mark { background: var(--ui-card); border: 1px solid var(--ui-line); }
+.bug-report-intro .bug-report-mark img { width: 54px; height: 54px; max-width: none; object-fit: contain; }
 .bug-report-intro h2,
 .bug-report-success h2 { margin: 0 0 4px; }
 .bug-report-intro p { margin: 0; color: var(--ui-muted); }
@@ -39,6 +41,11 @@
 .bug-report-panel :is(input:not([type="checkbox"]), select, textarea) {
   width: 100%;
   min-width: 0;
+}
+.bug-report-panel #bug-title {
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 9px 12px;
 }
 .bug-report-fields {
   display: grid;
@@ -79,9 +86,9 @@
 .bug-capture-consent .button { min-height: 44px; }
 .panel-report-button,
 .dialog-report-button { display: grid; place-items: center; width: 44px; min-width: 44px; height: 44px; border: 1px solid var(--ui-line); border-radius: 11px; background: var(--ui-card); color: var(--ui-primary); cursor: pointer; }
-.panel-report-button svg,
-.dialog-report-button svg,
-.hud-report-button svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.panel-report-button > img,
+.dialog-report-button > img { width: 34px; height: 34px; max-width: none; object-fit: contain; }
+.hud-report-button .hud-edge-art > img { object-fit: contain; }
 .dialog-report-button { position: absolute; z-index: 3; top: 10px; right: 60px; }
 .hud-report-button .hud-edge-art { display: grid; place-items: center; color: var(--ui-card-light); }
 .panel-report-button:focus-visible,

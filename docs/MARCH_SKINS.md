@@ -1,6 +1,6 @@
 # Marsch-Skins
 
-Der Serverkatalog liegt in `data/march_skins.json`. Er enthält zu jedem der 18 Burg-Skins genau einen Marsch-Skin. Legendäre Skins kosten zunächst 1.200 Juwelen, mythische 2.400 Juwelen. Diese Preise sind reine Katalogwerte und können später ohne Schemaänderung angepasst werden.
+Stand 26. September 2026: Der Serverkatalog in `data/march_skins.json` bewahrt fünf aktive IDs (`default`, `forest`, `fire`, `water`, `wind`) und 17 historische IDs für bestehende Besitzrechte und Marsch-Snapshots. Neue Elementarmärsche kosten 1.200 Juwelen. Archivierte Skins werden nicht neu verkauft; besessene Alt-Skins bleiben korrekt sichtbar und ausrüstbar. Die Sammlung zeigt aktive Einträge plus eigenen Altbesitz. Die zugehörige Regel für Burgen, Rahmen und historische Zahlungsbelege steht in `CASTLE_SKINS.md`.
 
 ## Verbindliche Gestaltungsregel
 
@@ -36,7 +36,7 @@ Die Expeditionsregeln geben `march_seconds` und `return_seconds` ebenfalls mit d
 
 ## Sammlung und Grafiken
 
-Die Sammlung ist über das eigene Dorfmenü → Skins → Marsch-Skins sowie über Armee → Marsch-Skins erreichbar. Burg und Marsch besitzen getrennte Auswahlen. Nach Kauf oder kostenloser Freischaltung bleibt der Skin zum direkten Anlegen geöffnet. Die Kaufbestätigung zeigt Preis, Guthaben und Restguthaben.
+Die Sammlung ist über das eigene Dorfmenü → Skins → Marsch-Skins sowie über Armee → Marsch-Skins erreichbar. Burg und Marsch besitzen getrennte Auswahlen. Nach Kauf oder kostenloser Freischaltung bleibt der Skin zum direkten Anlegen geöffnet. Die ausdrücklich beschriftete Sofortkauf-Aktion zeigt den Preis; Guthaben und Fehlbetrag sind sichtbar, und laufende Aktionen sperren Wiederholungen.
 
 Die individuellen Imagegen-Illustrationen liegen als transparente WebP-Dateien in `assets/art/marches/`. Prompts und Quellen sind in `docs/march-skin-art-prompts.json` festgehalten; Bildaufbereitung und Prüfung stehen in `assets/art/marches/README.md`. Eine Übersicht der ursprünglichen Motive liegt in `artifacts/march-skins/collection.png`.
 
@@ -66,7 +66,7 @@ Die Original-PNGs liegen unter `asset-workflow/01-source/marches/<id>/march-sour
 
 `ConquerMarchSkins.locomotion(id)` weist jedem Motiv seine eigene Fortbewegung zu. Eisenkoloss, Frostmammut und Wurzelkoloss stampfen schwer; Rosenhirsch und Jadeglockenlöwe galoppieren; Sonnenskarabäus und Glutsalamander krabbeln; Leuchtrücken und Korallenleviathan schwimmen; der Uhrwerkhase hüpft und der Saphirpfau stolziert. Rabenfürst fliegt, Sternenwal und Finstersonnenwagen gleiten, die Sturmqualle schwebt.
 
-Alle 17 Premium-Skins besitzen nun echte animierte Bildfolgen. Bei den 15 neuen Kreaturen bewegen sich je nach Körperbau Beine, Klauen, Flügel, Flossen, Rüssel, Ohren, Schwänze, Wurzeln oder Tentakel über acht von Imagegen abgeleitete, registrierte Einzelposen. Die Retained Sheets liegen unter `asset-workflow/02-animation-sheets/<id>/sheet.png`; Bewegungsabläufe und Bodenkontakte stehen in `docs/march-creature-motion-spec.json`. `tools/build-articulated-march-assets.py` entfernt den Vorschauhintergrund, isoliert jede Pose, richtet die Silhouette aus und schreibt transparente 256×256-WebPs sowie passende Standbilder. Die verwendeten Bildprompts und Quellen dokumentiert `docs/march-creature-animation-art.json`.
+Die 17 archivierten Premium-Skins besitzen weiterhin echte animierte Bildfolgen, damit bereits erworbene Skins und laufende Märsche korrekt dargestellt bleiben. Bei den 15 neuen Kreaturen bewegen sich je nach Körperbau Beine, Klauen, Flügel, Flossen, Rüssel, Ohren, Schwänze, Wurzeln oder Tentakel über acht von Imagegen abgeleitete, registrierte Einzelposen. Die Retained Sheets liegen unter `asset-workflow/02-animation-sheets/<id>/sheet.png`; Bewegungsabläufe und Bodenkontakte stehen in `docs/march-creature-motion-spec.json`. `tools/build-articulated-march-assets.py` entfernt den Vorschauhintergrund, isoliert jede Pose, richtet die Silhouette aus und schreibt transparente 256×256-WebPs sowie passende Standbilder. Die verwendeten Bildprompts und Quellen dokumentiert `docs/march-creature-animation-art.json`.
 
 Die Weltkarte lädt die animierte Datei nur für einen sichtbaren, tatsächlich laufenden Marsch. Angehaltene, sammelnde, außerhalb des Bildes liegende und im Hintergrund befindliche Märsche verwenden das Standbild. Die Sammlung aktiviert Animationen mit `IntersectionObserver` nur für sichtbare Porträts. Ein Ladefehler fällt einmalig auf das Standbild zurück. `prefers-reduced-motion` und die Spieleinstellung für reduzierte Bewegung erzwingen ebenfalls Standbilder und stoppen Spur sowie Schattenimpuls. Phönix und Drache behalten zusätzlich ihr größeres Fluglayout; die übrigen Kreaturen nutzen die normale Kartensilhouette.
 

@@ -3,7 +3,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright'),assert=req
 const base=process.env.MAP_SEARCH_FIXTURE_URL||'http://127.0.0.1:18959';assert(/^http:\/\/127\.0\.0\.1:\d+$/.test(base));
 (async()=>{const browser=await chromium.launch({headless:true,channel:'chrome'});try{
  const page=await browser.newPage({viewport:{width:390,height:844}});page.on('pageerror',e=>console.error(e.stack));
- await page.goto(base);await page.locator('[data-mode="login"]').click();await page.locator('[name="username"]').fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');await Promise.all([page.waitForURL('**/city'),page.locator('#auth-submit').click()]);
+ await page.goto(base);await page.goto(new URL('?zugang=login', page.url()).href);await page.locator("[name=identifier], [name=username]").fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');await Promise.all([page.waitForURL('**/city'),page.locator("form[action$=\"/auth/local\"] button[type=\"submit\"]").click()]);
  await page.waitForFunction(()=>document.querySelector('#player-hud-name')?.textContent.includes('PreviewPlayer'));await page.locator('#navigation [data-id="world"]').click();
  await page.locator('[data-atlas="search"]').click();await page.waitForFunction(()=>document.querySelector('#atlas-object-level').max!=='0');await page.locator('[data-search-category="food"]').click();await page.locator('#atlas-object-level').fill('1');await page.locator('.atlas-object-search-submit').click();await page.locator('.atlas-target-actions [data-atlas="search-next"]').waitFor();
  for(const [width,height] of [[1280,800],[390,844],[320,568],[844,390],[568,320]]){

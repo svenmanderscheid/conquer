@@ -11,7 +11,12 @@ $levels=array_fill(1,9,0);foreach($overview['lands'] as $land)$levels[$land['lev
 <div class="fields"><?php foreach($levels as $level=>$count): ?><span class="pill">Stufe <?= $level ?>: <?= $count ?> Länder</span><?php endforeach ?></div>
 <p class="subtle">Bestehende Welten behalten ihre geöffneten Gebiete. Neue Welten beginnen im Außenbereich. Änderungen an den Regeln setzen keinen Fortschritt zurück.</p></section>
 <section class="card"><h2>Kartenfreigabe</h2><div class="table-wrap"><table><thead><tr><th>Bereich</th><th>Status</th><th>Entwickelte Länder</th><th>Öffnung · UTC</th></tr></thead><tbody>
-<?php foreach($overview['zones'] as $zone): ?><tr><td><?= ah($zoneNames[$zone['key']]) ?></td><td><?= $zone['open']?'Geöffnet':'Gesperrt' ?></td><td><?= $zone['required_count']===null?'Ab Weltstart':((int)$zone['reached_count'].' / '.(int)$zone['required_count'].' auf Stufe '.(int)$zone['target_level']) ?></td><td><?= ah($zone['open']?($zone['opened_at']??'Ab Weltstart'):($zone['not_before']?'Frühestens '.$zone['not_before']:'Nach Öffnung des vorherigen Bereichs')) ?></td></tr><?php endforeach ?>
+<?php foreach($overview['zones'] as $zone):
+    $requirementKey=$zone['required_count']===null?'copy.1fc758386979d905':'admin.lands.requirement';
+    $requirementParams=$zone['required_count']===null?[]:['reached'=>(int)$zone['reached_count'],'required'=>(int)$zone['required_count'],'level'=>(int)$zone['target_level']]; ?>
+<tr><td><?= ah($zoneNames[$zone['key']]) ?></td><td><?= $zone['open']?'Geöffnet':'Gesperrt' ?></td>
+<td data-i18n="<?= ah($requirementKey) ?>" data-i18n-params="<?= ah(json_encode($requirementParams,JSON_THROW_ON_ERROR)) ?>"><?= \Conquer\Game\Locale::html($requirementKey,$requirementParams) ?></td>
+<td><?= ah($zone['open']?($zone['opened_at']??'Ab Weltstart'):($zone['not_before']?'Frühestens '.$zone['not_before']:'Nach Öffnung des vorherigen Bereichs')) ?></td></tr><?php endforeach ?>
 </tbody></table></div></section>
 <section class="card"><h2>Entwicklung und Freigaberegeln</h2>
 <?php adminForm('land-rules-save',$selectedWorld); ?>

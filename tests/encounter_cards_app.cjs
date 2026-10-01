@@ -15,9 +15,9 @@ const output=path.resolve(__dirname,'../artifacts/encounter-cards-20260913');fs.
    assert(position,'A portion of the one-tile target is reachable by touch');await target.click({position});
   };
   page.on('pageerror',e=>errors.push(e.stack||e.message));
-  await page.goto(base);await page.locator('[data-mode="login"]').click();
-  await page.locator('[name="username"]').fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');
-  await Promise.all([page.waitForURL('**/city'),page.locator('#auth-submit').click()]);
+  await page.goto(base);await page.goto(new URL('?zugang=login', page.url()).href);
+  await page.locator("[name=identifier], [name=username]").fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');
+  await Promise.all([page.waitForURL('**/city'),page.locator("form[action$=\"/auth/local\"] button[type=\"submit\"]").click()]);
   await page.waitForFunction(()=>document.querySelector('#player-hud-name')?.textContent.includes('PreviewPlayer'));
   const sceneSwitch=page.locator('#navigation .hud-scene-switch');await sceneSwitch.waitFor();if(await sceneSwitch.getAttribute('data-id')==='world')await sceneSwitch.click();
   await page.locator('.atlas-marker--nodes').first().waitFor({state:'attached'});

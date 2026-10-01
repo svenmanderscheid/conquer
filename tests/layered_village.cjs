@@ -1,0 +1,71 @@
+const assert=require('node:assert/strict');
+const path=require('node:path');
+const fs=require('node:fs');
+const pw=require(process.env.PLAYWRIGHT_MODULE||'playwright');
+const root=path.resolve(__dirname,'..');
+(async()=>{
+ const browser=await pw.chromium.launch({headless:true,channel:'msedge'});
+ try{
+  const page=await browser.newPage({viewport:{width:1536,height:1024}});
+  const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.route('**/__village_motion_fixture',route=>route.fulfill({contentType:'text/html',body:'<style>html,body{margin:0}#host{position:absolute;inset:0}</style><body class="city-mode"><main id="host"></main></body>'}));
+  await page.goto('http://localhost/conquer/__village_motion_fixture');
+  await page.addStyleTag({path:path.join(root,'assets/css/village-theme.css')});
+  await page.addScriptTag({path:path.join(root,'assets/js/city-painted.js')});
+  await page.evaluate(()=>{
+   window.fixture={host:document.querySelector('#host'),base:'http://localhost/conquer',state:{buildings:{},build_queue:[]},labels:{},countdown:end=>'<span data-end="'+end+'">1:00</span>'};
+   ConquerPaintedCity.render(fixture);
+   for(const b of document.querySelectorAll('.painted-village-building'))fixture.state.buildings[b.dataset.id]={level:5};
+   ConquerPaintedCity.render(fixture);
+  });
+  await page.waitForFunction(()=>[...document.images].every(i=>i.complete&&i.naturalWidth));
+  assert.equal(await page.locator('.painted-building-sprite').count(),15);
+  assert.equal(await page.locator('.painted-motion').count(),15);
+  assert(await page.locator('.painted-river-glint').count()>5,'River glints stay on sampled water');
+  const flag=page.locator('[data-id="lumber_camp"] .painted-moving');
+  const firstTransform=await flag.evaluate(e=>getComputedStyle(e).transform);
+  await page.waitForTimeout(250);
+  assert.notEqual(await flag.evaluate(e=>getComputedStyle(e).transform),firstTransform,'Mill wheel actually moves');
+  await page.evaluate(()=>ConquerPaintedCity.render(fixture));
+  assert.equal(await page.locator('.painted-motion').count(),15,'Updates do not duplicate animation layers');
+  await page.evaluate(()=>document.querySelector('.painted-village').classList.add('is-paused'));
+  assert.equal(await flag.evaluate(e=>getComputedStyle(e).animationPlayState),'paused');
+  await page.evaluate(()=>{document.querySelector('.painted-village').classList.remove('is-paused');document.body.dataset.graphicsQuality='light';});
+  assert.equal(await flag.evaluate(e=>getComputedStyle(e).animationName),'none');
+  assert.equal(await page.locator('.painted-river').isVisible(),false);
+  await page.evaluate(()=>delete document.body.dataset.graphicsQuality);
+  for(const code of ['castle','academy','treasure_house'])assert.match(await page.locator(`[data-id="${code}"] .painted-building-sprite`).getAttribute('src'),/_rounded\.webp$/);
+  for(const code of ['hospital','hall_of_alliance','stable','archery_range','barrack'])assert.match(await page.locator(`[data-id="${code}"] .painted-building-sprite`).getAttribute('src'),/_aligned\.webp$/);
+  const output=path.join(root,'artifacts/layered-village');fs.mkdirSync(output,{recursive:true});
+  await page.screenshot({path:path.join(output,'rounded-landmarks.png')});
+  await page.locator('[data-id="lumber_camp"]').screenshot({path:path.join(output,'animated-mill-detail.png')});
+  assert.equal(await page.locator('.painted-village-building.is-building').count(),0);
+  await page.evaluate(()=>{fixture.state.buildings.academy.level=0;fixture.state.build_queue=[{id:1,building_code:'castle',finishes_at:'2026-09-23 18:00:00'}];ConquerPaintedCity.render(fixture);});
+  assert(await page.locator('[data-id="academy"]').evaluate(e=>e.classList.contains('is-empty')));
+  assert.equal(await page.locator('[data-id="castle"] .painted-building-sprite').evaluate(e=>getComputedStyle(e).visibility),'visible');
+  assert(await page.locator('[data-id="castle"] .painted-scaffold').isVisible());
+  assert.equal(await page.locator('[data-id="castle"] .painted-scaffold>img').count(),2);
+  assert.equal(await page.locator('[data-id="castle"] .painted-motion').isVisible(),true);
+  assert.equal(await page.locator('[data-id="academy"] .painted-motion').isVisible(),false);
+  assert.equal(await page.locator('.painted-village-building.is-building').count(),1);
+  assert.equal(await page.locator('[data-id="castle"] [data-end]').getAttribute('data-end'),'2026-09-23 18:00:00');
+  assert.equal(await page.locator('[data-id="castle"] [data-end]').textContent(),'1:00','Name updates must not overwrite countdown');
+  await page.locator('[data-id="castle"]').screenshot({path:path.join(output,'construction-castle-detail.png')});
+  await page.emulateMedia({reducedMotion:'reduce'});
+  assert.equal(await flag.evaluate(e=>getComputedStyle(e).animationName),'none');
+  assert.equal(await page.locator('.painted-river').isVisible(),false);
+  assert.equal(await page.locator('[data-id="castle"] .painted-scaffold-motion').evaluate(e=>getComputedStyle(e).animationName),'none');
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  for(const [width,height] of [[1536,1024],[390,844],[844,390],[320,700]]){
+   await page.setViewportSize({width,height});
+   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+   await page.screenshot({path:path.join(output,`construction-${width}.png`)});
+  }
+  await page.evaluate(()=>{fixture.state.build_queue=[];fixture.state.buildings.castle.level=6;ConquerPaintedCity.render(fixture);});
+  assert.equal(await page.locator('.is-building').count(),0);
+  assert.equal(await page.locator('[data-id="castle"] .painted-building-sprite').evaluate(e=>getComputedStyle(e).visibility),'visible');
+  assert.equal(await page.locator('[data-id="castle"] [data-end]').count(),0);
+  assert.deepEqual(errors,[]);
+  console.log('Layered village: empty/building/finished states, completion, reduced motion, images and four viewports passed.');
+ }finally{await browser.close();}
+})().catch(e=>{console.error(e);process.exitCode=1;});

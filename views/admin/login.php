@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin &mdash; Conquer</title>
+  <title>Admin &mdash; Union of Kingdoms</title>
   <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR.'/assets/css/fantasy-fonts.css') ?>">
   <style>
     *, *::before, *::after { box-sizing: border-box; }
@@ -96,7 +96,7 @@
 </head>
 <body class="admin-village" data-i18n-scope>
 <div class="login-box">
-  <h1>&#9876; Conquer Admin</h1>
+  <h1>&#9876; Union of Kingdoms Admin</h1>
 
   <?php if (!empty($_SESSION['admin_flash'])): ?>
     <div class="flash"><?= htmlspecialchars($_SESSION['admin_flash']) ?></div>
@@ -132,7 +132,7 @@
     <button type="submit">Anmelden</button>
   </form>
 
-  <div class="admin-hint">Conquer Admin Panel &mdash; Nur autorisierte Zugriffe</div>
+  <div class="admin-hint">Union of Kingdoms Admin Panel &mdash; Nur autorisierte Zugriffe</div>
 </div>
 </body>
 </html>

@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace Conquer\Game\Map;
 use Conquer\Db\Connection;
+use Conquer\Game\World\{WorldMapProfile,LuxembourgGeography};
 
 /** All placement writers lock the world row until their transaction commits. */
 final class WorldPlacement
@@ -21,7 +22,7 @@ final class WorldPlacement
     }
     public static function footprint(string $kind,int $x,int $y): array
     {
-        return match($kind){'city'=>[$x-1,$y-1,$x+2,$y+2],'alliance_center'=>[$x-2,$y-2,$x+2,$y+2],'outpost'=>[$x-1,$y-1,$x+1,$y+1],'boss'=>[$x,$y,$x+1,$y+1],'resource','monster'=>[$x,$y,$x,$y],'shrine'=>[$x-2,$y-2,$x+3,$y+3],'congress'=>[$x-3,$y-3,$x+3,$y+3],default=>throw new \InvalidArgumentException('Unknown map object kind')};
+        return match($kind){'city'=>[$x-1,$y-1,$x+2,$y+2],'neutral_village'=>[$x,$y,$x+1,$y+1],'alliance_center'=>[$x-2,$y-2,$x+2,$y+2],'outpost'=>[$x-1,$y-1,$x+1,$y+1],'boss'=>[$x,$y,$x+1,$y+1],'resource','monster'=>[$x,$y,$x,$y],'shrine'=>[$x-2,$y-2,$x+3,$y+3],'congress'=>[$x-3,$y-3,$x+3,$y+3],default=>throw new \InvalidArgumentException('Unknown map object kind')};
     }
     public static function conflicts(string $kind,int $x,int $y,string $otherKind,int $ox,int $oy): bool
     {
@@ -31,9 +32,14 @@ final class WorldPlacement
     }
     public static function canPlace(Connection $db,int $worldId,string $kind,int $x,int $y,?int $ignoreId=null): bool
     {
-        $size=self::$sizes[spl_object_id($db).':'.$worldId]??(int)$db->query('SELECT map_size FROM worlds WHERE id=?',[$worldId])->fetchColumn();
+        $profile=WorldMapProfile::forWorld($worldId);
         [$left,$top,$right,$bottom]=self::footprint($kind,$x,$y);
-        if($left<0||$top<0||$right>=$size||$bottom>=$size||!WorldTerrain::isDryRectangle($left,$top,$right,$bottom))return false;
+        $canton=$profile['key']==='luxembourg'&&$kind==='city'?(LuxembourgGeography::at($x,$y)['canton_id']??null):null;
+        if($left<0||$top<0||$right>=$profile['width']||$bottom>=$profile['height']||!WorldTerrain::isDryRectangle($left,$top,$right,$bottom,$worldId,$canton))return false;
+        if($profile['key']==='luxembourg')foreach(LuxembourgGeography::landmarks()as$landmark){
+            [$l,$t,$r,$b]=LuxembourgGeography::boundsForSize($landmark['x'],$landmark['y'],$landmark['footprint']);
+            if(!($right<$l||$left>$r||$bottom<$t||$top>$b))return false;
+        }
         // Landmarks are preplaced in locked zones; interactions still require access.
         if(!in_array($kind,['shrine','congress'],true)&&class_exists(\Conquer\Game\World\LandAccessPolicy::class)){
             foreach([[$left,$top],[$right,$top],[$left,$bottom],[$right,$bottom]] as [$cx,$cy])
@@ -43,9 +49,12 @@ final class WorldPlacement
         $charm=$db->query('SELECT id FROM map_charms WHERE world_id=? AND collected_by IS NULL AND expires_at>UTC_TIMESTAMP() AND coord_x BETWEEN ? AND ? AND coord_y BETWEEN ? AND ? LIMIT 1 FOR UPDATE',[$worldId,$left,$right,$top,$bottom])->fetchColumn();
         if($charm!==false)return false;
         // Current reads remain accurate even if a caller had already opened a repeatable-read snapshot.
-        foreach(['cities'=>'city','field_objects'=>'resource','field_monsters'=>'monster','shrines'=>'shrine'] as $table=>$otherKind){
+        foreach(['cities'=>'city','neutral_villages'=>'neutral_village','field_objects'=>'resource','field_monsters'=>'monster','shrines'=>'shrine'] as $table=>$otherKind){
+            // Migrated worlds retain legacy shrine rows for historical battle receipts.
+            // Only the versioned territory catalog occupies land on Luxembourg.
+            if($table==='shrines'&&$profile['key']==='luxembourg')continue;
             // Cities extend two tiles; landmarks extend at most three tiles from their anchor.
-            $pad=$kind==='resource'&&$otherKind==='resource'?3:match($otherKind){'city'=>2,'resource','monster'=>1,'shrine'=>3,default=>0};
+            $pad=$kind==='resource'&&$otherKind==='resource'?3:match($otherKind){'city','neutral_village'=>2,'resource','monster'=>1,'shrine'=>3,default=>0};
             $rows=$db->query('SELECT id,coord_x,coord_y'.($table==='shrines'?',shrine_code':($table==='field_monsters'?',monster_code':'')).' FROM '.$table.' WHERE world_id=? AND coord_x BETWEEN ? AND ? AND coord_y BETWEEN ? AND ? FOR UPDATE',[$worldId,$left-$pad,$right+$pad,$top-$pad,$bottom+$pad])->fetchAll();
             foreach($rows as $row){$rowKind=($row['shrine_code']??'')==='CONGRESS'?'congress':$otherKind;if($otherKind==='monster')$rowKind=self::monsterKind((int)$row['monster_code']);if(($kind===$rowKind||(in_array($kind,['monster','boss'],true)&&$otherKind==='monster'))&&$ignoreId!==null&&(int)$row['id']===$ignoreId)continue;if(self::conflicts($kind,$x,$y,$rowKind,(int)$row['coord_x'],(int)$row['coord_y']))return false;}
         }
@@ -55,9 +64,17 @@ final class WorldPlacement
     }
     public static function findNear(Connection $db,int $worldId,string $kind,int $x,int $y,?int $ignoreId=null,int $radius=24,?string $biome=null): ?array
     {
-        for($r=0;$r<=$radius;$r++)for($dy=-$r;$dy<=$r;$dy++)for($dx=-$r;$dx<=$r;$dx++){
-            if(max(abs($dx),abs($dy))!==$r)continue;
-            if(($biome===null||WorldTerrain::biomeAt($x+$dx,$y+$dy)===$biome)&&self::canPlace($db,$worldId,$kind,$x+$dx,$y+$dy,$ignoreId))return [$x+$dx,$y+$dy];
+        if(!WorldMapProfile::isLuxembourg($worldId)&&!in_array($kind,['shrine','congress'],true)&&\Conquer\Game\World\LandProgressService::available()){
+            \Conquer\Game\World\LandProgressService::ensureWorld($worldId);
+            if(!$db->query("SELECT 1 FROM world_land_zones WHERE world_id=? AND status='open' LIMIT 1",[$worldId])->fetchColumn())return null;
+        }
+        // Visit each perimeter once, preserving the original nearest-first order.
+        // Scanning every square interior made a full-world failure cubic in size.
+        for($r=0;$r<=$radius;$r++)for($dy=-$r;$dy<=$r;$dy++){
+            $columns=abs($dy)===$r?range(-$r,$r):[-$r,$r];
+            foreach($columns as $dx){
+                if(($biome===null||WorldTerrain::biomeAt($x+$dx,$y+$dy,$worldId)===$biome)&&self::canPlace($db,$worldId,$kind,$x+$dx,$y+$dy,$ignoreId))return [$x+$dx,$y+$dy];
+            }
         }
         return null;
     }
@@ -65,6 +82,8 @@ final class WorldPlacement
     public static function repairCities(Connection $db,int $worldId,?int $playerId=null): int
     {
         $size=self::lockWorld($db,$worldId);$moved=0;
+        // Never reinterpret or automatically relocate a Luxembourg city's saved state.
+        if(WorldMapProfile::isLuxembourg($worldId))return 0;
         $rows=$db->query('SELECT id,player_id,coord_x,coord_y FROM cities WHERE world_id=?'.($playerId===null?'':' AND player_id=?').' ORDER BY id FOR UPDATE',$playerId===null?[$worldId]:[$worldId,$playerId])->fetchAll();
         foreach($rows as $city){
             $x=(int)$city['coord_x'];$y=(int)$city['coord_y'];$id=(int)$city['id'];$pid=(int)$city['player_id'];
@@ -76,7 +95,7 @@ final class WorldPlacement
             foreach($db->query('SELECT shrine_code,coord_x,coord_y FROM shrines WHERE world_id=? AND coord_x BETWEEN ? AND ? AND coord_y BETWEEN ? AND ? FOR UPDATE',[$worldId,$x-4,$x+5,$y-4,$y+5])->fetchAll() as $landmark){
                 if(self::conflicts('city',$x,$y,$landmark['shrine_code']==='CONGRESS'?'congress':'shrine',(int)$landmark['coord_x'],(int)$landmark['coord_y'])){$landmarkOverlap=true;break;}
             }
-            if($x>=1&&$y>=1&&$x<$size-2&&$y<$size-2&&WorldTerrain::isDryRectangle(...self::footprint('city',$x,$y))&&$overlap===false&&!$landmarkOverlap)continue;
+            if($x>=1&&$y>=1&&$x<$size-2&&$y<$size-2&&WorldTerrain::isDryRectangle(...[...self::footprint('city',$x,$y),$worldId])&&$overlap===false&&!$landmarkOverlap)continue;
             $active=$db->query("SELECT id FROM marches WHERE world_id=? AND (player_id=? OR (target_x=? AND target_y=?)) AND state IN ('marching','resolving','returning') LIMIT 1 FOR UPDATE",[$worldId,$pid,$x,$y])->fetchColumn();
             if($active!==false)continue;
             $rally=$db->query("SELECT r.id FROM rallies r LEFT JOIN rally_participants p ON p.rally_id=r.id WHERE r.world_id=? AND (r.leader_player_id=? OR r.target_player_id=? OR p.player_id=?) AND r.status IN ('gathering','marching','returning') LIMIT 1 FOR UPDATE",[$worldId,$pid,$pid,$pid])->fetchColumn();

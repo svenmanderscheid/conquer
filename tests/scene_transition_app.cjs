@@ -10,17 +10,32 @@ const { chromium } = require('playwright');
     page.on('pageerror', error => errors.push(error.message));
     page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
     await page.goto(base, { waitUntil: 'networkidle' });
-    await page.locator('[data-mode="login"]').click();
-    await page.locator('[name="username"]').fill('PreviewPlayer');
+    await page.goto(new URL('?zugang=login', page.url()).href);
+    await page.locator("[name=identifier], [name=username]").fill('PreviewPlayer');
     await page.locator('[name="password"]').fill('PreviewFixture!2026');
-    await Promise.all([page.waitForURL('**/city'), page.locator('#auth-submit').click()]);
+    await Promise.all([page.waitForURL('**/city'), page.locator("form[action$=\"/auth/local\"] button[type=\"submit\"]").click()]);
     await page.locator('#navigation [data-id="world"]').waitFor();
+    await page.evaluate(() => {
+      window.__sceneTrace = [];
+      const veil = document.querySelector('#scene-transition');
+      new MutationObserver(() => window.__sceneTrace.push({at:performance.now(),veil:veil.className,body:document.body.className})).observe(veil,{attributes:true,attributeFilter:['class']});
+    });
     return page;
   }
 
-  for (const [width, height] of [[1280, 800], [390, 844], [844, 390]]) {
+  async function waitForTransition(page, label) {
+    // First-mount rendering and two animation frames run between the timers.
+    // Inspect completion with a bounded wait instead of assuming a 1150 ms wall clock.
+    await page.waitForFunction(() => !document.querySelector('#scene-transition').classList.contains('is-active'), null, {timeout:3000});
+    const trace = await page.evaluate(() => window.__sceneTrace);
+    if (!trace.some(row => row.veil.includes('is-revealing'))) throw new Error(`${label}: reveal phase missing`);
+    console.log(`${label}: ${JSON.stringify(trace)}`);
+  }
+
+  for (const [width, height] of [[1280, 800], [390, 844], [320, 568], [844, 390], [568, 320]]) {
     const page = await openGame(width, height);
-    await page.evaluate(() => { window.__qaCityFrame = document.querySelector('#city-frame'); });
+    await page.locator('.painted-village').waitFor();
+    await page.evaluate(() => { window.__qaPaintedCity = document.querySelector('.painted-village'); });
     await page.locator('#navigation [data-id="world"]').click();
     await page.waitForTimeout(50);
     if (!await page.locator('#scene-transition').evaluate(node => node.classList.contains('is-active'))) {
@@ -32,23 +47,22 @@ const { chromium } = require('playwright');
     if (!await page.locator('body').evaluate(node => node.classList.contains('world-mode'))) {
       throw new Error(`${width}x${height}: world map was not mounted at the transition midpoint`);
     }
-    await page.waitForTimeout(800);
-    if (await page.locator('#scene-transition').evaluate(node => node.classList.contains('is-active'))) {
-      throw new Error(`${width}x${height}: transition remained active`);
-    }
+    await waitForTransition(page, `${width}x${height} first world mount`);
+    await page.evaluate(() => { window.__sceneTrace = []; });
     await page.locator('#navigation [data-id="city"]').click();
     await page.waitForTimeout(400);
     if (!await page.locator('body').evaluate(node => node.classList.contains('city-mode'))) {
       throw new Error(`${width}x${height}: village did not return`);
     }
-    await page.locator('#city-frame').waitFor();
-    if (!await page.evaluate(() => window.__qaCityFrame === document.querySelector('#city-frame'))) {
-      throw new Error(`${width}x${height}: city iframe was reloaded instead of reused`);
+    await page.locator('.playfield-scene-city.is-active .painted-village').waitFor();
+    if (!await page.evaluate(() => window.__qaPaintedCity === document.querySelector('.painted-village'))) {
+      throw new Error(`${width}x${height}: painted city was rebuilt instead of reused`);
     }
     await page.evaluate(() => { window.__qaWorldScene = document.querySelector('.atlas-shell'); });
-    await page.waitForTimeout(750);
+    await waitForTransition(page, `${width}x${height} return city`);
+    await page.evaluate(() => { window.__sceneTrace = []; });
     await page.locator('#navigation [data-id="world"]').click();
-    await page.waitForTimeout(1150);
+    await waitForTransition(page, `${width}x${height} cached world`);
     if (!await page.evaluate(() => window.__qaWorldScene === document.querySelector('.atlas-shell'))) {
       throw new Error(`${width}x${height}: world map was rebuilt instead of reused`);
     }

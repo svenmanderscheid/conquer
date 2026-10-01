@@ -31,7 +31,7 @@ final class RallyHandler
     public static function start(array $params): void
     {
         $s=self::session(true);$b=self::body();$pid=(int)$s['player_id'];
-        $max=(int)Connection::getInstance()->query('SELECT map_size FROM worlds WHERE id=?',[WorldContext::id()])->fetchColumn()-1;$x=self::integer($b,'target_x',0,$max);$y=self::integer($b,'target_y',0,$max);$target=self::integer($b,'target_player_id',1,PHP_INT_MAX);$minutes=self::integer($b+['rally_minutes'=>5],'rally_minutes',1,60);
+        $map=\Conquer\Game\World\WorldMapProfile::forWorld(WorldContext::id());$x=self::integer($b,'target_x',0,$map['width']-1);$y=self::integer($b,'target_y',0,$map['height']-1);$target=self::integer($b,'target_player_id',1,PHP_INT_MAX);$minutes=self::integer($b+['rally_minutes'=>5],'rally_minutes',1,60);
         if(!is_array($b['troops']??null)||!is_string($b['message']??''))Response::error(400,'INVALID_INPUT','Truppen und Rally-Nachricht sind ungültig.');
         $state=CityState::loadForPlayer($pid);if(!$state)Response::error(404,'NO_CITY','Keine Stadt gefunden.');
         try{$id=RallyService::start($pid,(int)$state['city']['id'],$target,$x,$y,$b['troops'],$minutes,$b['message']??'');}catch(\RuntimeException|\DomainException $e){Response::error(400,'RALLY_FAILED',$e->getMessage());}
@@ -40,8 +40,8 @@ final class RallyHandler
     public static function startMonster(array $params): void
     {
         $s=self::session(true);$b=self::body();$pid=(int)$s['player_id'];
-        $max=(int)Connection::getInstance()->query('SELECT map_size FROM worlds WHERE id=?',[WorldContext::id()])->fetchColumn()-1;
-        $x=self::integer($b,'target_x',0,$max);$y=self::integer($b,'target_y',0,$max);
+        $map=\Conquer\Game\World\WorldMapProfile::forWorld(WorldContext::id());
+        $x=self::integer($b,'target_x',0,$map['width']-1);$y=self::integer($b,'target_y',0,$map['height']-1);
         $minutes=self::integer($b+['rally_minutes'=>5],'rally_minutes',1,60);
         if(!is_array($b['troops']??null)||!is_string($b['message']??''))Response::error(400,'INVALID_INPUT','Truppen und Rally-Nachricht sind ungültig.');
         $city=WorldContext::city($pid);
@@ -77,7 +77,10 @@ final class RallyHandler
         if(!$r)Response::error(404,'NOT_FOUND','Rally nicht gefunden.');
         $participants=RallyService::getParticipants($id);$meta=json_decode($r['result_json']??'{}',true)?:[];$pid=(int)$s['player_id'];$alliance=WorldRules::alliance($pid);
         if($pid!==(int)$r['leader_player_id']&&$pid!==(int)$r['target_player_id']&&!in_array($pid,array_map(fn($p)=>(int)$p['player_id'],$participants),true)&&($alliance===null||$alliance!==($meta['alliance_id']??null)))Response::error(403,'FORBIDDEN','Diese Rally gehört nicht zu deiner Allianz.');
+        $participants=array_values(array_filter($participants,fn($p)=>in_array($p['status'],['joining','pending','marching'],true)));
         $r=RallyService::describe($r);$r['troops']=json_decode($r['troops_json'],true)?:[];$r['result']=$meta;$r['participants']=$participants;$r['participant_count']=count($participants);unset($r['troops_json'],$r['result_json']);
+        $summaries=\Conquer\Game\Kingdom\KingdomService::publicSummaries(array_filter([(int)$r['leader_player_id'],$r['target_player_id']!==null?(int)$r['target_player_id']:null]));
+        $r['leader']=$summaries[(int)$r['leader_player_id']]??null;$r['target_player']=$r['target_player_id']!==null?($summaries[(int)$r['target_player_id']]??null):null;
         Response::ok(['rally'=>$r,'participants'=>$participants]);
     }
 }

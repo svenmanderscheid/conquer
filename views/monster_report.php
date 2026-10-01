@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Conquer · Monster-Kampfbericht</title>
+  <title>Union of Kingdoms · Monster-Kampfbericht</title>
   <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR.'/assets/css/fantasy-fonts.css') ?>">
   <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/combat-report.css?v=<?= filemtime(ROOT_DIR.'/assets/css/combat-report.css') ?>">
   <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/village-theme.css?v=<?= filemtime(ROOT_DIR.'/assets/css/village-theme.css') ?>">
@@ -12,9 +12,11 @@
 </head>
 <body class="mobile-game mr-direct" data-i18n-scope>
 <main><a class="button" href="<?= APP_BASE ?>/city#reports">‹ Zur Post</a><div id="monster-report-root"></div><p id="report-error" role="alert"></p></main>
+<script src="<?= APP_BASE ?>/assets/js/boss-mechanic.js?v=<?= filemtime(ROOT_DIR.'/assets/js/boss-mechanic.js') ?>"></script>
 <script src="<?= APP_BASE ?>/assets/js/monster-report.js?v=<?= filemtime(ROOT_DIR.'/assets/js/monster-report.js') ?>"></script>
 <script>
-(() => {
+document.addEventListener('DOMContentLoaded',async () => {
+    if(window.ConquerLocale?.ready)await window.ConquerLocale.ready;
     const report=<?= json_encode($monsterReport,JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT) ?>;
     const base=<?= json_encode(APP_BASE,JSON_HEX_TAG|JSON_HEX_AMP) ?>;
     const root=document.querySelector('#monster-report-root');
@@ -35,7 +37,7 @@
             location.href=base+'/city#reports';
         } catch(error){document.querySelector('#report-error').textContent=error.message;button.disabled=false;}
     });
-})();
+});
 </script>
 </body>
 </html>

@@ -48,6 +48,6 @@ window.ConquerThemeBundles = (()=>{
             next_bundle_id:text(source?.next_bundle_id)
         });
     };
-    const money=(cents,currency='EUR')=>new Intl.NumberFormat('de-DE',{style:'currency',currency:currency||'EUR'}).format((integer(cents)||0)/100);
+    const money=(cents,currency='EUR')=>new Intl.NumberFormat(window.ConquerLocale?.locale??'en',{style:'currency',currency:currency||'EUR'}).format((integer(cents)||0)/100);
     return Object.freeze({normalize,money});
 })();

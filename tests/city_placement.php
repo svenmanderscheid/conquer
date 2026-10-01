@@ -38,6 +38,7 @@ try {
     mkdir($root.'/config',0700,true);$cfg['database']=$name;
     file_put_contents($root.'/config/database.php',"<?php\nreturn ".var_export($cfg,true).";\n");
     $db=Connection::init($root);
+    $db->execute('UPDATE worlds SET map_size=256 WHERE id=1');
     foreach([1,2]as$id)$db->execute('INSERT INTO players(id,username,email,password_hash)VALUES(?,?,?,?)',[$id,'PlacementFixture'.$id,'placement'.$id.'@invalid.test','unused']);
 
     // Standard creation also supports callers that have not opened a transaction.
@@ -69,9 +70,10 @@ try {
     $row=city($db,$cityId);
     verify(validCity($db,$row)&&(int)$row['wall_hp_current']===(int)$row['wall_hp_max'],'wall teleport reserves valid destination within current world and restores wall');
 
-    // A 4x4 world has one possible city anchor. Its monster blocks that footprint.
-    $db->execute('UPDATE worlds SET map_size=4 WHERE id=1');
-    $db->execute('INSERT INTO field_monsters(world_id,monster_code,coord_x,coord_y,hp_current)VALUES(1,20209901,1,1,1)');
+    // Keep the supported 256x256 geometry, but make every spawn zone unavailable.
+    // The old 4x4 shortcut fails geometry validation before placement is exercised.
+    $db->execute("UPDATE world_land_zones SET status='locked' WHERE world_id=1");
+    \Conquer\Game\World\LandProgressService::invalidate(1);
     rejected(fn()=>OAuth::createDefaultCity($db,2,'PlacementFixture2'),'registration fails closed when no complete city footprint remains');
     verify((int)$db->query('SELECT COUNT(*) FROM cities WHERE player_id=2')->fetchColumn()===0,'failed registration leaves no partial city');
     $db->execute('UPDATE players SET is_hidden=1 WHERE id=1');

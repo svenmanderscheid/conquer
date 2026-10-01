@@ -64,9 +64,24 @@ try{
     $db->execute("UPDATE players SET last_vip_login='2020-01-01' WHERE id=1");$points=VipService::status(1)['points'];
     vipHttp('/action',['action'=>'vip.daily'],401,true,false);vipHttp('/action',['action'=>'vip.daily'],403,false);vc(VipService::status(1)['points']===$points,'unauthorized/CSRF request never awards points');
     $result=vipHttp('/action',['action'=>'vip.daily','points'=>999999]);vc($result['data']['state']['vip']['points']===$points+10&&$result['data']['state']['vip']['daily_claimed'],'HTTP daily response includes authoritative refreshed VIP status');vipHttp('/action',['action'=>'vip.daily'],422);
-    vipHttp('/research',['code'=>'food_production','level_to'=>1]);$seconds=(int)$db->query('SELECT TIMESTAMPDIFF(SECOND,started_at,finishes_at) FROM research_queue WHERE player_id=1')->fetchColumn();$research=\Conquer\Game\Research\ResearchData::get('food_production')['levels'][0];vc($seconds===(int)round($research['time']*.8),'actual research queue receives VIP9 twenty percent time reduction');
-    $db->execute('UPDATE players SET vip_points=20000000,vip_level=20 WHERE id=1');$s=VipService::status(1);vc($s['is_max']&&$s['points_remaining']===0&&$s['next_bonuses']===null,'maximum level avoids nonexistent next threshold');vc(BuildingData::getBuildTime('farm',10,$s['bonuses'])===1,'existing maximum build-time balance retained');
+    vipHttp('/research',['code'=>'food_production','level_to'=>1]);$seconds=(int)$db->query('SELECT TIMESTAMPDIFF(SECOND,started_at,finishes_at) FROM research_queue WHERE player_id=1')->fetchColumn();$research=\Conquer\Game\Research\ResearchData::get('food_production')['levels'][0];vc($seconds===(int)ceil($research['time']/1.2),'actual research queue receives VIP9 twenty percent speed bonus');
+    $db->execute('UPDATE players SET vip_points=20000000,vip_level=20 WHERE id=1');$s=VipService::status(1);vc($s['is_max']&&$s['points_remaining']===0&&$s['next_bonuses']===null,'maximum level avoids nonexistent next threshold');vc(BuildingData::getBuildTime('farm',10,$s['bonuses'])===(int)ceil(BuildingData::getBuildTime('farm',10)/2),'VIP20 doubles build speed without making construction instant');
     VipService::addPoints(1,PHP_INT_MAX);vc(VipService::status(1)['points']===2147483647&&VipService::status(1)['level']===20,'large credit does not overflow signed database column');
-    vc(VipService::status(1)['building_slots']===2,'VIP4+ unlocks second building slot');
+    vc(VipService::status(1)['building_slots']===2,'VIP20 unlocks second building slot');
+    foreach(VipService::levels() as $entry){
+        vc($entry['building_slots']===($entry['level']>=4?2:1),'VIP catalog building slots at level '.$entry['level']);
+    }
+    $db->execute('UPDATE players SET vip_points=4999,vip_level=3 WHERE id=1');
+    vc(VipService::status(1)['building_slots']===1,'VIP3 keeps one building slot');
+    $state=CityState::loadForPlayer(1);
+    \Conquer\Game\City\BuildingUpgrader::start(1,'farm',$state['city'],$state['buildings'],3);
+    $blocked=false;
+    try{\Conquer\Game\City\BuildingUpgrader::start(1,'quarry',$state['city'],$state['buildings'],3);}
+    catch(RuntimeException $e){$blocked=str_contains($e->getMessage(),'VIP 4');}
+    vc($blocked,'VIP3 cannot start a second simultaneous building upgrade');
+    VipService::addPoints(1,1);
+    vc(VipService::status(1)['building_slots']===2,'Reaching VIP4 unlocks the second building slot');
+    \Conquer\Game\City\BuildingUpgrader::start(1,'quarry',$state['city'],$state['buildings'],4);
+    vc((int)$db->query('SELECT COUNT(*) FROM building_queue WHERE city_id=1 AND is_processed=0')->fetchColumn()===2,'VIP4 starts two simultaneous building upgrades');
     echo "PASS $checks VIP checks (boundaries, concurrent claims/credits, rollback, items, production, actual training).\n";
 }catch(Throwable$e){$failed=true;fwrite(STDERR,'FAIL '.$e->getMessage()."\n".$e->getTraceAsString()."\n");}finally{if(is_resource($server)){proc_terminate($server);proc_close($server);}foreach($httpFiles as$file)if(is_file($file))unlink($file);$fixture->close();}exit($failed?1:0);

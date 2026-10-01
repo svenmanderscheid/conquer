@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace Conquer\Game\Kingdom;
 
 use Conquer\Db\Connection;
+use Conquer\Game\Alliance\AllianceRank;
 use Conquer\Game\City\{BuildingData,CityState,ResourceTick,TroopData};
 use Conquer\Game\Hospital\HospitalService;
 use Conquer\Game\Inventory\InventoryService;
@@ -52,7 +53,7 @@ final class KingdomService
                 'vip'=>\Conquer\Game\Vip\VipService::status($playerId),
                 'settings'=>array_map(static fn($v): bool => (bool) $v, $settings),
                 'alliance'=>$alliance,
-                'alliances'=>$db->query("SELECT a.id,a.name,a.tag,a.description,a.max_members,
+                'alliances'=>$db->query("SELECT a.id,a.name,a.tag,a.description,a.max_members,a.recruitment_mode,a.minimum_power,
                     (SELECT COUNT(*) FROM alliance_members m WHERE m.alliance_id=a.id) AS member_count,
                     COALESCE(k.display_name,p.username) AS leader_name
                     FROM alliances a JOIN players p ON p.id=a.leader_id LEFT JOIN kingdom_profiles k ON k.player_id=p.id
@@ -114,6 +115,8 @@ final class KingdomService
                     'hospital.heal'=>HospitalService::perform($playerId,(int)$cityState['city']['id'],$body),
                     'treasure.equip','treasure.unequip'=>self::equip($playerId, $cityState, $body),
                     'treasure.preset_save','treasure.preset_apply'=>self::treasurePreset($playerId, $body),
+                    'treasure.exchange_fragments'=>TreasureService::exchangeUniversalFragments($playerId,self::integer($body,'treasure_code'),self::integer($body,'amount',1,10000)),
+                    'treasure.upgrade_effect'=>TreasureService::upgradeEffect($playerId,self::integer($body,'treasure_code'),self::integer($body,'effect_index',0,20)),
                     'chest.free'=>self::freeChest($playerId,$body),
                     'trading.buy'=>self::tradingBuy($playerId,$body),
                     'arena.challenge','arena.accept','arena.decline','arena.cancel'=>self::arenaAction($playerId, $body),
@@ -129,7 +132,9 @@ final class KingdomService
             $mutate = fn(): array => $replayable
                 ? \Conquer\Game\Operation::run($playerId,$receiptBody,fn(): array => $mutation($db))
                 : $db->transaction($mutation);
-            $result=$teleport?\Conquer\Game\WorldRules::combatLock($mutate):$mutate();
+            $membershipChange=in_array($body['action']??'',['alliance.leave','alliance.kick'],true);
+            if($membershipChange)\Conquer\Game\Territory\TerritoryService::tick(WorldContext::id(),null,1000);
+            $result=($teleport||$membershipChange)?\Conquer\Game\WorldRules::combatLock($mutate):$mutate();
             return ['message'=>$result['message'] ?? 'Gespeichert.', 'result'=>$result, 'state'=>self::state($playerId)];
         });
     }
@@ -169,7 +174,7 @@ final class KingdomService
     {
         $db = Connection::getInstance();
         $rows = $db->query("SELECT p.id AS player_id,p.lord_level,p.kill_count,COALESCE(k.display_name,p.username) AS display_name,
-            COALESCE(k.avatar,'knight') AS avatar,k.profile_image,COALESCE(k.name_frame,'default') AS name_frame,COALESCE(k.city_skin,'default') AS city_skin,k.march_skin,c.id AS city_id,c.name AS city_name,c.castle_level,
+            COALESCE(k.avatar,'knight') AS avatar,k.profile_image,COALESCE(k.name_frame,'default') AS name_frame,COALESCE(k.city_skin,'default') AS city_skin,k.march_skin,c.id AS city_id,c.name AS city_name,c.castle_level,c.coord_x,c.coord_y,
             a.tag AS alliance_tag,a.id AS alliance_id
             FROM players p JOIN cities c ON c.player_id=p.id AND c.world_id=" . WorldContext::id() . "
             LEFT JOIN kingdom_profiles k ON k.player_id=p.id
@@ -209,8 +214,14 @@ final class KingdomService
             $db->query("SELECT p.player_id,JSON_OBJECT(p.source_code,p.count) AS troops_json FROM defense_promotions p JOIN cities c ON c.id=p.city_id WHERE c.world_id=" . WorldContext::id() . " AND p.state='training'")->fetchAll(),
             $db->query("SELECT g.player_id,g.troops_json FROM shrine_garrisons g JOIN shrines s ON s.id=g.shrine_id WHERE s.world_id=" . WorldContext::id() . "")->fetchAll(),
             $db->query("SELECT player_id,troops_json,haul_json,state FROM marches WHERE world_id=" . WorldContext::id() . " AND state IN ('marching','resolving','returning')")->fetchAll(),
+            $db->query("SELECT leader_player_id AS player_id,troops_json FROM rallies WHERE world_id=" . WorldContext::id() . " AND status IN ('gathering','marching')")->fetchAll(),
+            $db->query("SELECT rp.player_id,rp.troops_json FROM rally_participants rp JOIN rallies r ON r.id=rp.rally_id WHERE r.world_id=" . WorldContext::id() . " AND r.status IN ('gathering','marching') AND rp.status IN ('joining','pending','marching')")->fetchAll(),
             $db->query("SELECT m.player_id,m.troops_json FROM expedition_missions m JOIN expeditions e ON e.id=m.expedition_id WHERE e.world_id=" . WorldContext::id() . " AND m.status IN ('marching','returning')")->fetchAll()
         );
+        if(\Conquer\Game\Territory\TerritoryService::enabled(WorldContext::id())){
+            $away=array_merge($away,$db->query("SELECT player_id,troops_json FROM territory_garrisons WHERE world_id=? AND status IN ('inbound','active','returning')",[WorldContext::id()])->fetchAll());
+            $away=array_merge($away,$db->query("SELECT player_id,troops_json FROM territory_army_returns WHERE world_id=? AND status='returning'",[WorldContext::id()])->fetchAll());
+        }
         foreach ($away as $mission) {
             $id = (int) $mission['player_id'];
             if (!isset($result[$id])) { continue; }
@@ -233,6 +244,19 @@ final class KingdomService
         return $result;
     }
 
+    /** Compact public identity data for shared game surfaces such as rallies. */
+    public static function publicSummaries(array $playerIds): array
+    {
+        $wanted=array_fill_keys(array_map('intval',$playerIds),true);if(!$wanted)return [];
+        $summaries=[];
+        foreach(self::standings() as $id=>$row)if(isset($wanted[(int)$id]))$summaries[(int)$id]=[
+            'player_id'=>(int)$id,'name'=>$row['display_name'],'power'=>(int)$row['power'],
+            'avatar'=>$row['avatar']??'knight','profile_image'=>self::profileImagePath($row['profile_image']??null),
+            'coord_x'=>(int)($row['coord_x']??0),'coord_y'=>(int)($row['coord_y']??0),
+        ];
+        return $summaries;
+    }
+
     private static function profile(int $target, int $viewer, array $standings): array
     {
         self::require(isset($standings[$target]), 'Dieses Spielerprofil wurde nicht gefunden.');
@@ -244,6 +268,7 @@ final class KingdomService
         $p['stats']['arena_wins'] = (int) $db->query("SELECT COUNT(*) FROM kingdom_arena_challenges WHERE winner_id=? AND world_id=? AND status='completed'", [$target,WorldContext::id()])->fetchColumn();
         $p['stats']['expedition_victories'] = (int) $db->query("SELECT COUNT(*) FROM expedition_participants p JOIN expeditions e ON e.id=p.expedition_id WHERE p.player_id=? AND e.world_id=? AND p.contribution>0 AND e.phase='victory'", [$target,WorldContext::id()])->fetchColumn();
         $membership = $db->query('SELECT a.id,a.name,a.tag,m.role FROM alliance_members m JOIN alliances a ON a.id=m.alliance_id WHERE m.player_id=? AND m.world_id=?', [$target,WorldContext::id()])->fetch();
+        if($membership)$membership['role_level']=AllianceRank::level($membership['role']);
         $achievements = [
             ['code'=>'founder','name'=>'Ein neues Königreich','description'=>'Gründe deine erste Stadt.','unlocked'=>true],
             ['code'=>'builder','name'=>'Baumeister','description'=>'Erreiche Burgstufe 3.','unlocked'=>(int) $p['castle_level']>=3],
@@ -278,11 +303,12 @@ final class KingdomService
         $db = Connection::getInstance();
         $a = $db->query('SELECT a.*,m.role FROM alliances a JOIN alliance_members m ON m.alliance_id=a.id WHERE m.player_id=? AND m.world_id=?', [$playerId,WorldContext::id()])->fetch();
         if (!$a) { return null; }
+        $a['role_level']=AllianceRank::level($a['role']);
         $members = $db->query("SELECT m.player_id,m.role,m.joined_at,COALESCE(k.display_name,p.username) AS display_name,
             COALESCE(k.avatar,'knight') AS avatar,k.profile_image,COALESCE(k.name_frame,'default') AS name_frame,c.coord_x,c.coord_y FROM alliance_members m JOIN players p ON p.id=m.player_id
             LEFT JOIN kingdom_profiles k ON k.player_id=m.player_id LEFT JOIN cities c ON c.player_id=m.player_id AND c.world_id=m.world_id WHERE m.alliance_id=?
             ORDER BY FIELD(m.role,'leader','vice_leader','officer','veteran','member'),m.joined_at", [$a['id']])->fetchAll();
-        foreach ($members as &$m) { $m['power'] = $standings[(int) $m['player_id']]['power'] ?? 0; $m['profile_image']=self::profileImagePath($m['profile_image']??null); }
+        foreach ($members as &$m) { $m['power'] = $standings[(int) $m['player_id']]['power'] ?? 0; $m['profile_image']=self::profileImagePath($m['profile_image']??null); $m['role_level']=AllianceRank::level($m['role']); }
         unset($m);
         $a['members'] = $members;
         $a['member_count'] = count($members);
@@ -309,8 +335,8 @@ final class KingdomService
     {
         LocalCosmeticEntitlements::sync($playerId);
         $skin = self::text($body, 'city_skin', 1, 20);
-        self::require(in_array($skin, ['default','ironkeep','rosehall','sandspire','tidewatch','winterhold','jadecourt','emberforge','ravenloft','clockwork','sapphire','phoenix','astral','leviathan','yggdrasil','tempest','eclipse','dragon'], true), 'Wähle einen verfügbaren Dorf-Skin.');
-        if($skin!=='default')self::require(Connection::getInstance()->query('SELECT 1 FROM player_castle_skins WHERE player_id=? AND skin_code=?',[$playerId,$skin])->fetchColumn()!==false,'Dieser Dorf-Skin gehört dir noch nicht.');
+        self::require(in_array($skin, ['default','forest','fire','water','wind','ironkeep','rosehall','sandspire','tidewatch','winterhold','jadecourt','emberforge','ravenloft','clockwork','sapphire','phoenix','astral','leviathan','yggdrasil','tempest','eclipse','dragon'], true), 'Wähle einen verfügbaren Dorf-Skin.');
+        if(!in_array($skin,['default','forest','fire','water','wind'],true))self::require(Connection::getInstance()->query('SELECT 1 FROM player_castle_skins WHERE player_id=? AND skin_code=?',[$playerId,$skin])->fetchColumn()!==false,'Dieser Dorf-Skin gehört dir noch nicht.');
         Connection::getInstance()->execute('UPDATE kingdom_profiles SET city_skin=? WHERE player_id=?', [$skin,$playerId]);
         return ['message'=>'Dein Dorf-Skin wurde angelegt.'];
     }
@@ -337,7 +363,7 @@ final class KingdomService
         $description = self::text($body, 'description', 0, 500);
         $db->execute('INSERT INTO alliances (world_id,name,tag,description,leader_id) VALUES (?,?,?,?,?)', [WorldContext::id(),$name,$tag,$description,$playerId]);
         $id = $db->lastInsertId();
-        $db->execute("INSERT INTO alliance_members (alliance_id,player_id,world_id,role) VALUES (?,?,?,'leader')", [$id,$playerId,WorldContext::id()]);
+        $db->execute("INSERT INTO alliance_members (alliance_id,player_id,world_id,role,role_level) VALUES (?,?,?,'leader',?)", [$id,$playerId,WorldContext::id(),AllianceRank::level('leader')]);
         $db->execute('INSERT INTO alliance_treasury (alliance_id) VALUES (?)', [$id]);
         return ['message'=>'Deine Allianz ist gegründet. Lade andere Königreiche ein, sich dir anzuschließen.','alliance_id'=>$id];
     }
@@ -346,13 +372,15 @@ final class KingdomService
     {
         $db = Connection::getInstance();
         $id = self::integer($body, 'alliance_id');
-        $a = $db->query('SELECT id,max_members FROM alliances WHERE id=? AND world_id=' . WorldContext::id() . ' FOR UPDATE', [$id])->fetch();
+        $a = $db->query('SELECT * FROM alliances WHERE id=? AND world_id=' . WorldContext::id() . ' FOR UPDATE', [$id])->fetch();
         self::require((bool) $a, 'Diese Allianz wurde nicht gefunden.');
+        \Conquer\Game\Community\AllianceCommunityService::assertCanJoin($playerId,$a);
         self::require(!$db->query('SELECT alliance_id FROM alliance_members WHERE player_id=? AND world_id=? FOR UPDATE', [$playerId,WorldContext::id()])->fetchColumn(), 'Verlasse zuerst deine bisherige Allianz.');
-        $count = (int) $db->query('SELECT COUNT(*) FROM alliance_members WHERE alliance_id=?', [$id])->fetchColumn();
+        $count = (int) $db->query('SELECT COUNT(*) FROM alliance_members WHERE alliance_id=? FOR UPDATE', [$id])->fetchColumn();
         self::require($count < (int) $a['max_members'], 'Diese Allianz ist bereits voll.');
-        $db->execute("INSERT INTO alliance_members (alliance_id,player_id,world_id,role) VALUES (?,?,?,'member')", [$id,$playerId,WorldContext::id()]);
+        $db->execute("INSERT INTO alliance_members (alliance_id,player_id,world_id,role,role_level) VALUES (?,?,?,'member',?)", [$id,$playerId,WorldContext::id(),AllianceRank::level('member')]);
         $db->execute('UPDATE alliances SET member_count=? WHERE id=?', [$count+1,$id]);
+        \Conquer\Game\Community\AllianceCommunityService::closeApplicationsAfterJoin($playerId,$id,WorldContext::id());
         return ['message'=>'Du bist der Allianz beigetreten.','alliance_id'=>$id];
     }
 
@@ -373,6 +401,7 @@ final class KingdomService
                 return self::withdraw($playerId, $cityId, $id, $body);
             case 'alliance.leave':
                 self::require(!$leader, 'Übertrage zuerst die Führung an ein anderes Mitglied.');
+                \Conquer\Game\Territory\TerritoryService::memberDeparting($playerId,WorldContext::id());
                 $db->execute('DELETE FROM alliance_members WHERE player_id=? AND alliance_id=?', [$playerId,$id]);
                 $message = 'Du hast die Allianz verlassen.';
                 break;
@@ -388,11 +417,12 @@ final class KingdomService
                 self::require($target !== $playerId, 'Wähle ein anderes Allianzmitglied.');
                 self::require((bool) $db->query('SELECT player_id FROM alliance_members WHERE player_id=? AND alliance_id=? FOR UPDATE', [$target,$id])->fetch(), 'Dieses Königreich gehört nicht zu deiner Allianz.');
                 if ($body['action'] === 'alliance.kick') {
+                    \Conquer\Game\Territory\TerritoryService::memberDeparting($target,WorldContext::id());
                     $db->execute('DELETE FROM alliance_members WHERE player_id=? AND alliance_id=?', [$target,$id]);
                     $message = 'Das Mitglied wurde aus der Allianz entlassen.';
                 } else {
-                    $db->execute("UPDATE alliance_members SET role='member' WHERE player_id=? AND alliance_id=?", [$playerId,$id]);
-                    $db->execute("UPDATE alliance_members SET role='leader' WHERE player_id=? AND alliance_id=?", [$target,$id]);
+                    $db->execute("UPDATE alliance_members SET role='member',role_level=? WHERE player_id=? AND alliance_id=?", [AllianceRank::level('member'),$playerId,$id]);
+                    $db->execute("UPDATE alliance_members SET role='leader',role_level=? WHERE player_id=? AND alliance_id=?", [AllianceRank::level('leader'),$target,$id]);
                     $db->execute('UPDATE alliances SET leader_id=? WHERE id=?', [$target,$id]);
                     $message = 'Die Allianzführung wurde übertragen.';
                 }

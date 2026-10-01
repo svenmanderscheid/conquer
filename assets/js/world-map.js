@@ -1,14 +1,41 @@
 // Scenery is decorative; occupied tiles and marching armies come from game state.
 window.ConquerWorld = (() => {
   'use strict';
+  const editorial=value=>window.ConquerLocale?.text(value)??value;
   const sceneryImages=new Map();
+  let painted=null,paintedLoading=false;
+  function loadPainted(){
+    if(paintedLoading)return;paintedLoading=true;
+    import(`${context.base}/assets/js/world-painted.js?v=5`).then(async module=>{
+      await module.init(context.base,invalidateArtwork,()=>!sceneVisible||motionReduced()||cameraGesture());
+      painted=module;invalidateArtwork();
+    }).catch(error=>{console.warn('Painted world fallback',error);loadScenery();});
+  }
+  function invalidateArtwork(){if(view?.el.isConnected){view.terrainStamp=null;view.cameraDirty=true;view.markersDirty=true;}}
+  function cameraGesture(){return Boolean(view?.pinch||(view?.drag?.moved&&!view.drag.teleport));}
   function loadScenery(){for(const name of ['pine','oak','cherry','mountain','rocks']){if(sceneryImages.has(name))continue;const img=new Image();sceneryImages.set(name,img);img.onload=()=>{if(view?.el.isConnected){view.terrainStamp=null;view.cameraDirty=true;}};img.src=`${context.base}/assets/art/map/scenery-${name}.png?v=fantasy3d1`;}}
-  const TILE = 44, SIZE = 256, MIN_ZOOM = .65, MAX_ZOOM = 1.8;
-  const memory = {x:null,y:null,zoom:1,filter:'all',search:'',selected:null,cell:null,panel:null,searchCategory:'solo',searchLevels:{},searchRun:null};
-  const searchCategories=[['solo','Monster','orc'],['rally','Rally','monsters/grumwald'],['food','Nahrung','farm'],['lumber','Holz','lumber'],['stone','Stein','quarry'],['gold','Gold','gold'],['gems','Kristalle','crystal']];
+  const TILE = 44, MIN_ZOOM = .65, MAX_ZOOM = 1.8;
+  const mapProfile=()=>context?.state.world?.map_profile||{key:'legacy',width:256,height:256};
+  const mapWidth=()=>Number(mapProfile().width)||256,mapHeight=()=>Number(mapProfile().height)||256;
+  const isLux=()=>mapProfile().key==='luxembourg';
+  let lux=null,luxRequest=null,luxKey='';
+  function loadLux(){
+    if(!isLux()){lux=null;luxKey='';return;}
+    const key=JSON.stringify(mapProfile());if(key===luxKey&&(lux||luxRequest))return;luxKey=key;lux=null;
+    const request=window.ConquerLuxWorld.load(context.base,mapProfile());luxRequest=request;
+    request.then(result=>{if(key!==luxKey)return;lux=result;if(view?.el.isConnected){view.terrainStamp=null;view.cameraDirty=true;view.navigationDirty=true;}}).catch(error=>{if(key===luxKey&&view?.el.isConnected){view.el.querySelector('.atlas-biome-label').textContent=error.message;view.overview?.setError();}}).finally(()=>{if(luxRequest===request)luxRequest=null;});
+  }
+  function updateNavigation(){
+    if(!view)return;view.el.classList.toggle('is-luxembourg',isLux());const form=view.el.querySelector('.atlas-jump');form.elements.x.max=mapWidth()-1;form.elements.y.max=mapHeight()-1;
+    const zones=view.el.querySelector('.atlas-zone-jumps');if(!isLux()&&view.legacyZones)zones.innerHTML=view.legacyZones;if(isLux())zones.innerHTML=`<button data-action="territory-open">⚑ Allianzgebiete und Ziele</button>${(lux?.cantons||[]).map(c=>`<button data-atlas="zone" data-x="${c.point[0]}" data-y="${c.point[1]}">${escape(c.name)}</button>`).join('')}`;
+    view.el.querySelector('.atlas-land-overview').hidden=isLux();
+    view.overview?.update();
+  }
+  const memory = {x:null,y:null,zoom:1,filter:'all',search:'',selected:null,cell:null,panel:null,searchCategory:'solo',searchLevels:{},searchRun:null,overview:{}};
+  const searchCategories=[['solo','Monster','monsters/2.5d/bright-v2/orc.png'],['rally','Rally','monsters/2.5d/bright-v2/magdar.png'],['food','Nahrung','fantasy-village-v1/world-farm-v8.png'],['lumber','Holz','fantasy-village-v1/world-lumber-v8.png'],['stone','Stein','fantasy-village-v1/world-quarry-v8.png'],['gold','Gold','fantasy-village-v1/world-gold-v2.png'],['gems','Kristalle','fantasy-village-v1/world-crystal-v8.png']];
   let searchCatalog=null,searchCatalogRequest=null,searchSequence=0;
   const searchKey=()=>JSON.stringify([context.state.city.world_id,context.state.city.id,context.state.city.coord_x,context.state.city.coord_y,memory.searchCategory,memory.searchLevels[memory.searchCategory]]);
-  function searchArtwork(key,art){return ['solo','rally'].includes(key)?`${context.base}/assets/art/${art}.png`:window.ConquerWorldEncounters?.image(context.base,art,true)||asset(art);}
+  function searchArtwork(_key,art){return `${context.base}/assets/art/${art}`;}
   function searchMarkup(){return `<form class="atlas-object-search" aria-label="Objekte auf der Weltkarte suchen"><div class="atlas-search-categories" role="group" aria-label="Objekttyp auswählen">${searchCategories.map(([key,label,art])=>`<button type="button" class="atlas-search-category" data-search-category="${key}" aria-pressed="${memory.searchCategory===key}"><img src="${escape(searchArtwork(key,art))}" alt=""><span>${label}</span></button>`).join('')}</div><div class="atlas-search-controls"><div class="atlas-search-level-heading"><label for="atlas-object-level">Stufe</label><span class="atlas-search-level-bounds"></span></div><div class="atlas-search-level-row"><button type="button" data-atlas="level-down" aria-label="Stufe verringern">${icon('minus')}</button><input id="atlas-object-level" type="range" min="0" max="0" value="0" aria-label="Objektstufe"><output class="atlas-search-level-value" for="atlas-object-level">–</output><button type="button" data-atlas="level-up" aria-label="Stufe erhöhen">${icon('plus')}</button></div></div><p class="atlas-search-hint">Nächstes verfügbares Ziel deiner Stadt</p><p class="atlas-search-feedback" role="status" aria-live="polite"></p><button type="submit" class="atlas-object-search-submit">${icon('search')}<span>Nächstes Ziel</span></button></form>`;}
   function updateSearchControls(){
     if(!view)return;
@@ -63,14 +90,15 @@ window.ConquerWorld = (() => {
   const seenImpacts=new Set();
   const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
   const number = v => Number.isFinite(Number(v)) ? Number(v) : 0;
-  const format = v => Math.round(number(v)).toLocaleString('de-DE');
+  const format = v => Math.round(number(v)).toLocaleString(window.ConquerLocale?.locale??'en');
   const hash = (x,y,s=0) => {let n=Math.imul(x+137,374761393)^Math.imul(y+419,668265263)^Math.imul(s+17,1274126177);n=Math.imul(n^(n>>>13),1274126177);return ((n^(n>>>16))>>>0)/4294967295;};
   const scale = () => TILE * memory.zoom;
   const project = (x,y) => [(number(x)-memory.x)*scale()+view.width/2,(number(y)-memory.y)*scale()+view.height/2];
   const unproject = (x,y) => [memory.x+(x-view.width/2)/scale(),memory.y+(y-view.height/2)/scale()];
   const stamp = t => {const value=String(t||'');return Date.parse(value.includes('T')?value:value.replace(' ','T')+'Z');};
   const escape = value => context.esc(String(value??''));
-  const asset = name => `${context.base}/assets/art/map/${name}.svg`;
+  const asset = name => `${context.base}/assets/art/map/${name.includes('.')?name:name+'.svg'}`;
+  const troopAsset = role => `${context.base}/assets/art/characters/fantasy-troops-v2/${role}-thumb.webp`;
   const motionPreference=matchMedia('(prefers-reduced-motion: reduce)');
   const graphicsQuality=()=>document.body.dataset.graphicsQuality||'normal';
   const graphicsLight=()=>graphicsQuality()==='light';
@@ -80,7 +108,7 @@ window.ConquerWorld = (() => {
   const motionReduced=()=>motionPreference.matches||document.body.classList.contains('reduced-motion')||graphicsLight()||document.hidden;
   // Explicit monster artwork (including regional bosses) takes precedence over generic animated units.
   const lifeKind=target=>target.kind==='nodes'&&window.ConquerWorldEncounters?.supports(target.resource?.art)?target.resource.art:target.kind==='monsters'&&!target.data.definition?.art&&window.ConquerWorldEncounters?.supports(target.artKey)?target.artKey:null;
-  const targetImage=(target,still=motionReduced())=>window.ConquerWorldEncounters?.image(context.base,lifeKind(target),still,target.biome?.id)||target.art;
+  const targetImage=(target,still=motionReduced())=>painted?.source(target)||window.ConquerWorldEncounters?.image(context.base,lifeKind(target),still,target.biome?.id)||target.art;
   const encounterImage=(target,still=motionReduced())=>`<img src="${escape(targetImage(target,still))}" ${lifeKind(target)?`data-life-kind="${lifeKind(target)}"`:''} alt="">`;
   let lastMotionReduced=motionReduced();
   function syncMotion(){const slow=motionReduced();if(slow===lastMotionReduced)return;lastMotionReduced=slow;if(view?.el.isConnected){view.targets=targetsFromState(context.state);view.targetMap=new Map(view.targets.map(target=>[target.key,target]));updateMarkers();updateShrineNavigation();view.detailStamp='';updateSidebar();}}
@@ -100,16 +128,16 @@ window.ConquerWorld = (() => {
   function shrineStatus(target,detailed=false){
     const event=target.data.event,owner=shrineOwner(target);if(!event)return owner;
     const state=event.active?'Umkämpft':'Geschlossen';if(!detailed)return `${owner} · ${state}`;
-    const when=stamp(event.active?event.ends_at:event.next_starts_at),time=Number.isFinite(when)?new Date(when).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):null;
+    const when=stamp(event.active?event.ends_at:event.next_starts_at),time=Number.isFinite(when)?new Date(when).toLocaleString(window.ConquerLocale?.locale??'en',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):null;
     return `${owner} · ${event.name||'Schreinereignis'} · ${state}${time?` · ${event.active?'bis':'ab'} ${time}`:''}`;
   }
-  const isVillage = target => target.kind==='home'||target.kind==='players';
-  const isCompactTarget = target => isVillage(target)||target.kind==='monsters'||target.kind==='nodes'||target.kind==='charms'||target.kind==='alliance_center'||target.kind==='outpost';
+  const isVillage = target => target.kind==='home'||target.kind==='players'||target.kind==='neutral_villages';
+  const isCompactTarget = target => isVillage(target)||target.kind==='territory'||target.kind==='monsters'||target.kind==='nodes'||target.kind==='charms'||target.kind==='alliance_center'||target.kind==='outpost';
   const isRegionalBoss = target => target.kind==='monsters'&&target.data.definition?.type==='rally'&&target.data.definition?.art?.startsWith('monsters/');
   // Feet in each original illustration, after object-fit:contain in the 3.6 x
   // 3.8 tile portrait. Wide Sandmaul has much more vertical transparent margin.
   const bossContactY={grumwald:.60,frostgrimm:.80,sandmaul:.14,glutramm:.42,daemmerhorn:.92};
-  const footprint = target => target.kind==='congress'?7:target.kind==='alliance_center'?5:target.kind==='outpost'?3:isVillage(target)?3:target.kind==='cell'&&context?.teleport?4:target.kind==='shrine'?6:target.kind==='monsters'&&(target.data.definition?.type==='rally'||Number(target.data.definition?.footprint)===2)?2:1;
+  const footprint = target => target.kind==='territory'?(Number(target.data.footprint)||(target.data.kind==='crown'?7:target.data.kind==='canton'?5:3)):target.kind==='congress'?7:target.kind==='alliance_center'?5:target.kind==='outpost'?3:isVillage(target)?(isLux()?4:3):target.kind==='cell'&&context?.teleport?number(context.teleport.footprint||4):target.kind==='shrine'?6:target.kind==='monsters'&&(target.data.definition?.type==='rally'||Number(target.data.definition?.footprint)===2)?2:1;
   // Villages use a compact 3 × 3 presentation without shrinking their castle art. Rally monsters occupy 2 × 2.
   // Shrines span anchor -2 through +3; even-sized footprints are centered half a tile past the anchor.
   // Even-sized footprints have their visual center half a tile past the anchor.
@@ -124,23 +152,30 @@ window.ConquerWorld = (() => {
     return view.targets.filter(t=>Math.abs(targetCenter(t)[0]-x)<footprint(t)/2&&Math.abs(targetCenter(t)[1]-y)<footprint(t)/2).sort((a,b)=>footprint(a)-footprint(b)||Math.hypot(a.x-x,a.y-y)-Math.hypot(b.x-x,b.y-y))[0];
   }
   function teleportPlacement(x,y){
-    const candidate={x:Math.round(x),y:Math.round(y)},center=[candidate.x+.5,candidate.y+.5];
-    if(candidate.x<1||candidate.y<1||candidate.x>253||candidate.y>253)return {...candidate,valid:false,reason:'Der vollständige 4 × 4-Platz muss innerhalb der Welt liegen.'};
+    const size=number(context.teleport.footprint||4),even=size%2===0,offset=even?.5:0,candidate={x:Math.round(x),y:Math.round(y)},center=[candidate.x+offset,candidate.y+offset],edge=Math.floor(size/2),min=even?edge-1:edge,maxX=mapWidth()-1-edge,maxY=mapHeight()-1-edge;
+    if(candidate.x<min||candidate.y<min||candidate.x>maxX||candidate.y>maxY)return {...candidate,valid:false,reason:`Der vollständige ${size} × ${size}-Platz muss innerhalb der Welt liegen.`};
+    if(isLux()){const reason=lux?lux.validFootprint(candidate.x,candidate.y,size):'Kartendaten werden geladen.';if(reason)return {...candidate,valid:false,reason};}
+    if(context.teleport.kind==='alliance-structure'){
+      const collision=view.targets.some(target=>Math.abs(placementCenter(target)[0]-center[0])<(placementFootprint(target)+size)/2&&Math.abs(placementCenter(target)[1]-center[1])<(placementFootprint(target)+size)/2);
+      if(collision)return {...candidate,valid:false,reason:`Der ${size} × ${size}-Platz wird von einem anderen Ziel blockiert.`};
+      for(let ty=candidate.y-edge;ty<=candidate.y+edge-(even?1:0);ty++)for(let tx=candidate.x-edge;tx<=candidate.x+edge-(even?1:0);tx++)if(isLux()?lux?.waterAt(tx,ty):window.ConquerLandscape.waterAt(tx,ty))return {...candidate,valid:false,reason:'Das Gebäude kann nicht auf Wasser stehen.'};
+      return {...candidate,valid:true,reason:`Freier ${size} × ${size}-Platz. Ziehen zum Verschieben.`};
+    }
     const distance=Math.max(Math.abs(candidate.x-number(context.teleport.origin_x)),Math.abs(candidate.y-number(context.teleport.origin_y)));
     if(distance<4)return {...candidate,valid:false,reason:'Wähle einen Platz außerhalb deines jetzigen Dorfes.'};
     const centers=context.teleport.alliance_centers||[],alliance=context.teleport.mode==='alliance';
     if(alliance&&!centers.some(city=>Math.max(Math.abs(candidate.x-number(city.x)),Math.abs(candidate.y-number(city.y)))<=number(context.teleport.max_distance||12)))return {...candidate,valid:false,reason:'Dieser Platz liegt außerhalb des Allianzgebiets.'};
-    const collision=view.targets.some(target=>target.kind!=='home'&&Math.abs(placementCenter(target)[0]-center[0])<(placementFootprint(target)+4)/2&&Math.abs(placementCenter(target)[1]-center[1])<(placementFootprint(target)+4)/2);
+    const collision=view.targets.some(target=>target.kind!=='home'&&Math.abs(placementCenter(target)[0]-center[0])<(placementFootprint(target)+size)/2&&Math.abs(placementCenter(target)[1]-center[1])<(placementFootprint(target)+size)/2);
     if(collision)return {...candidate,valid:false,reason:'Der 4 × 4-Platz wird von einem anderen Ziel blockiert.'};
-    for(let ty=candidate.y-1;ty<=candidate.y+2;ty++)for(let tx=candidate.x-1;tx<=candidate.x+2;tx++)if(window.ConquerLandscape.waterAt(tx,ty))return {...candidate,valid:false,reason:'Das Dorf kann nicht auf Wasser stehen.'};
+    for(let ty=candidate.y-1;ty<=candidate.y+2;ty++)for(let tx=candidate.x-1;tx<=candidate.x+2;tx++)if(isLux()?lux?.waterAt(tx,ty):window.ConquerLandscape.waterAt(tx,ty))return {...candidate,valid:false,reason:'Das Dorf kann nicht auf Wasser stehen.'};
     return {...candidate,valid:true,reason:'Freier 4 × 4-Platz. Ziehen zum Verschieben.'};
   }
   function chooseTeleportCell(x,y,focusAction=true){
-    const placement=teleportPlacement(x,y);stopFollowing();memory.selected=null;memory.cell={x:clamp(placement.x,1,253),y:clamp(placement.y,1,253)};memory.panel='actions';view.returnFocus=view.viewport;updateMarkers();updateSidebar();paint();
+    const size=number(context.teleport.footprint||4),edge=Math.floor(size/2),min=size%2===0?edge-1:edge,maxX=mapWidth()-1-edge,maxY=mapHeight()-1-edge,placement=teleportPlacement(x,y);stopFollowing();memory.selected=null;memory.cell={x:clamp(placement.x,min,maxX),y:clamp(placement.y,min,maxY)};memory.panel='actions';view.returnFocus=view.viewport;updateMarkers();updateSidebar();paint();
     if(focusAction)view.el.querySelector('.atlas-target-actions button')?.focus({preventScroll:true});
   }
   function selectCell(x,y){
-    x=Math.round(x);y=Math.round(y);if(x<0||y<0||x>=SIZE||y>=SIZE)return;
+    x=Math.round(x);y=Math.round(y);if(x<0||y<0||x>=mapWidth()||y>=mapHeight())return;
     if(context.teleport){chooseTeleportCell(x,y);return;}
     stopFollowing();
     const target=targetAt(x,y);if(target){select(target.key);return;}
@@ -148,24 +183,47 @@ window.ConquerWorld = (() => {
     memory.selected=null;memory.cell={x,y};memory.panel='actions';view.returnFocus=view.viewport;updateMarkers();updateSidebar();paint();view.el.querySelector('.atlas-target-actions button')?.focus({preventScroll:true});
   }
   const resources = {1:{name:'Getreidehof',kind:'food',word:'Nahrung',art:'farm'},2:{name:'Holzfällerlager',kind:'lumber',word:'Holz',art:'lumber'},3:{name:'Steinbruch',kind:'stone',word:'Stein',art:'quarry'},4:{name:'Goldmine',kind:'gold',word:'Gold',art:'gold'},5:{name:'Kristallader',kind:'gems',word:'Kristalle',art:'crystal'}};
+  // Relationship is viewer-specific and supplied by the server, never guessed
+  // from player names. Unknown ownership cannot enable a combat action.
+  const nodeOccupation=node=>!node.gatherer_march_id?'free':node.is_own_gathering?'own':node.can_attack===true?'enemy':node.can_attack===false?'ally':'occupied';
+  function nodeProgress(node){
+    const p=node.gathering_progress;if(node.is_own_gathering!==true||!node.gatherer_march_id||!p)return null;
+    const capacity=Number(p.capacity),limit=Number(p.limit),amount=Number(p.amount),rate=Number(p.rate),sample=stamp(p.sampled_at),finish=stamp(node.gathering_finishes_at);
+    if(![capacity,limit,amount,rate,sample,finish].every(Number.isFinite)||capacity<=0||limit<0||amount<0||rate<0)return null;
+    const elapsed=Math.max(0,(Math.min(context.now(),finish)-sample)/1000);
+    return {capacity,amount:Math.floor(Math.max(0,Math.min(capacity,limit,amount+elapsed*rate)))};
+  }
   function nodeStatus(node){
-    if(node.is_own_gathering&&node.gathering_finishes_at){
-      const seconds=Math.max(0,Math.ceil((stamp(node.gathering_finishes_at)-context.now())/1000));
-      if(!Number.isFinite(seconds))return 'Sammelt · Zeit offen';
-      if(seconds===0)return 'Rückkehr wird bestätigt';
-      const minutes=Math.floor(seconds/60),time=seconds>=3600?`${Math.floor(seconds/3600)}:${String(minutes%60).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`:`${minutes}:${String(seconds%60).padStart(2,'0')}`;
-      return `Sammelt · ${time}`;
-    }
-    return node.gatherer_march_id?`${node.can_attack?'Feindlich':'Allianz'} · ${node.gatherer_name||'Besetzt'}`:'';
+    if(!node.gatherer_march_id)return '';
+    if(node.is_own_gathering===true){const p=nodeProgress(node);return p?`Gesammelt: ${format(p.amount)} / ${format(p.capacity)}`:'Eigene Sammler';}
+    const relation=nodeOccupation(node);
+    return relation==='free'?'':`${relation==='own'?'Eigene Sammler':relation==='enemy'?'Fremde Sammler':relation==='ally'?'Allianz sammelt':'Wird gesammelt'} · ${node.gatherer_name||'Besetzt'}`;
   }
   function updateGatheringTimers(){
     for(const target of view.targets){
       if(target.kind!=='nodes')continue;const button=view.markerNodes.get(target.key);if(!button)continue;
       let badge=button.querySelector('.atlas-gathering-badge');
-      if(!badge){badge=document.createElement('span');badge.className='atlas-gathering-badge';button.append(badge);}
-      const text=nodeStatus(target.data);badge.hidden=!text;badge.textContent=text;
-      badge.classList.toggle('is-own',!!target.data.is_own_gathering);badge.classList.toggle('is-enemy',!!target.data.can_attack);
-      if(text)button.setAttribute('aria-label',`${target.name}, X ${target.x}, Y ${target.y}. ${text}`);
+      if(!badge){badge=document.createElement('span');badge.className='atlas-gathering-badge';badge.innerHTML='<span class="atlas-resource-level"></span><span class="atlas-resource-progress" role="progressbar" aria-label="Gesammelt / Traglast" hidden><i></i></span><span class="atlas-resource-status"></span>';button.append(badge);}
+      const relation=nodeOccupation(target.data);button.dataset.occupation=relation;
+      let work=button.querySelector('.atlas-gathering-work');
+      if(relation!=='free'&&!work){
+        work=document.createElement('span');work.className='atlas-gathering-work';work.setAttribute('aria-hidden','true');
+        // Relationship only; work happens inside the painted resource sprite.
+        work.innerHTML=`<svg class="atlas-gathering-flag" viewBox="0 0 36 40"><path class="gathering-pole" d="M7 37V4"/><path class="gathering-banner" d="M8 5Q16 1 23 5L32 5 27 13 32 21H23Q16 17 8 21Z"/></svg>`;
+        button.append(work);
+      }
+      if(relation==='free')work?.remove();
+      const text=nodeStatus(target.data),level=badge.querySelector('.atlas-resource-level'),status=badge.querySelector('.atlas-resource-status');
+      const levelText=`Lv. ${target.level}`,progress=nodeProgress(target.data),bar=badge.querySelector('.atlas-resource-progress');
+      const label=relation==='free'?'':relation==='own'?(progress?`${format(progress.amount)} / ${format(progress.capacity)}`:'Sammelt'):(target.data.gatherer_name||'Unbekannter Sammler');
+      bar.hidden=!progress;
+      if(progress){bar.setAttribute('aria-valuemin','0');bar.setAttribute('aria-valuemax',String(progress.capacity));bar.setAttribute('aria-valuenow',String(progress.amount));bar.firstElementChild.style.width=`${progress.amount/progress.capacity*100}%`;}
+      else{for(const attr of ['aria-valuemin','aria-valuemax','aria-valuenow'])bar.removeAttribute(attr);bar.firstElementChild.style.width='0%';}
+      badge.hidden=relation==='free';if(level.textContent!==levelText)level.textContent=levelText;
+      status.hidden=!label;if(status.textContent!==label)status.textContent=label;
+      badge.title=label?`${levelText} · ${label}`:levelText;
+      badge.classList.toggle('is-own',relation==='own');badge.classList.toggle('is-enemy',relation==='enemy');badge.classList.toggle('is-ally',relation==='ally');
+      button.setAttribute('aria-label',`${target.name}, Stufe ${target.level}, X ${target.x}, Y ${target.y}${text?`. ${text}`:''}`);
     }
     const selected=selectedTarget();
     if(selected?.kind==='nodes')view.el.querySelectorAll('.atlas-node-status').forEach(status=>{status.textContent=nodeStatus(selected.data);});
@@ -176,6 +234,7 @@ window.ConquerWorld = (() => {
   }
   function monsterName(monster) {
     const original=monster.definition?.name||'Waldkreatur';
+    if(/magdar/i.test(original))return 'Runenhorn';
     if(/skeleton/i.test(original))return 'Skeletttrupp';
     if(/golem/i.test(original))return 'Steingolem';
     if(/orc/i.test(original))return 'Orktrupp';
@@ -188,9 +247,16 @@ window.ConquerWorld = (() => {
   const charmName=charm=>charmNames[charm.stat_category]||'Magischer Charm';
   function monsterVisualKey(monster){
     const source=`${monster.definition?.art||''} ${monster.definition?.name||''} ${monster.definition?.title||''}`.toLowerCase();
-    if(/daemmerhorn|dämmerhorn/.test(source))return 'daemmerhorn';if(/grumwald/.test(source))return 'grumwald';if(/frostgrimm/.test(source))return 'frostgrimm';if(/sandmaul/.test(source))return 'sandmaul';if(/glutramm/.test(source))return 'glutramm';
+    if(/daemmerhorn|dämmerhorn/.test(source))return 'daemmerhorn';const regional=source.match(/grumwald|frostgrimm|sandmaul|glutramm/);if(regional)return regional[0];
     if(/dragon/.test(source))return 'dragon';if(/deathkar/.test(source))return 'deathkar';if(/magdar/.test(source))return 'magdar';if(/goblin/.test(source))return 'goblin';
     if(/skeleton/.test(source))return 'skeleton';if(/golem/.test(source))return 'golem';return 'orc';
+  }
+  function cityAlliance(target) {
+    const own=target.kind==='home',mine=number(context.alliance?.id);
+    const id=own?mine:number(target.data.alliance_id),tag=own?context.alliance?.tag:target.data.alliance_tag;
+    const relation=own?'own':id>0&&mine>0&&id===mine?'ally':id>0?'other':'none';
+    const status=editorial(own?'Deine Burg':relation==='ally'?'Deine Allianz':relation==='other'?'Andere Allianz':'Ohne Allianz');
+    return {relation,text:id>0?`${tag?'['+tag+']':editorial('Allianz')} · ${status}`:own?editorial('Deine Burg · Ohne Allianz'):status};
   }
   function targetsFromState(state) {
     const city=state.city;
@@ -199,34 +265,42 @@ window.ConquerWorld = (() => {
     for(const n of state.nodes||[]){const r=resources[n.object_type]||resources[1];targets.push({key:`nodes:${n.id}`,kind:'nodes',id:n.id,x:number(n.coord_x),y:number(n.coord_y),name:r.name,level:number(n.level)||1,art:asset(r.art),resource:r,data:n});}
     for(const charm of state.charms||[]){const x=number(charm.x??charm.coord_x),y=number(charm.y??charm.coord_y);targets.push({key:`charms:${charm.id}`,kind:'charms',id:Number(charm.id),x,y,name:charmName(charm),level:{normal:1,epic:2,legendary:3}[charm.grade]||1,art:`${context.base}/assets/art/map/runes-v1/${['normal','epic','legendary'].includes(charm.grade)?charm.grade:'normal'}.webp`,data:{...charm,coord_x:x,coord_y:y}});}
     for(const p of state.players||[])targets.push({key:`players:${p.id}`,kind:'players',id:p.id,x:number(p.coord_x),y:number(p.coord_y),name:p.display_name||p.username||'Siedlung',level:number(p.castle_level)||1,art:castleArt(p.city_skin),data:p});
-    if(state.congress){const g=state.congress;targets.push({key:"congress",kind:"congress",id:g.id,x:number(g.coord_x),y:number(g.coord_y),name:g.name||"Kongress",level:1,art:`${context.base}/assets/art/map/congress.${motionPreference.matches||document.body.classList.contains("reduced-motion")?"png":"webp"}?v=zones1`,data:g});}
-    for(const g of state.shrines||[]){const element=shrineElement(g);if(!shrineElements[element]||!Number.isFinite(Number(g.coord_x))||!Number.isFinite(Number(g.coord_y)))continue;targets.push({key:`shrine:${g.id}`,kind:'shrine',id:g.id,element,x:number(g.coord_x),y:number(g.coord_y),name:g.name||`${shrineElements[element].label}schrein`,art:`${context.base}/assets/art/map/shrine-${element}.${motionPreference.matches||document.body.classList.contains('reduced-motion')?'png':'webp'}?v=shrines1`,data:g});}
-    for(const g of state.alliance_structures||[]){const kind=g.structure_type==='center'?'alliance_center':'outpost';targets.push({key:`${kind}:${g.id}`,kind,id:g.id,x:number(g.coord_x),y:number(g.coord_y),name:g.name||(`${g.alliance_tag?'['+g.alliance_tag+'] ':''}${kind==='alliance_center'?'Allianzzentrum':'Außenposten'}`),level:1,art:asset(kind==='alliance_center'?'alliance-center':'alliance-outpost'),data:g});}
+    for(const p of state.neutral_villages||[])targets.push({key:`neutral_villages:${p.id}`,kind:'neutral_villages',id:p.id,x:number(p.coord_x),y:number(p.coord_y),name:p.name||'Freies Dorf',level:number(p.level)||1,art:`${context.base}/assets/art/map/castle-default.png`,data:p});
+    if(!isLux()&&state.congress){const g=state.congress;targets.push({key:"congress",kind:"congress",id:g.id,x:number(g.coord_x),y:number(g.coord_y),name:g.name||"Kongress",level:1,art:`${context.base}/assets/art/map/congress.${motionPreference.matches||document.body.classList.contains("reduced-motion")?"png":"webp"}?v=zones1`,data:g});}
+    for(const g of (isLux()?[]:state.shrines)||[]){const element=shrineElement(g);if(!shrineElements[element]||!Number.isFinite(Number(g.coord_x))||!Number.isFinite(Number(g.coord_y)))continue;targets.push({key:`shrine:${g.id}`,kind:'shrine',id:g.id,element,x:number(g.coord_x),y:number(g.coord_y),name:g.name||`${shrineElements[element].label}schrein`,art:`${context.base}/assets/art/map/shrine-${element}.${motionPreference.matches||document.body.classList.contains('reduced-motion')?'png':'webp'}?v=shrines1`,data:g});}
+    for(const g of state.alliance_structures||[]){const kind=g.structure_type==='center'?'alliance_center':'outpost';targets.push({key:`${kind}:${g.id}`,kind,id:g.id,x:number(g.coord_x),y:number(g.coord_y),name:g.name||(`${g.alliance_tag?'['+g.alliance_tag+'] ':''}${kind==='alliance_center'?'Allianzzentrum':'Außenposten'}`),level:1,art:asset(kind==='alliance_center'?'alliance-center-v3.webp':'alliance-outpost'),data:g});}
+    for(const g of state.territory?.map_targets||state.territory?.targets||[]){targets.push({key:`territory:${g.id}`,kind:'territory',id:g.id,x:number(g.x??g.coord_x),y:number(g.y??g.coord_y),name:g.name,level:1,art:window.ConquerTerritoryArt.image(context.base,g),artKey:window.ConquerTerritoryArt.key(g),data:g});}
     for(const target of targets){const [x,y]=targetCenter(target);target.biome=window.ConquerLandscape.biomeAt(x,y);}
     return targets;
   }
   function matching(target) {
     if(target.kind==='home'||target.kind==='congress')return true;
+    if(target.kind==='territory')return true;
     if(memory.filter!=='all'&&target.kind!==memory.filter&&target.resource?.kind!==memory.filter)return false;
     const haystack=`${target.name} ${target.resource?.word||''} ${target.kind==='charms'?'Charm Talisman '+(charmCategories[target.data.stat_category]||target.data.stat_category||''):''} ${target.kind==='shrine'?'Schrein shrine '+shrineElements[target.element].aliases:''} ${target.data.alliance_tag||''} ${target.data.alliance_name||''} ${target.x} ${target.y}`.toLocaleLowerCase('de-DE');
     return !memory.search||haystack.includes(memory.search.toLocaleLowerCase('de-DE'));
   }
   function render(options) {
-    context=options;loadScenery();
+    const worldKey=options.state.world?.id||options.state.city.world_id;
+    // Keep only the latest snapshot while a pointer owns this map. The camera
+    // continues locally; replacing marker DOM can wait until the gesture ends.
+    if(view?.el.isConnected&&view.host===options.host&&view.worldKey===worldKey&&view.pointers.size){view.pendingRender=options;return;}
+    if(view?.pointers.size)resetGesture();
+    context=options;loadPainted();loadLux();
     if(memory.x===null){memory.x=number(options.state.city.coord_x);memory.y=number(options.state.city.coord_y);}
     if(!view||!view.el.isConnected||view.host!==options.host)mount(options.host);
-    const worldKey=options.state.world?.id||options.state.city.world_id;if(view.worldKey&&view.worldKey!==worldKey){stopFollowing();cancelSearch();view.searchTarget=null;memory.panel=null;}view.worldKey=worldKey;
+    if(view.worldKey&&view.worldKey!==worldKey){stopFollowing();cancelSearch();view.searchTarget=null;memory.panel=null;memory.x=number(options.state.city.coord_x);memory.y=number(options.state.city.coord_y);}view.worldKey=worldKey;view.pendingRender=null;view.navigationDirty=false;
     // A poll started before the search may still contain the previous viewport.
     if(view.searchTarget){const {kind,data}=view.searchTarget,center=options.state.map_center;
       if(center&&Math.abs(center.x-data.coord_x)<=1&&Math.abs(center.y-data.coord_y)<=1)view.searchTarget=null;
       else if(!(options.state[kind]||[]).some(row=>Number(row.id)===Number(data.id)))options.state[kind]=[...(options.state[kind]||[]),data];
     }
     view.targets=targetsFromState(options.state);view.targetMap=new Map(view.targets.map(t=>[t.key,t]));
-    updateMarkers();updateShrineNavigation();updateSidebar();paint();
+    updateNavigation();updateMarkers();updateShrineNavigation();updateSidebar();paint();
     if(sceneVisible&&!frameId)frameId=requestAnimationFrame(animate);
   }
   function mount(host) {
-    if(view){view.observer?.disconnect();view.marchHud?.destroy();for(const effect of view.impacts||[]){effect.dispose?.();effect.node?.remove();}cancelAnimationFrame(frameId);frameId=0;}
+    if(view){resetGesture();view.observer?.disconnect();view.overview?.destroy();view.marchHud?.destroy();for(const effect of view.impacts||[]){effect.dispose?.();effect.node?.remove();}cancelAnimationFrame(frameId);frameId=0;}
     memory.panel=null;memory.selected=null;memory.cell=null;
     const panelClose='<button class="map-overlay-close" data-atlas="clear" aria-label="Kartenfenster schließen" title="Schließen">'+icon('close')+'</button>';
     host.innerHTML=`<section class="atlas-shell map-overlay-shell">
@@ -241,13 +315,15 @@ window.ConquerWorld = (() => {
       <section id="atlas-search-panel" class="map-overlay-panel map-overlay-search-panel" role="region" aria-label="Kartensuche in der Nähe" hidden><div class="map-overlay-heading"><h2>In der Nähe</h2><button class="map-search-collapse" data-atlas="clear" aria-label="Kartensuche einklappen" title="Einklappen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 15 7-7 7 7"/></svg></button></div>${searchMarkup()}</section>
       <section id="atlas-navigation-panel" class="map-overlay-panel map-overlay-navigation-panel" role="dialog" aria-label="Koordinaten und Weltübersicht" hidden><div class="map-overlay-heading"><h2>Weltübersicht</h2>${panelClose}</div><form class="atlas-jump" aria-label="Zu Koordinaten springen"><label>X<input name="x" type="number" min="0" max="255" step="1" required aria-label="X-Koordinate" value="${Math.round(memory.x)}"></label><label>Y<input name="y" type="number" min="0" max="255" step="1" required aria-label="Y-Koordinate" value="${Math.round(memory.y)}"></label><button type="submit" title="Koordinaten ansteuern" aria-label="Zu diesen Koordinaten springen">${icon('arrow')}</button></form><div class="map-overlay-navigation-grid"><button class="atlas-minimap" aria-label="Weltübersicht. Klicken, um zu einer Region zu springen."><canvas width="1024" height="1024" aria-hidden="true"></canvas></button><div class="atlas-zoom"><button data-atlas="zoom-in" aria-label="Karte vergrößern" title="Vergrößern">${icon('plus')}</button><span class="atlas-zoom-value"></span><button data-atlas="zoom-out" aria-label="Karte verkleinern" title="Verkleinern">${icon('minus')}</button><button data-atlas="home" aria-label="Auf eigene Stadt zentrieren" title="Eigene Stadt">${icon('home')}</button></div></div><button class="atlas-land-overview" data-action="tab" data-id="land">▦ Landübersicht öffnen</button><div class="atlas-zone-jumps" aria-label="Weltregionen"><button data-atlas="zone" data-x="64" data-y="64">Wald</button><button data-atlas="zone" data-x="192" data-y="64">Eis</button><button data-atlas="zone" data-x="64" data-y="192">Sand</button><button data-atlas="zone" data-x="192" data-y="192">Lava</button><button data-atlas="zone" data-x="128" data-y="128" class="atlas-congress-jump">♛ Kongress · Weltensee</button></div><div class="map-overlay-state"><span class="atlas-status" aria-live="polite"></span><span class="atlas-march-count"></span></div></section>
       <div class="atlas-target-actions" role="group" aria-label="Zielaktionen" hidden></div>
-      <section class="map-overlay-panel map-overlay-target-panel" role="dialog" aria-label="Zielinformationen" hidden><div class="atlas-detail"></div></section></section>`;
+      <section class="map-overlay-panel map-overlay-target-panel" data-i18n-scope role="dialog" aria-label="Zielinformationen" hidden><div class="atlas-detail"></div></section></section>`;
     const el=host.querySelector('.atlas-shell'),viewport=el.querySelector('.atlas-viewport');
     const atmosphere=document.createElement('canvas');atmosphere.className='atlas-atmosphere';atmosphere.setAttribute('aria-hidden','true');viewport.querySelector('.atlas-terrain').after(atmosphere);
     Object.assign(atmosphere.style,{position:'absolute',inset:'0',width:'100%',height:'100%',pointerEvents:'none',zIndex:'1'});
     const shrineNav=document.createElement('div');shrineNav.className='atlas-shrine-jumps atlas-zone-jumps';shrineNav.setAttribute('role','group');shrineNav.setAttribute('aria-label','Zu den vier Schreinen springen');shrineNav.hidden=true;el.querySelector('.atlas-zone-jumps').after(shrineNav);
     const creatures=document.createElement('div');creatures.className='atlas-markers atlas-creatures';el.querySelector('.atlas-parties').before(creatures);
     view={host,el,viewport,width:1,height:1,canvas:el.querySelector('.atlas-terrain'),ctx:el.querySelector('.atlas-terrain').getContext('2d'),mini:el.querySelector('.atlas-minimap canvas'),routes:el.querySelector('.atlas-routes'),markers:el.querySelector('.atlas-markers'),creatures,parties:el.querySelector('.atlas-parties'),markerNodes:new Map(),partyNodes:new Map(),impacts:[],shrineNav,shrineButtons:new Map(),targets:[],targetMap:new Map(),pointers:new Map(),drag:null,pinch:null,suppressUntil:0,detailStamp:'',nearStamp:'',lastAnimation:0,returnFocus:null};
+    view.legacyZones=el.querySelector('.atlas-zone-jumps').innerHTML;
+    view.overview=window.ConquerWorldOverview?.({panel:el.querySelector('#atlas-navigation-panel'),getContext:()=>context,getLux:()=>lux,remember:memory.overview,getCenter:()=>{const [left,top]=unproject(0,0),[right,bottom]=unproject(view.width,view.height);return {x:memory.x,y:memory.y,left,top,right,bottom};},jump:(x,y)=>{moveTo(x,y);clearSelection(false);viewport.focus({preventScroll:true});},retry:()=>{luxKey='';loadLux();},openTerritories:()=>{clearSelection(false);const open=()=>context.onTerritory?.();if(view.releasingMapHistory)view.pendingMapAction=open;else open();},esc:escape});
     view.marchHud=window.ConquerMarchHud?.({host:el,getContext:()=>context,follow:followMarch,locate:locateMarchTarget,stop:stopFollowing,focus,getSelected:()=>view.followId||null,onLayout:()=>{view.followAnchor=null;}});
     el.querySelector('.atlas-object-search').addEventListener('submit',e=>{e.preventDefault();e.stopPropagation();searchObjects();});
     el.querySelector('#atlas-object-level').addEventListener('input',e=>changeSearchLevel(Number(e.target.value)));
@@ -255,11 +331,11 @@ window.ConquerWorld = (() => {
     el.querySelector('.atlas-jump').addEventListener('submit',e=>{e.preventDefault();e.stopPropagation();if(!e.target.reportValidity())return;moveTo(number(e.target.elements.x.value),number(e.target.elements.y.value));clearSelection(false);viewport.focus({preventScroll:true});});
     el.addEventListener('click',handleClick);
     el.addEventListener('keydown',e=>{if(e.key==='Escape'&&memory.panel){e.preventDefault();e.stopPropagation();clearSelection();}});
-    viewport.addEventListener('pointerdown',pointerDown);viewport.addEventListener('pointermove',pointerMove);viewport.addEventListener('pointerup',pointerUp);viewport.addEventListener('pointercancel',e=>pointerUp(e,true));
+    viewport.addEventListener('pointerdown',pointerDown);viewport.addEventListener('pointermove',pointerMove);viewport.addEventListener('pointerup',pointerUp);viewport.addEventListener('pointercancel',e=>pointerUp(e,true));viewport.addEventListener('lostpointercapture',e=>pointerUp(e,true));
     viewport.addEventListener('click',e=>{if(performance.now()<view.suppressUntil&&!e.target.closest('.atlas-zoom,.atlas-minimap')){e.preventDefault();e.stopPropagation();}},true);
     viewport.addEventListener('wheel',e=>{e.preventDefault();const box=viewport.getBoundingClientRect();zoomTo(memory.zoom*(e.deltaY<0?1.12:1/1.12),e.clientX-box.left,e.clientY-box.top);},{passive:false});
     viewport.addEventListener('keydown',e=>{if(e.target!==viewport)return;const step=e.shiftKey?8:1;const keys={ArrowLeft:[-step,0],ArrowRight:[step,0],ArrowUp:[0,-step],ArrowDown:[0,step]};if(keys[e.key]){e.preventDefault();moveTo(memory.x+keys[e.key][0],memory.y+keys[e.key][1]);}else if(e.key==='Enter'||e.key===' '){e.preventDefault();selectCell(memory.x,memory.y);}else if(e.key==='+'||e.key==='='){e.preventDefault();zoomTo(memory.zoom*1.15);}else if(e.key==='-'){e.preventDefault();zoomTo(memory.zoom/1.15);}else if(e.key==='Home'){e.preventDefault();home();}else if(e.key==='Escape'){clearSelection();}});
-    const mini=el.querySelector('.atlas-minimap');mini.addEventListener('pointerdown',e=>e.stopPropagation());mini.addEventListener('click',e=>{e.stopPropagation();if(e.detail===0)return;const box=view.mini.getBoundingClientRect();moveTo((e.clientX-box.left)/box.width*255,(e.clientY-box.top)/box.height*255);clearSelection();});mini.addEventListener('keydown',e=>{const shift={ArrowLeft:[-20,0],ArrowRight:[20,0],ArrowUp:[0,-20],ArrowDown:[0,20]}[e.key];if(shift){e.preventDefault();e.stopPropagation();moveTo(memory.x+shift[0],memory.y+shift[1]);}});
+    const mini=el.querySelector('.atlas-minimap');mini.addEventListener('pointerdown',e=>e.stopPropagation());mini.addEventListener('click',e=>{e.stopPropagation();if(e.detail===0)return;const box=view.mini.getBoundingClientRect();isLux()&&view.miniProjection?moveTo(((e.clientX-box.left)/box.width*160-view.miniProjection.ox)/view.miniProjection.s,((e.clientY-box.top)/box.height*160-view.miniProjection.oy)/view.miniProjection.s):moveTo((e.clientX-box.left)/box.width*(mapWidth()-1),(e.clientY-box.top)/box.height*(mapHeight()-1));clearSelection();});mini.addEventListener('keydown',e=>{const shift={ArrowLeft:[-20,0],ArrowRight:[20,0],ArrowUp:[0,-20],ArrowDown:[0,20]}[e.key];if(shift){e.preventDefault();e.stopPropagation();moveTo(memory.x+shift[0],memory.y+shift[1]);}});
     view.atmosphere=atmosphere;view.atmosphereCtx=atmosphere.getContext('2d');view.ambienceTime=0;view.lastAmbience=null;view.lastMotionFrame=0;
     view.observer=new ResizeObserver(()=>resize());view.observer.observe(viewport);resize();
   }
@@ -281,7 +357,24 @@ window.ConquerWorld = (() => {
     if(button.dataset.followMarch){if(performance.now()>=view.suppressUntil)followMarch(button.dataset.followMarch);return;}
     if(button.dataset.atlasFilter){memory.filter=button.dataset.atlasFilter;view.el.querySelectorAll('[data-atlas-filter]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.atlasFilter===memory.filter)));updateMarkers();updateSidebar();paint();return;}
     if(button.dataset.atlasTarget){if(performance.now()<view.suppressUntil)return;select(button.dataset.atlasTarget,button.classList.contains('atlas-nearby-row'),true);return;}
-    if(button.dataset.action&&button.closest('.atlas-target-actions,.atlas-detail')){clearSelection(false);return;}
+    if(button.dataset.action&&button.closest('.atlas-target-actions,.atlas-detail')){
+      const kind=button.dataset.kind;
+      const open=button.dataset.action==='expedition'?(kind==='monsters'?context.onMonsterAttack:['nodes','node-attack','charms'].includes(kind)?context.onGather:null):null;
+      if(typeof open==='function'&&!button.disabled){
+        // The card owns a history entry. Finish removing it before the mobile
+        // march dialog adds its own entry, otherwise the pending Back closes it.
+        e.stopPropagation();
+        const mounted=view,world=context.state.city.world_id,id=Number(button.dataset.id);
+        clearSelection(false);
+        const sequence=searchSequence;
+        const launch=()=>{if(view===mounted&&mounted.el.isConnected&&sceneVisible&&context.state.city.world_id===world&&searchSequence===sequence)open(id,kind);};
+        // Native events can flush microtasks between listeners. A new task also
+        // lets the mobile history listener finish before adding the next overlay.
+        if(view.releasingMapHistory){view.pendingMapAction=()=>setTimeout(launch,0);view.viewport.focus({preventScroll:true});}
+        else launch();
+      }else clearSelection(false);
+      return;
+    }
     const action=button.dataset.atlas;
     if(action==='search-next'){searchObjects();return;}
     if(action==='details'){memory.panel='target';updateSidebar();paint();view.el.querySelector('.atlas-detail .atlas-close')?.focus({preventScroll:true});return;}
@@ -296,43 +389,48 @@ window.ConquerWorld = (() => {
   }
   function home(){moveTo(number(context.state.city.coord_x),number(context.state.city.coord_y));}
   function setMapHistory(panel){
-    const hasEntry=history.state?.conquerMapSearch||history.state?.conquerMapTarget;
-    const state={...history.state,conquerMapSearch:panel==='search',conquerMapTarget:panel==='target'};
+    const hasEntry=history.state?.conquerMapSearch||history.state?.conquerMapTarget||history.state?.conquerMapOverview;
+    const state={...history.state,conquerMapSearch:panel==='search',conquerMapTarget:panel==='target',conquerMapOverview:panel==='navigation'};
     history[hasEntry?'replaceState':'pushState'](state,'',location.href);view.mapHistoryUrl=location.href;
   }
   function releaseSearchHistory(){
-    if(!(history.state?.conquerMapSearch||history.state?.conquerMapTarget)||view.releasingMapHistory)return;
-    if(view.mapHistoryUrl&&view.mapHistoryUrl!==location.href){const state={...history.state};delete state.conquerMapSearch;delete state.conquerMapTarget;history.replaceState(state,'',location.href);return;}
+    if(!(history.state?.conquerMapSearch||history.state?.conquerMapTarget||history.state?.conquerMapOverview)||view.releasingMapHistory)return;
+    if(view.mapHistoryUrl&&view.mapHistoryUrl!==location.href){const state={...history.state};delete state.conquerMapSearch;delete state.conquerMapTarget;delete state.conquerMapOverview;history.replaceState(state,'',location.href);return;}
     view.releasingMapHistory=true;history.back();
   }
   window.addEventListener('popstate',()=>{
     if(!view?.el.isConnected)return;view.releasingMapHistory=false;
     if(view.pendingMapAction){const pending=view.pendingMapAction;view.pendingMapAction=null;pending();return;}
-    if((memory.panel==='search'&&!history.state?.conquerMapSearch)||(['actions','target'].includes(memory.panel)&&['nodes','monsters'].includes(selectedTarget()?.kind)&&!history.state?.conquerMapTarget))clearSelection(true,false);
+    if((memory.panel==='navigation'&&!history.state?.conquerMapOverview)||(memory.panel==='search'&&!history.state?.conquerMapSearch)||(['actions','target'].includes(memory.panel)&&['nodes','monsters'].includes(selectedTarget()?.kind)&&!history.state?.conquerMapTarget))clearSelection(true,false);
     else if(history.state?.conquerMapSearch&&memory.panel!=='search')openPanel('search',view.el.querySelector('[data-atlas="search"]'));
+    else if(history.state?.conquerMapOverview&&memory.panel!=='navigation')openPanel('navigation',view.el.querySelector('[data-atlas="navigation"]'));
   });
   function clearSelection(restoreFocus=true,releaseHistory=true){cancelSearch();if(releaseHistory)releaseSearchHistory();stopFollowing();memory.selected=null;memory.cell=null;memory.panel=null;updateMarkers();updateSidebar();paint();if(restoreFocus){const target=view.returnFocus?.isConnected?view.returnFocus:view.viewport;target.focus({preventScroll:true});}view.returnFocus=null;}
   document.addEventListener('pointerdown',e=>{
-    if(!view?.el.isConnected||memory.panel!=='actions'||e.target.closest('.atlas-target-actions,.atlas-viewport'))return;
+    if(!view?.el.isConnected||memory.panel!=='actions'||e.target.closest('dialog[open],.atlas-target-actions,.atlas-viewport'))return;
     clearSelection(false);
   });
   function openPanel(panel,trigger){
     if(view.releasingMapHistory){view.pendingMapAction=()=>openPanel(panel,trigger);return;}
     stopFollowing();if(memory.panel===panel){clearSelection();return;}cancelSearch();memory.selected=null;memory.cell=null;memory.panel=panel;view.returnFocus=trigger;updateMarkers();updateSidebar();paint();
     if(panel==='search'){setMapHistory('search');searchFeedback('');loadSearchCatalog();}
+    if(panel==='navigation'&&view.overview&&isLux())setMapHistory('navigation');
     view.el.querySelector(panel==='search'?'.atlas-search-category[aria-pressed="true"]':'#atlas-navigation-panel .map-overlay-close').focus({preventScroll:true});
   }
   function select(key,center=false,directMonster=false){
     if(view.releasingMapHistory){view.pendingMapAction=()=>select(key,center,directMonster);return;}
-    const target=view.targetMap.get(key);if(!target)return;
+    const target=view.targetMap.get(key);if(!target)return;if(directMonster&&target.kind==='territory'&&context.onTerritory){clearSelection(false);context.onTerritory(target.id);return;}
+    if(directMonster&&target.kind==='nodes'&&!target.data.gatherer_march_id&&typeof context.onGather==='function'){
+      cancelSearch();stopFollowing();view.objectActionFraming=null;memory.selected=null;memory.cell=null;memory.panel=null;view.returnFocus=view.markerNodes.get(key);updateMarkers();updateSidebar();paint();context.onGather(target.id);return;
+    }
     if(directMonster&&target.kind==='monsters'&&typeof context.onMonsterAttack==='function'){
       cancelSearch();stopFollowing();view.objectActionFraming=null;memory.selected=null;memory.cell=null;memory.panel=null;view.returnFocus=view.markerNodes.get(key);updateMarkers();updateSidebar();paint();context.onMonsterAttack(target.id);return;
     }
     if(memory.panel==='actions'&&memory.selected===key){clearSelection(false);view.viewport.focus({preventScroll:true});return;}if(['nodes','monsters'].includes(target.kind))setMapHistory('target');else releaseSearchHistory();cancelSearch();stopFollowing();view.objectActionFraming=null;memory.selected=key;memory.cell=null;memory.panel='actions';view.returnFocus=view.markerNodes.get(key);if(center||isCompactTarget(target))moveTo(...targetCenter(target));updateMarkers();updateSidebar();paint();view.el.querySelector('.atlas-target-actions button')?.focus({preventScroll:true});
   }
   function notify(){clearTimeout(notifyTimer);notifyTimer=setTimeout(()=>{if(view?.el.isConnected)window.dispatchEvent(new Event('conquer-world-moved'));},380);}
-  function moveTo(x,y){stopFollowing();memory.x=clamp(x,0,255);memory.y=clamp(y,0,255);paint();updateSidebar();notify();}
-  function zoomTo(value,anchorX=view.width/2,anchorY=view.height/2){const before=unproject(anchorX,anchorY);memory.zoom=clamp(value,MIN_ZOOM,MAX_ZOOM);memory.x=clamp(before[0]-(anchorX-view.width/2)/scale(),0,255);memory.y=clamp(before[1]-(anchorY-view.height/2)/scale(),0,255);paint();updateSidebar();notify();}
+  function moveTo(x,y){stopFollowing();memory.x=clamp(x,0,mapWidth()-1);memory.y=clamp(y,0,mapHeight()-1);paint();updateSidebar();notify();}
+  function zoomTo(value,anchorX=view.width/2,anchorY=view.height/2){const before=unproject(anchorX,anchorY);memory.zoom=clamp(value,MIN_ZOOM,MAX_ZOOM);memory.x=clamp(before[0]-(anchorX-view.width/2)/scale(),0,mapWidth()-1);memory.y=clamp(before[1]-(anchorY-view.height/2)/scale(),0,mapHeight()-1);paint();updateSidebar();notify();}
   function scheduleZoom(value,anchorX,anchorY){
     view.pendingZoom={value,anchorX,anchorY};
     if(view.zoomFrame)return;
@@ -342,7 +440,7 @@ window.ConquerWorld = (() => {
     if(e.button!==0||e.target.closest('.atlas-zoom,.atlas-minimap'))return;
     view.viewport.focus({preventScroll:true});view.pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});view.viewport.setPointerCapture(e.pointerId);
     if(view.pointers.size===1){const box=view.viewport.getBoundingClientRect(),point=unproject(e.clientX-box.left,e.clientY-box.top),teleport=!!(context.teleport&&memory.cell&&e.target.closest('.atlas-cell-focus'));view.drag={x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY,moved:false,teleport,offsetX:teleport?point[0]-memory.cell.x:0,offsetY:teleport?point[1]-memory.cell.y:0,march:e.target.closest('[data-follow-march]')?.dataset.followMarch,target:e.target.closest('[data-atlas-target]')?.dataset.atlasTarget};}
-    if(view.pointers.size===2){const points=[...view.pointers.values()];view.pinch={distance:Math.hypot(points[0].x-points[1].x,points[0].y-points[1].y),zoom:memory.zoom};if(view.drag)view.drag.moved=true;}
+    if(view.pointers.size===2){const points=[...view.pointers.values()];view.pinch={distance:Math.hypot(points[0].x-points[1].x,points[0].y-points[1].y),zoom:memory.zoom};if(view.drag)view.drag.moved=true;view.el.classList.add('is-camera-moving');}
   }
   function pointerMove(e){
     if(!view.pointers.has(e.pointerId))return;
@@ -350,16 +448,46 @@ window.ConquerWorld = (() => {
     if(view.pointers.size===2&&view.pinch){const points=[...view.pointers.values()],box=view.viewport.getBoundingClientRect(),distance=Math.hypot(points[0].x-points[1].x,points[0].y-points[1].y);scheduleZoom(view.pinch.zoom*distance/Math.max(1,view.pinch.distance),(points[0].x+points[1].x)/2-box.left,(points[0].y+points[1].y)/2-box.top);return;}
     const drag=view.drag;if(!drag)return;if(Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY)>5)drag.moved=true;
     if(drag.moved&&drag.teleport){const box=view.viewport.getBoundingClientRect(),point=unproject(e.clientX-box.left,e.clientY-box.top);view.viewport.classList.add('is-teleport-dragging');chooseTeleportCell(point[0]-drag.offsetX,point[1]-drag.offsetY,false);drag.x=e.clientX;drag.y=e.clientY;return;}
-    if(drag.moved){stopFollowing();if(memory.panel==='actions'&&!context.teleport)clearSelection(false);view.viewport.classList.add('is-dragging');memory.x=clamp(memory.x-(e.clientX-drag.x)/scale(),0,255);memory.y=clamp(memory.y-(e.clientY-drag.y)/scale(),0,255);panBufferedScene();notify();}drag.x=e.clientX;drag.y=e.clientY;
+    if(drag.moved){stopFollowing();if(memory.panel==='actions'&&!context.teleport)clearSelection(false);view.viewport.classList.add('is-dragging');view.el.classList.add('is-camera-moving');memory.x=clamp(memory.x-(e.clientX-drag.x)/scale(),0,mapWidth()-1);memory.y=clamp(memory.y-(e.clientY-drag.y)/scale(),0,mapHeight()-1);schedulePan();notify();}drag.x=e.clientX;drag.y=e.clientY;
+  }
+  function schedulePan(){
+    if(view.panFrame)return;
+    view.panFrame=requestAnimationFrame(()=>{view.panFrame=0;panBufferedScene();});
+  }
+  function flushZoom(){
+    if(!view.pendingZoom)return false;
+    cancelAnimationFrame(view.zoomFrame);view.zoomFrame=0;
+    const pending=view.pendingZoom;view.pendingZoom=null;zoomTo(pending.value,pending.anchorX,pending.anchorY);return true;
+  }
+  function resetGesture(){
+    cancelAnimationFrame(view.panFrame);cancelAnimationFrame(view.zoomFrame);view.panFrame=0;view.zoomFrame=0;view.pendingZoom=null;
+    const pointers=[...view.pointers.keys()];view.pointers.clear();view.drag=null;view.pinch=null;
+    for(const id of pointers)if(view.viewport.hasPointerCapture(id))view.viewport.releasePointerCapture(id);
+    view.viewport.classList.remove('is-dragging','is-teleport-dragging');view.el.classList.remove('is-camera-moving');
+  }
+  function applyPendingRender(){
+    const pending=view.pendingRender;if(!pending)return false;
+    view.pendingRender=null;render(pending);return true;
   }
   function pointerUp(e,cancelled=false){
     if(!view.pointers.has(e.pointerId))return;
     const drag=view.drag;view.pointers.delete(e.pointerId);if(view.viewport.hasPointerCapture(e.pointerId))view.viewport.releasePointerCapture(e.pointerId);
-    if(view.pointers.size===0){let flushedZoom=false;if(view.pendingZoom){cancelAnimationFrame(view.zoomFrame);view.zoomFrame=0;const pending=view.pendingZoom;view.pendingZoom=null;zoomTo(pending.value,pending.anchorX,pending.anchorY);flushedZoom=true;}view.viewport.classList.remove('is-dragging','is-teleport-dragging');view.suppressUntil=performance.now()+(drag?.moved?400:100);if(drag?.moved&&!drag.teleport&&!flushedZoom)paint();if(!cancelled&&!drag?.moved&&!drag?.teleport){const box=view.viewport.getBoundingClientRect();if(context.teleport)selectCell(...unproject(e.clientX-box.left,e.clientY-box.top));else if(drag?.march)followMarch(drag.march);else if(drag?.target)select(drag.target,false,true);else selectCell(...unproject(e.clientX-box.left,e.clientY-box.top));}view.drag=null;view.pinch=null;}
-    else {const point=[...view.pointers.values()][0];view.drag={x:point.x,y:point.y,startX:point.x,startY:point.y,moved:true,target:null};view.pinch=null;}
+    if(view.pointers.size===0){
+      const flushedZoom=flushZoom();resetGesture();
+      view.suppressUntil=performance.now()+(drag?.moved?400:100);
+      if(!applyPendingRender()&&drag?.moved&&!drag.teleport&&!flushedZoom)paint();
+      if(!cancelled&&!drag?.moved&&!drag?.teleport){const box=view.viewport.getBoundingClientRect();if(context.teleport)selectCell(...unproject(e.clientX-box.left,e.clientY-box.top));else if(drag?.march)followMarch(drag.march);else if(drag?.target)select(drag.target,false,true);else selectCell(...unproject(e.clientX-box.left,e.clientY-box.top));}
+    }
+    else {flushZoom();const point=[...view.pointers.values()][0];view.drag={x:point.x,y:point.y,startX:point.x,startY:point.y,moved:true,target:null};view.pinch=null;}
   }
   function updateMonsterHealth(button,target){
     const current=Number(target.data.hp_current),maximum=Number(target.data.hp_max);
+    const previous=Number(button.dataset.monsterHp);
+    if(target.kind==='monsters'&&Number.isFinite(previous)&&Number.isFinite(current)&&current<previous){
+      button.classList.remove('is-hit');void button.offsetWidth;button.classList.add('is-hit');
+      clearTimeout(button.hitTimer);button.hitTimer=setTimeout(()=>button.classList.remove('is-hit'),520);
+    }
+    if(Number.isFinite(current))button.dataset.monsterHp=String(current);
     const injured=target.kind==='monsters'&&Number.isFinite(current)&&Number.isFinite(maximum)&&current>0&&current<maximum;
     let health=button.querySelector('.atlas-monster-health');
     button.classList.toggle('is-injured',injured);
@@ -371,10 +499,16 @@ window.ConquerWorld = (() => {
     button.setAttribute('aria-label',`${button.getAttribute('aria-label')}, Lebenspunkte ${format(current)} von ${format(maximum)}`);
   }
   function updateMarkers(){
+    view.markersDirty=false;
     const present=new Set();
     for(const target of view.targets){present.add(target.key);let button=view.markerNodes.get(target.key);
-      if(!button){button=document.createElement('button');button.className=`atlas-marker atlas-marker--${target.kind}`;button.dataset.atlasTarget=target.key;button.innerHTML='<span class="atlas-marker-ground"></span><span class="castle-skin-effect" aria-hidden="true"></span><img alt="" draggable="false"><span class="atlas-marker-level"></span><span class="atlas-marker-name"></span>';(target.kind==='monsters'?view.creatures:view.markers).append(button);view.markerNodes.set(target.key,button);}
+      if(!button){button=document.createElement('button');button.className=`atlas-marker atlas-marker--${target.kind}`;button.dataset.atlasTarget=target.key;button.dataset.kind=target.kind;button.innerHTML='<span class="atlas-marker-ground"></span><span class="castle-skin-effect" aria-hidden="true"></span><img alt="" draggable="false"><span class="atlas-marker-level"></span><span class="atlas-marker-name"></span>';(target.kind==='monsters'?view.creatures:view.markers).append(button);view.markerNodes.set(target.key,button);}
       const img=button.querySelector('img'),kind=lifeKind(target);if(kind)img.dataset.lifeKind=kind;else delete img.dataset.lifeKind;const src=targetImage(target);if(img.getAttribute('src')!==src)img.src=src;if(isVillage(target)){const skin=window.ConquerCastleSkins.get(target.data.city_skin);button.dataset.skin=skin.id;button.dataset.rarity=skin.rarity;button.style.setProperty('--skin-aura',skin.effectColor);}
+      painted?.bind(button,target);
+      if(target.kind==='monsters'){
+        const visual=monsterVisualKey(target.data);button.dataset.monsterVisual=visual;button.classList.remove('is-defeated');button.disabled=false;button.style.setProperty('--monster-phase',String(Number(target.id)%9));
+        if(!button.querySelector('.atlas-monster-effects')){const effects=document.createElement('span');effects.className='atlas-monster-effects';effects.setAttribute('aria-hidden','true');effects.innerHTML='<i class="monster-glow monster-glow--left"></i><i class="monster-glow monster-glow--right"></i><i class="monster-glow monster-glow--rune"></i><i class="monster-hit-flash"></i>';button.insertBefore(effects,img);}
+      }else {delete button.dataset.monsterVisual;button.querySelector('.atlas-monster-effects')?.remove();}
       if(target.kind==='charms')button.dataset.grade=['normal','epic','legendary'].includes(target.data.grade)?target.data.grade:'normal';else delete button.dataset.grade;
       if(target.kind==='charms'&&!button.querySelector('.charm-rune-effects')){
         const fx=document.createElement('span');fx.className='charm-rune-effects';fx.setAttribute('aria-hidden','true');
@@ -385,9 +519,22 @@ window.ConquerWorld = (() => {
         const fx=document.createElement('span');fx.className='atlas-landmark-effects';fx.setAttribute('aria-hidden','true');
         fx.innerHTML='<i class="landmark-halo"></i><i class="landmark-orbit"></i><i class="landmark-beacon"></i>'+Array.from({length:6},(_,n)=>`<i class="landmark-spark" style="--spark:${n}"></i>`).join('');button.insertBefore(fx,img);
       }
-      const levelNode=button.querySelector('.atlas-marker-level');levelNode.textContent=target.kind==='shrine'?shrineStatus(target):target.kind==='congress'?(target.data.alliance_tag?'['+target.data.alliance_tag+']':'Neutral'):target.kind==='home'?'Deine Stadt':target.kind==='charms'?'':['alliance_center','outpost'].includes(target.kind)?`[${target.data.alliance_tag}] · R ${target.data.radius}`:`Lv. ${target.level}`;levelNode.toggleAttribute('aria-hidden',target.kind==='charms');const nameNode=button.querySelector('.atlas-marker-name');nameNode.textContent=target.name;if(isVillage(target))window.ConquerNameFrames?.apply(nameNode,window.ConquerNameFrames.resolve(target.data,target.data.city_skin));
+      const allianceBuilding=['alliance_center','outpost'].includes(target.kind),levelNode=button.querySelector('.atlas-marker-level');levelNode.textContent=target.kind==='territory'?(target.data.owner_name||'NPC-Besatzung'):target.kind==='shrine'?shrineStatus(target):target.kind==='congress'?(target.data.alliance_tag?'['+target.data.alliance_tag+']':'Neutral'):['home','players'].includes(target.kind)?String(target.level):target.kind==='charms'?'':allianceBuilding?'':`Lv. ${target.level}`;levelNode.hidden=allianceBuilding;levelNode.toggleAttribute('aria-hidden',target.kind==='charms'||allianceBuilding);
+      const nameNode=button.querySelector('.atlas-marker-name');
+      if(target.kind==='territory')button.setAttribute('translate','no');else button.removeAttribute('translate');
+      if(['home','players'].includes(target.kind)){
+        nameNode.replaceChildren(levelNode);
+        const label=document.createElement('span');label.className='name-frame-label';label.textContent=target.name;label.setAttribute('data-user-content','');nameNode.append(label);
+        const membership=cityAlliance(target),badge=document.createElement('span');
+        badge.className='atlas-city-alliance';badge.dataset.relation=membership.relation;badge.textContent=membership.text;badge.title=membership.text;nameNode.append(badge);
+        button.dataset.allianceRelation=membership.relation;
+      }else if(allianceBuilding){
+        const label=document.createElement('strong'),meta=document.createElement('small');label.className='alliance-marker-name-text';label.setAttribute('data-user-content','');label.textContent=target.data.alliance_name||target.name;meta.textContent=`[${target.data.alliance_tag||'ALL'}] · Radius ${format(target.data.radius)}`;nameNode.replaceChildren(label,meta);
+      }else nameNode.textContent=['monsters','nodes','charms','shrine','congress'].includes(target.kind)?editorial(target.name):target.name;
+      if(isVillage(target))window.ConquerNameFrames?.apply(nameNode,window.ConquerNameFrames.resolve(target.data,target.data.city_skin));
       button.setAttribute('aria-label',`${target.name}${target.kind==='shrine'?`, ${shrineStatus(target,true)}`:target.kind==='charms'?`, ${charmGrades[target.data.grade]||'magisch'}, ${charmCategories[target.data.stat_category]||target.data.stat_category||'Bonus'} plus ${format(target.data.bonus_pct)} Prozent` :`, Stufe ${target.level}`}, X ${target.x}, Y ${target.y}, ${footprint(target)} mal ${footprint(target)} Felder${target.data.gatherer_march_id?', derzeit besetzt':''}`);
       updateMonsterHealth(button,target);
+      if(['home','players'].includes(target.kind))button.setAttribute('aria-label',`${button.getAttribute('aria-label')}, ${cityAlliance(target).text}`);
       if(target.kind==='shrine'){button.dataset.shrine=target.element;button.classList.toggle('is-event-active',!!target.data.event?.active);button.title=shrineStatus(target,true);}
       button.classList.toggle('is-regional-boss',isRegionalBoss(target));
       if(target.kind==='monsters')button.dataset.monsterType=target.data.definition?.type==='rally'?'rally':'solo';
@@ -400,7 +547,10 @@ window.ConquerWorld = (() => {
       button.dataset.footprint=String(footprint(target));button.dataset.x=String(target.x);button.dataset.y=String(target.y);
       button.setAttribute('aria-pressed',String(target.key===memory.selected));button.classList.toggle('is-selected',target.key===memory.selected);button.classList.toggle('is-occupied',!!target.data.gatherer_march_id);button.dataset.filtered=String(target.kind!=='shrine'&&!matching(target));
     }
-    for(const [key,node]of view.markerNodes)if(!present.has(key)){node.remove();view.markerNodes.delete(key);}
+    for(const [key,node]of view.markerNodes)if(!present.has(key)){
+      if(node.classList.contains('atlas-marker--monsters')&&!node.classList.contains('is-defeated')){node.classList.add('is-defeated');node.disabled=true;setTimeout(()=>{if(!view?.targetMap.has(key)){node.remove();view?.markerNodes.delete(key);}},760);}
+      else if(!node.classList.contains('is-defeated')){node.remove();view.markerNodes.delete(key);}
+    }
     positionMarkers();updateFooter();updateGatheringTimers();
   }
   function updateShrineNavigation(){
@@ -417,7 +567,7 @@ window.ConquerWorld = (() => {
   function positionMarkers(){
     view.el.classList.toggle('encounters-paused',motionReduced());
     for(const target of view.targets){const node=view.markerNodes.get(target.key);if(!node)continue;const [x,y]=projectTarget(target),tiles=footprint(target),margin=scale()*Math.max(tiles/2+1,isRegionalBoss(target)?3.2:lifeKind(target)?2.2:0);node.hidden=node.dataset.filtered==='true'||x<-margin||y<-margin||x>view.width+margin||y>view.height+margin;const img=node.querySelector('img');if(lifeKind(target)){const src=targetImage(target,node.hidden||motionReduced());if(img.getAttribute('src')!==src)img.src=src;}node.style.left=`${x}px`;node.style.top=`${y}px`;node.style.setProperty('--tile-size',`${scale()}px`);node.style.setProperty('--footprint',String(tiles));node.style.zIndex=String((isVillage(target)?0:10000)+Math.round(y)+300);}
-    const target=selectedTarget(),focus=view.el.querySelector('.atlas-cell-focus');focus.hidden=!target;focus.classList.toggle('is-teleport-preview',!!(context.teleport&&target?.kind==='cell'));if(target){const [x,y]=projectTarget(target),size=scale()*footprint(target);focus.style.left=`${x}px`;focus.style.top=`${y}px`;focus.style.width=focus.style.height=`${size}px`;focus.dataset.x=String(target.x);focus.dataset.y=String(target.y);if(context.teleport&&target.kind==='cell'){const placement=teleportPlacement(target.x,target.y),preview=focus.querySelector('.atlas-teleport-city-preview'),state=focus.querySelector('.atlas-teleport-placement-state');focus.dataset.valid=String(placement.valid);preview.src=window.ConquerCastleSkins.image(context.base,context.state.city.city_skin||'default');state.textContent=placement.valid?`X ${target.x} · Y ${target.y}`:placement.reason;}}
+    const target=selectedTarget(),focus=view.el.querySelector('.atlas-cell-focus');focus.hidden=!target;focus.classList.toggle('is-teleport-preview',!!(context.teleport&&target?.kind==='cell'));if(target){const [x,y]=projectTarget(target),size=scale()*footprint(target);focus.style.left=`${x}px`;focus.style.top=`${y}px`;focus.style.width=focus.style.height=`${size}px`;focus.dataset.x=String(target.x);focus.dataset.y=String(target.y);if(context.teleport&&target.kind==='cell'){const placement=teleportPlacement(target.x,target.y),preview=focus.querySelector('.atlas-teleport-city-preview'),state=focus.querySelector('.atlas-teleport-placement-state');focus.dataset.valid=String(placement.valid);preview.src=context.teleport.kind==='alliance-structure'?asset(context.teleport.art):window.ConquerCastleSkins.image(context.base,context.state.city.city_skin||'default');preview.alt=context.teleport.kind==='alliance-structure'?`${context.teleport.label} platzieren`:'Stadt platzieren';state.textContent=placement.valid?`X ${target.x} · Y ${target.y}`:placement.reason;}}
   }
   function targetActions(target){
     if(!target)return '';
@@ -425,12 +575,14 @@ window.ConquerWorld = (() => {
     let actions='';
     if(context.teleport&&target.kind==='cell'){
       const placement=teleportPlacement(target.x,target.y);
-      actions=button(placement.valid?'Hierher teleportieren':'Platz nicht verfügbar','home',`data-action="teleport-confirm" data-x="${target.x}" data-y="${target.y}" ${placement.valid?'':'disabled'}`,'is-city');
+      const structure=context.teleport.kind==='alliance-structure';actions=button(placement.valid?(structure?'Hier errichten':'Hierher teleportieren'):'Platz nicht verfügbar','home',`data-action="${structure?'structure-confirm':'teleport-confirm'}" data-x="${target.x}" data-y="${target.y}" ${placement.valid?'':'disabled'}`,'is-city');
     }
     if(target.kind==='home')actions=button('Profil','profile','aria-label="Profil" data-action="dialog-tab" data-id="profile"')+button('Skin','skin','aria-label="Skin" data-action="city-skins"','is-skin')+button('Dorfübersicht','home','aria-label="Dorfübersicht" data-action="tab" data-id="city"','is-city');
     else if(target.kind==='players')actions=button('Profil','profile',`data-action="public-profile" data-id="${escape(target.id)}"`)+button('Solo-Attacke','sword',`data-action="village-attack" data-id="${escape(target.id)}"`,'is-attack')+button('Debuff','debuff',`data-action="village-debuff" data-id="${escape(target.id)}"`,'is-debuff')+button('Rally','flag',`data-action="village-rally" data-id="${escape(target.id)}"`,'is-rally')+button('Spähen','scout',`data-action="village-scout" data-id="${escape(target.id)}" data-x="${target.x}" data-y="${target.y}"`,'is-scout');
+    else if(target.kind==='neutral_villages')actions=button('Angreifen','sword',`data-action="neutral-village-attack" data-id="${escape(target.id)}"`,'is-attack')+button('Spähen','scout',`data-action="neutral-village-scout" data-id="${escape(target.id)}" data-x="${target.x}" data-y="${target.y}"`,'is-scout');
     else if(target.kind==='charms')actions='';
-    else if(!actions)actions=target.kind==='shrine'?button('Schrein','home',`data-action="shrine-open" data-id="${escape(target.id)}"`):target.kind==='congress'?button('Kongress','home','data-action="congress-open"'):button('Details','list','data-atlas="details"');
+    else if(!actions)actions=target.kind==='territory'?button('Gebiet öffnen','home',`data-action="territory-target" data-id="${escape(target.id)}"`):target.kind==='shrine'?button('Schrein','home',`data-action="shrine-open" data-id="${escape(target.id)}"`):target.kind==='congress'?button('Kongress','home','data-action="congress-open"'):button('Details','list','data-atlas="details"');
+    if(target.kind==='alliance_center'&&target.data.can_garrison)actions+=button('Verteidigen','home',`data-action="alliance-center-garrison" data-id="${escape(target.id)}"`,'is-garrison');
     if(target.kind==='shrine'&&target.data.can_attack)actions+=button('Angreifen','sword',`data-action="shrine-attack" data-id="${escape(target.id)}"`,'is-attack');
     if(target.kind==='congress'&&target.data.can_attack)actions+=button('Angreifen','sword','data-action="congress-attack"','is-attack');
     if(target.kind==='monsters')actions+=button(target.data.definition?.type==='rally'?'Rally starten':'Angreifen','sword',`data-action="expedition" data-kind="monsters" data-id="${escape(target.id)}"`,'is-attack');
@@ -441,16 +593,18 @@ window.ConquerWorld = (() => {
     if(['nodes','monsters'].includes(target.kind)){
       const node=target.kind==='nodes',data=target.data,current=Math.max(0,number(node?data.resource_amount:data.hp_current)),maximum=Math.max(1,number(node?data.resource_max:(data.hp_max??data.definition?.hp??number(data.definition?.stats?.hp)*number(data.definition?.amount)))||current);
       const status=node?nodeStatus(data):data.definition?.type==='rally'?'Gemeinsam im Rally angreifen':'Solo-Monster';
-      return `<div class="atlas-encounter-header"><strong>${escape(target.name)}</strong><button data-atlas="clear" aria-label="Zielmenü schließen">${icon('close')}</button></div><div class="atlas-encounter-summary">${encounterImage(target)}<div><strong>Stufe ${target.level}</strong><small>X ${target.x} · Y ${target.y}</small><small>${footprint(target)} × ${footprint(target)} ${footprint(target)===1?'Feld':'Felder'}</small></div></div><div class="atlas-encounter-stock"><span>${node?'Vorrat':'Lebenspunkte'}</span><strong>${format(current)} / ${format(maximum)}</strong><progress aria-label="${node?'Verbleibender Vorrat':'Lebenspunkte'}" value="${Math.min(current,maximum)}" max="${maximum}"></progress></div><p class="atlas-encounter-status">${escape(status)}</p><div class="atlas-actions-buttons">${actions}</div>`;
+      return `<div class="atlas-encounter-header"><strong>${escape(target.name)}</strong><button data-atlas="clear" aria-label="Zielmenü schließen">${icon('close')}</button></div><div class="atlas-encounter-summary">${encounterImage(target)}<div><strong>Stufe ${target.level}</strong><small>X ${target.x} · Y ${target.y}</small><small>${footprint(target)} × ${footprint(target)} ${footprint(target)===1?'Feld':'Felder'}</small></div></div><div class="atlas-encounter-stock"><span>${node?'Vorrat':'Lebenspunkte'}</span><strong>${format(current)} / ${format(maximum)}</strong><progress aria-label="${node?'Verbleibender Vorrat':'Lebenspunkte'}" value="${Math.min(current,maximum)}" max="${maximum}"></progress></div><p class="atlas-encounter-status${node?' atlas-node-status':''}"${node?` data-occupation="${nodeOccupation(data)}"`:''}>${escape(status)}</p><div class="atlas-actions-buttons">${actions}</div>`;
     }
     if(isCompactTarget(target)){
       const summary=target.kind==='charms'
         ? `<small class="atlas-charm-summary">X ${target.x} · Y ${target.y}</small>`
         : `<small>Lv. ${target.level} · X ${target.x} · Y ${target.y}</small>`;
       const close=target.kind==='charms'?'':`<button data-atlas="clear" aria-label="Zielmenü schließen">${icon('close')}</button>`;
-      return `<div class="atlas-village-banner"><strong>${escape(target.name)}</strong>${summary}${close}</div><div class="atlas-actions-buttons">${actions}</div>`;
+      const membership=['home','players'].includes(target.kind)?cityAlliance(target):null;
+      const alliance=membership?`<span class="atlas-city-alliance" data-user-content data-relation="${membership.relation}">${escape(membership.text)}</span>`:'';
+      return `<div class="atlas-village-banner"><strong${['territory','home','players','alliance_center'].includes(target.kind)?' data-user-content':''}>${escape(target.name)}</strong>${summary}${alliance}${close}</div><div class="atlas-actions-buttons">${actions}</div>`;
     }
-    return `<div class="atlas-actions-heading"><span>${escape(target.name)} · ${target.x}, ${target.y}</span><button data-atlas="clear" aria-label="Zielmenü schließen">${icon('close')}</button></div>${target.kind==='shrine'?`<small class="atlas-actions-status" title="${escape(shrineStatus(target,true))}">${escape(shrineStatus(target))}</small>`:''}<div class="atlas-actions-buttons">${actions}</div>`;
+    return `<div class="atlas-actions-heading"><span${['territory','home','players','alliance_center'].includes(target.kind)?' data-user-content':''}>${escape(target.name)} · ${target.x}, ${target.y}</span><button data-atlas="clear" aria-label="Zielmenü schließen">${icon('close')}</button></div>${target.kind==='shrine'?`<small class="atlas-actions-status" title="${escape(shrineStatus(target,true))}">${escape(shrineStatus(target))}</small>`:''}<div class="atlas-actions-buttons">${actions}</div>`;
   }
   function positionObjectActions(menu,target){
     const framing=`${target.key}:${view.width}:${view.height}:${memory.zoom}`;
@@ -459,7 +613,7 @@ window.ConquerWorld = (() => {
       view.objectActionFraming=framing;
       if(view.width<=620&&view.height<=520){
         // Leave a clear central lane for the side menu on very short screens.
-        const centerX=targetCenter(target)[0],screenX=view.width*(centerX<SIZE/2?.32:.68),cameraX=clamp(centerX+(view.width/2-screenX)/scale(),0,SIZE-1);
+        const centerX=targetCenter(target)[0],screenX=view.width*(centerX<mapWidth()/2?.32:.68),cameraX=clamp(centerX+(view.width/2-screenX)/scale(),0,mapWidth()-1);
         if(Math.abs(memory.x-cameraX)>.01){moveTo(cameraX,memory.y);return;}
       }
     }
@@ -522,6 +676,18 @@ window.ConquerWorld = (() => {
     menu.style.left=`${clamp(x-width/2,8,Math.max(8,view.width-width-8))}px`;
     menu.style.top=`${clamp(artBottom+gap,safeTop,Math.max(safeTop,safeBottom-height))}px`;
   }
+  function positionAllianceCenterActions(menu,target){
+    menu.style.removeProperty('height');
+    const banner=menu.querySelector('.atlas-village-banner'),buttons=menu.querySelector('.atlas-actions-buttons');
+    banner?.style.removeProperty('top');buttons?.style.removeProperty('top');
+    const viewport=view.viewport.getBoundingClientRect(),marker=view.markerNodes.get(target.key),label=marker.querySelector('.atlas-marker-name')?.getBoundingClientRect(),art=marker.querySelector('img').getBoundingClientRect();
+    const width=menu.offsetWidth,height=menu.offsetHeight,gap=8,[x]=projectTarget(target);
+    const topbar=document.querySelector('.topbar')?.getBoundingClientRect(),chat=document.querySelector('.world-chat')?.getBoundingClientRect();
+    const safeTop=Math.max(8,(topbar?.bottom||viewport.top)-viewport.top+6),safeBottom=Math.min(view.height-8,chat&&chat.height>32?chat.top-viewport.top-8:view.height-8);
+    const anchor=(label?.bottom||art.bottom)-viewport.top;
+    menu.style.left=`${clamp(x-width/2,8,Math.max(8,view.width-width-8))}px`;
+    menu.style.top=`${clamp(anchor+gap,safeTop,Math.max(safeTop,safeBottom-height))}px`;
+  }
   function positionEncounterActions(menu,target){
     menu.style.removeProperty('height');
     const viewport=view.viewport.getBoundingClientRect(),width=menu.offsetWidth,height=menu.offsetHeight,gap=10;
@@ -556,11 +722,12 @@ window.ConquerWorld = (() => {
   }
   function positionActions(){
     const menu=view.el.querySelector('.atlas-target-actions'),target=selectedTarget();if(menu.hidden||!target)return;
-    menu.classList.toggle('is-village',isCompactTarget(target));menu.classList.toggle('is-own-village',target.kind==='home');menu.classList.toggle('is-simple-target',['monsters','nodes','charms'].includes(target.kind));menu.classList.toggle('is-empty-cell',target.kind==='cell');menu.classList.toggle('is-monster',target.kind==='monsters');menu.classList.toggle('is-resource',target.kind==='nodes');menu.classList.toggle('is-charm',target.kind==='charms');
+    menu.classList.toggle('is-village',isCompactTarget(target));menu.classList.toggle('is-own-village',target.kind==='home');menu.classList.toggle('is-alliance-center',target.kind==='alliance_center');menu.classList.toggle('is-simple-target',['monsters','nodes','charms'].includes(target.kind));menu.classList.toggle('is-empty-cell',target.kind==='cell');menu.classList.toggle('is-monster',target.kind==='monsters');menu.classList.toggle('is-resource',target.kind==='nodes');menu.classList.toggle('is-charm',target.kind==='charms');
     if(target.kind==='charms')menu.dataset.grade=['normal','epic','legendary'].includes(target.data.grade)?target.data.grade:'normal';else delete menu.dataset.grade;
     const encounter=['monsters','nodes'].includes(target.kind);menu.classList.toggle('is-encounter',encounter);
     if(encounter){menu.classList.remove('is-village');positionEncounterActions(menu,target);return;}
     if(target.kind==='home'){positionOwnVillageActions(menu,target);return;}
+    if(target.kind==='alliance_center'){positionAllianceCenterActions(menu,target);return;}
     if(target.kind==='charms'){positionObjectActions(menu,target);return;}
     menu.style.removeProperty('height');
     const [x,y]=projectTarget(target),width=menu.offsetWidth,height=menu.offsetHeight,viewport=view.viewport.getBoundingClientRect();
@@ -583,14 +750,16 @@ window.ConquerWorld = (() => {
   function details(target){
     const close=`<button class="atlas-close" data-atlas="clear" aria-label="Zielauswahl schließen">${icon('close')}</button>`;
     if(!target)return memory.selected?`${close}<div class="atlas-detail-empty"><h2>Ziel nicht verfügbar</h2><p>Dieses Ziel liegt nicht mehr im geladenen Gebiet.</p></div>`:'';
-    if(target.kind==='cell')return `${close}<div class="atlas-target-heading atlas-empty-cell"><small>WELTKARTE · ${context.teleport?'4 × 4 STADTPLATZ':'1 × 1 FELD'}</small><h2>${context.teleport?'Neuer Standort':'Freies Feld'}</h2><span class="atlas-target-meta">X ${target.x} · Y ${target.y}</span></div><button class="atlas-primary" data-action="share-coordinates" data-x="${target.x}" data-y="${target.y}" data-name="Freies Feld">Koordinaten teilen ${icon('arrow')}</button>`;
-    if(target.kind==='congress')return `${close}<div class="atlas-target-heading"><h2>Kongress</h2><p>${escape(target.data.alliance_name||'Noch keine Allianz herrscht über den Weltensee.')}</p></div><button class="atlas-primary" data-action="congress-open">Kongress öffnen</button>`;
-    if(['alliance_center','outpost'].includes(target.kind)){const center=target.kind==='alliance_center';return `${close}<div class="atlas-target-heading"><small>ALLIANZGEBIET · RADIUS ${format(target.data.radius)}</small><h2>${escape(target.name)}</h2><p>[${escape(target.data.alliance_tag)}] ${escape(target.data.alliance_name)}</p><span class="atlas-target-meta">X ${target.x} · Y ${target.y}</span></div><p>${center?'+5 % Angriff und Verteidigung · +10 % Produktion und Sammeltempo':'+5 % Angriff, Leben und Verteidigung'}</p><button class="atlas-primary" data-action="share-coordinates" data-x="${target.x}" data-y="${target.y}" data-name="${escape(target.name)}">Koordinaten teilen</button>`;}
-    if(target.kind==='shrine')return `${close}<div class="atlas-target-heading"><h2>${escape(target.name)}</h2><p>${escape(shrineStatus(target,true))}</p></div><button class="atlas-primary" data-action="shrine-open" data-id="${escape(target.id)}">Schrein öffnen</button>`;
+    if(target.kind==='cell'){const structure=context.teleport?.kind==='alliance-structure',size=context.teleport?.footprint||4;return `${close}<div class="atlas-target-heading atlas-empty-cell"><small>WELTKARTE · ${context.teleport?`${size} × ${size} BAUPLATZ`:'1 × 1 FELD'}</small><h2>${context.teleport?(structure?context.teleport.label:'Neuer Standort'):'Freies Feld'}</h2><span class="atlas-target-meta">X ${target.x} · Y ${target.y}</span></div><button class="atlas-primary" data-action="share-coordinates" data-x="${target.x}" data-y="${target.y}" data-name="Freies Feld">Koordinaten teilen ${icon('arrow')}</button>`;}
+    if(target.kind==='territory')return `${close}<div class="atlas-target-heading"><h2 translate="no">${escape(target.name)}</h2><p ${target.data.owner_name?'data-user-content':''}>${escape(target.data.owner_name||'NPC-Besatzung')}</p></div><button class="atlas-primary" data-action="territory-target" data-id="${escape(target.id)}">Gebiet öffnen</button>`;
+    if(target.kind==='congress')return `${close}<div class="atlas-target-heading"><h2>Kongress</h2><p ${target.data.alliance_name?'data-user-content':''}>${escape(target.data.alliance_name||'Noch keine Allianz herrscht über den Weltensee.')}</p></div><button class="atlas-primary" data-action="congress-open">Kongress öffnen</button>`;
+    if(['alliance_center','outpost'].includes(target.kind)){const center=target.kind==='alliance_center';return `${close}<div class="atlas-target-heading"><small>ALLIANZGEBIET · RECHTECKIGER RADIUS ${format(target.data.radius)}</small><h2 ${["home","players","alliance_center","outpost","territory"].includes(target.kind)?'data-user-content':''}>${escape(target.name)}</h2><p data-user-content>[${escape(target.data.alliance_tag)}] ${escape(target.data.alliance_name)}</p><span class="atlas-target-meta">X ${target.x} · Y ${target.y}</span></div><p>${center?'+5 % Angriff und Verteidigung · +10 % Produktion und Sammeltempo':'+5 % Angriff, Leben und Verteidigung'}</p><button class="atlas-primary" data-action="share-coordinates" data-x="${target.x}" data-y="${target.y}" data-name="${escape(target.name)}">Koordinaten teilen</button>`;}
+    if(target.kind==='shrine')return `${close}<div class="atlas-target-heading"><h2 ${["home","players","alliance_center","outpost","territory"].includes(target.kind)?'data-user-content':''}>${escape(target.name)}</h2><p>${escape(shrineStatus(target,true))}</p></div><button class="atlas-primary" data-action="shrine-open" data-id="${escape(target.id)}">Schrein öffnen</button>`;
     const distance=Math.hypot(target.x-number(context.state.city.coord_x),target.y-number(context.state.city.coord_y)).toFixed(1).replace('.',',');
     let eyebrow='GESCHÜTZTE STADT',body='',action='';
     if(target.kind==='home'){eyebrow='DEIN KÖNIGREICH';action='<button class="atlas-primary" data-action="tab" data-id="city">Stadt betreten '+icon('arrow')+'</button>';}
     else if(target.kind==='players'){body=target.data.alliance_tag?`<p>Allianz <strong>[${escape(target.data.alliance_tag)}]</strong></p>`:'';action=`<button class="atlas-primary" data-action="public-profile" data-id="${escape(target.id)}">Profil ansehen ${icon('arrow')}</button>`;}
+    else if(target.kind==='neutral_villages'){eyebrow='FREIES DORF';body=`<p>Garnison und Vorräte sind von außen nicht sichtbar. Späher melden ausschließlich die stationierten Truppen.</p><div class="atlas-stat-pair"><span>Entfernung<strong>${distance} Felder</strong></span><span>Beute<strong>Unbekannt</strong></span></div>`;action=`<button class="atlas-primary" data-action="neutral-village-scout" data-id="${escape(target.id)}" data-x="${target.x}" data-y="${target.y}">Spähen ${icon('scout')}</button>`;}
     else if(target.kind==='monsters'){eyebrow='MONSTER';body=`<div class="atlas-stat-pair"><span>Lebenspunkte<strong>${format(target.data.hp_current)}</strong></span><span>Entfernung<strong>${distance} Felder</strong></span></div>`;action=`<button class="atlas-primary" data-action="expedition" data-kind="monsters" data-id="${escape(target.id)}">${target.data.definition?.type==='rally'?'Rally starten':'Angreifen'} ${icon('sword')}</button>`;}
     else if(target.kind==='charms'){eyebrow='KARTEN-CHARM';body=`<div class="atlas-stat-pair"><span>${escape(charmCategories[target.data.stat_category]||target.data.stat_category||'Bonus')}<strong>+${format(target.data.bonus_pct)} %</strong></span><span>Entfernung<strong>${distance} Felder</strong></span></div><p class="atlas-node-status">Wirkt nach dem Einsammeln ${format(target.data.effect_duration_seconds)} Sekunden.</p>`;action=`<button class="atlas-primary" data-action="expedition" data-kind="charms" data-id="${escape(target.id)}" ${target.data.collectible===false?'disabled':''}>Einsammeln ${icon('debuff')}</button>`;}
     else {const occupied=!!target.data.gatherer_march_id,attack=!!target.data.can_attack;eyebrow=target.resource.word.toLocaleUpperCase('de-DE');body=`<div class="atlas-stat-pair"><span>Vorrat<strong>${format(target.data.resource_amount)}</strong></span><span>Entfernung<strong>${distance} Felder</strong></span></div>`;action=`<button class="atlas-primary" data-action="expedition" data-kind="${attack?'node-attack':'nodes'}" data-id="${escape(target.id)}" ${occupied&&!attack?'disabled':''}>${attack?'Angreifen':occupied?'Derzeit besetzt':'Sammeln'} ${icon('resource')}</button>`;}
@@ -598,12 +767,12 @@ window.ConquerWorld = (() => {
       body+=`<p class="atlas-node-status">${escape(nodeStatus(target.data))}</p>`;
       if(target.data.is_own_gathering)action=`<button class="atlas-primary" data-action="gather-recall" data-id="${escape(target.data.gatherer_march_id)}">Sammler zurückrufen ${icon('home')}</button>`;
     }
-    return `${close}<div class="atlas-target-portrait atlas-target-portrait--${target.kind}">${encounterImage(target)}</div><div class="atlas-target-heading"><small>${eyebrow}</small><h2>${escape(target.name)}</h2><span class="atlas-target-meta">Stufe ${target.level}<i></i>X ${target.x} · Y ${target.y}</span></div>${body}${action}`;
+    return `${close}<div class="atlas-target-portrait atlas-target-portrait--${target.kind}">${encounterImage(target)}</div><div class="atlas-target-heading"><small>${eyebrow}</small><h2 ${["home","players","alliance_center","outpost","territory"].includes(target.kind)?'data-user-content':''}>${escape(target.name)}</h2><span class="atlas-target-meta">Stufe ${target.level}<i></i>X ${target.x} · Y ${target.y}</span></div>${body}${action}`;
   }
   function updateSidebar(){
     if(!view)return;const target=selectedTarget();
     const guide=view.el.querySelector('.atlas-teleport-guide');guide.hidden=!context.teleport||memory.panel==='actions';view.el.classList.toggle('is-teleporting',!!context.teleport);
-    if(context.teleport){const alliance=context.teleport.mode==='alliance';guide.querySelector('img').src=`${context.base}/assets/art/items/${alliance?'teleport-alliance.svg':'teleport.svg'}`;guide.querySelector('strong').textContent=alliance?'Allianz-Teleport':'Advanced-Teleport';guide.querySelector('small').textContent=alliance?'Nahe einer Stadt antippen · Vorschau ziehen':'Platz antippen · Dorf-Vorschau ziehen';}
+    if(context.teleport){const structure=context.teleport.kind==='alliance-structure',alliance=context.teleport.mode==='alliance';guide.querySelector('img').src=structure?asset(context.teleport.art):`${context.base}/assets/art/items/${alliance?'teleport-alliance.svg':'teleport.svg'}`;guide.querySelector('strong').textContent=structure?context.teleport.label:alliance?'Allianz-Teleport':'Advanced-Teleport';guide.querySelector('small').textContent=structure?'Bauplatz antippen · Vorschau ziehen':alliance?'Nahe einer Stadt antippen · Vorschau ziehen':'Platz antippen · Dorf-Vorschau ziehen';}
     for(const panel of ['search','navigation','target'])view.el.querySelector(`.map-overlay-${panel}-panel`).hidden=memory.panel!==panel;
     document.body.classList.toggle('world-search-open',memory.panel==='search');
     view.el.querySelector('.map-overlay-backdrop').hidden=!memory.panel||['actions','search'].includes(memory.panel);
@@ -637,15 +806,17 @@ window.ConquerWorld = (() => {
     }
   }
   function terrain(){
-    const signature=JSON.stringify([memory.x,memory.y,memory.zoom,view.width,view.height,lockedZone()?.bounds,context.teleport?.item_code||null,view.targets.map(t=>[t.key,t.x,t.y,footprint(t),matching(t),t.data.city_skin,t.data.name_frame,t.data.name_frame_id,t.artKey,isRegionalBoss(t)])]);
+    const signature=JSON.stringify([memory.x,memory.y,memory.zoom,view.width,view.height,context.state.territory?.ownership,lockedZone()?.bounds,context.teleport?.item_code||null,view.targets.map(t=>[t.key,t.x,t.y,footprint(t),matching(t),t.data.city_skin,t.data.name_frame,t.data.name_frame_id,t.artKey,isRegionalBoss(t)])]);
     if(signature===view.terrainStamp)return;view.terrainStamp=signature;
     const c=view.ctx,s=scale(),w=view.width,h=view.height;const [left,top]=unproject(0,0),[right,bottom]=unproject(w,h);
-    c.clearRect(0,0,w,h);window.ConquerLandscape.ground(c,project,s,{left,top,right,bottom});
-    const biome=window.ConquerLandscape.biomeAt(memory.x,memory.y);view.el.querySelector('.atlas-biome-label').textContent=Math.hypot(memory.x-128,memory.y-128)<22?'Weltensee · Kongress':biome.name;
+    if(isLux()){c.clearRect(0,0,w,h);if(lux){lux.draw(c,project,s,{left,top,right,bottom},{painted,targets:context.state.territory?.ownership||context.state.territory?.map_targets||context.state.territory?.targets||[],allianceId:context.state.territory?.alliance_id,gridLines:!!context.teleport||memory.zoom>=1.62,occupied:(x,y,pad=.5)=>view.targets.some(t=>Math.abs(targetCenter(t)[0]-x)<footprint(t)/2+pad&&Math.abs(targetCenter(t)[1]-y)<footprint(t)/2+pad)});const region=lux.at(memory.x,memory.y);view.el.querySelector('.atlas-biome-label').textContent=region?`${region.name} · Kanton ${lux.cantons.find(c=>c.id===region.canton)?.name||region.canton}`:'Am Rand des Kontinents';}else{c.fillStyle='#dbe3d4';c.fillRect(0,0,w,h);view.el.querySelector('.atlas-biome-label').textContent='Kontinent wird geladen …';}return;}
+    c.clearRect(0,0,w,h);if(!painted?.ground(c,project,s,{left,top,right,bottom}))window.ConquerLandscape.ground(c,project,s,{left,top,right,bottom});
+    const biome=window.ConquerLandscape.biomeAt(memory.x,memory.y);view.el.querySelector('.atlas-biome-label').textContent=Math.hypot(memory.x-128,memory.y-128)<22?editorial('Weltensee · Kongress'):editorial(biome.name);
     window.ConquerLandscape.water(c,project,s,{left,top,right,bottom});
     window.ConquerLandscape.bridges?.(c,project,s,{left,top,right,bottom});
     const occupied=(x,y,pad=.45)=>view.targets.some(t=>Math.abs(targetCenter(t)[0]-x)<footprint(t)/2+pad&&Math.abs(targetCenter(t)[1]-y)<footprint(t)/2+pad)||window.ConquerLandscape.waterAt(x,y);
     const decorations=[],clusterSpan=9;
+    if(!painted){
     // Vegetation forms a few readable groves with broad clearings between
     // them. This keeps the illustrated world alive without filling every tile.
     for(let gy=Math.floor(top/clusterSpan)-1;gy<=Math.ceil(bottom/clusterSpan)+1;gy++)for(let gx=Math.floor(left/clusterSpan)-1;gx<=Math.ceil(right/clusterSpan)+1;gx++){
@@ -677,6 +848,7 @@ window.ConquerWorld = (() => {
       if(wx<.5||wy<.5||wx>254.5||wy>254.5||occupied(wx,wy,.72))continue;
       decorations.push({x:wx,y:wy,size:s*(.72+hash(gx,gy,434)*.28),variant:hash(gx,gy,435),kind:'detail'});
     }
+    }
     const [edgeX,edgeY]=project(-.5,-.5),[endX,endY]=project(255.5,255.5);
     // Tile boundaries are a close-range aid, not part of the landscape. At
     // normal zoom the painted terrain remains uninterrupted and calm.
@@ -685,17 +857,18 @@ window.ConquerWorld = (() => {
       c.beginPath();for(let x=Math.max(0,Math.floor(left));x<=Math.min(256,Math.ceil(right)+1);x++){const [px]=project(x-.5,0);c.moveTo(px,Math.max(0,edgeY));c.lineTo(px,Math.min(h,endY));}for(let y=Math.max(0,Math.floor(top));y<=Math.min(256,Math.ceil(bottom)+1);y++){const [,py]=project(0,y-.5);c.moveTo(Math.max(0,edgeX),py);c.lineTo(Math.min(w,endX),py);}c.lineWidth=context.teleport?1.25:1;c.strokeStyle=context.teleport?'#5c427052':'#70472f12';c.stroke();
       c.restore();
     }
-    for(const t of view.targets){if(!['alliance_center','outpost'].includes(t.kind)||!matching(t))continue;const [x,y]=projectTarget(t),radius=number(t.data.radius)*s;c.save();c.beginPath();c.arc(x,y,radius,0,Math.PI*2);c.fillStyle=t.kind==='alliance_center'?'#71507918':'#c39a4b12';c.fill();c.strokeStyle=t.kind==='alliance_center'?'#8c69a9aa':'#d2ac5c99';c.lineWidth=Math.max(1,2*memory.zoom);c.setLineDash([8*memory.zoom,7*memory.zoom]);c.stroke();c.restore();}
+    for(const t of view.targets){if(!['alliance_center','outpost'].includes(t.kind)||!matching(t))continue;const radius=number(t.data.radius),[left,top]=project(t.x-radius-.5,t.y-radius-.5),[right,bottom]=project(t.x+radius+.5,t.y+radius+.5);c.save();c.beginPath();c.rect(left,top,right-left,bottom-top);c.fillStyle='#438fe42e';c.fill();c.strokeStyle='#2a72c9b8';c.lineWidth=Math.max(1.5,2*memory.zoom);c.setLineDash([8*memory.zoom,7*memory.zoom]);c.stroke();c.restore();}
     // Regional soil and foot shadows share the terrain pass. The selection
     // rectangle is shown only on selection, never baked beneath every resource.
     for(const t of view.targets){
       if(t.kind==='congress'||t.kind!=='shrine'&&!matching(t))continue;
       const [x,y]=projectTarget(t),[wx,wy]=targetCenter(t),point={x:wx,y:wy};
       if(x<-s*4||x>w+s*4||y<-s*4||y>h+s*4)continue;
+      if(painted?.shadow(c,x,y,s,t,footprint(t)))continue;
       if(isVillage(t))window.ConquerLandscape.settlement(c,x,y,s,t.data.city_skin||'default',point);
       else window.ConquerLandscape.objectGround(c,x,y,s,{kind:t.kind,point,biome:t.biome,large:isRegionalBoss(t),contactY:isRegionalBoss(t)?bossContactY[t.artKey]:undefined});
     }
-    renderScenery3D(c,project,s,decorations);
+    if(!painted?.scenery(c,project,s,{left,top,right,bottom},occupied))renderScenery3D(c,project,s,decorations);
     worldEdgeClouds(c,edgeX,edgeY,endX,endY,w,h,s,{left,top,right,bottom});
     lockedZoneOverlay(c);
   }
@@ -775,6 +948,8 @@ window.ConquerWorld = (() => {
   function minimap(){
     // The 1024px overview is only needed while its panel is open, never on every drag frame.
     if(memory.panel!=='navigation')return;
+    if(isLux()&&view.overview){view.overview.update();view.overview.draw();return;}
+    if(isLux()){const c=view.mini.getContext('2d');c.setTransform(view.mini.width/160,0,0,view.mini.height/160,0,0);if(lux){const [left,top]=unproject(0,0),[right,bottom]=unproject(view.width,view.height);view.miniProjection=lux.overview(c,160,160,view.targets,context.state.territory?.alliance_id,{left,top,right,bottom},context.state.territory?.ownership);}return;}
     const c=view.mini.getContext('2d'),ratio=160/255;c.setTransform(view.mini.width/160,0,0,view.mini.height/160,0,0);c.clearRect(0,0,160,160);window.ConquerLandscape.ground(c,(x,y)=>[x*ratio,y*ratio],ratio,{left:0,top:0,right:256,bottom:256});
     window.ConquerLandscape.water(c,(x,y)=>[x*ratio,y*ratio],ratio,{left:0,top:0,right:256,bottom:256});
     const locked=lockedZone();if(locked){const b=locked.bounds,x=(Number(b.x_min)-.5)*ratio,y=(Number(b.y_min)-.5)*ratio,width=(Number(b.x_max)-Number(b.x_min)+1)*ratio,height=(Number(b.y_max)-Number(b.y_min)+1)*ratio;c.fillStyle='#fff5d43b';c.fillRect(x,y,width,height);c.strokeStyle='#fff0bd';c.lineWidth=1.2;c.strokeRect(x,y,width,height);}
@@ -790,7 +965,8 @@ window.ConquerWorld = (() => {
     if(view.clockFrame!==undefined){const correction=view.clockNow+(frame-view.clockFrame)-now;view.clockCorrection=Math.abs(correction)<2500?correction:0;}
     else view.clockCorrection=0;
     view.clockNow=now+view.clockCorrection;view.clockFrame=frame;
-    for(const march of state.marches||[]){
+    const ownMarches=state.marches||[],ownIds=new Set(ownMarches.map(m=>String(m.id))),ownRallyIds=new Set(ownMarches.map(m=>m.rally_id).filter(Boolean).map(String)),visibleMarches=[...ownMarches,...(state.public_marches||[]).filter(m=>!m.is_own&&!ownIds.has(String(m.id))&&!(m.rally_id&&ownRallyIds.has(String(m.rally_id))))];
+    for(const march of visibleMarches){
       if(['arrived','complete'].includes(march.state))continue;
       const key=String(march.id);present.add(key);
       const returning=march.state==='returning',target=view.targets.find(t=>t.x===number(march.target_x)&&t.y===number(march.target_y));
@@ -803,17 +979,19 @@ window.ConquerWorld = (() => {
       const returnDuration=Math.max(1,Math.min(duration,Math.max(2000,roundTrip/2))),outboundDuration=clamp(roundTrip-returnDuration,0,duration);
       const turn=returning&&outboundDuration<duration?origin.map((v,i)=>v+(destination[i]-v)*outboundDuration/duration):destination;
       const from=returning?turn:origin,to=returning?origin:destination;
-      const a=project(...from),b=project(...to);if(march.state!=='gathering')lines.push(`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" class="${returning?'atlas-route-return':'atlas-route-out'}"/>`);
+      const a=project(...from),b=project(...to),publicRoute=!ownIds.has(key),pvp=[7,15].includes(number(march.march_type)),routeClass=publicRoute?(march.is_allied?'atlas-route-alliance':pvp?'atlas-route-pvp':'atlas-route-pve'):(returning?'atlas-route-return':'atlas-route-out');if(march.state!=='gathering')lines.push(`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" class="${routeClass}"/>`);
       let actor=view.partyNodes.get(key);if(!actor){actor=document.createElement('div');actor.className='atlas-march-party';actor.dataset.marchId=key;actor.setAttribute('role','img');actor.innerHTML='<span class="atlas-party-units"></span><span class="atlas-party-skin" aria-hidden="true"><span class="atlas-march-trail">'+Array.from({length:6},(_,i)=>`<i style="--spark:${i}"></i>`).join('')+'</span><img alt=""></span><small></small>';actor.label=actor.querySelector('small');const skinImage=actor.querySelector('.atlas-party-skin img');skinImage.addEventListener('load',()=>{if(actor.dataset.skinSource&&skinImage.getAttribute('src')===actor.dataset.skinSource){actor.classList.add('is-skinned');actor.classList.remove('is-skin-fallback');}});skinImage.addEventListener('error',()=>{if(skinImage.getAttribute('src')!==actor.dataset.skinSource)return;if(actor.dataset.skinSourceKind==='motion'){actor.dataset.motionFailed=actor.dataset.skinSource;setMarchSkinSource(actor,window.ConquerMarchSkins.image(context.base,actor.dataset.marchSkin),'still');return;}actor.classList.remove('is-skinned');actor.classList.add('is-skin-fallback');});view.parties.append(actor);view.partyNodes.set(key,actor);}
-      if(view.marchHud&&!actor.querySelector('.atlas-march-hit')){actor.setAttribute('role','group');const hit=document.createElement('button');hit.className='atlas-march-hit';hit.dataset.followMarch=key;hit.type='button';hit.setAttribute('aria-label',`Marsch ${key} mit der Kamera verfolgen`);actor.append(hit);}
+      if(!publicRoute&&view.marchHud&&!actor.querySelector('.atlas-march-hit')){actor.setAttribute('role','group');const hit=document.createElement('button');hit.className='atlas-march-hit';hit.dataset.followMarch=key;hit.type='button';hit.setAttribute('aria-label',`Marsch ${key} mit der Kamera verfolgen`);actor.append(hit);}
       let troops=march.troops||march.troops_json||{};if(typeof troops==='string'){try{troops=JSON.parse(troops);}catch{troops={};}}
       const types=new Map();let total=0;for(const [code,count]of Object.entries(troops)){const n=number(count);if(n<=0)continue;total+=n;const type=number(state.troop_defs?.find(t=>number(t.code)===number(code))?.type);if(type>=1&&type<=3)types.set(type,(types.get(type)||0)+n);}
-      const labels={1:'Infanterie',2:'Bogenschützen',3:'Kavallerie'},arts={1:'march-infantry',2:'march-archer',3:'march-cavalry'},composition=[...types].sort((a,b)=>a[0]-b[0]),signature=JSON.stringify(composition);
-      if(actor.dataset.composition!==signature){actor.dataset.composition=signature;actor.querySelector('.atlas-party-units').innerHTML=composition.map(([type,count])=>`<span class="atlas-party-type atlas-party-type--${type}" data-type="${type}" data-count="${count}"><img src="${asset(arts[type])}" alt=""><img src="${asset(arts[type])}" alt=""></span>`).join('')||`<span class="atlas-party-unknown">${icon('flag')}</span>`;}
+      const labels={1:'Infanterie',2:'Bogenschützen',3:'Kavallerie'},arts={1:'guardian',2:'fire-archer',3:'shadow-rider'},composition=[...types].sort((a,b)=>a[0]-b[0]),signature=JSON.stringify(composition);
+      if(actor.dataset.composition!==signature){actor.dataset.composition=signature;actor.querySelector('.atlas-party-units').innerHTML=composition.map(([type,count])=>`<span class="atlas-party-type atlas-party-type--${type}" data-type="${type}" data-count="${count}"><img src="${troopAsset(arts[type])}" alt=""><img src="${troopAsset(arts[type])}" alt=""></span>`).join('')||`<span class="atlas-party-unknown">${icon('flag')}</span>`;}
       // march_skin is the immutable server snapshot taken at dispatch. Never derive an active
       // march from the player's currently equipped skin: changing equipment affects only new marches.
       const skinId=typeof march.march_skin==='string'?march.march_skin.trim():'';
-      const skinCatalog=window.ConquerMarchSkins,knownSkin=skinId&&skinCatalog?.ids?.includes(skinId),skin=knownSkin?skinCatalog.get(skinId):null;
+      // The default is the live troop formation, not a cosmetic overlay. Premium
+      // skins replace it with their own creature silhouette.
+      const skinCatalog=window.ConquerMarchSkins,knownSkin=skinId&&skinId!=='default'&&skinCatalog?.allIds?.includes(skinId),skin=knownSkin?skinCatalog.get(skinId):null;
       const articulated=!!skinCatalog?.hasMotion?.(skinId),flightLayout=!!skinCatalog?.hasFlightLayout?.(skinId),skinSource=skin?skinCatalog.image(context.base,skinId):'';
       if(actor.dataset.marchSkin!==skinId){
         actor.dataset.marchSkin=skinId;actor.dataset.skinSource='';actor.dataset.skinSourceKind='';actor.dataset.motionFailed='';actor.classList.remove('is-skinned','is-skin-fallback');
@@ -825,13 +1003,14 @@ window.ConquerWorld = (() => {
       const end=returning?stamp(march.return_time):stamp(march.arrival_time),start=returning?end-returnDuration:stamp(march.departure_time);
       const old=actor.travel,arrival=stamp(march.arrival_time),attack=march.march_type==='rally'||[5,7,13,15].includes(number(march.march_type));
       if(old&&!old.returning&&returning&&now>=old.arrival)impact(old,frame);
-      const label=march.state==='gathering'?'Rally sammelt':returning?'Rückkehr':march.march_type==='rally'?'Rally':Number(march.march_type)===9||march.march_type==='gather'?'Sammeltrupp':'Feldzug';
-      actor.travel={from,to,offset,start,end,arrival,returning,state:march.state,attack,destination,skin,skinId,total,label,description:composition.map(([type,count])=>`${format(count)} ${labels[type]}`).join(', '),impactKey:`${state.world?.id||state.city.world_id||state.city.id}:${key}:${march.departure_time}`,observed:old?.observed||(!returning&&now<arrival),previous:old?.previous??null};
+      const label=march.state==='gathering'?'Rally sammelt':returning?'Rückkehr':march.march_type==='rally_join'?'Zur Rally':march.march_type==='rally'?'Rally':Number(march.march_type)===9||march.march_type==='gather'?'Sammeltrupp':'Feldzug';
+      const combatKind=target?.kind||(number(march.target_type)===3?'monsters':number(march.target_type)===2?'players':'');
+      actor.travel={from,to,offset,start,end,arrival,returning,state:march.state,attack,destination,skin,skinId,total,label,description:composition.map(([type,count])=>`${format(count)} ${labels[type]}`).join(', '),combatKind,combatArt:target&&combatKind==='monsters'?targetImage(target,true):'',attackArts:composition.slice(0,3).map(([type])=>troopAsset(arts[type])),impactKey:`${state.world?.id||state.city.world_id||state.city.id}:${key}:${march.departure_time}`,observed:old?.observed||(!returning&&now<arrival),previous:old?.previous??null};
       actor.label.textContent='';
-      actor.style.left='0px';actor.style.top='0px';actor.style.setProperty('--party-scale',String(clamp(memory.zoom,.7,1.35)));actor.classList.toggle('is-returning',returning);actor.classList.toggle('is-westbound',b[0]<a[0]);
+      actor.style.left='0px';actor.style.top='0px';actor.style.setProperty('--party-scale',String(clamp(memory.zoom,.7,1.35)));actor.classList.toggle('is-returning',returning);
     }
     for(const [key,node]of view.partyNodes)if(!present.has(key)){if(node.travel&&!node.travel.returning&&now>=node.travel.arrival&&now-node.travel.arrival<2000)impact(node.travel,frame);node.remove();view.partyNodes.delete(key);}const markup=lines.join('');if(view.routes.innerHTML!==markup)view.routes.innerHTML=markup;
-    if(view.followId&&!(state.marches||[]).some(m=>String(m.id)===view.followId))stopFollowing(true);
+    if(view.followId&&!ownMarches.some(m=>String(m.id)===view.followId))stopFollowing(true);
     view.marchHud?.sync(state);
     moveMarches(frame);
   }
@@ -854,6 +1033,11 @@ window.ConquerWorld = (() => {
       if(!t.returning&&p>=1&&t.state!=='gathering')impact(t,frame);
       t.previous={state:t.state,p};
       const x=t.from[0]+(t.to[0]-t.from[0])*p,y=t.from[1]+(t.to[1]-t.from[1])*p,[px,py]=project(x,y);
+      const previousWorldX=actor.worldPoint?.[0],worldDelta=x-previousWorldX;
+      // Face the real movement, not the route's original direction. This also
+      // handles recalls and return-state changes without showing a backwards step.
+      if(Number.isFinite(previousWorldX)&&Math.abs(worldDelta)>.0001)actor.classList.toggle('is-westbound',worldDelta<0);
+      else if(!Number.isFinite(previousWorldX))actor.classList.toggle('is-westbound',t.to[0]<t.from[0]);
       actor.worldPoint=[x,y];actor.classList.toggle('is-followed',view.followId===actor.dataset.marchId);actor.querySelector('.atlas-march-hit')?.setAttribute('aria-pressed',String(view.followId===actor.dataset.marchId));
       const visible=px>-140&&py>-140&&px<view.width+140&&py<view.height+140,moving=visible&&p<1&&t.state!=='gathering'&&!motionReduced();
       actor.hidden=!visible;actor.classList.toggle('is-moving',moving);
@@ -884,12 +1068,16 @@ window.ConquerWorld = (() => {
     seenImpacts.add(t.impactKey);if(seenImpacts.size>128)seenImpacts.delete(seenImpacts.values().next().value);
     const [x,y]=project(...t.destination);if(motionReduced()||x<-80||y<-80||x>view.width+80||y>view.height+80)return;
     if(view.impacts.length>=4){const expired=view.impacts.shift();expired.dispose?.();expired.node.remove();}
-    const theme=window.ConquerMarchSkins?.effect?.(t.skinId)||{kind:'dust',symbol:'✦'},node=document.createElement('div');node.className='atlas-march-impact';node.dataset.marchEffect=theme.kind;node.setAttribute('aria-hidden','true');node.style.setProperty('--march-accent',t.skin?.effect_color||'#e4af38');
+    const theme=window.ConquerMarchSkins?.effect?.(t.skinId)||{kind:'dust',symbol:'✦'},combatSkin={ember:'fire',frost:'ice',leaf:'nature',arcane:'shadow',storm:'storm'}[theme.kind]||'standard',node=document.createElement('div');node.className='atlas-march-impact';node.dataset.marchEffect=theme.kind;node.dataset.combatSkin=combatSkin;node.dataset.combatKind=t.combatKind||'players';node.setAttribute('aria-hidden','true');node.style.setProperty('--march-accent',t.skin?.effect_color||'#e4af38');
     const biome=window.ConquerLandscape.biomeAt(...t.destination).id;
     const effects=window.ConquerMarchEffects,art=effects?.create?.(t.skinId,{biome})||effects?.[t.skinId]?.({biome})||null;
+    const attackers=(t.attackArts?.length?t.attackArts:[troopAsset('guardian')]).map((src,index)=>`<img src="${escape(src)}" alt="" style="--fighter:${index}">`).join('');
+    const defender=t.combatKind==='monsters'&&t.combatArt?`<img class="atlas-impact-monster" src="${escape(t.combatArt)}" alt="">`:`<img src="${troopAsset('guardian')}" alt=""><img src="${troopAsset('fire-archer')}" alt="" style="--fighter:1">`;
+    const skinParticles=Array.from({length:8},(_,index)=>`<i style="--combat-particle:${index}"></i>`).join('');
+    node.innerHTML=`<span class="atlas-impact-combatants"><span class="atlas-impact-ground"></span><span class="atlas-impact-side is-attacker">${attackers}</span><span class="atlas-impact-clash"><b></b><b></b></span><span class="atlas-impact-skin-motif">${skinParticles}</span><span class="atlas-impact-side is-defender">${defender}</span></span>`;
     if(art){node.append(art.canvas);node.dataset.marchSkin=t.skinId;art.paint(0);}
-    else node.innerHTML=`<span class="atlas-impact-ring"></span><span class="atlas-impact-ring is-echo"></span><span class="atlas-impact-emblem">${theme.symbol}</span>`+Array.from({length:12},(_,i)=>{const angle=i*Math.PI/6;return `<i style="--burst-x:${Math.cos(angle)*(48+i%3*15)}px;--burst-y:${Math.sin(angle)*(28+i%3*12)-22}px;--burst-turn:${i*47}deg"></i>`;}).join('');
-    view.parties.append(node);view.impacts.push({node,point:t.destination,started:frame,duration:art?.duration||1500,paint:art?.paint,dispose:art?.dispose});
+    else node.insertAdjacentHTML('beforeend',`<span class="atlas-impact-ring"></span><span class="atlas-impact-ring is-echo"></span><span class="atlas-impact-emblem">${theme.symbol}</span>`+Array.from({length:12},(_,i)=>{const angle=i*Math.PI/6;return `<i style="--burst-x:${Math.cos(angle)*(48+i%3*15)}px;--burst-y:${Math.sin(angle)*(28+i%3*12)-22}px;--burst-turn:${i*47}deg"></i>`;}).join(''));
+    view.parties.append(node);view.impacts.push({node,point:t.destination,started:frame,duration:Math.max(1750,art?.duration||1500),paint:art?.paint,dispose:art?.dispose});
   }
   function paint(){if(!view?.el.isConnected)return;view.cameraDirty=false;shiftScenery(0,0);view.sceneCenter={x:memory.x,y:memory.y};const width=view.width,height=view.height;view.width+=view.terrainPad*2||0;view.height+=view.terrainPad*2||0;try{terrain();}finally{view.width=width;view.height=height;}atmosphere();positionMarkers();positionActions();minimap();marches();view.el.querySelector('.atlas-coordinates').textContent=`X ${Math.round(memory.x)} · Y ${Math.round(memory.y)}`;const jump=view.el.querySelector('.atlas-jump');if(!jump.contains(document.activeElement)){jump.elements.x.value=Math.round(memory.x);jump.elements.y.value=Math.round(memory.y);}view.el.querySelector('.atlas-zoom-value').textContent=`${Math.round(memory.zoom*100)}%`;view.el.querySelector('[data-atlas="zoom-in"]').disabled=memory.zoom>=MAX_ZOOM;view.el.querySelector('[data-atlas="zoom-out"]').disabled=memory.zoom<=MIN_ZOOM;updateFooter();}
   function shiftScenery(x,y){for(const layer of [view.canvas,view.markers,view.creatures,view.routes,view.el.querySelector('.atlas-cell-focus')])if(layer)layer.style.translate=`${x}px ${y}px`;}
@@ -907,14 +1095,14 @@ window.ConquerWorld = (() => {
     const m=context.state.marches?.find(m=>String(m.id)===String(id));if(!m)return;
     clearSelection(false);view.followId=String(id);view.marchHud?.sync(context.state);view.followAnchor=view.marchHud?.anchor()||{x:view.width*.5,y:view.height*.45};view.followFrame=performance.now();
     const point=view.partyNodes.get(String(id))?.worldPoint||[number(m.target_x)+.5,number(m.target_y)+.5];
-    if(Math.hypot(point[0]-memory.x,point[1]-memory.y)*scale()>Math.max(view.width,view.height)){memory.x=clamp(point[0],0,255);memory.y=clamp(point[1],0,255);paint();}
+    if(Math.hypot(point[0]-memory.x,point[1]-memory.y)*scale()>Math.max(view.width,view.height)){memory.x=clamp(point[0],0,mapWidth()-1);memory.y=clamp(point[1],0,mapHeight()-1);paint();}
     view.followNotify={x:memory.x,y:memory.y};notify();view.el.querySelector('.world-march-card [data-march-command="close"]')?.focus({preventScroll:true});
   }
   function locateMarchTarget(march){
     const type=number(march.march_type),targetType=number(march.target_type),id=String(march.target_id);
-    let key=type===9?`nodes:${id}`:type===6?`charms:${id}`:[13,14].includes(type)?`shrine:${id}`:targetType===3?`monsters:${id}`:targetType===2?`players:${id}`:null;
+    let key=targetType===5?`territory:${id}`:type===9?`nodes:${id}`:type===6?`charms:${id}`:[13,14].includes(type)?`shrine:${id}`:targetType===3?`monsters:${id}`:targetType===2?`players:${id}`:null;
     if([13,14].includes(type)&&!view.targetMap.has(key)&&String(context.state.congress?.id)===id)key='congress';
-    if(!view.targetMap.has(key)){const kinds=type===9?['nodes']:type===6?['charms']:[13,14].includes(type)?['shrine','congress']:targetType===3?['monsters']:targetType===2?['players']:[];key=view.targets.find(target=>kinds.includes(target.kind)&&target.x===number(march.target_x)&&target.y===number(march.target_y))?.key||key;}
+    if(!view.targetMap.has(key)){const kinds=targetType===5?['territory']:type===9?['nodes']:type===6?['charms']:[13,14].includes(type)?['shrine','congress']:targetType===3?['monsters']:targetType===2?['players']:[];key=view.targets.find(target=>kinds.includes(target.kind)&&target.x===number(march.target_x)&&target.y===number(march.target_y))?.key||key;}
     if(key&&view.targetMap.has(key)){select(key,true);return;}
     stopFollowing();focus(number(march.target_x)+.5,number(march.target_y)+.5);
   }
@@ -924,7 +1112,7 @@ window.ConquerWorld = (() => {
     const travel=view.partyNodes.get(view.followId)?.travel;let point=[number(march.target_x)+.5,number(march.target_y)+.5];
     if(travel){const raw=travel.state==='gathering'?0:travel.state==='resolving'?1:clamp((now-travel.start)/Math.max(1,travel.end-travel.start),0,1),p=Math.max(Number.isFinite(raw)?raw:0,travel.previous?.state===travel.state?travel.previous.p:0);point=travel.from.map((v,i)=>v+(travel.to[i]-v)*p);}
     const anchor=view.followAnchor||(view.followAnchor=view.marchHud?.anchor()||{x:view.width*.5,y:view.height*.45}),dt=Math.min(50,Math.max(0,frame-(view.followFrame??frame)));view.followFrame=frame;
-    const factor=motionReduced()?1:1-Math.exp(-dt/180),x=clamp(point[0]+(view.width/2-anchor.x)/scale(),0,255),y=clamp(point[1]+(view.height/2-anchor.y)/scale(),0,255);
+    const factor=motionReduced()?1:1-Math.exp(-dt/180),x=clamp(point[0]+(view.width/2-anchor.x)/scale(),0,mapWidth()-1),y=clamp(point[1]+(view.height/2-anchor.y)/scale(),0,mapHeight()-1);
     memory.x+=(x-memory.x)*factor;memory.y+=(y-memory.y)*factor;
     const dx=(view.sceneCenter.x-memory.x)*scale(),dy=(view.sceneCenter.y-memory.y)*scale();
     if(Math.abs(dx)>view.terrainPad*.65||Math.abs(dy)>view.terrainPad*.65){view.followPainting=true;try{paint();}finally{view.followPainting=false;}}
@@ -932,7 +1120,7 @@ window.ConquerWorld = (() => {
     if(view.followNotify&&Math.hypot(memory.x-view.followNotify.x,memory.y-view.followNotify.y)>3){view.followNotify={x:memory.x,y:memory.y};notify();}
   }
   function atmosphere(){
-    if(!view?.atmosphereCtx)return;const c=view.atmosphereCtx;c.clearRect(0,0,view.width,view.height);if(graphicsLight())return;
+    if(!view?.atmosphereCtx)return;const c=view.atmosphereCtx;c.clearRect(0,0,view.width,view.height);if(graphicsLight()||isLux())return;
     const [left,top]=unproject(0,0),[right,bottom]=unproject(view.width,view.height);
     window.ConquerLandscape.ambience?.(c,project,scale(),{left,top,right,bottom},view.ambienceTime);
   }
@@ -941,18 +1129,24 @@ window.ConquerWorld = (() => {
     if(document.hidden){view.lastAmbience=null;return;}
     if(time-view.lastMotionFrame<1000/30)return;
     view.lastMotionFrame=time;
-    syncMotion();
-    if(view.cameraDirty){paint();updateSidebar();}
-    moveMarches(time);
+    const interacting=Boolean(view.pointers.size);
+    if(!interacting){
+      syncMotion();
+      if(view.navigationDirty){view.navigationDirty=false;updateNavigation();}
+      if(view.markersDirty)updateMarkers();
+      if(view.cameraDirty){paint();updateSidebar();}
+    }
+    if(!view.panFrame)moveMarches(time);
     const slow=motionPreference.matches||document.body.classList.contains('reduced-motion')||graphicsLight();
-    if(slow)view.lastAmbience=null;
+    if(painted&&!cameraGesture())for(const target of view.targets){const node=view.markerNodes.get(target.key);if(node&&!node.hidden)painted.draw(node,target,time/1000,slow);}
+    if(slow||cameraGesture())view.lastAmbience=null;
     else if(view.lastAmbience===null||time-view.lastAmbience>=100){
       if(view.lastAmbience!==null)view.ambienceTime+=Math.min((time-view.lastAmbience)/1000,.25);
       view.lastAmbience=time;atmosphere();
     }
     if(time-view.lastAnimation<1000)return;view.lastAnimation=time;updateGatheringTimers();view.marchHud?.sync(context.state);
   }
-  function getCenter(){return memory.x===null?null:{x:Math.round(memory.x),y:Math.round(memory.y),radius:clamp(Math.ceil(Math.max(view?.width||1,view?.height||1)/scale()/2+6),12,60)};}
+  function getCenter(){return memory.x===null?null:{x:Math.round(memory.x),y:Math.round(memory.y),radius:clamp(Math.ceil(Math.max(view?.width||1,view?.height||1)/scale()/2+6),12,isLux()?48:60)};}
   function focus(x,y){if(!view?.el.isConnected)return;moveTo(number(x),number(y));clearSelection(false);view.viewport.focus({preventScroll:true});}
   function locate(x,y,kinds=[],id=null){
     if(!view?.el.isConnected)return false;
@@ -963,6 +1157,15 @@ window.ConquerWorld = (() => {
     if(target){select(target.key,true);return true;}
     focus(x,y);return false;
   }
-  function setVisible(visible){sceneVisible=Boolean(visible);if((!sceneVisible||document.hidden)&&frameId){cancelAnimationFrame(frameId);frameId=0;}else if(sceneVisible&&!document.hidden&&view?.el.isConnected&&!frameId){view.lastAnimation=performance.now();frameId=requestAnimationFrame(animate);}}
+  function setVisible(visible){
+    sceneVisible=Boolean(visible);view?.el.classList.toggle('gathering-paused',!sceneVisible||document.hidden);
+    if(!sceneVisible||document.hidden){
+      if(view?.pointers.size){resetGesture();view.cameraDirty=true;}
+      if(frameId){cancelAnimationFrame(frameId);frameId=0;}
+    }else if(view?.el.isConnected){
+      applyPendingRender();
+      if(!frameId){view.lastAnimation=performance.now();frameId=requestAnimationFrame(animate);}
+    }
+  }
   return {render,getCenter,focus,locate,followMarch,setVisible};
 })();

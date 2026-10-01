@@ -1,10 +1,68 @@
 /* Transparent model renders keep their own painted colours over every biome. */
+/* Approved painted assets retain img geometry for menus; local motion lives in
+   a pointer-transparent canvas and shares the existing map lifecycle. */
+.map-overlay-shell .atlas-marker[data-painted] > .atlas-painted-motion{position:absolute;left:50%;pointer-events:none;max-width:none;z-index:1}
+.map-overlay-shell .atlas-marker[data-painted] > img{animation:none!important;mix-blend-mode:normal;transform:none!important}
+.map-overlay-shell .atlas-marker[data-painted] :is(.atlas-monster-effects,.atlas-boss-effects,.castle-skin-effect){display:none}
+.map-overlay-shell .atlas-marker[data-painted] :is(.atlas-marker-level,.atlas-marker-name,.atlas-monster-health){z-index:3}
+.map-overlay-shell .atlas-marker[data-painted].is-defeated > .atlas-painted-motion{animation:monster-defeated .72s ease-out both}
+.map-overlay-shell .atlas-marker[data-painted].is-hit > .atlas-painted-motion{animation:monster-hit .48s ease-out both}
+.map-overlay-shell .atlas-marker[data-painted].is-selected > .atlas-painted-motion{filter:drop-shadow(0 0 3px var(--ui-gold))}
+@media(prefers-reduced-motion:reduce){.map-overlay-shell .atlas-marker[data-painted].is-defeated > .atlas-painted-motion{animation:none;opacity:0}}
 .atlas-creatures{mix-blend-mode:normal}
 .atlas-marker--monsters img{mix-blend-mode:multiply}
 .atlas-marker--monsters img[data-life-kind]{mix-blend-mode:normal}
 .map-overlay-shell .atlas-marker--nodes img[data-life-kind]{width:calc(var(--tile-size,44px)*1.85);height:calc(var(--tile-size,44px)*1.85);margin-left:calc(var(--tile-size,44px)*-.925);bottom:calc(var(--tile-size,44px)*-.03)}
 .map-overlay-shell .atlas-marker--monsters img[data-life-kind]{width:calc(var(--tile-size,44px)*1.45);height:calc(var(--tile-size,44px)*1.45);margin-left:calc(var(--tile-size,44px)*-.725);bottom:calc(var(--tile-size,44px)*.02)}
 .atlas-target-portrait img[data-life-kind],.atlas-nearby-row img[data-life-kind]{mix-blend-mode:normal}
+
+/* Lightweight 2.5D solo-monster motion. The feet stay anchored to the tile. */
+.map-overlay-shell .atlas-marker--monsters:is([data-monster-type="solo"],[data-monster-visual="dragon"],[data-monster-visual="magdar"])>img{
+  transform-origin:50% 94%;
+  animation:monster-idle 3.8s ease-in-out infinite;
+  animation-delay:calc((var(--monster-phase,0) - 1)*.37s);
+}
+.map-overlay-shell .atlas-marker--monsters[data-monster-visual="orc"]>img{animation-name:monster-brace;animation-duration:3.9s}
+.map-overlay-shell .atlas-marker--monsters[data-monster-visual="skeleton"]>img{animation-name:monster-rattle;animation-duration:3.25s}
+.map-overlay-shell .atlas-marker--monsters[data-monster-visual="golem"]>img{animation-name:monster-golem-idle;animation-duration:4.4s}
+.map-overlay-shell .atlas-marker--monsters[data-monster-visual="goblin"]>img{animation-name:monster-sneak;animation-duration:3.15s}
+.map-overlay-shell .atlas-marker--monsters[data-monster-visual="dragon"]>img{animation-name:monster-dragon-breathe;animation-duration:4.6s}
+.map-overlay-shell .atlas-marker--monsters[data-monster-visual="magdar"]>img{animation-name:monster-magdar-power;animation-duration:4.1s}
+.atlas-monster-effects{position:absolute;inset:0;pointer-events:none;z-index:2}
+.monster-glow,.monster-hit-flash{position:absolute;display:none;pointer-events:none}
+.atlas-marker--monsters[data-monster-visual="golem"] .monster-glow{display:block;border-radius:50%;background:#69fff2;mix-blend-mode:screen;box-shadow:0 0 7px 3px #27e4db99;animation:monster-rune-pulse 2.2s ease-in-out infinite}
+.atlas-marker--monsters[data-monster-visual="golem"] .monster-glow--left{left:41%;top:29%;width:7%;height:5%}
+.atlas-marker--monsters[data-monster-visual="golem"] .monster-glow--right{left:57%;top:31%;width:6%;height:5%;animation-delay:-.18s}
+.atlas-marker--monsters[data-monster-visual="golem"] .monster-glow--rune{left:47%;top:52%;width:10%;height:9%;animation-delay:-.7s}
+.atlas-marker--monsters[data-monster-visual="goblin"] .monster-glow{display:block;border-radius:50%;background:#fff4a7;mix-blend-mode:screen;box-shadow:0 0 5px 2px #ffd3348f;animation:monster-coin-spark 2.7s ease-in-out infinite}
+.atlas-marker--monsters[data-monster-visual="goblin"] .monster-glow--left{left:25%;top:25%;width:5%;height:5%}
+.atlas-marker--monsters[data-monster-visual="goblin"] .monster-glow--right{left:34%;top:31%;width:4%;height:4%;animation-delay:-.9s}
+.atlas-marker--monsters[data-monster-visual="goblin"] .monster-glow--rune{left:20%;top:38%;width:4%;height:4%;animation-delay:-1.7s}
+.atlas-marker--monsters[data-monster-visual="dragon"] .monster-glow--right{display:block;left:62%;top:30%;width:5%;height:4%;border-radius:50%;background:#fff2a8;mix-blend-mode:screen;box-shadow:0 0 6px 2px #ffd85a99;animation:monster-rune-pulse 2.45s ease-in-out infinite}
+.atlas-marker--monsters[data-monster-visual="magdar"] .monster-glow{display:block;border-radius:50%;background:#ff70ff;mix-blend-mode:screen;box-shadow:0 0 7px 3px #d726e499;animation:monster-rune-pulse 1.85s ease-in-out infinite}
+.atlas-marker--monsters[data-monster-visual="magdar"] .monster-glow--left{left:43%;top:32%;width:6%;height:4%}
+.atlas-marker--monsters[data-monster-visual="magdar"] .monster-glow--right{left:54%;top:32%;width:6%;height:4%;animation-delay:-.16s}
+.atlas-marker--monsters[data-monster-visual="magdar"] .monster-glow--rune{left:47%;top:52%;width:11%;height:9%;animation-delay:-.55s}
+.atlas-marker--monsters.is-selected .atlas-marker-ground{animation:monster-selection-ring 1.45s ease-in-out infinite}
+.atlas-marker--monsters.is-selected>img{filter:drop-shadow(0 0 5px var(--ui-gold))!important}
+.atlas-marker--monsters.is-hit>img{animation:monster-hit .48s ease-out both!important}
+.atlas-marker--monsters.is-hit .monster-hit-flash{display:block;inset:7% 7% 12%;border-radius:45%;background:#fff2cf99;mix-blend-mode:screen;animation:monster-hit-flash .45s ease-out both}
+.atlas-marker--monsters.is-defeated{pointer-events:none}
+.atlas-marker--monsters.is-defeated>img{animation:monster-defeated .72s cubic-bezier(.3,.7,.4,1) both!important}
+.atlas-marker--monsters.is-defeated :is(.monster-glow,.atlas-marker-level,.atlas-marker-name,.atlas-monster-health){animation:none!important;opacity:0}
+@keyframes monster-idle{0%,100%{transform:translateY(0) scale(1,1) rotate(-.35deg)}50%{transform:translateY(-2px) scale(1.018,1.035) rotate(.35deg)}}
+@keyframes monster-brace{0%,100%{transform:translateY(0) rotate(-.45deg) scale(1)}48%{transform:translateY(-2px) rotate(.55deg) scale(1.018,1.032)}72%{transform:translateY(-1px) rotate(.15deg) scale(1.008,1.015)}}
+@keyframes monster-rattle{0%,100%{transform:translateY(0) rotate(-.55deg) scale(1)}38%{transform:translateY(-2px) rotate(.8deg) scale(1.012,1.025)}45%{transform:translateY(-2px) rotate(-.3deg) scale(1.016,1.025)}52%{transform:translateY(-2px) rotate(.45deg) scale(1.012,1.025)}}
+@keyframes monster-golem-idle{0%,100%{transform:translateY(0) scale(1,1)}48%{transform:translateY(-1px) scale(1.025,1.035)}58%{transform:translateY(1px) scale(1.035,.985)}66%{transform:translateY(0) scale(1,1)}}
+@keyframes monster-sneak{0%,100%{transform:translateY(0) rotate(-.8deg) scale(1)}42%{transform:translateY(-3px) rotate(.8deg) scale(1.02,1.03)}64%{transform:translateY(-1px) rotate(.25deg) scale(1.01)}}
+@keyframes monster-dragon-breathe{0%,100%{transform:translateY(0) scale(1,1) rotate(-.3deg)}50%{transform:translateY(-2px) scale(1.035,1.025) rotate(.35deg)}72%{transform:translateY(-1px) scale(1.018,1.012)}}
+@keyframes monster-magdar-power{0%,100%{transform:translateY(0) scale(1) rotate(-.25deg)}45%{transform:translateY(-2px) scale(1.025,1.035) rotate(.25deg)}62%{transform:translateY(-1px) scale(1.012,1.018)}}
+@keyframes monster-rune-pulse{0%,100%{opacity:.4;transform:scale(.82)}50%{opacity:1;transform:scale(1.18)}}
+@keyframes monster-coin-spark{0%,72%,100%{opacity:.15;transform:scale(.65)}82%{opacity:1;transform:scale(1.35)}90%{opacity:.35;transform:scale(.85)}}
+@keyframes monster-selection-ring{0%,100%{box-shadow:0 0 0 2px #c5a36144;background:#f1e2bd35}50%{box-shadow:0 0 0 6px #c5a36120;background:#f1e2bd70}}
+@keyframes monster-hit{0%{transform:translateX(0) rotate(0);filter:brightness(1)}18%{transform:translateX(-5px) rotate(-3deg);filter:brightness(1.8) saturate(.45)}42%{transform:translateX(4px) rotate(2deg)}70%{transform:translateX(-2px) rotate(-1deg)}100%{transform:translateX(0) rotate(0);filter:brightness(1)}}
+@keyframes monster-hit-flash{0%{opacity:.9;transform:scale(.75)}100%{opacity:0;transform:scale(1.18)}}
+@keyframes monster-defeated{0%{opacity:1;transform:translateY(0) rotate(0) scale(1)}55%{opacity:.85;transform:translateY(4px) rotate(-8deg) scale(1.04,.78)}100%{opacity:0;transform:translateY(12px) rotate(-15deg) scale(.72,.28)}}
 
 /* Feet and the four-tile hit area stay fixed throughout every idle cycle. */
 .map-overlay-shell .is-regional-boss > img{transform-origin:50% 96%;animation:boss-breathe 5.4s ease-in-out infinite;animation-delay:var(--boss-phase,0s);transition:filter .18s}
@@ -30,3 +88,11 @@
 .encounters-paused .is-regional-boss > img,.reduced-motion .is-regional-boss > img{animation:none;transform:none}
 .encounters-paused .boss-mote,.reduced-motion .boss-mote{animation:none;opacity:0}
 @media(prefers-reduced-motion:reduce){.map-overlay-shell .is-regional-boss > img{animation:none;transform:none}.boss-mote{animation:none;opacity:0}}
+@media(prefers-reduced-motion:reduce){.map-overlay-shell .atlas-marker--monsters>img,.atlas-marker--monsters .monster-glow,.atlas-marker--monsters.is-selected .atlas-marker-ground{animation:none!important}.atlas-marker--monsters.is-hit .monster-hit-flash{display:none}.atlas-marker--monsters.is-defeated>img{opacity:0!important}}
+.reduced-motion .map-overlay-shell .atlas-marker--monsters>img,
+.reduced-motion .atlas-marker--monsters .monster-glow,
+.reduced-motion .atlas-marker--monsters.is-selected .atlas-marker-ground,
+.encounters-paused .map-overlay-shell .atlas-marker--monsters>img,
+.encounters-paused .atlas-marker--monsters .monster-glow{animation:none!important;transform:none}
+.reduced-motion .atlas-marker--monsters.is-hit .monster-hit-flash,
+.encounters-paused .atlas-marker--monsters.is-hit .monster-hit-flash{display:none}

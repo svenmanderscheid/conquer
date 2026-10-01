@@ -1,0 +1,140 @@
+/* Layout for the read-only atlas. Shared UI tokens come from village-theme.css. */
+.dungeon-atlas-preview { margin:0; min-height:100dvh; color:var(--ui-ink); background:var(--ui-paper); font:17px/1.4 var(--ui-font); }
+.dungeon-atlas-preview * { box-sizing:border-box; }
+.dungeon-atlas-preview [hidden] { display:none!important; }
+.dungeon-atlas-preview button,.dungeon-atlas-preview input { font:inherit; }
+.dungeon-atlas-preview button { cursor:pointer; touch-action:manipulation; }
+.dungeon-atlas-preview a { color:inherit; }
+.dungeon-atlas-preview :focus-visible { outline:3px solid var(--ui-primary); outline-offset:4px; }
+.atlas-page { max-width:1100px; margin:auto; padding:22px max(24px,env(safe-area-inset-right)) 18px max(24px,env(safe-area-inset-left)); }
+.atlas-brand { display:flex; justify-content:space-between; align-items:center; gap:10px; margin:0 5px 20px; }
+.atlas-brand>a { font-size:27px; font-weight:700; letter-spacing:.5px; text-decoration:none; line-height:1.2; }
+.atlas-brand>a span { display:block; font-size:12px; font-weight:400; letter-spacing:.7px; color:var(--ui-muted); }
+.concept-pill { border:1px solid var(--ui-line); border-radius:30px; padding:7px 15px; color:var(--ui-muted); font-size:14px; background:var(--ui-card); }
+.atlas-window { overflow:hidden; border:3px solid var(--ui-window-frame); outline:1px solid var(--ui-window-frame-edge); border-radius:20px; background:var(--ui-paper); box-shadow:var(--ui-shadow); }
+.atlas-heading { display:flex; align-items:center; gap:15px; padding:17px 28px; color:var(--ui-card-light); background:linear-gradient(115deg,var(--ui-primary-dark),var(--ui-primary)); border-bottom:3px solid var(--ui-gold); box-shadow:inset 0 2px var(--ui-primary-light); }
+.atlas-heading p { margin:0; font-size:13px; letter-spacing:1.7px; color:var(--ui-window-head-light); }
+.atlas-heading h1 { margin:0; font-weight:400; font-size:31px; line-height:1.2; }
+.heading-country { margin-left:auto; text-align:right; font-size:19px; }
+.heading-country small { font-size:13px; color:var(--ui-window-head-light); }
+.atlas-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 24px; border-bottom:1px solid var(--ui-line); background:var(--ui-card); }
+.view-tabs { display:flex; gap:5px; }
+.view-tabs button,.atlas-action { min-height:44px; border:1px solid var(--ui-line); border-radius:9px; padding:8px 22px; background:var(--ui-card); color:var(--ui-ink); }
+.view-tabs button[aria-pressed=true] { background:var(--ui-inset); border-color:var(--ui-gold); box-shadow:inset 0 1px var(--ui-card-light); }
+.progress-toggle { display:flex; align-items:center; gap:8px; min-height:44px; font-size:15px; cursor:pointer; }
+.progress-toggle input { width:18px; height:18px; accent-color:var(--ui-primary); }
+.atlas-layout { display:block; }
+.atlas-explore { position:relative; min-width:0; background:radial-gradient(ellipse at 50% 45%,var(--ui-card-light),transparent 72%),var(--ui-paper); }
+.map-intro { position:absolute; left:26px; top:24px; z-index:1; max-width:210px; pointer-events:none; }
+.eyebrow { color:var(--ui-muted); text-transform:uppercase; font-size:10px; letter-spacing:1.8px; margin:0 0 9px; }
+.map-intro h2 { font-size:26px; line-height:1.08; font-weight:400; margin:0 0 12px; }
+.map-intro>p:last-child { font-size:15px; color:var(--ui-muted); margin:0; }
+.map-view { position:relative; height:686px; }
+.map-stage { width:557px; height:686px; position:relative; margin:auto; }
+.map-stage svg { display:block; width:100%; height:100%; overflow:visible; }
+.map-loading { position:absolute; inset:45% 0 auto; text-align:center; }
+.canton-shape { stroke:#786342; stroke-width:1.3; stroke-linejoin:round; cursor:pointer; transition:fill .18s; }
+.canton-shape.is-selected { stroke:var(--ui-primary-dark); stroke-width:4; filter:url(#selected-glow); }
+.map-marker { position:absolute; display:flex; align-items:center; justify-content:center; width:44px; height:44px; min-width:44px; min-height:44px; padding:0; border:0; border-radius:50%; background:transparent; color:var(--ui-ink); transform:translate(-50%,-50%); z-index:2; }
+.map-marker .marker-art { width:44px; height:44px; border-radius:50%; border:2px solid var(--ui-window-frame); outline:1px solid #786342; object-fit:cover; box-shadow:0 3px 0 #78634250; transition:transform .16s; }
+.map-marker .marker-label { position:absolute; top:calc(100% + 3px); left:50%; transform:translateX(-50%); padding:2px 7px; border:1px solid var(--ui-line); border-radius:6px; background:var(--ui-card); font-size:14px; line-height:1.1; white-space:nowrap; box-shadow:0 2px 0 #78634220; }
+.map-marker[aria-pressed=true] { z-index:3; }
+.map-marker[aria-pressed=true] .marker-art { outline:3px solid var(--ui-primary); border-color:var(--ui-gold-soft); transform:scale(1.1); }
+.map-marker[aria-pressed=true] .marker-label { background:var(--ui-primary); color:var(--ui-card-light); border-color:var(--ui-primary-dark); }
+.marker-state { position:absolute; top:-4px; left:calc(50% + 12px); border-radius:50%; min-width:20px; height:20px; text-align:center; background:var(--ui-card); border:1px solid var(--ui-line); font:700 12px/18px var(--ui-font-number); }
+.is-done .marker-state { background:var(--ui-green); color:var(--ui-card-light); }
+.marker-state svg { width:12px; height:12px; margin:3px auto; }
+.is-locked .marker-art { filter:grayscale(.75); }
+.map-compass { position:absolute; right:23px; top:17px; text-align:center; color:var(--ui-muted); font-size:12px; pointer-events:none; }
+.map-compass span { display:block; margin-bottom:-5px; }
+.map-compass img { opacity:.7; }
+.map-note { position:absolute; left:25px; bottom:75px; display:flex; gap:9px; align-items:center; pointer-events:none; }
+.map-note>span { font-size:38px; color:var(--ui-gold); }
+.map-note p { margin:0; line-height:1.15; font-size:17px; }
+.map-note small { color:var(--ui-muted); font-size:13px; }
+.map-legend { display:flex; justify-content:center; flex-wrap:wrap; gap:12px; padding:0 12px 10px; font-size:13px; }
+.map-legend>span { display:flex; align-items:center; gap:6px; }
+.map-legend i { width:9px; height:9px; border-radius:50%; border:1px solid var(--ui-ink); background:var(--ui-inset); }
+.map-legend .legend-selected { background:var(--ui-primary); }
+.map-legend .legend-open { background:var(--ui-gold); }
+.map-legend .legend-done { background:var(--ui-green); }
+.map-legend .legend-locked { background:var(--ui-disabled); }
+.map-credit { color:var(--ui-muted); text-align:center; font-size:10px; padding:0 15px; margin:0 0 14px; }
+.dungeon-detail { padding:22px; min-width:0; background:var(--ui-card); }
+.detail-location { display:flex; align-items:center; justify-content:space-between; font-size:13px; color:var(--ui-muted); margin-bottom:12px; }
+.detail-location strong { color:var(--ui-primary); font-size:15px; }
+.detail-art { position:relative; aspect-ratio:3/2; overflow:hidden; border:2px solid var(--ui-line); border-radius:12px; background:var(--ui-inset); }
+.detail-art>img { width:100%; height:100%; object-fit:cover; }
+.detail-theme { position:absolute; left:10px; bottom:10px; background:var(--ui-card); color:var(--ui-ink); border:1px solid var(--ui-line); border-radius:7px; padding:4px 9px; font-size:12px; }
+.detail-heading { margin:17px 0 7px; font-size:29px; font-weight:400; line-height:1.03; }
+.detail-description { color:var(--ui-muted); font-size:15px; margin:0 0 17px; min-height:62px; }
+.detail-stats { display:grid; grid-template-columns:1fr 1fr; padding:12px 0; border-top:1px solid var(--ui-line); border-bottom:1px solid var(--ui-line); }
+.detail-stats>div+div { padding-left:16px; border-left:1px solid var(--ui-line); }
+.detail-stats small { display:block; font-size:12px; color:var(--ui-muted); margin-bottom:3px; }
+.detail-stats strong { font-size:15px; font-weight:400; }
+.loot-heading { display:flex; align-items:center; justify-content:space-between; margin:20px 0 10px; }
+.loot-heading h3 { font-size:18px; font-weight:400; margin:0; }
+.loot-heading span { font-size:11px; color:var(--ui-muted); }
+.signature-drop { display:flex; align-items:center; gap:12px; padding:12px; border-radius:12px; border:1px solid var(--ui-gold); background:var(--ui-gold-soft); }
+.drop-icon { width:58px; height:58px; flex:none; display:flex; align-items:center; justify-content:center; background:var(--ui-card-light); border:1px solid var(--ui-gold); border-radius:10px; }
+.drop-icon img { width:49px; height:49px; object-fit:contain; }
+.signature-drop small { display:block; color:var(--ui-muted); font-size:11px; }
+.signature-drop strong { display:block; font-size:18px; line-height:1.15; margin:3px 0; }
+.signature-drop p { margin:0; font-size:12px; color:var(--ui-muted); }
+.secondary-drops { display:flex; gap:7px; margin:12px 0 19px; align-items:center; font-size:12px; color:var(--ui-muted); }
+.secondary-drops img { width:25px; height:25px; object-fit:contain; }
+.detail-access { padding:10px 12px; border-radius:9px; border:1px solid var(--ui-line); background:var(--ui-paper); font-size:13px; }
+.detail-access strong { display:block; color:var(--ui-ink); margin-bottom:2px; font-size:14px; }
+.detail-history { margin-top:16px; border:1px solid var(--ui-line); border-radius:10px; background:var(--ui-card); overflow-wrap:anywhere; }
+.detail-history summary { min-height:44px; padding:11px 12px; color:var(--ui-primary-dark); cursor:pointer; font-size:15px; }
+.detail-history summary:focus-visible,.detail-history a:focus-visible { outline:2px solid var(--ui-primary); outline-offset:2px; border-radius:6px; }
+.detail-history p { margin:0; padding:0 12px 8px; font-size:13px; color:var(--ui-muted); }
+.detail-history ul { list-style:none; margin:0; padding:0 8px 8px; }
+.detail-history a { display:block; min-height:44px; padding:9px 4px; font-size:12px; color:var(--ui-primary-dark); text-underline-offset:3px; }
+.atlas-action { display:block; width:100%; margin-top:13px; border-color:var(--ui-primary-dark); background:var(--ui-primary); color:var(--ui-card-light); box-shadow:0 3px 0 var(--ui-primary-dark); }
+.detail-footnote { font-size:11px; color:var(--ui-muted); text-align:center; margin:9px 0 0; }
+.atlas-footer { border-top:1px solid var(--ui-line); padding:13px 24px; display:flex; gap:15px; justify-content:space-between; align-items:center; font-size:15px; background:var(--ui-inset); }
+.atlas-footer>span>span { color:var(--ui-primary); margin-right:5px; }
+.atlas-footer small { font-size:11px; color:var(--ui-muted); text-align:right; }
+.preview-note { margin:15px 0 0; color:var(--ui-muted); text-align:center; font-size:12px; }
+.canton-list { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:25px; }
+.atlas-explore:has(.map-view[hidden]) .map-intro { position:static; max-width:none; margin:24px 25px 0; }
+.canton-card { border:1px solid var(--ui-line); padding:10px; display:flex; gap:10px; align-items:center; text-align:left; border-radius:10px; background:var(--ui-card); color:var(--ui-ink); min-height:88px; }
+.canton-card[aria-pressed=true] { border:2px solid var(--ui-primary); background:var(--ui-gold-soft); padding:9px; }
+.canton-card>img { width:58px; height:58px; object-fit:cover; border-radius:8px; }
+.canton-card strong,.canton-card small { display:block; }
+.canton-card strong { font-size:16px; line-height:1.1; }
+.canton-card small { font-size:12px; color:var(--ui-muted); margin-top:4px; }
+.visually-hidden { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+@media (hover:hover) { .map-marker:hover .marker-art { transform:translateY(-3px) scale(1.08); } .canton-card:hover { border-color:var(--ui-primary); } }
+@media (max-width:1170px) { .map-intro { max-width:160px; left:17px; } .map-intro h2 { font-size:22px; } .map-intro>p:last-child { font-size:13px; } .map-stage { margin:auto; } .map-note { left:17px; bottom:35px; } .map-note p { font-size:14px; } .map-note small { font-size:11px; } .atlas-layout { grid-template-columns:minmax(0,1fr) 320px; } .dungeon-detail { padding:18px; } }
+@media (max-width:990px) { .atlas-page { padding:15px; } .atlas-layout { grid-template-columns:minmax(0,1fr) 300px; } .map-intro { position:static; max-width:none; padding:18px 20px 0; } .map-intro h2 { font-size:25px; margin:0; } .map-intro>p:last-child { display:none; } .map-view { height:auto; } .map-stage { width:100%; height:auto; aspect-ratio:650/800; } .map-note { display:none; } .map-compass { right:10px; top:10px; } .map-compass img { width:43px; height:43px; } .map-marker .marker-art { width:36px; height:36px; } .map-marker .marker-label { font-size:12px; padding:2px 5px; } .canton-list { grid-template-columns:1fr; padding:18px; } .map-legend { margin-top:12px; } .atlas-footer { flex-direction:column; gap:3px; text-align:center; } .atlas-footer small { text-align:center; } }
+@media (max-width:699px) { .atlas-page { padding:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(15px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left)); } .atlas-brand { margin:0 4px 14px; } .atlas-brand>a { font-size:22px; } .atlas-brand>a span { font-size:10px; letter-spacing:0; } .concept-pill { font-size:11px; padding:5px 8px; } .atlas-window { border-radius:15px; } .atlas-heading { padding:15px; gap:10px; } .atlas-heading>img { width:38px; height:38px; } .atlas-heading h1 { font-size:27px; } .atlas-heading p { font-size:11px; } .heading-country { display:none; } .atlas-toolbar { padding:8px 11px; flex-wrap:wrap; gap:3px 8px; } .view-tabs { flex:1; } .view-tabs button { flex:1; padding:8px 12px; font-size:15px; } .progress-toggle { font-size:13px; } .atlas-layout { display:block; } .atlas-explore { border-right:0; border-bottom:1px solid var(--ui-line); } .map-intro { padding:18px 16px 0; } .eyebrow { font-size:9px; margin-bottom:5px; } .map-intro h2 { font-size:25px; } .map-stage { max-width:480px; } .map-marker { min-width:44px; min-height:44px; } .map-marker .marker-art { width:33px; height:33px; } .map-marker .marker-label { font-size:12px; } .marker-state { min-width:17px; height:17px; font-size:10px; line-height:15px; left:calc(50% + 9px); } .map-credit { font-size:9px; } .map-legend { font-size:11px; gap:8px; } .dungeon-detail { padding:20px; scroll-margin-top:12px; } .detail-description { min-height:0; } .detail-heading { font-size:31px; } .detail-art { max-height:250px; } .atlas-footer { padding:12px; } .atlas-footer small { font-size:10px; } .canton-list { grid-template-columns:1fr 1fr; padding:15px; gap:8px; } .canton-card { display:block; padding:8px; min-height:145px; } .canton-card[aria-pressed=true] { padding:7px; } .canton-card>img { width:100%; height:75px; margin-bottom:7px; } .canton-card strong { font-size:15px; } }
+@media (max-width:359px) { .map-marker .marker-art { width:29px; height:29px; } .map-marker .marker-label { font-size:10px; padding:2px 3px; } .map-compass img { width:32px; height:32px; } .map-intro h2 { font-size:22px; } .dungeon-detail { padding:16px; } .atlas-heading h1 { font-size:25px; } }
+@media (prefers-reduced-motion:reduce) { .dungeon-atlas-preview * { transition:none!important; scroll-behavior:auto!important; } }
+@media (max-width:699px) { .map-marker .marker-label { top:39px; } }
+@media (max-width:359px) { .map-marker .marker-label { top:35px; } }
+
+/* Modal details leave the whole atlas available as the primary view. */
+.dungeon-popup-open { overflow:hidden; }
+.atlas-dialog { width:min(760px,calc(100% - 24px)); max-width:none; max-height:calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); margin:auto; padding:0; overflow:hidden; border:3px solid var(--ui-window-frame); outline:1px solid var(--ui-window-frame-edge); border-radius:var(--ui-radius-window); color:var(--ui-ink); background:var(--ui-paper); box-shadow:var(--ui-shadow); font:17px/1.4 var(--ui-font); }
+.atlas-dialog[open] { display:flex; flex-direction:column; }
+.atlas-dialog::backdrop { background:color-mix(in srgb,var(--ui-primary-dark) 68%,transparent); }
+.dungeon-dialog-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; flex:none; padding:17px 20px; background:var(--ui-primary); color:var(--ui-card-light); border-bottom:2px solid var(--ui-gold); box-shadow:inset 0 2px var(--ui-primary-light); }
+.dungeon-dialog-heading>div { min-width:0; }
+.dungeon-dialog-heading p { margin:0 0 3px; font-size:13px; color:var(--ui-window-head-light); }
+.dungeon-dialog-heading h2 { margin:0; font-size:29px; font-weight:400; line-height:1.1; overflow-wrap:anywhere; }
+.dialog-close { flex:none; width:44px; height:44px; padding:0; border:1px solid var(--ui-line); border-radius:9px; background:var(--ui-card); color:var(--ui-primary-dark); font-size:29px!important; line-height:1; }
+.dialog-close:focus-visible { outline-color:var(--ui-gold-soft); }
+.atlas-dialog .dungeon-detail { display:grid; grid-template-columns:minmax(0,1.12fr) minmax(0,1fr); gap:22px; overflow-y:auto; overscroll-behavior:contain; min-height:0; padding:20px; background:var(--ui-paper); }
+.detail-visual,.detail-rewards { min-width:0; }
+.atlas-dialog .detail-description { margin:13px 0; min-height:0; }
+.atlas-dialog .loot-heading { margin-top:0; gap:8px; }
+.dungeon-dialog-footer { flex:none; display:grid; grid-template-columns:1fr 1fr; gap:6px 12px; padding:12px 20px; border-top:1px solid var(--ui-line); background:var(--ui-card); }
+.dungeon-dialog-footer .atlas-action { margin:0; padding:8px 12px; }
+.dialog-return { min-height:44px; padding:8px 12px; border:1px solid var(--ui-line); border-radius:9px; background:var(--ui-inset); color:var(--ui-ink); }
+.dungeon-dialog-footer .detail-footnote { grid-column:1/-1; margin:4px 0 0; }
+@media (max-width:990px) { .map-stage { max-width:557px; } }
+@media (max-width:699px) { .atlas-brand>a { font-size:22px; letter-spacing:0; } .concept-pill { flex:none; } .map-stage { max-width:480px; } }
+@media (max-width:559px) { .atlas-dialog { width:calc(100% - 20px); } .atlas-dialog .dungeon-detail { grid-template-columns:1fr; gap:20px; padding:16px; } .dungeon-dialog-heading { padding:12px 14px; gap:10px; } .dungeon-dialog-heading h2 { font-size:25px; } .dungeon-dialog-heading p { font-size:12px; } .dungeon-dialog-footer { padding:10px 14px; gap:5px 8px; } .dungeon-dialog-footer button { font-size:15px; } }
+@media (max-height:450px) and (min-width:560px) { .dungeon-dialog-heading { padding:8px 14px; } .dungeon-dialog-heading h2 { font-size:24px; } .atlas-dialog .dungeon-detail { padding:14px; gap:16px; } .dungeon-dialog-footer { padding:8px 14px; } .dungeon-dialog-footer .detail-footnote { margin:2px 0 0; } }

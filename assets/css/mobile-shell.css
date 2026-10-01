@@ -26,9 +26,9 @@ body.mobile-game > #save-state.error { z-index:85; top:110px; right:12px; width:
 .mobile-game.playfield-mode .page-heading { display:none; }
 .mobile-game.city-mode .scene-wrap { position:fixed; inset:0; width:100%; height:100dvh; border:0; border-radius:0; box-shadow:none; margin:0; background:#8faf79; }
 .mobile-game.city-mode .scene-wrap>div:first-child { height:100%; }
-.mobile-game.city-mode .city-frame { display:block; width:100%; height:100dvh; border:0; background:#8faf79; }
+
 .mobile-game.city-mode .city-playfield { position:fixed; inset:0; width:100%; height:100dvh; overflow:hidden; background:#8faf79; }
-.mobile-game.city-mode .city-playfield>.city-frame { position:absolute; inset:0; width:100%; height:100%; }
+
 .mobile-game.city-mode .scene-label,.mobile-game.city-mode .scene-buttons,.mobile-game.city-mode .village-caption { display:none; }
 
 /* The top edge is open scenery. Only the profile and individual resources have backing. */
@@ -214,4 +214,3 @@ body.mobile-game .menu-link>span:last-child{margin-left:0}
 /* Village fills the viewport behind the parent HUD, including after rotation. */
 .mobile-game.city-mode.playfield-mode #main>#content,.mobile-game.city-mode.playfield-mode #playfield-content{position:fixed;inset:0;width:100%;height:100dvh;max-width:none;min-height:0;margin:0;padding:0;overflow:hidden}
 .mobile-game.city-mode.playfield-mode .city-playfield{position:absolute;inset:0;width:100%;height:100%;max-width:none;margin:0;padding:0;border:0;border-radius:0}
-.mobile-game.city-mode.playfield-mode .city-playfield>.city-frame{display:block;position:absolute;inset:0;width:100%;height:100%;max-width:none;margin:0;padding:0;border:0;border-radius:0}

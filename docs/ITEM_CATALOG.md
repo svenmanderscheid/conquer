@@ -1,8 +1,8 @@
 # Itemkatalog nach den Inventarreferenzen
 
-166 Verbrauchsitems und 82 anlegbare Relikte sind verfügbar. Die Referenzrelikte stehen vollständig in [TREASURE_CATALOG.md](TREASURE_CATALOG.md).
+163 Verbrauchsitems sowie 77 aktive Relikte sind verfügbar; fünf ältere Relikte bleiben für bestehende Besitzer erhalten. Die Referenzrelikte stehen vollständig in [TREASURE_CATALOG.md](TREASURE_CATALOG.md).
 
-Zusätzlich enthält der Katalog 26 Materialien aus dem Balanceimport: Goldene Säule und Allianzabzeichen werden bei passenden Gebäudeausbauten automatisch verbraucht. Für 24 weitere Quellitems fehlt eine vollständige Wirkungsdefinition, darunter die Inhalte der Beschleunigerkisten Stufe 3 und 4. Sie bleiben erhalten und werden als noch nicht verwendbar erklärt; es wurden keine Wirkungen oder Kisteninhalte erfunden. Die offenen Quellcodes stehen in [BALANCE_IMPORT.md](BALANCE_IMPORT.md).
+Zusätzlich enthält der Katalog 27 Materialien. Allianzabzeichen werden beim Ausbau der Allianzhalle automatisch verbraucht; goldene Säulen gehören nicht mehr zu den Baukosten. Für 24 weitere Quellitems fehlt eine vollständige Wirkungsdefinition, darunter die Inhalte der Beschleunigerkisten Stufe 3 und 4. Sie bleiben erhalten und werden als noch nicht verwendbar erklärt; es wurden keine Wirkungen oder Kisteninhalte erfunden. Die offenen Quellcodes stehen in [BALANCE_IMPORT.md](BALANCE_IMPORT.md).
 
 ## Im Spiel
 
@@ -57,8 +57,6 @@ Die 43 alten Itemcodes, Mengen, Dauern, Bonusstärken und bestehenden Preise ble
 | 10102001 | Rohstoffproduktion +25 % · 8 Stunden | rare | Erhöht Rohstoffproduktion für 8 Stunden um 25 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere. |
 | 10102002 | Rohstoffproduktion +25 % · 1 Tag | epic | Erhöht Rohstoffproduktion für 1 Tag um 25 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere. |
 | 10102011 | Sammelgeschwindigkeit +50 % · 8 Stunden | rare | Erhöht Sammelgeschwindigkeit für 8 Stunden um 50 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere. |
-| 10102021 | Baugeschwindigkeit +25 % · 8 Stunden | rare | Erhöht Baugeschwindigkeit für 8 Stunden um 25 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere. |
-| 10102031 | Forschungsgeschwindigkeit +25 % · 8 Stunden | rare | Erhöht Forschungsgeschwindigkeit für 8 Stunden um 25 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere. |
 | 10102041 | Ausbildungsgeschwindigkeit +25 % · 8 Stunden | rare | Erhöht Ausbildungsgeschwindigkeit für 8 Stunden um 25 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere. |
 | 10102051 | Spähschutz · 8 Stunden | rare | Verbirgt Ressourcen, Truppen und Mauerwerte deiner aktiven Stadt 8 Stunden vor Spähern. |
 | 10102061 | Königsschild · 8 Stunden | rare | Schützt deine aktive Stadt 8 Stunden vor feindlichen Angriffen. Nicht während eigener feindlicher Märsche nutzbar. |
@@ -130,8 +128,6 @@ Die 43 alten Itemcodes, Mengen, Dauern, Bonusstärken und bestehenden Preise ble
 | 10202007 | Goldproduktion +25 % · 8 Stunden | rare | Erhöht Goldproduktion für 8 Stunden um 25 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere. |
 | 10202008 | Goldproduktion +25 % · 1 Tag | epic | Erhöht Goldproduktion für 1 Tag um 25 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere. |
 | 10202009 | Sammelgeschwindigkeit +50 % · 1 Tag | epic | Erhöht Sammelgeschwindigkeit für 1 Tag um 50 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere. |
-| 10202010 | Baugeschwindigkeit +25 % · 1 Tag | epic | Erhöht Baugeschwindigkeit für 1 Tag um 25 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere. |
-| 10202011 | Forschungsgeschwindigkeit +25 % · 1 Tag | epic | Erhöht Forschungsgeschwindigkeit für 1 Tag um 25 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere. |
 | 10202012 | Ausbildungsgeschwindigkeit +25 % · 1 Tag | epic | Erhöht Ausbildungsgeschwindigkeit für 1 Tag um 25 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere. |
 | 10202013 | Truppenangriff +10 % · 1 Stunde | rare | Erhöht Truppenangriff für 1 Stunde um 10 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere. |
 | 10202014 | Truppenangriff +20 % · 1 Stunde | epic | Erhöht Truppenangriff für 1 Stunde um 20 %. Gilt accountweit; laufende Auftrags- und Marschzeiten bleiben unverändert. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere. |
@@ -209,3 +205,5 @@ Die 43 alten Itemcodes, Mengen, Dauern, Bonusstärken und bestehenden Preise ble
 | 10300002 | Legendäres Reliktfragment | legendary | Gewährt ein Fragment eines zufälligen legendären Relikts. Fragmente erhöhen automatisch dessen Stufe. |
 | 10300003 | Portalsphäre · Fragment | epic | Gewährt genau ein Fragment der Portalsphäre. Fragmente erhöhen automatisch die Reliktstufe. |
 | 10300004 | Großes Kriegshorn · 1 Stunde | legendary | Erhöht die Marschkapazität für eine Stunde um 50 %. Gilt für neu entsandte Armeen. Gleiche Stärke verlängert die Laufzeit; stärkere Boni ersetzen schwächere. |
+
+Die zeitlich begrenzten Bau- und Forschungsbonus-Items (8 Stunden und 1 Tag, jeweils +25 %) sind seit dem 30. September 2026 entfernt. Ihre IDs 10102021, 10102031, 10202010 und 10202011 bleiben reserviert. Alte Bestände sind ausgeblendet und unbenutzbar; bereits aktivierte Itemeffekte beeinflussen neue Aufträge nicht mehr. Historische Inventarzeilen und laufende Auftragszeiten bleiben erhalten. Produktions-, Sammel- und Ausbildungsboni sowie normale Zeitbeschleuniger bleiben verfügbar.

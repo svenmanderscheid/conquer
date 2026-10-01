@@ -4,7 +4,7 @@ const fs=require('fs'),path=require('path'),vm=require('vm'),assert=require('ass
 const root=path.resolve(__dirname,'..');
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const state={player:{id:1,name:'Wächter'},city:{id:11,player_id:1,coord_x:80,coord_y:70,castle_level:3},players:[{id:2,coord_x:91,coord_y:74,castle_level:4,display_name:'Fremde Burg'}]};
-let html='',actions=[],marches=[],selectedText=false,rally={id:9,leader_player_id:1,leader_name:'Anführer',target_player_id:2,target_name:'Fremde Burg',target_x:91,target_y:74,status:'gathering',launch_at:'2030-01-01T00:00:00Z',troops:{50100101:10}},participants=[{player_id:3,username:'Verbündeter',troops:{50200101:4}}];
+let html='',actions=[],marches=[],selectedText=false,rally={id:9,leader_player_id:1,leader_name:'Anführer',leader:{player_id:1,name:'Anführer',power:12345,avatar:'knight',coord_x:80,coord_y:70},target_player_id:2,target_name:'Fremde Burg',target_player:{player_id:2,name:'Fremde Burg',power:9876,avatar:'rider',coord_x:91,coord_y:74},target_x:91,target_y:74,status:'gathering',launch_at:'2030-01-01T00:00:00Z',troops:{50100101:10}},participants=[{player_id:3,username:'Verbündeter',troops:{50200101:4}}];
 const sandbox={window:{},innerHeight:844,Number,String,Object,Array,Math,Date,console,navigator:{},document:{body:{classList:{contains:()=>false}},querySelector:()=>({select(){selectedText=true;}})}};
 vm.createContext(sandbox);
 for(const file of ['castle-skins.js','march-skins.js','village-menu.js','rally-panel.js'])vm.runInContext(fs.readFileSync(path.join(root,'assets/js',file),'utf8'),sandbox);
@@ -25,7 +25,7 @@ async function main(){
  check('leader sees own reserved troops, participant troops and management controls',()=>{assert(html.includes('Anführer'));assert(html.includes('10 Truppen'));assert(html.includes('4 Truppen'));assert(html.includes('data-action="rally-launch"'));assert(html.includes('data-action="rally-cancel"'));assert(!html.includes('data-action="rally-join"'));});
  state.player.id=4;rallies.onClick('rally-detail',{dataset:{id:'9'}});await settle();
  check('eligible nonparticipant sees Join, never leader controls',()=>{assert(html.includes('data-action="rally-join"'));assert(!html.includes('data-action="rally-launch"'));assert(!html.includes('data-action="rally-cancel"'));});
- check('joining passes exact rally id and target to composer',()=>{rallies.onClick('rally-join',{dataset:{id:'9'}});const args=marches.at(-1);assert.strictEqual(args[0],2);assert.strictEqual(args[1],'rally-join');assert.strictEqual(args[2].rally_id,9);assert.strictEqual(args[2].target.coord_x,91);});
+ check('joining passes exact rally id and leader destination to composer',()=>{rallies.onClick('rally-join',{dataset:{id:'9'}});const args=marches.at(-1);assert.strictEqual(args[0],1);assert.strictEqual(args[1],'rally-join');assert.strictEqual(args[2].rally_id,9);assert.strictEqual(args[2].target.coord_x,80);assert.strictEqual(args[2].target.coord_y,70);});
  state.player.id=3;rallies.onClick('rally-detail',{dataset:{id:'9'}});await settle();
  check('existing participants cannot join twice through the UI',()=>assert(!html.includes('data-action="rally-join"')));
  rally={...rally,status:'marching'};state.player.id=1;rallies.onClick('rally-detail',{dataset:{id:'9'}});await settle();

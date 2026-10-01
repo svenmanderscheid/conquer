@@ -16,21 +16,24 @@ foreach ($manifest['files'] as $file=>$hash) balanceCheck(hash_file('sha256',ROO
 $materials=balanceJson('source_item_map')['building_materials'];
 $day=86400;
 $timeCurves=[
+    'castle'=>array_map(static fn(int $level):int=>(int)round(35*$day/1.2**(30-$level)),range(21,30)),
     'major'=>[4*$day,5*$day,6*$day,8*$day,10*$day,13*$day,17*$day,21*$day,25*$day,30*$day],
     'infrastructure'=>[4*$day,5*$day,6*$day,8*$day,10*$day,12*$day,15*$day,18*$day,22*$day,26*$day],
     'capacity'=>[2*$day,3*$day,4*$day,5*$day,7*$day,9*$day,12*$day,16*$day,21*$day,26*$day],
     'military'=>[18*3600,$day,32*3600,42*3600,54*3600,3*$day,4*$day,5*$day,7*$day,10*$day],
     'resource'=>[16*3600,22*3600,30*3600,42*3600,54*3600,3*$day,4*$day,5*$day,7*$day,10*$day],
 ];
-$timeGroups=['major'=>['castle','academy'],'infrastructure'=>['hall_of_alliance','hospital','trading_post','treasure_house','wall'],'capacity'=>['storage','watch_tower'],'military'=>['barrack'],'resource'=>['farm','gold_mine','lumber_camp','quarry']];
+$timeGroups=['castle'=>['castle'],'major'=>['academy'],'infrastructure'=>['hall_of_alliance','hospital','trading_post','treasure_house','wall'],'capacity'=>['storage','watch_tower'],'military'=>['barrack'],'resource'=>['farm','gold_mine','lumber_camp','quarry']];
 $timeGroupByBuilding=[];foreach($timeGroups as $group=>$codes)foreach($codes as $code)$timeGroupByBuilding[$code]=$group;
 $buildingCodes=array_keys(balanceJson('buildings')['buildings']);sort($buildingCodes);$curveCodes=array_keys($timeGroupByBuilding);sort($curveCodes);balanceCheck($curveCodes===$buildingCodes,'Every building has a Conquer time curve');
 foreach(balanceJson('buildings')['buildings'] as $code=>$levels) {
     $source=balanceJson('balance-source/'.$code);$power=0;
     foreach($source as $level=>$row) {
         $resources=['food'=>0,'lumber'=>0,'stone'=>0,'gold'=>0];$items=[];
-        foreach($row['resources'] as $r) { if(isset($materials[$r['type']]))$items[$materials[$r['type']]]=$r['value'];else $resources[$r['type']]=$r['value']; }
-        balanceCheck(BuildingData::getCost($code,(int)$level)===$resources,'Exact cost '.$code.' '.$level);
+        foreach($row['resources'] as $r) { if($r['type']==='golden_pillar')continue; if(isset($materials[$r['type']]))$items[$materials[$r['type']]]=$r['value'];else $resources[$r['type']]=$r['value']; }
+        $activeCost=BuildingData::getCost($code,(int)$level);
+        balanceCheck($activeCost===$levels[$level]['resources'],'Catalogue cost reaches runtime '.$code.' '.$level);
+        foreach($resources as $resource=>$amount)balanceCheck(is_int($activeCost[$resource])&&$activeCost[$resource]>=0&&$activeCost[$resource]<=$amount&&($activeCost[$resource]===0)===($amount===0),'Reduced resource cost preserves free resources '.$code.' '.$level.' '.$resource);
         balanceCheck(BuildingData::getItemCosts($code,(int)$level)==$items,'Exact materials '.$code.' '.$level);
         $expectedTime=(int)$level<=20 ? $row['time'] : $timeCurves[$timeGroupByBuilding[$code]][(int)$level-21];
         balanceCheck(BuildingData::getBuildTime($code,(int)$level)===$expectedTime,'Conquer seconds '.$code.' '.$level);
@@ -52,18 +55,19 @@ foreach(balanceJson('buildings')['buildings'] as $code=>$levels) {
     balanceCheck(BuildingData::level($code,31)===null,'No invented L31');
 }
 foreach(['archery_range','stable'] as $code) balanceCheck(BuildingData::getCost($code,30)===BuildingData::getCost('barrack',30),'Conquer schools share barrack balance');
-balanceCheck(BuildingData::getBuildTime('castle',30)===30*$day,'Castle L30 takes exactly thirty days');
+balanceCheck(BuildingData::getBuildTime('castle',30)===35*$day,'Castle L30 takes exactly thirty-five days');
 balanceCheck(BuildingData::getBuildTime('academy',30)===30*$day,'Academy L30 takes exactly thirty days');
-echo "PASS 420 building levels: source costs/materials/power/prerequisites and Conquer durations\n";
+echo "PASS 420 building levels: reduced costs, original badges/power/prerequisites, no pillars and Conquer durations\n";
 foreach(['production','battle','advanced'] as $tree) {
     $source=balanceJson('balance-source/'.$tree);
     foreach(ResearchData::tree($tree) as $node) foreach($node['levels'] as $i=>$row) {
         $raw=$source[$node['source_code']??$node['code']][$i];
-        foreach(['time','power'] as $key)balanceCheck($row[$key]===(int)$raw[$key],'Research '.$key);
+        balanceCheck($row['power']===(int)$raw['power'],'Research source power');
+        balanceCheck($row['time']>0 && $row['time']<=(int)$raw['time'],'Research duration remains positive and no slower than source');
         balanceCheck($row['ability_value']==(float)$raw['stats']['ability_value'],'Research ability');
     }
 }
-echo "PASS 951 active research levels retain source values and stable IDs\n";
+echo "PASS 963 active research levels retain source power, effects and stable IDs with reduced durations\n";
 $map=balanceJson('source_item_map');
 foreach(['field_monster','field_object'] as $file) foreach(balanceJson('balance-source/'.$file) as $raw) {
     $monster=$file==='field_monster';
@@ -88,7 +92,14 @@ foreach(RewardCatalog::sources('monster') as $entry) {
     $def=MonsterData::get((int)$entry['key']);
     if(isset($def['source_code'])) {
         $source=MonsterData::source($def['source_code'],(int)$def['level']);
-        balanceCheck(RewardCatalog::availableDrops($def['drops'])===RewardCatalog::availableDrops($source['drops']),'Source rewards reach real monster lookup with unchanged codes, quantities and probabilities');
+        if(($def['type']??'solo')==='solo'||($def['reward_family']??null)==='deathkar'){
+            // Imported source rows remain exact above; active monsters deliberately
+            // use the subsequently adopted level-based MonsterRewardRules contract.
+            $drops=array_column(RewardCatalog::availableDrops($def['drops']),null,'item_code');
+            foreach([10203022,10203030] as $speedup)balanceCheck(isset($drops[$speedup])&&(int)$drops[$speedup]['count']===(int)$def['level']&&(float)$drops[$speedup]['probability']===1.0,'Active reward policy preserves both guaranteed level-based speedups');
+        }else{
+            balanceCheck(RewardCatalog::availableDrops($def['drops'])===RewardCatalog::availableDrops($source['drops']),'Unchanged source rewards reach real monster lookup with exact codes, quantities and probabilities');
+        }
         balanceCheck($def['stats']===$source['stats']&&$def['xp']===$source['xp'],'Source stats reach battle lookup');
     }
 }

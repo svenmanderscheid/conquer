@@ -1,0 +1,1137 @@
+{
+    "version": 1,
+    "geometry_hash": "fc72469b1025fa2ae4ccc36cd258c278a6df0bf0c8617c0299dfdf77c03482e5",
+    "minimum_gap": 5,
+    "landmarks": [
+        {
+            "id": "crown:krounbuerg",
+            "type": "crown",
+            "name": "Royal Castle",
+            "commune_id": null,
+            "canton_id": null,
+            "x": 378,
+            "y": 850,
+            "footprint": 7
+        },
+        {
+            "id": "canton:01",
+            "type": "canton",
+            "name": "Shrine of Capellen",
+            "commune_id": null,
+            "canton_id": "01",
+            "x": 218,
+            "y": 810,
+            "footprint": 6
+        },
+        {
+            "id": "canton:02",
+            "type": "canton",
+            "name": "Shrine of Esch-sur-Alzette",
+            "commune_id": null,
+            "canton_id": "02",
+            "x": 278,
+            "y": 990,
+            "footprint": 6
+        },
+        {
+            "id": "canton:03",
+            "type": "canton",
+            "name": "Shrine of Luxembourg",
+            "commune_id": null,
+            "canton_id": "03",
+            "x": 418,
+            "y": 846,
+            "footprint": 6
+        },
+        {
+            "id": "canton:04",
+            "type": "canton",
+            "name": "Shrine of Mersch",
+            "commune_id": null,
+            "canton_id": "04",
+            "x": 369,
+            "y": 635,
+            "footprint": 6
+        },
+        {
+            "id": "canton:05",
+            "type": "canton",
+            "name": "Shrine of Clervaux",
+            "commune_id": null,
+            "canton_id": "05",
+            "x": 266,
+            "y": 178,
+            "footprint": 6
+        },
+        {
+            "id": "canton:06",
+            "type": "canton",
+            "name": "Shrine of Diekirch",
+            "commune_id": null,
+            "canton_id": "06",
+            "x": 382,
+            "y": 482,
+            "footprint": 6
+        },
+        {
+            "id": "canton:07",
+            "type": "canton",
+            "name": "Shrine of Redange",
+            "commune_id": null,
+            "canton_id": "07",
+            "x": 146,
+            "y": 574,
+            "footprint": 6
+        },
+        {
+            "id": "canton:08",
+            "type": "canton",
+            "name": "Shrine of Wiltz",
+            "commune_id": null,
+            "canton_id": "08",
+            "x": 170,
+            "y": 370,
+            "footprint": 6
+        },
+        {
+            "id": "canton:09",
+            "type": "canton",
+            "name": "Shrine of Vianden",
+            "commune_id": null,
+            "canton_id": "09",
+            "x": 410,
+            "y": 378,
+            "footprint": 6
+        },
+        {
+            "id": "canton:10",
+            "type": "canton",
+            "name": "Shrine of Echternach",
+            "commune_id": null,
+            "canton_id": "10",
+            "x": 618,
+            "y": 594,
+            "footprint": 6
+        },
+        {
+            "id": "canton:11",
+            "type": "canton",
+            "name": "Shrine of Grevenmacher",
+            "commune_id": null,
+            "canton_id": "11",
+            "x": 594,
+            "y": 738,
+            "footprint": 6
+        },
+        {
+            "id": "canton:12",
+            "type": "canton",
+            "name": "Shrine of Remich",
+            "commune_id": null,
+            "canton_id": "12",
+            "x": 558,
+            "y": 950,
+            "footprint": 6
+        },
+        {
+            "id": "commune:0101",
+            "type": "commune",
+            "name": "Commune Dippach",
+            "commune_id": "0101",
+            "canton_id": "01",
+            "x": 230,
+            "y": 894,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0102",
+            "type": "commune",
+            "name": "Commune Garnich",
+            "commune_id": "0102",
+            "canton_id": "01",
+            "x": 194,
+            "y": 846,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0103",
+            "type": "commune",
+            "name": "Commune Habscht",
+            "commune_id": "0103",
+            "canton_id": "01",
+            "x": 190,
+            "y": 730,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0104",
+            "type": "commune",
+            "name": "Commune Käerjeng",
+            "commune_id": "0104",
+            "canton_id": "01",
+            "x": 158,
+            "y": 894,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0105",
+            "type": "commune",
+            "name": "Commune Kehlen",
+            "commune_id": "0105",
+            "canton_id": "01",
+            "x": 286,
+            "y": 758,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0106",
+            "type": "commune",
+            "name": "Commune Koerich",
+            "commune_id": "0106",
+            "canton_id": "01",
+            "x": 218,
+            "y": 770,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0107",
+            "type": "commune",
+            "name": "Commune Kopstal",
+            "commune_id": "0107",
+            "canton_id": "01",
+            "x": 334,
+            "y": 778,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0108",
+            "type": "commune",
+            "name": "Commune Mamer",
+            "commune_id": "0108",
+            "canton_id": "01",
+            "x": 262,
+            "y": 826,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0110",
+            "type": "commune",
+            "name": "Commune Steinfort",
+            "commune_id": "0110",
+            "canton_id": "01",
+            "x": 178,
+            "y": 798,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0201",
+            "type": "commune",
+            "name": "Commune Bettembourg",
+            "commune_id": "0201",
+            "canton_id": "02",
+            "x": 338,
+            "y": 990,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0202",
+            "type": "commune",
+            "name": "Commune Differdange",
+            "commune_id": "0202",
+            "canton_id": "02",
+            "x": 142,
+            "y": 990,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0203",
+            "type": "commune",
+            "name": "Commune Dudelange",
+            "commune_id": "0203",
+            "canton_id": "02",
+            "x": 342,
+            "y": 1050,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0204",
+            "type": "commune",
+            "name": "Commune Esch-sur-Alzette",
+            "commune_id": "0204",
+            "canton_id": "02",
+            "x": 235,
+            "y": 1034,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0205",
+            "type": "commune",
+            "name": "Commune Frisange",
+            "commune_id": "0205",
+            "canton_id": "02",
+            "x": 438,
+            "y": 998,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0206",
+            "type": "commune",
+            "name": "Commune Kayl",
+            "commune_id": "0206",
+            "canton_id": "02",
+            "x": 286,
+            "y": 1050,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0207",
+            "type": "commune",
+            "name": "Commune Leudelange",
+            "commune_id": "0207",
+            "canton_id": "02",
+            "x": 322,
+            "y": 918,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0208",
+            "type": "commune",
+            "name": "Commune Mondercange",
+            "commune_id": "0208",
+            "canton_id": "02",
+            "x": 266,
+            "y": 974,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0209",
+            "type": "commune",
+            "name": "Commune Pétange",
+            "commune_id": "0209",
+            "canton_id": "02",
+            "x": 114,
+            "y": 946,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0210",
+            "type": "commune",
+            "name": "Commune Reckange-sur-Mess",
+            "commune_id": "0210",
+            "canton_id": "02",
+            "x": 266,
+            "y": 930,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0211",
+            "type": "commune",
+            "name": "Commune Roeser",
+            "commune_id": "0211",
+            "canton_id": "02",
+            "x": 385,
+            "y": 968,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0212",
+            "type": "commune",
+            "name": "Commune Rumelange",
+            "commune_id": "0212",
+            "canton_id": "02",
+            "x": 266,
+            "y": 1078,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0213",
+            "type": "commune",
+            "name": "Commune Sanem",
+            "commune_id": "0213",
+            "canton_id": "02",
+            "x": 194,
+            "y": 974,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0214",
+            "type": "commune",
+            "name": "Commune Schifflange",
+            "commune_id": "0214",
+            "canton_id": "02",
+            "x": 270,
+            "y": 1014,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0301",
+            "type": "commune",
+            "name": "Commune Bertrange",
+            "commune_id": "0301",
+            "canton_id": "03",
+            "x": 294,
+            "y": 870,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0302",
+            "type": "commune",
+            "name": "Commune Contern",
+            "commune_id": "0302",
+            "canton_id": "03",
+            "x": 490,
+            "y": 890,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0303",
+            "type": "commune",
+            "name": "Commune Hesperange",
+            "commune_id": "0303",
+            "canton_id": "03",
+            "x": 414,
+            "y": 906,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0304",
+            "type": "commune",
+            "name": "Commune Luxembourg",
+            "commune_id": "0304",
+            "canton_id": "03",
+            "x": 388,
+            "y": 840,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0305",
+            "type": "commune",
+            "name": "Commune Niederanven",
+            "commune_id": "0305",
+            "canton_id": "03",
+            "x": 474,
+            "y": 790,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0306",
+            "type": "commune",
+            "name": "Commune Sandweiler",
+            "commune_id": "0306",
+            "canton_id": "03",
+            "x": 462,
+            "y": 850,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0307",
+            "type": "commune",
+            "name": "Commune Schuttrange",
+            "commune_id": "0307",
+            "canton_id": "03",
+            "x": 518,
+            "y": 834,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0308",
+            "type": "commune",
+            "name": "Commune Steinsel",
+            "commune_id": "0308",
+            "canton_id": "03",
+            "x": 394,
+            "y": 762,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0309",
+            "type": "commune",
+            "name": "Commune Strassen",
+            "commune_id": "0309",
+            "canton_id": "03",
+            "x": 322,
+            "y": 826,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0310",
+            "type": "commune",
+            "name": "Commune Walferdange",
+            "commune_id": "0310",
+            "canton_id": "03",
+            "x": 386,
+            "y": 786,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0311",
+            "type": "commune",
+            "name": "Commune Weiler-la-Tour",
+            "commune_id": "0311",
+            "canton_id": "03",
+            "x": 450,
+            "y": 950,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0401",
+            "type": "commune",
+            "name": "Commune Colmar-Berg",
+            "commune_id": "0401",
+            "canton_id": "04",
+            "x": 334,
+            "y": 558,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0402",
+            "type": "commune",
+            "name": "Commune Bissen",
+            "commune_id": "0402",
+            "canton_id": "04",
+            "x": 306,
+            "y": 586,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0403",
+            "type": "commune",
+            "name": "Commune Helperknapp",
+            "commune_id": "0403",
+            "canton_id": "04",
+            "x": 282,
+            "y": 670,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0404",
+            "type": "commune",
+            "name": "Commune Fischbach",
+            "commune_id": "0404",
+            "canton_id": "04",
+            "x": 438,
+            "y": 654,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0405",
+            "type": "commune",
+            "name": "Commune Heffingen",
+            "commune_id": "0405",
+            "canton_id": "04",
+            "x": 494,
+            "y": 626,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0406",
+            "type": "commune",
+            "name": "Commune Larochette",
+            "commune_id": "0406",
+            "canton_id": "04",
+            "x": 446,
+            "y": 606,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0407",
+            "type": "commune",
+            "name": "Commune Lintgen",
+            "commune_id": "0407",
+            "canton_id": "04",
+            "x": 390,
+            "y": 686,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0408",
+            "type": "commune",
+            "name": "Commune Lorentzweiler",
+            "commune_id": "0408",
+            "canton_id": "04",
+            "x": 398,
+            "y": 722,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0409",
+            "type": "commune",
+            "name": "Commune Mersch",
+            "commune_id": "0409",
+            "canton_id": "04",
+            "x": 353,
+            "y": 652,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0410",
+            "type": "commune",
+            "name": "Commune Nommern",
+            "commune_id": "0410",
+            "canton_id": "04",
+            "x": 402,
+            "y": 570,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0501",
+            "type": "commune",
+            "name": "Commune Clervaux",
+            "commune_id": "0501",
+            "canton_id": "05",
+            "x": 306,
+            "y": 174,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0502",
+            "type": "commune",
+            "name": "Commune Wincrange",
+            "commune_id": "0502",
+            "canton_id": "05",
+            "x": 182,
+            "y": 186,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0503",
+            "type": "commune",
+            "name": "Commune Parc Hosingen",
+            "commune_id": "0503",
+            "canton_id": "05",
+            "x": 342,
+            "y": 278,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0504",
+            "type": "commune",
+            "name": "Commune Troisvierges",
+            "commune_id": "0504",
+            "canton_id": "05",
+            "x": 254,
+            "y": 58,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0505",
+            "type": "commune",
+            "name": "Commune Weiswampach",
+            "commune_id": "0505",
+            "canton_id": "05",
+            "x": 318,
+            "y": 78,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0601",
+            "type": "commune",
+            "name": "Commune Bettendorf",
+            "commune_id": "0601",
+            "canton_id": "06",
+            "x": 458,
+            "y": 474,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0602",
+            "type": "commune",
+            "name": "Commune Bourscheid",
+            "commune_id": "0602",
+            "canton_id": "06",
+            "x": 318,
+            "y": 410,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0603",
+            "type": "commune",
+            "name": "Commune Diekirch",
+            "commune_id": "0603",
+            "canton_id": "06",
+            "x": 398,
+            "y": 466,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0604",
+            "type": "commune",
+            "name": "Commune Erpeldange-sur-Sûre",
+            "commune_id": "0604",
+            "canton_id": "06",
+            "x": 366,
+            "y": 466,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0605",
+            "type": "commune",
+            "name": "Commune Ettelbruck",
+            "commune_id": "0605",
+            "canton_id": "06",
+            "x": 334,
+            "y": 502,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0606",
+            "type": "commune",
+            "name": "Commune Feulen",
+            "commune_id": "0606",
+            "canton_id": "06",
+            "x": 286,
+            "y": 482,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0607",
+            "type": "commune",
+            "name": "Commune Mertzig",
+            "commune_id": "0607",
+            "canton_id": "06",
+            "x": 258,
+            "y": 522,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0608",
+            "type": "commune",
+            "name": "Commune Reisdorf",
+            "commune_id": "0608",
+            "canton_id": "06",
+            "x": 518,
+            "y": 474,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0609",
+            "type": "commune",
+            "name": "Commune Schieren",
+            "commune_id": "0609",
+            "canton_id": "06",
+            "x": 366,
+            "y": 530,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0610",
+            "type": "commune",
+            "name": "Commune Vallée de l'Ernz",
+            "commune_id": "0610",
+            "canton_id": "06",
+            "x": 466,
+            "y": 534,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0701",
+            "type": "commune",
+            "name": "Commune Beckerich",
+            "commune_id": "0701",
+            "canton_id": "07",
+            "x": 150,
+            "y": 674,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0702",
+            "type": "commune",
+            "name": "Commune Préizerdaul",
+            "commune_id": "0702",
+            "canton_id": "07",
+            "x": 190,
+            "y": 570,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0703",
+            "type": "commune",
+            "name": "Commune Ell",
+            "commune_id": "0703",
+            "canton_id": "07",
+            "x": 90,
+            "y": 606,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0704",
+            "type": "commune",
+            "name": "Commune Rambrouch",
+            "commune_id": "0704",
+            "canton_id": "07",
+            "x": 78,
+            "y": 518,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0706",
+            "type": "commune",
+            "name": "Commune Redange",
+            "commune_id": "0706",
+            "canton_id": "07",
+            "x": 146,
+            "y": 610,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0707",
+            "type": "commune",
+            "name": "Commune Saeul",
+            "commune_id": "0707",
+            "canton_id": "07",
+            "x": 226,
+            "y": 678,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0708",
+            "type": "commune",
+            "name": "Commune Useldange",
+            "commune_id": "0708",
+            "canton_id": "07",
+            "x": 222,
+            "y": 618,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0709",
+            "type": "commune",
+            "name": "Commune Vichten",
+            "commune_id": "0709",
+            "canton_id": "07",
+            "x": 262,
+            "y": 562,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0711",
+            "type": "commune",
+            "name": "Commune Groussbus-Wal",
+            "commune_id": "0711",
+            "canton_id": "07",
+            "x": 186,
+            "y": 506,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0801",
+            "type": "commune",
+            "name": "Commune Boulaide",
+            "commune_id": "0801",
+            "canton_id": "08",
+            "x": 62,
+            "y": 430,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0802",
+            "type": "commune",
+            "name": "Commune Esch-sur-Sûre",
+            "commune_id": "0802",
+            "canton_id": "08",
+            "x": 202,
+            "y": 438,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0804",
+            "type": "commune",
+            "name": "Commune Goesdorf",
+            "commune_id": "0804",
+            "canton_id": "08",
+            "x": 238,
+            "y": 374,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0805",
+            "type": "commune",
+            "name": "Commune Kiischpelt",
+            "commune_id": "0805",
+            "canton_id": "08",
+            "x": 260,
+            "y": 304,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0806",
+            "type": "commune",
+            "name": "Commune Lac de la Haute Sûre",
+            "commune_id": "0806",
+            "canton_id": "08",
+            "x": 106,
+            "y": 378,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0807",
+            "type": "commune",
+            "name": "Commune Wiltz",
+            "commune_id": "0807",
+            "canton_id": "08",
+            "x": 194,
+            "y": 302,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0808",
+            "type": "commune",
+            "name": "Commune Winseler",
+            "commune_id": "0808",
+            "canton_id": "08",
+            "x": 122,
+            "y": 318,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0901",
+            "type": "commune",
+            "name": "Commune Tandel",
+            "commune_id": "0901",
+            "canton_id": "09",
+            "x": 422,
+            "y": 406,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0902",
+            "type": "commune",
+            "name": "Commune Putscheid",
+            "commune_id": "0902",
+            "canton_id": "09",
+            "x": 382,
+            "y": 342,
+            "footprint": 4
+        },
+        {
+            "id": "commune:0903",
+            "type": "commune",
+            "name": "Commune Vianden",
+            "commune_id": "0903",
+            "canton_id": "09",
+            "x": 446,
+            "y": 366,
+            "footprint": 4
+        },
+        {
+            "id": "commune:1001",
+            "type": "commune",
+            "name": "Commune Beaufort",
+            "commune_id": "1001",
+            "canton_id": "10",
+            "x": 538,
+            "y": 518,
+            "footprint": 4
+        },
+        {
+            "id": "commune:1002",
+            "type": "commune",
+            "name": "Commune Bech",
+            "commune_id": "1002",
+            "canton_id": "10",
+            "x": 586,
+            "y": 646,
+            "footprint": 4
+        },
+        {
+            "id": "commune:1003",
+            "type": "commune",
+            "name": "Commune Berdorf",
+            "commune_id": "1003",
+            "canton_id": "10",
+            "x": 594,
+            "y": 542,
+            "footprint": 4
+        },
+        {
+            "id": "commune:1004",
+            "type": "commune",
+            "name": "Commune Consdorf",
+            "commune_id": "1004",
+            "canton_id": "10",
+            "x": 578,
+            "y": 606,
+            "footprint": 4
+        },
+        {
+            "id": "commune:1005",
+            "type": "commune",
+            "name": "Commune Echternach",
+            "commune_id": "1005",
+            "canton_id": "10",
+            "x": 650,
+            "y": 575,
+            "footprint": 4
+        },
+        {
+            "id": "commune:1006",
+            "type": "commune",
+            "name": "Commune Rosport-Mompach",
+            "commune_id": "1006",
+            "canton_id": "10",
+            "x": 702,
+            "y": 614,
+            "footprint": 4
+        },
+        {
+            "id": "commune:1008",
+            "type": "commune",
+            "name": "Commune Waldbillig",
+            "commune_id": "1008",
+            "canton_id": "10",
+            "x": 530,
+            "y": 574,
+            "footprint": 4
+        },
+        {
+            "id": "commune:1101",
+            "type": "commune",
+            "name": "Commune Betzdorf",
+            "commune_id": "1101",
+            "canton_id": "11",
+            "x": 566,
+            "y": 762,
+            "footprint": 4
+        },
+        {
+            "id": "commune:1102",
+            "type": "commune",
+            "name": "Commune Biwer",
+            "commune_id": "1102",
+            "canton_id": "11",
+            "x": 602,
+            "y": 710,
+            "footprint": 4
+        },
+        {
+            "id": "commune:1103",
+            "type": "commune",
+            "name": "Commune Flaxweiler",
+            "commune_id": "1103",
+            "canton_id": "11",
+            "x": 598,
+            "y": 802,
+            "footprint": 4
+        },
+        {
+            "id": "commune:1104",
+            "type": "commune",
+            "name": "Commune Grevenmacher",
+            "commune_id": "1104",
+            "canton_id": "11",
+            "x": 654,
+            "y": 758,
+            "footprint": 4
+        },
+        {
+            "id": "commune:1105",
+            "type": "commune",
+            "name": "Commune Junglinster",
+            "commune_id": "1105",
+            "canton_id": "11",
+            "x": 502,
+            "y": 706,
+            "footprint": 4
+        },
+        {
+            "id": "commune:1106",
+            "type": "commune",
+            "name": "Commune Manternach",
+            "commune_id": "1106",
+            "canton_id": "11",
+            "x": 654,
+            "y": 690,
+            "footprint": 4
+        },
+        {
+            "id": "commune:1107",
+            "type": "commune",
+            "name": "Commune Mertert",
+            "commune_id": "1107",
+            "canton_id": "11",
+            "x": 714,
+            "y": 698,
+            "footprint": 4
+        },
+        {
+            "id": "commune:1108",
+            "type": "commune",
+            "name": "Commune Wormeldange",
+            "commune_id": "1108",
+            "canton_id": "11",
+            "x": 638,
+            "y": 830,
+            "footprint": 4
+        },
+        {
+            "id": "commune:1202",
+            "type": "commune",
+            "name": "Commune Dalheim",
+            "commune_id": "1202",
+            "canton_id": "12",
+            "x": 506,
+            "y": 958,
+            "footprint": 4
+        },
+        {
+            "id": "commune:1203",
+            "type": "commune",
+            "name": "Commune Lenningen",
+            "commune_id": "1203",
+            "canton_id": "12",
+            "x": 570,
+            "y": 862,
+            "footprint": 4
+        },
+        {
+            "id": "commune:1204",
+            "type": "commune",
+            "name": "Commune Mondorf-les-Bains",
+            "commune_id": "1204",
+            "canton_id": "12",
+            "x": 526,
+            "y": 998,
+            "footprint": 4
+        },
+        {
+            "id": "commune:1205",
+            "type": "commune",
+            "name": "Commune Remich",
+            "commune_id": "1205",
+            "canton_id": "12",
+            "x": 602,
+            "y": 950,
+            "footprint": 4
+        },
+        {
+            "id": "commune:1206",
+            "type": "commune",
+            "name": "Commune Schengen",
+            "commune_id": "1206",
+            "canton_id": "12",
+            "x": 578,
+            "y": 1026,
+            "footprint": 4
+        },
+        {
+            "id": "commune:1207",
+            "type": "commune",
+            "name": "Commune Stadtbredimus",
+            "commune_id": "1207",
+            "canton_id": "12",
+            "x": 594,
+            "y": 902,
+            "footprint": 4
+        },
+        {
+            "id": "commune:1209",
+            "type": "commune",
+            "name": "Commune Bous-Waldbredimus",
+            "commune_id": "1209",
+            "canton_id": "12",
+            "x": 550,
+            "y": 930,
+            "footprint": 4
+        }
+    ]
+}

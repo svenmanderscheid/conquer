@@ -9,7 +9,7 @@ final class WorldService
     public static function state(int $playerId): array
     {
         $worlds=Connection::getInstance()->query('SELECT w.id,w.name,w.slug,w.status,w.map_size,w.speed_factor,w.gather_factor,w.haul_factor,c.id AS city_id,c.name AS city_name,c.castle_level FROM worlds w LEFT JOIN cities c ON c.world_id=w.id AND c.player_id=? ORDER BY w.id',[$playerId])->fetchAll();
-        foreach($worlds as &$world){$world['id']=(int)$world['id'];$world['owned']=$world['city_id']!==null;$world['selected']=$world['id']===WorldContext::id();$world['can_join']=!$world['owned']&&in_array($world['status'],['open','running'],true);$world['can_select']=$world['owned'];}unset($world);
+        foreach($worlds as &$world){$world['id']=(int)$world['id'];$world['map_profile']=WorldMapProfile::forWorld($world['id']);$world['map_width']=$world['map_profile']['width'];$world['map_height']=$world['map_profile']['height'];$world['owned']=$world['city_id']!==null;$world['selected']=$world['id']===WorldContext::id();$world['can_join']=!$world['owned']&&in_array($world['status'],['open','running'],true);$world['can_select']=$world['owned'];}unset($world);
         return ['active_world_id'=>WorldContext::id(),'worlds'=>$worlds,'server_time'=>time()];
     }
     public static function action(array $session,array $body): array
@@ -45,6 +45,10 @@ final class WorldService
         $db=Connection::getInstance();
         $work=static function()use($db,$worldId):void{
             $size=\Conquer\Game\Map\WorldPlacement::lockWorld($db,$worldId);
+            if(WorldMapProfile::isLuxembourg($worldId)){
+                \Conquer\Game\Territory\TerritoryService::ensureWorld($worldId);
+                LandProgressService::ensureWorld($worldId);return;
+            }
             if($size!==256)throw new \DomainException('Spielbare Welten benötigen derzeit genau 256 × 256 Felder.');
             $center=intdiv($size,2);
             $existing=$db->query('SELECT shrine_code FROM shrines WHERE world_id=?',[$worldId])->fetchAll(\PDO::FETCH_COLUMN);

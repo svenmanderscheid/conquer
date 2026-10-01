@@ -1,76 +1,36 @@
 <?php
 declare(strict_types=1);
-
-if (PHP_SAPI !== 'cli') { exit(1); }
-$base = rtrim($argv[1] ?? 'http://localhost/conquer', '/');
-if (!in_array(parse_url($base, PHP_URL_HOST), ['localhost', '127.0.0.1'], true)) { exit("Local hosts only.\n"); }
-define('ROOT_DIR', dirname(__DIR__));
-require ROOT_DIR . '/src/Bootstrap.php';
-\Conquer\Bootstrap::init(ROOT_DIR);
-
+if(PHP_SAPI!=='cli')exit(1);
+define('ROOT_DIR',dirname(__DIR__));
+require ROOT_DIR.'/src/Autoloader.php';(new \Conquer\Autoloader(ROOT_DIR.'/src'))->register();
+require __DIR__.'/Support/FeatureDatabase.php';require __DIR__.'/Support/HttpApp.php';
 use Conquer\Auth\AlphaAccess;
 use Conquer\Db\Connection;
-
-$db = Connection::getInstance();
-$jars = [tempnam(sys_get_temp_dir(), 'alpha-a-'), tempnam(sys_get_temp_dir(), 'alpha-b-'), tempnam(sys_get_temp_dir(), 'alpha-c-')];
-$name = 'AlphaAuto' . bin2hex(random_bytes(4));
-$password = bin2hex(random_bytes(16));
-$label = 'HTTP Alpha-Test ' . $name;
-$key = AlphaAccess::generate($db, $label, 1);
-$db->execute("DELETE FROM login_attempts WHERE ip_address IN ('127.0.0.1','::1')");
-$failure = null;
-
-function alphaRequest(int $session, string $path, ?array $form = null): array
-{
-    global $base, $jars;
-    $handle = curl_init($base . $path);
-    curl_setopt_array($handle, [CURLOPT_RETURNTRANSFER => true, CURLOPT_COOKIEJAR => $jars[$session], CURLOPT_COOKIEFILE => $jars[$session], CURLOPT_TIMEOUT => 20]);
-    if ($form !== null) { curl_setopt_array($handle, [CURLOPT_POST => true, CURLOPT_POSTFIELDS => http_build_query($form)]); }
-    $text = curl_exec($handle);
-    if ($text === false) { throw new RuntimeException(curl_error($handle)); }
-    $status = (int) curl_getinfo($handle, CURLINFO_HTTP_CODE);
-    curl_close($handle);
-    return ['status' => $status, 'text' => $text];
-}
-
-function alphaCsrf(int $session): string
-{
-    $page = alphaRequest($session, '/');
-    preg_match('/name="csrf" value="([a-f0-9]+)"/', $page['text'], $match);
-    return $match[1] ?? '';
-}
-
-function alphaAssert(bool $condition, string $label): void
-{
-    if (!$condition) { throw new RuntimeException($label); }
-    echo "PASS {$label}\n";
-}
-
+use ConquerTests\HttpApp;
+function alphaAssert(bool $ok,string $label):void{if(!$ok)throw new RuntimeException($label);echo "PASS $label\n";}
+$fixture=new \ConquerTests\FeatureDatabase();$jars=[];$mail=tempnam(sys_get_temp_dir(),'alpha-mail-');
 try {
-    $csrf = alphaCsrf(0);
-    alphaAssert($csrf !== '', 'public page provides a registration CSRF token');
-    $created = alphaRequest(0, '/auth/local', ['mode' => 'register', 'alpha_key' => $key, 'username' => $name, 'password' => $password, 'csrf' => $csrf]);
-    alphaAssert($created['status'] === 302, 'valid single-use key creates an account');
-    alphaAssert((int) $db->query('SELECT uses_count FROM alpha_access_keys WHERE label=?', [$label])->fetchColumn() === 1, 'successful registration consumes the key exactly once');
-
-    $reuse = alphaRequest(1, '/auth/local', ['mode' => 'register', 'alpha_key' => $key, 'username' => $name . 'X', 'password' => $password, 'csrf' => alphaCsrf(1)]);
-    alphaAssert($reuse['status'] === 200 && str_contains($reuse['text'], 'ungültig oder nicht mehr verfügbar'), 'used key cannot create a second account');
-
-    $login = alphaRequest(2, '/auth/local', ['mode' => 'login', 'username' => $name, 'password' => $password, 'csrf' => alphaCsrf(2)]);
-    alphaAssert($login['status'] === 302, 'invited player signs in later without resubmitting the key');
-    echo "ALL ALPHA REGISTRATION CHECKS PASSED\n";
-} catch (Throwable $e) {
-    $failure = $e;
-} finally {
-    $playerId = $db->query('SELECT id FROM players WHERE username IN (?,?)', [$name, $name . 'X'])->fetchAll(PDO::FETCH_COLUMN);
-    foreach ($playerId as $id) {
-        $db->execute('DELETE FROM cities WHERE player_id=?', [(int) $id]);
-        $db->execute('DELETE FROM players WHERE id=?', [(int) $id]);
-    }
-    $db->execute('DELETE FROM alpha_access_keys WHERE label=?', [$label]);
-    foreach ($jars as $jar) { if (is_file($jar)) { unlink($jar); } }
-}
-if ($failure !== null) {
-    fwrite(STDERR, 'FAIL ' . $failure->getMessage() . PHP_EOL);
-    exit(1);
-}
+    $db=Connection::getInstance();$db->execute("UPDATE worlds SET status='running' WHERE id=1");
+    $base=$fixture->serve(HttpApp::source([], $mail),['-d','disable_functions=mail','-d','display_errors=0']);
+    for($i=0;$i<3;$i++)$jars[]=tempnam(sys_get_temp_dir(),'alpha-cookie-');
+    $key=AlphaAccess::generate($db,'Isolated HTTP alpha',1);$name='AlphaIsolated';$password='Alpha-password-2026!';
+    $csrf=static function(int $i)use($base,$jars):string{$r=HttpApp::request($base,'/','GET',[],null,$jars[$i]);preg_match('/name="csrf" value="([a-f0-9]+)"/',$r['body'],$m);return $m[1]??'';};
+    $post=static fn(int $i,array $data):array=>HttpApp::request($base,'/auth/local','POST',['Content-Type: application/x-www-form-urlencoded'],http_build_query($data),$jars[$i]);
+    $token=$csrf(0);alphaAssert($token!=='','public registration supplies CSRF');
+    $form=['mode'=>'register','alpha_key'=>$key,'username'=>$name,'email'=>'alpha@example.invalid','password'=>$password,'csrf'=>$token];
+    $created=$post(0,$form);alphaAssert($created['status']===302,'valid single-use key and email create isolated account');
+    alphaAssert((int)$db->query('SELECT uses_count FROM alpha_access_keys')->fetchColumn()===1,'key consumed exactly once');
+    $mails=array_values(array_filter(explode("\n",(string)file_get_contents($mail))));alphaAssert(count($mails)===1,'verification message captured without external delivery');
+    $message=json_decode($mails[0],true);preg_match('/token=([a-f0-9]{64})/',$message['body'],$tokenMatch);
+    alphaAssert(isset($tokenMatch[1]),'captured verification includes token');
+    $verified=HttpApp::request($base,'/auth/verify-email?token='.$tokenMatch[1]);alphaAssert($verified['status']<400&&(bool)$db->query('SELECT email_verified_at FROM players WHERE username=?',[$name])->fetchColumn(),'verification link confirms isolated mailbox');
+    $reuse=$post(1,array_replace($form,['username'=>'AlphaSecond','email'=>'second@example.invalid','csrf'=>$csrf(1)]));
+    alphaAssert($reuse['status']===200&&str_contains($reuse['body'],'ungültig oder nicht mehr verfügbar'),'used key cannot register twice');
+    $login=$post(2,['mode'=>'login','identifier'=>'alpha@example.invalid','password'=>$password,'csrf'=>$csrf(2)]);
+    alphaAssert($login['status']===302,'existing invited account signs in by email');
+    $entry=HttpApp::request($base,'/','GET',[],null,$jars[2]);
+    alphaAssert($entry['status']===302&&in_array('location: /city',$entry['headers'],true),'returning authenticated player enters the city directly');
+    $db->execute('UPDATE players SET is_banned=1 WHERE username=?',[$name]);
+    $me=HttpApp::request($base,'/api/auth/me','GET',[],null,$jars[2]);alphaAssert($me['status']===401,'banning player revokes API access immediately');
+    echo "ALL ISOLATED ALPHA REGISTRATION CHECKS PASSED\n";
+}finally{$fixture->close();foreach([...$jars,$mail]as$f)if(is_file($f))unlink($f);}

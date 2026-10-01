@@ -11,7 +11,7 @@ declare(strict_types=1);
  *   1. Bootstraps the app (loads DB connection)
  *   2. Ensures the `migrations` tracking table exists
  *   3. Scans migrations/ for *.sql files, sorted by filename
- *   4. Applies each file that hasn't been recorded yet — in a transaction
+ *   4. Applies each file that hasn't been recorded yet, in statement order
  *   5. Records applied migrations in the `migrations` table
  */
 

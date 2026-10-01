@@ -46,7 +46,7 @@
                     const value = Number(effect.bonus_pct);
                     return `<li class="active-effect is-${esc(effect.kind)}" data-effect-id="${esc(effect.id)}">
                         <span class="active-effect-art grade-${grade}" aria-hidden="true"><img src="${base}/assets/art/${effect.source === 'charm' ? 'map/crystal' : 'items/speedup'}.svg" alt=""></span>
-                        <div class="active-effect-copy"><small>${esc(source)}</small><strong>${esc(labels[effect.stat_category] || 'Aktiver Effekt')} <b>${value > 0 ? '+' : ''}${esc(value.toLocaleString('de-DE', {maximumFractionDigits:2}))} %</b></strong>
+                        <div class="active-effect-copy"><small>${esc(source)}</small><strong>${esc(labels[effect.stat_category] || 'Aktiver Effekt')} <b>${value > 0 ? '+' : ''}${esc(value.toLocaleString(window.ConquerLocale?.locale??'en', {maximumFractionDigits:2}))} %</b></strong>
                         <div class="active-effect-duration"><span class="active-effect-track" aria-hidden="true"><span></span></span><time aria-label="Verbleibende Dauer"></time></div></div>
                     </li>`;
                 }).join('');

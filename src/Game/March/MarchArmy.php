@@ -19,7 +19,7 @@ final class MarchArmy
         }
         $clean = [];
         foreach ($input as $code => $count) {
-            if (!preg_match('/^[1-9][0-9]*$/D', (string) $code) || TroopData::get((int) $code) === null
+            if (!preg_match('/^[1-9][0-9]*$/D', (string) $code) || !TroopData::isActive((int) $code)
                 || !is_int($count) || $count < 0 || $count > $limit) {
                 throw new \RuntimeException('Truppentypen und nichtnegative ganze Truppenanzahlen sind erforderlich.');
             }

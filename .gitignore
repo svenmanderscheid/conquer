@@ -7,6 +7,7 @@ config/database.php
 config/app.php
 config/secrets.php
 config/local.php
+config/discord.php
 .env
 .env.local
 .env.*.local
@@ -27,6 +28,7 @@ tmp/
 temp/
 *.tmp
 *.bak
+data/balance-history/local-five-tiers-backup-*.json
 
 # OS
 .DS_Store
@@ -108,3 +110,15 @@ scripts/local-*.sh
 local-*.php
 
 asset-workflow/
+
+# Local audit evidence, prototypes and exports are not release contents.
+artifacts/
+outputs/
+preview/
+.claude/
+/Routkaepp_Ekki_Sunny_Orange.pdf
+.codex-tmp/
+.codex-remote-attachments/
+__pycache__/
+*.pyc
+logs/*.json
