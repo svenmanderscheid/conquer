@@ -75,6 +75,18 @@
     function has(key){return Object.hasOwn(catalogs[locale]||{},key)||Object.hasOwn(catalogs.en||{},key);}
     function localeTag(){return locale==='fr'?'fr-FR':locale==='en'?'en-US':'de-DE';}
     function formatNumber(value,options={}){return new Intl.NumberFormat(localeTag(),options).format(Number(value)||0);}
+    // HUD counters share short units across languages; detailed values keep formatNumber.
+    function formatHudNumber(value){
+        const parsed=Number(value),amount=Number.isFinite(parsed)?Math.floor(parsed):0;
+        if(Math.abs(amount)<10000)return formatNumber(amount);
+        const units=['thousand','million','billion','trillion'];
+        let magnitude=1000,index=0;
+        while(index<units.length-1&&Math.abs(amount)>=magnitude*1000){magnitude*=1000;index++;}
+        // Promote after rounding too: 999,950 should read 1M, never 1,000K.
+        if(Math.round(Math.abs(amount)/magnitude*10)/10>=1000){magnitude*=1000;index++;}
+        if(index>=units.length)return formatNumber(amount,{notation:'scientific',maximumFractionDigits:1,useGrouping:false});
+        return formatNumber(amount/magnitude,{maximumFractionDigits:1,useGrouping:false})+t('hud.number.'+units[index]);
+    }
     function formatDate(value,options={}){const date=value instanceof Date?value:new Date(value);return new Intl.DateTimeFormat(localeTag(),options).format(date);}
     function formatDuration(value){
         const seconds=Math.max(0,Math.ceil(Number(value)||0)),parts=[];
@@ -169,7 +181,7 @@
     window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();installPrompt=event;});
     window.addEventListener('appinstalled',()=>{installPrompt=null;document.dispatchEvent(new CustomEvent('conquer:installed'));});
     window.addEventListener('storage',event=>{if(event.key==='conquer.locale'){locale=normalize(event.newValue);const selected=locale;prepareLocale(locale).then(()=>{if(locale===selected){apply();document.dispatchEvent(new CustomEvent('conquer:locale',{detail:{locale}}));}});}});
-    window.ConquerLocale={ready,t,text:textTranslation,has,apply,mount,setLocale,normalize,formatNumber,formatDate,formatDuration,get locale(){return locale;},get supported(){return{...supported};}};
+    window.ConquerLocale={ready,t,text:textTranslation,has,apply,mount,setLocale,normalize,formatNumber,formatHudNumber,formatDate,formatDuration,get locale(){return locale;},get supported(){return{...supported};}};
     window.ConquerPWA={register,install:installApp};
     const start=()=>{ready.then(()=>{observe();register();});};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();

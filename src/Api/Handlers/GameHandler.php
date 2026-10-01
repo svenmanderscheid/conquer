@@ -156,6 +156,7 @@ final class GameHandler
             'active_effects'=>\Conquer\Game\Buff\ActiveEffectService::forPlayer($pid,$worldId),
             'building_plots'=>\Conquer\Game\City\BuildingPlotService::snapshot($state),
             'plot_queue'=>\Conquer\Game\City\BuildingPlotService::queue((int)$city['id']),
+            'building_completions'=>\Conquer\Game\Notification\NotificationService::buildingCompletions($pid,(int)$city['id'],$worldId),
             'storage_caps'=>\Conquer\Game\City\ResourceTick::storageCaps($state['buildings'],$state['vip']['bonuses']),
             'trained_total' => (int) $db->query('SELECT COALESCE(SUM(count),0) FROM troop_queue WHERE city_id = ? AND is_processed = 1', [$city['id']])->fetchColumn(),
             'player' => ['name' => $session['username'], 'csrf' => $session['csrf_token'],

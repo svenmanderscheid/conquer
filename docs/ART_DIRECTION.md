@@ -16,6 +16,8 @@ Use chunky, rounded silhouettes, warm ivory walls, saturated roof colors, dark e
 
 Animation stays calm, supports reduced motion and never obscures labels, selection or touch controls. Inspect the whole city and building dialogs in the actual app at desktop, narrow portrait and landscape sizes. Keep images compressed and reuse sprites.
 
+Construction reuses the approved scaffold artwork with a fixed frame and worker silhouette. Only the isolated hammer moves, with small timed dust/chip accents at the strike point; do not stack transparent whole-frame poses or move the entire building. The detail SVG is mounted only for an authoritative active build queue, retained across refreshes and removed when that queue settles. Countdown expiry alone does not finish the work. Timer labels stay above the scaffold. Light graphics retains the small tool motion and omits particles; reduced motion uses a fully still worksite. Dialogs, hidden tabs and the world view pause construction. Check `tests/city_construction_app.cjs` and `tests/painted_city.cjs`.
+
 Luxembourg conquest landmarks use the eight transparent illustrations in `assets/art/territory-v2/`: six commune benefits, a canton fortress and the Royal Castle. The 30 September revision gives them broader halls, stronger foundations, heavier bastions and more substantial walls while retaining the original roof colors and benefit emblems. Map and territory dialogs share `assets/js/territory-art.js`; their illustrated size follows the authoritative footprint. Sources, prompts, compression and visual checks are documented in `TERRITORY_ART.md`. The previous `territory-v1` set remains available for comparison.
 
 ### Premium castle and march skins

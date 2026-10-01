@@ -156,6 +156,7 @@
                 $('#save-state').classList.toggle('error',Object.keys(loadErrors).length>0);
                 document.body.classList.toggle('reduced-motion',Boolean(kingdom?.settings?.reduced_motion));
                 renderHud();
+                syncCityReadiness();
                 mailboxPanel.refresh();
                 const signature=JSON.stringify([state.buildings,state.troops,state.build_queue,state.troop_queue,state.research,state.research_queue,state.research_duration_factor,state.research_defs.map(n=>canAfford(n.levels.find(l=>l.level===Number(state.research[n.code]||0)+1)?.resources||{})),state.marches,state.public_marches,state.reports,state.monsters,state.charms,state.nodes,state.players,state.congress,state.shrines,state.land_progression,state.territory,state.world?.map_profile,state.map_center,kingdom?.profile,kingdom?.march_skins,kingdom?.name_frames,kingdom?.theme_bundles,kingdom?.skin_bundles,kingdom?.alliance,kingdom?.inventory,kingdom?.quests,kingdom?.hospital,kingdom?.treasures,[kingdom?.trading?.rotation,kingdom?.trading?.offers,kingdom?.trading?.vip],[kingdom?.chests?.free_silver_remaining,kingdom?.chests?.free_silver_available,kingdom?.chests?.free_gold_available],kingdom?.rankings,kingdom?.arena,expeditions?.expeditions,market]);
                 const editing=current!=='world'&&($('#content').dataset.dirty==='true'||($('#content').contains(document.activeElement)&&document.activeElement.matches('input,textarea,select')));
@@ -316,7 +317,8 @@
     function countdown(end) { return `<span data-end="${esc(end)}">${duration((date(end)-now())/1000)}</span>`; }
     function renderHud() {
         const compact=n=>kingdom?.settings?.compact_numbers||Number(n)>=1000000?Intl.NumberFormat(window.ConquerLocale?.locale??'en',{notation:'compact',maximumFractionDigits:1}).format(Number(n)||0):fmt(n);
-        $('#resources').innerHTML = Object.keys(resourceIcons).map(k => `<button class="resource" data-action="resource" data-id="${k}" aria-label="${resourceNames[k]}: ${fmt(state.city[k])}, Details öffnen" title="${resourceNames[k]}: ${fmt(state.city[k])}"><span class="resource-icon" aria-hidden="true"><img src="${base}/assets/art/ui-resources/${k}.png" alt=""></span><span><strong>${compact(state.city[k])}</strong><small>${resourceNames[k]}</small></span></button>`).join('');
+        const mobileCompact=n=>i18n?.formatHudNumber?.(n)??fmt(n);
+        $('#resources').innerHTML = Object.keys(resourceIcons).map(k => `<button class="resource" data-action="resource" data-id="${k}" aria-label="${resourceNames[k]}: ${fmt(state.city[k])}, Details öffnen" title="${resourceNames[k]}: ${fmt(state.city[k])}"><span class="resource-icon" aria-hidden="true"><img src="${base}/assets/art/ui-resources/${k}.png" alt=""></span><span><strong><span class="hud-value-full">${compact(state.city[k])}</span><span class="hud-value-compact" aria-hidden="true">${mobileCompact(state.city[k])}</span></strong><small>${resourceNames[k]}</small></span></button>`).join('');
         $('#player-hud-name').textContent=kingdom?.profile?.display_name||state.player.name;
         $('#hud-power-value').textContent=fmt(kingdom?.profile?.power||state.city.power);
         window.ConquerNameFrames.syncSelf(kingdom?.name_frames,document,kingdom?.profile?.name_frame||kingdom?.profile?.city_skin||'default');
@@ -366,13 +368,14 @@
         document.body.classList.toggle('popup-mode',hasPanel);
         const focusedNav=document.activeElement?.closest('#navigation [data-id]')?.dataset.id;
         const sceneTab=playfield==='world'?'city':'world';
-        const dock=[['quests',t('nav.quests_short'),'quest','tab'],['inventory',t('nav.inventory_short'),'inventory','tab'],['reports','Post','reports','tab'],['chat','Chat','chat','chat-open'],['shop',t('nav.market'),'shop','shop-open'],['alliance','Allianz','alliance','tab'],[sceneTab,sceneTab==='city'?'Dorf':'Welt',sceneTab,'tab']];
+        const dock=[['quests',t('nav.quests_short'),'quest','tab'],['inventory',t('nav.inventory_short'),'inventory','tab'],['reports','Post','reports','tab'],['chat','Chat','chat','chat-open'],['shop',t('nav.market'),'shop','shop-open'],['alliance','Allianz','alliance','tab'],[sceneTab,t('hud.scene.'+sceneTab),sceneTab,'tab']];
         $('#navigation').innerHTML=dock.map(([key,name,art,act])=>{
             const dockMenuArt={quests:'quests',inventory:'inventory',reports:'reports',chat:'chat',shop:'market',alliance:'alliance',city:'village',world:'world-map'}[key];
             const icon=dockMenuArt?`<img class="dock-icon dock-menu-art" src="${base}/assets/art/menu-icons/${dockMenuArt}.png" alt="">`:`<img class="dock-icon" src="${base}/assets/art/hud/${art}.svg" alt="">`;
             const badge=key==='quests'?'<span class="dock-badge" aria-hidden="true" hidden></span>':key==='chat'?'<span class="dock-badge chat-dock-badge" aria-hidden="true" hidden></span>':'';
-            const labelKey={quests:'nav.quests_short',inventory:'nav.inventory_short',shop:'nav.market'}[key];
-            return `<button class="game-dock-item ${key===sceneTab?'hud-scene-switch':''} ${current===key?'current':''}" data-action="${act}" data-id="${key}" aria-label="${name} öffnen" ${current===key?'aria-current="page"':''}>${icon}<span class="dock-label" ${labelKey?`data-i18n="${labelKey}"`:''}>${name}</span>${badge}</button>`;
+            const labelKey={quests:'nav.quests_short',inventory:'nav.inventory_short',shop:'nav.market',city:'hud.scene.city',world:'hud.scene.world'}[key];
+            const sceneAction=key===sceneTab?'hud.scene.'+key+'_open':null;
+            return `<button class="game-dock-item ${key===sceneTab?'hud-scene-switch':''} ${current===key?'current':''}" data-action="${act}" data-id="${key}" aria-label="${sceneAction?esc(t(sceneAction)):`${name} öffnen`}" ${sceneAction?`data-i18n-attrs="aria-label:${sceneAction}"`:''} ${current===key?'aria-current="page"':''}>${icon}<span class="dock-label" ${labelKey?`data-i18n="${labelKey}"`:''}>${name}</span>${badge}</button>`;
         }).join('');
         updateQuestBadge();
         mailboxPanel.badge();
@@ -407,7 +410,35 @@
         sound?.updateControls();
     }
     function renderCity(host=playfieldHost) {
-        return window.ConquerPaintedCity.render({host,base,state,labels,esc,countdown,citySkin:kingdom?.profile?.city_skin||'default'});
+        return window.ConquerPaintedCity.render({host,base,state,kingdom:loadErrors.kingdom?null:kingdom,labels,esc,countdown,citySkin:kingdom?.profile?.city_skin||'default'});
+    }
+    function syncCityReadiness(){
+        if(!state)return;
+        document.querySelectorAll('.painted-village').forEach(village=>window.ConquerPaintedCity.updateReadiness({host:village.parentElement,base,state,kingdom:loadErrors.kingdom?null:kingdom,labels}));
+    }
+    const pendingCityNotices=new Set();
+    async function openCityNotice(code){
+        if(pendingCityNotices.has(code))return;
+        const notice=window.ConquerPaintedCity.readiness({state,kingdom:loadErrors.kingdom?null:kingdom}).find(entry=>entry.code===code);
+        if(!notice)return;
+        if(notice.kind==='chest'){treasurePanel.selectTab('chests');navigate('treasures');return;}
+        if(notice.kind==='research'&&notice.data?.research_code)window.ConquerResearch.focus(notice.data.research_code,state.research_defs);
+        if(notice.kind==='building')buildingDialog(code);else buildingFunction(code,notice.kind==='training'?notice.data?.troop_code:null);
+        if(notice.kind==='research')revealFocusedResearch();
+        toast(t('city.ready.confirmed.'+notice.kind,{count:fmt(notice.count),building:labels[code]||code}));
+        const scope=String(state.city.id)+':'+String(state.city.world_id);
+        pendingCityNotices.add(code);
+        try{
+            if(polling)await polling;
+            if(scope!==String(state.city.id)+':'+String(state.city.world_id))return;
+            await api('notifications/read',{ids:notice.ids});
+            // A poll already in flight may still contain the acknowledged IDs.
+            if(polling)await polling;
+            if(scope!==String(state.city.id)+':'+String(state.city.world_id))return;
+            state.building_completions=(state.building_completions||[]).filter(entry=>!notice.ids.includes(Number(entry.id)));
+            syncCityReadiness();
+        }catch(error){toast(t('city.ready.dismiss_failed'));}
+        finally{pendingCityNotices.delete(code);}
     }
     function compactGuide() {
         const next = state.buildings.castle.level < 2 ? ['Baue deine Burg auf Stufe 2 aus.','building','castle'] : state.trained_total < 20 ? ['Bilde deine ersten 20 Truppen aus.','tab','army'] : !state.reports.length ? ['Besiege einen Ork-Späher in deiner Nähe.','tab','world'] : !Object.keys(state.research).length ? ['Entdecke deine erste Forschung.','tab','research'] : ['Dein Reich ist bereit für neue Abenteuer.','tab','world'];
@@ -638,6 +669,7 @@
         if(act==='structure-confirm'&&teleportSelection?.kind==='alliance-structure'){const selection=teleportSelection,x=Number(b.dataset.x),y=Number(b.dataset.y);(async()=>{const result=await communityPanel.placeStructure(selection.structure_type,x,y);if(result){teleportSelection=null;renderWorld();window.ConquerWorld.locate(x,y,[selection.structure_type==='center'?'alliance_center':'outpost'],result.id);}})();return;}
         if(act==='alliance-center-garrison'){const target=state.alliance_structures?.find(entry=>Number(entry.id)===Number(b.dataset.id));if(target?.can_garrison)marchPanel.open(target.id,'alliance-center-garrison',{target});return;}
         if(act==='retry') return refresh(); if(!state)return;
+        if(act==='city-ready'){openCityNotice(id);return;}
         if(act==='close-dialog'){$('#game-dialog').close();return;}
         if(act==='bug-report-open'){const dialogTitle=$('#game-dialog').open?$('#dialog-content h2,h3')?.textContent.trim():'';bugReports.begin({path:location.pathname+'#'+current,label:dialogTitle?navs[current]+' – '+dialogTitle:navs[current]});return;}
         if(beginnerGuide.onClick(act,b))return;

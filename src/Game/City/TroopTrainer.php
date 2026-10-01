@@ -199,6 +199,11 @@ final class TroopTrainer
                 'UPDATE troop_queue SET is_processed = 1 WHERE id = ?',
                 [(int) $entry['id']],
             );
+            \Conquer\Game\Notification\NotificationService::pushCityCompletion(
+                $cityId, \Conquer\Game\Notification\NotificationService::TYPE_TRAIN_COMPLETE,
+                ['building_code'=>TroopData::buildingFor($code), 'queue_id'=>(int)$entry['id'],
+                    'troop_code'=>$code, 'count'=>$count],
+            );
             });
         }
 

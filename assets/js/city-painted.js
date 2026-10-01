@@ -4,11 +4,73 @@ window.ConquerPaintedCity=(()=>{
  const places=[['castle',44,4,17,24],['academy',25,12,12,19],['treasure_house',64.5,14,14,18],['hospital',11.5,28,14,16],['hall_of_alliance',28.5,30,15,18],['trading_post',55.625,30.75,13.75,16.25],['storage',69.5,29,15,20],['watch_tower',89,34,6,16],['stable',6,49,16,14],['archery_range',13,63,14,12],['barrack',30,58,14,16],['farm',56,55,14,15],['lumber_camp',78,54,15,15],['gold_mine',54,72,11,11],['quarry',67,70,17,14],['wall',34,84,10,12]];
  const spriteName=code=>['castle','academy','treasure_house'].includes(code)?code+'_rounded':['hospital','hall_of_alliance','stable','archery_range','barrack'].includes(code)?code+'_aligned':code;
  const defaultCastleSprite=base=>`${base}/assets/art/village-layered-v2/runtime/castle_rounded.webp`;
+ function constructionArtwork(base,code){
+  const id='painted-construction-'+code,src=`${base}/assets/art/village-layered-v2/runtime/construction-scaffold-frame-1.webp`.replaceAll('&','&amp;').replaceAll('"','&quot;');
+  // Follow the tool silhouette through the transparent gap beside the cap.
+  // The hand is painted over its handle; no part of the face or scaffold moves.
+  const tool='M184 218 199 190 213 190 243 207 242 226 229 244 217 244 213 241 210 243 191 241 194 232 184 226Z';
+  const picture=`<image href="${src}" width="768" height="768"/>`;
+  return `<svg class="painted-construction-art" viewBox="0 0 768 768" preserveAspectRatio="xMidYMax meet" aria-hidden="true" focusable="false"><defs><mask id="${id}-base" maskUnits="userSpaceOnUse" x="0" y="0" width="768" height="768"><rect width="768" height="768" fill="white"/><path d="${tool}" fill="black"/></mask><clipPath id="${id}-tool"><path d="${tool}"/></clipPath></defs><g class="painted-construction-hammer" style="transform-origin:199px 249px"><g clip-path="url(#${id}-tool)">${picture}</g></g><g mask="url(#${id}-base)">${picture}</g><g class="painted-construction-impact" transform="translate(232 290)"><g class="painted-construction-dust"><ellipse cx="-5" cy="0" rx="10" ry="6"/><ellipse cx="7" cy="-3" rx="8" ry="7"/></g><path class="painted-construction-chip painted-construction-chip--left" d="m-4-2 7-2-2 6Z"/><path class="painted-construction-chip painted-construction-chip--right" d="m1-1 6 1-3 5Z"/></g></svg>`;
+ }
  const villageSkinAsset=url=>url+(url.includes('?')?'&':'?')+'village=3';
  const trainingBuildingFor=(state,job)=>{
   const definition=(state.troop_defs||[]).find(t=>Number(t.code)===Number(job.troop_code));
   return definition?.training_building||({1:'barrack',2:'archery_range',3:'stable'}[Number(job.barrack_slot)]??'barrack');
  };
+ const completionKinds={train_complete:'training',research_complete:'research',heal_complete:'healing',build_complete:'building'};
+ const readyIcons={training:'menu-icons/army.png',research:'menu-icons/research.png',healing:'items/healing.svg',building:'items/builders-hammer.png',chest:'items/daily-chest-gold-v1.png'};
+ // Only confirmed server events can produce a completion marker. An expired
+ // countdown still belongs to the running queue until the server settles it.
+ function readiness({state,kingdom}){
+  const notices=[];
+  for(const [code] of places){
+   if(Number(state?.buildings?.[code]?.level||0)<1)continue;
+   const events=(state.building_completions||[]).filter(entry=>Number(entry.id)>0&&completionKinds[entry.type]&&entry.data?.building_code===code
+    &&Number(entry.data.city_id)===Number(state.city?.id)&&Number(entry.data.world_id)===Number(state.city?.world_id));
+   const chests=code==='treasure_house'?kingdom?.chests:null;
+   const silver=chests?.free_silver_available===true&&Number(chests.free_silver_remaining)>0,gold=chests?.free_gold_available===true;
+   if(silver||gold){notices.push({code,kind:'chest',ids:[],count:Number(silver)+Number(gold),icon:gold?readyIcons.chest:'items/daily-chest-blue-v1.png'});continue;}
+   if(!events.length)continue;
+   const event=events.find(entry=>entry.type!=='build_complete')||events[0],kind=completionKinds[event.type];
+   const count=events.filter(entry=>entry.type===event.type).reduce((total,entry)=>total+Math.max(0,Number(entry.data.count)||0),0);
+   notices.push({code,kind,ids:events.map(entry=>Number(entry.id)),count,icon:readyIcons[kind],data:event.data});
+  }
+  return notices;
+ }
+ function updateReadiness({host,base,state,kingdom,labels}){
+  const scene=host.querySelector('.painted-village-scene');if(!scene)return;
+  syncHeadroom(scene.closest('.painted-village'));
+  let layer=scene.querySelector('.painted-building-notices');
+  if(!layer){layer=document.createElement('div');layer.className='painted-building-notices';scene.append(layer);}
+  const notices=readiness({state,kingdom}),active=new Set(notices.map(notice=>notice.code));
+  for(const button of [...layer.children])if(!active.has(button.dataset.id))button.remove();
+  for(const notice of notices){
+   let button=layer.querySelector(`[data-id="${notice.code}"]`);
+   if(!button){
+    button=document.createElement('button');button.type='button';button.className='painted-building-ready';button.dataset.action='city-ready';button.dataset.id=notice.code;
+    const [,x,y,w,h]=places.find(place=>place[0]===notice.code);
+    button.style.left=(x+w/2)+'%';button.style.top=(y+h*.25)+'%';
+    const art=document.createElement('img');art.alt='';art.draggable=false;
+    const check=document.createElement('span');check.className='painted-ready-check';check.setAttribute('aria-hidden','true');check.textContent='✓';
+    button.append(art,check);layer.append(button);
+   }
+   button.dataset.kind=notice.kind;
+   const label=window.ConquerLocale?.t('city.ready.'+notice.kind,{building:labels[notice.code]||notice.code,count:window.ConquerLocale?.formatNumber(notice.count)??notice.count})||notice.kind;
+   if(button.getAttribute('aria-label')!==label){button.setAttribute('aria-label',label);button.title=label;}
+   const image=button.querySelector('img'),src=`${base}/assets/art/${notice.icon}`;
+   if(image.getAttribute('src')!==src)image.src=src;
+  }
+ }
+ function syncHeadroom(village){
+  const scene=village.querySelector('.painted-village-scene'),scroll=village.querySelector('.painted-village-scroll');
+  const resources=document.getElementById('resources');
+  if(!scene||!scroll||!resources)return;
+  // Allow even the highest roof marker to move below the fixed resource bar.
+  // This is real scrollable space, so markers always stay anchored to their roofs.
+  const room=Math.max(0,Math.ceil(resources.getBoundingClientRect().bottom-village.getBoundingClientRect().top+12-scene.offsetHeight*.1+27));
+  scroll.style.setProperty('--painted-headroom',room+'px');
+ }
+ window.addEventListener('resize',()=>requestAnimationFrame(()=>document.querySelectorAll('.painted-village').forEach(syncHeadroom)));
  function syncCastleSkin(button,base,skinId){
   const image=button?.querySelector('.painted-building-sprite');if(!image)return;
   const catalog=window.ConquerCastleSkins,requested=typeof skinId==='string'&&/^[a-z0-9-]{1,32}$/.test(skinId)?skinId:'default',id=requested||'default';
@@ -120,11 +182,12 @@ window.ConquerPaintedCity=(()=>{
   quarry:'<path class="icon-fill" d="m4 18 4-9 6-4 6 13Z"/><path d="m4 18 4-9 6-4 6 13ZM3 18h18M8 9l5 4 3-6"/>',
   wall:'<path class="icon-fill" d="M4 20V8h4V5h3v3h4V5h3v3h2v12Z"/><path d="M4 20V8h4V5h3v3h4V5h3v3h2v12M2 20h20M9 20v-5h6v5"/>'
  };
- function render({host,base,state,labels,countdown,citySkin}){
+ function render({host,base,state,kingdom,labels,countdown,citySkin}){
   if(!host.querySelector('.painted-village')){
    const art=`${base}/assets/art/village-layered-v2/runtime`;
-   host.innerHTML=`<div class="painted-village"><div class="painted-village-scroll" tabindex="0" aria-label="Dorfansicht – mit der Maus ziehen oder wischen"><div class="painted-village-scene"><img src="${art}/terrain.webp" alt="Dorfuntergrund ohne Gebäude" draggable="false">${places.map(([code,x,y,w,h])=>`<button type="button" class="painted-village-building" data-action="building" data-id="${code}" style="left:${x}%;top:${y}%;width:${w}%;height:${h}%">${code==='wall'?'':`<img class="painted-building-sprite" src="${art}/${spriteName(code)}.webp" alt="" draggable="false">`}<span class="painted-scaffold" aria-hidden="true"><img src="${art}/construction-scaffold-frame-1.webp" alt="" draggable="false"><img class="painted-scaffold-motion" src="${art}/construction-scaffold-frame-2.webp" alt="" draggable="false"></span><small class="painted-build-status"></small><span class="painted-building-label"></span></button>`).join('')}</div></div><button class="city-building-tool" data-action="buildings" aria-label="Gebäudeübersicht öffnen">♜ <small>Gebäude</small></button></div>`;
+   host.innerHTML=`<div class="painted-village"><div class="painted-village-scroll" tabindex="0" aria-label="Dorfansicht – mit der Maus ziehen oder wischen"><div class="painted-village-scene"><img src="${art}/terrain.webp" alt="Dorfuntergrund ohne Gebäude" draggable="false">${places.map(([code,x,y,w,h])=>`<button type="button" class="painted-village-building" data-action="building" data-id="${code}" style="left:${x}%;top:${y}%;width:${w}%;height:${h}%">${code==='wall'?'':`<img class="painted-building-sprite" src="${art}/${spriteName(code)}.webp" alt="" draggable="false">`}<span class="painted-scaffold" aria-hidden="true"></span><small class="painted-build-status"></small><span class="painted-building-label"></span></button>`).join('')}</div></div><button class="city-building-tool" data-action="buildings" aria-label="Gebäudeübersicht öffnen">♜ <small>Gebäude</small></button></div>`;
    const terrain=host.querySelector('.painted-village-scene>img');
+   host.querySelector('.painted-village').style.backgroundImage=`url("${art}/terrain.webp")`;
    if(terrain.complete)mountRiverMotion(terrain);else terrain.addEventListener('load',()=>mountRiverMotion(terrain),{once:true});
    host.querySelectorAll('.painted-building-sprite').forEach(img=>{
     const mount=()=>mountBuildingMotion(img,img.parentElement.dataset.id);
@@ -210,6 +273,11 @@ window.ConquerPaintedCity=(()=>{
    const status=queue?'Stufe '+level+' · Im Ausbau':training?`Stufe ${level} · ${training.count} Truppen in Ausbildung`:level>0?'Stufe '+level:'Freier Bauplatz';
    const text=`${labels[code]||code} · ${status}`;
    b.classList.toggle('is-building',Boolean(queue));
+   const scaffold=b.querySelector('.painted-scaffold');
+   if(queue&&!scaffold.firstChild){
+    scaffold.innerHTML=constructionArtwork(base,code);
+    scaffold.style.setProperty('--construction-delay',-(places.findIndex(place=>place[0]===code)%5)*.47+'s');
+   }else if(!queue&&scaffold.firstChild)scaffold.replaceChildren();
    b.classList.toggle('is-training',Boolean(training));
    b.classList.toggle('is-empty',!queue&&level<=0&&code!=='wall');
    b.dataset.status=status;
@@ -228,6 +296,7 @@ window.ConquerPaintedCity=(()=>{
   }
   const selected=host.querySelector('.painted-village-building[aria-pressed="true"]');
   if(selected)host.querySelector('.painted-building-banner small').textContent=selected.dataset.status;
+  updateReadiness({host,base,state,kingdom,labels});
  }
- return {render};
+ return {render,readiness,updateReadiness};
 })();

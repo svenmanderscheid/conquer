@@ -27,13 +27,19 @@ final class HospitalService
     {
         $db=Connection::getInstance();
         $settle=static function()use($db,$cityId):void{
-            $rows=$db->query('SELECT id,troop_code,count,healing_count FROM hospital_wounded WHERE city_id=? AND healing_count>0 AND healing_ends_at<=UTC_TIMESTAMP() FOR UPDATE',[$cityId])->fetchAll();
+            $rows=$db->query('SELECT id,troop_code,count,healing_count,healing_batch FROM hospital_wounded WHERE city_id=? AND healing_count>0 AND healing_ends_at<=UTC_TIMESTAMP() FOR UPDATE',[$cityId])->fetchAll();
+            $completed=[];
             foreach($rows as $row){
                 $count=min((int)$row['count'],(int)$row['healing_count']);
                 if($count>0)$db->execute('INSERT INTO city_troops(city_id,troop_code,count) VALUES(?,?,?) ON DUPLICATE KEY UPDATE count=count+VALUES(count)',[$cityId,TroopData::activeCode((int)$row['troop_code']),$count]);
                 if($count===(int)$row['count'])$db->execute('DELETE FROM hospital_wounded WHERE id=?',[$row['id']]);
                 else $db->execute('UPDATE hospital_wounded SET count=count-?,healing_count=0,healing_ends_at=NULL,healing_started_at=NULL,healing_batch=NULL WHERE id=?',[$count,$row['id']]);
+                if($count>0){$batch=(string)($row['healing_batch']??$row['id']);$completed[$batch]=($completed[$batch]??0)+$count;}
             }
+            foreach($completed as $batch=>$count)\Conquer\Game\Notification\NotificationService::pushCityCompletion(
+                $cityId,\Conquer\Game\Notification\NotificationService::TYPE_HEAL_COMPLETE,
+                ['building_code'=>'hospital','batch_id'=>$batch,'count'=>$count],
+            );
         };
         if($db->getPdo()->inTransaction())$settle();else $db->transaction($settle);
     }

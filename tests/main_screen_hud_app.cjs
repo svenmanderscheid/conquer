@@ -34,13 +34,15 @@ const { chromium } = require('playwright');
         oneRow: rects.every(rect => Math.abs(rect.top - rects[0].top) < 2),
         dockInside: dock.scrollWidth <= dock.clientWidth + 1,
         buttonsInside: rects.every(rect => rect.left >= -1 && rect.right <= innerWidth + 1),
-        previewRows: document.querySelectorAll('.world-chat-preview-message').length,
-        heightDelta: Math.abs(preview.getBoundingClientRect().height - dock.getBoundingClientRect().height),
+        previewRows: [...document.querySelectorAll('.world-chat-preview-message')].filter(node => node.getClientRects().length).length,
+        previewHeight: preview.getBoundingClientRect().height,
+        dockHeight: dock.getBoundingClientRect().height,
+        touchTargets: rects.every(rect => rect.width >= 43.5 && rect.height >= 43.5),
         chatDockGap: Math.min(...rects.map(rect => rect.top)) - preview.getBoundingClientRect().bottom,
         overlap: preview.getBoundingClientRect().bottom > Math.min(...rects.map(rect => rect.top)) + 1
       };
     });
-    if (layout.count !== 7 || !layout.oneRow || !layout.dockInside || !layout.buttonsInside || layout.previewRows !== 2 || layout.heightDelta > 2 || layout.chatDockGap < 7 || layout.chatDockGap > 9 || layout.overlap) {
+    if (layout.count !== 7 || !layout.oneRow || !layout.dockInside || !layout.buttonsInside || !layout.touchTargets || layout.previewRows !== 1 || layout.previewHeight < 44 || layout.previewHeight > 45 || layout.dockHeight > 54 || layout.chatDockGap < 3 || layout.chatDockGap > 8 || layout.overlap) {
       throw new Error(`${name} HUD contract failed: ${JSON.stringify(layout)}`);
     }
     await page.screenshot({ path: `${shotDir}\\conquer-hud-${name}.png`, fullPage: true });

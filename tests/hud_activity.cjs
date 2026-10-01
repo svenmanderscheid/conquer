@@ -64,6 +64,7 @@ const html=execFileSync(process.env.PHP_BINARY||'C:/xampp/php/php.exe',['-r',php
    await page.evaluate(mode=>{time=Date.parse('2030-01-01T12:00:11Z');orders();if(mode==='idle'){state.build_queue=[];state.research_queue=[];state.troop_queue=[];kingdom.hospital=null}if(mode==='finishing')time+=3600000;draw()},mode);
    const result=await page.evaluate(()=>{
     const rect=e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,right:r.right,bottom:r.bottom,width:r.width,height:r.height}};
+    const compact=matchMedia('(max-width:700px), (max-width:1100px) and (max-height:520px)').matches;
     const jobs=[...document.querySelectorAll('.hud-job')].filter(e=>e.getClientRects().length);
     const other=[...document.querySelectorAll('#world-chat,.hud-right-tools button')].filter(e=>getComputedStyle(e).visibility!=='hidden');
     const overlap=(a,b)=>a.x<b.right-1&&a.right>b.x+1&&a.y<b.bottom-1&&a.bottom>b.y+1;
@@ -71,11 +72,15 @@ const html=execFileSync(process.env.PHP_BINARY||'C:/xampp/php/php.exe',['-r',php
     const statusButtons=['hud-vip-button','lord-talent-button','hud-energy'].map(id=>rect(document.getElementById(id))),statusHeights=statusButtons.map(r=>r.height);
     if(Math.max(...statusHeights)-Math.min(...statusHeights)>1)hudBad.push('VIP, Hunter and AP do not have equal heights');
     for(const e of document.querySelectorAll('#account-button,.hud-power,#hud-vip-button,#lord-talent-button,#hud-energy,#hud-gems,#resources .resource')){
+     if(!e.getClientRects().length)continue;
      const r=rect(e);if(r.width<43.5||r.height<43.5)hudBad.push((e.id||e.className)+' is smaller than the 44px touch target');
     }
     const [vip,hunter,energy]=statusButtons,account=rect(document.querySelector('#account-button'));
     if(statusButtons.some(r=>Math.abs(r.y-vip.y)>1)||overlap(vip,hunter)||overlap(hunter,energy)||overlap(vip,energy))hudBad.push('Status actions do not share a separate, non-overlapping row');
-    if(account.bottom>vip.y+1)hudBad.push('Profile action overlaps the status row');
+    if(compact){
+     if(Math.abs(account.y-vip.y)>1||overlap(account,vip)||overlap(account,hunter)||overlap(account,energy))hudBad.push('Compact profile actions do not share one non-overlapping touch row');
+     if(rect(document.querySelector('.hud-profile')).height>48)hudBad.push('Compact profile exceeds one touch row');
+    }else if(account.bottom>vip.y+1)hudBad.push('Profile action overlaps the status row');
     for(const e of document.querySelectorAll('#hud-energy strong,#hud-gems strong,#resources .resource strong'))if(parseFloat(getComputedStyle(e).fontSize)<13)hudBad.push((e.id||e.parentElement.id||e.textContent)+' value is below the readable HUD size');
     for(const label of document.querySelectorAll('#navigation .dock-label')){
      if(parseFloat(getComputedStyle(label).fontSize)<11)hudBad.push('Dock label is below the readable navigation size');
@@ -84,15 +89,12 @@ const html=execFileSync(process.env.PHP_BINARY||'C:/xampp/php/php.exe',['-r',php
     for(const e of hud){const r=rect(e);if(r.x<0||r.y<0||r.right>innerWidth||r.bottom>innerHeight)hudBad.push((e.id||e.className)+' outside viewport');if(e.id!=='resources'&&(e.scrollWidth>e.clientWidth+2||e.scrollHeight>e.clientHeight+2))hudBad.push((e.id||e.className)+` overflows ${e.clientWidth}x${e.clientHeight} -> ${e.scrollWidth}x${e.scrollHeight}`);}
     for(let i=0;i<hud.length;i++)for(let j=i+1;j<hud.length;j++)if(overlap(rect(hud[i]),rect(hud[j])))hudBad.push((hud[i].id||hud[i].className)+' overlaps '+(hud[j].id||hud[j].className));
     for(const resource of document.querySelectorAll('#resources .resource'))for(const tool of document.querySelectorAll('.hud-right-tools button'))if(overlap(rect(resource),rect(tool)))hudBad.push('Resource overlaps '+(tool.id||tool.getAttribute('aria-label')));
-    if(innerWidth<=600&&innerHeight>520){
+    if(compact){
      const profile=rect(document.querySelector('.hud-profile')),resources=[...document.querySelectorAll('#resources .resource')].map(rect);
-     if(profile.height>account.height+Math.max(...statusHeights)+24)hudBad.push('Mobile profile exceeds two touch rows plus its frame and spacing');
-     if(resources.some(r=>r.y<profile.bottom||Math.abs(r.y-resources[0].y)>1))hudBad.push('Portrait resources do not share a separate row below the profile');
-    }
-    if(innerWidth>innerHeight&&innerHeight<=520){
-     const profile=rect(document.querySelector('.hud-profile')),resourceRows=[...document.querySelectorAll('#resources .resource')].map(rect);
-     if(profile.height>account.height+Math.max(...statusHeights)+24)hudBad.push('Landscape profile exceeds two touch rows plus its frame and spacing');
-     if(resourceRows.length!==4||Math.abs(resourceRows[0].y-resourceRows[1].y)>1||Math.abs(resourceRows[2].y-resourceRows[3].y)>1||resourceRows[2].y<resourceRows[0].bottom)hudBad.push('Landscape resources do not form two separate touch rows');
+     if(resources.length!==4||resources.some(r=>Math.abs(r.y-resources[0].y)>1))hudBad.push('Compact resources do not share one touch row');
+     if(innerWidth>innerHeight&&innerHeight<=520){if(resources.some(r=>Math.abs(r.y-profile.y)>1))hudBad.push('Landscape resources do not share the profile row');}
+     else if(resources.some(r=>r.y<profile.bottom))hudBad.push('Portrait resources do not share a separate row below the profile');
+     if(Math.max(...resources.map(r=>r.bottom))>102)hudBad.push('Compact header leaves too little space for the playfield');
     }
     return hudBad.concat(jobs.flatMap(e=>{const r=rect(e),bad=[];
      if(r.x<0||r.y<0||r.right>innerWidth||r.bottom>innerHeight)bad.push(e.id+' outside viewport');

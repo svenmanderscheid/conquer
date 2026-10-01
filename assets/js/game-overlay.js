@@ -36,7 +36,8 @@ window.ConquerOverlay = function (ctx) {
     'use strict';
     const {getState, getKingdom, getRallies=()=>[], now, date, esc, fmt, openDialog, countdown} = ctx;
     const $ = id => document.getElementById(id);
-    const rallyText = (key, parameters = {}) => (ctx.t || window.ConquerLocale?.t)?.(key, parameters) ?? key;
+    const hudText = (key, parameters = {}) => (ctx.t || window.ConquerLocale?.t)?.(key, parameters) ?? key;
+    const compactNumber = value => window.ConquerLocale?.formatHudNumber?.(value) ?? fmt(value);
     const clock = end => {
         const s = Math.max(0, Math.ceil((date(end) - now()) / 1000));
         return s >= 3600 ? `${Math.floor(s / 3600)}:${String(Math.floor(s % 3600 / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}` : `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
@@ -48,15 +49,27 @@ window.ConquerOverlay = function (ctx) {
         const ap=Math.max(0,Number(profile?.action_points??0)),apMax=Math.max(1,Number(profile?.action_points_max||200));
         const energy=$('hud-energy'),energyTrack=energy.querySelector('[role="progressbar"]');
         energy.querySelector('strong').textContent = profile ? `${fmt(ap)} / ${fmt(apMax)}` : '… / …';
+        const compactEnergy = energy.querySelector('.hud-energy-compact');
+        if (compactEnergy) compactEnergy.textContent = profile ? compactNumber(ap) : '…';
         energy.setAttribute('aria-label', profile ? `${fmt(ap)} von ${fmt(apMax)} Aktionspunkten. Profil öffnen` : 'Aktionspunkte werden geladen');
         energyTrack.setAttribute('aria-valuemax',String(apMax));energyTrack.setAttribute('aria-valuenow',String(ap));
         $('hud-energy-fill').style.width=`${Math.min(100,ap/apMax*100)}%`;
-        $('hud-gems').querySelector('strong').textContent = profile ? fmt(profile.gems) : '…';
+        const gems=$('hud-gems'),compactGems=gems.querySelector('.hud-gems-compact');
+        gems.querySelector('strong').textContent = profile ? fmt(profile.gems) : '…';
+        if (compactGems) compactGems.textContent = profile ? compactNumber(profile.gems) : '…';
+        if (profile) {
+            gems.title = hudText('hud.gems.summary', {amount:fmt(profile.gems)});
+            gems.setAttribute('aria-label', gems.title);
+        }
         const level = String(profile?.lord_level || state.lord?.level || 1);
         $('hud-player-level')?.remove();
         $('lord-hud-level').textContent=level;
-        if ($('hud-power-value')) $('hud-power-value').textContent=fmt(profile?.power || state.city.power);
-        $('account-button').title = `${profile?.display_name || state.player.name} · Hunter-Stufe ${level} · ${fmt(profile?.power || state.city.power)} Macht`;
+        const power=profile?.power ?? state.city.power;
+        if ($('hud-power-value')) $('hud-power-value').textContent=fmt(power);
+        if ($('hud-compact-power-value')) $('hud-compact-power-value').textContent=compactNumber(power);
+        const account=$('account-button');
+        account.title = hudText('hud.profile.summary', {name:profile?.display_name || state.player.name, level, power:fmt(power)});
+        account.setAttribute('aria-label', account.title);
         const hunter=$('lord-talent-button'),hunterTrack=hunter.querySelector('[role="progressbar"]'),hunterMax=Number(profile?.lord_level||1)>=Number(profile?.lord_max_level||60),hunterXp=Math.max(0,Number(profile?.lord_xp_into||0)),hunterNext=Math.max(1,Number(profile?.lord_xp_next||1));
         $('hud-hunter-xp').textContent=profile?(hunterMax?'Höchststufe':profile.lord_xp_next==null?'Fortschritt':`${fmt(hunterXp)} / ${fmt(hunterNext)} XP`):'… XP';
         hunterTrack.setAttribute('aria-valuemax',String(hunterMax?1:hunterNext));hunterTrack.setAttribute('aria-valuenow',String(hunterMax?1:hunterXp));
@@ -76,14 +89,14 @@ window.ConquerOverlay = function (ctx) {
             &&(!r.world_id||Number(r.world_id)===worldId)&&(!r.result?.alliance_id||Number(r.result.alliance_id)===allianceId));
         button.hidden=!rallies.length;
         $('hud-rally-count').textContent=String(rallies.length);
-        if(!rallies.length){$('hud-rally-status').textContent='';button.setAttribute('aria-label',rallyText('rally.hud.open'));button.title='';return;}
+        if(!rallies.length){$('hud-rally-status').textContent='';button.setAttribute('aria-label',hudText('rally.hud.open'));button.title='';return;}
         const gathering=rallies.filter(r=>r.status==='gathering'),marching=rallies.length-gathering.length;
         const end=r=>r.status==='gathering'?r.launch_at:r.arrival_time;
         const due=r=>end(r)&&Number.isFinite(date(end(r)))?date(end(r)):Infinity;
         const soonest=[...(gathering.length?gathering:rallies)].sort((a,b)=>due(a)-due(b))[0];
         const timed=Number.isFinite(due(soonest))&&due(soonest)>now();
-        $('hud-rally-status').textContent=timed?rallyText(soonest.status==='gathering'?'rally.hud.start':'rally.hud.arrival',{time:clock(end(soonest))}):rallyText('rally.hud.pending');
-        button.setAttribute('aria-label',rallyText('rally.hud.summary',{count:fmt(rallies.length),gathering:fmt(gathering.length),marching:fmt(marching)}));
+        $('hud-rally-status').textContent=timed?hudText(soonest.status==='gathering'?'rally.hud.start':'rally.hud.arrival',{time:clock(end(soonest))}):hudText('rally.hud.pending');
+        button.setAttribute('aria-label',hudText('rally.hud.summary',{count:fmt(rallies.length),gathering:fmt(gathering.length),marching:fmt(marching)}));
         button.title=button.getAttribute('aria-label');
     }
     function job(id, row, {label, locked = false, loading = false}) {

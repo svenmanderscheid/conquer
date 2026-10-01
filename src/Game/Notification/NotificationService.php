@@ -30,6 +30,7 @@ final class NotificationService
     public const TYPE_BUILD_COMPLETE    = 'build_complete';
     public const TYPE_RESEARCH_COMPLETE = 'research_complete';
     public const TYPE_TRAIN_COMPLETE    = 'train_complete';
+    public const TYPE_HEAL_COMPLETE     = 'heal_complete';
     public const TYPE_MARCH_RETURNED    = 'march_returned';
     public const TYPE_BATTLE_INCOMING   = 'battle_incoming';
     public const TYPE_BATTLE_REPORT     = 'battle_report';
@@ -73,6 +74,18 @@ final class NotificationService
         }
     }
 
+    /** Persist a completion in the same transaction as its automatically credited result. */
+    public static function pushCityCompletion(int $cityId, string $type, array $data): void
+    {
+        $owner = Connection::getInstance()->query(
+            'SELECT player_id, world_id FROM cities WHERE id = ?', [$cityId],
+        )->fetch();
+        if (!$owner) return;
+        $data['city_id'] = $cityId;
+        $data['world_id'] = (int) $owner['world_id'];
+        self::push((int) $owner['player_id'], $type, $data);
+    }
+
     // -------------------------------------------------------------------------
     // Read
     // -------------------------------------------------------------------------
@@ -114,6 +127,26 @@ final class NotificationService
             },
             $rows,
         );
+    }
+
+    /** Completion markers remain until acknowledged, even after the queues are settled. */
+    public static function buildingCompletions(int $playerId, int $cityId, int $worldId): array
+    {
+        $types = [self::TYPE_BUILD_COMPLETE, self::TYPE_TRAIN_COMPLETE,
+            self::TYPE_RESEARCH_COMPLETE, self::TYPE_HEAL_COMPLETE];
+        $rows = Connection::getInstance()->query(
+            'SELECT id, type, data_json, created_at FROM notifications
+             WHERE player_id = ? AND read_at IS NULL AND ' . self::WORLD_FILTER . '
+               AND CAST(JSON_UNQUOTE(JSON_EXTRACT(data_json,\'$.city_id\')) AS UNSIGNED) = ?
+               AND type IN (?, ?, ?, ?)
+             ORDER BY id DESC LIMIT 200',
+            [$playerId, $worldId, $cityId, ...$types],
+        )->fetchAll();
+        return array_map(static fn(array $row): array => [
+            'id' => (int) $row['id'], 'type' => $row['type'],
+            'data' => json_decode((string) $row['data_json'], true, 32, JSON_THROW_ON_ERROR),
+            'created_at' => $row['created_at'],
+        ], $rows);
     }
 
     /**
@@ -297,7 +330,8 @@ final class NotificationService
             $db->execute(
                 'DELETE FROM notifications
                  WHERE  player_id  = ?
-                   AND  created_at < DATE_SUB(UTC_TIMESTAMP(), INTERVAL ? DAY)',
+                   AND  created_at < DATE_SUB(UTC_TIMESTAMP(), INTERVAL ? DAY)
+                   AND (read_at IS NOT NULL OR type NOT IN (\'build_complete\',\'train_complete\',\'research_complete\',\'heal_complete\'))',
                 [$playerId, self::RETENTION_DAYS],
             );
         } catch (\Throwable) {

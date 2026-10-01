@@ -73,6 +73,12 @@ final class ResearchProcessor
                             'UPDATE research_queue SET is_processed = 1 WHERE id = ?',
                             [$entryId],
                         );
+                        $cityId = (int) $db->query('SELECT id FROM cities WHERE player_id=? AND world_id=?', [$playerId,$worldId])->fetchColumn();
+                        \Conquer\Game\Notification\NotificationService::pushCityCompletion(
+                            $cityId, \Conquer\Game\Notification\NotificationService::TYPE_RESEARCH_COMPLETE,
+                            ['building_code'=>'academy', 'queue_id'=>$entryId,
+                                'research_code'=>$researchCode, 'level'=>$levelTo],
+                        );
                     },
                 );
             } catch (\Throwable) {
