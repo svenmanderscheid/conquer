@@ -5,12 +5,12 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/audio-2026
 (async()=>{
  const port=await new Promise(resolve=>{const s=net.createServer();s.listen(0,'127.0.0.1',()=>{const p=s.address().port;s.close(()=>resolve(p));});});
  const fixture=spawn(process.env.PHP_BINARY||'C:/xampp/php/php.exe',[root+'/tools/preview-feature-fixture.php','--appearance','--port='+port],{cwd:root,stdio:['pipe','pipe','pipe'],windowsHide:true});
- let browser,log='',page;const errors=[],checks=[];let downloads=0;
+ let browser,log='',page;const errors=[],checks=[],musicRequests=[];let downloads=0;
  try{
   await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error(log||'Preview timeout')),60000);fixture.stdout.on('data',d=>{log+=d;if(log.includes('Synthetic preview ready')){clearTimeout(timer);resolve();}});fixture.stderr.on('data',d=>log+=d);fixture.on('error',reject);fixture.on('exit',()=>{clearTimeout(timer);reject(Error(log));});});
   browser=await chromium.launch({headless:true,executablePath:process.env.BROWSER_EXECUTABLE_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe'});
   const context=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,locale:'de-DE'}),base='http://127.0.0.1:'+port;
-  page=await context.newPage();page.setDefaultTimeout(20000);page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(r.url().endsWith('.wav'))downloads++;});
+  page=await context.newPage();page.setDefaultTimeout(20000);page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(r.url().endsWith('.wav')){downloads++;musicRequests.push(new URL(r.url()).pathname);}});
   await page.goto(base+'/?zugang=login');await page.locator("[name=identifier], [name=username]").fill('PreviewPlayer');await page.locator('[name=password]').fill('PreviewFixture!2026');
   await Promise.all([page.waitForURL('**/city'),page.locator("form[action$=\"/auth/local\"] button[type=\"submit\"]").click()]);
   await page.goto(base+'/city#settings');await page.locator('.audio-settings').waitFor();
@@ -18,6 +18,7 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/audio-2026
   assert.equal((await status()).context,'idle');assert.equal(downloads,0,'no audio download or context before a game gesture');
   await page.locator('[data-audio-start]').tap();await page.waitForFunction(()=>ConquerAudio.status().musicPlaying);
   assert.equal(downloads,1);assert.equal((await status()).settings.musicVolume,20);
+  assert.deepEqual(musicRequests,['/assets/audio/village-daylight-v1.wav'],'The game plays the existing brighter Daylight theme');
   for(const [width,height]of [[1280,800],[390,844],[320,568],[844,390],[568,320]]){
    await page.setViewportSize({width,height});await page.locator('.audio-settings').scrollIntoViewIfNeeded();
    const layout=await page.locator('.audio-settings').evaluate(el=>{const r=el.getBoundingClientRect(),controls=[...el.querySelectorAll('button,input[type=range]')].map(e=>e.getBoundingClientRect());return {fits:r.left>=0&&r.right<=innerWidth+1,overflow:el.scrollWidth-el.clientWidth,controlsFit:controls.every(c=>c.width>=44&&c.height>=44&&c.left>=r.left&&c.right<=r.right+1)};});
@@ -83,12 +84,12 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/audio-2026
   await isolated.close();
   const fallback=await context.newPage();fallback.on('pageerror',e=>errors.push(e.message));let failedLoads=0;
   await fallback.route('**/__audio-fixture',route=>route.fulfill({contentType:'text/html',body:'<!doctype html><html><body></body></html>'}));
-  await fallback.route('**/assets/audio/village-meadow-v1.wav',route=>{failedLoads++;return route.fulfill({status:503,body:'Audio temporarily unavailable'});});
+  await fallback.route('**/assets/audio/village-daylight-v1.wav',route=>{failedLoads++;return route.fulfill({status:503,body:'Audio temporarily unavailable'});});
   await fallback.goto(base+'/__audio-fixture');await fallback.addScriptTag({url:base+'/assets/js/game-audio.js'});
   await fallback.evaluate(()=>{window.testAudio=ConquerAudio.create({base:''});document.body.innerHTML=testAudio.controls();});await fallback.locator('[data-audio-start]').click();await fallback.waitForFunction(()=>ConquerAudio.status().loadFailed);
   await fallback.locator('[data-audio-demo=training]').click();assert.equal(await fallback.evaluate(()=>ConquerAudio.status().lastSound),'training','effects survive a missing music file');
   await fallback.evaluate(()=>{window.dispatchEvent(new Event('pageshow'));document.dispatchEvent(new Event('visibilitychange'));});assert.equal(failedLoads,1,'no retry loop on failed music');
-  await fallback.unroute('**/assets/audio/village-meadow-v1.wav');await fallback.locator('[data-audio-start]').click();await fallback.waitForFunction(()=>ConquerAudio.status().musicPlaying);
+  await fallback.unroute('**/assets/audio/village-daylight-v1.wav');await fallback.locator('[data-audio-start]').click();await fallback.waitForFunction(()=>ConquerAudio.status().musicPlaying);
   await fallback.evaluate(()=>{testAudio.destroy();window.AudioContext=window.webkitAudioContext=undefined;window.testAudio=ConquerAudio.create({base:''});document.body.innerHTML=testAudio.controls();testAudio.updateControls();});
   await fallback.locator('[data-audio-start]').click();assert.equal(await fallback.evaluate(()=>ConquerAudio.status().supported),false);assert(await fallback.locator('[data-audio-demo=training]').isDisabled());
   await fallback.close();checks.push({missingMusicEffects:true,noRetryLoop:true,explicitRetry:true,unsupportedBrowser:true});assert.deepEqual(errors,[]);
