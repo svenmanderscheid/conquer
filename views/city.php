@@ -81,7 +81,7 @@ foreach ($troopQueue as $tq) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Union of Kingdoms — <?= htmlspecialchars($city['name']) ?></title>
+    <title>Union of Kingdoms — <?= htmlspecialchars($city['name']) ?></title><?php require ROOT_DIR.'/views/partials/brand-head.php'; ?>
     <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR.'/assets/css/fantasy-fonts.css') ?>">
     <link rel="stylesheet" href="/assets/css/main.css">
     <style>

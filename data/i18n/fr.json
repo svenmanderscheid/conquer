@@ -1,4 +1,5 @@
 {
+  "inventory.quantity": "Quantité à utiliser",
   "crystal_shop.title": "Boutique de cristaux",
   "crystal_shop.intro": "Dépensez vos cristaux pour des provisions et des objets.",
   "crystal_shop.resources": "Offres de ressources",

@@ -35,8 +35,29 @@ fs.mkdirSync(output,{recursive:true});
   const catalogs=['production','battle','advanced'].flatMap(tree=>JSON.parse(fs.readFileSync(path.join(__dirname,'../data/research',tree+'.json'),'utf8')).nodes);
   for(const node of catalogs)assert.deepEqual(data.research_defs.find(def=>def.code===node.code).levels.map(level=>[level.resources,level.time]),node.levels.map(level=>[level.resources,level.time]));
   checks++;
+  // Resource help and building dialogs must show the same increased server rates.
+  for(const [width,height]of[[1280,800],[320,568],[568,320]]){
+   await page.setViewportSize({width,height});await page.waitForTimeout(250);
+   for(const [resource,building]of Object.entries({food:'farm',lumber:'lumber_camp',stone:'quarry',gold:'gold_mine'})){
+    await page.locator(`#resources [data-action="resource"][data-id="${resource}"]`).tap();
+    await page.locator('#game-dialog[open]').waitFor();
+    const shown=await page.locator('#game-dialog .detail-row').filter({hasText:'Produktion pro Stunde'}).locator('strong').innerText();
+    assert.equal(Number(shown.replace(/\D/g,'')),Math.floor(data.production_rates[building]),`${resource} hourly production matches the server`);checks++;
+    assert.equal(data.buildings[building].production,data.production_rates[building]);checks++;
+    await page.locator(`#game-dialog [data-action="building"][data-id="${building}"]`).tap();
+    const production=page.locator('#game-dialog .levelup-stat').filter({hasText:'Produktion je Stunde'});
+    assert.equal(Number((await production.locator('strong').innerText()).replace(/\D/g,'')),Math.floor(data.production_rates[building]),`${building} shows the same hourly rate`);checks++;
+    const inside=await page.locator('#game-dialog').evaluate(el=>{const r=el.getBoundingClientRect();return r.left>=-1&&r.top>=-1&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1&&el.scrollWidth<=el.clientWidth+1;});
+    assert(inside,'Production window fits the viewport');checks++;
+    await page.screenshot({path:path.join(output,`production-${width}x${height}-${resource}.png`)});
+    await page.locator('#game-dialog>.dialog-close:visible, #game-dialog .mobile-page-back:visible').first().tap();
+   }
+  }
+  await page.setViewportSize({width:1280,height:800});await page.waitForTimeout(250);
   await page.locator('#hud-research').click();
   await page.locator('.rt-continuous').waitFor();
+  assert.equal(await page.locator('.rt-branch').first().getAttribute('data-id'),'military');
+  assert.equal(await page.locator('.rt-branch.is-selected').getAttribute('data-id'),'military');checks+=2;
   for(const [width,height]of[[1280,800],[390,844],[320,568],[844,390],[568,320]]){
    await page.setViewportSize({width,height});
    // The app debounces orientation layout by 150 ms. Measure after it settles.
@@ -65,8 +86,6 @@ fs.mkdirSync(output,{recursive:true});
      return{
       clipped:nodes.filter(n=>{const name=n.querySelector('.rt-node-name');return name.scrollWidth>name.clientWidth+1||name.getBoundingClientRect().bottom>n.getBoundingClientRect().bottom+1;}).map(n=>n.dataset.id),
       badEdges:[...board.querySelectorAll('.rt-edge')].filter(e=>{const from=byCode.get(e.dataset.from),to=byCode.get(e.dataset.to);return !e.querySelector('path').getAttribute('d')||(from&&from.getBoundingClientRect().bottom>=to.getBoundingClientRect().top);}).map(e=>e.dataset.from+' → '+e.dataset.to)
-  assert.equal(await page.locator('.rt-branch').first().getAttribute('data-id'),'military');
-  assert.equal(await page.locator('.rt-branch.is-selected').getAttribute('data-id'),'military');checks+=2;
      };
     });
     assert.deepEqual(layout.clipped,[],`Clipped names at ${width}×${height}`);assert.deepEqual(layout.badEdges,[],`Edges must progress downwards at ${width}×${height}`);checks+=2;

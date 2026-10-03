@@ -69,18 +69,19 @@ final class KingdomInventory
             KingdomService::require(isset($body['operation_key']), 'Eine eindeutige Vorgangskennung ist erforderlich.');
         }
         $quantity = isset($body['quantity']) ? KingdomService::integer($body, 'quantity', 1, 10000) : 1;
-        if (($def['category'] ?? '') !== 'speedup') {
+        if (!in_array($def['category'] ?? '', ['resource_pack','speedup','chest','ap_refill','vip_point','boost','resource_box','fragment_pack'], true)) {
             KingdomService::require($quantity===1, 'Bitte verwende jeweils einen Gegenstand.');
         }
         $db = Connection::getInstance();
         $owned = (int) $db->query('SELECT quantity FROM player_inventory WHERE player_id=? AND item_code=? FOR UPDATE', [$playerId,$code])->fetchColumn();
         KingdomService::require($owned>0 && $owned >= $quantity, 'Dieser Gegenstand liegt nicht in ausreichender Menge in deinem Inventar.');
         $cityId = (int) $state['city']['id'];
-        if ($useAll) {
-            $result = self::useAll($playerId, $cityId, $def, $body, $owned);
-            $quantity = (int)($result['quantity'] ?? $owned);
+        if ($useAll || $quantity > 1) {
+            KingdomService::require(isset($body['operation_key']), 'Eine eindeutige Vorgangskennung ist erforderlich.');
+            $result = self::useAll($playerId, $cityId, $def, $body, $useAll ? $owned : $quantity);
+            $quantity = (int)($result['quantity'] ?? ($useAll ? $owned : $quantity));
             KingdomService::require(InventoryService::removeItems($playerId, $code, $quantity), 'Die Gegenstände wurden bereits verwendet.');
-            return array_replace($result, ['item_code'=>$code,'quantity'=>$quantity,'use_all'=>true]);
+            return array_replace($result, ['item_code'=>$code,'quantity'=>$quantity,'use_all'=>$useAll]);
         }
         $result = match ($def['category']) {
             'resource_pack'=>self::resource($playerId, $cityId, $def),

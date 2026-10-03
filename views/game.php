@@ -113,8 +113,9 @@ $base = htmlspecialchars(APP_BASE, ENT_QUOTES);
 </dialog>
 <dialog id="game-dialog" aria-label="Spielfenster"><button type="button" class="dialog-report-button" data-action="bug-report-open" aria-label="Bug oder Idee in diesem Fenster melden" title="Bug oder Idee melden"><img src="<?= $base ?>/assets/art/menu-icons/bug-report.png" alt="" aria-hidden="true"></button><button class="dialog-close" aria-label="Fenster schließen">×</button><div id="dialog-content"></div></dialog>
 <div id="toast" role="status" aria-live="polite"></div>
-<script>window.CONQUER_ITEM_ART_VERSION = <?= max(filemtime(__DIR__ . '/../data/items.json'), ...array_map('filemtime', array_merge(glob(__DIR__ . '/../assets/art/items/*.svg'), glob(__DIR__ . '/../assets/art/items/backpack/*.svg'), glob(__DIR__ . '/../assets/art/items/reference/*.png')))) ?>;window.CONQUER_WORLD = <?= \Conquer\Game\World\WorldContext::id() ?>;window.CONQUER_BASE = <?= json_encode(APP_BASE, JSON_HEX_TAG | JSON_HEX_AMP) ?>;</script>
+<script>window.CONQUER_ITEM_ART_VERSION = <?= max(filemtime(__DIR__ . '/../data/items.json'), ...array_map('filemtime', array_merge(glob(__DIR__ . '/../assets/art/items/*.svg'), glob(__DIR__ . '/../assets/art/items/backpack/*.svg'), glob(__DIR__ . '/../assets/art/items/reference/*.png'), glob(__DIR__ . '/../assets/art/items/painted-v1/*.webp')))) ?>;window.CONQUER_WORLD = <?= \Conquer\Game\World\WorldContext::id() ?>;window.CONQUER_BASE = <?= json_encode(APP_BASE, JSON_HEX_TAG | JSON_HEX_AMP) ?>;</script>
 <script src="<?= $base ?>/assets/js/browser-compat.js?v=<?= filemtime(__DIR__ . '/../assets/js/browser-compat.js') ?>" defer></script>
+<script src="<?= $base ?>/assets/js/item-art.js?v=<?= filemtime(ROOT_DIR.'/assets/js/item-art.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/reward-dialog.js?v=<?= filemtime(__DIR__ . '/../assets/js/reward-dialog.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/castle-skins.js?v=<?= filemtime(__DIR__ . '/../assets/js/castle-skins.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/march-skins.js?v=<?= filemtime(__DIR__ . '/../assets/js/march-skins.js') ?>" defer></script>

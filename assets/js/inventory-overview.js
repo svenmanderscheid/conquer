@@ -68,7 +68,7 @@
         const button = document.getElementById('inventory-overview-button');
         const dialog = document.getElementById('game-dialog');
         let tab = 'resources', unit = 'days', historyEntry = null, closingHistory = false, sequence = 0;
-        const image = file => `${base}/assets/art/items/${file}?v=${encodeURIComponent(window.CONQUER_ITEM_ART_VERSION || 'overview1')}`;
+        const image = file => window.ConquerItemArt?.url(base,file)??`${base}/assets/art/items/${file}?v=${encodeURIComponent(window.CONQUER_ITEM_ART_VERSION||'overview1')}`;
         const numberCell = (value, column) => `<td data-column="${column}" data-value="${value ?? ''}" title="${exact(value)}" aria-label="${exact(value)}">${compact(value)}</td>`;
         function table(totals) {
             if (tab === 'resources') return `<table class="inventory-overview-table"><caption class="inventory-overview-sr">Rohstoffpakete und aktuelle Vorräte</caption>

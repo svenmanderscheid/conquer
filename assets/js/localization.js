@@ -170,6 +170,7 @@
     }
     function observe(){if(observer)return;observer=new MutationObserver(()=>{if(scheduled)return;scheduled=true;queueMicrotask(()=>{scheduled=false;apply();});});observer.observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['title','aria-label','placeholder','alt']});apply();}
     async function register(){
+        if(bootstrap.registerServiceWorker===false)return null;
         if(!('serviceWorker'in navigator)||!window.isSecureContext)return null;
         try{return await navigator.serviceWorker.register(base+'/service-worker.js',{scope:base+'/',updateViaCache:'none'});}catch{return null;}
     }

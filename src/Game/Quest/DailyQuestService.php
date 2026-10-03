@@ -226,6 +226,16 @@ final class DailyQuestService
      */
     public static function claimReward(int $playerId, string $questCode): array
     {
+        // Both the kingdom action and the legacy quest endpoint use this path.
+        // Keep the claim marker and every item/currency grant in one transaction.
+        return Connection::getInstance()->transaction(
+            static fn(): array => self::claimRewardInTransaction($playerId, $questCode),
+        );
+    }
+
+    /** @return list<array<string, mixed>> */
+    private static function claimRewardInTransaction(int $playerId, string $questCode): array
+    {
         $db = Connection::getInstance();
 
         // Load the quest row with a lock to prevent double-claiming.
@@ -234,7 +244,8 @@ final class DailyQuestService
              FROM   player_daily_quests
              WHERE  player_id  = ?
                AND  quest_code = ?
-               AND  quest_date = UTC_DATE()',
+               AND  quest_date = UTC_DATE()
+             FOR UPDATE',
             [$playerId, $questCode],
         )->fetch();
 
@@ -260,7 +271,7 @@ final class DailyQuestService
         /** @var list<array<string, mixed>> $rewards */
         $rewards = $def['rewards'] ?? [];
 
-        // Mark as claimed first — then distribute rewards (fail-safe ordering).
+        // Reserve the claim; any failed grant also rolls back this marker.
         $affected = $db->execute(
             'UPDATE player_daily_quests
              SET    claimed = 1

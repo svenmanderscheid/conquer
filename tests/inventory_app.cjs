@@ -97,19 +97,21 @@ const out=path.resolve(__dirname,'../artifacts/inventory-reference');fs.mkdirSyn
   assert(owned,'Fixture must contain a resource pack for the real consumption check');
   if(owned){
    await page.locator(`[data-action="inventory-item"][data-id="${owned.item_code}"]`).click();
+   const selectedQuantity=Math.min(3,owned.quantity);
+   await page.locator('#inventory-quantity').fill(String(selectedQuantity));
    await Promise.all([page.waitForResponse(r=>r.url().endsWith('/api/kingdom/action')&&r.request().method()==='POST'),page.locator('#inventory-details button[type="submit"]').click()]);
    await page.waitForFunction(()=>!document.querySelector('#game-dialog').open);
    const after=await page.evaluate(async()=> (await (await fetch('/api/kingdom/state')).json()).data);
-   assert.equal(after.inventory.find(i=>i.item_code===owned.item_code)?.quantity||0,owned.quantity-1);
+   assert.equal(after.inventory.find(i=>i.item_code===owned.item_code)?.quantity||0,owned.quantity-selectedQuantity);
    assert.equal(await page.locator('#panel-dialog').evaluate(d=>d.open),true,'Consumption keeps the inventory open');
-   await page.waitForFunction(({code,count})=>document.querySelector(`#inventory-details [data-id="${code}"]`)?.closest('.inventory-dialog')?.querySelector('.inventory-owned')?.textContent.includes(Number(count).toLocaleString('de-DE')), {code:owned.item_code,count:owned.quantity-1});
+   await page.waitForFunction(({code,count})=>document.querySelector(`#inventory-details [data-id="${code}"]`)?.closest('.inventory-dialog')?.querySelector('.inventory-owned')?.textContent.includes(Number(count).toLocaleString('de-DE')), {code:owned.item_code,count:owned.quantity-selectedQuantity});
    const bulkRequests=[];const trackBulk=r=>{if(r.method()==='POST'&&r.url().endsWith('/api/kingdom/action')&&r.postDataJSON()?.use_all)bulkRequests.push(r.postDataJSON());};page.on('request',trackBulk);
    const bulkResponse=page.waitForResponse(r=>r.url().endsWith('/api/kingdom/action')&&r.request().postDataJSON()?.use_all===true);
    await page.locator('#inventory-details [data-action="inventory-use-all"]').dblclick();
    const response=await bulkResponse;assert.equal(response.status(),200);
    const result=(await response.json()).data;
-   assert.equal(result.result.quantity,owned.quantity-1,'All consumes the full remaining stack');
-   assert.equal(result.result.amount,(owned.quantity-1)*owned.amount,'All credits the complete package value');
+   assert.equal(result.result.quantity,owned.quantity-selectedQuantity,'All consumes the full remaining stack');
+   assert.equal(result.result.amount,(owned.quantity-selectedQuantity)*owned.amount,'All credits the complete package value');
    await page.waitForFunction(code=>!document.querySelector(`.inventory-page-grid [data-action="inventory-item"][data-id="${code}"]`),owned.item_code);
    assert.equal(bulkRequests.length,1,'Double click issues only one bulk request');page.off('request',trackBulk);
    assert(bulkRequests[0].operation_key,'Bulk request has a persistent receipt');

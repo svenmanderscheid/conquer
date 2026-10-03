@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 $localizationBase=htmlspecialchars(APP_BASE,ENT_QUOTES);
+require ROOT_DIR.'/views/partials/brand-head.php';
 ?>
 <link rel="stylesheet" href="<?= $localizationBase ?>/assets/css/localization.css?v=<?= filemtime(ROOT_DIR.'/assets/css/localization.css') ?>">
 <?= \Conquer\Game\Locale::bootstrapScripts() ?>

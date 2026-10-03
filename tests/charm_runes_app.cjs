@@ -20,7 +20,7 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/charm-rune
   });
   // Grounded portraits compensate for transparent margins; compare their size
   // hierarchy, not an older image-box multiplier from before that normalization.
-  assert(Math.abs(sizes.charm-1.0125)<.02&&Math.abs(sizes.rally-2.7)<.02&&sizes.mine>=2&&sizes.mine<3,JSON.stringify(sizes));
+  assert(Math.abs(sizes.charm-1.0125)<.02&&Math.abs(sizes.rally-2.7*.95)<.02&&sizes.mine>=2&&sizes.mine<3,JSON.stringify(sizes));
   assert(sizes.charm<sizes.solo&&sizes.solo<sizes.rally);
   for(const grade of ['normal','epic','legendary']){const marker=page.locator('.atlas-marker--charms[data-grade="'+grade+'"]');assert.match(await marker.locator('img').getAttribute('src'),new RegExp('/runes-v1/'+grade+'\\.webp$'));assert.equal(await marker.locator('.charm-rune-spark').count(),3);}
   const crystal=markers.first().locator('img');const first=await crystal.evaluate(el=>getComputedStyle(el).transform);await page.waitForFunction(previous=>getComputedStyle(document.querySelector('.atlas-marker--charms>img')).transform!==previous,first);

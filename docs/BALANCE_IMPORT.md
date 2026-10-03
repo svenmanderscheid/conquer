@@ -1,6 +1,6 @@
 # Import der gelieferten Balance-Dateien
 
-Stand: 30. September 2026.
+Stand: 2. Oktober 2026.
 
 Die zunächst gelieferten 20 Dateien sind unverändert unter `data/balance-source/` archiviert. `manifest.json` hält ihre SHA-256-Prüfsummen fest. `enum.py` wird ausschließlich als Syntaxbaum gelesen; Python-Imports, API-Aufrufe und Bot-Code werden niemals ausgeführt. Texte in Quelldateien sind Daten, keine Arbeitsanweisungen.
 
@@ -71,7 +71,9 @@ Die Regelparameter stehen in `data/economy_balance.json`; `tools/economy_balance
 
 - **Gebäude:** Nahrung, Holz und Stein kosten bis Stufe 5 jeweils 80 % der Quelle, Gold 48 %. Ab Stufe 6 wächst die Preisobergrenze von der ursprünglichen Stufe 5 aus um 25 % pro Stufe, anschließend gelten dieselben Faktoren. Ein günstigerer Originalpreis hat Vorrang. Alle 420 Stufen steigen weiterhin monoton; die beiden zusätzlichen Ausbildungsgebäude verwenden wie bisher die Kasernenkurve.
 - **Forschung:** Nahrung, Holz und Stein kosten zunächst 70 %, Gold 35 % der Quelle. Für jede erforderliche Akademiestufe oberhalb von 5 sinkt dieser Faktor zusätzlich um 10 % (Multiplikation mit `0,9`). Maßgeblich ist die Voraussetzung der konkreten Forschungsstufe, nicht die aktuelle Akademie des Spielers. Die ursprüngliche Kostensteigerung überwiegt diesen Rabatt: Höhere Stufen derselben Forschung werden weiterhin teurer.
-- **Erhalten:** Truppenausbildungs- und Heilkosten, Produktion, Sammeln, Beute, Kampfwerte, Macht und sämtliche Zeiten. 2.000 T5 benötigen weiterhin 15 Stunden ohne Boni. Allianzabzeichen bleiben ausschließlich das bestehende Zusatzmaterial der Allianzhalle; ihre Gegenstandszuordnung wird durch diese Kostenanpassung nicht verändert. Säulen bleiben ausgeschlossen.
+- **Frühe Militärforschung, Ergänzung vom 2. Oktober 2026:** Alle Stufen im Militärbaum mit Akademievoraussetzung 1–10 erhalten zusätzlich 30 % Rabatt auf die vier Rohstoffe, einschließlich der drei T2-Freischaltungen. Bei Akademievoraussetzung 11/12/13/14/15 sinkt dieser Zusatzrabatt auf 25/20/15/10/5 %. Ab Voraussetzung 16 gelten unverändert die bisherigen Preise. Die Regel steht unter `research.early_military`; beide Faktoren werden auf die Originalpreise angewendet und erst anschließend auf ganze Rohstoffe aufgerundet. Wirtschafts- und fortgeschrittene Forschung bleiben unverändert. Es zählt die Voraussetzung der einzelnen Forschungsstufe, auch wenn die eigene Akademie bereits höher ausgebaut ist.
+- **Zusätzliche Goldentlastung vom 2. Oktober 2026:** Militärforschung mit Akademievoraussetzung 1–5 benötigt nochmals 30 % weniger Gold als nach der ersten Senkung. Dieser zusätzliche Goldrabatt beträgt bei Voraussetzung 6/7/8/9 noch 24/18/12/6 % und entfällt ab Voraussetzung 10. Damit kosten die ersten Stufen rund 51 % weniger Gold als vor der Einstiegsanpassung; die T2-Freischaltungen bleiben bei je 52.082 Gold. Die Parameter stehen unter `research.early_military.gold`. Auch hier wird ausschließlich vom Originalpreis und erst am Ende gerundet.
+- **Erhalten durch die Kostenanpassung:** Truppenausbildungs- und Heilkosten, Sammeln, Monsterbeute, Kampfwerte, Macht und sämtliche Zeiten. Die separat angehobene Stadtproduktion und die zusätzlichen Aufgabenbelohnungen stehen unten. 2.000 T5 benötigen weiterhin 15 Stunden ohne Boni. Allianzabzeichen bleiben ausschließlich das bestehende Zusatzmaterial der Allianzhalle; ihre Gegenstandszuordnung wird durch diese Kostenanpassung nicht verändert. Säulen bleiben ausgeschlossen.
 
 Summen aus Nahrung, Holz, Stein und Gold, jeweils für genau einen Ausbau bzw. eine Freischaltung ohne Vorbedingungen:
 
@@ -83,18 +85,35 @@ Summen aus Nahrung, Holz, Stein und Gold, jeweils für genau einen Ausbau bzw. e
 | Burg 30 | 469.491.186 | 14.464.319 |
 | Akademie 30 | 250.562.824 | 13.823.749 |
 | Farm 30 | 15.689.133 | 2.957.206 |
-| T2-Freischaltung pro Truppenart | 900.000 | 297.608 |
+| T2-Freischaltung pro Truppenart | 900.000 | 208.328 |
 | T3-Freischaltung pro Truppenart | 7.200.000 | 1.265.288 |
 | T4-Freischaltung pro Truppenart | 29.325.000 | 2.464.856 |
 | T5-Freischaltung pro Truppenart | 103.500.000 | 4.160.940 |
 
-Die gesamte erforderliche Forschung bis T5-Infanterie umfasst 104 einzelne Stufen einschließlich geteilter Vorforschungen, jede nur einmal gezählt: neu 54.081.545 Rohstoffe, davon 14.461.385 Gold. Gebäude, Truppen und optionale Forschung kommen hinzu. Die einzelne T5-Freischaltung dauert seit der Zeitabstimmung 45 Tage ohne Boni. Der vollständige erforderliche Forschungsweg zur ersten T5-Infanterie sinkt von rund 351,64 auf 183,26 Tage ohne Boni, Bauzeiten oder Wartepausen; das ist eine Summe der Forschungstimer und keine Kalenderprognose für einen aktiven Spieler.
+Der Weg zur ersten T2-Infanterie umfasst einschließlich aller geteilten Vorforschungen 28 einzelne Stufen. Die erste Senkung reduzierte ihn von 1.380.140 auf 966.125 Rohstoffe; mit der zusätzlichen Goldentlastung sind es 926.461, davon 241.579 statt ursprünglich 401.765 Gold. Die einzelne T2-Freischaltung kostet je 52.082 Nahrung, Holz, Stein und Gold statt zuvor je 74.402. Frühe Beispiele: Infanterie-Verteidigung Stufe 1 kostet insgesamt 7.145 statt ursprünglich 11.340; Infanterie-Angriff Stufe 1 kostet 20.839 statt 33.075. Die Kosten höherer Stufen steigen weiterhin monoton.
 
-Als Vergleich auf einer normalen Welt ohne Boni liefern vier Produktionsgebäude auf Stufe 30 zusammen rund 1,368 Millionen Rohstoffe pro Tag, davon 207.272 Gold. Der Preis von Burg 30 entspricht etwa 13 Tagen dieser Endstufenproduktion; vor dem Ausbau mit Produktionsgebäuden auf Stufe 29 sind es rund 15 Tage. Begrenzend ist Stein, bei gleichzeitig ausreichend Lagerplatz. Akademie 30 benötigt wegen des Goldanteils rund 22 Tage. Drei Märsche auf Stufe-10-Feldern könnten bei je acht tatsächlichen Sammelstunden zusätzlich insgesamt 2,04 Millionen pro Tag holen. Das ist ein Rechenbeispiel: Reisen, Traglast, Konkurrenz, Monsterjagden und erneutes Aussenden senken diese Ausbeute. Monsterbeute und Boni ergänzen die Einnahmen, sind aber keine Voraussetzung dieser passiven Vergleichsrechnung.
+Die gesamte erforderliche Forschung bis T5-Infanterie umfasst 104 einzelne Stufen einschließlich geteilter Vorforschungen, jede nur einmal gezählt: aktuell 52.611.876 Rohstoffe, davon 13.986.111 Gold. Vor dem zusätzlichen Einstiegsrabatt waren es 54.081.545 beziehungsweise 14.461.385. Die einzelne T3-, T4- und T5-Freischaltung behält ihren bisherigen Preis. Gebäude, Truppen und optionale Forschung kommen hinzu. Die einzelne T5-Freischaltung dauert seit der Zeitabstimmung 45 Tage ohne Boni. Der vollständige erforderliche Forschungsweg zur ersten T5-Infanterie sinkt von rund 351,64 auf 183,26 Tage ohne Boni, Bauzeiten oder Wartepausen; das ist eine Summe der Forschungstimer und keine Kalenderprognose für einen aktiven Spieler.
+
+Als Vergleich auf einer normalen Welt ohne Boni liefern vier Produktionsgebäude nach der Produktionserhöhung vom 2. Oktober auf Stufe 30 zusammen rund 1,778 Millionen Rohstoffe pro Tag, davon 269.453 Gold. Der Preis von Burg 30 entspricht etwa 10 Tagen dieser Endstufenproduktion; vor dem Ausbau mit Produktionsgebäuden auf Stufe 29 sind es rund 11,5 Tage. Begrenzend ist Stein, bei gleichzeitig ausreichend Lagerplatz. Akademie 30 benötigt wegen des Goldanteils rund 17 Tage. Drei Märsche auf Stufe-10-Feldern könnten bei je acht tatsächlichen Sammelstunden zusätzlich insgesamt 2,04 Millionen pro Tag holen. Das ist ein Rechenbeispiel: Reisen, Traglast, Konkurrenz, Monsterjagden und erneutes Aussenden senken diese Ausbeute. Monsterbeute und Boni ergänzen die Einnahmen, sind aber keine Voraussetzung dieser passiven Vergleichsrechnung.
 
 Die Kostenkurve ist eine erste spielbare Abstimmung, kein Nachweis eines bestimmten Fortschrittstempos. Insbesondere parallele Ausbildung aller drei Truppentypen bleibt teuer: je 2.000 T5 kosten zusammen weiterhin 7,56 Millionen Rohstoffe. Regelmäßige Spieltests müssen zeigen, wie viel Ausbildung nach Ausbau, Forschung und Heilung tatsächlich finanzierbar bleibt.
 
 Neue Aufträge verwenden sofort die neuen Katalogpreise. Laufende Bauaufträge behalten ihren gespeicherten Kostenbeleg für eine spätere Erstattung; laufende Bau-, Forschungs- und Ausbildungszeiten bleiben erhalten. Forschung erstattet beim Abbruch gemäß bestehender Regel keine Rohstoffe. Es erfolgt keine rückwirkende Erstattung bereits abgeschlossener Käufe und keine Änderung an Spielständen.
+
+## Stadtproduktion und frühe Aufgaben ab 2. Oktober 2026
+
+Alle vier städtischen Rohstoffgebäude produzieren auf jeder Stufe 30 % mehr. `BuildingData::getHourlyRate()` ist die gemeinsame Quelle für tatsächliche Gutschriften, Offlineproduktion und Anzeige. Auf Stufe 1 gelten ohne Boni pro Stunde: Farm 390 Nahrung (zuvor 300), Holzfäller 390 Holz (300), Steinbruch 312 Stein (240), Goldmine 195 Gold (150). Die Steigerung je Gebäudestufe bleibt 15 %; Welt-, VIP-, Forschungs-, Allianz- und aktive Produktionsboni gelten weiterhin genau einmal. Lagergrenzen, Sammelraten auf der Weltkarte und Kristalle ändern sich nicht. Beim nächsten Ressourcenabgleich wird noch nicht verbuchte Offlinezeit nach der aktiven Produktionsregel berechnet; bereits gespeicherte Vorräte werden nicht pauschal erhöht.
+
+Die drei früh erreichbaren Tagesaufgaben behalten ihre bisherigen Belohnungen und erhalten garantierte Rohstoffpakete:
+
+| Aufgabe | Nahrung | Holz | Stein | Gold |
+|---|---:|---:|---:|---:|
+| Ein Gebäude ausbauen | – | 10.000 | 10.000 | 10.000 |
+| 100 Truppen ausbilden | 20.000 | – | – | 10.000 |
+| Eine Forschung abschließen | – | 10.000 | 10.000 | 10.000 |
+| Gesamt je Tag bei allen drei Aufgaben | 20.000 | 20.000 | 20.000 | 30.000 |
+
+Die Pakete werden beim Abholen ins Inventar gelegt und dort bei Bedarf geöffnet. Die bestehenden Katalogeinträge liefern Bilder und Übersetzungen. Die Aufgaben gelten weiterhin für alle Spieler und werden einmal je Konto und UTC-Tag belohnt. Bereits abgeholte Aufgaben erhalten keine nachträgliche Gutschrift. Abholstatus und sämtliche Belohnungen werden gemeinsam in einer Transaktion gespeichert; Wiederholungen buchen nicht doppelt. Prüfungen: `tests/resource_production.php`, `tests/starter_quest_rewards.php`, `tests/economy_balance.py`, `tests/economy_http.php` und die Forschungs-/Aufgabenprüfungen der Haupt-App.
 
 ## Geschwindigkeitsboni für Bau und Forschung
 

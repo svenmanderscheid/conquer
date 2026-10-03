@@ -35,7 +35,7 @@
             if(musicBuffer||loading||loadFailed||!wantsMusic()||!context)return;
             controller=new AbortController();const request=controller;
             loading=(async()=>{
-                try{const response=await fetch(`${base}/assets/audio/village-meadow-v1.wav`,{credentials:'omit',cache:'force-cache',signal:request.signal});if(!response.ok)throw new Error('Audio unavailable');const bytes=await response.arrayBuffer();if(request.signal.aborted||destroyed)return;musicBuffer=await context.decodeAudioData(bytes);}
+                try{const response=await fetch(`${base}/assets/audio/village-daylight-v1.wav`,{credentials:'omit',cache:'force-cache',signal:request.signal});if(!response.ok)throw new Error('Audio unavailable');const bytes=await response.arrayBuffer();if(request.signal.aborted||destroyed)return;musicBuffer=await context.decodeAudioData(bytes);}
                 catch(error){if(error.name!=='AbortError')loadFailed=true;}
                 finally{loading=null;controller=null;if(!destroyed)sync();}
             })();updateControls();return loading;

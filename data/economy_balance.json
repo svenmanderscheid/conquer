@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-30",
+  "version": "2026-10-02",
   "buildings": {
     "resource_factor": "0.80",
     "gold_factor": "0.60",
@@ -10,6 +10,16 @@
     "resource_factor": "0.70",
     "gold_factor": "0.50",
     "anchor_academy_level": 5,
-    "factor_per_academy_level": "0.90"
+    "factor_per_academy_level": "0.90",
+    "early_military": {
+      "resource_factor": "0.70",
+      "full_discount_through_academy_level": 10,
+      "normal_cost_from_academy_level": 16,
+      "gold": {
+        "resource_factor": "0.70",
+        "full_discount_through_academy_level": 5,
+        "normal_cost_from_academy_level": 10
+      }
+    }
   }
 }

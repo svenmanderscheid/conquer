@@ -1,6 +1,17 @@
 # Dorfmusik und Spieleffekte
 
-Aktuell spielt `village-meadow-v1.wav`: 2:08 Minuten zurückhaltende Dorfmusik,
+Seit dem 1. Oktober 2026 spielt Union of Kingdoms die bereits vorhandene
+hellere Fassung `village-daylight-v1.wav`: eine Melodie in G-Dur,
+84 BPM, 4/4-Takt, rund 45,7 Sekunden. Weiche glöckchenartige Töne, sparsame
+Harfenbegleitung und leise Flötenantworten ersetzen die langsamere Meadow-Fassung.
+Erzeugung: `python tools/generate-village-daylight.py` mit NumPy. Mono,
+22.050 Hz, 16-Bit PCM, etwa 2 MB. Spitzenpegel 32 %, RMS etwa 6,7 % gegenüber
+16,4 % bei der ersten Version: durchschnittlich rund 7,8 dB leiser.
+Gespeicherte Lautstärkeeinstellungen und Spieleffekte bleiben unverändert.
+Auch diese Komposition ist vollständig synthetisiert, ohne fremde Samples.
+Die anderen Versionen bleiben als Vergleich erhalten.
+
+Zuvor aktiv: `village-meadow-v1.wav`, 2:08 Minuten zurückhaltende Dorfmusik,
 60 BPM, weiche Flötenphrasen, einzelne Harfentöne und leise gehaltene Akkorde.
 Kein Schlagzeug, keine Glöckchenspitzen, keine Einleitung oder Schluss-Pause.
 Die Harmonie an der Schleifengrenze bleibt G-add9; ausklingende Instrumente
@@ -13,17 +24,7 @@ Die Hörprobe `artifacts/audio-meadow/loop-transition.wav` enthält zwölf Sekun
 vor und zwölf Sekunden nach dem Übergang. Die Browserprüfung rendert zwei
 vollständige Schleifen mit Web Audio und vergleicht beide sampleweise.
 
-Zweite Fassung: `village-daylight-v1.wav`, eine hellere Melodie in G-Dur,
-84 BPM, 4/4-Takt, rund 45,7 Sekunden. Weiche glöckchenartige Töne, sparsame
-Harfenbegleitung und leise Flötenantworten ersetzen die dichtere erste Melodie.
-Erzeugung: `python tools/generate-village-daylight.py` mit NumPy. Mono,
-22.050 Hz, 16-Bit PCM, etwa 2 MB. Spitzenpegel 32 %, RMS etwa 6,7 % gegenüber
-16,4 % bei der ersten Version: durchschnittlich rund 7,8 dB leiser.
-Gespeicherte Lautstärkeeinstellungen und Spieleffekte bleiben unverändert.
-Auch diese Komposition ist vollständig synthetisiert, ohne fremde Samples.
-Die erste Version bleibt als Vergleich erhalten:
-
-`village-morning-v1.wav` ist eine für Conquer erzeugte Originalmelodie: D-Dur,
+`village-morning-v1.wav` ist die erste für Union of Kingdoms erzeugte Originalmelodie: D-Dur,
 75 BPM, 3/4-Takt, 16 Takte / 38,4 Sekunden. Harfenartige Arpeggien und eine
 flötenartige Melodie werden vollständig synthetisiert. Es werden keine fremden
 Aufnahmen, Samples oder externen Musikdienste verwendet.

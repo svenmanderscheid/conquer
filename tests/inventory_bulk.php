@@ -35,6 +35,11 @@ try {
     $food=findBulk('resource_pack','food');$code=(int)$food['code'];
     InventoryService::addItems(1,$code,10003);
     InventoryService::addItems(1,10101011,7);
+    $selected = KingdomService::action(1, ['action'=>'inventory.use','item_code'=>$code,'quantity'=>3,'operation_key'=>'test_selected_quantity','expected_world_id'=>1])['result'];
+    checkBulk($selected['quantity']===3 && $selected['amount']===$food['amount']*3 && stockBulk($code)===10000, 'selected quantity credits and consumes exactly three packs');
+    $replayed = KingdomService::action(1, ['action'=>'inventory.use','item_code'=>$code,'quantity'=>3,'operation_key'=>'test_selected_quantity','expected_world_id'=>1])['result'];
+    checkBulk($selected===$replayed && stockBulk($code)===10000, 'selected quantity replay never consumes twice');
+    InventoryService::addItems(1,$code,3);
     $before=(int)$db->query('SELECT food FROM cities WHERE id=1')->fetchColumn();
     $result=useBulk($code,'bulk_resource_once');
     checkBulk($result['quantity']===10003 && $result['amount']===$food['amount']*10003, 'whole stack above 10000 is credited');

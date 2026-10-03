@@ -19,6 +19,7 @@ STATIC += ['community_chat_app','social_hub_app','hud_activity','locale_delivery
 STATIC += ['world_sprite_hit_bounds','map_action_history']
 BACKEND += ['boss_mechanics','grumwald_rally','rally_boss_skills']
 BACKEND.append('alliance_ranks')
+BACKEND += ['resource_production', 'starter_quest_rewards', 'economy_http']
 APP.append('alliance_ranks_app')
 STATIC.append('alliance_ranks_ui')
 APP.append('rally_boss_skills_app')

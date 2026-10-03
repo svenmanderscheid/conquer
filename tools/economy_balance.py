@@ -22,6 +22,15 @@ def scaled_price(value, factor):
     return int((Decimal(value) * factor).to_integral_value(rounding=ROUND_CEILING))
 
 
+def early_research_factor(academy, rule):
+    """Taper an early discount using the required academy level, not the player's."""
+    start = rule['full_discount_through_academy_level']
+    end = rule['normal_cost_from_academy_level']
+    factor = Decimal(rule['resource_factor'])
+    progress = Decimal(max(0, min(academy - start, end - start))) / Decimal(end - start)
+    return factor + (1 - factor) * progress
+
+
 def apply_costs(buildings, research, source, policy):
     """Change only resources. Keep materials, timers, effects, IDs and prerequisites."""
     rule = policy['buildings']
@@ -52,7 +61,11 @@ def apply_costs(buildings, research, source, policy):
                 row = rows[entry['level']]
                 academy = max((int(req['level']) for req in row['requirements'] if req['type'] == 'academy'), default=1)
                 factor = Decimal(rule['resource_factor']) * Decimal(rule['factor_per_academy_level']) ** max(0, academy - rule['anchor_academy_level'])
+                gold_factor = Decimal(rule['gold_factor'])
+                if tree == 'battle':
+                    factor *= early_research_factor(academy, rule['early_military'])
+                    gold_factor *= early_research_factor(academy, rule['early_military']['gold'])
                 entry['resources'] = {
-                    resource: scaled_price(value, factor * (Decimal(rule['gold_factor']) if resource == 'gold' else 1))
+                    resource: scaled_price(value, factor * (gold_factor if resource == 'gold' else 1))
                     for resource, value in source_resources(row).items()
                 }

@@ -1,0 +1,20 @@
+{
+  "approved": "2026-10-03",
+  "reference": "approved inventory concept sheet",
+  "source": "approved-transparent-source.png",
+  "preparation": "Imagegen background removal; grid extraction, transparent padding and 256px WebP compression",
+  "icons": [
+    "food",
+    "lumber",
+    "stone",
+    "gold",
+    "gems",
+    "speedup",
+    "energy",
+    "chest",
+    "shield",
+    "research",
+    "construction",
+    "fragment"
+  ]
+}

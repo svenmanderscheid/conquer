@@ -31,7 +31,10 @@
       "target": 1,
       "rewards": [
         { "item_code": 10103011, "quantity": 1 },
-        { "gems": 15 }
+        { "gems": 15 },
+        { "item_code": 10201010, "quantity": 1 },
+        { "item_code": 10201018, "quantity": 1 },
+        { "item_code": 10201026, "quantity": 1 }
       ]
     },
     {
@@ -42,7 +45,9 @@
       "target": 100,
       "rewards": [
         { "item_code": 10103031, "quantity": 1 },
-        { "gems": 15 }
+        { "gems": 15 },
+        { "item_code": 10201003, "quantity": 2 },
+        { "item_code": 10201026, "quantity": 1 }
       ]
     },
     {
@@ -53,7 +58,10 @@
       "target": 1,
       "rewards": [
         { "item_code": 10103021, "quantity": 1 },
-        { "gems": 20 }
+        { "gems": 20 },
+        { "item_code": 10201010, "quantity": 1 },
+        { "item_code": 10201018, "quantity": 1 },
+        { "item_code": 10201026, "quantity": 1 }
       ]
     },
     {

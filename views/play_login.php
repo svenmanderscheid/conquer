@@ -14,8 +14,8 @@ $identifier = htmlspecialchars(is_string($_POST['identifier'] ?? null) ? $_POST[
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#443052">
-<title>Union of Kingdoms – Sign in to play</title>
-<link rel="icon" href="<?= $base ?>/assets/icons/conquer.svg" type="image/svg+xml">
+<title>Union of Kingdoms – Sign in to play</title><?php require ROOT_DIR.'/views/partials/brand-head.php'; ?>
+
 <link rel="stylesheet" href="<?= $base ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR.'/assets/css/fantasy-fonts.css') ?>">
 <link rel="stylesheet" href="<?= $base ?>/assets/css/localization.css?v=<?= filemtime(ROOT_DIR.'/assets/css/localization.css') ?>">
 <link rel="stylesheet" href="<?= $base ?>/assets/css/play-login.css?v=<?= filemtime(ROOT_DIR.'/assets/css/play-login.css') ?>">

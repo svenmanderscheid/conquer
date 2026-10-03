@@ -9,7 +9,7 @@ window.ConquerTrading = function(ctx){
     let mode='merchant',vipView='mine',vipCategory='all',busy=false,clockOffset=0,lastServerTime='',refreshRequested='';
     const num=n=>Number(n||0);
     const now=()=>ctx.now?ctx.now():Date.now()+clockOffset;
-    const art=file=>base+'/assets/art/items/'+file+'?v='+encodeURIComponent(window.CONQUER_ITEM_ART_VERSION||'catalog3');
+    const art=file=>window.ConquerItemArt?.url(base,file)??base+'/assets/art/items/'+file+'?v='+encodeURIComponent(window.CONQUER_ITEM_ART_VERSION||'catalog3');
     const resourceArt=key=>key==='gems'?art('gems.svg'):base+'/assets/art/ui-resources/'+key+'.png';
     const list=()=>mode==='crystals'?data()?.crystals:mode==='vip'?data()?.vip:data();
     const allOffers=()=>list()?.offers||[];
@@ -23,6 +23,8 @@ window.ConquerTrading = function(ctx){
     const timeStamp=s=>num(s)>=86400?short(num(s)/86400)+'d':num(s)>=3600?short(num(s)/3600)+'h':short(num(s)/60)+'min';
     function stamp(i){return i.category==='resource_pack'?short(i.amount):i.duration_seconds?timeStamp(i.duration_seconds):i.category==='vip_point'?short(i.vip_points):i.category==='ap_refill'?short(i.ap_amount):i.category==='fragment_pack'?short(i.fragment_amount)+' Fr.':'';}
     function itemArt(i){
+        const painted=window.ConquerItemArt?.forItem(i);
+        if(painted)return `<img src="${art(painted)}" alt="" loading="lazy">`;
         if(i.icon)return `<img src="${esc(art(i.icon))}" alt="" loading="lazy">${i.category==='speedup'&&!i.icon_framed?specialty(i):''}`;
         if(i.category==='resource_pack')return `<img src="${resourceArt(i.resource)}" alt="" loading="lazy">`;
         const file=i.category==='speedup'?'speedup.svg':i.category==='vip_point'?'prestige.svg':i.category==='ap_refill'?'energy.svg':i.category==='chest'?'chest-'+(['silver','gold','platinum'].includes(i.chest_type)?i.chest_type:'silver')+'.svg':i.category==='fragment_pack'?'fragment-'+(['normal','rare','epic','legendary','mythic'].includes(i.fragment_grade)?i.fragment_grade:'normal')+'.svg':'fragment.svg';

@@ -127,7 +127,14 @@ window.ConquerLandscape = (() => {
         c.save();
         c.lineCap='round';c.lineJoin='round';
         function strokePath(points,width){
-            const parts=[];for(let i=0;i<points.length-1;i+=12){const part=points.slice(i,i+13),mid=part[Math.floor(part.length/2)];parts.push({points:part,biome:biomeAt(...mid)});}
+            const parts=[],pad=width*.9+1/s;
+            for(let i=0;i<points.length-1;i+=12){
+                const part=points.slice(i,i+13);
+                // Include the full bank and round caps. Rivers outside the
+                // buffered viewport otherwise submit hundreds of empty strokes.
+                if(part.every(([x])=>x<bounds.left-pad)||part.every(([x])=>x>bounds.right+pad)||part.every(([,y])=>y<bounds.top-pad)||part.every(([,y])=>y>bounds.bottom+pad))continue;
+                const mid=part[Math.floor(part.length/2)];parts.push({points:part,biome:biomeAt(...mid)});
+            }
             // Draw all banks before the inner water, so colour segments never leave end-cap seams.
             for(const [factor,key] of [[1.78,'roadEdge'],[1.6,'shore'],[1.22,'bank'],[1,'waterDeep'],[.68,'water'],[.11,'waterLight']])for(const part of parts){
                 c.beginPath();part.points.forEach(([x,y],i)=>{const [px,py]=project(x,y);i?c.lineTo(px,py):c.moveTo(px,py);});
