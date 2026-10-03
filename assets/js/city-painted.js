@@ -4,6 +4,8 @@ window.ConquerPaintedCity=(()=>{
  const places=[['castle',44,4,17,24],['academy',25,12,12,19],['treasure_house',64.5,14,14,18],['hospital',11.5,28,14,16],['hall_of_alliance',28.5,30,15,18],['trading_post',55.625,30.75,13.75,16.25],['storage',69.5,29,15,20],['watch_tower',89,34,6,16],['stable',6,49,16,14],['archery_range',13,63,14,12],['barrack',30,58,14,16],['farm',56,55,14,15],['lumber_camp',78,54,15,15],['gold_mine',54,72,11,11],['quarry',67,70,17,14],['wall',34,84,10,12]];
  const spriteName=code=>['castle','academy','treasure_house'].includes(code)?code+'_rounded':['hospital','hall_of_alliance','stable','archery_range','barrack'].includes(code)?code+'_aligned':code;
  const defaultCastleSprite=base=>`${base}/assets/art/village-layered-v2/runtime/castle_rounded.webp`;
+ // The extended painting surrounds the existing 3:2 building coordinate area.
+ const terrainFrame={x:106,y:99,width:1229,height:819};
  function constructionArtwork(base,code){
   const id='painted-construction-'+code,src=`${base}/assets/art/village-layered-v2/runtime/construction-scaffold-frame-1.webp`.replaceAll('&','&amp;').replaceAll('"','&quot;');
   // Follow the tool silhouette through the transparent gap beside the cap.
@@ -64,7 +66,12 @@ window.ConquerPaintedCity=(()=>{
  function syncHeadroom(village){
   const scene=village.querySelector('.painted-village-scene'),scroll=village.querySelector('.painted-village-scroll');
   const resources=document.getElementById('resources');
-  if(!scene||!scroll||!resources)return;
+  if(!scene||!scroll)return;
+  // End scrolling at the painting's real lower edge; never expose a fallback
+  // background or reserve more HUD space than the approved artwork contains.
+  const ground=scene.parentElement;
+  ground.style.setProperty('--painted-footroom',Math.floor(scene.offsetWidth*(1086-terrainFrame.y-terrainFrame.height)/terrainFrame.width)+'px');
+  if(!resources)return;
   // Allow even the highest roof marker to move below the fixed resource bar.
   // This is real scrollable space, so markers always stay anchored to their roofs.
   const room=Math.max(0,Math.ceil(resources.getBoundingClientRect().bottom-village.getBoundingClientRect().top+12-scene.offsetHeight*.1+27));
@@ -150,7 +157,7 @@ window.ConquerPaintedCity=(()=>{
   // One small sampling pass, no canvas rendering loop. Only clear water qualifies.
   const canvas=document.createElement('canvas');canvas.width=384;canvas.height=256;
   const ctx=canvas.getContext('2d',{willReadFrequently:true});if(!ctx)return;
-  let pixels;try{ctx.drawImage(terrain,0,0,384,256);pixels=ctx.getImageData(0,0,384,256).data;}catch{return;}
+  let pixels;try{ctx.drawImage(terrain,terrainFrame.x,terrainFrame.y,terrainFrame.width,terrainFrame.height,0,0,384,256);pixels=ctx.getImageData(0,0,384,256).data;}catch{return;}
   const water=(x,y)=>{const i=(y*384+x)*4;return pixels[i]<120&&pixels[i+1]>145&&pixels[i+2]>175&&pixels[i+2]>pixels[i]*1.5;};
   const layer=document.createElement('div');layer.className='painted-river';layer.setAttribute('aria-hidden','true');
   let count=0;
@@ -185,9 +192,11 @@ window.ConquerPaintedCity=(()=>{
  function render({host,base,state,kingdom,labels,countdown,citySkin}){
   if(!host.querySelector('.painted-village')){
    const art=`${base}/assets/art/village-layered-v2/runtime`;
-   host.innerHTML=`<div class="painted-village"><div class="painted-village-scroll" tabindex="0" aria-label="Dorfansicht – mit der Maus ziehen oder wischen"><div class="painted-village-scene"><img src="${art}/terrain.webp" alt="Dorfuntergrund ohne Gebäude" draggable="false">${places.map(([code,x,y,w,h])=>`<button type="button" class="painted-village-building" data-action="building" data-id="${code}" style="left:${x}%;top:${y}%;width:${w}%;height:${h}%">${code==='wall'?'':`<img class="painted-building-sprite" src="${art}/${spriteName(code)}.webp" alt="" draggable="false">`}<span class="painted-scaffold" aria-hidden="true"></span><small class="painted-build-status"></small><span class="painted-building-label"></span></button>`).join('')}</div></div><button class="city-building-tool" data-action="buildings" aria-label="Gebäudeübersicht öffnen">♜ <small>Gebäude</small></button></div>`;
+   host.innerHTML=`<div class="painted-village"><div class="painted-village-scroll" tabindex="0" aria-label="Dorfansicht – mit der Maus ziehen oder wischen"><div class="painted-village-ground"><div class="painted-village-scene"><img src="${art}/terrain-extended.webp" alt="Dorfuntergrund ohne Gebäude" draggable="false">${places.map(([code,x,y,w,h])=>`<button type="button" class="painted-village-building" data-action="building" data-id="${code}" style="left:${x}%;top:${y}%;width:${w}%;height:${h}%">${code==='wall'?'':`<img class="painted-building-sprite" src="${art}/${spriteName(code)}.webp" alt="" draggable="false">`}<span class="painted-scaffold" aria-hidden="true"></span><small class="painted-build-status"></small><span class="painted-building-label"></span></button>`).join('')}</div></div></div><button class="city-building-tool" data-action="buildings" aria-label="Gebäudeübersicht öffnen">♜ <small>Gebäude</small></button></div>`;
    const terrain=host.querySelector('.painted-village-scene>img');
-   host.querySelector('.painted-village').style.backgroundImage=`url("${art}/terrain.webp")`;
+   const frame=terrainFrame;
+   terrain.style.cssText=`left:${-frame.x/frame.width*100}%;top:${-frame.y/frame.height*100}%;width:${1448/frame.width*100}%;height:${1086/frame.height*100}%`;
+   host.querySelector('.painted-village-ground').style.setProperty('--painted-terrain-image',`url("${art}/terrain-extended.webp")`);
    if(terrain.complete)mountRiverMotion(terrain);else terrain.addEventListener('load',()=>mountRiverMotion(terrain),{once:true});
    host.querySelectorAll('.painted-building-sprite').forEach(img=>{
     const mount=()=>mountBuildingMotion(img,img.parentElement.dataset.id);

@@ -1,0 +1,17 @@
+{
+  "tool": "Built-in image_gen",
+  "date": "2026-10-01",
+  "source": "terrain.webp",
+  "output": "terrain-extended.webp",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "sceneFrame": {
+    "x": 106,
+    "y": 99,
+    "width": 1229,
+    "height": 819
+  },
+  "prompt": "Use case: precise-object-edit. Asset type: seamless outer terrain extension for an existing 2D fantasy game village. Edit target: the referenced terrain.webp, exactly 1536 x 1024 pixels. Outpaint a 256 pixel border on ALL FOUR SIDES to create a 2048 x 1536 image. The complete original image must remain UNCHANGED at coordinates x=256..1791, y=256..1279, original scale and original proportions, no zoom or recentering. Extend only the land beyond those original edges: continue the same woodland, soft trees, bushes, rocks, grass and turquoise river naturally. Continue the entrance bridge and its tan path into the lower new woodland border. Extend the waterfall/forest above. No additional walls, towers, settlements, buildings, text or interface. Match the original warm storybook cartoon artwork, dark brown outlines, rounded shapes, restrained texture, soft earth colours. New pixels must connect seamlessly to the original four edges, with no straight seams, mirrored objects or repeat tiling. Preserve every original wall, path, fountain, river and tree in the original central rectangle. Output opaque 2048 x 1536 landscape image."
+}
