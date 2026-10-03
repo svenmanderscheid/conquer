@@ -10,7 +10,7 @@ $base = htmlspecialchars(APP_BASE, ENT_QUOTES);
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#5c4270">
   <link rel="stylesheet" href="<?= $base ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR.'/assets/css/fantasy-fonts.css') ?>">
-  <title>Union of Kingdoms · Gemeinsam gegen die Dunkelheit</title>
+  <title>Union of Kingdoms · Gemeinsam gegen die Dunkelheit</title><?php require ROOT_DIR.'/views/partials/brand-head.php'; ?>
   <link rel="stylesheet" href="<?= $base ?>/assets/css/world-map.css?v=<?= filemtime(__DIR__ . '/../assets/css/world-map.css') ?>">
   <link rel="stylesheet" href="<?= $base ?>/assets/css/game.css?v=style7">
   <link rel="stylesheet" href="<?= $base ?>/assets/css/research-tree.css?v=<?= filemtime(__DIR__ . '/../assets/css/research-tree.css') ?>">
@@ -35,7 +35,7 @@ $base = htmlspecialchars(APP_BASE, ENT_QUOTES);
   <link rel="stylesheet" href="<?= $base ?>/assets/css/inventory-reference.css?v=<?= filemtime(__DIR__ . '/../assets/css/inventory-reference.css') ?>">
   <link rel="stylesheet" href="<?= $base ?>/assets/css/world-zones.css?v=<?= filemtime(__DIR__ . '/../assets/css/world-zones.css') ?>">
   <link rel="stylesheet" href="<?= $base ?>/assets/css/world-shrines.css?v=<?= filemtime(__DIR__ . '/../assets/css/world-shrines.css') ?>">
-<link rel="stylesheet" href="<?= $base ?>/assets/css/mailbox-panel.css?v=<?= filemtime(ROOT_DIR.'/assets/css/mailbox-panel.css') ?>"><link rel="stylesheet" href="<?= $base ?>/assets/css/community-panel.css?v=features1"><link rel="stylesheet" href="<?= $base ?>/assets/css/defense-panel.css?v=features1"><link rel="stylesheet" href="<?= $base ?>/assets/css/progression-panel.css?v=features1"><link rel="stylesheet" href="<?= $base ?>/assets/css/lord-talents.css?v=<?= filemtime(ROOT_DIR.'/assets/css/lord-talents.css') ?>"><link rel="manifest" href="<?= htmlspecialchars(APP_BASE,ENT_QUOTES) ?>/manifest.php?v=<?= filemtime(ROOT_DIR.'/manifest.php') ?>"><link rel="apple-touch-icon" href="<?= htmlspecialchars(APP_BASE,ENT_QUOTES) ?>/assets/icons/conquer-192.png"><link rel="stylesheet" href="<?= htmlspecialchars(APP_BASE,ENT_QUOTES) ?>/assets/css/localization.css?v=<?= filemtime(ROOT_DIR.'/assets/css/localization.css') ?>"><?= \Conquer\Game\Locale::bootstrapScripts() ?><script src="<?= htmlspecialchars(APP_BASE,ENT_QUOTES) ?>/assets/js/localization.js?v=<?= filemtime(ROOT_DIR.'/assets/js/localization.js') ?>" defer></script>
+<link rel="stylesheet" href="<?= $base ?>/assets/css/mailbox-panel.css?v=<?= filemtime(ROOT_DIR.'/assets/css/mailbox-panel.css') ?>"><link rel="stylesheet" href="<?= $base ?>/assets/css/community-panel.css?v=features1"><link rel="stylesheet" href="<?= $base ?>/assets/css/defense-panel.css?v=features1"><link rel="stylesheet" href="<?= $base ?>/assets/css/progression-panel.css?v=features1"><link rel="stylesheet" href="<?= $base ?>/assets/css/lord-talents.css?v=<?= filemtime(ROOT_DIR.'/assets/css/lord-talents.css') ?>"><link rel="stylesheet" href="<?= htmlspecialchars(APP_BASE,ENT_QUOTES) ?>/assets/css/localization.css?v=<?= filemtime(ROOT_DIR.'/assets/css/localization.css') ?>"><?= \Conquer\Game\Locale::bootstrapScripts() ?><script src="<?= htmlspecialchars(APP_BASE,ENT_QUOTES) ?>/assets/js/localization.js?v=<?= filemtime(ROOT_DIR.'/assets/js/localization.js') ?>" defer></script>
   <link rel="stylesheet" href="<?= $base ?>/assets/css/world-chat.css?v=<?= filemtime(__DIR__ . '/../assets/css/world-chat.css') ?>">
   <link rel="stylesheet" href="<?= $base ?>/assets/css/trading-panel.css?v=<?= filemtime(__DIR__ . '/../assets/css/trading-panel.css') ?>">
   <link rel="stylesheet" href="<?= $base ?>/assets/css/treasure-panel.css?v=<?= filemtime(__DIR__ . '/../assets/css/treasure-panel.css') ?>">
@@ -95,9 +95,13 @@ $base = htmlspecialchars(APP_BASE, ENT_QUOTES);
   <button id="hud-marches" class="hud-edge-button" data-world-only data-action="hud-marches" aria-label="Truppenmärsche öffnen"><span class="hud-edge-art"><img src="<?= $base ?>/assets/art/items/army.svg" alt=""></span><span class="hud-edge-label">Truppen</span><small id="hud-march-status" class="hud-edge-status">0 unterwegs</small></button>
 </nav>
 <nav class="hud-edge-tools hud-right-tools" aria-label="Spielmenü und Ereignisse">
+  <button type="button" id="hud-mail" class="hud-edge-button hud-mail-button" data-action="tab" data-id="reports" aria-label="<?= htmlspecialchars(\Conquer\Game\Locale::t('hud.mail.open'), ENT_QUOTES) ?>"><span class="hud-edge-art"><img src="<?= $base ?>/assets/art/menu-icons/reports.png" alt=""></span><span class="hud-edge-label" data-i18n="hud.mail.label"><?= htmlspecialchars(\Conquer\Game\Locale::t('hud.mail.label'), ENT_QUOTES) ?></span></button>
   <button id="hud-report" class="hud-edge-button hud-report-button" data-action="bug-report-open" aria-label="Bug oder Idee melden" aria-haspopup="dialog"><span class="hud-edge-art" aria-hidden="true"><img src="<?= $base ?>/assets/art/menu-icons/bug-report.png" alt=""></span><span class="hud-edge-label">Melden</span></button>
   <button id="hud-menu" class="hud-edge-button" data-action="menu-more" aria-label="Spielmenü öffnen" aria-haspopup="dialog"><span class="hud-edge-art"><img src="<?= $base ?>/assets/art/menu-icons/menu.png" alt=""></span><span class="hud-edge-label">Menü</span></button>
+  <div class="hud-event-stack">
   <button type="button" id="hud-alliance-rallies" class="hud-edge-button hud-rally-alert" data-world-only data-action="rally-list" aria-label="<?= htmlspecialchars(\Conquer\Game\Locale::t('rally.hud.open'), ENT_QUOTES) ?>" hidden><span class="hud-edge-art"><img src="<?= $base ?>/assets/art/menu-icons/alliance.png" alt=""><b id="hud-rally-count" class="hud-rally-count" aria-hidden="true">0</b></span><span class="hud-edge-label" data-i18n="rally.hud.label"><?= htmlspecialchars(\Conquer\Game\Locale::t('rally.hud.label'), ENT_QUOTES) ?></span><small id="hud-rally-status" class="hud-edge-status"></small></button>
+  <button type="button" id="hud-extra-event" class="hud-edge-button hud-extra-event" data-action="tab" hidden><span class="hud-edge-art"><img src="<?= $base ?>/assets/art/menu-icons/events.png" alt=""></span><span class="hud-edge-label" data-user-content></span></button>
+  </div>
   <button class="hud-edge-button" data-action="tab" data-id="events" aria-label="Weltereignisse öffnen"><span class="hud-edge-art"><img src="<?= $base ?>/assets/art/menu-icons/events.png" alt=""></span><span class="hud-edge-label">Events</span></button>
 </nav>
 <aside id="world-chat" class="world-chat" aria-label="Welt- und Allianzchat" hidden></aside>
@@ -171,6 +175,7 @@ $base = htmlspecialchars(APP_BASE, ENT_QUOTES);
 <script src="<?= $base ?>/assets/js/app-polling.js?v=<?= filemtime(__DIR__ . '/../assets/js/app-polling.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/game-comfort.js?v=<?= filemtime(__DIR__ . '/../assets/js/game-comfort.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/game-audio.js?v=<?= filemtime(__DIR__ . '/../assets/js/game-audio.js') ?>" defer></script>
+<script src="<?= $base ?>/assets/js/extra-events.js?v=<?= filemtime(__DIR__ . '/../assets/js/extra-events.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/game.js?v=<?= filemtime(__DIR__ . '/../assets/js/game.js') ?>" defer></script>
 <script type="application/json" id="uok-layout-config"><?= json_encode($uiLayoutProfiles ?? \Conquer\Game\Ui\LayoutSettings::read()['profiles'],JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_THROW_ON_ERROR) ?></script>
 <script type="application/json" id="uok-layout-catalog"><?= json_encode(\Conquer\Game\Ui\LayoutSettings::catalog(),JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_THROW_ON_ERROR) ?></script>

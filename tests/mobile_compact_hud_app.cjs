@@ -58,7 +58,7 @@ function measureNumbers(){return [...document.querySelectorAll('.hud-compact-pow
    if(phase==='before')continue;
    const compact=width<=700||(width<=1100&&height<=520),overlap=(a,b)=>a.x<b.right-1&&a.right>b.x+1&&a.y<b.bottom-1&&a.bottom>b.y+1;
    assert.equal(await page.locator('#navigation').count(),1,'One shared city/world navigation');
-   assert.equal(await page.locator('#navigation button').count(),7,'Every main destination remains available');
+   assert.equal(await page.locator('#navigation button:visible').count(),compact?5:7,'Five clear mobile destinations; seven on desktop');
    for(const item of result.controls){
     assert(item.width>=43.5&&item.height>=43.5,'44px touch target: '+JSON.stringify(item));
     assert(item.x>=-.5&&item.y>=-.5&&item.right<=width+.5&&item.bottom<=height+.5,'Control within viewport: '+JSON.stringify(item));
@@ -66,6 +66,8 @@ function measureNumbers(){return [...document.querySelectorAll('.hud-compact-pow
    }
    for(let i=0;i<result.controls.length;i++)for(let j=i+1;j<result.controls.length;j++)assert(!overlap(result.controls[i],result.controls[j]),'HUD controls overlap: '+result.controls[i].id+' / '+result.controls[j].id);
    if(compact){
+    const mail=result.controls.find(control=>control.id==='hud-mail'),chat=result.boxes['#world-chat'];
+    assert(mail&&mail.bottom<=chat.y&&chat.y-mail.bottom<=12,'Mail sits directly above the chat without covering it');
     assert(result.boxes['.hud-profile'].height<=48,'Mobile profile uses one compact touch row');
     assert(result.boxes['#resources'].bottom<=102,'Profile and resources leave the field below 102px');
     assert(result.boxes['#world-chat'].height<=45,'Collapsed mobile chat uses one touch row');
@@ -84,7 +86,10 @@ function measureNumbers(){return [...document.querySelectorAll('.hud-compact-pow
    // Reach the complete views with actual taps. No reward, purchase or production action is triggered.
    for(const selector of ['#account-button','#hud-energy','#hud-vip-button','#lord-talent-button','#hud-gems'])await opensPanel(selector);
    for(const resource of ['food','lumber','stone','gold'])await opensPanel('#resources [data-id="'+resource+'"]');
+   if(compact)await opensPanel('#hud-mail');
+   if(compact){await page.locator('#navigation [data-id="shop"]').tap();await page.locator('#panel-dialog[data-panel="market"]').waitFor();await closePanels();}
    await page.locator('#hud-menu').tap();await page.locator('.menu-groups').waitFor();
+   assert.equal(await page.locator('.menu-groups [data-id="market"]').count(),1,'Market remains reachable from the menu');
    assert.equal(await page.locator('.menu-groups [data-action="bug-report-open"][data-id="bugreport"]').count(),1,'Reporting remains in the menu');
    assert.equal(await page.locator('.menu-groups [data-action="vip-open"]').count(),1,'VIP and the second builder remain available');
    if(width===390&&mode==='world')await page.screenshot({path:path.join(output,'after-390x844-menu.png')});await closePanels();

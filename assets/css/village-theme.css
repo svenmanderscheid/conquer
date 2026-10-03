@@ -24,6 +24,14 @@
 /* Currency identity follows the approved amethyst mine; action/rarity colours stay separate. */
 body.mobile-game #hud-gems { background:linear-gradient(var(--ui-crystal-soft),var(--ui-crystal-light));border-color:var(--ui-crystal);color:var(--ui-crystal-dark);box-shadow:inset 0 1px var(--ui-card-light),0 3px var(--ui-crystal-dark); }
 body.mobile-game .crystal-shop-summary strong { color:var(--ui-crystal-dark); }
+/* Crystal offers start at the top so long catalogues remain fully scrollable. */
+body.mobile-game .shop-crystal-view { display:block; }
+body.mobile-game .shop-crystal-view > h3 { margin:12px 0; color:var(--ui-ink); }
+body.mobile-game .trading-shell > .crystal-categories { flex:0 0 44px; padding:0 4px; }
+body.mobile-game .crystal-categories button { min-height:44px; }
+@media (max-height:440px) {
+  body.mobile-game .trading-shell:has(.shop-crystal-view) .trading-summary p { display:none; }
+}
 body.mobile-game .march-gem { color:var(--ui-crystal);text-shadow:0 0 24px var(--ui-crystal-light); }
 
 /* Troop tiers: the same semantic palette for every troop type and portrait surface. */
@@ -2284,11 +2292,11 @@ body.mobile-game #player-hud-name { font-weight:700; }
   body.mobile-game #navigation .game-dock-item.hud-scene-switch { width:64px; height:59px; margin:0 0 0 4px; }
   body.mobile-game #navigation .hud-scene-switch .dock-icon { top:-14px; width:60px; height:57px; }
 }
-/* Bosses reserve 2 x 2 tiles; their tall silhouette rises above their feet. */
+/* Bosses reserve 2 x 2 tiles; artwork shares the painted encounters' 5% reduction. */
 .mobile-game .map-overlay-shell .atlas-marker--monsters.is-regional-boss > img {
-  width:calc(var(--tile-size,44px)*2.7);
-  height:calc(var(--tile-size,44px)*2.88);
-  margin-left:calc(var(--tile-size,44px)*-1.35);
+  width:calc(var(--tile-size,44px)*2.7*.95);
+  height:calc(var(--tile-size,44px)*2.88*.95);
+  margin-left:calc(var(--tile-size,44px)*-1.35*.95);
   bottom:calc(var(--tile-size,44px)*.06);
   mix-blend-mode:normal;
 }
@@ -3311,10 +3319,10 @@ body.mobile-game .map-overlay-shell .is-charm[data-grade=epic] { --charm-grade:#
 body.mobile-game .map-overlay-shell .is-charm[data-grade=legendary] { --charm-grade:#FFB72C;--charm-grade-dark:#805C2B; }
 /* Solo creatures remain larger than collectibles; legacy rally art keeps a smaller footprint. */
 .mobile-game .map-overlay-shell .atlas-marker--monsters[data-monster-type=solo] > img {
- width:calc(var(--tile-size,44px)*1.75);height:calc(var(--tile-size,44px)*1.75);margin-left:calc(var(--tile-size,44px)*-.875);
+ width:calc(var(--tile-size,44px)*1.35);height:calc(var(--tile-size,44px)*1.35);margin-left:calc(var(--tile-size,44px)*-.675);
 }
 .mobile-game .map-overlay-shell .atlas-marker--monsters[data-monster-type=rally]:not(.is-regional-boss) > img {
- width:calc(var(--tile-size,44px)*1.17);height:calc(var(--tile-size,44px)*1.17);margin-left:calc(var(--tile-size,44px)*-.585);
+ width:calc(var(--tile-size,44px)*2.6);height:calc(var(--tile-size,44px)*2.6);margin-left:calc(var(--tile-size,44px)*-1.3);
 }
 .mobile-game .map-overlay-shell .atlas-marker--nodes > img:is([data-life-kind=quarry],[data-life-kind=gold],[data-life-kind=crystal]) {
  width:calc(var(--tile-size,44px)*2.3125);height:calc(var(--tile-size,44px)*2.3125);margin-left:calc(var(--tile-size,44px)*-1.15625);
@@ -3372,6 +3380,7 @@ body.mobile-game #panel-dialog[data-panel="army"] #content>.subtabs button {
   background:linear-gradient(145deg,var(--ui-card-light),var(--ui-card) 60%,#e4d0aa);
   box-shadow:inset 1px 1px #fff,0 3px 0 #9f895f,0 6px 10px #44354926;
   transform:translateY(-1px);
+.mobile-game .map-overlay-shell .atlas-marker--congress > img { width:calc(var(--tile-size,44px)*6.2);height:calc(var(--tile-size,44px)*6.2);margin-left:calc(var(--tile-size,44px)*-3.1); }
 }
 body.mobile-game #panel-dialog[data-panel="army"] #content>.subtabs button[aria-pressed="true"] {
   border-color:var(--ui-gold);
@@ -4837,12 +4846,12 @@ body.mobile-game #hud-gems>.hud-gems-compact { display:none; }
   body.mobile-game .hud-profile:has(.hud-effect-button:not([hidden])) {
     grid-column:1;grid-row:1;display:grid;grid-template-columns:minmax(0,1fr) 44px 44px 54px;grid-template-rows:44px;
     width:100%;max-width:none;min-width:0;height:44px;min-height:0;margin:0;padding:0;gap:3px;
-    border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;
+    border:0!important;border-radius:9px!important;background:color-mix(in srgb,var(--ui-card) 94%,transparent)!important;box-shadow:none!important;
   }
   body.mobile-game #account-button {
     grid-column:1;grid-row:1;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:2px;
     width:100%;height:44px;min-height:44px;padding:2px 3px 2px 42px;border-radius:9px!important;
-    background:color-mix(in srgb,var(--ui-card) 90%,transparent)!important;box-shadow:none!important;
+    background:transparent!important;box-shadow:none!important;
   }
   body.mobile-game #account-button .avatar { left:2px;top:2px;width:36px;height:40px;border-width:1px;border-radius:8px; }
   body.mobile-game #player-hud-name,body.mobile-game #player-hud-name.name-frame {
@@ -4858,7 +4867,7 @@ body.mobile-game #hud-gems>.hud-gems-compact { display:none; }
   body.mobile-game #hud-energy.hud-energy {
     grid-row:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
     width:100%;height:44px!important;min-height:44px!important;margin:0;padding:2px;
-    border:0!important;border-radius:9px!important;background:color-mix(in srgb,var(--ui-card) 90%,transparent)!important;color:var(--ui-ink)!important;box-shadow:none!important;
+    border:0!important;border-radius:0!important;background:transparent!important;color:var(--ui-ink)!important;box-shadow:none!important;
   }
   body.mobile-game .hud-rank.hud-vip { grid-column:2; }
   body.mobile-game #lord-talent-button.hud-hunter { grid-column:3;position:relative; }
@@ -4876,16 +4885,48 @@ body.mobile-game #hud-gems>.hud-gems-compact { display:none; }
   body.mobile-game #hud-gems {
     grid-column:2;grid-row:1;position:static;display:flex;flex-direction:column;align-items:center;justify-content:center;
     width:54px;min-width:44px;height:44px;min-height:44px;padding:2px;gap:1px;
+body.mobile-game #hud-mail { display:none; }
+body.mobile-game .hud-event-stack { display:flex;flex-direction:column;align-items:center;gap:5px; }
+body.mobile-game .hud-event-stack:has(#hud-extra-event[hidden]):has(#hud-alliance-rallies[hidden]) { display:none; }
+body.admin-village .extra-event-preview { display:flex;align-items:center;gap:10px;margin:12px 0;color:var(--ui-ink); }
+body.mobile-game #hud-extra-event .hud-edge-art { border-color:var(--ui-gold)!important; }
+body.mobile-game #hud-extra-event[hidden] { display:none!important; }
+body.mobile-game:has(#hud-extra-event:not([hidden])) .hud-right-tools>button[data-id="events"] { display:none!important; }
+body.mobile-game #hud-extra-event { position:relative; }
+body.mobile-game #hud-extra-event .extra-events-count { position:absolute;top:-3px;right:0;min-width:18px;height:18px;padding:0 3px;border:1px solid var(--ui-card-light);border-radius:9px;background:var(--ui-red);color:var(--ui-card-light);font:700 11px/16px var(--ui-font-number); }
+body.mobile-game #hud-extra-event .extra-events-count[hidden] { display:none; }
+body.mobile-game #game-dialog:has(.extra-events) { width:min(640px,calc(100vw - 20px));height:min(580px,calc(100dvh - 32px)); }
+body.mobile-game #game-dialog[open]:has(.extra-events) { display:flex;flex-direction:column; }
+body.mobile-game #game-dialog:has(.extra-events) #dialog-content { display:flex;flex:1;min-height:0;overflow:hidden!important; }
+body.mobile-game .extra-events { display:flex;flex:1;flex-direction:column;gap:12px;min-width:0;min-height:0; }
+body.mobile-game .extra-event-tabs { display:flex;gap:6px;overflow-x:auto;padding:4px 2px 8px;flex-shrink:0;scrollbar-width:thin; }
+body.mobile-game .extra-event-tabs [role="tab"] { display:flex;align-items:center;gap:7px;flex:0 0 auto;max-width:240px;min-height:44px;padding:6px 12px;border:1px solid var(--ui-line);border-radius:10px;background:var(--ui-card);color:var(--ui-ink);font:700 15px var(--ui-font); }
+body.mobile-game .extra-event-tabs [role="tab"][aria-selected="true"] { background:var(--ui-gold-soft);border-color:var(--ui-gold); }
+body.mobile-game .extra-event-tabs [role="tab"] img { width:28px;height:28px;object-fit:contain; }
+body.mobile-game .extra-event-tabs [role="tab"] span { min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+body.mobile-game .extra-events [role="tabpanel"] { display:flex;flex:1;flex-direction:column;min-height:0;overflow:hidden;border:1px solid var(--ui-line);border-radius:var(--ui-radius);background:var(--ui-card); }
+body.mobile-game .extra-event-details { flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding:18px; }
+body.mobile-game .extra-event-footer { flex:none;padding:10px 18px;border-top:1px solid var(--ui-line);background:var(--ui-card); }
+body.mobile-game .extra-event-footer .button { min-height:44px; }
+body.mobile-game .extra-event-hero { display:flex;align-items:center;gap:16px;margin-bottom:16px; }
+body.mobile-game .extra-event-hero img { width:72px;height:72px;object-fit:contain; }
+body.mobile-game .extra-event-hero h3 { margin:0;overflow-wrap:anywhere; }
+body.mobile-game .extra-event-description { white-space:pre-wrap;overflow-wrap:anywhere; }
+body.mobile-game .extra-event-description:empty { display:none; }
+body.mobile-game .extra-event-time strong { font-family:var(--ui-font-number); }
+body.admin-village .extra-event-admin-tabs { display:flex;flex-wrap:wrap;gap:8px;margin:14px 0; }
+body.admin-village .extra-event-admin-tabs a { min-height:44px;display:flex;align-items:center;padding:8px 12px;border:1px solid var(--ui-line);border-radius:10px;background:var(--ui-card);color:var(--ui-ink);overflow-wrap:anywhere; }
+body.admin-village .extra-event-admin-tabs a[aria-current] { background:var(--ui-gold-soft);border-color:var(--ui-gold); }
     border:1px solid var(--ui-crystal-dark)!important;border-radius:9px!important;background:var(--ui-crystal-soft)!important;box-shadow:none!important;
   }
   body.mobile-game #hud-gems img { width:19px;height:19px; }
   body.mobile-game #hud-gems>strong,body.mobile-game #hud-gems>span:not(.hud-gems-compact) { display:none; }
   body.mobile-game #hud-gems>.hud-gems-compact { display:block;margin:0;color:var(--ui-crystal-dark);font:700 13px/16px var(--ui-font-number); }
-  body.mobile-game #resources { grid-column:1/-1;grid-row:2;display:grid;grid-template-columns:repeat(4,minmax(44px,1fr));gap:2px;width:100%;max-width:none;height:44px;margin:0;padding:0; }
+  body.mobile-game #resources { grid-column:1/-1;grid-row:2;display:grid;grid-template-columns:repeat(4,minmax(44px,1fr));gap:2px;width:100%;max-width:none;height:44px;margin:0;padding:0;border-radius:9px;background:color-mix(in srgb,var(--ui-primary-dark) 88%,transparent); }
   body.mobile-game #resources .resource { display:flex;flex-direction:row;align-items:center;justify-content:center;gap:3px;height:44px;min-height:44px;padding:2px;border:0!important;border-radius:8px!important;background:transparent!important;box-shadow:none!important; }
   body.mobile-game #resources .resource-icon { width:24px;height:28px;flex:0 0 24px;margin:0; }
   body.mobile-game #resources .resource-icon img { width:26px;height:26px; }
-  body.mobile-game #resources .resource>span:last-child { display:block;min-width:0;padding:4px 5px;border-radius:7px;background:color-mix(in srgb,var(--ui-primary-dark) 90%,transparent);color:var(--ui-card-light); }
+  body.mobile-game #resources .resource>span:last-child { display:block;min-width:0;padding:4px 5px;background:transparent;color:var(--ui-card-light); }
   body.mobile-game #resources .resource strong { color:var(--ui-card-light)!important;font:700 13px/17px var(--ui-font-number);white-space:nowrap; }
   body.mobile-game #resources .resource small,body.mobile-game .hud-value-full { display:none!important; }
   body.mobile-game .hud-value-compact { display:inline; }
@@ -4932,7 +4973,7 @@ body.mobile-game #hud-gems>.hud-gems-compact { display:none; }
   body.mobile-game.world-mode:not(.world-search-open) .map-overlay-shell .map-overlay-search-toggle { top:auto!important;left:calc(var(--edge-gap) + env(safe-area-inset-left,0px))!important;bottom:calc(var(--world-chat-bottom) + 48px + env(safe-area-inset-bottom,0px))!important; }
   body.mobile-game.world-mode .map-overlay-search-toggle .map-overlay-scroll { border-width:1px;box-shadow:none; }
   body.mobile-game.world-mode .map-overlay-search-toggle .map-overlay-scroll svg { width:25px!important;height:25px!important; }
-  body.mobile-game.world-mode .map-overlay-shell .map-overlay-coordinate-toggle { top:auto;left:auto;right:calc(var(--edge-gap) + env(safe-area-inset-right,0px));bottom:calc(var(--world-chat-bottom) + 48px + env(safe-area-inset-bottom,0px));width:164px;min-width:164px;height:44px;border-width:1px;border-radius:12px;box-shadow:none;transform:none; }
+  body.mobile-game.world-mode .map-overlay-shell .map-overlay-coordinate-toggle { top:auto;left:auto;right:calc(var(--edge-gap) + 52px + env(safe-area-inset-right,0px));bottom:calc(var(--world-chat-bottom) + 48px + env(safe-area-inset-bottom,0px));width:164px;min-width:164px;height:44px;border-width:1px;border-radius:12px;box-shadow:none;transform:none; }
   body.mobile-game.world-mode .map-overlay-coordinate-toggle .atlas-coordinates { font-size:11px; }
 }
 @media(max-width:1100px) and (max-height:520px) and (orientation:landscape) {
@@ -4940,7 +4981,7 @@ body.mobile-game #hud-gems>.hud-gems-compact { display:none; }
   body.mobile-game #hud-left-tools { flex-direction:row;width:auto; }
   body.mobile-game.city-mode #hud-objective { display:none; }
   body.mobile-game.world-mode:not(.world-search-open) .map-overlay-shell .map-overlay-search-toggle { left:calc(var(--edge-gap) + env(safe-area-inset-left,0px))!important; }
-  body.mobile-game.world-mode .map-overlay-shell .map-overlay-coordinate-toggle { right:calc(var(--edge-gap) + env(safe-area-inset-right,0px));left:auto; }
+  body.mobile-game.world-mode .map-overlay-shell .map-overlay-coordinate-toggle { right:calc(var(--edge-gap) + 52px + env(safe-area-inset-right,0px));left:auto; }
 }
 @media(min-width:540px) and (max-width:1100px) and (max-height:520px) and (orientation:landscape) {
   body.mobile-game { --edge-top:56px; }
@@ -4956,5 +4997,12 @@ body.mobile-game #hud-gems>.hud-gems-compact { display:none; }
   body.mobile-game #resources .resource { gap:2px; }
   body.mobile-game #resources .resource-icon { width:20px;flex-basis:20px; }
   body.mobile-game #resources .resource-icon img { width:20px;height:20px; }
+  body.mobile-game #hud-extra-event .hud-edge-label { display:block!important;width:44px;max-width:44px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:1px 2px;border-radius:4px;background:var(--ui-card);color:var(--ui-primary-dark);font:700 11px/14px var(--ui-font);text-shadow:none; }
   body.mobile-game #resources .resource>span:last-child { padding:4px 3px; }
 }
+  body.mobile-game #navigation.game-dock { grid-template-columns:repeat(5,minmax(0,1fr))!important; }
+  body.mobile-game #navigation .game-dock-item:is([data-id="reports"],[data-id="chat"]) { display:none!important; }
+  body.mobile-game #navigation [data-id="shop"] { order:4; }
+  body.mobile-game #navigation .hud-scene-switch { order:5; }
+  body.mobile-game #hud-mail { display:flex;position:fixed;top:auto;left:auto;right:calc(var(--edge-gap) + env(safe-area-inset-right,0px));bottom:calc(var(--world-chat-bottom) + 48px + env(safe-area-inset-bottom,0px));width:44px;min-height:44px; }
+  body.mobile-game #hud-mail .mail-dock-badge { position:absolute;top:-3px;right:0;min-width:17px;height:17px;padding:0 3px;border:1px solid var(--ui-card-light);border-radius:9px;background:var(--ui-red);color:var(--ui-card-light);font:700 11px/15px var(--ui-font-number); }

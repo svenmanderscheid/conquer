@@ -110,6 +110,7 @@ final class KingdomService
                     'alliance.leave','alliance.update','alliance.kick','alliance.transfer','alliance.donate','alliance.withdraw'=>self::manageAlliance($playerId, $body, (int) $cityState['city']['id']),
                     'inventory.use'=>KingdomInventory::use($playerId, $cityState, $body),
                     'inventory.buy'=>KingdomInventory::buy($playerId, $body),
+                    'crystal.buy'=>KingdomInventory::buy($playerId, $body, true),
                     'vip.daily'=>\Conquer\Game\Vip\VipService::claimDaily($playerId),
                     'quest.claim'=>self::claimQuest($playerId, $body),
                     'hospital.heal'=>HospitalService::perform($playerId,(int)$cityState['city']['id'],$body),

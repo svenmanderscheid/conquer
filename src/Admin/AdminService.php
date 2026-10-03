@@ -39,6 +39,7 @@ final class AdminService
                     'alpha-key-revoke'=>AlphaKeyAdmin::revoke($db,$input),
                     'world-save','world-create'=>self::world($db,$adminId,$action,$input),
                     'world-events'=>self::events($input),
+                    'extra-event-save'=>\Conquer\Game\Ui\ExtraEventButton::save($db,$input),
                     'world-territory-rules'=>self::territoryRules($input),
                     'gift'=>self::gift($db,$op,$input),
                     'reward-save','reward-reset'=>RewardEditor::save($db,$adminId,$action,$input),

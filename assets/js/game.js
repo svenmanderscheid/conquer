@@ -317,6 +317,7 @@
     }
     function countdown(end) { return `<span data-end="${esc(end)}">${duration((date(end)-now())/1000)}</span>`; }
     function renderHud() {
+        updateExtraEvent();
         const compact=n=>kingdom?.settings?.compact_numbers||Number(n)>=1000000?Intl.NumberFormat(window.ConquerLocale?.locale??'en',{notation:'compact',maximumFractionDigits:1}).format(Number(n)||0):fmt(n);
         const mobileCompact=n=>i18n?.formatHudNumber?.(n)??fmt(n);
         $('#resources').innerHTML = Object.keys(resourceIcons).map(k => `<button class="resource" data-action="resource" data-id="${k}" aria-label="${resourceNames[k]}: ${fmt(state.city[k])}, Details öffnen" title="${resourceNames[k]}: ${fmt(state.city[k])}"><span class="resource-icon" aria-hidden="true"><img src="${base}/assets/art/ui-resources/${k}.png" alt=""></span><span><strong><span class="hud-value-full">${compact(state.city[k])}</span><span class="hud-value-compact" aria-hidden="true">${mobileCompact(state.city[k])}</span></strong><small>${resourceNames[k]}</small></span></button>`).join('');
@@ -327,6 +328,9 @@
         overlay.update();trainingHud.update();vipPanel.updateHud();activeEffects.update();
         updateQuestBadge();
         mailboxPanel.badge();
+    }
+    function updateExtraEvent() {
+        extraEvents.update();
     }
     function updateQuestBadge() {
         const button=$('#navigation [data-id="quests"]');if(!button)return;
@@ -369,12 +373,12 @@
         document.body.classList.toggle('popup-mode',hasPanel);
         const focusedNav=document.activeElement?.closest('#navigation [data-id]')?.dataset.id;
         const sceneTab=playfield==='world'?'city':'world';
-        const dock=[['quests',t('nav.quests_short'),'quest','tab'],['inventory',t('nav.inventory_short'),'inventory','tab'],['reports','Post','reports','tab'],['chat','Chat','chat','chat-open'],['shop',t('nav.market'),'shop','shop-open'],['alliance','Allianz','alliance','tab'],[sceneTab,t('hud.scene.'+sceneTab),sceneTab,'tab']];
+        const dock=[['quests',t('nav.quests_short'),'quest','tab'],['inventory',t('nav.inventory_short'),'inventory','tab'],['reports','Post','reports','tab'],['chat','Chat','chat','chat-open'],['shop',t('nav.shop'),'shop','shop-open'],['alliance','Allianz','alliance','tab'],[sceneTab,t('hud.scene.'+sceneTab),sceneTab,'tab']];
         $('#navigation').innerHTML=dock.map(([key,name,art,act])=>{
             const dockMenuArt={quests:'quests',inventory:'inventory',reports:'reports',chat:'chat',shop:'market',alliance:'alliance',city:'village',world:'world-map'}[key];
             const icon=dockMenuArt?`<img class="dock-icon dock-menu-art" src="${base}/assets/art/menu-icons/${dockMenuArt}.png" alt="">`:`<img class="dock-icon" src="${base}/assets/art/hud/${art}.svg" alt="">`;
             const badge=key==='quests'?'<span class="dock-badge" aria-hidden="true" hidden></span>':key==='chat'?'<span class="dock-badge chat-dock-badge" aria-hidden="true" hidden></span>':'';
-            const labelKey={quests:'nav.quests_short',inventory:'nav.inventory_short',shop:'nav.market',city:'hud.scene.city',world:'hud.scene.world'}[key];
+            const labelKey={quests:'nav.quests_short',inventory:'nav.inventory_short',shop:'nav.shop',city:'hud.scene.city',world:'hud.scene.world'}[key];
             const sceneAction=key===sceneTab?'hud.scene.'+key+'_open':null;
             return `<button class="game-dock-item ${key===sceneTab?'hud-scene-switch':''} ${current===key?'current':''}" data-action="${act}" data-id="${key}" aria-label="${sceneAction?esc(t(sceneAction)):`${name} öffnen`}" ${sceneAction?`data-i18n-attrs="aria-label:${sceneAction}"`:''} ${current===key?'aria-current="page"':''}>${icon}<span class="dock-label" ${labelKey?`data-i18n="${labelKey}"`:''}>${name}</span>${badge}</button>`;
         }).join('');
@@ -602,6 +606,7 @@
         if(!window.ConquerWorld.locate(x,y,['monsters']))toast('Das Monster ist nicht mehr vorhanden. Die letzte Position wird gezeigt.');
     };
     const overlay=window.ConquerOverlay({...featureContext,now,labels,getRallies:()=>allianceRallies});
+    const extraEvents=window.ConquerExtraEvents({getState:()=>state,base,openDialog,navigate,now,date});
     const activeEffects=window.ConquerActiveEffects({...featureContext,now});
     const inventoryOverview=window.ConquerInventoryOverview.create(featureContext);
     const itemSources=window.ConquerItemSources.create({...featureContext,
@@ -660,6 +665,7 @@
     document.addEventListener('click',e=>{
         const b=e.target.closest('[data-action]'); if(!b || b.disabled) return;
         const {action:act,id,kind}=b.dataset;
+        if(extraEvents.onAction(act,id))return;
         if(act==='command-retry'){const pending=commands.pending();if(pending)action(pending.path,pending.body,'Auftrag bestätigt.');return;}
         if(rewards.onClick(act))return;
         if(monsterReports.onClick(act,b))return;
@@ -741,7 +747,7 @@
     window.addEventListener('resize',()=>{panelNeedsResize=true;resizePanel();});
     panelHost.addEventListener('focusout',resizePanel);
     $('#game-dialog').addEventListener('close',resizePanel);
-    setInterval(()=>{if(document.hidden)return;rallyPanel.updateTime();marchPanel.update();queueSpeedups.update();activeEffects.update();treasurePanel.updateTime();tradingPanel.updateTime();panels.updateHospitalTime();document.querySelectorAll('[data-end]').forEach(el=>{const text=duration((date(el.dataset.end)-now())/1000);if(el.textContent!==text)el.textContent=text;});},1000);
+    setInterval(()=>{if(document.hidden)return;updateExtraEvent();rallyPanel.updateTime();marchPanel.update();queueSpeedups.update();activeEffects.update();treasurePanel.updateTime();tradingPanel.updateTime();panels.updateHospitalTime();document.querySelectorAll('[data-end]').forEach(el=>{const text=duration((date(el.dataset.end)-now())/1000);if(el.textContent!==text)el.textContent=text;});},1000);
     window.ConquerPolling({delay:()=>Math.max(apiRetryAt-Date.now(),current==='world'||state?.marches?.length||state?.build_queue?.length||state?.troop_queue?.length||state?.research_queue?.length?5000:15000),refresh:async()=>{
         if(busy) return;
         const dialog=$('#game-dialog');

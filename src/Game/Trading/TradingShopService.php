@@ -37,7 +37,7 @@ final class TradingShopService
         $db=Connection::getInstance();$city=WorldContext::city($playerId);$now=time();
         $level=(int)$db->query("SELECT level FROM city_buildings WHERE city_id=? AND building_code='trading_post'",[$city['id']])->fetchColumn();
         $vip=VipService::status($playerId)['level'];$marketPeriod=self::period('caravan',$now);$vipPeriod=self::period('vip',$now);
-        return ['market_level'=>$level,'server_time'=>gmdate('Y-m-d\TH:i:s\Z',$now),'world_id'=>WorldContext::id(),
+        return ['crystals'=>['offers'=>CrystalShop::offers()],'market_level'=>$level,'server_time'=>gmdate('Y-m-d\TH:i:s\Z',$now),'world_id'=>WorldContext::id(),
             'refresh_at'=>gmdate('Y-m-d\TH:i:s\Z',$marketPeriod['end']),'rotation'=>$marketPeriod['rotation'],
             'offers'=>self::offers($playerId,'caravan',$marketPeriod,$level,$vip),
             'vip'=>['level'=>$vip,'reset_at'=>gmdate('Y-m-d\TH:i:s\Z',$vipPeriod['end']),'rotation'=>$vipPeriod['rotation'],

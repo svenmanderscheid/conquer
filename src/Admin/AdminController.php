@@ -153,7 +153,8 @@ final class AdminController
             if(is_array($_SESSION['admin_world_create_draft']['settings']??null)&&!array_key_exists('enabled',$_SESSION['admin_world_create_draft']['settings']))$_SESSION['admin_world_create_draft']['settings']['enabled']=0;
         }
         if($alphaAction||$action==='alpha-waitlist-update'){header('Location: '.APP_BASE.$return,true,303);exit;}
-        header('Location: '.APP_BASE.$return.'?world_id='.$worldId.($rewardAction?'&type='.rawurlencode($sourceType).'&source='.rawurlencode($sourceKey).'&scope='.(($_POST['reward_scope']??'global')==='world'?'world':'global'):''), true,303);exit;
+        $extraEventQuery=$action==='extra-event-save'?'&event_id='.(int)($result['event_id']??$_POST['event_id']??0).'#extra-event-settings':'';
+        header('Location: '.APP_BASE.$return.'?world_id='.$worldId.($rewardAction?'&type='.rawurlencode($sourceType).'&source='.rawurlencode($sourceKey).'&scope='.(($_POST['reward_scope']??'global')==='world'?'world':'global'):'').$extraEventQuery, true,303);exit;
     }
     private static function render(string $view,string $title,array $vars=[]): void
     {

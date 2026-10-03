@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="{{csp}}">
+  <meta name="theme-color" content="#443052">
+  <title>Union of Kingdoms</title>
+  <link rel="icon" href="{{icon}}">
+{{styles}}
+</head>
+<body class="mobile-shell">
+  <main class="mobile-shell-window" aria-labelledby="mobile-title">
+    <header class="mobile-shell-header">
+      <img src="{{icon}}" width="72" height="72" alt="">
+      <h1 id="mobile-title" translate="no">Union of Kingdoms</h1>
+    </header>
+    <div class="mobile-shell-content">
+      <h2 data-i18n="mobile.connection.title">{{mobile.connection.title}}</h2>
+      <p data-i18n="mobile.connection.description">{{mobile.connection.description}}</p>
+      <a class="mobile-shell-retry" href="{{gameUrl}}" data-i18n="mobile.connection.retry">{{mobile.connection.retry}}</a>
+      <div data-locale-controls data-locale-compact="true" data-locale-install="false"></div>
+    </div>
+  </main>
+{{scripts}}
+</body>
+</html>

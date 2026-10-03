@@ -1,0 +1,217 @@
+{
+  "version": 1,
+  "offers": [
+    {
+      "item_code": 10201004,
+      "price_crystals": 70
+    },
+    {
+      "item_code": 10201011,
+      "price_crystals": 70
+    },
+    {
+      "item_code": 10201019,
+      "price_crystals": 70
+    },
+    {
+      "item_code": 10101032,
+      "price_crystals": 70
+    },
+    {
+      "item_code": 10202017,
+      "price_crystals": 200
+    },
+    {
+      "item_code": 10202015,
+      "price_crystals": 200
+    },
+    {
+      "item_code": 10202013,
+      "price_crystals": 200
+    },
+    {
+      "item_code": 10202023,
+      "price_crystals": 200
+    },
+    {
+      "item_code": 10102011,
+      "price_crystals": 200
+    },
+    {
+      "item_code": 10103003,
+      "price_crystals": 40
+    },
+    {
+      "item_code": 10103005,
+      "price_crystals": 200
+    },
+    {
+      "item_code": 10202001,
+      "price_crystals": 100
+    },
+    {
+      "item_code": 10202003,
+      "price_crystals": 100
+    },
+    {
+      "item_code": 10202005,
+      "price_crystals": 100
+    },
+    {
+      "item_code": 10202007,
+      "price_crystals": 100
+    },
+    {
+      "item_code": 10202002,
+      "price_crystals": 300
+    },
+    {
+      "item_code": 10202004,
+      "price_crystals": 300
+    },
+    {
+      "item_code": 10202006,
+      "price_crystals": 300
+    },
+    {
+      "item_code": 10202008,
+      "price_crystals": 300
+    },
+    {
+      "item_code": 10201005,
+      "price_crystals": 500
+    },
+    {
+      "item_code": 10201013,
+      "price_crystals": 500
+    },
+    {
+      "item_code": 10201021,
+      "price_crystals": 500
+    },
+    {
+      "item_code": 10201029,
+      "price_crystals": 500
+    },
+    {
+      "item_code": 10202009,
+      "price_crystals": 600
+    },
+    {
+      "item_code": 10202019,
+      "price_crystals": 1000
+    },
+    {
+      "item_code": 10202018,
+      "price_crystals": 500
+    },
+    {
+      "item_code": 10202016,
+      "price_crystals": 500
+    },
+    {
+      "item_code": 10202014,
+      "price_crystals": 500
+    },
+    {
+      "item_code": 10202020,
+      "price_crystals": 2500
+    },
+    {
+      "item_code": 10202024,
+      "price_crystals": 500
+    },
+    {
+      "item_code": 10203018,
+      "price_crystals": 500
+    },
+    {
+      "item_code": 10203026,
+      "price_crystals": 500
+    },
+    {
+      "item_code": 10203035,
+      "price_crystals": 500
+    },
+    {
+      "item_code": 10203019,
+      "price_crystals": 1450
+    },
+    {
+      "item_code": 10203027,
+      "price_crystals": 1450
+    },
+    {
+      "item_code": 10203036,
+      "price_crystals": 1450
+    },
+    {
+      "item_code": 10300004,
+      "price_crystals": 6000
+    },
+    {
+      "item_code": 10203020,
+      "price_crystals": 3300
+    },
+    {
+      "item_code": 10203028,
+      "price_crystals": 3300
+    },
+    {
+      "item_code": 10203037,
+      "price_crystals": 3300
+    },
+    {
+      "item_code": 10203006,
+      "price_crystals": 13000
+    },
+    {
+      "item_code": 10103001,
+      "price_crystals": 5
+    },
+    {
+      "item_code": 10103002,
+      "price_crystals": 15
+    },
+    {
+      "item_code": 10103004,
+      "price_crystals": 100
+    },
+    {
+      "item_code": 10103006,
+      "price_crystals": 500
+    },
+    {
+      "item_code": 10102001,
+      "price_crystals": 200
+    },
+    {
+      "item_code": 10102002,
+      "price_crystals": 600
+    },
+    {
+      "item_code": 10102041,
+      "price_crystals": 200
+    },
+    {
+      "item_code": 10102051,
+      "price_crystals": 50
+    },
+    {
+      "item_code": 10102061,
+      "price_crystals": 100
+    },
+    {
+      "item_code": 10208001,
+      "price_crystals": 2000
+    },
+    {
+      "item_code": 10208002,
+      "price_crystals": 500
+    },
+    {
+      "item_code": 10208003,
+      "price_crystals": 1000
+    }
+  ]
+}

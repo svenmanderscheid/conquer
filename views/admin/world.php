@@ -5,6 +5,7 @@ $runs=$db->query('SELECT * FROM world_spawn_runs WHERE world_id=? ORDER BY id DE
 $recipientCount=(int)$db->query('SELECT COUNT(*) FROM cities c JOIN players p ON p.id=c.player_id WHERE c.world_id=? AND p.is_banned=0',[$selectedWorld])->fetchColumn();
 $mapProfile=\Conquer\Game\World\WorldMapProfile::forWorld($selectedWorld);
 ?>
+<?php require __DIR__.'/extra_event.php'; ?>
 <section class="card"><div class="split"><div><h2><?= ah($world['name']) ?></h2><p>Welt #<?= $selectedWorld ?> · <?= (int)$mapProfile['width'] ?> × <?= (int)$mapProfile['height'] ?> Kartenfelder<?= $mapProfile['key']==='luxembourg'?' · Luxemburg':'' ?></p></div><span class="pill <?= ah($world['status']) ?>"><?= ah($world['status']) ?></span></div>
 <?php adminForm('world-save',$selectedWorld); ?>
 <div class="fields"><label>Weltname<input name="name" value="<?= ah($world['name']) ?>" required minlength="2" maxlength="50"></label><label>Weltstatus<select name="status"><?php foreach(['open'=>'Offen','running'=>'Laufend','paused'=>'Pausiert','closed'=>'Geschlossen'] as $key=>$label): ?><option value="<?= $key ?>" <?= $world['status']===$key?'selected':'' ?>><?= $label ?></option><?php endforeach ?></select></label><?php foreach(['speed_factor'=>'Geschwindigkeitsfaktor','gather_factor'=>'Sammelfaktor','haul_factor'=>'Transportfaktor'] as $key=>$label)adminNumber($label,$key,$world[$key],.1,20,'.1'); ?></div>

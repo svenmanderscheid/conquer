@@ -1,0 +1,2 @@
+# Native source, local configuration and dependencies are never web assets.
+Require all denied

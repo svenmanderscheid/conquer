@@ -2,13 +2,15 @@
 
 ## Ziel
 
-Conquer soll später aus einer gemeinsamen Codebasis als Web-App, iOS-App und Android-App angeboten werden. Das vorhandene Frontend aus HTML, CSS und JavaScript wird dafür weiterverwendet und voraussichtlich mit Capacitor in native App-Projekte eingebettet. Das PHP-/MySQL-System bleibt das zentrale Online-Backend für Anmeldung, Spielregeln und gespeicherte Spielstände.
+Union of Kingdoms soll aus einer gemeinsamen Codebasis als Web-App, iOS-App und Android-App angeboten werden. Das vorhandene Frontend aus HTML, CSS und JavaScript wird dafür weiterverwendet und mit Capacitor in native App-Projekte eingebettet. Das PHP-/MySQL-System bleibt das zentrale Online-Backend für Anmeldung, Spielregeln und gespeicherte Spielstände.
 
 ## Zeitpunkt
 
-Die eigentlichen Capacitor-, Xcode- und Android-Studio-Projekte werden erst angelegt, wenn die wichtigsten Spielabläufe, die Navigation, die Benutzeroberfläche und die Server-Schnittstellen weitgehend stabil sind. Auch App-Symbole, Startbildschirm, Push-Nachrichten, Store-Metadaten, Signierung und Store-Einreichung gehören in diese späte Phase.
+**Ergänzung vom 1. Oktober 2026:** Der Nutzer hat ausdrücklich darum gebeten, jetzt mit der Google-Play-App anzufangen. Deshalb beginnt unter `mobile/` ein begrenzter Android-Prototyp mit Capacitor 8.5.2. Ein iOS-Projekt, endgültige Gerätefunktionen, Store-Metadaten, Signierung und Store-Einreichung bleiben der späteren stabilen App-Phase vorbehalten.
 
-Bis dahin bleibt die bestehende PWA der direkte mobile Testweg. Jede neue Funktion wird so gebaut, dass die spätere Verpackung keine grundlegende Neuentwicklung verlangt.
+Der erste Android-Prototyp lädt die bestehende HTTPS-Spielseite und erhält dadurch die bisherige PHP-Anmeldung mit Sitzungscookie und API-Aufrufen auf demselben Ursprung. Das lokale Paket enthält nur eine Verbindungs-/Fehlerseite mit öffentlichen Assets. Capacitors `server.url` dient hier ausschließlich dem Prototyp; vor Veröffentlichung sind ein mitgeliefertes statisches Frontend sowie App-Start, Anmeldung und Server-API getrennt auszuarbeiten. Release-Builds bleiben gesperrt. Einrichtung und Grenzen stehen in [mobile/README.md](../mobile/README.md).
+
+Am 1. Oktober wurden Android Studio, Java 21 und das Android SDK installiert. Der erste Debug-APK-Build mit Gradle 8.14.3 und die Signaturprüfung waren erfolgreich; die Testdatei liegt unter `artifacts/android/Union-of-Kingdoms-0.1.0-prototype.apk`. Installation und erster Start auf dem S23 Ultra mit Android 16 sind erfolgt. Die vollständige Geräteprüfung steht weiter aus; eine Startmeldung der SystemBars-Erweiterung zu Bildschirmrändern ist in `mobile/README.md` dokumentiert. Browser und PWA bleiben parallel ein mobiler Testweg. Die Android-Hülle gilt erst nach dem dokumentierten Gerätedurchstich als geprüft.
 
 ## Anforderungen während der laufenden Entwicklung
 
@@ -45,6 +47,6 @@ Vorgangskennungen müssen auch beim lokalen Handytest über eine HTTP-LAN-Adress
 
 ## Späte App-Phase
 
-Wenn das Spiel stabil genug ist, folgt ein kleiner technischer Prototyp mit Capacitor für beide Plattformen. Dabei werden zuerst Anmeldung, gezeichnete Stadt, Weltkarte, Sitzungswiederaufnahme und ein kompletter schreibender Spielablauf auf echten Geräten geprüft. Erst nach diesem Durchstich folgen Push-Nachrichten und weitere native Funktionen.
+Der jetzt begonnene Android-Prototyp prüft zuerst Anmeldung, gezeichnete Stadt, Weltkarte, Sitzungswiederaufnahme und einen kompletten schreibenden Spielablauf auf einem echten Gerät. Eine erste Hochformatprüfung auf dem S23 Ultra bestätigte das angemeldete Spiel, Stadt/Welt, Inventar → Android Zurück → Stadt sowie den Erhalt der Anmeldung nach App-Wechsel. Weitere Zurück-Abläufe, Prozessende, Querformat, Tastatur, Verbindungsverlust, PWA-Verhalten und externe Links sind noch offen; schreibende Spielaktionen wurden nicht geprüft. Das Geräteprotokoll steht in `mobile/README.md`. Das iOS-Projekt und die endgültige App-/API-Trennung folgen auf Grundlage dieser Ergebnisse, sobald die Kernabläufe stabil genug sind. Erst nach dem jeweiligen Gerätedurchstich folgen Push-Nachrichten und weitere native Funktionen.
 
 Swift für iOS und Kotlin für Android werden nur für begrenzte native Anpassungen verwendet. Die gemeinsame Spiellogik und Oberfläche bleiben in JavaScript, damit Fehlerbehebungen und neue Funktionen nicht dreimal umgesetzt werden müssen.

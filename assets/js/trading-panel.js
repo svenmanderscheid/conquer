@@ -5,19 +5,20 @@ window.ConquerTrading = function(ctx){
     const host=()=>document.querySelector('#content');
     const data=()=>getKingdom()?.trading;
     const resources=Object.defineProperties({},Object.fromEntries(['food','lumber','stone','gold','gems'].map(key=>[key,{enumerable:true,get:()=>window.ConquerLocale.t('resource.'+key)}])));
+    let crystalCategory='all',pendingCrystal=null;
     let mode='merchant',vipView='mine',vipCategory='all',busy=false,clockOffset=0,lastServerTime='',refreshRequested='';
     const num=n=>Number(n||0);
     const now=()=>ctx.now?ctx.now():Date.now()+clockOffset;
     const art=file=>base+'/assets/art/items/'+file+'?v='+encodeURIComponent(window.CONQUER_ITEM_ART_VERSION||'catalog3');
     const resourceArt=key=>key==='gems'?art('gems.svg'):base+'/assets/art/ui-resources/'+key+'.png';
-    const list=()=>mode==='vip'?data()?.vip:data();
+    const list=()=>mode==='crystals'?data()?.crystals:mode==='vip'?data()?.vip:data();
     const allOffers=()=>list()?.offers||[];
     const category=o=>({resource_pack:'resources',speedup:'speedups',boost:'boosts',vip_point:'progress',ap_refill:'progress',chest:'treasures',fragment_pack:'treasures'})[o.item?.category]||'other';
     const offers=()=>allOffers().filter(o=>mode!=='vip'||(vipView==='all'||!o.locked)&&(vipCategory==='all'||category(o)===vipCategory));
-    const deadline=()=>Date.parse(mode==='merchant'?getMarket?.()?.refresh_at:mode==='vip'?data()?.vip?.reset_at:data()?.refresh_at);
+    const deadline=()=>Date.parse(mode==='merchant'?getMarket?.()?.refresh_at:['vip','crystals'].includes(mode)?data()?.vip?.reset_at:data()?.refresh_at);
     const balance=key=>num(key==='gems'?getKingdom()?.profile?.gems??getState()?.player?.gems:getState()?.city?.[key]);
     const affordable=(o,q)=>balance(o.price?.resource)>=num(o.price?.amount)*q;
-    const expired=()=>Number.isFinite(deadline())&&deadline()<=now();
+    const expired=()=>mode!=='crystals'&&Number.isFinite(deadline())&&deadline()<=now();
     const short=n=>num(n)>=1000000?String(num(n)/1000000).replace('.',',')+'M':num(n)>=1000?String(num(n)/1000).replace('.',',')+'k':fmt(num(n));
     const timeStamp=s=>num(s)>=86400?short(num(s)/86400)+'d':num(s)>=3600?short(num(s)/3600)+'h':short(num(s)/60)+'min';
     function stamp(i){return i.category==='resource_pack'?short(i.amount):i.duration_seconds?timeStamp(i.duration_seconds):i.category==='vip_point'?short(i.vip_points):i.category==='ap_refill'?short(i.ap_amount):i.category==='fragment_pack'?short(i.fragment_amount)+' Fr.':'';}
@@ -32,12 +33,12 @@ window.ConquerTrading = function(ctx){
     function buyButton(o,q,all=false){
         const disabled=busy||o.locked||num(o.remaining)<q||q<1||!affordable(o,q)||expired();
         const label=all?window.ConquerLocale.t('market.buy_all',{quantity:fmt(q)}):num(o.quantity)>1?window.ConquerLocale.t('market.buy_quantity',{quantity:fmt(o.quantity)}):window.ConquerLocale.text('Kaufen');
-        const why=o.locked?(mode==='vip'?'VIP '+o.vip_level+' benötigt':'Handelsposten benötigt'):num(o.remaining)<1?'Ausverkauft':expired()?'Angebote werden erneuert':!affordable(o,q)?window.ConquerLocale.t('market.not_enough',{resource:resources[o.price.resource]||o.price.resource}):label;
+        const why=o.locked?(['vip','crystals'].includes(mode)?'VIP '+o.vip_level+' benötigt':'Handelsposten benötigt'):num(o.remaining)<1?'Ausverkauft':expired()?'Angebote werden erneuert':!affordable(o,q)?window.ConquerLocale.t('market.not_enough',{resource:resources[o.price.resource]||o.price.resource}):label;
         return `<button type="button" class="trading-buy ${o.price.resource==='gems'?'pays-gems':'pays-resources'} ${all?'buy-all':''}" data-action="trading-buy" data-id="${esc(o.id)}" data-quantity="${q}" ${disabled?'disabled':''} title="${esc(why)}" aria-label="${esc(window.ConquerLocale.t('market.offer_action',{action:label,item:window.ConquerLocale.text(o.item.name_de||o.item.name),amount:fmt(num(o.price.amount)*q),resource:resources[o.price.resource],reason:disabled?' · '+window.ConquerLocale.text(why):''}))}">${price(o,q)}<span>${label}</span></button>`;
     }
     function card(o){
         const i=o.item||{},rarity=i.rarity||i.grade||'normal',grade=['normal','rare','epic','legendary','mythic'].includes(rarity)?rarity:'normal';
-        return `<article class="trading-card ${o.locked?'is-locked':''} ${num(o.remaining)<1?'is-sold-out':''}" aria-label="${esc(i.name_de||i.name||'Gegenstand')}"><div class="trading-item-art grade-${grade} ${i.icon_framed?'is-framed':''}">${itemArt(i)}${stamp(i)?`<span class="trading-item-stamp">${esc(stamp(i))}</span>`:''}${o.treasure_code?'<span class="trading-item-fragment">✚ 1</span>':''}${num(o.quantity)>1?`<span class="trading-item-count">×${fmt(o.quantity)}</span>`:''}${o.locked?'<span class="trading-lock" aria-label="Gesperrt">▣</span>':''}</div>${num(o.discount)>0?`<span class="trading-discount ${num(o.discount)>=60?'hot':''}">−${fmt(o.discount)}%</span>`:''}<h3>${esc(i.name_de||i.name||'Gegenstand')}</h3>${mode==='vip'?`<strong class="trading-vip-level">VIP ${fmt(o.vip_level)}</strong>`:''}<p class="trading-item-description" title="${esc(i.description_de||i.description||'')}">${esc(i.description_de||i.description||'Für dein Königreich.')}</p><div class="trading-stock">${num(o.remaining)>0?'Verfügbar: <strong>'+fmt(o.remaining)+'</strong>':'Ausverkauft'}${mode==='vip'?'<small> / Woche</small>':''}</div><div class="trading-purchase">${buyButton(o,1)}${mode==='vip'&&num(o.limit)>1?buyButton(o,Math.max(1,num(o.remaining)),true):''}</div></article>`;
+        return `<article class="trading-card ${o.locked?'is-locked':''} ${num(o.remaining)<1?'is-sold-out':''}" aria-label="${esc(i.name_de||i.name||'Gegenstand')}"><div class="trading-item-art grade-${grade} ${i.icon_framed?'is-framed':''}">${itemArt(i)}${stamp(i)?`<span class="trading-item-stamp">${esc(stamp(i))}</span>`:''}${o.treasure_code?'<span class="trading-item-fragment">✚ 1</span>':''}${num(o.quantity)>1?`<span class="trading-item-count">×${fmt(o.quantity)}</span>`:''}${o.locked?'<span class="trading-lock" aria-label="Gesperrt">▣</span>':''}</div>${num(o.discount)>0?`<span class="trading-discount ${num(o.discount)>=60?'hot':''}">−${fmt(o.discount)}%</span>`:''}<h3>${esc(i.name_de||i.name||'Gegenstand')}</h3>${mode==='vip'?`<strong class="trading-vip-level">VIP ${fmt(o.vip_level)}</strong>`:''}<p class="trading-item-description" title="${esc(i.description_de||i.description||'')}">${esc(i.description_de||i.description||'Für dein Königreich.')}</p><div class="trading-stock">${mode==='crystals'?window.ConquerLocale.t('crystal_shop.available'):num(o.remaining)>0?'Verfügbar: <strong>'+fmt(o.remaining)+'</strong>':'Ausverkauft'}${mode==='vip'?'<small> / Woche</small>':''}</div><div class="trading-purchase">${buyButton(o,1)}${mode==='vip'&&num(o.limit)>1?buyButton(o,Math.max(1,num(o.remaining)),true):''}</div></article>`;
     }
     function grids(){
         const visible=offers();
@@ -74,13 +75,15 @@ window.ConquerTrading = function(ctx){
         return `${shopTabs()}<header class="trading-summary"><div><h2>Händler</h2><p>Faire 1:1-Tauschkurse und besondere Kristallangebote.</p></div><div class="trading-reset"><span>Neue Angebote in</span><strong data-trading-countdown>--:--:--</strong><div class="trading-countdown-track"><i data-trading-progress></i></div></div></header><div class="trading-scroll" data-mode="merchant" tabindex="0" aria-label="Angebote des Händlers"><div class="shop-merchant-grid">${cards}</div>${history?`<section class="shop-merchant-history"><h3>Letzte Handelsabschlüsse</h3>${history}</section>`:''}${!offers.length?'<div class="trading-empty">Der Händler wird geladen.</div>':''}</div><footer class="trading-footer"><span>${fmt(offers.length)} Angebote · Nach jedem Kauf wird der Platz neu belegt.</span><span>Alle 24 Stunden komplett erneuert.</span></footer>`;
     }
     function crystalView(){
-        const gems=num(getKingdom()?.profile?.gems??getState()?.player?.gems);
-        return `${shopTabs()}<header class="trading-summary"><div><h2>Kristall-Shop</h2><p>Kristalle und besondere Pakete.</p></div><span class="trading-level">${fmt(gems)} Kristalle</span></header><div class="trading-scroll shop-crystal-view" data-mode="crystals" tabindex="0"><div class="crystal-shop-summary"><img src="${base}/assets/art/items/gems.svg" alt=""><span><small>Dein Bestand</small><strong>${fmt(gems)} Kristalle</strong></span></div><p class="notice">Kristallpakete werden erst mit der späteren App- und Zahlungsanbindung freigeschaltet. Es werden hier noch keine Käufe oder Preise vorgetäuscht.</p></div><footer class="trading-footer"><span>Sicher vorbereitet</span><span>Noch keine Echtgeldkäufe aktiv.</span></footer>`;
+        const t=(key,params)=>window.ConquerLocale.t('crystal_shop.'+key,params);
+        const gems=balance('gems'),cats=[['all','all'],['resource_pack','resources'],['speedup','speedups'],['teleport','teleports'],['boost','buffs']];
+        const items=allOffers().filter(o=>crystalCategory==='all'||o.item?.category===crystalCategory);
+        return `${shopTabs()}<header class="trading-summary"><div><h2>${esc(t('title'))}</h2><p>${esc(t('intro'))}</p></div><span class="trading-level">${fmt(gems)} ${esc(resources.gems)}</span></header><div class="trading-categories crystal-categories" role="group" aria-label="${esc(t('categories'))}">${cats.map(([id,key])=>`<button type="button" data-action="trading-crystal-category" data-id="${id}" class="${crystalCategory===id?'active':''}" aria-pressed="${crystalCategory===id}">${esc(t(key))}</button>`).join('')}</div><div class="trading-scroll shop-crystal-view" data-mode="crystals" tabindex="0" aria-label="${esc(t('title'))}"><div class="trading-grid">${items.map(card).join('')}</div>${!data()?`<p class="notice">${esc(t('loading'))}</p>`:''}</div><footer class="trading-footer"><span>${esc(t('inventory'))}</span><span>${esc(t('regular'))}</span></footer>`;
     }
     function render(){
         if(!host())return;
         if(mode==='merchant'){host().innerHTML=`<section class="trading-shell" aria-label="Shop">${merchantView()}</section>`;updateTime();keepActiveTabVisible();return;}
-        if(mode==='crystals'){host().innerHTML=`<section class="trading-shell" aria-label="Shop">${crystalView()}</section>`;keepActiveTabVisible();return;}
+        if(mode==='crystals'){const scroll=host().querySelector('[data-mode=crystals]')?.scrollTop||0;host().innerHTML=`<section class="trading-shell" aria-label="Shop">${crystalView()}</section>`;host().querySelector('.trading-scroll').scrollTop=scroll;keepActiveTabVisible();return;}
         const d=data();if(!d){host().innerHTML='<div class="trading-empty">Der Handelsposten wird geladen.</div>';return;}
         if(d.server_time!==lastServerTime){lastServerTime=d.server_time;const t=Date.parse(d.server_time);if(Number.isFinite(t))clockOffset=t-Date.now();}
         const previous=host().querySelector('.trading-scroll'),sameList=previous?.dataset.mode===mode&&previous?.dataset.view===(mode==='vip'?vipView:'')&&previous?.dataset.category===(mode==='vip'?vipCategory:''),scroll=sameList?previous.scrollTop:0;
@@ -106,8 +109,14 @@ window.ConquerTrading = function(ctx){
     async function purchase(id,quantity){
         const o=allOffers().find(o=>String(o.id)===String(id));
         if(busy||!o||o.locked||!Number.isInteger(quantity)||quantity<1||quantity>num(o.remaining)||!affordable(o,quantity)||expired())return;
-        const selectedMode=mode,rotation=list().rotation;busy=true;render();
-        try{await action('kingdom/action',{action:'trading.buy',mode:selectedMode,offer_id:o.id,quantity,rotation},'Kauf abgeschlossen. Die Items sind im Inventar.');}
+        const selectedMode=mode,rotation=list().rotation;
+        let payload={action:'trading.buy',mode:selectedMode,offer_id:o.id,quantity,rotation};
+        if(selectedMode==='crystals'){
+            if(!pendingCrystal||pendingCrystal.code!==o.item_code||pendingCrystal.quantity!==quantity)pendingCrystal={code:o.item_code,quantity,id:crypto.randomUUID()};
+            payload={action:'crystal.buy',item_code:o.item_code,quantity,request_id:pendingCrystal.id};
+        }
+        busy=true;render();
+        try{const result=await action('kingdom/action',payload,'Kauf abgeschlossen. Die Items sind im Inventar.');if(selectedMode==='crystals'&&result)pendingCrystal=null;}
         catch(error){toast(error.message||'Der Kauf konnte nicht abgeschlossen werden.');}
         finally{busy=false;if(host()?.querySelector('.trading-shell'))render();}
     }
@@ -115,6 +124,7 @@ window.ConquerTrading = function(ctx){
         if(!act.startsWith('trading-'))return false;
         if(b.disabled||busy)return true;
         if(act==='trading-tab'&&['merchant','crystals','vip','caravan'].includes(b.dataset.id)){mode=b.dataset.id;render();host()?.querySelector(`[data-action="trading-tab"][data-id="${mode}"]`)?.focus({preventScroll:true});}
+        else if(act==='trading-crystal-category'&&['all','resource_pack','speedup','teleport','boost'].includes(b.dataset.id)){crystalCategory=b.dataset.id;render();host()?.querySelector(`[data-action="trading-crystal-category"][data-id="${crystalCategory}"]`)?.focus({preventScroll:true});}
         else if(act==='trading-view'&&['mine','all'].includes(b.dataset.id)){vipView=b.dataset.id;render();host()?.querySelector(`[data-action="trading-view"][data-id="${vipView}"]`)?.focus({preventScroll:true});}
         else if(act==='trading-category'&&['all','resources','speedups','boosts','progress','treasures'].includes(b.dataset.id)){vipCategory=b.dataset.id;render();host()?.querySelector(`[data-action="trading-category"][data-id="${vipCategory}"]`)?.focus({preventScroll:true});}
         else if(act==='trading-upgrade')ctx.onUpgrade?.();

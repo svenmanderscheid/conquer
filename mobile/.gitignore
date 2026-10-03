@@ -1,0 +1,13 @@
+node_modules/
+www/
+capacitor.config.json
+mobile.local.json
+.pnpm-store/
+.gradle/
+*.keystore
+*.jks
+*.p12
+*.apk
+*.aab
+local.properties
+key.properties

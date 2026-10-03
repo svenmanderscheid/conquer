@@ -1,0 +1,28 @@
+{
+  "name": "union-of-kingdoms-mobile",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shared Capacitor shell for Union of Kingdoms; Android device prototype",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "packageManager": "pnpm@11.19.0",
+  "scripts": {
+    "configure": "node scripts/configure.cjs",
+    "web": "node scripts/build-web.cjs",
+    "android:add": "cap add android",
+    "android:sync": "node scripts/build-web.cjs && cap sync android",
+    "android:open": "cap open android",
+    "android:run": "cap run android",
+    "doctor": "node scripts/doctor.cjs",
+    "test": "node --test ../tests/mobile_config.cjs"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.2",
+    "@capacitor/app": "8.1.1",
+    "@capacitor/core": "8.5.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.2"
+  }
+}

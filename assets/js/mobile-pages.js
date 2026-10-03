@@ -5,7 +5,7 @@ window.ConquerMobilePages = function (ctx) {
     const media = matchMedia('(max-width:700px), (max-width:1100px) and (max-height:520px) and (orientation:landscape)');
     const panel = document.querySelector('#panel-dialog'), dialog = document.querySelector('#game-dialog');
     const key = 'conquerMobilePage';
-    const fullDetails = '.territory-shell,.item-sources,.research-detail,.march-command,.rally-detail,.rally-list,.skin-collection,.march-skin-detail,.theme-bundle-review,.vip-panel,.mail-detail,.mail-compose,.community-letter,.battle-report,.combat-report,.monster-report,.scout-report,.menu-groups,.shop-hub,.lok-profile,.bug-report-form,form[data-form="profile"]';
+    const fullDetails = '.extra-events,.territory-shell,.item-sources,.research-detail,.march-command,.rally-detail,.rally-list,.skin-collection,.march-skin-detail,.theme-bundle-review,.vip-panel,.mail-detail,.mail-compose,.community-letter,.battle-report,.combat-report,.monster-report,.scout-report,.menu-groups,.shop-hub,.lok-profile,.bug-report-form,form[data-form="profile"]';
     let activeOverlay = null, traversing = false, backPending = false;
     const dismissals = new Map();
     const read = () => history.state?.[key];

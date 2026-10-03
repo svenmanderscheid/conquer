@@ -11,7 +11,8 @@ function fixture() {
     const state = {
         world: { id: 1 },
         city: { id: 1, world_id: 1, coord_x: 64, coord_y: 64, castle_level: 5, city_skin: 'default' },
-        players: [{ id: 2, coord_x: 67, coord_y: 64, city_skin: 'default', username: 'Initial player' }],
+        players: [{ id: 2, coord_x: 67, coord_y: 64, city_skin: 'default', username: 'Initial player' },
+            { id: 99, coord_x: 200, coord_y: 200, city_skin: 'default', username: 'Distant player' }],
         monsters: [{ id: 1, coord_x: 65, coord_y: 64, hp_current: 100, hp_max: 100,
             definition: { name: 'Magdar', art: 'monsters/2.5d/bright-v2/magdar', type: 'rally', level: 3 } }],
         nodes: [], marches: []
@@ -98,6 +99,38 @@ async function checkViewport(browser, width, height, origin) {
         });
         await frame(page);
 
+        // Idle animation must not invalidate styles on every sprite frame.
+        await page.evaluate(()=>{
+            window.spriteStyleWrites=0;
+            window.spriteStyleObserver=new MutationObserver(records=>spriteStyleWrites+=records.length);
+            spriteStyleObserver.observe(document.querySelector('[data-painted="magdar"] canvas'),{attributes:true,attributeFilter:['style']});
+        });
+        await page.waitForTimeout(300);
+        assert.equal(await page.evaluate(()=>spriteStyleWrites),0,'animation keeps sprite geometry stable');
+        await page.evaluate(()=>spriteStyleObserver.disconnect());
+
+        // Panning a loaded region must not churn styles for distant targets.
+        // The same node must still be positioned correctly when brought on-screen.
+        await page.evaluate(() => {
+            window.distantStyleWrites = 0;
+            window.distantMarker = document.querySelector('[data-atlas-target="players:99"]');
+            window.distantObserver = new MutationObserver(records => { distantStyleWrites += records.length; });
+            distantObserver.observe(distantMarker, { attributes: true, attributeFilter: ['style'] });
+        });
+        await page.evaluate(() => ConquerWorld.focus(66, 66));
+        await frame(page);
+        assert.equal(await page.evaluate(() => distantStyleWrites), 0, 'distant target gets no geometry writes while panning elsewhere');
+        await page.evaluate(() => { distantObserver.disconnect(); ConquerWorld.focus(200, 200); });
+        await frame(page);
+        assert(await page.locator('[data-atlas-target="players:99"]').isVisible(), 'distant target reappears when focused');
+        assert(await page.evaluate(() => {
+            const node = document.querySelector('[data-atlas-target="players:99"]');
+            const r = node.getBoundingClientRect(), v = document.querySelector('.atlas-viewport').getBoundingClientRect();
+            return node === distantMarker && r.right > v.left && r.left < v.right && r.bottom > v.top && r.top < v.bottom;
+        }), 'reused target has current on-screen coordinates');
+        await page.evaluate(() => ConquerWorld.focus(64, 64));
+        await frame(page);
+
         // A large input burst exceeds the buffer several times, but must not
         // synchronously rebuild terrain for each event. Release flushes all input.
         for (const release of ['pointerup', 'pointercancel']) {
@@ -116,8 +149,11 @@ async function checkViewport(browser, width, height, origin) {
 
         await page.evaluate(() => ConquerWorld.focus(64, 64));
         await frame(page);
-        const frameStart = await page.evaluate(() => terrainPasses);
         let scheduledPoint = await beginDrag(page);
+        // Artwork can finish while the pointer is moving into position. Only
+        // count renders after capture, when the gesture actually owns the map.
+        await frame(page);
+        const frameStart = await page.evaluate(() => terrainPasses);
         const scheduled = await burst(page, scheduledPoint, 440);
         assert.equal(scheduled.synchronousPasses, 0, 'live pan input does not repaint synchronously');
         await frame(page);
