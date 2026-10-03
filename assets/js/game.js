@@ -271,6 +271,7 @@
         ++sceneTransitionToken;clearTimeout(sceneTransitionTimer);sceneCommitPending=changesScene;
         if(!changesScene){const veil=$('#scene-transition');veil?.classList.remove('is-active','is-covering','is-revealing');if(veil)delete veil.dataset.target;}
         rememberView();
+        if(tab==='research')viewPositions.delete(tab);
         const mobileHistory=mobilePages?.route(tab,fromHistory);
         if(tab!=='world')teleportSelection=null;
         if($('#game-dialog').open)$('#game-dialog').close();
@@ -506,7 +507,7 @@
         const active=document.activeElement,focused=active?.closest('.rt-node')?.dataset.id,branch=active?.closest('.rt-branch')?.dataset.id;
         const searchFocused=active?.id==='research-search',scrollFocused=active===scroller;
         const host=$('#content'),style=getComputedStyle(host),viewport={width:host.clientWidth-parseFloat(style.paddingLeft)-parseFloat(style.paddingRight),height:host.clientHeight-parseFloat(style.paddingTop)-parseFloat(style.paddingBottom)};
-        host.innerHTML=window.ConquerResearch.render({state,base,esc,fmt,duration,researchNames,costHtml,countdown,viewport});
+        host.innerHTML=window.ConquerResearch.render({state,base,esc,fmt,duration,researchNames,costHtml,countdown,viewport,autoScroll:!scroller});
         if($('.rt-scroll')){$('.rt-scroll').scrollLeft=scroll.left;$('.rt-scroll').scrollTop=scroll.top;}
         if(focused)document.querySelector(`.rt-node[data-id="${CSS.escape(focused)}"]`)?.focus({preventScroll:true});
         else if(branch)document.querySelector(`.rt-branch[data-id="${CSS.escape(branch)}"]`)?.focus({preventScroll:true});

@@ -50,12 +50,23 @@ fs.mkdirSync(output,{recursive:true});
     assert.deepEqual((await page.locator('.rt-node').evaluateAll(nodes=>nodes.map(node=>node.dataset.id))).sort(),expected);checks++;
     assert.equal(await page.locator('.rt-pagination,[data-action="research-page"],#research-chapter').count(),0);checks++;
     const metrics=await page.evaluate(()=>{const el=document.querySelector('.rt-scroll');return{w:el.clientWidth,h:el.clientHeight,sw:el.scrollWidth,sh:el.scrollHeight,left:el.scrollLeft,top:el.scrollTop};});
-    assert(metrics.h>=80,`Tree has usable height at ${width}×${height}: ${JSON.stringify(metrics)}`);assert(metrics.sw<=metrics.w);assert(metrics.sh>metrics.h);assert.equal(metrics.left,0);assert.equal(metrics.top,0);checks+=5;
+    assert(metrics.h>=80,`Tree has usable height at ${width}×${height}: ${JSON.stringify(metrics)}`);assert(metrics.sw<=metrics.w);assert(metrics.sh>metrics.h);assert.equal(metrics.left,0);assert(metrics.top>=0);checks+=5;
+    const currentResearchState=await page.evaluate(async()=> (await (await fetch('/api/game/state')).json()).data);
+    const nextVisible=await page.locator('.rt-scroll').evaluate((scroll,data)=>{
+     const available=[...scroll.querySelectorAll('.rt-available')];
+     const target=available.find(el=>{const def=data.research_defs.find(n=>n.code===el.dataset.id),next=def.levels.find(l=>l.level===Number(data.research[def.code]||0)+1);return Object.entries(next.resources||{}).every(([key,value])=>Number(data.city[key]||0)>=Number(value));})||available[0]||scroll.querySelector('.rt-running');
+     if(!target)return true;
+     const rect=target.getBoundingClientRect(),view=scroll.getBoundingClientRect();
+     return rect.bottom>view.top&&rect.top<view.bottom;
+    },currentResearchState);
+    assert(nextVisible,'Next available research is immediately visible');checks++;
     const layout=await page.locator('.rt-board').evaluate(board=>{
      const nodes=[...board.querySelectorAll('.rt-node')],byCode=new Map(nodes.map(n=>[n.dataset.id,n]));
      return{
       clipped:nodes.filter(n=>{const name=n.querySelector('.rt-node-name');return name.scrollWidth>name.clientWidth+1||name.getBoundingClientRect().bottom>n.getBoundingClientRect().bottom+1;}).map(n=>n.dataset.id),
       badEdges:[...board.querySelectorAll('.rt-edge')].filter(e=>{const from=byCode.get(e.dataset.from),to=byCode.get(e.dataset.to);return !e.querySelector('path').getAttribute('d')||(from&&from.getBoundingClientRect().bottom>=to.getBoundingClientRect().top);}).map(e=>e.dataset.from+' → '+e.dataset.to)
+  assert.equal(await page.locator('.rt-branch').first().getAttribute('data-id'),'military');
+  assert.equal(await page.locator('.rt-branch.is-selected').getAttribute('data-id'),'military');checks+=2;
      };
     });
     assert.deepEqual(layout.clipped,[],`Clipped names at ${width}×${height}`);assert.deepEqual(layout.badEdges,[],`Edges must progress downwards at ${width}×${height}`);checks+=2;
