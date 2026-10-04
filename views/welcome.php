@@ -5,7 +5,7 @@ $config = \Conquer\Bootstrap::getConfig();
 $configuredRoot = rtrim((string) ($config['base_url'] ?? ''), '/');
 $requestHost = strtolower((string) parse_url('http://' . ($_SERVER['HTTP_HOST'] ?? ''), PHP_URL_HOST));
 if (in_array($requestHost, ['unionofkingdoms.com', 'www.unionofkingdoms.com', 'play.unionofkingdoms.com'], true)) {
-    $configuredRoot = 'https://' . $requestHost;
+    $configuredRoot = 'https://' . ($requestHost === 'www.unionofkingdoms.com' ? 'unionofkingdoms.com' : $requestHost);
 }
 if (!filter_var($configuredRoot, FILTER_VALIDATE_URL)) {
     $scheme = !empty($_SERVER['HTTPS']) ? 'https' : 'http';
@@ -14,6 +14,8 @@ if (!filter_var($configuredRoot, FILTER_VALIDATE_URL)) {
 $publicRoot = $configuredRoot;
 $canonical = $publicRoot . '/';
 $socialImage = $publicRoot . '/assets/marketing/kingdom-social-en-v5.webp';
+$seoTitle = \Conquer\Game\Locale::t('landing.seo.title', [], 'en');
+$seoDescription = \Conquer\Game\Locale::t('landing.seo.description', [], 'en');
 $waitlistError = $waitlistError ?? '';
 $waitlistSuccess = $waitlistSuccess ?? false;
 $waitlistValue = static fn(string $name): string => htmlspecialchars(is_string($_POST[$name] ?? null) ? mb_substr($_POST[$name], 0, 254) : '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
@@ -22,11 +24,11 @@ $structuredData = [
     '@context' => 'https://schema.org',
     '@graph' => [[
         '@type' => 'WebSite', '@id' => $canonical . '#website', 'url' => $canonical,
-        'name' => 'Union of Kingdoms · A new Era begins', 'inLanguage' => 'en',
+        'name' => 'Union of Kingdoms', 'inLanguage' => 'en',
         'description' => 'Build a lasting fantasy kingdom, develop your army and face rivals and powerful monsters with your alliance.',
     ], [
         '@type' => ['VideoGame', 'WebApplication'], '@id' => $canonical . '#game',
-        'name' => 'Union of Kingdoms · A new Era begins', 'url' => $canonical,
+        'name' => 'Union of Kingdoms', 'url' => $canonical,
         'description' => 'A browser strategy game about city development, research, armies, PvP and cooperative alliance PvE. Currently in closed alpha.',
         'image' => $socialImage, 'inLanguage' => 'en', 'genre' => ['Strategy', 'City building', 'Fantasy'],
         'gamePlatform' => 'Webbrowser', 'applicationCategory' => 'GameApplication',
@@ -40,8 +42,8 @@ $structuredData = [
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Union of Kingdoms – A new Era begins</title><?php require ROOT_DIR.'/views/partials/brand-head.php'; ?>
-<meta name="description" content="Build your kingdom, develop three troop types through ten tiers each, equip relics and face rivals and rally monsters with your alliance. Register for closed alpha.">
+<title><?= htmlspecialchars($seoTitle, ENT_QUOTES) ?></title><?php require ROOT_DIR.'/views/partials/brand-head.php'; ?>
+<meta name="description" content="<?= htmlspecialchars($seoDescription, ENT_QUOTES) ?>">
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
 <meta name="theme-color" content="#5c4270">
 <link rel="canonical" href="<?= htmlspecialchars($canonical, ENT_QUOTES) ?>">
@@ -49,11 +51,11 @@ $structuredData = [
 
 
 <meta property="og:type" content="website"><meta property="og:locale" content="en_US">
-<meta property="og:site_name" content="Union of Kingdoms"><meta property="og:title" content="Union of Kingdoms – A new Era begins">
-<meta property="og:description" content="Build, research and fight with your alliance in a shared fantasy world. Closed alpha.">
+<meta property="og:site_name" content="Union of Kingdoms"><meta property="og:title" content="<?= htmlspecialchars($seoTitle, ENT_QUOTES) ?>">
+<meta property="og:description" content="<?= htmlspecialchars($seoDescription, ENT_QUOTES) ?>">
 <meta property="og:url" content="<?= htmlspecialchars($canonical, ENT_QUOTES) ?>"><meta property="og:image" content="<?= htmlspecialchars($socialImage, ENT_QUOTES) ?>">
 <meta property="og:image:width" content="1122"><meta property="og:image:height" content="1402"><meta property="og:image:alt" content="The illustrated fantasy world of Union of Kingdoms">
-<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Union of Kingdoms – A new Era begins"><meta name="twitter:description" content="Build, research and fight in the closed alpha."><meta name="twitter:image" content="<?= htmlspecialchars($socialImage, ENT_QUOTES) ?>">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="<?= htmlspecialchars($seoTitle, ENT_QUOTES) ?>"><meta name="twitter:description" content="<?= htmlspecialchars($seoDescription, ENT_QUOTES) ?>"><meta name="twitter:image" content="<?= htmlspecialchars($socialImage, ENT_QUOTES) ?>">
 <link rel="preload" as="image" href="<?= $base ?>/assets/art/loading/branded/royal-sunrise-logo-v1.webp" type="image/webp" fetchpriority="high">
 <link rel="stylesheet" href="<?= $base ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR . '/assets/css/fantasy-fonts.css') ?>">
 <link rel="stylesheet" href="<?= $base ?>/assets/css/landing.css?v=<?= filemtime(ROOT_DIR . '/assets/css/landing.css') ?>">
@@ -87,7 +89,7 @@ $structuredData = [
     <div class="lp-hero-content">
       <p class="lp-kicker"><span>In your browser</span><i aria-hidden="true">·</i><span>no download</span></p>
       <h1 id="hero-title"><span>Your kingdom.</span><br><em>Our next adventure.</em></h1>
-      <p class="lp-lead">Grow your city. Build your army. Face rivals and mighty monsters together.</p>
+      <p class="lp-lead"><?= \Conquer\Game\Locale::html('landing.seo.intro', [], 'en') ?></p>
       <a class="lp-button lp-hero-start" href="<?= $base ?>/?zugang=waitlist#zugang" data-auth-target="waitlist"><span>Register for closed alpha</span> <span aria-hidden="true">→</span></a>
     </div>
     <div class="lp-hero-controls" role="group" aria-label="Choose featured artwork">

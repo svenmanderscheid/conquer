@@ -8,6 +8,10 @@ Beim ersten Start meldete Capacitor 8.5.2 einmal `Error injecting safe area CSS:
 
 ## Architektur und Grenzen
 
+### Freigegebenes App-Icon (4. Oktober 2026)
+
+Das freigegebene Motiv zeigt Magdar beim Angriff auf den Guardian, Feuerbogenschützin und Schattenreiter vor dem Congress, mit violetter Boss-Aura. Die Quelle liegt unter `assets/art/app-icon/union-of-kingdoms-boss-attack-v2-aura.png`. `tools/build-brand-icons.cjs` exportiert daraus Web-/PWA-, Apple-Touch- und Android-Launcher-Symbole. Die maskierbare Fassung setzt das vollständige Motiv mit Sicherheitsrand auf Violett. Android verwendet `drawable-nodpi/uok_launcher.png`; auf bereits installierten Geräten erscheint die Änderung erst nach einem neuen APK-Build und einer Aktualisierung der App.
+
 ### Ausblendbare Android-Navigation (3. Oktober 2026)
 
 Der Debug-Build `0.1.1-prototype` (Versionscode 2) blendet die untere Android-Systemnavigation mit `WindowInsetsControllerCompat` aus. Ein Randwisch zeigt die Leiste vorübergehend als Overlay; Android Zurück bleibt unverändert verfügbar. Die Statusleiste und Capacitors bestehende Behandlung der sicheren Bildschirmränder bleiben erhalten. Start, Wiederaufnahme, Fensterfokus und Ausrichtungswechsel stellen den Modus wieder her. Während sichtbarer Bildschirmtastatur wird die Navigation nicht erneut verborgen; nach dem Schließen der Tastatur wird sie wieder ausgeblendet. Der Tastaturbeobachter ersetzt nicht Capacitors Insets-Listener.

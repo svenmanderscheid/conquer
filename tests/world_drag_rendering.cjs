@@ -299,6 +299,9 @@ async function checkViewport(browser, width, height, origin) {
         await page.mouse.up();
         await frame(page);
         assert.equal(await playerName(page), 'New world immediately', 'release cannot restore stale world state');
+        for(let i=0;i<20;i++)await page.locator('.atlas-viewport').press('-');
+        assert.equal(await page.locator('.atlas-zoom-value').textContent(),Math.min(width,height)<=600?'45%':'65%','overview zoom respects portrait, landscape and desktop limits');
+        assert(await page.locator('[data-atlas="zoom-out"]').isDisabled(),'zoom-out stops at the overview limit');
         assert.deepEqual(errors, [], 'no browser errors');
         assert.deepEqual(assetFailures, [], 'all production artwork loads');
         console.log(`PASS ${width}x${height}: coalesced pan, complete up/cancel delta, latest snapshot, paused decorations, capture loss, pinch, reopen, reduced motion, teleport and world switch`);

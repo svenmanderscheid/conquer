@@ -14,7 +14,9 @@ window.ConquerWorld = (() => {
   function invalidateArtwork(){if(view?.el.isConnected){view.terrainStamp=null;view.cameraDirty=true;view.markersDirty=true;}}
   function cameraGesture(){return Boolean(view?.pinch||(view?.drag?.moved&&!view.drag.teleport));}
   function loadScenery(){for(const name of ['pine','oak','cherry','mountain','rocks']){if(sceneryImages.has(name))continue;const img=new Image();sceneryImages.set(name,img);img.onload=()=>{if(view?.el.isConnected){view.terrainStamp=null;view.cameraDirty=true;}};img.src=`${context.base}/assets/art/map/scenery-${name}.png?v=fantasy3d1`;}}
-  const TILE = 44, MIN_ZOOM = .65, MAX_ZOOM = 1.8;
+  const TILE = 44, MIN_ZOOM = .65, MOBILE_MIN_ZOOM = .45, MAX_ZOOM = 1.8;
+  // Use the short screen edge so phones retain their overview in landscape.
+  const minZoom = () => Math.min(window.innerWidth,window.innerHeight)<=600 ? MOBILE_MIN_ZOOM : MIN_ZOOM;
   const mapProfile=()=>context?.state.world?.map_profile||{key:'legacy',width:256,height:256};
   const mapWidth=()=>Number(mapProfile().width)||256,mapHeight=()=>Number(mapProfile().height)||256;
   const isLux=()=>mapProfile().key==='luxembourg';
@@ -343,6 +345,7 @@ window.ConquerWorld = (() => {
   function resize() {
     if(!view?.el.isConnected)return;
     view.width=Math.max(1,view.viewport.clientWidth);view.height=Math.max(1,view.viewport.clientHeight);
+    memory.zoom=clamp(memory.zoom,minZoom(),MAX_ZOOM);
     // A high-resolution full-screen terrain canvas is expensive while panning.
     // Touch-sized views render at CSS resolution; desktop keeps modest extra
     // sharpness without multiplying the off-screen buffer unnecessarily.
@@ -431,7 +434,7 @@ window.ConquerWorld = (() => {
   }
   function notify(){clearTimeout(notifyTimer);notifyTimer=setTimeout(()=>{if(view?.el.isConnected)window.dispatchEvent(new Event('conquer-world-moved'));},380);}
   function moveTo(x,y){stopFollowing();memory.x=clamp(x,0,mapWidth()-1);memory.y=clamp(y,0,mapHeight()-1);paint();updateSidebar();notify();}
-  function zoomTo(value,anchorX=view.width/2,anchorY=view.height/2){const before=unproject(anchorX,anchorY);memory.zoom=clamp(value,MIN_ZOOM,MAX_ZOOM);memory.x=clamp(before[0]-(anchorX-view.width/2)/scale(),0,mapWidth()-1);memory.y=clamp(before[1]-(anchorY-view.height/2)/scale(),0,mapHeight()-1);paint();updateSidebar();notify();}
+  function zoomTo(value,anchorX=view.width/2,anchorY=view.height/2){const before=unproject(anchorX,anchorY);memory.zoom=clamp(value,minZoom(),MAX_ZOOM);memory.x=clamp(before[0]-(anchorX-view.width/2)/scale(),0,mapWidth()-1);memory.y=clamp(before[1]-(anchorY-view.height/2)/scale(),0,mapHeight()-1);paint();updateSidebar();notify();}
   function scheduleZoom(value,anchorX,anchorY){
     view.pendingZoom={value,anchorX,anchorY};
     if(view.zoomFrame)return;
@@ -1097,7 +1100,7 @@ window.ConquerWorld = (() => {
     else node.insertAdjacentHTML('beforeend',`<span class="atlas-impact-ring"></span><span class="atlas-impact-ring is-echo"></span><span class="atlas-impact-emblem">${theme.symbol}</span>`+Array.from({length:12},(_,i)=>{const angle=i*Math.PI/6;return `<i style="--burst-x:${Math.cos(angle)*(48+i%3*15)}px;--burst-y:${Math.sin(angle)*(28+i%3*12)-22}px;--burst-turn:${i*47}deg"></i>`;}).join(''));
     view.parties.append(node);view.impacts.push({node,point:t.destination,started:frame,duration:Math.max(1750,art?.duration||1500),paint:art?.paint,dispose:art?.dispose});
   }
-  function paint(){if(!view?.el.isConnected)return;view.cameraDirty=false;shiftScenery(0,0);view.sceneCenter={x:memory.x,y:memory.y};const width=view.width,height=view.height;view.width+=view.terrainPad*2||0;view.height+=view.terrainPad*2||0;try{terrain();}finally{view.width=width;view.height=height;}atmosphere();positionMarkers();positionActions();minimap();marches();view.el.querySelector('.atlas-coordinates').textContent=`X ${Math.round(memory.x)} · Y ${Math.round(memory.y)}`;const jump=view.el.querySelector('.atlas-jump');if(!jump.contains(document.activeElement)){jump.elements.x.value=Math.round(memory.x);jump.elements.y.value=Math.round(memory.y);}view.el.querySelector('.atlas-zoom-value').textContent=`${Math.round(memory.zoom*100)}%`;view.el.querySelector('[data-atlas="zoom-in"]').disabled=memory.zoom>=MAX_ZOOM;view.el.querySelector('[data-atlas="zoom-out"]').disabled=memory.zoom<=MIN_ZOOM;updateFooter();}
+  function paint(){if(!view?.el.isConnected)return;view.cameraDirty=false;shiftScenery(0,0);view.sceneCenter={x:memory.x,y:memory.y};const width=view.width,height=view.height;view.width+=view.terrainPad*2||0;view.height+=view.terrainPad*2||0;try{terrain();}finally{view.width=width;view.height=height;}atmosphere();positionMarkers();positionActions();minimap();marches();view.el.querySelector('.atlas-coordinates').textContent=`X ${Math.round(memory.x)} · Y ${Math.round(memory.y)}`;const jump=view.el.querySelector('.atlas-jump');if(!jump.contains(document.activeElement)){jump.elements.x.value=Math.round(memory.x);jump.elements.y.value=Math.round(memory.y);}view.el.querySelector('.atlas-zoom-value').textContent=`${Math.round(memory.zoom*100)}%`;view.el.querySelector('[data-atlas="zoom-in"]').disabled=memory.zoom>=MAX_ZOOM;view.el.querySelector('[data-atlas="zoom-out"]').disabled=memory.zoom<=minZoom();updateFooter();}
   function shiftScenery(x,y){for(const layer of [view.canvas,view.markers,view.creatures,view.routes,view.el.querySelector('.atlas-cell-focus')])if(layer)layer.style.translate=`${x}px ${y}px`;}
   function panBufferedScene(){
     const center=view.sceneCenter||{x:memory.x,y:memory.y},dx=(center.x-memory.x)*scale(),dy=(center.y-memory.y)*scale();

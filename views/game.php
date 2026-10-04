@@ -59,6 +59,7 @@ $base = htmlspecialchars(APP_BASE, ENT_QUOTES);
   <link rel="stylesheet" href="<?= $base ?>/assets/css/village-theme.css?v=<?= filemtime(__DIR__ . '/../assets/css/village-theme.css') ?>">
 </head>
 <body class="mobile-game">
+<?php require ROOT_DIR.'/views/partials/app-start.php'; ?>
 <a class="skip-link" href="#main">Zum Spielinhalt</a>
 <header class="topbar">
   <div class="hud-profile">

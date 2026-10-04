@@ -170,8 +170,10 @@
                 beginnerGuide.maybeWelcome(current);
                 comfort.update();
                 sound?.observe(state);
+                window.ConquerStartup?.ready();
                 return true;
             } catch(e) {
+                if(!state)window.ConquerStartup?.fail();
                 $('#save-state').textContent='Verbindung unterbrochen';$('#save-state').classList.add('error');
                 if(!state)$('#content').innerHTML=`<div class="empty"><span class="empty-icon">♜</span><h3>Dein Reich ist kurz außer Reichweite.</h3><p>${esc(e.message)}</p><button class="button" data-action="retry">Erneut versuchen</button></div>`;
                 return false;

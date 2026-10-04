@@ -1,4 +1,12 @@
 {
+  "landing.seo.title": "Union of Kingdoms – Fantasy Browser Strategy Game",
+  "landing.seo.description": "Build a fantasy kingdom, research upgrades and lead your army in PvP and alliance monster rallies. Play in your browser. Join the closed alpha waiting list.",
+  "landing.seo.intro": "Union of Kingdoms is a fantasy browser strategy game. Grow your city, research upgrades and build your army. Challenge rival players and face mighty monsters with your alliance.",
+  "startup.loading": "Preparing your kingdom…",
+  "startup.tagline": "Build a kingdom. Forge an alliance.",
+  "startup.ready": "Your kingdom awaits",
+  "startup.error": "Loading took too long. Please try again.",
+  "startup.retry": "Try again",
   "rally.ai.name": "Royal Vanguard (AI)",
   "rally.ai.label": "AI reinforcement",
   "rally.ai.hint": "In quiet worlds, AI reinforcements may arrive after 45 seconds. Human troops take priority. AI earns no rewards.",

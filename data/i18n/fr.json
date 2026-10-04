@@ -1,4 +1,12 @@
 {
+  "landing.seo.title": "Union of Kingdoms – Jeu de stratégie fantastique sur navigateur",
+  "landing.seo.description": "Bâtissez un royaume fantastique, recherchez des améliorations et menez votre armée en JcJ et contre des monstres en alliance. Rejoignez la liste d’attente de l’alpha fermée.",
+  "landing.seo.intro": "Union of Kingdoms est un jeu de stratégie fantastique sur navigateur. Développez votre ville, recherchez des améliorations et formez votre armée. Affrontez des joueurs rivaux et de puissants monstres avec votre alliance.",
+  "startup.loading": "Préparation de votre royaume…",
+  "startup.tagline": "Bâtissez un royaume. Forgez une alliance.",
+  "startup.ready": "Votre royaume vous attend",
+  "startup.error": "Le chargement prend trop de temps. Veuillez réessayer.",
+  "startup.retry": "Réessayer",
   "rally.ai.name": "Avant-garde royale (IA)",
   "rally.ai.label": "Renfort IA",
   "rally.ai.hint": "Dans les mondes peu peuplés, des renforts IA peuvent arriver après 45 secondes. Les troupes humaines sont prioritaires. L’IA ne reçoit aucune récompense.",

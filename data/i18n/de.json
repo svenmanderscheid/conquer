@@ -1,4 +1,12 @@
 {
+  "landing.seo.title": "Union of Kingdoms – Fantasy-Strategiespiel im Browser",
+  "landing.seo.description": "Baue ein Fantasy-Königreich, erforsche Verbesserungen und führe deine Armee in PvP-Kämpfe und Allianz-Rallys gegen Monster. Melde dich für die geschlossene Alpha an.",
+  "landing.seo.intro": "Union of Kingdoms ist ein Fantasy-Strategiespiel im Browser. Entwickle deine Stadt, erforsche Verbesserungen und baue deine Armee auf. Fordere andere Spieler heraus und stelle dich mit deiner Allianz mächtigen Monstern.",
+  "startup.loading": "Dein Königreich wird vorbereitet…",
+  "startup.tagline": "Baue ein Königreich. Schmiede eine Allianz.",
+  "startup.ready": "Dein Königreich wartet",
+  "startup.error": "Das Laden dauert zu lange. Bitte versuche es erneut.",
+  "startup.retry": "Erneut versuchen",
   "rally.ai.name": "Königliche Vorhut (KI)",
   "rally.ai.label": "KI-Verstärkung",
   "rally.ai.hint": "In wenig bevölkerten Welten kann nach 45 Sekunden KI-Verstärkung eintreffen. Echte Truppen haben Vorrang. KI erhält keine Belohnungen.",

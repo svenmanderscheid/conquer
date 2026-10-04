@@ -1,4 +1,9 @@
 {
+  "startup.loading": "Däi Kinnekräich gëtt virbereet…",
+  "startup.tagline": "Bau e Kinnekräich. Grënn eng Allianz.",
+  "startup.ready": "Däi Kinnekräich waart",
+  "startup.error": "D’Luede dauert ze laang. Probéier nach eng Kéier.",
+  "startup.retry": "Nach eng Kéier",
   "alliance_home.together": "Zesumme méi staark",
   "alliance_home.shared_goal": "Gemeinsaamt Zil",
   "alliance_home.no_shared_goal": "Är Allianz huet nach keen Zil gewielt.",

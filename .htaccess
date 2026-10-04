@@ -14,6 +14,11 @@
 # Front controller pattern — route all non-existing requests to index.php
 RewriteEngine On
 
+# Consolidate public website URLs without replaying submitted forms.
+RewriteCond %{HTTP_HOST} ^www\.unionofkingdoms\.com$ [NC]
+RewriteCond %{REQUEST_METHOD} ^(?:GET|HEAD)$
+RewriteRule ^ https://unionofkingdoms.com%{REQUEST_URI} [R=301,L]
+
 # Redirect before internal routing; use 308 to preserve methods and request bodies.
 RewriteCond %{HTTPS} off
 RewriteCond %{HTTP_HOST} !^(localhost|127\.0\.0\.1)(:\d+)?$ [NC]

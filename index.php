@@ -81,7 +81,7 @@ if (in_array($_requestHost, ['unionofkingdoms.com', 'www.unionofkingdoms.com'], 
 if (in_array($_requestHost, ['unionofkingdoms.com', 'www.unionofkingdoms.com', 'play.unionofkingdoms.com'], true)) {
     // The public website and game login share one deployment, but each keeps
     // its own canonical host for links, metadata, robots and the sitemap.
-    $_configuredOrigin = 'https://' . $_requestHost;
+    $_configuredOrigin = 'https://' . ($_requestHost === 'www.unionofkingdoms.com' ? 'unionofkingdoms.com' : $_requestHost);
 }
 if (!filter_var($_configuredOrigin, FILTER_VALIDATE_URL)) {
     $_configuredOrigin = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
@@ -94,17 +94,23 @@ $_landingCsp = "default-src 'self'; img-src 'self' data:; style-src 'self'; font
 if ($_normalizedPath === '/robots.txt' && $method === 'GET') {
     header('Content-Type: text/plain; charset=utf-8');
     header('Cache-Control: public, max-age=3600');
-    echo "User-agent: *\nAllow: /\nDisallow: " . APP_BASE . "/api/\nDisallow: " . APP_BASE . "/admin/\nDisallow: " . APP_BASE . "/auth/\nDisallow: " . APP_BASE . "/city\nDisallow: " . APP_BASE . "/game\nSitemap: " . $_publicRoot . "/sitemap.xml\n";
+    echo "User-agent: *\nAllow: /\nDisallow: " . APP_BASE . "/api/\nDisallow: " . APP_BASE . "/admin/\nDisallow: " . APP_BASE . "/auth/\nDisallow: " . APP_BASE . "/city\nDisallow: " . APP_BASE . "/game\n";
+    if (!$_useGameLogin) echo "Sitemap: " . $_publicRoot . "/sitemap.xml\n";
     exit;
 }
 if ($_normalizedPath === '/sitemap.xml' && $method === 'GET') {
     header('Content-Type: application/xml; charset=utf-8');
     header('Cache-Control: public, max-age=3600');
     $location = htmlspecialchars($_publicRoot . '/', ENT_XML1 | ENT_QUOTES, 'UTF-8');
-    $lastModified = gmdate('Y-m-d', (int) filemtime(ROOT_DIR . '/views/welcome.php'));
+    $lastModified = gmdate('Y-m-d', max(
+        (int) filemtime(ROOT_DIR . '/views/welcome.php'),
+        (int) filemtime(ROOT_DIR . '/views/partials/landing-game-guide.php'),
+        (int) filemtime(ROOT_DIR . '/data/i18n/en.json')
+    ));
     echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n"
-        . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>' . $location . '</loc><lastmod>'
-        . $lastModified . '</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url></urlset>';
+        . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+        . ($_useGameLogin ? '' : '<url><loc>' . $location . '</loc><lastmod>' . $lastModified . '</lastmod></url>')
+        . '</urlset>';
     exit;
 }
 if (($_normalizedPath === '/' && $method === 'GET') || $_normalizedPath === '/alpha/waitlist') {
@@ -120,6 +126,7 @@ if (($_normalizedPath === '/' && $method === 'GET') || $_normalizedPath === '/al
     // The page embeds a session-bound CSRF token; never let a shared cache reuse it.
     header('Cache-Control: private, no-store');
     if ($_normalizedPath === '/' && $_useGameLogin) {
+        header('X-Robots-Tag: noindex, nofollow');
         if (\Conquer\Auth\Session::current() !== null) {
             header('Location: ' . APP_BASE . '/city');
             exit;
