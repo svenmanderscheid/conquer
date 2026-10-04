@@ -47,7 +47,7 @@ function updateHitBounds(img,binding){
  });
 }
 export function key(target){
- if(['home','players'].includes(target.kind))return window.ConquerCastleSkins.get(target.data.city_skin).id==='default'?'castle':null;
+ if(['home','players','neutral_villages'].includes(target.kind))return window.ConquerCastleSkins.get(target.data.city_skin).id==='default'?'castle':null;
  if(target.kind==='nodes')return files[target.resource?.art]?target.resource.art:null;
  if(target.kind!=='monsters')return null;
  const name=(target.art||'').split('/').pop().replace(/\.png.*$/,'').replace('-turquoise','');

@@ -23,6 +23,7 @@ const basic={id:1,target_kind:'monster',leader_player_id:8,leader_name:'Forschun
 window.listRows=[basic,{...basic,id:2,capacity:100,troops:{50100101:100}},{...basic,id:3,launch_at:stamp(-1)},{...basic,id:4,leader_player_id:7},{...basic,id:5,participants:[{player_id:7,status:'pending',troops:{50100101:10}}],participant_count:1},{...basic,id:6,status:'marching',arrival_time:stamp(600)},{...basic,id:7,status:'returning',return_time:stamp(900)},{...basic,id:8,target_kind:'territory',target_name:'Commune Forschung',launch_at:stamp(1200)},{...basic,id:9,target_kind:'city',target_name:'Forschung',target_player:{...leader,name:'Forschung'},capacity:null,launch_at:stamp(1800)}];
 window.detailRows=Object.fromEntries(listRows.map(r=>[r.id,{rally:structuredClone(r),participants:structuredClone(r.participants)}]));
 detailRows[1].participants=Array.from({length:12},(_,i)=>({player_id:30+i,username:i?'Ally '+i:'Forschung',profile:{name:i?'Ally '+i:'Forschung',power:900},troops:{50100101:25},status:i===0?'joining':'pending',arrival_time:stamp(30)}));
+Object.assign(detailRows[1].participants[11],{player_id:-1,is_ai:true,name_key:'rally.ai.name',username:'Royal Vanguard (AI)',profile:null});
 detailRows[1].rally.participant_count=12;detailRows[1].rally.participants=detailRows[1].participants;
 window.sent=[];window.reads=[];window.notices=[];window.composerCalls=[];
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -98,7 +99,7 @@ async function statusContrasts(page,view){return page.locator('.rally-status').e
     await page.locator('.rally-card[data-rally-id="1"] [data-action="rally-detail"]').click({position:{x:15,y:15}});await page.waitForSelector('.rally-detail');
     await stableFrame(page,viewport,label+' detail');assert.equal(await page.locator('.rally-member').count(),13,'all twelve members and captain shown');
     assert.equal(await page.locator('.rally-member[open]').count(),1,'captain troop roster opens initially');
-    const ally=page.locator('.rally-member[data-player-id="30"]');await ally.locator('summary').click();assert(await ally.locator('.rally-member-troops').isVisible(),'member tap shows exact troop roster');
+    const ally=page.locator('.rally-member[data-player-id="30"]');await ally.locator('summary').click();assert(await ally.locator('.rally-member-troops').isVisible(),'member tap shows exact troop roster');assert((await page.locator('.rally-member[data-player-id="-1"]').textContent()).includes(catalogs.en['rally.ai.label']),'AI reinforcement is explicitly labelled');
     await page.evaluate(()=>{const rows=structuredClone(listRows);rows[0]=structuredClone(detailRows[1].rally);rows[0].target_y++;rallies.sync(rows)});
     assert(await ally.locator('.rally-member-troops').isVisible(),'poll preserves expanded member troops');
     await page.waitForFunction(()=>[...document.querySelectorAll('.rally-detail img')].every(img=>img.complete&&img.naturalWidth>0));
@@ -168,7 +169,14 @@ async function statusContrasts(page,view){return page.locator('.rally-status').e
    assert(footer.contrast>=4.5,locale+' readable Join label '+JSON.stringify(footer));
    localizedFooters.push({locale,...footer});await page.screenshot({path:path.join(out,'320x568-list-'+locale+'.png')});checks++;
   }
-  for(const key of ['rally.join.open','rally.join.closed','rally.list_hint','rally.arrival_rule'])assert.equal(typeof catalogs.en[key],'string','English catalog key '+key);
+  for(const locale of ['en','de','fr']){
+   await page.evaluate(locale=>{ConquerLocale.setLocale(locale);detailRows[1].rally.launch_at='2030-01-01 13:00:00';detailRows[1].rally.human_capacity_remaining=100;detailRows[1].rally.capacity=400;rallies.onClick('rally-detail',{dataset:{id:'1'}});},locale);
+   await page.waitForFunction(name=>document.querySelector('.rally-member[data-player-id="-1"]')?.textContent.includes(name),catalogs[locale]['rally.ai.name']);const ai=page.locator('.rally-member[data-player-id="-1"]');await ai.scrollIntoViewIfNeeded();
+   assert((await ai.textContent()).includes(catalogs[locale]['rally.ai.name']));assert((await ai.textContent()).includes(catalogs[locale]['rally.ai.label']));
+   assert.equal(await page.locator('.rally-detail-actions [data-action="rally-join"]').isDisabled(),false,'humans can replace AI at full capacity');
+   await page.screenshot({path:path.join(out,'320x568-ai-'+locale+'.png')});
+  }
+  for(const key of ['rally.join.open','rally.join.closed','rally.list_hint','rally.arrival_rule','rally.ai.name','rally.ai.label','rally.ai.hint'])assert.equal(typeof catalogs.en[key],'string','English catalog key '+key);
   assert.deepEqual(errors,[],'no browser exceptions');assert.deepEqual(failures,[],'layout checks');assert.deepEqual(badStatuses,[],'all rally status contrast');
   fs.writeFileSync(path.join(out,'result.json'),JSON.stringify({checks,viewports:5,errors,failures,statusReport,localizedFooters},null,2));console.log('PASS '+checks+' rally window groups. Screenshots: '+out);
  }finally{await browser.close();}

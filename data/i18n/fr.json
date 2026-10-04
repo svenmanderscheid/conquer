@@ -1,4 +1,7 @@
 {
+  "rally.ai.name": "Avant-garde royale (IA)",
+  "rally.ai.label": "Renfort IA",
+  "rally.ai.hint": "Dans les mondes peu peuplés, des renforts IA peuvent arriver après 45 secondes. Les troupes humaines sont prioritaires. L’IA ne reçoit aucune récompense.",
   "inventory.quantity": "Quantité à utiliser",
   "crystal_shop.title": "Boutique de cristaux",
   "crystal_shop.intro": "Dépensez vos cristaux pour des provisions et des objets.",

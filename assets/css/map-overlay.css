@@ -66,7 +66,7 @@
 /* One coordinate is one square. Towns own sixteen tiles, centered on anchor + .5. */
 .map-overlay-shell .atlas-marker{width:calc(var(--tile-size,44px)*var(--footprint,1));height:calc(var(--tile-size,44px)*var(--footprint,1));transform:translate(-50%,-50%);transform-origin:center;border-radius:0!important}
 .map-overlay-shell .atlas-marker img{width:calc(var(--tile-size,44px)*1.05);height:calc(var(--tile-size,44px)*1.12);bottom:calc(var(--tile-size,44px)*.12);left:50%;margin-left:calc(var(--tile-size,44px)*-.525)}
-.map-overlay-shell :is(.atlas-marker--home,.atlas-marker--players) img{width:calc(var(--tile-size,44px)*3.7125);height:calc(var(--tile-size,44px)*3.78);bottom:calc(var(--tile-size,44px)*.245);margin-left:calc(var(--tile-size,44px)*-1.85625)}
+.map-overlay-shell :is(.atlas-marker--home,.atlas-marker--players,.atlas-marker--neutral_villages) img{width:calc(var(--tile-size,44px)*3.7125);height:calc(var(--tile-size,44px)*3.78);bottom:calc(var(--tile-size,44px)*.245);margin-left:calc(var(--tile-size,44px)*-1.85625)}
 .map-overlay-shell .atlas-marker-level{bottom:0;max-width:calc(var(--tile-size,44px)*2.8);font-size:9px}
 .map-overlay-shell .atlas-marker-name{max-width:calc(var(--tile-size,44px)*3.8);overflow:hidden;text-overflow:ellipsis}
 .map-overlay-shell .atlas-marker-ground{left:1px;bottom:1px;width:calc(100% - 2px);height:calc(100% - 2px);border-radius:0;background:none}

@@ -6,7 +6,7 @@ window.ConquerWorld = (() => {
   let painted=null,paintedLoading=false;
   function loadPainted(){
     if(paintedLoading)return;paintedLoading=true;
-    import(`${context.base}/assets/js/world-painted.js?v=7`).then(async module=>{
+    import(`${context.base}/assets/js/world-painted.js?v=8`).then(async module=>{
       await module.init(context.base,invalidateArtwork,()=>!sceneVisible||motionReduced()||cameraGesture());
       painted=module;invalidateArtwork();
     }).catch(error=>{console.warn('Painted world fallback',error);loadScenery();});

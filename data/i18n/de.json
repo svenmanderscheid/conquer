@@ -1,4 +1,7 @@
 {
+  "rally.ai.name": "Königliche Vorhut (KI)",
+  "rally.ai.label": "KI-Verstärkung",
+  "rally.ai.hint": "In wenig bevölkerten Welten kann nach 45 Sekunden KI-Verstärkung eintreffen. Echte Truppen haben Vorrang. KI erhält keine Belohnungen.",
   "inventory.quantity": "Menge verwenden",
   "crystal_shop.title": "Kristall-Shop",
   "crystal_shop.intro": "Gib deine Kristalle für Vorräte und Gegenstände aus.",

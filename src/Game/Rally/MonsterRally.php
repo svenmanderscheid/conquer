@@ -71,6 +71,7 @@ final class MonsterRally
         catch(\RuntimeException $e){return ['armies'=>$armies,'reason'=>$e->getMessage(),'cancelled'=>true,'outcome'=>'cancelled'];}
         if((int)$target['monster_code']!==$meta['monster_code'])return ['armies'=>$armies,'reason'=>'Das ursprüngliche Monster ist nicht mehr verfügbar.','cancelled'=>true,'outcome'=>'cancelled'];
         foreach($armies as &$army){
+            if(!empty($army['is_ai'])){$army['buffs']=[];$army['source_snapshot']=['is_ai'=>true,'name_key'=>'rally.ai.name'];continue;}
             $army['buffs']=BuffEngine::getBuffs($army['player_id'],$world);
             $army['source_snapshot']=\Conquer\Game\March\MonsterReport::capture($army['player_id'],$army['city_id'],$world);
         }unset($army);
@@ -81,6 +82,7 @@ final class MonsterRally
             $gems=$meta['monster']['gems_drop']??[];
             $baseXp=(int)($meta['monster']['xp']??(max(1,(int)$meta['monster']['level'])*($meta['monster']['xp_per_level']??(str_contains(strtolower($meta['monster']['name']),'deathkar')?20:10))));
             foreach($armies as $i=>$army){
+                if(!empty($army['is_ai']))continue;
                 foreach($basePool as $resource=>$amount)if(in_array($resource,['food','lumber','stone','gold'],true))$loot[$i][$resource]=(int)$amount;
                 if(self::roll((float)($gems['chance']??0)))$loot[$i]['gems']=(int)($gems['amount']??0);
                 foreach($meta['drops'] as $drop)if(self::roll((float)$drop['probability']))$items[$i][(int)$drop['item_code']]=($items[$i][(int)$drop['item_code']]??0)+(int)$drop['count'];
@@ -98,6 +100,7 @@ final class MonsterRally
             $db->execute('DELETE FROM field_monsters WHERE id=? AND world_id=?',[$target['id'],$world]);
         }else{$db->execute('UPDATE field_monsters SET hp_current=? WHERE id=? AND world_id=?',[$result['new_monster_hp'],$target['id'],$world]);}
         foreach($result['armies'] as $i=>&$army){
+            if(!empty($army['is_ai'])){$army['loot']=[];$army['items']=[];continue;}
             $pid=$army['player_id'];HospitalService::addWounded($army['city_id'],$army['wounded']);
             $army['loot']=\Conquer\Game\Player\TalentEffects::monsterLoot($loot[$i]??[],$armies[$i]['buffs']);$army['items']=$items[$i]??[];
             $earned=$result['monster_killed']?LordLevel::addXp($pid,$xp[$i]??0,$world,'monster-rally:'.$r['id']):0;
@@ -108,6 +111,7 @@ final class MonsterRally
             $report=$result['report']+['type'=>'monster_rally','rally_id'=>(int)$r['id'],'loot'=>$army['loot'],'items'=>$army['items'],'lord_xp'=>$earned,'own_survivors'=>$army['survivors'],'own_wounded'=>$army['wounded']];
             if($settlement!==null)$report['charm']=$result['charm'];
             $report['troops']=$ownTroops;$report['item_rewards']=$itemRewards;
+            $report['ai_support']=$meta['ai_support']??[];
             $report['rally_combat_snapshot']=$result['report']['combat_snapshot'];
             $report['combat_snapshot']=$army['combat_snapshot'];
             $report['source_snapshot']=$armies[$i]['source_snapshot'];

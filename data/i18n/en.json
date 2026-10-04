@@ -1,4 +1,7 @@
 {
+  "rally.ai.name": "Royal Vanguard (AI)",
+  "rally.ai.label": "AI reinforcement",
+  "rally.ai.hint": "In quiet worlds, AI reinforcements may arrive after 45 seconds. Human troops take priority. AI earns no rewards.",
   "inventory.quantity": "Quantity to use",
   "crystal_shop.title": "Crystal Shop",
   "crystal_shop.intro": "Spend your crystals on supplies and items.",
