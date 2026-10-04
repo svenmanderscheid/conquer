@@ -14,7 +14,7 @@ window.ConquerWorld = (() => {
   function invalidateArtwork(){if(view?.el.isConnected){view.terrainStamp=null;view.cameraDirty=true;view.markersDirty=true;}}
   function cameraGesture(){return Boolean(view?.pinch||(view?.drag?.moved&&!view.drag.teleport));}
   function loadScenery(){for(const name of ['pine','oak','cherry','mountain','rocks']){if(sceneryImages.has(name))continue;const img=new Image();sceneryImages.set(name,img);img.onload=()=>{if(view?.el.isConnected){view.terrainStamp=null;view.cameraDirty=true;}};img.src=`${context.base}/assets/art/map/scenery-${name}.png?v=fantasy3d1`;}}
-  const TILE = 44, MIN_ZOOM = .65, MOBILE_MIN_ZOOM = .45, MAX_ZOOM = 1.8;
+  const TILE = 44, MIN_ZOOM = .4, MOBILE_MIN_ZOOM = .25, MAX_ZOOM = 1.8;
   // Use the short screen edge so phones retain their overview in landscape.
   const minZoom = () => Math.min(window.innerWidth,window.innerHeight)<=600 ? MOBILE_MIN_ZOOM : MIN_ZOOM;
   const mapProfile=()=>context?.state.world?.map_profile||{key:'legacy',width:256,height:256};

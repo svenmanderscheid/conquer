@@ -8,6 +8,12 @@ Beim ersten Start meldete Capacitor 8.5.2 einmal `Error injecting safe area CSS:
 
 ## Architektur und Grenzen
 
+### Aktualisierter Android-Build (4. Oktober 2026)
+
+Der aktuelle Projektstand wurde mit synchronisierter Fehlerseite und den aktuellen Android-Ressourcen einschließlich des freigegebenen Launcher-Icons als `0.1.2-prototype` (Versionscode 3) gebaut. Datei: `artifacts/android/Union-of-Kingdoms-0.1.2-prototype.apk`. `assembleDebug --offline` und die APK-Signaturprüfung bestanden. SHA-256: `d06c44f71c5d70e7fdb461435af8a085cca2abc1af071de95370c2b2015884d8`.
+
+Beim Build war kein USB-Gerät verbunden; Installation und Geräteprüfung dieses Builds stehen aus. Die APK lädt weiterhin den HTTPS-Spielserver. Lokale Änderungen am eigentlichen Spiel benötigen zusätzlich ein Serverdeployment.
+
 ### Freigegebenes App-Icon (4. Oktober 2026)
 
 Das freigegebene Motiv zeigt Magdar beim Angriff auf den Guardian, Feuerbogenschützin und Schattenreiter vor dem Congress, mit violetter Boss-Aura. Die Quelle liegt unter `assets/art/app-icon/union-of-kingdoms-boss-attack-v2-aura.png`. `tools/build-brand-icons.cjs` exportiert daraus Web-/PWA-, Apple-Touch- und Android-Launcher-Symbole. Die maskierbare Fassung setzt das vollständige Motiv mit Sicherheitsrand auf Violett. Android verwendet `drawable-nodpi/uok_launcher.png`; auf bereits installierten Geräten erscheint die Änderung erst nach einem neuen APK-Build und einer Aktualisierung der App.
