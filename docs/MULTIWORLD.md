@@ -13,6 +13,9 @@ atomic under the shared player lock. Duplicate requests return receipts;
 replaying an old selection cannot undo a subsequent selection. An old browser
 tab must send its original world with `X-World-ID` or `expected_world_id` so the
 request guard can reject stale actions with HTTP 409.
+After selection, the app replaces the selector page with the selected village.
+This avoids adding another selector document to mobile Back history; older
+commands still retain their original expected world and cannot write into it.
 
 Each account can create exactly one village in one world. A person may register
 a separate account for another village. Existing multiworld villages remain

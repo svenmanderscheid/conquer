@@ -31,8 +31,8 @@ const root=path.resolve(__dirname,'..'),output=path.join(root,'artifacts','vip-w
   const page=await browser.newPage({viewport:{width:390,height:844},hasTouch:true}),errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto(base+'/?zugang=login');await page.locator('[name=identifier], [name=username]').first().fill('PreviewPlayer');await page.locator('[name=password]').fill('PreviewFixture!2026');
   await Promise.all([page.waitForURL('**/city'),page.locator('form[action$="/auth/local"] button[type=submit]').click()]);
-  const ready=async()=>{await page.locator('.painted-village-scene').waitFor();await page.waitForFunction(()=>!document.querySelector('.scene-transition.is-active')&&!document.querySelector('#app-start'));};
-  const close=async()=>{for(let n=0;n<5;n++){const dialog=await page.locator('#game-dialog[open]').count()?'#game-dialog[open]':'#panel-dialog[open]';const back=page.locator(dialog+' .dialog-close:visible,'+dialog+' .panel-close:visible,'+dialog+' .mobile-page-back:visible').first();if(!await back.count())break;await back.tap();await page.waitForFunction(selector=>!document.querySelector(selector),dialog);}};
+  const ready=async()=>{await page.locator('.painted-village-scene').waitFor();await page.waitForFunction(()=>!document.querySelector('.scene-transition.is-active')&&!document.querySelector('#app-start')&&Number(document.querySelector('#hud-vip-button [data-vip-level]')?.textContent)>0);};
+  const close=async()=>{for(let n=0;n<5;n++){const dialog=await page.locator('#game-dialog[open]').count()?'#game-dialog[open]':'#panel-dialog[open]';const back=page.locator(dialog+' .dialog-close:visible,'+dialog+' .panel-close:visible,'+dialog+' .mobile-page-back:visible').first();if(!await back.count())break;const overlay=await page.evaluate(()=>history.state?.conquerMobilePage?.overlay);await back.tap();await page.waitForFunction(({dialog,overlay})=>!document.querySelector(dialog)&&!document.querySelector('.scene-transition.is-active')&&(overlay!=='dialog'||history.state?.conquerMobilePage?.overlay!=='dialog'),{dialog,overlay});await ready();}};
   const state=async()=> (await (await page.request.get(base+'/api/kingdom/state')).json()).data;
   const worlds=async()=>{await close();await page.locator('#hud-menu').tap();await page.locator('#game-dialog [data-action=dialog-tab][data-id=worlds]').tap();await page.locator('.world-selector').waitFor();};
   await ready();await close();
@@ -49,7 +49,7 @@ const root=path.resolve(__dirname,'..'),output=path.join(root,'artifacts','vip-w
   await page.locator('[data-action=vip-item][data-id="10206002"]:not([disabled])').waitFor();
   snapshot=await state();assert.equal(snapshot.vip.points,2010);assert.equal(snapshot.inventory.find(i=>i.item_code===10206002).quantity,1);
   await worlds();assert(await page.locator('[data-action=worlds-select][data-world="3"]').isDisabled());
-  await Promise.all([page.waitForURL('**/city#worlds'),page.locator('[data-action=worlds-select][data-world="2"]').tap()]);await ready();
+  await Promise.all([page.waitForURL('**/city#city'),page.locator('[data-action=worlds-select][data-world="2"]').tap()]);await ready();
   snapshot=await state();assert.equal(snapshot.vip.world_id,2);assert.equal(snapshot.vip.points,200);assert.equal(snapshot.vip.daily_claimed,false);assert(!snapshot.inventory.some(i=>i.item_code===10206002));
   await close();await page.locator('#hud-vip-button').tap();await page.locator('.vip-note').waitFor();assert.equal(await page.locator('#hud-vip-button [data-vip-level]').textContent(),'1');
   responsePromise=page.waitForResponse(r=>r.url().endsWith('/api/kingdom/action')&&r.request().postDataJSON()?.action==='vip.daily');
@@ -71,7 +71,7 @@ const root=path.resolve(__dirname,'..'),output=path.join(root,'artifacts','vip-w
    }
   }
   await close();await page.evaluate(()=>ConquerLocale.setLocale('en'));await ready();await worlds();
-  await Promise.all([page.waitForNavigation({waitUntil:'domcontentloaded'}),page.locator('[data-action=worlds-select][data-world="1"]').tap()]);await ready();snapshot=await state();assert.equal(snapshot.vip.points,2010);assert.equal(snapshot.vip.daily_claimed,true);assert.equal(snapshot.inventory.find(i=>i.item_code===10206002).quantity,1);
+  await Promise.all([page.waitForURL('**/city#city'),page.locator('[data-action=worlds-select][data-world="1"]').tap()]);await ready();snapshot=await state();assert.equal(snapshot.vip.points,2010);assert.equal(snapshot.vip.daily_claimed,true);assert.equal(snapshot.inventory.find(i=>i.item_code===10206002).quantity,1);
   assert.deepEqual(errors,[]);console.log('PASS main-app world VIP isolation, daily claims, item use, legacy selection, denied extra village, EN/DE/FR and desktop/portrait/landscape.');
  }finally{if(browser)await browser.close();fixture.stdin.write('\n');await new Promise(resolve=>{const timer=setTimeout(()=>{fixture.kill();resolve();},10000);fixture.once('exit',()=>{clearTimeout(timer);resolve();});});}
 })().catch(error=>{console.error(error);process.exitCode=1;});
