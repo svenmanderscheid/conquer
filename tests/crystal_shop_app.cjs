@@ -31,14 +31,49 @@ const root=path.resolve(__dirname,'..'),output=path.join(root,'artifacts/crystal
   const replayState=await state();assert.equal(replayState.profile.gems,after.profile.gems);assert.equal(quantity(replayState),quantity(after));
   const denied=await page.request.post(base+'/api/kingdom/action',{data:{...payload,request_id:'crystal-no-csrf-0001'}});assert.equal(denied.status(),403);
   const anonymous=await browser.newContext();assert.equal((await anonymous.request.post(base+'/api/kingdom/action',{data:payload})).status(),401);await anonymous.close();
+  const vipFilter=()=>page.locator('[data-action=trading-crystal-category][data-id=vip_point]');
+  await vipFilter().scrollIntoViewIfNeeded();await vipFilter().tap();
+  const vipOffers=before.trading.crystals.offers.filter(o=>o.item.category==='vip_point');
+  assert.deepEqual(vipOffers.map(o=>o.item.vip_points),[10,100,500,1000,10000]);
+  assert.equal(await page.locator('.trading-card').count(),5);assert.equal(await vipFilter().getAttribute('aria-pressed'),'true');
+  assert.equal(await page.locator('.trading-summary p').innerText(),'1 VIP Point costs 1 Crystal.');
+  const vipOffer=vipOffers.find(o=>o.item.vip_points===1000),vipBefore=await state();
+  const vipResponsePromise=page.waitForResponse(r=>r.url().endsWith('/api/kingdom/action')&&r.request().postDataJSON()?.action==='crystal.buy');
+  await page.locator('[data-action=trading-buy][data-id="'+vipOffer.id+'"]').tap();const vipResponse=await vipResponsePromise,vipPurchase=await vipResponse.json();assert.equal(vipPurchase.ok,true);assert.equal(vipPurchase.data.message,'1 × 1000 VIP Points added to your inventory.');
+  const vipAfter=await state(),vipQuantity=s=>Number(s.inventory.find(i=>Number(i.item_code)===vipOffer.item_code)?.quantity||0);
+  assert.equal(vipBefore.profile.gems-vipAfter.profile.gems,1000);assert.equal(vipQuantity(vipAfter)-vipQuantity(vipBefore),1);assert.equal(vipAfter.vip.points,vipBefore.vip.points);
+  assert.equal(await vipFilter().getAttribute('aria-pressed'),'true');assert.equal(await page.locator('.trading-card').count(),5);
+  const vipPayload=vipResponse.request().postDataJSON();
+  const vipReplay=await page.request.post(base+'/api/kingdom/action',{data:vipPayload,headers:{'X-CSRF-Token':headers['x-csrf-token'],'X-World-ID':'1'}});assert.equal((await vipReplay.json()).data.result.duplicate,true);
+  const vipReplayState=await state();assert.equal(vipReplayState.profile.gems,vipAfter.profile.gems);assert.equal(vipQuantity(vipReplayState),vipQuantity(vipAfter));
+  assert(await page.locator('[data-action=trading-buy][data-id="crystal-10206004"]').isDisabled(),'10,000-point pack requires its full Crystal price');
   fs.mkdirSync(output,{recursive:true});
-  for(const [width,height]of [[390,844],[568,320],[1280,800]]){
+  for(const locale of ['en','de','fr']){
+   if(locale!=='en'){
+    await Promise.all([page.waitForNavigation({waitUntil:'domcontentloaded'}),page.evaluate(value=>ConquerLocale.setLocale(value),locale)]);
+    await page.locator('.painted-village-scene').waitFor();await page.waitForFunction(()=>!document.querySelector('.scene-transition.is-active'));
+    if(!await page.locator('#panel-dialog[open][data-panel=market]').count())await page.locator('#navigation [data-action=shop-open]').tap();
+    await page.locator('[data-action=trading-tab][data-id=crystals]').tap();
+    await vipFilter().scrollIntoViewIfNeeded();await vipFilter().tap();
+   }
+   for(const [width,height]of [[390,844],[320,568],[568,320],[1280,800]]){
    await page.setViewportSize({width,height});await page.locator('.trading-scroll').evaluate(e=>e.scrollTop=0);
    assert.equal(await page.locator('.trading-scroll').evaluate(e=>getComputedStyle(e).scrollbarWidth),'none');
+   assert.equal(await page.locator('.trading-card').count(),5);
+   for(const offer of vipOffers){
+    const buy=page.locator('[data-action=trading-buy][data-id="'+offer.id+'"]'),card=buy.locator('xpath=ancestor::article');
+    const expected=await page.evaluate(({points})=>({name:ConquerLocale.t('crystal_shop.vip_pack',{points:ConquerLocale.formatNumber(points)}),price:ConquerLocale.formatNumber(points)}),{points:offer.item.vip_points});
+    const spaces=value=>value.replace(/\s/gu,' ');
+    assert.equal(spaces(await card.locator('h3').innerText()),spaces(expected.name));assert.equal(spaces(await buy.locator('.trading-price strong').innerText()),spaces(expected.price));
+    assert.equal(await card.locator('img').first().evaluate(async i=>{i.loading='eager';await i.decode();return i.naturalWidth>0;}),true);
+   }
    const last=page.locator('.trading-buy').last();await last.scrollIntoViewIfNeeded();assert(await last.evaluate(b=>{const r=b.getBoundingClientRect(),hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return b===hit||b.contains(hit);}));
-   await page.locator('.trading-scroll').evaluate(e=>e.scrollTop=0);await page.screenshot({path:path.join(output,width+'x'+height+'-app.png')});
+   await vipFilter().scrollIntoViewIfNeeded();assert(await vipFilter().evaluate(b=>{const r=b.getBoundingClientRect();return r.height>=44&&r.left>=0&&r.right<=innerWidth+1;}));
+   assert(await page.locator('#panel-dialog').evaluate(d=>d.scrollWidth<=d.clientWidth+1));
+   await page.locator('.trading-scroll').evaluate(e=>e.scrollTop=0);await page.screenshot({path:path.join(output,width+'x'+height+'-'+locale+'-vip-app.png')});
+   }
   }
-  assert.deepEqual(errors,[]);console.log('PASS Crystal Shop main app: base VIP purchase without Trading Post, real currency/inventory, replay, CSRF/auth and three viewport sizes.');
+  assert.deepEqual(errors,[]);console.log('PASS Crystal Shop main app: VIP packs and exact prices, inventory purchase, replay, CSRF/auth, EN/DE/FR and four viewport sizes.');
  }finally{
   if(browser)await browser.close();fixture.stdin.end('\n');await new Promise(resolve=>{if(fixture.exitCode!==null)return resolve();fixture.once('exit',resolve);});
  }

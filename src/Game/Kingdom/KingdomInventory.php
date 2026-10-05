@@ -50,7 +50,10 @@ final class KingdomInventory
         $cost=$price*$quantity;
         KingdomService::require($db->execute('UPDATE players SET gems=gems-? WHERE id=? AND gems>=?',[$cost,$playerId,$cost])===1,'Du hast nicht genügend Edelsteine.');
         InventoryService::addItems($playerId,$code,$quantity);
-        $result=['message'=>$quantity.' × '.$item['name'].' wurde deinem Inventar hinzugefügt.','item_code'=>$code,'quantity'=>$quantity,'cost_gems'=>$cost];
+        $message=$crystalShop&&$item['category']==='vip_point'
+            ? \Conquer\Game\Locale::t('crystal_shop.vip_purchased',['quantity'=>$quantity,'points'=>$item['vip_points']])
+            : $quantity.' × '.$item['name'].' wurde deinem Inventar hinzugefügt.';
+        $result=['message'=>$message,'item_code'=>$code,'quantity'=>$quantity,'cost_gems'=>$cost];
         $db->execute("INSERT INTO world_operations(player_id,session_id,request_id,payload_hash,action,world_id,result_json)VALUES(?,0,?,?,?,?,?)",[$playerId,$request,$hash,$purchaseAction,$world,json_encode($result,JSON_THROW_ON_ERROR)]);
         return $result+['duplicate'=>false];
     }

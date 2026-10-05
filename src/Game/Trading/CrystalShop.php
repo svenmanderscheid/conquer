@@ -13,7 +13,7 @@ final class CrystalShop
         $offers=[];
         foreach($catalog['offers'] as $row){
             $item=InventoryService::getItemDef((int)$row['item_code']);
-            if(!$item || ($item['is_usable']??true)===false || !in_array($item['category'],['resource_pack','speedup','teleport','boost'],true) || ($item['resource']??'')==='gems' || !is_int($row['price_crystals']) || $row['price_crystals']<=0)throw new \RuntimeException('Invalid Crystal Shop catalogue.');
+            if(!$item || ($item['is_usable']??true)===false || !in_array($item['category'],['resource_pack','speedup','teleport','boost','vip_point'],true) || ($item['resource']??'')==='gems' || !is_int($row['price_crystals']) || $row['price_crystals']<=0)throw new \RuntimeException('Invalid Crystal Shop catalogue.');
             $offers[]=['id'=>'crystal-'.$item['code'],'item_code'=>$item['code'],'item'=>$item,'quantity'=>1,'price'=>['resource'=>'gems','amount'=>$row['price_crystals']],'remaining'=>100,'limit'=>100,'locked'=>false];
         }
         return $offers;

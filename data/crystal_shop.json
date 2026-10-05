@@ -212,6 +212,26 @@
     {
       "item_code": 10208003,
       "price_crystals": 1000
+    },
+    {
+      "item_code": 10206001,
+      "price_crystals": 10
+    },
+    {
+      "item_code": 10106001,
+      "price_crystals": 100
+    },
+    {
+      "item_code": 10106002,
+      "price_crystals": 500
+    },
+    {
+      "item_code": 10206002,
+      "price_crystals": 1000
+    },
+    {
+      "item_code": 10206004,
+      "price_crystals": 10000
     }
   ]
 }
