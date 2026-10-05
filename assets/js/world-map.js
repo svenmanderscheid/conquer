@@ -100,7 +100,7 @@ window.ConquerWorld = (() => {
   const stamp = t => {const value=String(t||'');return Date.parse(value.includes('T')?value:value.replace(' ','T')+'Z');};
   const escape = value => context.esc(String(value??''));
   const asset = name => `${context.base}/assets/art/map/${name.includes('.')?name:name+'.svg'}`;
-  const troopAsset = role => `${context.base}/assets/art/characters/fantasy-troops-v2/${role}-thumb.webp`;
+  const troopAsset = role => `${context.base}/assets/art/characters/fantasy-troops-v3/${role}-thumb.webp`;
   const motionPreference=matchMedia('(prefers-reduced-motion: reduce)');
   const graphicsQuality=()=>document.body.dataset.graphicsQuality||'normal';
   const graphicsLight=()=>graphicsQuality()==='light';
@@ -271,7 +271,7 @@ window.ConquerWorld = (() => {
     for(const p of state.neutral_villages||[])targets.push({key:`neutral_villages:${p.id}`,kind:'neutral_villages',id:p.id,x:number(p.coord_x),y:number(p.coord_y),name:p.name||'Freies Dorf',level:number(p.level)||1,art:`${context.base}/assets/art/map/castle-default.png`,data:p});
     if(!isLux()&&state.congress){const g=state.congress;targets.push({key:"congress",kind:"congress",id:g.id,x:number(g.coord_x),y:number(g.coord_y),name:g.name||"Kongress",level:1,art:`${context.base}/assets/art/territory-v3/congress-forum.webp`,data:g});}
     for(const g of (isLux()?[]:state.shrines)||[]){const element=shrineElement(g);if(!shrineElements[element]||!Number.isFinite(Number(g.coord_x))||!Number.isFinite(Number(g.coord_y)))continue;targets.push({key:`shrine:${g.id}`,kind:'shrine',id:g.id,element,x:number(g.coord_x),y:number(g.coord_y),name:g.name||`${shrineElements[element].label}schrein`,art:`${context.base}/assets/art/map/painted-v2/shrine-${element}.${motionPreference.matches||document.body.classList.contains('reduced-motion')?'png':'webp'}?v=shrines1`,data:g});}
-    for(const g of state.alliance_structures||[]){const kind=g.structure_type==='center'?'alliance_center':'outpost';targets.push({key:`${kind}:${g.id}`,kind,id:g.id,x:number(g.coord_x),y:number(g.coord_y),name:g.name||(`${g.alliance_tag?'['+g.alliance_tag+'] ':''}${kind==='alliance_center'?'Allianzzentrum':'Außenposten'}`),level:1,art:asset(kind==='alliance_center'?'alliance-center-v3.webp':'alliance-outpost'),data:g});}
+    for(const g of state.alliance_structures||[]){const kind=g.structure_type==='center'?'alliance_center':'outpost';targets.push({key:`${kind}:${g.id}`,kind,id:g.id,x:number(g.coord_x),y:number(g.coord_y),name:g.name||(`${g.alliance_tag?'['+g.alliance_tag+'] ':''}${kind==='alliance_center'?'Allianzzentrum':'Außenposten'}`),level:1,art:asset(kind==='alliance_center'?'painted-v2/alliance-center.webp':'alliance-outpost'),data:g});}
     for(const g of state.territory?.map_targets||state.territory?.targets||[]){targets.push({key:`territory:${g.id}`,kind:'territory',id:g.id,x:number(g.x??g.coord_x),y:number(g.y??g.coord_y),name:g.name,level:1,art:window.ConquerTerritoryArt.image(context.base,g),artKey:window.ConquerTerritoryArt.key(g),data:g});}
     for(const target of targets){const [x,y]=targetCenter(target);target.biome=window.ConquerLandscape.biomeAt(x,y);}
     return targets;

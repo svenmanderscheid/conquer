@@ -5,7 +5,7 @@ $scriptPath=parse_url((string)($_SERVER['SCRIPT_NAME']??'/manifest.php'),PHP_URL
 $base=defined('APP_BASE')?(string)APP_BASE:rtrim(str_replace('\\','/',dirname(is_string($scriptPath)?$scriptPath:'/manifest.php')),'/.');
 if($base!==''&&!preg_match('#^/(?:[A-Za-z0-9._~%+-]+/?)+$#D',$base))$base='';
 $root=$base.'/';
-$iconVersion='20261004-rally';
+$iconVersion='20261005-art-fixes';
 header('Content-Type: application/manifest+json; charset=utf-8');
 // Browsers cache Web App Manifests aggressively. Revalidate every request so
 // branding changes reach the install prompt without waiting for an old TTL.

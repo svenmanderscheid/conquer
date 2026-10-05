@@ -34,7 +34,7 @@ const root=path.resolve(__dirname,'..'),out=path.resolve(process.env.MARCH_OUTPU
   const expectedTiers=Array.from({length:5},(_,i)=>5-i).flatMap(t=>[t,t,t]);
   const roster=await page.locator('.march-portrait').evaluateAll(async portraits=>{await Promise.all(portraits.map(el=>el.querySelector('img').decode()));return portraits.map(el=>({tier:+el.dataset.troopTier,color:getComputedStyle(el).borderTopColor,style:getComputedStyle(el).borderTopStyle,shadow:getComputedStyle(el).boxShadow,src:el.querySelector('img').getAttribute('src')}));});
   assert.deepEqual(roster.map(r=>r.tier),expectedTiers);
-  for(const item of roster){const hex=palette[item.tier-1].color;const rgb=hex.slice(1).match(/../g).map(v=>parseInt(v,16));assert.equal(item.color,`rgb(${rgb.join(', ')})`);assert(item.src.includes('/fantasy-troops-v2/'));if(item.tier===9)assert.equal(item.style,'double');if(item.tier===10)assert(item.shadow.includes('131, 141, 155'));}
+  for(const item of roster){const hex=palette[item.tier-1].color;const rgb=hex.slice(1).match(/../g).map(v=>parseInt(v,16));assert.equal(item.color,`rgb(${rgb.join(', ')})`);assert(item.src.includes('/fantasy-troops-v3/'));if(item.tier===9)assert.equal(item.style,'double');if(item.tier===10)assert(item.shadow.includes('131, 141, 155'));}
   for(const [width,height]of [[1580,883],[1280,800],[768,1024],[390,844],[320,568],[844,390],[568,320]]){
    await page.setViewportSize({width,height});
    const list=page.locator('.march-unit-list'),inputs=page.locator('.march-unit-amount input');

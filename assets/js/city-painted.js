@@ -8,7 +8,7 @@ window.ConquerPaintedCity=(()=>{
  const terrainFrame={x:106,y:99,width:1229,height:819};
  // Each approved site has four registered poses in one lightweight atlas.
  // A discrete frame change never blends duplicate buildings or scaffolds.
- const constructionAtlases={"castle":[384,373,"a731439a7968"],"academy":[384,367,"b61e0fd018dc"],"treasure_house":[384,370,"5e92d1eb03e8"],"hospital":[384,344,"d41b82889c22"],"hall_of_alliance":[384,350,"1cb6fc3cc6c5"],"trading_post":[384,329,"3265c26c88d7"],"storage":[384,376,"49d78d22bd5f"],"watch_tower":[324,384,"381af0f126a1"],"stable":[384,327,"bf2916f97cf5"],"archery_range":[384,323,"98110e9be806"],"barrack":[384,368,"10d1d87663e9"],"farm":[384,335,"ea0473d1bd6f"],"lumber_camp":[384,364,"329b95750c39"],"gold_mine":[384,320,"a56238f87933"],"quarry":[384,297,"caded5832281"],"wall":[377,384,"81827528d31c"]};
+ const constructionAtlases={"castle":[384,373,"a731439a7968"],"academy":[384,367,"b61e0fd018dc"],"treasure_house":[384,370,"5e92d1eb03e8"],"hospital":[384,344,"d41b82889c22"],"hall_of_alliance":[384,350,"1cb6fc3cc6c5"],"trading_post":[384,329,"3265c26c88d7"],"storage":[384,376,"49d78d22bd5f"],"watch_tower":[324,384,"381af0f126a1"],"stable":[384,327,"bf2916f97cf5"],"archery_range":[384,323,"98110e9be806"],"barrack":[384,368,"10d1d87663e9"],"farm":[384,335,"ea0473d1bd6f"],"lumber_camp":[384,364,"392a8af688d2"],"gold_mine":[384,320,"a56238f87933"],"quarry":[384,297,"caded5832281"],"wall":[377,384,"81827528d31c"]};
  function constructionArtwork(base,code){
   const [width,height,version]=constructionAtlases[code],id='painted-construction-'+code;
   const src=`${base}/assets/art/city-construction-v1/${code}.webp?v=${version}`.replaceAll('&','&amp;').replaceAll('"','&quot;');
@@ -28,7 +28,7 @@ window.ConquerPaintedCity=(()=>{
   return definition?.training_building||({1:'barrack',2:'archery_range',3:'stable'}[Number(job.barrack_slot)]??'barrack');
  };
  const completionKinds={train_complete:'training',research_complete:'research',heal_complete:'healing',build_complete:'building'};
- const readyIcons={training:'menu-icons/army.png',research:'menu-icons/research.png',healing:'items/healing.svg',building:'items/builders-hammer.png',chest:'items/daily-chest-gold-v1.png'};
+ const readyIcons={training:'menu-icons-v2/army.png',research:'menu-icons-v2/research.png',healing:'items/healing.svg',building:'items/builders-hammer.png',chest:'items/daily-chest-gold-v1.png'};
  // Only confirmed server events can produce a completion marker. An expired
  // countdown still belongs to the running queue until the server settles it.
  function readiness({state,kingdom}){

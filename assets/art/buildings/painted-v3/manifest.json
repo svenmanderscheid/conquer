@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-05",
+  "purpose": "Reuse exact approved city sprites in dialogs, requirements and quests.",
+  "sourceDirectory": "assets/art/village-layered-v2/runtime",
+  "sourceMapping": {
+    "castle": "castle_rounded",
+    "academy": "academy_rounded",
+    "treasure_house": "treasure_house_rounded",
+    "hospital": "hospital_aligned",
+    "hall_of_alliance": "hall_of_alliance_aligned",
+    "trading_post": "trading_post",
+    "storage": "storage",
+    "watch_tower": "watch_tower",
+    "stable": "stable_aligned",
+    "archery_range": "archery_range_aligned",
+    "barrack": "barrack_aligned",
+    "farm": "farm",
+    "lumber_camp": "lumber_camp",
+    "gold_mine": "gold_mine",
+    "quarry": "quarry"
+  },
+  "wall": {
+    "generator": "built-in image_gen",
+    "source": "exec-f1260eda-afc5-43e6-a9ea-60cae5d808d8.png",
+    "prompt": "Finished L-shaped ivory city wall, blue gate tower and blue/gold banners; exact approved rounded castle style; no workers, scaffolding, tools or text; transparent."
+  }
+}

@@ -102,7 +102,7 @@ for(const [objectType,file] of [[1,'farm-v8'],[2,'lumber-v8'],[3,'quarry-v8'],[4
  await page.waitForFunction(()=>[...document.querySelectorAll('.march-target-art img,.march-portrait img,.march-selected-card img')].every(i=>i.complete&&i.naturalWidth>0));
  check('Painted resource '+file,()=>{});
  assert.match(await page.locator('.march-target-art img').getAttribute('src'),new RegExp('world-'+file+'\\.png$'));
- assert((await page.locator('.march-portrait img').first().getAttribute('src')).includes('fantasy-troops-v2/'));
+ assert((await page.locator('.march-portrait img').first().getAttribute('src')).includes('fantasy-troops-v3/'));
 }
 for(const id of ['orc','skeleton','golem','treasure-goblin','green-dragon','red-dragon','gold-dragon','magdar','frostgrimm']){
  await page.evaluate(id=>{state.monsters[0].definition.art='monsters/'+id;state.monsters[0].definition.name=id;openMarch('monster-rally');},id);
@@ -167,7 +167,7 @@ for(const viewport of [{width:1280,height:800},{width:390,height:844},{width:320
  },assetBase);
  await page.waitForFunction(()=>[...document.querySelectorAll('.monster-report img')].every(i=>i.complete&&i.naturalWidth>0));
  assert((await page.locator('.cr-identity.defender img').getAttribute('src')).includes('bright-v2/orc.png'));
- assert.equal(await page.locator('img[src*="fantasy-troops-v2"]').count(),9);
+ assert.equal(await page.locator('img[src*="fantasy-troops-v3"]').count(),9);
  assert(await page.locator('.combat-report').evaluate(el=>el.scrollWidth<=el.clientWidth+1),'Report has no horizontal overflow');
  await page.screenshot({path:path.join(out,`updated-report-${viewport.width}.png`)});
 }

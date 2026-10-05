@@ -28,6 +28,6 @@ $extra+=['enabled'=>false,'name_en'=>'','name_de'=>'','name_fr'=>'','description
     <label><?= Locale::html('extra_event.icon') ?><select name="icon"><?php foreach(ExtraEventButton::ICONS as $icon): ?><option value="<?= ah($icon) ?>" <?= $extra['icon']===$icon?'selected':'' ?>><?= Locale::html('nav.'.($icon==='world-map'?'world':($icon==='quests'?'quests':$icon))) ?></option><?php endforeach ?></select></label>
     <label><?= Locale::html('extra_event.target') ?><select name="target"><?php foreach(ExtraEventButton::TARGETS as $target): ?><option value="<?= ah($target) ?>" <?= $extra['target']===$target?'selected':'' ?>><?= Locale::html('nav.'.$target) ?></option><?php endforeach ?></select></label>
   </div>
-  <div class="extra-event-preview"><img src="<?= htmlspecialchars(APP_BASE,ENT_QUOTES) ?>/assets/art/menu-icons/<?= ah($extra['icon']) ?>.png" width="44" height="44" alt=""><strong><?= ah($extra['name_en']) ?></strong></div>
+  <div class="extra-event-preview"><img src="<?= htmlspecialchars(APP_BASE,ENT_QUOTES) ?>/assets/art/menu-icons-v2/<?= ah($extra['icon']) ?>.png" width="44" height="44" alt=""><strong><?= ah($extra['name_en']) ?></strong></div>
   <?php adminSubmit(Locale::t('extra_event.save')); ?>
 </section>

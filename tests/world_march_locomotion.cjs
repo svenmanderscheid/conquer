@@ -92,8 +92,8 @@ const contentType=file=>file.endsWith('.js')?'text/javascript':file.endsWith('.c
     assert(new Set(samples.actor).size>4,`${viewport.name}/${id}: authoritative march transform did not advance`);
     if(id!=='default'){
      assert.equal(state.articulated,true,`${viewport.name}/${id}: articulated motion marker missing`);
-     if(['phoenix','dragon'].includes(id))assert.match(state.source,/flight-(phoenix|dragon)\.webp/,`${viewport.name}/${id}: moving flight sprite not loaded`);
-     else assert.match(state.source,new RegExp(`animated-march-${id}\\.webp`),`${viewport.name}/${id}: articulated gait not loaded`);
+     if(['phoenix','dragon'].includes(id))assert.match(state.source,/flight-(phoenix|dragon)-v3\.webp/,`${viewport.name}/${id}: moving flight sprite not loaded`);
+     else assert.match(state.source,new RegExp(`animated-march-${id}${id==='tempest'?'-v3':''}\\.webp`),`${viewport.name}/${id}: articulated gait not loaded`);
      assert.equal(state.animationName,'none',`${viewport.name}/${id}: animated sprite must not also receive a CSS body transform`);
      continue;
     }
@@ -112,9 +112,9 @@ const contentType=file=>file.endsWith('.js')?'text/javascript':file.endsWith('.c
     assert.equal(reduced[id].animationName,'none',`${viewport.name}/${id}: system reduced motion leaves an animation running`);
     assert.equal(reduced[id].trailDisplay,'none',`${viewport.name}/${id}: system reduced motion leaves the wake visible`);
    }
-   assert.match(reduced.phoenix.source,/flight-phoenix\.png/,`${viewport.name}: phoenix reduced-motion still image missing`);
-   assert.match(reduced.dragon.source,/flight-dragon\.png/,`${viewport.name}: dragon reduced-motion still image missing`);
-   for(const id of Object.keys(premium).filter(id=>!['phoenix','dragon'].includes(id)))assert.match(reduced[id].source,new RegExp(`march-${id}\\.webp`),`${viewport.name}/${id}: reduced motion must use the static fallback`);
+   assert.match(reduced.phoenix.source,/flight-phoenix-v3\.png/,`${viewport.name}: phoenix reduced-motion still image missing`);
+   assert.match(reduced.dragon.source,/flight-dragon-v3\.png/,`${viewport.name}: dragon reduced-motion still image missing`);
+   for(const id of Object.keys(premium).filter(id=>!['phoenix','dragon'].includes(id)))assert.match(reduced[id].source,new RegExp(`march-${id}${id==='tempest'?'-v3':''}\\.webp`),`${viewport.name}/${id}: reduced motion must use the static fallback`);
 
    if(viewport.name==='desktop'){
     await page.emulateMedia({reducedMotion:'no-preference'});

@@ -13,7 +13,7 @@ window.ConquerBugReports=function(ctx){
             return;
         }
         host.innerHTML=`<section class="panel bug-report-panel">
-          <div class="bug-report-intro"><span class="bug-report-mark" aria-hidden="true"><img src="${ctx.base}/assets/art/menu-icons/bug-report.png" alt=""></span><div><h2>Bug oder Idee melden</h2><p data-i18n="bugreport.intro">${escapeHtml(window.ConquerLocale.t('bugreport.intro'))}</p></div></div>
+          <div class="bug-report-intro"><span class="bug-report-mark" aria-hidden="true"><img src="${ctx.base}/assets/art/menu-icons-v2/bug-report.png" alt=""></span><div><h2>Bug oder Idee melden</h2><p data-i18n="bugreport.intro">${escapeHtml(window.ConquerLocale.t('bugreport.intro'))}</p></div></div>
           <form data-form="bug-report">
             <div class="bug-report-fields">
               <label for="bug-type">Meldungsart<select id="bug-type" name="report_type" required><option value="bug">Bug</option><option value="idea">Idee / Vorschlag</option></select></label>

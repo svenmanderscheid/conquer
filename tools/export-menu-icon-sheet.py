@@ -2,19 +2,28 @@
 
 from collections import deque
 from pathlib import Path
+import argparse
+import shutil
 
 from PIL import Image
 
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "assets" / "art" / "menu-icons" / "menu-icon-concepts.png"
-OUTPUT = SOURCE.parent
+OUTPUT = SOURCE.parent.parent / "menu-icons-v2"
+CORRECTED = ["army", "inventory", "quests", "settings", "menu", "arena", "profile"]
 NAMES = [
     "profile", "quests", "army", "research", "inventory",
     "treasures", "mastery", "market", "community", "defense",
     "events", "expeditions", "rankings", "arena", "worlds",
     "reports", "settings", "account", "help", "menu",
 ]
+# The painted sheet has an outer border and uneven row spacing. Dividing the
+# full bitmap into equal quarters clips the first-row bottoms and last-row tops.
+# These are the actual panel boundaries in the approved 1402 x 1122 source.
+SOURCE_SIZE = (1402, 1122)
+COLUMN_EDGES = (27, 286, 560, 835, 1110, 1378)
+ROW_EDGES = (32, 309, 561, 814, 1086)
 
 
 def is_sheet_background(pixel: tuple[int, int, int, int]) -> bool:
@@ -87,16 +96,27 @@ def keep_main_subject(image: Image.Image) -> Image.Image:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--only", nargs="*", choices=NAMES, default=CORRECTED,
+                        help="Re-export only these existing menu symbols.")
+    args = parser.parse_args()
     sheet = Image.open(SOURCE).convert("RGBA")
-    cell_width = sheet.width / 5
-    cell_height = sheet.height / 4
+    OUTPUT.mkdir(parents=True, exist_ok=True)
+    # Version the complete public set while preserving unaffected illustrations.
+    for existing in SOURCE.parent.glob("*.png"):
+        if existing != SOURCE:
+            shutil.copy2(existing, OUTPUT / existing.name)
+    if sheet.size != SOURCE_SIZE:
+        raise RuntimeError("Approved sheet size changed; review panel boundaries before export")
     for index, name in enumerate(NAMES):
+        if args.only and name not in args.only:
+            continue
         column, row = index % 5, index // 5
         box = (
-            round(column * cell_width + 11),
-            round(row * cell_height + 11),
-            round((column + 1) * cell_width - 11),
-            round((row + 1) * cell_height - 11),
+            COLUMN_EDGES[column] + 2,
+            ROW_EDGES[row] + 2,
+            COLUMN_EDGES[column + 1] - 2,
+            ROW_EDGES[row + 1] - 2,
         )
         icon = keep_main_subject(clear_connected_background(sheet.crop(box)))
         alpha_box = icon.getchannel("A").getbbox()

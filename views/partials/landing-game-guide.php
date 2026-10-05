@@ -18,7 +18,7 @@
       '10-alpha' => ['Be part of the beginning.', 'A guardian and archer welcoming players through the city gates', '#zugang', 'Register for closed alpha'],
     ] as $art => [$title, $description, $target, $link]): ?>
     <figure class="lp-campaign-card">
-      <?php $artVersion = 'v4'; ?>
+      <?php $artVersion = 'v5'; ?>
       <a href="<?= $target ?>"><img src="<?= $base ?>/assets/marketing/<?= $art === '01-build' ? 'kingdom-social-en-v5' : 'campaign-' . $art . '-' . $artVersion ?>.webp" width="1122" height="1402" loading="lazy" decoding="async" alt="<?= $description ?>"></a>
       <figcaption><h3><?= $title ?></h3><a href="<?= $target ?>"><?= $link ?> <span aria-hidden="true">→</span></a></figcaption>
     </figure>
@@ -45,9 +45,9 @@
   </div>
   <p class="lp-tier-status" data-tier-status role="status">Troop artwork · Tier 5 of 5</p>
   <div class="lp-guide-grid lp-troop-grid">
-    <article class="lp-guide-card"><img src="<?= $base ?>/assets/art/characters/fantasy-troops-v2/guardian-t5-ui.webp" width="512" height="512" loading="lazy" alt="The current infantry artwork: a guardian with a blue shield and hammer"><h3>Infantry</h3><p class="lp-guide-label">Barracks · T1–T5</p><p>Build the core of your army. Compare attack, defence, health and carrying capacity before choosing the troops for a march. The new guardian artwork gives infantry its shield-bearing identity.</p></article>
-    <article class="lp-guide-card"><img src="<?= $base ?>/assets/art/characters/fantasy-troops-v2/fire-archer-t5-ui.webp" width="512" height="512" loading="lazy" alt="The current archer artwork: a white-haired archer with a red hood and flaming arrow"><h3>Archers</h3><p class="lp-guide-label">Archery range · T1–T5</p><p>Develop your ranged troops alongside the rest of the army. The new fire-archer artwork brings a red hood, a crescent bow and a blazing arrow to the battlefield.</p></article>
-    <article class="lp-guide-card"><img src="<?= $base ?>/assets/art/characters/fantasy-troops-v2/shadow-rider-t5-ui.webp" width="512" height="512" loading="lazy" alt="The current cavalry artwork: a violet shadow rider on an antlered mount"><h3>Cavalry</h3><p class="lp-guide-label">Stable · T1–T5</p><p>Bring mounted troops into your formations. Consider march speed, carrying capacity and the strength needed at the destination. The shadow rider is the new cavalry appearance.</p></article>
+    <article class="lp-guide-card"><img src="<?= $base ?>/assets/art/characters/fantasy-troops-v3/guardian-ui.webp" width="512" height="512" loading="lazy" alt="The current infantry artwork: a guardian with a blue shield and hammer"><h3>Infantry</h3><p class="lp-guide-label">Barracks · T1–T5</p><p>Build the core of your army. Compare attack, defence, health and carrying capacity before choosing the troops for a march. The new guardian artwork gives infantry its shield-bearing identity.</p></article>
+    <article class="lp-guide-card"><img src="<?= $base ?>/assets/art/characters/fantasy-troops-v3/fire-archer-ui.webp" width="512" height="512" loading="lazy" alt="The current archer artwork: a white-haired archer with a red hood and flaming arrow"><h3>Archers</h3><p class="lp-guide-label">Archery range · T1–T5</p><p>Develop your ranged troops alongside the rest of the army. The new fire-archer artwork brings a red hood, a crescent bow and a blazing arrow to the battlefield.</p></article>
+    <article class="lp-guide-card"><img src="<?= $base ?>/assets/art/characters/fantasy-troops-v3/shadow-rider-ui.webp" width="512" height="512" loading="lazy" alt="The current cavalry artwork: a violet shadow rider on an antlered mount"><h3>Cavalry</h3><p class="lp-guide-label">Stable · T1–T5</p><p>Bring mounted troops into your formations. Consider march speed, carrying capacity and the strength needed at the destination. The shadow rider is the new cavalry appearance.</p></article>
   </div>
   <p class="lp-guide-note">Train, unlock higher tiers and promote eligible troops. Treat wounded units in the hospital and use suitable speedups on active orders.</p>
 </section>

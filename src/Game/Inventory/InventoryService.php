@@ -643,7 +643,7 @@ final class InventoryService
                     $item['icon']='reference/speedup-'.$role.'-v2.png';
                     $item['icon_framed']=false;
                 } elseif ($category==='ap_refill') {
-                    $item['icon']='reference/action-points.png';$item['icon_framed']=false;
+                    $item['icon']='reference/action-points-v2.png';$item['icon_framed']=false;
                 } elseif ($category==='vip_point') {
                     $item['icon']='reference/vip-points.png';$item['icon_framed']=false;
                 } elseif ($category==='fragment_pack' && ($item['subcategory']??'')==='dragon_egg') {

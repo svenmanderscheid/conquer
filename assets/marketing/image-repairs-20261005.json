@@ -1,0 +1,115 @@
+{
+  "tool": "built-in imagegen",
+  "date": "2026-10-05",
+  "posters": [
+    {
+      "id": "campaign-02-army-v5",
+      "source": "campaign-02-army-v4.webp",
+      "fix": "Change gold badge from '10 TIERS EACH' to exactly '5 TIERS EACH'. Correct mounted rider antlers: BOTH antlers must originate at the SAME dark mount's skull in front/left of rider face. Remove ALL antlers that grow behind/above the rider hood. Rider has no horns. Correct archer bow: two taut thin string segments join at arrow's rear nock in drawing hand left of bow; erase undrawn string close to bow grip. Keep pose/characters/theme; do not add details.",
+      "prompt": "Use case: precise-object-edit. First image is the poster edit target; second is corrected cavalry reference only. Change gold badge from '10 TIERS EACH' to exactly '5 TIERS EACH'. Correct mounted rider antlers: BOTH antlers must originate at the SAME dark mount's skull in front/left of rider face. Remove ALL antlers that grow behind/above the rider hood. Rider has no horns. Correct archer bow: two taut thin string segments join at arrow's rear nock in drawing hand left of bow; erase undrawn string close to bow grip. Keep pose/characters/theme; do not add details. Preserve composition, scenery, logo, poster border and ALL other text EXACTLY including 'UNION OF KINGDOMS', 'A new Era begins', 'Register for closed alpha', and 'www.unionofkingdoms.com'. Same warm bold outlined chibi illustrated style. Keep portrait ratio. No new text. Return single finished full poster.",
+      "generatedSource": "exec-d2239a08-fa27-497d-8607-74d5e6feffbf.png"
+    },
+    {
+      "id": "campaign-05-cavalry-v5",
+      "source": "campaign-05-cavalry-v4.webp",
+      "fix": "Correct mounted rider antlers. BOTH purple antlers must visibly originate at the SAME dark mount's skull above its ears in front/left of the rider's face. Remove the misplaced purple antler from behind/right of rider hood/quiver; restore background there. Rider has NO antlers or horns. Preserve mount body, four legs, saddle, rider cape and weapon. Match paired attachment anatomy of second reference, while preserving original poster pose.",
+      "prompt": "Use case: precise-object-edit. First image is the poster edit target; second is corrected cavalry reference only. Correct mounted rider antlers. BOTH purple antlers must visibly originate at the SAME dark mount's skull above its ears in front/left of the rider's face. Remove the misplaced purple antler from behind/right of rider hood/quiver; restore background there. Rider has NO antlers or horns. Preserve mount body, four legs, saddle, rider cape and weapon. Match paired attachment anatomy of second reference, while preserving original poster pose. Preserve composition, scenery, logo, poster border and ALL other text EXACTLY including 'UNION OF KINGDOMS', 'A new Era begins', 'Register for closed alpha', and 'www.unionofkingdoms.com'. Same warm bold outlined chibi illustrated style. Keep portrait ratio. No new text. Return single finished full poster.",
+      "generatedSource": "exec-41ae077f-2db7-4ffd-9a9c-05412cad6272.png"
+    },
+    {
+      "id": "campaign-04-archers-v5",
+      "source": "campaign-04-archers-v4.webp",
+      "fix": "Fix the bow mechanism only: remove the extra undrawn straight string next to bow. The single taut golden bowstring consists of TWO continuous segments from upper tip to rear arrow nock held by drawing fingers near left shoulder, then from that same nock to bottom tip. A clearly pulled sideways V. Both segments join at arrow's leftmost end, not the bow grip. Keep the original thin gold string, red hood and brown gold bow.",
+      "prompt": "Use case: precise-object-edit. Edit this existing Union of Kingdoms poster. Fix the bow mechanism only: remove the extra undrawn straight string next to bow. The single taut golden bowstring consists of TWO continuous segments from upper tip to rear arrow nock held by drawing fingers near left shoulder, then from that same nock to bottom tip. A clearly pulled sideways V. Both segments join at arrow's leftmost end, not the bow grip. Keep the original thin gold string, red hood and brown gold bow. Preserve the original scene, anatomy of all other characters, layout, colors and ALL written text EXACTLY, including logo 'UNION OF KINGDOMS', tagline 'A new Era begins', footer 'Register for closed alpha' and URL 'www.unionofkingdoms.com'. Same portrait dimensions and painted chibi style. No new text or extra characters. Return one complete corrected poster.",
+      "generatedSource": "exec-b043f4f7-45fd-4aaf-aa1e-49818908b103.png"
+    },
+    {
+      "id": "campaign-07-alliance-v5",
+      "source": "campaign-07-alliance-v4.webp",
+      "fix": "REMOVE BOTH violet antlers behind the head of the rightmost purple hooded elf. That elf is dismounted at the table and has no horns or antlers; the entire space above/behind his hood should show the ordinary castle scenery. Keep his hood, ears, hair, hands, quiver, purple cloak and polearm. Do NOT add any mount or replace with other head decorations.",
+      "prompt": "Use case: precise-object-edit. Edit this existing Union of Kingdoms poster. REMOVE BOTH violet antlers behind the head of the rightmost purple hooded elf. That elf is dismounted at the table and has no horns or antlers; the entire space above/behind his hood should show the ordinary castle scenery. Keep his hood, ears, hair, hands, quiver, purple cloak and polearm. Do NOT add any mount or replace with other head decorations. Preserve the original scene, anatomy of all other characters, layout, colors and ALL written text EXACTLY, including logo 'UNION OF KINGDOMS', tagline 'A new Era begins', footer 'Register for closed alpha' and URL 'www.unionofkingdoms.com'. Same portrait dimensions and painted chibi style. No new text or extra characters. Return one complete corrected poster.",
+      "generatedSource": "exec-17db3633-317a-4d05-967e-b4f22736afc5.png"
+    },
+    {
+      "id": "campaign-06-relics-v5",
+      "source": "assets/marketing/campaign-06-relics-v4.webp",
+      "refs": [
+        "assets/art/relics-v4-storybook/rel-006-axt-des-gruenhains.png",
+        "assets/art/relics-v4-storybook/rel-020-banner-der-drei-heere.png"
+      ],
+      "fix": "Correct ONLY the two relic objects to match their actual in-game identities in references2and3. Left axe: single broad golden crescent blade with green leaves and emerald gem, carved wooden handle with vine; NOT silver double axe. Right banner: a gold tipped wooden staff carrying three flowing red, blue, yellow streamers, matching reference3; NOT a blue heraldic rectangle. Keep cornucopia unchanged. Keep both replacements in their original display positions and proportional size, with fully coherent silhouettes.",
+      "prompt": "Use case: precise-object-edit. Image1 is the poster edit target; additional images are exact relic identity references. Correct ONLY the two relic objects to match their actual in-game identities in references2and3. Left axe: single broad golden crescent blade with green leaves and emerald gem, carved wooden handle with vine; NOT silver double axe. Right banner: a gold tipped wooden staff carrying three flowing red, blue, yellow streamers, matching reference3; NOT a blue heraldic rectangle. Keep cornucopia unchanged. Keep both replacements in their original display positions and proportional size, with fully coherent silhouettes. Preserve all composition, illustrated chibi style, colors, logo, banners and ALL existing text exactly: UNION OF KINGDOMS, A new Era begins, and footer Register for closed alpha, www.unionofkingdoms.com. Do not crop or add content.",
+      "generatedSource": "exec-b110684a-03fa-451a-8bb9-9f44032556d9.png"
+    },
+    {
+      "id": "campaign-08-monsters-v5",
+      "source": "assets/marketing/campaign-08-monsters-v4.webp",
+      "refs": [],
+      "fix": "Correct ONLY the red-hooded archers bowstring. It is currently a straight line missing the drawing hand. A single taut V-shaped string must run from upper bow tip to arrow nock pinched by the rear drawing fingers near her face, then to the lower bow tip. The arrow shaft begins at that nock and passes over the bow grip toward the flaming point. No additional unused string and no string through her bow-holding hand. Preserve both hands, face, arrow aim, bow silhouette and every other detail.",
+      "prompt": "Use case: precise-object-edit. Image1 is the poster edit target; additional images are exact relic identity references. Correct ONLY the red-hooded archers bowstring. It is currently a straight line missing the drawing hand. A single taut V-shaped string must run from upper bow tip to arrow nock pinched by the rear drawing fingers near her face, then to the lower bow tip. The arrow shaft begins at that nock and passes over the bow grip toward the flaming point. No additional unused string and no string through her bow-holding hand. Preserve both hands, face, arrow aim, bow silhouette and every other detail. Preserve all composition, illustrated chibi style, colors, logo, banners and ALL existing text exactly: UNION OF KINGDOMS, A new Era begins, and footer Register for closed alpha, www.unionofkingdoms.com. Do not crop or add content.",
+      "generatedSource": "exec-69e948dd-ac26-4706-b529-f9ebc54298f3.png"
+    },
+    {
+      "id": "campaign-02-army-open-alpha-v2",
+      "source": "campaign-02-army-v5",
+      "prompt": "Use case: text-localization. Edit only the very bottom call-to-action line on this corrected Union of Kingdoms poster: replace \"Register for closed alpha\" with exact text \"Play the Open Alpha\". Preserve its dark serif lettering, cream scroll, sizing and centered placement. Preserve EVERY other pixel as closely as possible: especially corrected anatomy, equipment, counts, all art, the logo UNION OF KINGDOMS, tagline \"A new Era begins\", and URL \"www.unionofkingdoms.com\". Do not alter the character antlers, drawn bowstring, or 5 TIERS badge. No other changes.",
+      "generatedSource": "exec-284304ff-c2d1-4b04-a956-0a1143992483.png"
+    },
+    {
+      "id": "campaign-05-cavalry-open-alpha-v2",
+      "source": "campaign-05-cavalry-v5",
+      "prompt": "Use case: text-localization. Edit only the very bottom call-to-action line on this corrected Union of Kingdoms poster: replace \"Register for closed alpha\" with exact text \"Play the Open Alpha\". Preserve its dark serif lettering, cream scroll, sizing and centered placement. Preserve EVERY other pixel as closely as possible: especially corrected anatomy, equipment, counts, all art, the logo UNION OF KINGDOMS, tagline \"A new Era begins\", and URL \"www.unionofkingdoms.com\". Do not alter the character antlers, drawn bowstring, or 5 TIERS badge. No other changes.",
+      "generatedSource": "exec-5bed8462-7ec0-4231-823d-960fcd8e082b.png"
+    },
+    {
+      "id": "campaign-04-archers-open-alpha-v2",
+      "source": "campaign-04-archers-v5",
+      "prompt": "Use case: text-localization. Edit ONLY bottom call-to-action line in this corrected Union of Kingdoms poster: replace \"Register for closed alpha\" with exact \"Play the Open Alpha\". Preserve dark serif lettering on cream scroll, size and centered placement. Preserve EVERY other element especially the corrected bowstring or clean horn-free rider hood, the logo, headline, tagline \"A new Era begins\", and URL \"www.unionofkingdoms.com\". No other changes.",
+      "generatedSource": "exec-166a7b09-9d4d-4cbd-afe7-5fc235271bf3.png"
+    },
+    {
+      "id": "campaign-07-alliance-open-alpha-v2",
+      "source": "campaign-07-alliance-v5",
+      "prompt": "Use case: text-localization. Edit ONLY bottom call-to-action line in this corrected Union of Kingdoms poster: replace \"Register for closed alpha\" with exact \"Play the Open Alpha\". Preserve dark serif lettering on cream scroll, size and centered placement. Preserve EVERY other element especially the corrected bowstring or clean horn-free rider hood, the logo, headline, tagline \"A new Era begins\", and URL \"www.unionofkingdoms.com\". No other changes.",
+      "generatedSource": "exec-d464609b-1f64-4145-b111-a61c4d7cdd21.png"
+    },
+    {
+      "id": "campaign-06-relics-open-alpha-v2",
+      "source": "campaign-06-relics-v5",
+      "prompt": "Use case: text-localization. Edit ONLY bottom call-to-action line in this corrected Union of Kingdoms poster: replace \"Register for closed alpha\" with exact \"Play the Open Alpha\". Preserve dark serif lettering on cream scroll, size and centered placement. Preserve EVERY other element especially the corrected bowstring or golden leaf axe and three colored banner streamers, the logo, headline, tagline \"A new Era begins\", and URL \"www.unionofkingdoms.com\". No other changes.",
+      "generatedSource": "exec-cb2f4dae-236f-42fb-ad37-68dbe8970f36.png"
+    },
+    {
+      "id": "campaign-08-monsters-open-alpha-v2",
+      "source": "campaign-08-monsters-v5",
+      "prompt": "Use case: text-localization. Edit ONLY bottom call-to-action line in this corrected Union of Kingdoms poster: replace \"Register for closed alpha\" with exact \"Play the Open Alpha\". Preserve dark serif lettering on cream scroll, size and centered placement. Preserve EVERY other element especially the corrected bowstring or golden leaf axe and three colored banner streamers, the logo, headline, tagline \"A new Era begins\", and URL \"www.unionofkingdoms.com\". No other changes.",
+      "generatedSource": "exec-157fba1d-0831-40b7-8228-17237253bb11.png"
+    }
+  ],
+  "banners": [
+    {
+      "id": "heroes-monsters-logo-v2",
+      "source": "heroes-monsters-logo-v1",
+      "fix": "Replace the three OLD heroes on the LEFT of the banner with the EXACT CURRENT troop identities in references2-4, while retaining the original scene composition and their approximate positions: bottom-left blue helmeted hammer-and-tall-shield guardian, middle-left red hood white-haired elf fire archer, top-left purple hood masked elf mounted on dark purple antlered fantasy mount. Do not change the monsters on right. Antlers grow only from the mounts head, never rider. Archer has correct drawn V bowstring attached to nock in rear hand.",
+      "prompt": "Use case: compositing. Image1 is the wide 16:9 banner to edit. Images2-4 are CURRENT character design references only, adapt their poses and simplified rendering to image1. Replace the three OLD heroes on the LEFT of the banner with the EXACT CURRENT troop identities in references2-4, while retaining the original scene composition and their approximate positions: bottom-left blue helmeted hammer-and-tall-shield guardian, middle-left red hood white-haired elf fire archer, top-left purple hood masked elf mounted on dark purple antlered fantasy mount. Do not change the monsters on right. Antlers grow only from the mounts head, never rider. Archer has correct drawn V bowstring attached to nock in rear hand. Preserve landscape, castle, all buildings, background, layout, bold dark outlines, flat two-tone chunky chibi style. Preserve top-center logo shape and UNION OF KINGDOMS wording; ribbon tagline must read exactly \"A new Era begins\". No new text, no crop, no photorealism.",
+      "generatedSource": "exec-8a6ca67e-9448-448a-a786-b188a71898da.png"
+    },
+    {
+      "id": "royal-sunrise-logo-v2",
+      "source": "royal-sunrise-logo-v1",
+      "fix": "Replace the three OLD heroes at lower-left looking across the landscape with the EXACT CURRENT troop identities in references2-4, shown from behind/three-quarter looking into landscape in the original positions: red hood white-haired elf archer at farleft, blue plumed helmet guardian with hammer and tall blue shield in centerleft, purple hood elf mounted on dark-purple antlered creature at lowermiddle. Preserve pose orientation and relative small scale; no front-facing pasted sticker poses. Both antlers emerge from mounts skull, riderhoodclean. Retain original sunrise scene.",
+      "prompt": "Use case: compositing. Image1 is the wide 16:9 banner to edit. Images2-4 are CURRENT character design references only, adapt their poses and simplified rendering to image1. Replace the three OLD heroes at lower-left looking across the landscape with the EXACT CURRENT troop identities in references2-4, shown from behind/three-quarter looking into landscape in the original positions: red hood white-haired elf archer at farleft, blue plumed helmet guardian with hammer and tall blue shield in centerleft, purple hood elf mounted on dark-purple antlered creature at lowermiddle. Preserve pose orientation and relative small scale; no front-facing pasted sticker poses. Both antlers emerge from mounts skull, riderhoodclean. Retain original sunrise scene. Preserve landscape, castle, all buildings, background, layout, bold dark outlines, flat two-tone chunky chibi style. Preserve top-center logo shape and UNION OF KINGDOMS wording; ribbon tagline must read exactly \"A new Era begins\". No new text, no crop, no photorealism.",
+      "generatedSource": "exec-0222d523-7243-49e8-8c56-219459995d4d.png"
+    },
+    {
+      "id": "moonlit-kingdom-logo-v2",
+      "source": "moonlit-kingdom-logo-v1",
+      "prompt": "Use case: compositing. Image1 is the wide16:9 moonlit banner to edit. Image2 and3 are current character design references. Replace only the two old heroes with CURRENT designs: lowerleft use blue-plumed full-helmet guardian holding a chunky hammer and large tall blue gold-edged shield (image2), lower right use red-hooded white-haired elven fire archer (image3) facing LEFT toward center with the flaming arrow aimed left. On the archer, the single taut V bowstring connects both bow tips to arrow nock at her rear drawing fingers, not bowgrip. Preserve original positions, approximate scale, poseorientation and chunky2D rendering. Keep all monsters, moon, night lighting, buildings, landscape and central logo unchanged. Keep UNION OF KINGDOMS and ribbon tagline \"A new Era begins\". No extra words, no crop, no photorealism.",
+      "generatedSource": "exec-ecd7b226-1161-4357-9806-6ff834568e4b.png"
+    }
+  ],
+  "appIcon": {
+    "prompt": "Use case: precise-object-edit. Edit the square Union of Kingdoms launcher illustration, image1. Keep exactly the epic battle composition, giant boss on the right, blue shield knight foreground, architecture, lighting, outlines, colors, square crop, no text. Correct TWO defects only. Purple mounted rider upper-left: BOTH antlers must grow from the MOUNT skull, both clearly in front of rider; remove the stray antler growing from behind the riders hood and restore background. Hood is clean, rider is human elf with no horns. Use image2 only as reference for correct mount anatomy. Red archer lower-left: ONE taut V-shaped bowstring from upper bow tip to arrow nock pinched in rear drawing fingers then lower bow tip; the nock is at the rear hand, NOT grip. Remove straight undrawn string. Use image3 for bow mechanics. Preserve every unrelated detail including all legitimate horns on the giant monster.",
+    "generatedSource": "exec-6cc49c02-93d0-4485-9071-1601186a76b8.png"
+  }
+}

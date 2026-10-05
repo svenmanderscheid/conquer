@@ -86,7 +86,7 @@ window.ConquerCommunity=function(ctx){
             </header>
             <div class="alliance-building-grid">
                 <article class="alliance-building-card is-center ${center?'is-built':'is-open'}">
-                    <div class="alliance-building-art"><img src="${esc(base+'/assets/art/map/alliance-center-v3.webp')}" alt="" loading="lazy"><span class="alliance-building-state">${center?'Errichtet':'Bereit zum Bau'}</span></div>
+                    <div class="alliance-building-art"><img src="${esc(base+'/assets/art/map/painted-v2/alliance-center.webp')}" alt="" loading="lazy"><span class="alliance-building-state">${center?'Errichtet':'Bereit zum Bau'}</span></div>
                     <div class="alliance-building-content"><div class="alliance-building-heading"><span><small>Hauptgebäude · 5 × 5 Felder</small><h3>Allianzzentrum</h3></span><strong>${fmt(t.center_radius)}<small>Radius</small></strong></div>
                     <p class="alliance-building-location">${location}</p>${center?`<button type="button" class="alliance-map-link" data-action="community-structure-show" data-id="${Number(center.id)}" data-kind="alliance_center" data-x="${Number(center.coord_x)}" data-y="${Number(center.coord_y)}">Auf Karte zeigen</button>`:''}
                     <ul class="alliance-bonus-list"><li><b>+5 %</b><span>Angriff & Verteidigung</span></li><li><b>+10 %</b><span>Produktion & Sammeltempo</span></li></ul></div>

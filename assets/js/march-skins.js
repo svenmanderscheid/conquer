@@ -31,13 +31,15 @@ window.ConquerMarchSkins = (()=>{
     const hasFlightLayout=id=>flightLayoutIds.includes(get(id).id);
     const image=(base,id='default')=>{
         const resolved=get(id).id;
-        if(hasFlightLayout(resolved))return `${base}/assets/art/marches/flight-${resolved}.png?v=2`;
+        if(hasFlightLayout(resolved))return `${base}/assets/art/marches/flight-${resolved}-v3.png`;
+        if(['default','tempest'].includes(resolved))return `${base}/assets/art/marches/march-${resolved}-v3.webp`;
         return `${base}/assets/art/marches/march-${resolved}.webp?v=${['default','forest','fire','water','wind'].includes(resolved)?4:3}`;
     };
     const motionImage=(base,id='default')=>{
         const resolved=get(id).id;
         if(!hasMotion(resolved))return image(base,resolved);
-        if(hasFlightLayout(resolved))return `${base}/assets/art/marches/flight-${resolved}.webp?v=2`;
+        if(hasFlightLayout(resolved))return `${base}/assets/art/marches/flight-${resolved}-v3.webp`;
+        if(resolved==='tempest')return `${base}/assets/art/marches/animated-march-tempest-v3.webp`;
         return `${base}/assets/art/marches/animated-march-${resolved}.webp?v=2`;
     };
     // Visual motifs only. Ownership, price and travel speed remain server-defined.

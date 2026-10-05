@@ -1,0 +1,404 @@
+{
+  "schema": 1,
+  "date": "2026-10-05",
+  "game": "Union of Kingdoms",
+  "builder": "tools/build-character-art-repairs-v3.py",
+  "default_source_directory": "output/image-fixes-2026-10-05/characters/masters",
+  "sources_local_only": true,
+  "flights": [
+    {
+      "id": "flight-dragon",
+      "sourceSheet": "output/image-fixes-2026-10-05/characters/masters/flight-dragon-sheet.png",
+      "static": "assets/art/marches/flight-dragon-v3.png",
+      "animated": "assets/art/marches/flight-dragon-v3.webp",
+      "pose_count": 4,
+      "frame_count": 6,
+      "order": [
+        0,
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "duration_ms": 120,
+      "dimensions": [
+        384,
+        384
+      ],
+      "direction": "right",
+      "registration": [
+        {
+          "pose": 0,
+          "dx": 0,
+          "dy": 0,
+          "head_match_mean_error": 0.0
+        },
+        {
+          "pose": 1,
+          "dx": -4,
+          "dy": 0,
+          "head_match_mean_error": 15.163
+        },
+        {
+          "pose": 2,
+          "dx": -7,
+          "dy": 0,
+          "head_match_mean_error": 16.618
+        },
+        {
+          "pose": 3,
+          "dx": -14,
+          "dy": 0,
+          "head_match_mean_error": 18.569
+        }
+      ],
+      "static_bytes": 135414,
+      "animated_bytes": 190074,
+      "static_sha256": "866d963d416e96bdca0d8edd57c479853c793e2630a5bf5f8f79d29c201d150a",
+      "animated_sha256": "922d618d8aeef0fb2d0eeefef2260679c438ff28b7d2eb0e81839df3dd292418",
+      "qa": "all selected poses inspected, alpha preserved, common scale, head registration, no crossfading; animated canvas and transparency checked",
+      "source_master_filename": "flight-dragon-sheet.png",
+      "source_master_sha256": "91223ac4b5662c25a302a15d927c61ba8e288d405dd0945d91e372093b26e292",
+      "generation_stages": [
+        {
+          "tool": "built-in image_gen.imagegen",
+          "prompt": "Asset type: production registered sprite sheet for a looping fantasy creature flight animation in Union of Kingdoms. Use case: style-transfer / identity-preserve. Exactly EIGHT separate full-body sprites in an even 4-column by 2-row grid. No extra sprites. Each cell has generous transparent margins; no creature parts cross cell boundaries. All eight sprites are the SAME individual creature, same size, same face, same anatomy, same armor details/colors, same three-quarter camera, facing screen RIGHT. Body/eyes centered at precisely the same position within every cell; no rotation of entire body, no translation, no perspective turn. Animate ONLY the two wings through one smooth flap: row-major sequence high-up, mid-up, level-out, mid-down, low-down, mid-down, level-out, mid-up. Both wings emerge at their matching shoulder joints; distinct far wing stays behind body. Gently streamlined flying legs and tail unchanged across frames. Hand-painted chibi game art: large soft simplified shapes, dark-brown outlines, restrained flat colors with gentle painted shading, coherent with approved source. Entire canvas has genuine transparent alpha. No ground, no sky, no shadow plate, no labels, no numbers, no borders, no checkerboard, no text. No faceted 3D rendering, no glossy realism, no extra limbs, no fused heads, no changing costume. Image1 is the exact creature identity and painted style reference: emerald green chibi dragon, light beige underside, golden yellow eyes, bronze/gold crown helmet and shoulder armor, two curved dark horns, two leathery charcoal wing membranes framed with emerald and bronze. Preserve this recognizable dragon and all major armor details. Mouth closed or small calm orange mouth glow constant, no large fire breath, no drifting particles. Four compact clawed legs tucked consistently for flying. Dragon remains anatomical and friendly-fierce.",
+          "source_images": [
+            {
+              "path": "assets/art/marches/march-dragon.webp",
+              "sha256": "f4ee53004d7a38b4c789e132eadc764bb08758af0482d23b695d675b00a0a16e",
+              "bytes": 65494,
+              "dimensions": [
+                512,
+                512
+              ],
+              "frames": 1
+            }
+          ],
+          "generated_image_sha256": "cbf67f2544c48a5c2bf776a0ed2119c902e4506db891620bd9b0a309eff2b614"
+        },
+        {
+          "tool": "built-in image_gen.imagegen",
+          "prompt": "Precise sprite sheet correction. Keep this exact 4-column by 2-row transparent painted dragon sprite sheet: same eight emerald-green dragons, same right-facing view, same body, head, bronze armor, legs and tails unchanged. Correct the WING POSE ORDER to make a smooth complete flap. Each cell row-major is one time step: cell1 both wings raised HIGH; cell2 wings raised halfway; cell3 wings extended LEVEL; cell4 both wings HALFWAY DOWN, pointing diagonally toward lower left/lower right below their shoulder joints; cell5 both wings at LOWEST fully DOWN; cell6 both wings HALFWAY DOWN, same as cell4; cell7 LEVEL, same as cell3; cell8 HALFWAY UP, same as cell2. Especially cells4 and6 need a clear intermediate downward wing angle between level and fully down. Both wings attached correctly to shoulders; preserve exact dragon body and armor in every cell. Both wings move through the cycle, including far wing. Body and head anchored at same grid coordinates in every frame, no body rotation. Keep generous margins at every cell boundary. Retain true transparent alpha, no grid lines, no text, no shadows. No extra dragons, no cropped wings, no added legs, no changed colors. Exactly eight full creatures in even4x2 cells.",
+          "source": "previous registered dragon pose sheet",
+          "generated_image_sha256": "91223ac4b5662c25a302a15d927c61ba8e288d405dd0945d91e372093b26e292"
+        }
+      ],
+      "extraction": {
+        "grid": [
+          4,
+          2
+        ],
+        "overscan_px": 32,
+        "window_size": 512,
+        "subject_isolation": "retain original alpha of nearest central connected subject in overlapping window",
+        "scale": 0.73,
+        "origin": [
+          7,
+          2
+        ]
+      },
+      "rejected_pose_note": "Dragon large downstroke excluded because angle jump disrupts smooth cycle; four coherent raised-to-level poses selected."
+    },
+    {
+      "id": "flight-phoenix",
+      "sourceSheet": "output/image-fixes-2026-10-05/characters/masters/flight-phoenix-sheet.png",
+      "static": "assets/art/marches/flight-phoenix-v3.png",
+      "animated": "assets/art/marches/flight-phoenix-v3.webp",
+      "pose_count": 5,
+      "frame_count": 8,
+      "order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        3,
+        2,
+        1
+      ],
+      "duration_ms": 95,
+      "dimensions": [
+        384,
+        384
+      ],
+      "direction": "right",
+      "registration": [
+        {
+          "pose": 0,
+          "dx": 0,
+          "dy": 0,
+          "head_match_mean_error": 0.0
+        },
+        {
+          "pose": 1,
+          "dx": -1,
+          "dy": 0,
+          "head_match_mean_error": 9.599
+        },
+        {
+          "pose": 2,
+          "dx": -4,
+          "dy": 0,
+          "head_match_mean_error": 11.047
+        },
+        {
+          "pose": 3,
+          "dx": -6,
+          "dy": 0,
+          "head_match_mean_error": 9.669
+        },
+        {
+          "pose": 4,
+          "dx": -1,
+          "dy": -37,
+          "head_match_mean_error": 35.849
+        }
+      ],
+      "static_bytes": 125473,
+      "animated_bytes": 208802,
+      "static_sha256": "01f58d8a5985436bb72527abaf70f878caa31005465dd02907f9c3abd2e88db9",
+      "animated_sha256": "ebec2dfcbee46e9381027648386997b1794a74394874acf09ec51f5b9cd4cddb",
+      "qa": "all selected poses inspected, alpha preserved, common scale, head registration, no crossfading; animated canvas and transparency checked",
+      "source_master_filename": "flight-phoenix-sheet.png",
+      "source_master_sha256": "ef13c69ab46a2aeb20871a05c60f92395ae1d58e46de62fecb859101222db833",
+      "generation_stages": [
+        {
+          "tool": "built-in image_gen.imagegen",
+          "prompt": "Asset type: production registered sprite sheet for a looping fantasy creature flight animation in Union of Kingdoms. Use case: style-transfer / identity-preserve. Exactly EIGHT separate full-body sprites in an even 4-column by 2-row grid. No extra sprites. Each cell has generous transparent margins; no creature parts cross cell boundaries. All eight sprites are the SAME individual creature, same size, same face, same anatomy, same armor details/colors, same three-quarter camera, facing screen RIGHT. Body/eyes centered at precisely the same position within every cell; no rotation of entire body, no translation, no perspective turn. Animate ONLY the two wings through one smooth flap: row-major sequence high-up, mid-up, level-out, mid-down, low-down, mid-down, level-out, mid-up. Both wings emerge at their matching shoulder joints; distinct far wing stays behind body. Gently streamlined flying legs and tail unchanged across frames. Hand-painted chibi game art: large soft simplified shapes, dark-brown outlines, restrained flat colors with gentle painted shading, coherent with approved source. Entire canvas has genuine transparent alpha. No ground, no sky, no shadow plate, no labels, no numbers, no borders, no checkerboard, no text. No faceted 3D rendering, no glossy realism, no extra limbs, no fused heads, no changing costume. Image1 is the exact PHOENIX color/identity reference to repaint: red/crimson feathered phoenix, golden orange primary feather tips, warm golden beak and breast armor, small dark obsidian red-trimmed crest/armor, flame-shaped red/gold tail. Preserve that red-and-gold bird identity, two feathery wings, exactly two tucked bird legs, NO lion body, no horns. Image2 is STYLE ONLY: match its warm dark outlines, soft painted chibi feathers, large expressive bird eye and simple legible shapes, but absolutely NO blue/white palette, NO griffin anatomy, NO turquoise gems. A coherent phoenix bird with red plumage and golden details, bright amber eye, calm closed beak. Flame-shaped feathers rather than changing particle fire.",
+          "source_images": [
+            {
+              "path": "assets/art/marches/flight-phoenix.png",
+              "sha256": "cabfe89fe93a0223b2583e1447a3fec592a0e6208d696f3289a9994da4c84157",
+              "bytes": 38056,
+              "dimensions": [
+                384,
+                384
+              ],
+              "frames": 1
+            },
+            {
+              "path": "assets/art/marches/march-wind.webp",
+              "sha256": "3de973826e442570c2d2f8bd6ef2486aac7d13a7135575a216c0b47788043fbf",
+              "bytes": 52540,
+              "dimensions": [
+                512,
+                512
+              ],
+              "frames": 1
+            }
+          ],
+          "generated_image_sha256": "ef13c69ab46a2aeb20871a05c60f92395ae1d58e46de62fecb859101222db833"
+        }
+      ],
+      "extraction": {
+        "grid": [
+          4,
+          2
+        ],
+        "overscan_px": 32,
+        "window_size": 512,
+        "subject_isolation": "retain original alpha of nearest central connected subject in overlapping window",
+        "scale": 0.73,
+        "origin": [
+          7,
+          2
+        ]
+      },
+      "rejected_pose_note": "All five up-to-down poses retained; reversing them closes the wingbeat."
+    }
+  ],
+  "tempest": {
+    "static": "assets/art/marches/march-tempest-v3.webp",
+    "animated": "assets/art/marches/animated-march-tempest-v3.webp",
+    "sourceSheet": "output/image-fixes-2026-10-05/characters/masters/tempest-sheet.png",
+    "selected_poses": [
+      0,
+      1,
+      2
+    ],
+    "loop_order": [
+      0,
+      1,
+      2,
+      1
+    ],
+    "rejected_pose": 3,
+    "rejected_reason": "mirrored cap ornament changes creature identity",
+    "frame_count": 4,
+    "duration_ms": 180,
+    "static_dimensions": [
+      512,
+      512
+    ],
+    "animated_dimensions": [
+      384,
+      384
+    ],
+    "registration": "upper-cloud silhouette center and cloud top; original generated alpha retained",
+    "anchors": [
+      [
+        416.24772139079556,
+        65
+      ],
+      [
+        367.05558111449767,
+        68
+      ],
+      [
+        340.19898002792104,
+        35
+      ]
+    ],
+    "static_bytes": 57310,
+    "animated_bytes": 133566,
+    "static_sha256": "ca1122fccbd5744b45a8b61562514d1c579526cdc5ef0234424c382d224ced4b",
+    "animated_sha256": "a9259bfa0b4301669d528e765fd9ec47dfee33b269c1263eb1d760faa10f7fc9",
+    "id": "tempest",
+    "source_master_filename": "tempest-sheet.png",
+    "source_master_sha256": "e2fed8f5422762f3096831830523c7eebac25f43c459ffc84cc13843d1224d53",
+    "generation_stages": [
+      {
+        "tool": "built-in image_gen.imagegen",
+        "prompt": "Use case: background-extraction / identity-preserve animation. Create a production painted sprite sheet from this exact Union of Kingdoms tempest creature. Remove ALL opaque checkerboard background and all checkerboard fringe patches. Image1 is the creature identity reference. Preserve this specific floating storm-cloud jellyfish: domed puffy cream/white cloud, saturated blue underside, gold lightning/star filigree across cloud cap, exactly SEVEN long cloud-and-gold-lightning trailing tendrils, each ends in one blue diamond crystal. No face, no eyes, no new anatomy. Match original soft painted dark-brown-outlined chibi fantasy style. Exactly FOUR identical-scale full creatures in an even TWO columns by TWO rows grid. Genuine transparent alpha everywhere between and around creatures, no checkerboard or colored halo residue. Create four coherent subtle floating poses: cloud body shape, position and gold ornament remain fixed; seven attached tendrils sway gently left, slightly less left, near center, slightly right in row-major order. All seven crystals and continuous attachment paths remain visible and anatomically coherent. No disappearing, multiplying or detached tendrils; cloud cap never changes shape. Complete uncropped bodies in each cell with ample transparent margin; no neighboring cell overlap. No labels, text, frame, ground, background, sparkle particles, grids, or previews. No rendered 3D geometry. True transparent background, opaque painted creature.",
+        "source_images": [
+          {
+            "path": "assets/art/marches/march-tempest.webp",
+            "sha256": "c681b2b7e4f82ab56630eab1ba699e67124dbf34aa2e22ff756ed549888c89d1",
+            "bytes": 59316,
+            "dimensions": [
+              512,
+              512
+            ],
+            "frames": 1
+          }
+        ],
+        "generated_image_sha256": "e2fed8f5422762f3096831830523c7eebac25f43c459ffc84cc13843d1224d53"
+      }
+    ],
+    "anatomy_qa": "Eight continuous crystal-tipped tendrils in each accepted pose; no detached tips or missing attachments. The production prompt requested seven; the generated eight-tip design is internally consistent.",
+    "extraction": {
+      "grid": [
+        2,
+        2
+      ],
+      "cell_size": 627,
+      "outer_padding": 16,
+      "available_size": 480
+    }
+  },
+  "default_march": {
+    "id": "default",
+    "path": "assets/art/marches/march-default-v3.webp",
+    "size": [
+      512,
+      512
+    ],
+    "source_images": [
+      "assets/art/characters/fantasy-troops-v3/guardian-ui.webp",
+      "assets/art/characters/fantasy-troops-v3/fire-archer-ui.webp",
+      "assets/art/characters/fantasy-troops-v3/shadow-rider-ui.webp"
+    ],
+    "placements": [
+      {
+        "id": "guardian",
+        "height": 245,
+        "x": 14,
+        "y": 174
+      },
+      {
+        "id": "fire-archer",
+        "height": 285,
+        "x": 174,
+        "y": 65
+      },
+      {
+        "id": "shadow-rider",
+        "height": 235,
+        "x": 267,
+        "y": 202
+      }
+    ],
+    "method": "Alpha crop, proportional scale, transparent composition only. All faces/weapons visible, subject bounds uncropped."
+  },
+  "delivery": [
+    {
+      "path": "assets/art/marches/march-default-v3.webp",
+      "sha256": "186aa162901531629e62bf440b005af51bfcbe81d1be834ead35176e88c809c4",
+      "bytes": 66638,
+      "dimensions": [
+        512,
+        512
+      ],
+      "frames": 1
+    },
+    {
+      "path": "assets/art/marches/flight-dragon-v3.png",
+      "sha256": "866d963d416e96bdca0d8edd57c479853c793e2630a5bf5f8f79d29c201d150a",
+      "bytes": 135414,
+      "dimensions": [
+        384,
+        384
+      ],
+      "frames": 1
+    },
+    {
+      "path": "assets/art/marches/flight-dragon-v3.webp",
+      "sha256": "922d618d8aeef0fb2d0eeefef2260679c438ff28b7d2eb0e81839df3dd292418",
+      "bytes": 190074,
+      "dimensions": [
+        384,
+        384
+      ],
+      "frames": 6
+    },
+    {
+      "path": "assets/art/marches/flight-phoenix-v3.png",
+      "sha256": "01f58d8a5985436bb72527abaf70f878caa31005465dd02907f9c3abd2e88db9",
+      "bytes": 125473,
+      "dimensions": [
+        384,
+        384
+      ],
+      "frames": 1
+    },
+    {
+      "path": "assets/art/marches/flight-phoenix-v3.webp",
+      "sha256": "ebec2dfcbee46e9381027648386997b1794a74394874acf09ec51f5b9cd4cddb",
+      "bytes": 208802,
+      "dimensions": [
+        384,
+        384
+      ],
+      "frames": 8
+    },
+    {
+      "path": "assets/art/marches/march-tempest-v3.webp",
+      "sha256": "ca1122fccbd5744b45a8b61562514d1c579526cdc5ef0234424c382d224ced4b",
+      "bytes": 57310,
+      "dimensions": [
+        512,
+        512
+      ],
+      "frames": 1
+    },
+    {
+      "path": "assets/art/marches/animated-march-tempest-v3.webp",
+      "sha256": "a9259bfa0b4301669d528e765fd9ec47dfee33b269c1263eb1d760faa10f7fc9",
+      "bytes": 133566,
+      "dimensions": [
+        384,
+        384
+      ],
+      "frames": 4
+    }
+  ],
+  "qa": [
+    "All retained poses visually inspected at source and delivery size",
+    "Overscan isolates complete phoenix far wing, no neighboring sprite fragments",
+    "True alpha, no checkerboard fill or fringe in tempest",
+    "No optical crossfade or superimposed wings",
+    "Original historical assets remain unchanged"
+  ]
+}

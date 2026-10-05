@@ -10,18 +10,19 @@ const articulated=[
  'clockwork','sapphire','astral','leviathan','yggdrasil','tempest','eclipse'
 ];
 assert.equal(catalog.hasMotion('default'),false);
+assert.equal(catalog.image('/conquer','default'),'/conquer/assets/art/marches/march-default-v3.webp');
 assert.equal(catalog.motionImage('/conquer','default'),catalog.image('/conquer','default'));
 for(const id of articulated){
  assert.equal(catalog.hasMotion(id),true,`${id}: catalog must advertise articulated motion`);
  assert.equal(catalog.hasFlightLayout(id),false,`${id}: ordinary creature must keep the normal map footprint`);
- assert.equal(catalog.motionImage('/conquer',id),`/conquer/assets/art/marches/animated-march-${id}.webp?v=2`,`${id}: motion path contract changed`);
- assert.equal(catalog.image('/conquer',id),`/conquer/assets/art/marches/march-${id}.webp?v=${catalog.ids.includes(id)?4:3}`,`${id}: static fallback contract changed`);
+ assert.equal(catalog.motionImage('/conquer',id),`/conquer/assets/art/marches/animated-march-${id}${id==='tempest'?'-v3.webp':'.webp?v=2'}`,`${id}: motion path contract changed`);
+ assert.equal(catalog.image('/conquer',id),`/conquer/assets/art/marches/march-${id}${id==='tempest'?'-v3.webp':'.webp?v='+(catalog.ids.includes(id)?4:3)}`,`${id}: static fallback contract changed`);
 }
 for(const id of ['phoenix','dragon']){
  assert.equal(catalog.hasMotion(id),true,`${id}: legacy articulated asset lost motion support`);
  assert.equal(catalog.hasFlightLayout(id),true,`${id}: legacy flight layout changed`);
- assert.equal(catalog.motionImage('',id),`/assets/art/marches/flight-${id}.webp?v=2`);
- assert.equal(catalog.image('',id),`/assets/art/marches/flight-${id}.png?v=2`);
+ assert.equal(catalog.motionImage('',id),`/assets/art/marches/flight-${id}-v3.webp`);
+ assert.equal(catalog.image('',id),`/assets/art/marches/flight-${id}-v3.png`);
 }
 assert.equal(catalog.hasMotion('unknown'),false,'unknown snapshots must not inherit premium motion');
 assert.equal(catalog.hasFlightLayout('unknown'),false,'unknown snapshots must not inherit flight layout');

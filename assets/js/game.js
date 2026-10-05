@@ -53,7 +53,7 @@
     const svg = key => {
         const artKey=menuIconKey(key);
         const icon=menuIconKeys.has(artKey)
-            ? `<img class="nav-art" src="${base}/assets/art/menu-icons/${artKey}.png" alt="">`
+            ? `<img class="nav-art" src="${base}/assets/art/menu-icons-v2/${artKey}.png" alt="">`
             : iconPaths[key]
                 ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${iconPaths[key]}"/></svg>`
                 : `<span class="nav-symbol" aria-hidden="true">${navIcons[key] || '✦'}</span>`;
@@ -384,7 +384,7 @@
         const dock=[['quests',t('nav.quests_short'),'quest','tab'],['inventory',t('nav.inventory_short'),'inventory','tab'],['reports','Post','reports','tab'],['chat','Chat','chat','chat-open'],['shop',t('nav.shop'),'shop','shop-open'],['alliance','Allianz','alliance','tab'],[sceneTab,t('hud.scene.'+sceneTab),sceneTab,'tab']];
         $('#navigation').innerHTML=dock.map(([key,name,art,act])=>{
             const dockMenuArt={quests:'quests',inventory:'inventory',reports:'reports',chat:'chat',shop:'market',alliance:'alliance',city:'village',world:'world-map'}[key];
-            const icon=dockMenuArt?`<img class="dock-icon dock-menu-art" src="${base}/assets/art/menu-icons/${dockMenuArt}.png" alt="">`:`<img class="dock-icon" src="${base}/assets/art/hud/${art}.svg" alt="">`;
+            const icon=dockMenuArt?`<img class="dock-icon dock-menu-art" src="${base}/assets/art/menu-icons-v2/${dockMenuArt}.png" alt="">`:`<img class="dock-icon" src="${base}/assets/art/hud/${art}.svg" alt="">`;
             const badge=key==='quests'?'<span class="dock-badge" aria-hidden="true" hidden></span>':key==='chat'?'<span class="dock-badge chat-dock-badge" aria-hidden="true" hidden></span>':'';
             const labelKey={quests:'nav.quests_short',inventory:'nav.inventory_short',shop:'nav.shop',city:'hud.scene.city',world:'hud.scene.world'}[key];
             const sceneAction=key===sceneTab?'hud.scene.'+key+'_open':null;
@@ -472,7 +472,7 @@
         if(tabs[code])navigate(tabs[code]);else buildingDialog(code);
     }
     const buildingArt={watch_tower:'map/wall',castle:'map/castle',wall:'map/wall',farm:'map/farm',lumber_camp:'map/lumber',quarry:'map/quarry',gold_mine:'map/gold',trading_post:'buildings/trading_post',academy:'buildings/academy',hospital:'buildings/hospital',storage:'buildings/storage',treasure_house:'buildings/treasure_house',barrack:'buildings/barrack',archery_range:'buildings/archery_range',stable:'buildings/stable',hall_of_alliance:'buildings/hall_of_alliance'};
-    const buildingImage=code=>code==='castle'&&kingdom?.profile?.city_skin&&kingdom.profile.city_skin!=='default'?window.ConquerCastleSkins.image(base,kingdom.profile.city_skin):`${base}/assets/art/buildings/${Object.hasOwn(buildingArt,code)?code:'castle'}-city-v2.png`;
+    const buildingImage=code=>code==='castle'&&kingdom?.profile?.city_skin&&kingdom.profile.city_skin!=='default'?window.ConquerCastleSkins.image(base,kingdom.profile.city_skin):`${base}/assets/art/buildings/painted-v3/${Object.hasOwn(buildingArt,code)?code:'castle'}.webp`;
     function buildingRequirements(requirements) {
         const entries=Object.entries(requirements||{}).map(([code,needed])=>({code,needed:Number(needed),current:Number(state.buildings[code]?.level||0)}));
         if(!entries.length)return '';
@@ -659,7 +659,7 @@
         monsterReports.open(report);return true;
     }});
     const territoryPanel=window.ConquerTerritory({...featureContext,unitName,marchPanel});
-    const communityPanel=window.ConquerCommunity({...featureContext,openSharedReport,openSharedLocation,openStructureLocation:async location=>{navigate('world',{focusTitle:false});window.ConquerWorld.focus(location.x,location.y);await refresh();if(!window.ConquerWorld.locate(location.x,location.y,[location.kind],location.id))toast('Das Allianzgebäude ist an dieser Position nicht mehr vorhanden.');},beginStructurePlacement:structureType=>{const center=structureType==='center';teleportSelection={kind:'alliance-structure',structure_type:center?'center':'outpost',footprint:center?5:3,label:center?'Allianzzentrum':'Außenposten',art:center?'alliance-center-v3.webp':'alliance-outpost'};navigate('world',{focusTitle:false});toast(`${teleportSelection.label} auf einen freien Platz ziehen.`);},openMailbox:()=>{navigate('reports');mailboxPanel.select('private');}});
+    const communityPanel=window.ConquerCommunity({...featureContext,openSharedReport,openSharedLocation,openStructureLocation:async location=>{navigate('world',{focusTitle:false});window.ConquerWorld.focus(location.x,location.y);await refresh();if(!window.ConquerWorld.locate(location.x,location.y,[location.kind],location.id))toast('Das Allianzgebäude ist an dieser Position nicht mehr vorhanden.');},beginStructurePlacement:structureType=>{const center=structureType==='center';teleportSelection={kind:'alliance-structure',structure_type:center?'center':'outpost',footprint:center?5:3,label:center?'Allianzzentrum':'Außenposten',art:center?'painted-v2/alliance-center.webp':'alliance-outpost'};navigate('world',{focusTitle:false});toast(`${teleportSelection.label} auf einen freien Platz ziehen.`);},openMailbox:()=>{navigate('reports');mailboxPanel.select('private');}});
     const socialHub=window.ConquerSocialHub({...featureContext,openPublicProfile:id=>panels.onClick('public-profile',{dataset:{id:String(id)}}),openPrivate:(id,name)=>{navigate(playfield);worldChat?.openPrivate(id,name);},openChat:channel=>{navigate(playfield);worldChat?.openChannel(channel);},chatChanged:()=>worldChat?.refresh(),openMailbox:()=>{navigate('reports');mailboxPanel.select('private');}});
     const allianceCommunity=window.ConquerAllianceCommunity(featureContext);
     const dungeonPanel=window.ConquerDungeons({...featureContext,unitName});
