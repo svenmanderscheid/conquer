@@ -12,7 +12,6 @@ window.ConquerPanels = function(ctx) {
     const objectiveNames={defenses:'Schutzanlagen',pass:'Gebirgspass',boss:'Der Aschenfürst'};
     const ranks=window.ConquerAllianceRanks;
     const rankLabel=role=>ranks.level(role)?`<span class="alliance-rank-label">${ranks.badge(role)}<span data-i18n="alliance_rank.role.${role}">${esc(ranks.name(role))}</span></span>`:'';
-    const bonusNames={march_capacity:'Zusätzliche Truppen pro Marsch',hospital_capacity:'Zusätzliche Hospitalplätze',resource_protection:'Geschützte Vorräte',all_attack:'Angriff aller Truppen',all_defense:'Verteidigung aller Truppen',all_hp:'Lebenspunkte aller Truppen',cavalry_attack:'Kavallerieangriff',construction_speed:'Baugeschwindigkeit',food_production:'Nahrungsproduktion',gathering_speed:'Sammelgeschwindigkeit',gold_production:'Goldproduktion',infantry_defense:'Infanterieverteidigung',infantry_hp:'Infanterielebenspunkte',lumber_production:'Holzproduktion',march_speed:'Marschgeschwindigkeit',ranged_attack:'Fernkampfangriff',research_speed:'Forschungsgeschwindigkeit',stone_production:'Steinproduktion',training_speed:'Ausbildungsgeschwindigkeit',vs_monster_attack:'Angriff gegen Monster'};
     const portrait=(id,custom=null)=>custom&&/^assets\/uploads\/profile\/\d+-[a-f0-9]{32}\.jpg$/.test(custom)?base+'/'+custom:base+'/assets/art/'+(['knight','archer','rider'].includes(id)?id:'knight')+'.png';
     const troopLabel=t=>{const unit=S().troop_defs.find(u=>Number(u.code)===Number(t.code||t.troop_code));const value=unit&&Number(unit.tier)===1?({1:'Schwertkämpfer',2:'Bogenschützen',3:'Reiter'})[unit.type]||unit.name:unit?.name||t.name||'Truppen';return window.ConquerLocale?.text(value)??value;};
     const button=(label,act,id='',cls='',extra='')=>`<button class="button ${cls}" data-action="${act}" data-id="${esc(id)}" ${extra}>${label}</button>`;
@@ -23,7 +22,6 @@ window.ConquerPanels = function(ctx) {
     const stats=list=>`<div class="stats-grid">${list.map(([name,value])=>`<div class="stat-box"><small>${esc(name)}</small><strong>${esc(value)}</strong></div>`).join('')}</div>`;
     const tabs=(group,items)=>`<div class="subtabs" aria-label="${esc(group)} Unterbereiche">${Object.entries(items).map(([key,name])=>`<button class="subtab ${tabsState[group]===key?'active':''}" data-action="panel-tab" data-group="${group}" data-id="${key}" aria-pressed="${tabsState[group]===key}">${esc(name)}</button>`).join('')}</div>`;
     const when=v=>new Date(date(v)).toLocaleString(window.ConquerLocale?.locale??'en',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
-    const bonuses=b=>Object.entries(b||{}).map(([key,value])=>row(bonusNames[key]||relicPresentation.bonusName(key),'+'+Number(value).toLocaleString(window.ConquerLocale?.locale??'en',{maximumFractionDigits:2})+(['march_capacity','hospital_capacity'].includes(key)?'':' %'))).join('');
     const resourceLine=r=>Object.entries(r||{}).filter(([k,v])=>resources[k]&&Number(v)>0).map(([k,v])=>`${resIcons[k]} ${fmt(v)} ${resources[k]}`).join(' · ');
     const kd=(act,payload={},message)=>action('kingdom/action',{action:act,...payload},message);
     const ed=(act,payload={},message)=>action('expeditions/action',{action:act,...payload},message);
@@ -129,22 +127,18 @@ window.ConquerPanels = function(ctx) {
         const withdrawing=leader&&tabsState.treasury==='withdraw',available=Object.entries(a.treasury).filter(([r])=>resources[r]);
         host().insertAdjacentHTML('beforeend',`<div class="treasury-view">${leader?tabs('treasury',{donate:'Einzahlen',withdraw:'Entnehmen'}):''}<div class="treasury">${available.map(([r,n])=>`<span>${resIcons[r]} <strong>${fmt(n)}</strong><small> ${resources[r]}</small></span>`).join('')}</div><form data-form="${withdrawing?'alliance-withdraw':'alliance-donate'}"><div class="inline-pair"><div><label for="treasury-resource">Rohstoff</label><select id="treasury-resource" name="resource">${available.map(([r,n])=>`<option value="${r}">${resources[r]} (${fmt(withdrawing?n:S().city[r])})</option>`).join('')}</select></div><div><label for="treasury-amount">Menge</label><input id="treasury-amount" name="amount" type="number" min="1" max="1000000" value="100" required></div></div><p class="muted">${withdrawing?'Vorräte werden deinem Königreich gutgeschrieben.':'Dein Beitrag unterstützt eure gemeinsamen Feldzüge.'}</p><button class="button gold wide">${withdrawing?'Vorräte entnehmen':'Rohstoffe einzahlen'}</button></form></div>`);
     }
-    const inventoryCategories={all:'Alles',resource_pack:'Rohstoffe',speedup:'Beschleuniger',boost:'Boni',chest:'Truhen',other:'Sonstiges',treasures:'Relikte'};
+    const inventoryCategories={all:'Alles',resource_pack:'Rohstoffe',speedup:'Beschleuniger',boost:'Boni',chest:'Truhen',other:'Sonstiges'};
     const inventoryMainCategories=['resource_pack','speedup','boost','other'];
-    const inventoryCategoryArt={all:'chest-silver.svg',resource_pack:'pouch.svg',speedup:'speedup.svg',boost:'production.svg',chest:'chest-gold.svg',other:'energy.svg',treasures:'compass.svg'};
+    const inventoryCategoryArt={all:'chest-silver.svg',resource_pack:'pouch.svg',speedup:'speedup.svg',boost:'production.svg',chest:'chest-gold.svg',other:'energy.svg'};
     const inventoryQueueSelections={},inventoryQuantities={};
-    let inventoryView='collection',inventoryScope='owned',inventoryUsePending=false;
+    let inventoryScope='owned',inventoryUsePending=false;
     const inventorySelections={};
     const boostLabels={resource_production:'Produktionsbonus',gathering_speed:'Sammelbonus',construction_speed:'Baubonus',research_speed:'Forschungsbonus',training_speed:'Ausbildungsbonus',anti_spy:'Spähschutz'};
     const speedupLabels={generic:'Universell',building:'Bauen',research:'Forschung',training:'Ausbildung',healing:'Heilung'};
-    const relicPresentation=window.ConquerRelicPresentation;
-    const gradeLabels={normal:'Gewöhnlich',rare:'Selten',epic:'Episch',legendary:'Legendär',mythic:'Mythisch'};
     const itemImage=file=>window.ConquerItemArt?.url(base,file)??base+'/assets/art/items/'+file+'?v='+encodeURIComponent(window.CONQUER_ITEM_ART_VERSION||'catalog3');
     const shortItemValue=n=>Number(n)>=1000000?Number(n/1000000).toLocaleString(window.ConquerLocale?.locale??'en',{maximumFractionDigits:1})+'M':Number(n)>=1000?Number(n/1000).toLocaleString(window.ConquerLocale?.locale??'en',{maximumFractionDigits:1})+'k':fmt(n);
     const itemTime=s=>Number(s)>=86400?fmt(Number(s)/86400)+' Tg.':Number(s)>=3600?fmt(Number(s)/3600)+' Std.':Number(s)>=60?fmt(Number(s)/60)+' Min.':fmt(s)+' Sek.';
     const itemIconTime=s=>Number(s)>=86400?fmt(Number(s)/86400)+'d':Number(s)>=3600?fmt(Number(s)/3600)+'h':Number(s)>=60?fmt(Number(s)/60)+'min':fmt(s)+'s';
-    const treasureName=relicPresentation.name;
-    const treasureGrade=relicPresentation.grade;
     function inventoryGroup(i){return ['resource_pack','speedup','boost','chest'].includes(i.category)?i.category:'other';}
     function inventorySort(a,b){
         const groups=['resource_pack','speedup','boost','chest','other'],rank=(value,list)=>{const at=list.indexOf(value);return at<0?list.length:at;};
@@ -191,7 +185,6 @@ window.ConquerPanels = function(ctx) {
     }
     function speedupTierAttribute(i){const tier=window.ConquerItemArt?.speedupTier(i);return tier?` data-speedup-tier="${tier}"`:'';}
     function lootTile(i){const speedup=i.category==='speedup'?` speedup-${Object.hasOwn(speedupLabels,i.subcategory)?i.subcategory:'generic'}`:'';return `<span class="loot-tile rarity-${itemRarity(i)} tone-${inventoryGroup(i)}${speedup}${i.icon_framed&&!window.ConquerItemArt?.forItem(i)?' is-framed':''}${Number(i.quantity)>0?'':' is-unowned'}"${speedupTierAttribute(i)}><span class="loot-value">${esc(itemStamp(i))}</span><span class="loot-art">${itemArt(i)}</span><span class="loot-count">${speedup?'×':''}${fmt(i.quantity)}</span></span>`;}
-    function treasureTile(t){const framed=relicPresentation.framed(t);return `<span class="loot-tile grade-${treasureGrade(t)} ${t.equipped_slot?'is-equipped':''} ${framed?'is-framed':''}"><span class="loot-value">STUFE ${fmt(t.level)}</span><span class="loot-art ${framed?'is-reference':''}"><img src="${relicPresentation.image(base,t)}" alt="" loading="lazy"></span><span class="loot-count">${fmt(t.fragments)} <span>Fr.</span></span>${t.equipped_slot?'<span class="loot-equipped" aria-label="Ausgerüstet">✓</span>':''}</span>`;}
     function itemDescription(i){if(i.description_de)return i.description_de;if(i.category==='resource_pack')return `Fügt deinem Vorrat sofort ${fmt(i.amount)} ${resources[i.resource]||i.resource} hinzu. Das Paket bleibt bis zur Verwendung sicher im Inventar.`;if(i.category==='speedup')return `Verkürzt einen laufenden ${i.subcategory==='generic'?'Bau-, Forschungs-, Ausbildungs- oder Heilungsauftrag':({building:'Bauauftrag',research:'Forschungsauftrag',training:'Ausbildungsauftrag',healing:'Heilungsauftrag'})[i.subcategory]||'Auftrag'} um ${itemTime(i.duration_seconds)}`;if(i.category==='chest')return 'Enthält nützliche Gegenstände oder Reliktfragmente. Nach dem Öffnen findest du deine Beute im Inventar und in der Reliktsammlung.';if(i.category==='boost'&&i.boost_type==='city_shield')return `Schützt deine Stadt für ${itemTime(i.duration_seconds)}. Eigene Stadtangriffe und Spähaufträge beenden den Schutz.`;if(i.category==='boost')return i.boost_type==='anti_spy'?'Ein Schutzgegenstand gegen feindliche Späher.':`Erhöht ${({resource_production:'deine Rohstoffproduktion',gathering_speed:'deine Sammelgeschwindigkeit',construction_speed:'deine Baugeschwindigkeit',research_speed:'deine Forschungsgeschwindigkeit',training_speed:'deine Ausbildungsgeschwindigkeit'})[i.boost_type]||'einen Königreichsbonus'} um ${fmt(i.bonus_pct)} % für ${itemTime(i.duration_seconds)}`;if(i.category==='ap_refill')return `Füllt bis zu ${fmt(i.ap_amount)} Aktionspunkte auf. Dein maximales Aktionspunktekonto wird dabei berücksichtigt.`;if(i.category==='vip_point')return `Schreibt deinem Herrscher ${fmt(i.vip_points)} Prestigepunkte gut.`;return i.description||'Ein Gegenstand für dein Königreich.';}
     function renderInventory(resetScroll=false){
         if(!requireState())return;
@@ -203,18 +196,17 @@ window.ConquerPanels = function(ctx) {
         if(oldQuantity)inventoryQuantities[oldQuantity.closest('form').dataset.id]=oldQuantity.value;
         const oldQueue=host().querySelector('#inventory-queue');
         if(oldQueue)inventoryQueueSelections[oldQueue.closest('form').dataset.id]=oldQueue.value;
-        const focused=document.activeElement?.closest?.('[data-action="inventory-item"],[data-action="treasure-dialog"]');
+        const focused=document.activeElement?.closest?.('[data-action="inventory-item"]');
         const owned=(inventoryScope==='all'?(K().inventory_catalog||K().inventory):K().inventory).filter(i=>inventoryScope==='all'||Number(i.quantity)>0),selected=Object.hasOwn(inventoryCategories,tabsState.inventory)?tabsState.inventory:'resource_pack';
         tabsState.inventory=selected;
         const items=owned.filter(i=>selected==='all'||inventoryGroup(i)===selected||(selected==='other'&&i.category==='chest')).sort((a,b)=>(Number(b.quantity)>0)-(Number(a.quantity)>0)||Number(b.level||b.tier||0)-Number(a.level||a.tier||0)||inventorySort(a,b));
         const detailItem=items.find(i=>Number(i.item_code)===inventorySelections[selected])||items[0];
         if(detailItem)inventorySelections[selected]=Number(detailItem.item_code);
         let contents;
-        if(selected==='treasures')contents=renderTreasures();
-        else if(items.length){
+        if(items.length){
             contents=`<div class="inventory-browser"><div class="inventory-board inventory-scroll-board" tabindex="0" aria-label="${esc(inventoryCategories[selected])}, nach unten scrollen"><div class="inventory-page-grid inventory-all-grid" ${inventoryGridAttributes(true)}>${items.map(i=>`<button class="loot-card ${Number(i.quantity)>0?'is-owned':'is-unowned'}" data-action="inventory-item" data-id="${Number(i.item_code)}" title="${esc(itemName(i))}" aria-label="${esc(itemName(i))}, ${fmt(i.quantity)} vorhanden, Details anzeigen" aria-controls="inventory-details" aria-pressed="${Number(i.item_code)===Number(detailItem.item_code)}">${lootTile(i)}</button>`).join('')}</div></div>${inventoryInspector(itemDetails(detailItem))}</div>`;
         }else contents=inventoryEmpty(selected,'Noch keine Gegenstände','Neue Vorräte findest du in Aufgaben und Truhen.',button('Alle Items ansehen','inventory-scope','all','gold small'));
-        host().innerHTML=`<div class="inventory-shell inventory-paged inventory-backpack"><nav class="inventory-category-tabs" aria-label="Inventarkategorie">${inventoryMainCategories.map(key=>`<button data-action="inventory-category" data-id="${key}" class="${key===selected?'active':''}" aria-pressed="${key===selected}" title="${esc(inventoryCategories[key])}"><span>${key==='speedup'?'Beschleu&shy;niger':esc(inventoryCategories[key])}</span></button>`).join('')}</nav>${selected==='treasures'?`<div class="inventory-views" aria-label="Reliktansicht">${Object.entries({collection:'Sammlung',equipment:'Plätze',bonuses:'Boni'}).map(([key,label])=>`<button data-action="inventory-view" data-id="${key}" class="${inventoryView===key?'active':''}" aria-pressed="${inventoryView===key}">${label}</button>`).join('')}</div>`:''}${selected!=='treasures'?`<div class="inventory-scope-bar" aria-label="Inventaransicht"><button data-action="inventory-scope" data-id="owned" class="${inventoryScope==='owned'?'active':''}" aria-pressed="${inventoryScope==='owned'}">Im Besitz</button><button data-action="inventory-scope" data-id="all" class="${inventoryScope==='all'?'active':''}" aria-pressed="${inventoryScope==='all'}">Alle Items</button><span>${items.length} Gegenstände</span></div>`:''}<div id="inventory-body" class="inventory-body">${contents}</div></div>`;
+        host().innerHTML=`<div class="inventory-shell inventory-paged inventory-backpack"><nav class="inventory-category-tabs" aria-label="Inventarkategorie">${inventoryMainCategories.map(key=>`<button data-action="inventory-category" data-id="${key}" class="${key===selected?'active':''}" aria-pressed="${key===selected}" title="${esc(inventoryCategories[key])}"><span>${key==='speedup'?'Beschleu&shy;niger':esc(inventoryCategories[key])}</span></button>`).join('')}</nav><div class="inventory-scope-bar" aria-label="Inventaransicht"><button data-action="inventory-scope" data-id="owned" class="${inventoryScope==='owned'?'active':''}" aria-pressed="${inventoryScope==='owned'}">Im Besitz</button><button data-action="inventory-scope" data-id="all" class="${inventoryScope==='all'?'active':''}" aria-pressed="${inventoryScope==='all'}">Alle Items</button><span>${items.length} Gegenstände</span></div><div id="inventory-body" class="inventory-body">${contents}</div></div>`;
         const board=host().querySelector('.inventory-scroll-board,.inventory-scroll-list');
         if(board)board.scrollTop=scrollTop;
         const details=host().querySelector('.inventory-inspector');
@@ -268,36 +260,6 @@ window.ConquerPanels = function(ctx) {
         host().querySelector('.inventory-inspector')?.scrollIntoView({block:'nearest'});
         return true;
     }
-    function renderTreasures(){
-        const t=K().treasures;
-        if(inventoryView==='equipment'){
-            const slots=Array.from({length:Number(t.slots)},(_,i)=>({slot:i+1,item:t.items.find(x=>Number(x.equipped_slot)===i+1)}));
-            return slots.length?`<div class="inventory-equipment-page inventory-scroll-list">${slots.map(({slot,item:eq})=>eq?`<button class="relic-slot occupied" data-action="treasure-dialog" data-id="${Number(eq.treasure_code)}">${treasureTile(eq)}<span><small>PLATZ ${slot}</small><strong>${esc(treasureName(eq))}</strong><em>${gradeLabels[treasureGrade(eq)]} · Stufe ${fmt(eq.level)}</em></span></button>`:`<button class="relic-slot" data-action="inventory-view" data-id="collection"><span class="relic-slot-empty"><img src="${itemImage('compass.svg')}" alt=""></span><span><small>PLATZ ${slot}</small><strong>Freier Reliktplatz</strong><em>Relikt aus der Sammlung wählen</em></span></button>`).join('')}</div>`:inventoryEmpty('treasures','Noch kein Ausrüstungsplatz','Baue dein Schatzhaus aus, um Relikte auszurüsten.');
-        }
-        if(inventoryView==='bonuses'){
-            const active=Object.entries(t.bonuses||{}).filter(([,value])=>Number(value)!==0);
-            return active.length?`<div class="inventory-bonus-page inventory-scroll-list" aria-label="Aktive Reliktboni">${active.map(([key,value])=>`<div><span>${esc(bonusNames[key]||relicPresentation.bonusName(key))}</span><strong>+${Number(value).toLocaleString(window.ConquerLocale?.locale??'en',{maximumFractionDigits:2})}${['march_capacity','hospital_capacity'].includes(key)?'':' %'}</strong></div>`).join('')}</div>`:inventoryEmpty('treasures','Noch keine aktiven Boni','Rüste ein freigeschaltetes Relikt aus.',button('Zur Sammlung','inventory-view','collection','gold small'));
-        }
-        const relics=[...t.items].sort((a,b)=>Number(Boolean(b.is_unlocked))-Number(Boolean(a.is_unlocked))||Number(b.level)-Number(a.level)||Number(a.treasure_code)-Number(b.treasure_code));
-        const selected=relics.find(i=>Number(i.treasure_code)===inventorySelections.treasures)||relics[0];
-        if(selected)inventorySelections.treasures=Number(selected.treasure_code);
-        return relics.length?`<div class="inventory-browser"><div class="inventory-board inventory-relic-board inventory-scroll-board" tabindex="0" aria-label="Reliktsammlung, nach unten scrollen"><div class="inventory-page-grid inventory-all-grid" ${inventoryGridAttributes(true)}>${relics.map(i=>`<button class="loot-card ${i.is_unlocked?'is-owned':'is-unowned'}" data-action="treasure-dialog" data-id="${Number(i.treasure_code)}" title="${esc(treasureName(i))}" aria-label="${esc(treasureName(i))}, ${esc(gradeLabels[treasureGrade(i)])}, Stufe ${fmt(i.level)}, Details anzeigen" aria-controls="inventory-details" aria-pressed="${Number(i.treasure_code)===Number(selected.treasure_code)}">${treasureTile(i)}</button>`).join('')}</div></div>${inventoryInspector(treasureDetails(selected))}</div>`:inventoryEmpty('treasures','Noch keine Relikte','Finde Reliktfragmente in Schatztruhen.');
-    }
-    function treasureDialog(id){
-        const t=K().treasures,i=t.items.find(i=>Number(i.treasure_code)===Number(id));if(!i)return;
-        if(host().querySelector('.inventory-shell')){
-            inventoryView='collection';
-            selectInventoryItem(id);
-            return;
-        }
-        openDialog(treasureDetails(i));
-    }
-    function treasureDetails(i){
-        const t=K().treasures,id=Number(i.treasure_code);
-        const freeSlots=Array.from({length:Number(t.slots)},(_,n)=>n+1).filter(slot=>!t.items.some(x=>Number(x.equipped_slot)===slot));
-        return `<div class="inventory-dialog"><div class="inventory-dialog-heading">${treasureTile(i)}<div><span class="inventory-kicker rarity-${treasureGrade(i)}">${gradeLabels[treasureGrade(i)]} · RELIKT</span><h2>${esc(treasureName(i))}</h2><span class="inventory-owned">Stufe ${fmt(i.level)} · ${fmt(i.fragments)} Fragmente</span></div></div>${bonuses(i.stats_at_level)}${i.fragments_next?`<div class="relic-next-level"><span>Nächste Stufe</span><strong>${fmt(i.fragments)} / ${fmt(i.fragments_next)} Fragmente</strong>${progress(i.fragments,i.fragments_next,'blue')}</div>`:''}${i.effect_note?`<p class="notice warning">${esc(i.effect_note)}</p>`:''}${i.equipped_slot?`<p class="success">Auf Platz ${fmt(i.equipped_slot)} ausgerüstet.</p>${button('Relikt ablegen','treasure-unequip',id,'secondary wide')}`:i.is_unlocked&&i.is_usable&&freeSlots.length?`<form data-form="treasure-equip" data-id="${Number(id)}"><label for="treasure-slot">Freier Ausrüstungsplatz</label><select id="treasure-slot" name="slot">${freeSlots.map(slot=>`<option value="${slot}">Platz ${slot}</option>`).join('')}</select><div class="inventory-use-footer"><button class="button gold wide">Relikt ausrüsten</button></div></form>`:`<p class="muted">${!i.is_unlocked?'Sammle weitere Fragmente in Schatztruhen.':!i.is_usable?'Dieses Sammlerrelikt verleiht derzeit keinen aktiven Bonus.':'Alle Plätze sind belegt. Lege zuerst ein anderes Relikt ab.'}</p>`}</div>`;
-    }
-
     function questCopy(q){const copy={login_daily:['Willkommen zurück','Besuche dein Königreich.'],attack_monster_1:['Die erste Begegnung','Kämpfe heute gegen ein Monster auf der Weltkarte.'],attack_monster_3:['Wächter des Grünlands','Kämpfe heute gegen drei Monster.'],upgrade_building_1:['Stein auf Stein','Schließe einen Gebäudeausbau ab.'],train_troops_100:['Neue Gefährten','Bilde heute 100 Truppen aus.'],research_complete_1:['Ein kluger Fortschritt','Schließe eine Forschung ab.'],collect_resources:['Vorräte aus der Wildnis','Bringe mit Sammelzügen Ressourcen nach Hause.'],open_chest_1:['Verborgene Schätze','Öffne eine Schatztruhe in deinem Inventar.']};return (copy[q.quest_code]||[q.title,q.description]).map(value=>window.ConquerLocale.text(value));}
     function questItem(code){
         const item=[...(K().inventory_catalog||[]),...(K().inventory||[])].find(i=>Number(i.item_code)===Number(code));
@@ -382,7 +344,6 @@ window.ConquerPanels = function(ctx) {
         if(act==='inventory-item'){selectInventoryItem(id);return true;}
         if(act==='teleport-select'){const item=(K().inventory||[]).find(entry=>Number(entry.item_code)===Number(id));if(item)ctx.beginTeleport?.(item);return true;}
         if(act==='inventory-use-all'){const form=b.closest('form');if(form?.reportValidity())onSubmit(form,true).catch(error=>toast(error.message));return true;}
-        if(act==='inventory-view'){if(['collection','equipment','bonuses'].includes(id)){inventoryView=id;renderInventory(true);host().querySelector(`[data-action="inventory-view"][data-id="${id}"]`)?.focus({preventScroll:true});}return true;}
         if(act==='edit-profile'){editProfile();return true;}
         if(act==='profile-image-remove'){ctx.removeProfileImage().then(async()=>{await refresh(false);editProfile();}).catch(error=>toast(error.message));return true;}
         if(act==='arena-report'){const r=K().arena.challenges.find(r=>Number(r.id)===Number(id));openDialog(`<h2>Arenabericht</h2>${row(r.challenger_name,fmt(r.result?.challenger_score)+' Kampfkraft')}${row(r.opponent_name,fmt(r.result?.opponent_score)+' Kampfkraft')}<p class="success">Keine Truppenverluste</p>`);return true;}
@@ -398,8 +359,6 @@ window.ConquerPanels = function(ctx) {
         if(act==='alliance-leave'){confirm('Allianz verlassen','Du verlässt deine Allianz. Deine bereits geleisteten Beiträge und erworbenen Belohnungen bleiben erhalten. Neue Feldzugsaufträge sind anschließend nicht möglich.','alliance.leave');return true;}
         if(act==='alliance-transfer'||act==='alliance-kick'){const m=K().alliance.members.find(m=>Number(m.player_id)===Number(id));confirm(act==='alliance-transfer'?'Führung übergeben':'Mitglied entfernen',act==='alliance-transfer'?m.display_name+' übernimmt die Führung deiner Allianz.':m.display_name+' wird aus deiner Allianz entfernt.',act==='alliance-transfer'?'alliance.transfer':'alliance.kick',{player_id:Number(id)});return true;}
         if(act==='item-dialog'){itemDialog(id);return true;}
-        if(act==='treasure-dialog'){treasureDialog(id);return true;}
-        if(act==='treasure-unequip'){kd('treasure.unequip',{treasure_code:Number(id)});return true;}
         if(act==='quest-claim'){kd('quest.claim',{quest_code:id}).then(result=>{if(result){lastClaimedQuest=id;if(host().querySelector('.quest-list'))renderQuests();}});return true;}
         if(act==='quest-next'){const next=K().quests.find(q=>q.quest_code===id&&!q.claimed);if(next?.completed){tabsState.quests='ready';renderQuests();const row=[...host().querySelectorAll('[data-quest-code]')].find(el=>el.dataset.questCode===id);row?.scrollIntoView({block:'nearest'});row?.querySelector('button')?.focus({preventScroll:true});}else if(next)navigate(questTarget(next));return true;}
         if(act==='army-hospital'){tabsState.army='hospital';navigate('army');return true;}
@@ -438,7 +397,6 @@ window.ConquerPanels = function(ctx) {
             return null;
         }
         if(name==='item-use'){if(inventoryUsePending)return;const item=K()?.inventory?.find(i=>Number(i.item_code)===id);if(!item||Number(item.quantity)<=0||item.is_usable===false){toast('Dieser Gegenstand ist nicht verfügbar.');return;}const quantity=Number(value('quantity')||1);if(!useAll&&(!form.reportValidity()||!Number.isInteger(quantity)||quantity<1||quantity>Math.min(10000,Number(item.quantity))))return;inventoryQuantities[id]=quantity;const queue=value('queue').split(':');if(item.category==='speedup'&&ctx.openSpeedups&&!useAll&&quantity===1){const target=(K().queues||[]).find(q=>q.type===queue[0]&&Number(q.id)===Number(queue[1])&&(item.subcategory==='generic'||q.type===item.subcategory));if(!target){toast('Kein passender Auftrag aktiv.');return;}inventoryQueueSelections[id]=value('queue');ctx.openSpeedups(target.type,target.id,id);return;}inventoryUsePending=true;try{return await kd('inventory.use',{item_code:id,...(useAll?{use_all:true}:{quantity}),...(queue[0]?{queue_type:queue[0],queue_id:Number(queue[1]),...(queue[0]==='healing'?{batch_id:K().hospital?.active?.batch_id}:{})}:{})});}finally{inventoryUsePending=false;}}
-        if(name==='treasure-equip')return kd('treasure.equip',{treasure_code:id,slot:Number(value('slot'))});
         if(name==='raid-create'){const result=await ed('create',{name:value('name').trim(),boss_code:value('boss_code')||'ashen_lord',difficulty:value('difficulty')||'normal'});if(result?.expedition_id){selectedRaid=Number(result.expedition_id);navigate('expeditions');}return result;}
         if(name==='raid-invite')return ed('invite',{expedition_id:id,alliance_id:Number(value('alliance_id'))});
         if(name==='raid-supply')return ed('supply',{expedition_id:id,amount:Number(value('amount'))});

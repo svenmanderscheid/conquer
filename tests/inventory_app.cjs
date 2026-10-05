@@ -36,7 +36,7 @@ const out=path.resolve(__dirname,'../artifacts/inventory-reference');fs.mkdirSyn
    await page.setViewportSize({width,height});await page.waitForTimeout(450);
    for(const category of ['resource_pack','speedup','boost','other']){
     await page.locator(`[data-action="inventory-category"][data-id="${category}"]`).click();
-    assert.equal(await page.locator('#panel-dialog').getAttribute('data-panel'),'inventory','Relics stay in the backpack');
+    assert.equal(await page.locator('#panel-dialog').getAttribute('data-panel'),'inventory','Item categories stay in the backpack');
     const board=page.locator('.inventory-scroll-board');await board.waitFor();
     await page.locator('.inventory-page-grid').evaluate(async el=>{await Promise.all([...el.querySelectorAll('img')].map(async i=>{i.loading='eager';await i.decode()}))});
     const metrics=await page.evaluate(()=>{
@@ -48,15 +48,6 @@ const out=path.resolve(__dirname,'../artifacts/inventory-reference');fs.mkdirSyn
     assert.equal(metrics.columns,width>=1000?5:width>=700?4:width>=540?3:4,JSON.stringify(metrics));assert.equal(metrics.overflow,false,JSON.stringify({width,height,category,metrics}));assert.equal(metrics.outside,false);assert.deepEqual(metrics.bad,[]);
     const tiles=page.locator('[data-action="inventory-item"]');
     assert((await tiles.evaluateAll(nodes=>nodes.map(node=>Number(node.dataset.id)))).every(code=>!retired.has(code)),'Removed items never appear in the backpack');
-    if(category==='treasures'){
-     const relic=page.locator('.inventory-page-grid [data-action="treasure-dialog"]').last();
-     if(await relic.count()){
-      await relic.click();
-      assert.equal(await relic.getAttribute('aria-pressed'),'true');
-      assert.equal(await page.locator('#game-dialog').evaluate(d=>d.open),false,'Relic details also stay inline');
-      assert(await page.locator('#inventory-details').isVisible());
-     }
-    }
     if(await tiles.count()){
      const tile=tiles.last(),id=await tile.getAttribute('data-id');await tile.click();
      const scroll=await board.evaluate(b=>b.scrollTop);
@@ -127,6 +118,6 @@ const out=path.resolve(__dirname,'../artifacts/inventory-reference');fs.mkdirSyn
   await page.locator('#navigation [data-id="inventory"]').click();
   await page.goBack();
   await page.waitForFunction(()=>!document.querySelector('#panel-dialog').open);
-  assert.deepEqual(errors,[]);console.log('PASS real inventory: five categories, five viewports, icons, details, scrolling, ownership and available item use. '+out);
+  assert.deepEqual(errors,[]);console.log('PASS real inventory: four categories, five viewports, icons, details, scrolling, ownership and available item use. '+out);
  }finally{if(browser)await browser.close();if(fixture&&fixture.exitCode===null){fixture.stdin.end('\n');await new Promise(resolve=>fixture.once('exit',resolve));}}
 })().catch(e=>{console.error(e);process.exitCode=1});
