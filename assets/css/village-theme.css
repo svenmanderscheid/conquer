@@ -3322,6 +3322,13 @@ body.mobile-game #panel-dialog .audio-settings .button { min-height:44px;white-s
 .setting-row-select select { min-width:132px;min-height:44px;padding:8px 32px 8px 10px;border:1px solid var(--ui-line);border-radius:9px;background:var(--ui-card-light);color:var(--ui-ink);font:inherit; }
 @media(max-width:420px) { .setting-row-select { align-items:flex-start;flex-direction:column; }.setting-row-select select { width:100%; } }
 .audio-settings input[type=checkbox] { flex:none;width:24px;height:24px;accent-color:var(--ui-primary); }
+.completion-report-settings { min-width:0;margin:24px 0 0;padding:14px;border:1px solid var(--ui-line);border-radius:12px;background:var(--ui-card);color:var(--ui-ink); }
+.completion-report-settings legend { padding:0 6px;font-size:18px; }
+.completion-report-settings .setting-row { min-height:44px;gap:12px;cursor:pointer;border-color:var(--ui-line); }
+.completion-report-settings .setting-row>span { min-width:0; }
+.completion-report-settings .setting-row strong { color:var(--ui-ink); }
+.completion-report-settings .setting-row small { color:var(--ui-muted); }
+.completion-report-settings input[type=checkbox] { flex:none;width:24px;height:24px;accent-color:var(--ui-primary); }
 .audio-volume { display:grid;grid-template-columns:minmax(0,1fr) 60px;align-items:center;gap:0 12px;margin:0 0 14px;color:var(--ui-ink); }
 .audio-volume>span { grid-column:1/-1; }
 .audio-settings .audio-volume input[type=range] { width:100%;min-width:0;height:44px;margin:0;padding:0;border:0;background:transparent;accent-color:var(--ui-primary);cursor:pointer; }

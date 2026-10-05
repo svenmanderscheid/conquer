@@ -43,6 +43,8 @@ final class NotificationService
     private const POLL_LIMIT = 50;
     // Notifications predating multi-world support belong to the original world.
     private const WORLD_FILTER = "COALESCE(CAST(JSON_UNQUOTE(JSON_EXTRACT(data_json,'$.world_id')) AS UNSIGNED),1)=?";
+    // Keep completion records for building readiness even when report delivery is disabled.
+    private const DELIVERY_FILTER = "COALESCE(JSON_UNQUOTE(JSON_EXTRACT(data_json,'$.report_enabled')),'true')<>'false'";
 
     // -------------------------------------------------------------------------
     // Write
@@ -61,6 +63,11 @@ final class NotificationService
     {
         try {
             $db       = Connection::getInstance();
+            if (in_array($type, [self::TYPE_BUILD_COMPLETE, self::TYPE_RESEARCH_COMPLETE, self::TYPE_TRAIN_COMPLETE], true)) {
+                $enabled = $db->query('SELECT report_' . $type . ' FROM kingdom_profiles WHERE player_id=?', [$playerId])->fetchColumn();
+                // Snapshot the choice at completion so re-enabling cannot backfill muted reports.
+                $data['report_enabled'] = $enabled === false || (bool) $enabled;
+            }
             $data['world_id'] ??= \Conquer\Game\World\WorldContext::id();
             $dataJson = $data !== [] ? json_encode($data, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR) : null;
 
@@ -101,7 +108,7 @@ final class NotificationService
         $rows = $db->query(
             'SELECT id, type, data_json, created_at
              FROM   notifications
-             WHERE  player_id = ? AND read_at IS NULL AND ' . self::WORLD_FILTER . '
+             WHERE  player_id = ? AND read_at IS NULL AND ' . self::WORLD_FILTER . ' AND ' . self::DELIVERY_FILTER . '
              ORDER  BY created_at DESC
              LIMIT  ' . self::POLL_LIMIT,
             [$playerId,WorldContext::id()],
@@ -159,7 +166,7 @@ final class NotificationService
         $row = $db->query(
             'SELECT COUNT(*) AS cnt
              FROM   notifications
-             WHERE  player_id = ? AND read_at IS NULL AND ' . self::WORLD_FILTER,
+             WHERE  player_id = ? AND read_at IS NULL AND ' . self::WORLD_FILTER . ' AND ' . self::DELIVERY_FILTER,
             [$playerId,WorldContext::id()],
         )->fetch();
 
