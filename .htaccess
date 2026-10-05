@@ -87,6 +87,10 @@ RedirectMatch 403 ^/(src|config|migrations|cron|tests|docs|data|vendor|node_modu
 # ============================================================================
 # Performance — caching for static assets
 # ============================================================================
+<IfModule mod_mime.c>
+    # ES modules must have a JavaScript MIME type when nosniff is enabled.
+    AddType application/javascript .mjs
+</IfModule>
 <IfModule mod_expires.c>
     ExpiresActive On
     
