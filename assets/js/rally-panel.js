@@ -99,7 +99,7 @@ window.ConquerRallies = function({base='',api,esc,fmt,date,duration,openDialog,a
         const r=current;if(!r||joinState(r)!=='open')return;
         const host=r.leader||{};
         marchPanel.open(r.leader_player_id,'rally-join',{
-            rally_id:Number(r.id),rally_target_kind:r.target_kind||'city',rally_launch_at:r.launch_at,rally_status:r.status,rally_capacity_remaining:remaining(r),
+            rally_id:Number(r.id),rally_target_kind:r.target_kind||'city',rally_ap_cost:Number(r.ap_cost_base??r.result?.monster?.action_point_cost??0),rally_launch_at:r.launch_at,rally_status:r.status,rally_capacity_remaining:remaining(r),
             rally_boss_mechanic:r.target_kind==='monster'?r.result?.monster?.boss_mechanic:null,
             onRallyBack:()=>detail(r.id),
             target:{id:Number(r.leader_player_id),coord_x:Number(host.coord_x??r.origin_x),coord_y:Number(host.coord_y??r.origin_y),display_name:host.name||r.leader_name||r.leader_username,city_skin:host.city_skin,castle_level:host.castle_level??null}

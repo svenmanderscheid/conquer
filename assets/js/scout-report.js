@@ -9,7 +9,7 @@ window.ConquerScoutReport = function(ctx) {
     const section=(title,body,kind)=>`<section class="sr-section sr-${kind}"><h3>${title}</h3>${body}</section>`;
     const note=text=>`<p class="sr-note">${esc(text)}</p>`;
     const image=(file,cls='')=>`<img class="${cls}" src="${esc(base+'/assets/art/'+file)}" alt="" loading="lazy">`;
-    const itemArt=icon=>{const path=String(icon||'').replace(/^assets\/art\/items\//,'');return /^[a-zA-Z0-9_/-]+\.(png|svg|webp)$/.test(path)&&!path.includes('..')?'items/'+path:'items/compass.svg';};
+    const itemArt=icon=>{const raw=String(icon||''),path=raw.replace(/^assets\/art\//,'');return /^[a-zA-Z0-9_/-]+\.(png|svg|webp)$/.test(path)&&!path.includes('..')?(raw.startsWith('assets/art/')||path.startsWith('items/')?path:'items/'+path):'items/compass.svg';};
     const stat=(label,value)=>`<div><dt>${esc(label)}</dt><dd>${value}</dd></div>`;
     function troopList(rows,empty) {
         if(rows==null)return note('Truppen wurden in diesem Bericht nicht erfasst.');
@@ -38,10 +38,10 @@ window.ConquerScoutReport = function(ctx) {
         const branches=d.mastery.branches?.length?d.mastery.branches:branchDefaults;
         const cards=branches.map(b=>{
             const selected=nodes.filter(n=>n.branch===b.code),points=selected.reduce((sum,n)=>sum+Number(n.level),0);
-            const role=branchDefaults.some(v=>v.code===b.code)?b.code:'unknown';
-            return `<article class="sr-mastery-card sr-role-${role}">${image(itemArt(b.icon))}<strong>${esc(b.name)}</strong><span><b>${number(points)}</b> Punkte</span></article>`;
+            const role=({infantry:'defense',archer:'gather',cavalry:'hunter',monster:'hunter',combat:'attack',gathering:'gather'})[b.code]||(branchDefaults.some(v=>v.code===b.code)?b.code:'unknown');
+            return `<article class="sr-mastery-card sr-role-${role}">${image(itemArt(b.icon))}<strong>${esc(b.name_key?ConquerLocale.t(b.name_key):b.name)}</strong><span><b>${number(points)}</b> Punkte</span></article>`;
         }).join('');
-        const ranks=nodes.length?`<dl class="sr-stats sr-talents">${nodes.map(n=>stat(n.name,`Rang ${number(n.level)}${n.max_level?'/'+number(n.max_level):''}`)).join('')}</dl>`:note('Keine Meisterschaftspunkte vergeben.');
+        const ranks=nodes.length?`<dl class="sr-stats sr-talents">${nodes.map(n=>stat(n.name_key?ConquerLocale.t(n.name_key):n.name,`Rang ${number(n.level)}${n.max_level?'/'+number(n.max_level):''}`)).join('')}</dl>`:note('Keine Meisterschaftspunkte vergeben.');
         return section('Meisterschaft',`<div class="sr-mastery-grid">${cards}</div>${ranks}<p class="sr-total">Lord-Stufe <strong>${number(d.lord_level??d.mastery.lord?.level)}</strong></p>`,'mastery');
     }
     function equipment(d) {
@@ -60,7 +60,7 @@ window.ConquerScoutReport = function(ctx) {
         const rows=[];
         if(d.wall?.attack_buff!=null)rows.push(stat('Mauerangriff',percent(d.wall.attack_buff)));
         if(d.wall?.defense_buff!=null)rows.push(stat('Mauerverteidigung',percent(d.wall.defense_buff)));
-        for(const node of d.mastery?.nodes||[])if(Number(node.level)>0&&node.bonus!=null)rows.push(stat((node.label||node.name)+' · Meisterschaft',percent(Number(node.level)*Number(node.bonus)*100)));
+        for(const node of d.mastery?.nodes||[])if(Number(node.level)>0&&node.bonus!=null)rows.push(stat((node.label_key?ConquerLocale.t(node.label_key):node.label||node.name)+' · Meisterschaft',node.unit==='AP'?`+${number(Number(node.level)*Number(node.bonus))} AP`:percent(Number(node.level)*Number(node.bonus)*100)));
         return section('Gesichtete Boni',`${rows.length?`<dl class="sr-stats">${rows.join('')}</dl>`:note('Keine Boni in diesem Bericht erfasst.')}${note('Mauer- und Meisterschaftsboni bei der Aufklärung. Weitere aktive Boni wurden nicht erfasst.')}`,'bonuses');
     }
     function render(r,footer) {

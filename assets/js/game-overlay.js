@@ -77,7 +77,7 @@ window.ConquerOverlay = function (ctx) {
         hunter.setAttribute('aria-label',profile?(hunterMax?`Hunter-Stufe ${level}, Höchststufe erreicht. Hunter-Talente öffnen`:`Hunter-Stufe ${level}, ${fmt(hunterXp)} von ${fmt(hunterNext)} Jagd-XP. Hunter-Talente öffnen`):'Hunter-Fortschritt wird geladen');
         const second=$('hud-build-second'),slots=Number(kingdom?.vip?.building_slots||state.vip?.building_slots||1),unlocked=slots>1;
         if(second){second.dataset.action=unlocked?'buildings':'vip-open';second.classList.toggle('is-locked',!unlocked);second.setAttribute('aria-label',unlocked?'Zweite Bauschleife öffnen':'Zweite Bauschleife wird mit VIP 4 freigeschaltet');}
-        $('hud-march-status').textContent = `${state.marches?.length || 0} / ${(state.army_limits?.march_slots || 3)+(state.army_limits?.gather_march_slots || 0)}`;
+        $('hud-march-status').textContent = `${state.marches?.length || 0} / ${(state.army_limits?.march_slots || 3)+(state.army_limits?.gather_march_slots || 0)+(state.army_limits?.hunt_march_slots || 0)}`;
         $('hud-marches')?.classList.toggle('has-activity',!!state.marches?.length);
         rallyAlert();
         tick();

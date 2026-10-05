@@ -19,14 +19,14 @@ try{
  $fixture=new \ConquerTests\FeatureDatabase();$db=Connection::getInstance();$password='FixturePassword_2026';
  foreach([1,2]as$pid){$db->execute('INSERT INTO players(id,username,email,password_hash) VALUES(?,?,?,?)',[$pid,'Feature'.$pid,'feature'.$pid.'@tests.invalid',password_hash($password,PASSWORD_DEFAULT)]);$db->execute("INSERT INTO cities(id,player_id,world_id,name,coord_x,coord_y,castle_level,food,lumber,stone,gold) VALUES(?,?,1,?, ?,40,12,100000,100000,100000,100000)",[$pid,$pid,'Feature city '.$pid,40+$pid*6]);foreach(\Conquer\Game\City\CityState::BUILDING_CODES as$code)$db->execute('INSERT INTO city_buildings(city_id,building_code,level) VALUES(?,?,?)',[$pid,$code,$code==='castle'?12:1]);$db->execute('INSERT INTO city_troops(city_id,troop_code,count) VALUES(?,50100101,1000)',[$pid]);}
  \Conquer\Game\Player\LordLevel::addXp(1,\Conquer\Game\Player\LordLevel::totalForLevel(11));
- ok(MasteryService::snapshot(1)['available']===11,'lord progression grants finite mastery points');
- $body=['action'=>'mastery.apply','ranks'=>['gather_1'=>1],'revision'=>0,'operation_key'=>'mastery_idempotent_0001'];operation(1,$body);operation(1,$body);
+ ok(MasteryService::snapshot(1)['available']===13,'lord progression grants finite mastery points');
+ $body=['action'=>'mastery.apply','ranks'=>['gathering_9'=>1],'revision'=>0,'operation_key'=>'mastery_idempotent_0001'];operation(1,$body);operation(1,$body);
  ok(MasteryService::snapshot(1)['spent']===1,'mastery retry spends one point');
- ok(abs(BuffEngine::getBuffs(1)['food_production']-.02)<.000001,'mastery modifies actual production buffs');
- denies(fn()=>operation(1,array_replace($body,['ranks'=>['attack_0'=>1]])),'changed operation payload is rejected');
- operation(1,['action'=>'mastery.apply','ranks'=>['gather_1'=>5],'revision'=>1]);
- denies(fn()=>operation(1,['action'=>'mastery.apply','ranks'=>['gather_1'=>6],'revision'=>2]),'mastery maximum level enforced');
- operation(1,['action'=>'mastery.apply','ranks'=>[],'revision'=>2]);ok(MasteryService::snapshot(1)['available']===11,'respec returns exactly the earned points');
+ ok(abs(BuffEngine::getBuffs(1)['gathering_speed']-.02)<.000001,'mastery modifies actual gathering buffs');
+ denies(fn()=>operation(1,array_replace($body,['ranks'=>['combat_9'=>1]])),'changed operation payload is rejected');
+ operation(1,['action'=>'mastery.apply','ranks'=>['gathering_9'=>1,'gathering_0'=>5],'revision'=>1]);
+ denies(fn()=>operation(1,['action'=>'mastery.apply','ranks'=>['gathering_9'=>1,'gathering_0'=>6],'revision'=>2]),'mastery maximum level enforced');
+ operation(1,['action'=>'mastery.apply','ranks'=>[],'revision'=>2]);ok(MasteryService::snapshot(1)['available']===13,'respec returns exactly the earned points');
  // Active catalog: stars are explicitly upgraded; merely owning fragments is not an upgrade.
  $baseHospital=\Conquer\Game\Hospital\HospitalService::getStatus(1)['capacity'];$baseMarch=ResearchEffects::limits(BuffEngine::getBuffs(1))['march_capacity'];
  foreach([[60500101,4,1],[60500102,4,2]] as [$relic,$effect,$slot]){

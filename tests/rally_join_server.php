@@ -77,7 +77,7 @@ try {
     $speed = min(MarchSpeed::rally(50100101,BuffEngine::getBuffs(2,1),true),MarchSpeed::rally(50200101,BuffEngine::getBuffs(2,1),true));
     $travel = MarchSpeed::duration(10,$speed,1);
     rallyJoinCheck($member['status']==='joining' && strtotime($member['arrival_time'].' UTC')-strtotime($member['joined_at'].' UTC')===$travel, 'saved arrival uses distance to the host and the slowest selected troop');
-    rallyJoinCheck((int)$db->query('SELECT action_points FROM players WHERE id=2')->fetchColumn()===200 && strtotime($db->query('SELECT beginner_shield_until FROM players WHERE id=2')->fetchColumn().' UTC')>time(), 'joining a monster rally preserves member AP and city protection');
+    rallyJoinCheck((int)$member['ap_cost_paid']>0 && (int)$db->query('SELECT action_points FROM players WHERE id=2')->fetchColumn()===200-(int)$member['ap_cost_paid'] && strtotime($db->query('SELECT beginner_shield_until FROM players WHERE id=2')->fetchColumn().' UTC')>time(), 'joining a monster rally charges the member AP once and preserves city protection');
     $routes = RallyService::activeMarchesForPlayer(2);
     rallyJoinCheck(count($routes)===1 && $routes[0]['march_type']==='rally_join' && $routes[0]['target_x']===30 && $routes[0]['target_y']===40 && $routes[0]['origin_x']===40, 'map march travels from the member city to the host, not the monster');
     $again = $call('rally/join',$join);
@@ -104,6 +104,7 @@ try {
     rallyJoinCheck(count($detail['participants'])===2 && array_unique(array_column($detail['participants'],'status'))===['pending'], 'arrived members remain in the detail roster with an arrived status');
     RallyService::cancel($rallyId,1);
     rallyJoinCheck($stock(1)===10000 && $stock(2)===10000 && $stock(2,50200101)===10000 && $stock(3)===10000, 'cancelling returns every reserved army exactly once');
+    rallyJoinCheck((int)$db->query('SELECT action_points FROM players WHERE id=2')->fetchColumn()===200 && (int)$db->query('SELECT ap_cost_paid FROM rally_participants WHERE rally_id=? AND player_id=2',[$rallyId])->fetchColumn()===0,'cancel refunds the exact paid AP and clears the receipt');
     RallyService::tick();
     rallyJoinCheck($stock(2)===10000 && RallyService::activeMarchesForPlayer(2)===[] && $call('rally/list')['json']['data']['rallies']===[], 'finished cancellation clears map/list activity without duplicating troops');
     echo "ALL $checks RALLY JOIN SERVER CHECKS PASSED\n";

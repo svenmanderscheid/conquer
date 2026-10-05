@@ -1,0 +1,225 @@
+{
+  "version": 1,
+  "approval": "User approved the revised talent icons and requested game integration on 2026-10-05",
+  "method": "Built-in image generation: background extraction; mechanical crop/resize/WebP compression",
+  "source": "artifacts/talent-icons-v1/runtime-atlas-v1.png",
+  "sourceSha256": "4a676c06454d6195e3e9dbc4c4bc0106cad4531d42a684dd78b3a23b589db1c4",
+  "icons": {
+    "infantry": {
+      "width": 256,
+      "height": 256,
+      "bytes": 14596,
+      "sha256": "e8721769e52f0756b9c29435bbb38c2ec96cd066fba20438f3ec86035c3a0787",
+      "crop": {
+        "left": 98,
+        "top": 43,
+        "width": 214,
+        "height": 233
+      }
+    },
+    "archer": {
+      "width": 256,
+      "height": 256,
+      "bytes": 16564,
+      "sha256": "d0f0656b0eb0a732aff4947cebb0c56602cd83c8b91c5c3ad3058eeec37e1e59",
+      "crop": {
+        "left": 391,
+        "top": 44,
+        "width": 261,
+        "height": 235
+      }
+    },
+    "cavalry": {
+      "width": 256,
+      "height": 256,
+      "bytes": 16070,
+      "sha256": "512d15a0cdb1504471e43f9a0e11f45bafbd666e24b12bff26d39a36f6dae7fa",
+      "crop": {
+        "left": 700,
+        "top": 45,
+        "width": 260,
+        "height": 226
+      }
+    },
+    "monster": {
+      "width": 256,
+      "height": 256,
+      "bytes": 14780,
+      "sha256": "8bb8f737e0984ed8fb77d7566f5ef064aba9801dbf4545b7b10b82360bf72b7c",
+      "crop": {
+        "left": 74,
+        "top": 297,
+        "width": 266,
+        "height": 212
+      }
+    },
+    "combat": {
+      "width": 256,
+      "height": 256,
+      "bytes": 15448,
+      "sha256": "5ae2b72a67636d099f6ce3a461b4ae907924ac59551bdb4035552f0713798b94",
+      "crop": {
+        "left": 394,
+        "top": 302,
+        "width": 239,
+        "height": 209
+      }
+    },
+    "gathering": {
+      "width": 256,
+      "height": 256,
+      "bytes": 19378,
+      "sha256": "5f1a166b229f3fe850d396be88e4b8eff56a3e4824e0cb96e966074949334d2d",
+      "crop": {
+        "left": 697,
+        "top": 293,
+        "width": 268,
+        "height": 218
+      }
+    },
+    "ap": {
+      "width": 256,
+      "height": 256,
+      "bytes": 12342,
+      "sha256": "2a279eb3af55ec378b63237e2a6de92c4bb0a114c9654e13d5d62d7da35bbf09",
+      "crop": {
+        "left": 109,
+        "top": 521,
+        "width": 195,
+        "height": 216
+      }
+    },
+    "healing": {
+      "width": 256,
+      "height": 256,
+      "bytes": 15062,
+      "sha256": "fe3be96f5eac1f67fcdde3325e1c065e4f197ba1171481fe03ceab934c02e78b",
+      "crop": {
+        "left": 394,
+        "top": 524,
+        "width": 248,
+        "height": 210
+      }
+    },
+    "loot": {
+      "width": 256,
+      "height": 256,
+      "bytes": 13972,
+      "sha256": "88f4c26c0ec1c8d0a837872f459387677963e2d39743ff935b499caf0ba93f27",
+      "crop": {
+        "left": 702,
+        "top": 530,
+        "width": 281,
+        "height": 206
+      }
+    },
+    "march-speed": {
+      "width": 256,
+      "height": 256,
+      "bytes": 13376,
+      "sha256": "246851fa5eae0a05c70d68281499d361b5c82ad17d283375a0b72fa39f09ef18",
+      "crop": {
+        "left": 70,
+        "top": 748,
+        "width": 275,
+        "height": 209
+      }
+    },
+    "carrying-capacity": {
+      "width": 256,
+      "height": 256,
+      "bytes": 14676,
+      "sha256": "20125c1ef77a09df8816be863fa45aaae2b12f6cbf8d20749ff5e88f00a6f412",
+      "crop": {
+        "left": 387,
+        "top": 748,
+        "width": 261,
+        "height": 210
+      }
+    },
+    "hp": {
+      "width": 256,
+      "height": 256,
+      "bytes": 10804,
+      "sha256": "f37e80c262c9b8991470cc1bdcd872cc27f9a983057c26871364762320d87fdf",
+      "crop": {
+        "left": 719,
+        "top": 758,
+        "width": 225,
+        "height": 194
+      }
+    },
+    "defence": {
+      "width": 256,
+      "height": 256,
+      "bytes": 12048,
+      "sha256": "fa56a5c54cee6a113e6623da440e76332a7a881a2b02dd7989baa4354586ee41",
+      "crop": {
+        "left": 98,
+        "top": 966,
+        "width": 215,
+        "height": 230
+      }
+    },
+    "rally-size": {
+      "width": 256,
+      "height": 256,
+      "bytes": 15120,
+      "sha256": "b07a92204be561d4b799e175b949a12d96d07da5c6de219689e80c69c4b26544",
+      "crop": {
+        "left": 372,
+        "top": 965,
+        "width": 289,
+        "height": 231
+      }
+    },
+    "training": {
+      "width": 256,
+      "height": 256,
+      "bytes": 16538,
+      "sha256": "294be86edc41777da6714764d41927a6d4388b503c886db5eeaaac6007394e13",
+      "crop": {
+        "left": 711,
+        "top": 971,
+        "width": 256,
+        "height": 216
+      }
+    },
+    "construction": {
+      "width": 256,
+      "height": 256,
+      "bytes": 11990,
+      "sha256": "b3906baf136a00958384f9956e6b337a0c8be7ce93f9081274be5f9012b1f034",
+      "crop": {
+        "left": 63,
+        "top": 1222,
+        "width": 283,
+        "height": 233
+      }
+    },
+    "research": {
+      "width": 256,
+      "height": 256,
+      "bytes": 12242,
+      "sha256": "09b0917e14824e8aaae3db4e6d985ccfe043e7c333e9e2cdd0c412f63dd72ff4",
+      "crop": {
+        "left": 360,
+        "top": 1240,
+        "width": 306,
+        "height": 206
+      }
+    },
+    "production": {
+      "width": 256,
+      "height": 256,
+      "bytes": 15324,
+      "sha256": "c2193f47ea83c2d3920a8f9223ae1a88234e20d2e1f4afeffaa4557ede54af2d",
+      "crop": {
+        "left": 692,
+        "top": 1224,
+        "width": 284,
+        "height": 231
+      }
+    }
+  }
+}

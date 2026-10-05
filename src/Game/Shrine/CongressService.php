@@ -92,6 +92,10 @@ final class CongressService
             $seconds=self::travelSeconds($city,$shrine,$troops,$buffs,$skinSnapshot,!$garrison&&$shrine['alliance_id']!==null);
             $db->execute("INSERT INTO marches(player_id,world_id,march_type,march_skin,march_speed_bonus_pct,origin_city_id,target_x,target_y,target_type,target_id,troops_json,departure_time,arrival_time,state) VALUES(?,?,?,?,?,?,?,?,?,?,?,UTC_TIMESTAMP(),DATE_ADD(UTC_TIMESTAMP(),INTERVAL ? SECOND),'marching')",[$playerId,WorldContext::id(),$garrison?self::GARRISON:self::ATTACK,$skinSnapshot['march_skin'],$skinSnapshot['bonus_pct'],$city['id'],$shrine['coord_x'],$shrine['coord_y'],self::TARGET_TYPE,$shrineId,json_encode($troops,JSON_THROW_ON_ERROR),$seconds]);
             $id=$db->lastInsertId();
+            if(!$garrison&&$shrine['alliance_id']!==null){
+                $returnSeconds=self::travelSeconds($city,$shrine,$troops,$buffs,$skinSnapshot,true,true);
+                $db->execute('UPDATE marches SET haul_json=? WHERE id=?',[json_encode(['pvp_return_seconds'=>$returnSeconds]),$id]);
+            }
             $db->execute('INSERT INTO shrine_march_orders(march_id,alliance_id,buffs_json,event_instance) VALUES(?,?,?,?)',[$id,$alliance,json_encode($buffs,JSON_THROW_ON_ERROR),$eventInstance]);
             return self::receipt($id,$garrison?'Verstärkung ist zum Schrein unterwegs.':'Der Angriff auf den Schrein ist unterwegs.');
         });
@@ -162,18 +166,19 @@ final class CongressService
     private static function fight(Connection $db,array $march,array $shrine,array $troops,int $alliance): void
     {
         $guards=$db->query('SELECT * FROM shrine_garrisons WHERE shrine_id=? ORDER BY id FOR UPDATE',[$shrine['id']])->fetchAll();
+        $enemyTroops=[];foreach($guards as $guard)foreach(json_decode($guard['troops_json'],true)?:[] as $code=>$count)$enemyTroops[$code]=($enemyTroops[$code]??0)+$count;
         $attackBuffs=ResearchEffects::armyBuffs(json_decode($march['buffs_json']??'{}',true)?:[],$troops);
-        if($shrine['alliance_id']!==null)$attackBuffs=\Conquer\Game\Player\TalentEffects::combat($attackBuffs,'pvp');
+        if($shrine['alliance_id']!==null)$attackBuffs=\Conquer\Game\Player\TalentEffects::combat($attackBuffs,'pvp',false,$enemyTroops);
         $attack=self::power($troops,$attackBuffs,false);$absorption=self::power($troops,$attackBuffs,true);
         $defense=self::power($shrine['garrison_troops'],[],true);
-        foreach($guards as $guard){$army=json_decode($guard['troops_json'],true)?:[];$defense+=self::power($army,ResearchEffects::armyBuffs(json_decode($guard['buffs_json'],true)?:[],$army),true);}
+        foreach($guards as $guard){$army=json_decode($guard['troops_json'],true)?:[];$defense+=self::power($army,\Conquer\Game\Player\TalentEffects::combat(ResearchEffects::armyBuffs(json_decode($guard['buffs_json'],true)?:[],$army),'field_defense',false,$troops),true);}
         $wins=$attack>=$defense;
         $attackRate=$wins?min(.5,$defense/max(1,$absorption)):min(.8,$defense/max(1,$absorption)*.6);
         $defenseRate=$wins?.5:min(.5,$attack/max(1,$defense));
-        $loss=self::casualties($troops,$attackRate);
+        $loss=self::casualties($troops,$attackRate,$attackBuffs,$enemyTroops);
         HospitalService::addWounded((int)$march['origin_city_id'],$loss['wounded']);
         foreach($guards as $guard){
-            $guardLoss=self::casualties(json_decode($guard['troops_json'],true)?:[],$defenseRate);
+            $guardLoss=self::casualties(json_decode($guard['troops_json'],true)?:[],$defenseRate,json_decode($guard['buffs_json'],true)?:[],$troops);
             HospitalService::addWounded((int)$guard['city_id'],$guardLoss['wounded']);
             if($wins)self::returnGarrison($db,$guard,$shrine,$guardLoss['survivors']);
             else $db->execute('UPDATE shrine_garrisons SET troops_json=? WHERE id=?',[json_encode($guardLoss['survivors']),$guard['id']]);
@@ -205,9 +210,9 @@ final class CongressService
         $score=0.0;foreach($troops as $code=>$count){$def=TroopData::get((int)$code);if(!$def)continue;$type=ResearchEffects::troopType((int)$code);$value=$defense?($def['hp']*BuffEngine::effectiveMultiplier($buffs,$type,'hp')+$def['defense']*BuffEngine::effectiveMultiplier($buffs,$type,'def')):$def['attack']*BuffEngine::effectiveMultiplier($buffs,$type,'atk');$score+=$count*$value;}return $score;
     }
 
-    private static function casualties(array $troops,float $rate): array
+    private static function casualties(array $troops,float $rate,array $buffs=[],array $enemyTroops=[]): array
     {
-        $out=['survivors'=>[],'wounded'=>[],'dead'=>[]];foreach($troops as $code=>$count){$lost=min($count,(int)round($count*$rate));$wounded=(int)floor($lost*.3);$out['survivors'][$code]=$count-$lost;$out['wounded'][$code]=$wounded;$out['dead'][$code]=$lost-$wounded;}return $out;
+        $out=['survivors'=>[],'wounded'=>[],'dead'=>[]];foreach($troops as $code=>$count){$factor=\Conquer\Game\Player\TalentEffects::lossFactor($buffs,ResearchEffects::troopType((int)$code),$enemyTroops);$lost=min($count,(int)round($count*$rate*$factor));$wounded=(int)floor($lost*.3);$out['survivors'][$code]=$count-$lost;$out['wounded'][$code]=$wounded;$out['dead'][$code]=$lost-$wounded;}return $out;
     }
 
     private static function returnMarch(Connection $db,array $march,array $troops,string $reason): void
@@ -221,14 +226,15 @@ final class CongressService
         $id=$db->lastInsertId();$db->execute('DELETE FROM shrine_garrisons WHERE id=?',[$guard['id']]);return $id;
     }
 
-    private static function duration(array $march): int {return max(5,strtotime($march['arrival_time'].' UTC')-strtotime($march['departure_time'].' UTC'));}
+    private static function duration(array $march): int {$haul=json_decode($march['haul_json']??'{}',true)?:[];return max(5,(int)($haul['pvp_return_seconds']??(strtotime($march['arrival_time'].' UTC')-strtotime($march['departure_time'].' UTC'))));}
 
     /** DB clock also drives arrival and return SQL, preventing mixed-clock boundary decisions. */
     private static function now(): int {return (int)Connection::getInstance()->query('SELECT UNIX_TIMESTAMP(UTC_TIMESTAMP())')->fetchColumn();}
 
-    private static function travelSeconds(array $city,array $shrine,array $troops,array $buffs,array $skinSnapshot,bool $occupiedAttack): int
+    private static function travelSeconds(array $city,array $shrine,array $troops,array $buffs,array $skinSnapshot,bool $occupiedAttack,bool $return=false): int
     {
         $skinMultiplier=MarchSkinService::speedMultiplier($skinSnapshot);$speed=PHP_INT_MAX;
+        if($occupiedAttack)$buffs=\Conquer\Game\Player\TalentEffects::cavalryMarch($buffs,$troops,$return);
         foreach($troops as $code=>$count)$speed=min($speed,$occupiedAttack?MarchSpeed::pvp((int)$code,$buffs,$skinMultiplier):MarchSpeed::generic((int)$code,$buffs,$skinMultiplier));
         return max(5,(int)floor(hypot($city['coord_x']-$shrine['coord_x'],$city['coord_y']-$shrine['coord_y'])*100/max(1,$speed)));
     }

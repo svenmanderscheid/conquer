@@ -2,6 +2,7 @@
 window.ConquerWorld = (() => {
   'use strict';
   const editorial=value=>window.ConquerLocale?.text(value)??value;
+  const translated=(key,fallback)=>{const value=window.ConquerLocale?.t(key);return value&&value!==key?value:fallback;};
   const sceneryImages=new Map();
   let painted=null,paintedLoading=false;
   function loadPainted(){
@@ -134,12 +135,12 @@ window.ConquerWorld = (() => {
     return `${owner} · ${event.name||'Schreinereignis'} · ${state}${time?` · ${event.active?'bis':'ab'} ${time}`:''}`;
   }
   const isVillage = target => target.kind==='home'||target.kind==='players'||target.kind==='neutral_villages';
-  const isCompactTarget = target => isVillage(target)||target.kind==='territory'||target.kind==='monsters'||target.kind==='nodes'||target.kind==='charms'||target.kind==='alliance_center'||target.kind==='outpost';
+  const isCompactTarget = target => isVillage(target)||target.kind==='territory'||target.kind==='dungeons'||target.kind==='monsters'||target.kind==='nodes'||target.kind==='charms'||target.kind==='alliance_center'||target.kind==='outpost';
   const isRegionalBoss = target => target.kind==='monsters'&&target.data.definition?.type==='rally'&&target.data.definition?.art?.startsWith('monsters/');
   // Feet in each original illustration, after object-fit:contain in the 3.6 x
   // 3.8 tile portrait. Wide Sandmaul has much more vertical transparent margin.
   const bossContactY={grumwald:.60,frostgrimm:.80,sandmaul:.14,glutramm:.42,daemmerhorn:.92};
-  const footprint = target => target.kind==='territory'?(Number(target.data.footprint)||(target.data.kind==='crown'?7:target.data.kind==='canton'?5:3)):target.kind==='congress'?7:target.kind==='alliance_center'?5:target.kind==='outpost'?3:isVillage(target)?(isLux()?4:3):target.kind==='cell'&&context?.teleport?number(context.teleport.footprint||4):target.kind==='shrine'?6:target.kind==='monsters'&&(target.data.definition?.type==='rally'||Number(target.data.definition?.footprint)===2)?2:1;
+  const footprint = target => target.kind==='dungeons'?number(target.data.footprint||3):target.kind==='territory'?(Number(target.data.footprint)||(target.data.kind==='crown'?7:target.data.kind==='canton'?5:3)):target.kind==='congress'?7:target.kind==='alliance_center'?5:target.kind==='outpost'?3:isVillage(target)?(isLux()?4:3):target.kind==='cell'&&context?.teleport?number(context.teleport.footprint||4):target.kind==='shrine'?6:target.kind==='monsters'&&(target.data.definition?.type==='rally'||Number(target.data.definition?.footprint)===2)?2:1;
   // Villages use a compact 3 × 3 presentation without shrinking their castle art. Rally monsters occupy 2 × 2.
   // Shrines span anchor -2 through +3; even-sized footprints are centered half a tile past the anchor.
   // Even-sized footprints have their visual center half a tile past the anchor.
@@ -273,12 +274,13 @@ window.ConquerWorld = (() => {
     for(const g of (isLux()?[]:state.shrines)||[]){const element=shrineElement(g);if(!shrineElements[element]||!Number.isFinite(Number(g.coord_x))||!Number.isFinite(Number(g.coord_y)))continue;targets.push({key:`shrine:${g.id}`,kind:'shrine',id:g.id,element,x:number(g.coord_x),y:number(g.coord_y),name:g.name||`${shrineElements[element].label}schrein`,art:`${context.base}/assets/art/map/painted-v2/shrine-${element}.${motionPreference.matches||document.body.classList.contains('reduced-motion')?'png':'webp'}?v=shrines1`,data:g});}
     for(const g of state.alliance_structures||[]){const kind=g.structure_type==='center'?'alliance_center':'outpost';targets.push({key:`${kind}:${g.id}`,kind,id:g.id,x:number(g.coord_x),y:number(g.coord_y),name:g.name||(`${g.alliance_tag?'['+g.alliance_tag+'] ':''}${kind==='alliance_center'?'Allianzzentrum':'Außenposten'}`),level:1,art:asset(kind==='alliance_center'?'painted-v2/alliance-center.webp':'alliance-outpost'),data:g});}
     for(const g of state.territory?.map_targets||state.territory?.targets||[]){targets.push({key:`territory:${g.id}`,kind:'territory',id:g.id,x:number(g.x??g.coord_x),y:number(g.y??g.coord_y),name:g.name,level:1,art:window.ConquerTerritoryArt.image(context.base,g),artKey:window.ConquerTerritoryArt.key(g),data:g});}
+    for(const entrance of state.dungeon_entrances||[]){targets.push({key:`dungeons:${entrance.id}`,kind:'dungeons',id:entrance.id,x:number(entrance.x),y:number(entrance.y),name:translated(entrance.name_key,'The Sealed Well'),level:1,art:`${context.base}/${entrance.art}`,data:entrance});}
     for(const target of targets){const [x,y]=targetCenter(target);target.biome=window.ConquerLandscape.biomeAt(x,y);}
     return targets;
   }
   function matching(target) {
     if(target.kind==='home'||target.kind==='congress')return true;
-    if(target.kind==='territory')return true;
+    if(target.kind==='territory'||target.kind==='dungeons')return true;
     if(memory.filter!=='all'&&target.kind!==memory.filter&&target.resource?.kind!==memory.filter)return false;
     if(!memory.search)return true;
     const haystack=`${target.name} ${target.resource?.word||''} ${target.kind==='charms'?'Charm Talisman '+(charmCategories[target.data.stat_category]||target.data.stat_category||''):''} ${target.kind==='shrine'?'Schrein shrine '+shrineElements[target.element].aliases:''} ${target.data.alliance_tag||''} ${target.data.alliance_name||''} ${target.x} ${target.y}`.toLocaleLowerCase('de-DE');
@@ -526,6 +528,7 @@ window.ConquerWorld = (() => {
       }
       const allianceBuilding=['alliance_center','outpost'].includes(target.kind),levelNode=button.querySelector('.atlas-marker-level');levelNode.textContent=target.kind==='territory'?(target.data.owner_name||'NPC-Besatzung'):target.kind==='shrine'?shrineStatus(target):target.kind==='congress'?(target.data.alliance_tag?'['+target.data.alliance_tag+']':'Neutral'):['home','players'].includes(target.kind)?String(target.level):target.kind==='charms'?'':allianceBuilding?'':`Lv. ${target.level}`;levelNode.hidden=allianceBuilding;levelNode.toggleAttribute('aria-hidden',target.kind==='charms'||allianceBuilding);
       const nameNode=button.querySelector('.atlas-marker-name');
+      if(target.kind==='dungeons'){levelNode.hidden=true;levelNode.setAttribute('aria-hidden','true');}
       if(target.kind==='territory'){button.setAttribute('translate','no');button.dataset.territoryKind=target.data.kind;}else {button.removeAttribute('translate');delete button.dataset.territoryKind;}
       if(['home','players'].includes(target.kind)){
         nameNode.replaceChildren(levelNode);
@@ -601,6 +604,7 @@ window.ConquerWorld = (() => {
     else if(target.kind==='players')actions=button('Profil','profile',`data-action="public-profile" data-id="${escape(target.id)}"`)+button('Solo-Attacke','sword',`data-action="village-attack" data-id="${escape(target.id)}"`,'is-attack')+button('Debuff','debuff',`data-action="village-debuff" data-id="${escape(target.id)}"`,'is-debuff')+button('Rally','flag',`data-action="village-rally" data-id="${escape(target.id)}"`,'is-rally')+button('Spähen','scout',`data-action="village-scout" data-id="${escape(target.id)}" data-x="${target.x}" data-y="${target.y}"`,'is-scout');
     else if(target.kind==='neutral_villages')actions=button('Angreifen','sword',`data-action="neutral-village-attack" data-id="${escape(target.id)}"`,'is-attack')+button('Spähen','scout',`data-action="neutral-village-scout" data-id="${escape(target.id)}" data-x="${target.x}" data-y="${target.y}"`,'is-scout');
     else if(target.kind==='charms')actions='';
+    else if(target.kind==='dungeons')actions=button(escape(translated('melusina.open','Explore the well')),'home','data-action="dialog-tab" data-id="dungeons"');
     else if(!actions)actions=target.kind==='territory'?button('Gebiet öffnen','home',`data-action="territory-target" data-id="${escape(target.id)}"`):target.kind==='shrine'?button('Schrein','home',`data-action="shrine-open" data-id="${escape(target.id)}"`):target.kind==='congress'?button('Kongress','home','data-action="congress-open"'):button('Details','list','data-atlas="details"');
     if(target.kind==='alliance_center'&&target.data.can_garrison)actions+=button('Verteidigen','home',`data-action="alliance-center-garrison" data-id="${escape(target.id)}"`,'is-garrison');
     if(target.kind==='shrine'&&target.data.can_attack)actions+=button('Angreifen','sword',`data-action="shrine-attack" data-id="${escape(target.id)}"`,'is-attack');
@@ -616,7 +620,7 @@ window.ConquerWorld = (() => {
       return `<div class="atlas-encounter-header"><strong>${escape(target.name)}</strong><button data-atlas="clear" aria-label="Zielmenü schließen">${icon('close')}</button></div><div class="atlas-encounter-summary">${encounterImage(target)}<div><strong>Stufe ${target.level}</strong><small>X ${target.x} · Y ${target.y}</small><small>${footprint(target)} × ${footprint(target)} ${footprint(target)===1?'Feld':'Felder'}</small></div></div><div class="atlas-encounter-stock"><span>${node?'Vorrat':'Lebenspunkte'}</span><strong>${format(current)} / ${format(maximum)}</strong><progress aria-label="${node?'Verbleibender Vorrat':'Lebenspunkte'}" value="${Math.min(current,maximum)}" max="${maximum}"></progress></div><p class="atlas-encounter-status${node?' atlas-node-status':''}"${node?` data-occupation="${nodeOccupation(data)}"`:''}>${escape(status)}</p><div class="atlas-actions-buttons">${actions}</div>`;
     }
     if(isCompactTarget(target)){
-      const summary=target.kind==='charms'
+      const summary=target.kind==='charms'||target.kind==='dungeons'
         ? `<small class="atlas-charm-summary">X ${target.x} · Y ${target.y}</small>`
         : `<small>Lv. ${target.level} · X ${target.x} · Y ${target.y}</small>`;
       const close=target.kind==='charms'?'':`<button data-atlas="clear" aria-label="Zielmenü schließen">${icon('close')}</button>`;
@@ -801,7 +805,7 @@ window.ConquerWorld = (() => {
     view.el.querySelector('.map-overlay-search-toggle').classList.toggle('is-filtered',memory.filter!=='all'||!!memory.search);
     const detailSignature=JSON.stringify([memory.selected,memory.cell,target?.data,context.teleport?.item_code||null,motionReduced(),memory.searchRun?.key===searchKey(),memory.searchRun?.targetKey]);if(detailSignature!==view.detailStamp){view.detailStamp=detailSignature;view.el.querySelector('.atlas-detail').innerHTML=details(target);commands.innerHTML=targetActions(target);updateSearchControls();}
   }
-  function updateFooter(){if(!view)return;const visible=view.targets.filter(t=>t.kind!=='home'&&matching(t)).length;view.el.querySelector('.atlas-status').textContent=`${visible} Ziele im erkundeten Gebiet`;view.el.querySelector('.atlas-march-count').textContent=`${context.state.marches?.length||0} / ${context.state.army_limits?.march_slots||3} Märsche unterwegs`;}
+  function updateFooter(){if(!view)return;const visible=view.targets.filter(t=>t.kind!=='home'&&matching(t)).length;view.el.querySelector('.atlas-status').textContent=`${visible} Ziele im erkundeten Gebiet`;view.el.querySelector('.atlas-march-count').textContent=`${context.state.marches?.length||0} / ${(context.state.army_limits?.march_slots||3)+(context.state.army_limits?.gather_march_slots||0)+(context.state.army_limits?.hunt_march_slots||0)} Märsche unterwegs`;}
   // Decorative terrain uses the same pre-rendered 3D language as settlements,
   // resources and monsters. The former canvas volcanoes, crystal spires and
   // flat relic drawings are intentionally not used here.

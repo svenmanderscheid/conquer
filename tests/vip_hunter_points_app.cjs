@@ -27,7 +27,7 @@ async function fixture() {
         const page=await context.newPage(),errors=[],report=[];
         page.on('pageerror',e=>errors.push(e.message));
         page.setDefaultTimeout(15000);
-        await page.goto(test.base+'/?zugang=login');
+        await page.goto(test.base+'/?zugang=login',{waitUntil:'domcontentloaded',timeout:60000});
         await page.locator('[name="identifier"], [name="username"]').first().fill('PreviewPlayer');
         await page.locator('[name="password"]').fill('PreviewFixture!2026');
         await Promise.all([page.waitForURL('**/city'),page.locator('form[action$="/auth/local"] button[type="submit"], #auth-submit').first().click()]);

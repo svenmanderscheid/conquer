@@ -47,6 +47,7 @@ final class ResearchEffects
             'march_capacity' => self::wholeCount((float)($buffs['base_march_capacity']??5000) * (1 + max(0.0, (float)($buffs['march_size'] ?? 0))) + max(0,(int)($buffs['march_capacity_flat']??0))),
             'march_slots' => 3 + max(0, (int)($buffs['march_limit'] ?? 0)),
             'gather_march_slots' => max(0,(int)($buffs['gather_march_slots']??0)),
+            'hunt_march_slots' => max(0,(int)($buffs['hunt_march_slots']??0)),
         ];
     }
 
@@ -96,6 +97,6 @@ final class ResearchEffects
                 $buffs[$type.'_'.$stat] = ($buffs[$type.'_'.$stat] ?? 0) + $extra;
             }
         }
-        return $buffs;
+        return \Conquer\Game\Player\TalentEffects::formation($buffs,$troops,$rally);
     }
 }

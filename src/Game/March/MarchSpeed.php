@@ -44,16 +44,20 @@ final class MarchSpeed
     public static function readModel(int $code,array $buffs,float $skinMultiplier=1): array
     {
         $generic=self::generic($code,$buffs,$skinMultiplier);
+        $cavalry=\Conquer\Game\Player\TalentEffects::cavalryMarch($buffs,[50300101=>1]);
         return [
             'march_speed'=>$generic,
             'monster_march_speed'=>self::monster($code,$buffs,$skinMultiplier),
             'monster_rally_speed'=>self::rally($code,$buffs,true,$skinMultiplier),
             'charm_march_speed'=>self::charm($code,$skinMultiplier),
             'pvp_march_speed'=>self::pvp($code,$buffs,$skinMultiplier),
+            'cavalry_pvp_march_speed'=>self::pvp($code,$cavalry,$skinMultiplier),
             'pvp_rally_speed'=>self::rally($code,$buffs,false,$skinMultiplier),
+            'cavalry_pvp_rally_speed'=>self::rally($code,$cavalry,false,$skinMultiplier),
             'reinforce_march_speed'=>$generic,
             'shrine_neutral_speed'=>$generic,
             'shrine_occupied_speed'=>self::pvp($code,$buffs,$skinMultiplier),
+            'cavalry_shrine_occupied_speed'=>self::pvp($code,$cavalry,$skinMultiplier),
         ];
     }
 

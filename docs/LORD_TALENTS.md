@@ -1,54 +1,69 @@
-# Lord-Level und Talente
+# Hunter-Talente in Union of Kingdoms
 
-Implementiert am 11. September 2026. Öffnen: Lord-Schaltfläche im HUD oder Spielmenü → Lord-Talente (`/city#mastery`).
+Seit 5. Oktober 2026 verwendet der Talentkatalog Version 2: sechs Sternengitter mit jeweils 13 Knoten, insgesamt 78 Talente und Wegknoten. Das gemeinsame Fenster ist über das Hunter-HUD und Menü → Talente erreichbar.
 
-## Darstellung und Bedienung
+## Punkte und Fortschritt
 
-Vier Bereiche mit je neun Talenten: Angriff, Verteidigung, Sammler und Jäger. Die Ansicht verwendet die Dorfpalette aus `storybook-style.js`: Elfenbein, warmes Holzbraun, blaue Dächer und gedecktes Grün. Eigene, weich gezeichnete SVG-Symbole liegen in `assets/icons/talents.svg`. Verbundene Talentkarten zeigen den Rang und direkte Plus-/Minus-Schaltflächen. Gelernte Karten sind grün umrandet, vollständige golden; gesperrte bleiben lesbar.
+Hunter-Level 1 startet mit einem Punkt. Jedes weitere Level gibt einen Punkt; Level 10, 20, 30, 40 und 50 geben jeweils drei Punkte statt einem. Maximallevel ist 50. Die Formel lautet `level + 2 * floor(level / 10)` und ergibt maximal 60 Hunter-Punkte. VIP ergänzt `VIP-Level − 1`, höchstens 19 Punkte. Damit stehen insgesamt höchstens 79 Punkte zur Verfügung. Hunter-XP und VIP-Fortschritt gelten in der jeweiligen Welt.
 
-Punkteanzeige, Bereiche und Speicherleiste bleiben sichtbar, während der Baum scrollt. Ein Klick auf den Talentnamen öffnet Wirkung und Voraussetzungen als Detailfenster. Zurück oder Escape schließt es, ohne den Baum zu versetzen. „Deine Boni“ fasst die Wirkungen aller Bereiche zusammen; das Drei-Punkte-Menü enthält Verwerfen und Neuverteilen. Auf kleinen Bildschirmen bleiben zwei verbundene Spalten erhalten.
+Die bisherigen XP-Schwellen bis Level 50 bleiben erhalten. Importierte XP oberhalb des Maximums werden nicht gelöscht, erzeugen aber keine zusätzlichen Level oder Punkte. Wiederholte Monsterabrechnungen vergeben dank des bestehenden XP-Belegs keine doppelten XP.
 
-Punkte werden zunächst lokal geplant. Erst „Speichern“ übernimmt die gesamte Verteilung. Fehlgeschlagene Anfragen behalten den Plan und verwenden beim Wiederholen dieselbe Vorgangskennung. Eine Versionsnummer verhindert das Überschreiben einer neueren Verteilung aus einem zweiten Fenster. Ein Weltwechsel verwirft verspätete Antworten der alten Welt.
+## Verbundene Wege
 
-## Fortschritt und Regeln
+Jeder Bereich beginnt ausschließlich mit dem oberen Wegknoten (Index 9). Er kostet einen Punkt und öffnet drei Routen. Vier kleine Wegknoten haben jeweils einen Rang; neun Hauptknoten können bis Rang 5 verbessert werden. Ein Rang eines bereits vom Einstieg aus erreichbaren Vorgängers genügt für den nächsten verbundenen Knoten. Es gibt keine Mindestpunktzahl pro Ebene und keine Pflicht, vorher einen Knoten auf Rang 3 oder 5 zu bringen.
 
-- Hunter- und Jagdlevel sind ein gemeinsamer Fortschritt: Start auf Level 1 mit einem Punkt, Obergrenze 60 mit insgesamt 60 Punkten aus dem Hunter-Level. Seit 5. Oktober 2026 ergänzt VIP zusätzliche Hunter-Punkte gemäß der VIP-Tabelle: VIP 1 gibt 0, VIP 2 gibt 1, bis VIP 20 insgesamt 19 zusätzliche Punkte. Das gemeinsame Budget beträgt Hunter-Level + VIP-Zusatzpunkte, maximal 79. VIP erhöht weder Jagd-XP noch Hunter-Level; Burgstufen vergeben keine Punkte. Der accountweite VIP-Zusatz gilt in jeder Welt, Hunter-Level und Talentverteilung bleiben weltbezogen. Die Punkte werden aus den erreichten Stufen abgeleitet und nicht bei jeder Abfrage erneut gutgeschrieben.
-- Monsterkills geben 10 Jagd-XP × Monsterlevel, Deathkar 20 × Monsterlevel. Kills und XP werden in derselben Transaktion abgerechnet. Der Kampfbericht zeigt die tatsächlich erhaltenen XP; am Levelmaximum gibt es keine zusätzlichen XP.
-- Feldzugssiege verteilen einen Pool von 500 × Weltkapitel des Begegnungskatalogs proportional zum tatsächlichen Bossschaden. Es wird pro Spieler abgerundet; reine Anmeldung und Versorgungsbeiträge erhalten keine Jagd-XP. Eindeutige Belege verhindern doppelte Belohnung.
-- Die kumulierten alten XP-Schwellen von Level 2 bis 50 bleiben erhalten. Level 1 beginnt jetzt bei null. Die zehn neuen Stufen kosten jeweils den alten Level-50-Schritt × 1,08^(Level−50), auf ganze XP aufgerundet. Werte sind erste Balancingwerte.
-- Jeder Rang kostet einen Punkt. Die fünf Reihen verlangen 0 / 5 / 15 / 25 / 35 Punkte in **vorherigen Reihen desselben Bereichs**. Verbundene Vorgänger brauchen Rang 3. Beim Abschlusstalent reicht einer der beiden Vorgänger; zusätzlich ist Lord-Level 40 erforderlich.
-- Ein Bereich kostet vollständig 45 Punkte. Ein maximiertes Abschlusstalent ist ab 40 investierten Punkten möglich. Zwei teilweise gelernte Abschlusstalente sind mit zusätzlichen VIP-Punkten erreichbar; zwei vollständig maximierte Abschlusstalente benötigen mindestens 80 Punkte. Hunter-Level-Voraussetzungen und Verbindungen gelten auch für VIP-Punkte unverändert.
-- Punkte entfernen oder umverteilen ist einmal alle 24 Stunden kostenlos. Zusätzliche Punkte zu vergeben verbraucht keinen Reset. Die erste Umverteilung ist sofort verfügbar.
-- Eine neue Verteilung kann erst bei zurückgekehrten Armeen übernommen werden. Märsche, Rallys, Feldzugsarmeen, Verstärkungen und Schreingarnisonen werden berücksichtigt. Angekündigte Stadt-Rallys sowie Stadtangriffe mit höchstens zehn Minuten Restzeit sperren ebenfalls den Wechsel.
-- Produktion, Mauerregeneration und Aktionspunkte werden vor einem Wechsel mit den bisherigen Werten abgerechnet. Bereits laufende Bau-, Forschungs- und Heilaufträge behalten ihre gesetzten Endzeiten.
+Die Verbindung ist gerichtet von oben nach unten. Bei mehreren Vorgängern genügt ein erreichbarer Vorgänger. Punkte können zurückgenommen werden, solange alle verbleibenden gelernten Knoten eine gelernte Route vom Einstieg behalten. Der Meisterknoten (Index 8) verlangt zusätzlich Hunter-Level 40. Alle Pfade, Kosten und Ranggrenzen werden auf dem Server validiert.
 
-## Wirkungen
+## Bereiche und tatsächliche Wirkungen
 
-Der vollständige Katalog mit Namen, Texten, Werten, Voraussetzungen und vorhandenen Spielsymbolen liegt in `data/lord_talents.json`. `MasteryService` validiert den gesamten Plan und liefert die Boni an den bestehenden `BuffEngine`. `TalentEffects` trennt Kampfkontexte und Sammeltraglast.
-
-| Bereich | Angeschlossene Spielwirkungen |
+| Bereich | Wirkungen |
 |---|---|
-| Angriff | Eigener PvP-Angriff und LP, PvP-Marschtempo, Ausbildung, Marschkapazität, Mauerschaden, eigener Rally-Angriff. PvP-Talente wirken bei Stadtangriffen und gegen besetzte Schreine, nicht gegen Monster. |
-| Verteidigung | Eigene Stadtverteidiger und eigene Verstärkungen: Angriff, Verteidigung, LP und Schadensreduktion. Zusätzlich Ressourcenschutz, Heiltempo, Lazarettkapazität und Mauerregeneration. |
-| Sammler | Stadtproduktion, Sammeltempo, Sammelmarschtempo, Sammeltraglast, Bau- und Forschungstempo. „Karawanenmeister“ Rang 5 gibt einen ausschließlich zum Sammeln verfügbaren Zusatzplatz; Server und Marschdialog prüfen denselben Grenzwert. |
-| Jäger | Monsterangriff, Monster-LP, Jagdmarschtempo, Feldzugsangriff, gewöhnliche Ressourcenbeute, AP-Regeneration und Feldzugskapazität. Spezialdrops, Edelsteine und XP erhalten keinen Beutemultiplikator. |
+| Infanterie | Angriff, LP, Verteidigung, Ausbildung; Angriff gegen Kavallerie, Widerstand und LP gegen Bogenschützen; eigene Stadtverteidiger und Verstärkungen; Schildwall ab 70 % Infanterie-Grundmacht. |
+| Bogenschützen | Angriff, LP, Verteidigung, Ausbildung; Angriff gegen Infanterie, Widerstand und LP gegen Kavallerie; eigener Rally-Beitrag; gezielte Salve ab 70 % Bogenschützen-Grundmacht. |
+| Kavallerie | Angriff, LP, Verteidigung, Ausbildung, eigene Traglast; Angriff gegen Bogenschützen, Widerstand gegen Infanterie; schnellerer PvP-Hinweg und Rückweg bei mindestens 70 % Kavallerie-Grundmacht. |
+| Monster | Eigener Monster- und Bossangriff, Jagdmarschtempo, AP-Kosten und Regeneration, Monster-LP, gewöhnliche Ressourcenbeute, gezielte Heilung von Monsterwunden; Meisterjäger Rang 5 gibt einen zusätzlichen Solo-Jagdplatz. |
+| Kampf | Allgemeine Kampfwerte, eigene Rally-Kampfwerte, Kapazität geführter Rallys, Stadtverteidigung, Heiltempo und eigene Marschkapazität; verbundene Waffen verlangen mindestens 20 % Grundmacht je Truppenart. |
+| Sammeln | Abbaurate am Ressourcenfeld, Hin- und Rückreise, eigene Sammeltraglast, Dorfproduktion, Bau- und Forschungstempo, Ressourcenschutz; Karawanenmeister Rang 5 gibt einen zusätzlichen Sammelplatz. |
 
-„Rudeljäger“ verbessert gegenüber dem Entwurf die **Feldzugskapazität** um 2 % pro Rang: Der vorhandene verlustfreie Feldzugskampf besitzt keinen LP-Verbrauch, ein reines LP-Talent hätte dort keine Wirkung. „Rüstzeug“ verbessert die LP bei Weltkartenmonstern. Das bestehende Sammelsystem erntet bei Ankunft; dessen Sammeltempo beschleunigt die Reise, ohne zusätzliche Ressourcen im Feld zu erzeugen. Bau-, Forschungs- und Heiltempo der Talente teilen die bisher berechnete Dauer durch 1 + Talentbonus; bestehende Forschungs- und Reliktformeln bleiben bestehen.
+Prozentwerte im Katalog sind Bruchteile pro Rang. Die Darstellung zeigt den Gesamtbonus des gewählten Ranges. Der kleine Monster-Einstieg „AP-Reserve“ verwendet eine feste Einheit: **+10 maximale AP**, kein Prozentwert. Er füllt die aktuellen AP nicht sofort auf. AP-Regeneration, Rückerstattung und AP-Gegenstände berücksichtigen den höheren Höchstwert.
 
-Aktionspunkte bleiben accountweit. `player_ap_regeneration` speichert den zuletzt angewandten Regenerationssatz und Bruchteile eines AP. Bereits verstrichene Zeit wird nicht nachträglich mit einem frisch gewählten Jagdbonus bewertet; bei vollem Vorrat wird keine Regenerationszeit angespart.
+Konterboni werden mit dem Anteil der jeweiligen gegnerischen Truppenart an ihrer **Grundmacht** gewichtet. Sie gelten für die eigenen Truppen im PvP: Städte, Ressourcenfelder, besetzte Schreine und Territorialkämpfe. Widerstand wirkt auch in der tatsächlichen Verlustberechnung. Eigene Formationstalente richten sich ebenfalls nach Grundmacht, nicht nach bloßer Truppenanzahl. Allgemeine Truppenwerte und passende Formationseffekte erreichen auch Dungeons; die Dungeon-Rollen ordnen Infanterie der Verteidigung, Bogenschützen/Kavallerie dem Angriff, Monster dem Jäger, Sammeln dem Sammler und Kampf beiden Kampfrollen zu. Bestehende Dungeon-Rollen bleiben erhalten.
 
-## Daten und Migration
+Rally-Angriffsboni bleiben beim jeweiligen Besitzer seiner Truppen. Mitglieder vervielfachen den Kapazitätsbonus des Anführers nicht. Kavallerie-Reisetalente gelten beim tatsächlichen PvP-Angriff und Rückweg; die Reise eines Mitglieds zum Rally-Anführer bleibt eine eigene Teilnahme-Reise. „Verfolgung“ wirkt nur auf den Hinweg, „Schneller Einsatz“ zusätzlich auf den Rückweg. Die beim Abschicken gespeicherte Rückreisedauer verhindert, dass der Hinwegbonus ungewollt auf den Rückweg übertragen wird.
 
-`0075_lord_talents.sql` ergänzt `player_lord_progress`, `player_lord_talents`, `lord_xp_receipts` und `player_ap_regeneration`. XP und Talente sind weltbezogen. Bei der einmaligen Übernahme werden bisherige accountweite Jagd-XP der Welt mit der ältesten Stadt des Spielers zugeordnet; weitere Welten starten bei null. Die vorhandenen `players.lord_xp`, `players.lord_level` und `player_masteries` bleiben als Archiv erhalten, wirken aber nicht zusätzlich auf das neue Punktebudget. Neu vergebene XP oberhalb der alten 50er-Grenze gehen nicht verloren. Bereits vorhandene XP über dem neuen Maximum werden ebenfalls erhalten, ohne weitere Punkte zu erzeugen.
+Monster-AP-Kosten werden serverseitig mit `ceil(baseCost * (1 + talent_monster_ap_cost))` berechnet, bei positiven Grundkosten mindestens 1 AP. Kostenlose Angriffe bleiben kostenlos. Jeder menschliche Teilnehmer einer neuen Monster-Rally bezahlt seinen eigenen rabattierten AP-Betrag. Abgebrochene oder verspätete Teilnahmen erstatten den gespeicherten Betrag genau einmal. Bereits bestehende Teilnahmen ohne Kostenbeleg erhalten keine zusätzliche Erstattung.
 
-Lokales gezieltes Upgrade: `php tools/migrate-lord-talents.php --verify`, anschließend `php tools/migrate-lord-talents.php`. Der erste Aufruf nutzt eine wegwerfbare Datenbank. Die Migration ist wiederholbar und überschreibt keine vorhandenen Lord-Fortschritte. Ein Rollback sollte die neuen Tabellen erhalten, damit neue Jagd-XP und Verteilungen nicht verloren gehen.
+Monster-Heilboni gelten ausschließlich für neue, als Monsterwunden gespeicherte Verwundete. Alte Verwundete behalten gewöhnliche Heilung. Eine gemischte Heilung berechnet die Zeit pro Anteil; neue Verwundete treten nicht nachträglich einer laufenden Heilung bei. Allgemeines Heiltempo und Monster-Heiltempo addieren sich für Monsterwunden. Laufende Heil-, Bau- und Forschungszeiten werden durch eine Talentänderung nicht neu berechnet.
 
-## Prüfung
+Der Beutebonus erhöht ausschließlich gewöhnliche Ressourcen. Kristalle, Gegenstands-Dropchancen, Reliktfragmente und Hunter-XP erhalten keinen Beutemultiplikator. Sammeltraglast verbessert kein PvP-Plündern; Kavallerietraglast gilt dagegen für die eigenen Kavallerietruppen in beiden Situationen.
 
-- `tests/vip_hunter_points.php`: 35 Prüfungen für das gemeinsame Budget, 79-Punkte-Grenze, unveränderte Hunter-Level-Voraussetzungen, echte Speicherung und Wirkung, wiederholte Abfragen, manipulierte Clientwerte sowie accountweite VIP-Punkte mit weltbezogener Verteilung. `tests/vip_hunter_points_app.cjs` prüft die echte `/city`-App mit isoliertem Konto in Englisch, Deutsch und Französisch bei Desktop, 390 px, 320 px und Handy-Querformat; Quellenaufteilung und VIP-Punkte ohne Prozentzeichen. Aufnahmen und Protokoll: `output/playwright/vip-hunter/`. Native Geräte wurden dafür nicht geprüft. Die übrigen neuen VIP-Tabellenwerte sind mit dieser Erweiterung noch nicht übernommen.
-- 200 Prüfungen in `tests/lord_talents.php`: Schwellen, Migration, Welttrennung, Punktebudget, Voraussetzungen, Reset, Versionskonflikte, Idempotenz, AP-Bruchteile, Kampfkontexte und tatsächliche Wirtschafts-/Marschwirkungen.
-- `tests/full_progression.php`, `tests/defense_lifecycle.php`, `tests/expedition_lifecycle.php`, `tests/research_effects.php` und `tests/research_live_services.php` bestanden. Monster- und Boss-XP werden auch im tatsächlichen Abrechnungsweg auf wiederholte Verarbeitung geprüft.
-- `tests/progression_panel.cjs`: 20 Layoutkombinationen und eine zusätzliche Talentansicht mit 320 px Breite. Geprüft werden direkte Rangänderungen, feste Speicherleiste, Entwürfe beim Bereichswechsel, Detailfenster mit Fokus-/Scrollwiederherstellung, Boni, Verwerfen und Neuverteilen sowie fehlgeschlagene Anfragen, Idempotenz und Navigation während einer laufenden Anfrage.
-- `tests/march_windows.cjs`: 444 Prüfungen bestanden, darunter das Freigeben und Sperren des zusätzlichen Sammelplatzes im echten Marschdialog.
-- Das Fenster wurde außerdem in der laufenden Haupt-App mit einem isolierten Testspieler geprüft: Lord-HUD, alle vier Bereiche, Talentfreischaltung, Speichern und erneutes Laden. Auch bei 320 px Breite gab es keinen horizontalen Überlauf und keine fehlenden Talentsymbole. Die eingebettete 3D-Stadt wurde in Gesamt- und Nahansicht auf HUD, Gebäudebeschriftungen und bewegte Figuren geprüft; keine Browserwarnungen oder JavaScriptfehler. Testdaten verändern keine echten Spieler.
-- Breitere bestehende Tests melden weiterhin Fehler außerhalb des Talentbaums: `city_combat.php` bei der erwarteten Verlagerung eines alten Rohstofffelds; `pve_integration.php` bei der alten 3D-Bridge-Zeichenfolge. Diese beiden Prüfungen sind nicht als vollständig bestanden gewertet.
+Die Zusatzplätze sind reserviert: nur Solo-Monsterangriffe beziehungsweise nur Sammeln. Sie ersetzen keine allgemeinen Marschplätze und erlauben keine zusätzliche Rally. Serverprüfung, Marschdialog und HUD berücksichtigen beide Arten.
+
+## Bestehende Talentpläne und sichere Speicherung
+
+`data/lord_talents_legacy.json` bewahrt den vorherigen Vier-Bereiche-Katalog. Gültige alte Pläne bleiben wirksam, bis der Spieler ausdrücklich einen neuen Plan speichert. Die neue Oberfläche zeigt dafür alle verfügbaren Punkte frei und erklärt den Wechsel. Die erste Umstellung kostet nichts und startet keine Umskill-Abklingzeit. Gespeicherte Spielerpläne werden nicht aus der Beispielverteilung des Entwurfs übernommen.
+
+Spätere Rücknahmen oder Umverteilungen bleiben einmal je 24 Stunden kostenlos. Zusätzliche Punkte lassen sich ohne Umskillen hinzufügen. Aktive Armeen, Rallys, Garnisonen, Verstärkungen, Feldzüge und Dungeontruppen sowie unmittelbar bevorstehende Angriffe blockieren die Übernahme. Die bestehenden Welt-, Versions-, CSRF- und Vorgangsbelegprüfungen bleiben wirksam. Ein wiederholter Speicheraufruf nach verlorener Antwort zahlt oder verteilt keine Punkte doppelt. Verstrichene Produktion, Mauererholung und AP-Regeneration werden vor dem Wechsel mit den alten Boni abgerechnet.
+
+## Oberfläche, Bilder und Sprachen
+
+Die Reiter zeigen sechs Bereiche, auf schmalen Hochformaten in zwei Reihen. Das Sternengitter scrollt; Kopf, Reiter und Speicherleiste bleiben erreichbar. Ein Tipp auf einen Knoten öffnet Beschreibung, Wirkung, Rangänderung, Voraussetzungen und nächste Routen. Ein-Punkt-Knoten zeigen ihren kleinen vollständigen Bonus. Verbundene Linien, Ränge, Sperrhinweise und die grüne/goldene Markierung machen den Zustand ohne alleinige Farbcodierung verständlich. Die Detailansicht bewahrt den Entwurf, die Scrollposition und den Fokus.
+
+Alle sichtbaren neuen Texte haben eine vollständige englische Fassung im gemeinsamen Sprachsystem. Deutsch umfasst auch alle 78 Knotennamen, Wirkungen und Beschreibungen. Die französische Oberfläche verwendet die gemeinsame englische Rückfallebene für noch nicht übersetzte Knotentexte. Ohne ausdrückliche Wahl bleibt Englisch die Standardsprache.
+
+`assets/art/talents/painted-v1/` enthält 18 freigegebene transparente WebP-Motive mit 256 × 256 px, zusammen etwa 254 KiB. Die Zuordnung steht im Talentkatalog. Vorlage, transparente Quelle und exakte Bildprompts liegen unter `artifacts/talent-icons-v1/`; `tools/prepare-talent-icons.cjs` schneidet und komprimiert die vorhandenen Zeichnungen. Die Krone des Hunter-Kopfs verwendet weiterhin den bestehenden SVG-Bildsatz. Gemeinsame UI-Farben, Schriften und unsichtbare Browser-Scrollleisten bleiben in `village-theme.css`.
+
+## Datenbank und Prüfung
+
+`0130_hunter_constellations.sql` ergänzt `monster_count`, `monster_healing_count` und `ap_cost_paid` wiederholbar. Bestehende Wunden, aktive Heilzeiten und Teilnahmen bleiben erhalten. Der bestehende weltbezogene VIP-Vertrag benötigt zusätzlich `0129_world_vip.sql`. Beide Schemata sind lokal eingerichtet; vorhandene VIP-Fortschritte in der ursprünglichen Welt und VIP-Gegenstandsmengen wurden beim Upgrade auf Erhalt geprüft. Kein Deployment wurde ausgeführt.
+
+- `tests/hunter_constellations.php` / `tests/lord_talents.php`: 471 Prüfungen in einer wegwerfbaren Datenbank für alle Wege, Punkte, Ranggrenzen, Englische Texte, AP, Monsterwunden, Formation, Konter, Beute, Sonderplätze, Versionskonflikte, Vorgangsbelege und alte Pläne.
+- `tests/vip_hunter_points.php`: 35 Prüfungen für das kombinierte Budget und die weltbezogene VIP-Quelle.
+- `tests/hunter_constellations_app.cjs`: echte `/city`-App, echte Speicherung und AP-Reserve; 90 Kombinationen aus sechs Bereichen, drei Sprachen und fünf Größen einschließlich 320 px und kurzem Querformat. Aufnahmen und Protokoll: `output/playwright/hunter-constellations/`.
+- `tests/vip_hunter_points_app.cjs`: Quellenaufteilung und VIP-Punkte ohne Prozentzeichen in der echten App, drei Sprachen und vier Größen.
+- `tests/progression_panel.cjs`: 25 Layoutkombinationen, Rang-Details, unverdeckte Speicherleiste, Entwurf, Rücknahme, Wiederholungsanfragen und verspätete Antworten bei Navigation/Weltwechsel.
+- `tests/scout_report_app.cjs`: fünf Bildschirmgrößen, historische neue und alte Talentpläne, korrekte Bildpfade für Talente und Relikte sowie die flache AP-Reserve; zusätzlich Favoriten, Zurück-Navigation und Datenschutz der Verteidigeransicht.
+- `tests/march_windows.cjs`: alle neuen Fälle für reservierte Jagdmarschplätze und gerundete AP-Rabatte bestehen. Die gesamte bestehende Prüfung wird wegen elf Desktop-Layoutfehlern nicht als bestanden gewertet: Fenstergrenzen bei 1280 × 720 und die Bestätigung nach Scrollen beim Monster-Rally-Beitritt bei 1280 × 800. Der Vergleich mit dem vorherigen Marschskript und den vorherigen CSS-Dateien reproduziert dieselben Maße; diese Änderungen betreffen die Talentregeln, nicht das Layout des Marschfensters.
+- Gezielte bestehende Prüfungen für Hospital, Sammeln, Forschung, Rally-Beitritt/-Kapazität, Dungeon und Territorialkämpfe bestehen. Eine breitere bestehende Fortschrittsprüfung erreicht nach den Talentprüfungen einen Fehler im Reliktfragment-Fixture; sie wird nicht als vollständig bestanden gewertet.
+
+Die mobilen Größen wurden im Browser geprüft. Eine native iOS-/Android-Geräteabnahme steht weiterhin aus.

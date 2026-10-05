@@ -29,21 +29,77 @@ final class MasteryService
         return array_map('intval',Connection::getInstance()->query('SELECT talent_code,rank FROM player_lord_talents WHERE player_id=? AND world_id=?',[$playerId,$worldId])->fetchAll(\PDO::FETCH_KEY_PAIR));
     }
 
+    public static function legacyNodes(): array
+    {
+        static $nodes;
+        if($nodes!==null)return $nodes;
+        $nodes=[];
+        foreach(json_decode(file_get_contents(ROOT_DIR.'/data/lord_talents_legacy.json'),true,512,JSON_THROW_ON_ERROR)['branches'] as $branch)
+            foreach($branch['nodes'] as $node)$nodes[$node['code']]=$node+['branch'=>$branch['code']];
+        return $nodes;
+    }
+
+    private static function legacy(array $ranks): bool
+    {
+        return $ranks&&!array_diff_key($ranks,self::legacyNodes());
+    }
+
+    private static function validLegacy(array $ranks,int $level,int $vipLevel): bool
+    {
+        $nodes=self::legacyNodes();
+        if(array_sum($ranks)>LordLevel::talentPoints($level)+VipService::hunterPoints($vipLevel))return false;
+        foreach($ranks as $code=>$rank){
+            if(!isset($nodes[$code])||$rank<1||$rank>5)return false;
+        }
+        foreach($ranks as $code=>$rank){
+            $n=$nodes[$code];$earlier=0;
+            foreach($ranks as $other=>$points)if($nodes[$other]['branch']===$n['branch']&&$nodes[$other]['tier']<$n['tier'])$earlier+=$points;
+            if($level<$n['required_level']||$earlier<$n['required_points'])return false;
+            if($n['parents']&&!array_filter($n['parents'],static fn($parent)=>($ranks[$parent]??0)>=3))return false;
+        }
+        return true;
+    }
+
+    public static function activeNodes(int $playerId,int $worldId): array
+    {
+        return self::legacy(self::ranks($playerId,$worldId))?self::legacyNodes():self::nodes();
+    }
+
+    /** Historical intelligence records the active plan, including unconverted old plans. */
+    public static function reportSnapshot(int $playerId,int $worldId): array
+    {
+        $ranks=self::ranks($playerId,$worldId);$legacy=self::legacy($ranks);
+        $catalog=$legacy?json_decode(file_get_contents(ROOT_DIR.'/data/lord_talents_legacy.json'),true,512,JSON_THROW_ON_ERROR):self::catalog();
+        return ['lord'=>LordLevel::snapshot($playerId,$worldId),'branches'=>array_map(static fn($b)=>array_intersect_key($b,array_flip(['code','name','name_key','icon'])),$catalog['branches']),
+            'nodes'=>array_values(array_map(static fn($n)=>$n+['level'=>$ranks[$n['code']]??0],$legacy?self::legacyNodes():self::nodes()))];
+    }
+
+    /** Only learned, directed paths beginning at a paid entry are reachable. */
+    public static function reachable(array $ranks): array
+    {
+        $nodes=self::nodes();$found=[];
+        foreach($nodes as $code=>$node)if(!empty($node['entry'])&&($ranks[$code]??0)>0)$found[$code]=true;
+        do{
+            $changed=false;
+            foreach($ranks as $code=>$rank)if($rank>0&&!isset($found[$code])&&isset($nodes[$code]))
+                foreach($nodes[$code]['parents'] as $parent)if(isset($found[$parent])){$found[$code]=true;$changed=true;break;}
+        }while($changed);
+        return $found;
+    }
+
     /** Validate the entire plan, including dependencies after removing a rank. */
     public static function validate(array $ranks,int $level,int $vipLevel=1): array
     {
         $nodes=self::nodes(); $clean=[];
         foreach($ranks as $code=>$rank) {
-            if(!isset($nodes[$code])||!is_int($rank)||$rank<0||$rank>5) throw new \DomainException('Ungültiger Talentrang.');
+            if(!isset($nodes[$code])||!is_int($rank)||$rank<0||$rank>$nodes[$code]['max_level']) throw new \DomainException(Locale::t('talents.invalid_rank'));
             if($rank) $clean[$code]=$rank;
         }
-        if(array_sum($clean)>min(LordLevel::MAX_LEVEL,$level)+VipService::hunterPoints($vipLevel)) throw new \DomainException('Nicht genügend Talentpunkte.');
+        if(array_sum($clean)>LordLevel::talentPoints($level)+VipService::hunterPoints($vipLevel)) throw new \DomainException(Locale::t('talents.insufficient_points'));
+        $connected=self::reachable($clean);
         foreach($clean as $code=>$rank) {
-            $n=$nodes[$code]; $earlier=0;
-            foreach($clean as $other=>$points) if($nodes[$other]['branch']===$n['branch']&&$nodes[$other]['tier']<$n['tier']) $earlier+=$points;
-            $parentOk=!$n['parents'];
-            foreach($n['parents'] as $parent) if(($clean[$parent]??0)>=3) $parentOk=true;
-            if($level<$n['required_level']||$earlier<$n['required_points']||!$parentOk) throw new \DomainException('Voraussetzungen für „'.$n['name'].'“ fehlen.');
+            $n=$nodes[$code];
+            if($level<$n['required_level']||!isset($connected[$code])) throw new \DomainException(Locale::t('talents.missing_requirements',['name'=>Locale::t($n['name_key'])]));
         }
         ksort($clean);
         return $clean;
@@ -71,10 +127,13 @@ final class MasteryService
         $worldId??=WorldContext::id(); WorldContext::city($playerId,$worldId);
         $lord=LordLevel::snapshot($playerId,$worldId); $ranks=self::ranks($playerId,$worldId);
         $vipPoints=VipService::status($playerId,$worldId)['bonuses']['hunter_points'];
-        $earned=$lord['level']+$vipPoints;
+        $hunterPoints=LordLevel::talentPoints($lord['level']);$earned=$hunterPoints+$vipPoints;
+        $legacy=self::legacy($ranks);$legacyBonuses=$legacy?self::bonuses($playerId,$worldId):[];
+        if($legacy)$ranks=[];
         $row=Connection::getInstance()->query('SELECT revision,last_respec_at FROM player_lord_progress WHERE player_id=? AND world_id=?',[$playerId,$worldId])->fetch()?:[];
-        $ready=empty($row['last_respec_at'])?0:strtotime($row['last_respec_at'].' UTC')+86400;
-        return ['world_id'=>$worldId,'lord'=>$lord,'earned'=>$earned,'points_from_hunter'=>$lord['level'],'points_from_vip'=>$vipPoints,'spent'=>array_sum($ranks),'available'=>max(0,$earned-array_sum($ranks)),
+        $ready=$legacy||empty($row['last_respec_at'])?0:strtotime($row['last_respec_at'].' UTC')+86400;
+        return ['world_id'=>$worldId,'lord'=>$lord,'earned'=>$earned,'points_from_hunter'=>$hunterPoints,'points_from_vip'=>$vipPoints,'spent'=>array_sum($ranks),'available'=>max(0,$earned-array_sum($ranks)),
+            'catalog_version'=>self::catalog()['version'],'legacy_plan'=>$legacy,'legacy_bonuses'=>$legacyBonuses,
             'revision'=>(int)($row['revision']??0),'ranks'=>$ranks?:new \stdClass(),
             'branches'=>self::catalog()['branches'],'nodes'=>array_values(array_map(static fn($n)=>$n+['level'=>$ranks[$n['code']]??0],self::nodes())),
             'respec_available_at'=>$ready,'blocked_reason'=>self::blockedReason($playerId,$worldId),'server_time'=>time(),
@@ -92,11 +151,11 @@ final class MasteryService
             if(!is_int($body['revision']??null)||$body['revision']!==(int)$row['revision']) throw new \DomainException('Die Talentverteilung hat sich geändert. Bitte neu laden.');
             if(!is_array($body['ranks']??null)) throw new \DomainException('Talentplan fehlt.');
             $ranks=self::validate($body['ranks'],LordLevel::levelFromTotalXp((int)$row['xp']),VipService::status($playerId,$worldId)['level']);
-            $old=self::ranks($playerId,$worldId); ksort($old);
+            $old=self::ranks($playerId,$worldId); ksort($old);$legacy=self::legacy($old);
             if($ranks===$old) return ['message'=>'Diese Talente sind bereits aktiv.','mastery'=>self::snapshot($playerId,$worldId)];
             if($reason=self::blockedReason($playerId,$worldId)) throw new \DomainException($reason);
             $respec=false;
-            foreach($old as $code=>$rank) if(($ranks[$code]??0)<$rank) $respec=true;
+            if(!$legacy)foreach($old as $code=>$rank) if(($ranks[$code]??0)<$rank) $respec=true;
             if($respec&&!empty($row['last_respec_at'])&&strtotime($row['last_respec_at'].' UTC')+86400>time()) throw new \DomainException('Umskillen ist 24 Stunden nach dem letzten Wechsel wieder kostenlos möglich.');
             // Settle elapsed production, wall recovery and AP using the old talents.
             $buildings=[];
@@ -106,7 +165,7 @@ final class MasteryService
             ActionPoints::get($playerId);
             $db->execute('DELETE FROM player_lord_talents WHERE player_id=? AND world_id=?',[$playerId,$worldId]);
             foreach($ranks as $code=>$rank)$db->execute('INSERT INTO player_lord_talents(player_id,world_id,talent_code,rank) VALUES(?,?,?,?)',[$playerId,$worldId,$code,$rank]);
-            $db->execute('UPDATE player_lord_progress SET revision=revision+1,last_respec_at=IF(?,UTC_TIMESTAMP(),last_respec_at) WHERE player_id=? AND world_id=?',[$respec?1:0,$playerId,$worldId]);
+            $db->execute('UPDATE player_lord_progress SET revision=revision+1,last_respec_at=CASE WHEN ? THEN NULL WHEN ? THEN UTC_TIMESTAMP() ELSE last_respec_at END WHERE player_id=? AND world_id=?',[$legacy?1:0,$respec?1:0,$playerId,$worldId]);
             ActionPoints::get($playerId);
             return ['message'=>'Deine Talente sind jetzt aktiv.','mastery'=>self::snapshot($playerId,$worldId)];
         }));
@@ -116,11 +175,20 @@ final class MasteryService
     {
         $worldId??=WorldContext::id(); $out=[]; $nodes=self::nodes();
         $ranks=self::ranks($playerId,$worldId);
-        try {$ranks=self::validate($ranks,LordLevel::snapshot($playerId,$worldId)['level'],VipService::status($playerId,$worldId)['level']);}
-        catch(\DomainException) {return [];}
+        if(self::legacy($ranks)){
+            if(!self::validLegacy($ranks,LordLevel::snapshot($playerId,$worldId)['level'],VipService::status($playerId,$worldId)['level']))return [];
+            $nodes=self::legacyNodes();
+        }
+        else{
+            try {$ranks=self::validate($ranks,LordLevel::snapshot($playerId,$worldId)['level'],VipService::status($playerId,$worldId)['level']);}
+            catch(\DomainException) {return [];}
+        }
         foreach($ranks as $code=>$rank) {
             $n=$nodes[$code]; $out[$n['stat']]=($out[$n['stat']]??0)+$n['bonus']*$rank;
             if($code==='gather_8'&&$rank===5) $out['gather_march_slots']=1;
+            if(isset($n['additional_bonus'])&&$rank>=$n['additional_bonus']['required_rank']){
+                $extra=$n['additional_bonus'];$out[$extra['stat']]=($out[$extra['stat']]??0)+$extra['value'];
+            }
         }
         return $out;
     }

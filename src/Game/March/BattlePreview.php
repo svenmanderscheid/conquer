@@ -64,7 +64,7 @@ final class BattlePreview
         foreach ([$wall,$enemyBonus] as $value) {
             if ((!is_int($value)&&!is_float($value))||!is_finite((float)$value)||$value<0||$value>1000) throw new \DomainException('Boni müssen zwischen 0 und 1.000 Prozent liegen.',422);
         }
-        $buffs=TalentEffects::combat(ResearchEffects::armyBuffs($buffs,$troops,$kind==='rally'),'pvp',$kind==='rally');
+        $buffs=TalentEffects::combat(ResearchEffects::armyBuffs($buffs,$troops,$kind==='rally'),'pvp',$kind==='rally',$defenders);
         $enemyBuffs=['troops_atk'=>$enemyBonus/100,'troops_def'=>$enemyBonus/100,'troops_hp'=>$enemyBonus/100];
         $attack=0.0; $defense=0.0;
         foreach ($troops as $code=>$count) $attack+=PvpRules::strength($code,$count,$buffs);
@@ -73,7 +73,7 @@ final class BattlePreview
         $won=PvpRules::attackerWins($attack,$defense);
         return ['kind'=>$kind,'calculated_at'=>time(),'luck_percent'=>0.0,'luck_range'=>[-10.0,10.0],'outcome'=>$won?'attacker_wins':'defender_wins',
             'attacker_score'=>(int)round($attack),'defender_score'=>(int)round($defense),
-            'attacker'=>self::totals(PvpRules::losses($troops,$won?.1:.3)),
+            'attacker'=>self::totals(PvpRules::losses($troops,$won?.1:.3,$buffs,$defenders)),
             'defender'=>self::totals(PvpRules::losses($defenders,$won?.3:.1)),
             'assumptions'=>'Beispielrechnung mit deinen eingegebenen Gegnertruppen, einem gemeinsamen Gegnerbonus und Mauerbonus. Keine echten Gegnerdaten.',
             'notice'=>'Referenzrechnung mit 0 % Kampfglück. Im echten Kampf wird serverseitig zwischen −10 % und +10 % gewürfelt; Ausgang und Verluste können abweichen. Weitere Rally-Mitglieder, Verstärkungen und spezielle Verteidigertalente sind nicht enthalten. Verwundete benötigen freie Hospitalbetten.'];

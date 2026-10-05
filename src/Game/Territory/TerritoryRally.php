@@ -17,9 +17,10 @@ final class TerritoryRally
     /** Troop effects and march speed bind at dispatch; offline settlement must not read later buffs. */
     public static function snapshot(int $player,int $city,int $world,array $troops,array $skin,bool $rally=true): array
     {
-        $raw=BuffEngine::getBuffs($player,$world);$buffs=ResearchEffects::armyBuffs($raw,$troops,$rally);$speed=INF;
-        foreach($troops as $code=>$count)if($count>0)$speed=min($speed,MarchSpeed::rally((int)$code,$raw,false,MarchSkinService::speedMultiplier($skin)));
-        return ['version'=>1,'captured_at'=>gmdate('Y-m-d H:i:s'),'buffs'=>$buffs,'march_speed'=>$speed,'report'=>CombatReport::army(['player_id'=>$player,'city_id'=>$city,'troops'=>$troops],$buffs)];
+        $raw=BuffEngine::getBuffs($player,$world);$buffs=ResearchEffects::armyBuffs($raw,$troops,$rally);$speed=INF;$returnSpeed=INF;
+        $travel=$rally?\Conquer\Game\Player\TalentEffects::cavalryMarch($raw,$troops):$raw;$back=$rally?\Conquer\Game\Player\TalentEffects::cavalryMarch($raw,$troops,true):$raw;
+        foreach($troops as $code=>$count)if($count>0){$speed=min($speed,MarchSpeed::rally((int)$code,$travel,false,MarchSkinService::speedMultiplier($skin)));$returnSpeed=min($returnSpeed,MarchSpeed::rally((int)$code,$back,false,MarchSkinService::speedMultiplier($skin)));}
+        return ['version'=>1,'captured_at'=>gmdate('Y-m-d H:i:s'),'buffs'=>$buffs,'march_speed'=>$speed,'return_march_speed'=>$returnSpeed,'report'=>CombatReport::army(['player_id'=>$player,'city_id'=>$city,'troops'=>$troops],$buffs)];
     }
     public static function validateJoin(array $r,int $player): void
     {
@@ -40,12 +41,13 @@ final class TerritoryRally
             if(TerritoryService::timestamp($p['arrival_time'])<=$at&&WorldRules::alliance((int)$p['player_id'],$world)===(int)$c['alliance_id'])$db->execute("UPDATE rally_participants SET status='pending' WHERE id=?",[$p['id']]);
             else TerritoryArmyReturn::dispatch($r,$p,$at);
         }
-        $armies=RallyService::armies($r);$origin=WorldRules::origin((int)$r['leader_player_id'],(int)$r['leader_city_id'],$world);$speed=INF;
-        foreach($armies as $a){$snapshot=$a['army_snapshot']??self::snapshot((int)$a['player_id'],(int)$a['city_id'],$world,$a['troops'],['bonus_pct'=>$a['march_speed_bonus_pct']??0]);$speed=min($speed,(float)$snapshot['march_speed']);}
+        $armies=RallyService::armies($r);$origin=WorldRules::origin((int)$r['leader_player_id'],(int)$r['leader_city_id'],$world);$speed=INF;$returnSpeed=INF;
+        foreach($armies as $a){$snapshot=$a['army_snapshot']??self::snapshot((int)$a['player_id'],(int)$a['city_id'],$world,$a['troops'],['bonus_pct'=>$a['march_speed_bonus_pct']??0]);$speed=min($speed,(float)$snapshot['march_speed']);$returnSpeed=min($returnSpeed,(float)($snapshot['return_march_speed']??$snapshot['march_speed']));}
         $seconds=MarchSpeed::duration(hypot($r['target_x']-$origin['coord_x'],$r['target_y']-$origin['coord_y']),$speed,$world);
+        $returnSeconds=MarchSpeed::duration(hypot($r['target_x']-$origin['coord_x'],$r['target_y']-$origin['coord_y']),$returnSpeed,$world);
         $rules=json_decode($c['rules_json'],true);$elig=json_decode($c['eligibility_json'],true);$target=TerritoryService::target($world,$c['target_id']);
         if(($target['owner_alliance_id']!==null||$target['kind']==='crown')&&($at+$seconds>=(int)$elig['window']['end']||$at+$seconds<(int)$elig['window']['start'])){self::cancelGathering($r,'Die Armee erreicht das Ziel außerhalb des angekündigten Kampffensters.',$at);return;}
-        $db->execute("UPDATE rallies SET status='marching',launch_at=?,arrival_time=?,return_time=? WHERE id=?",[TerritoryService::date($at),TerritoryService::date($at+$seconds),TerritoryService::date($at+$seconds*2),$r['id']]);$db->execute("UPDATE rally_participants SET status='marching' WHERE rally_id=? AND status='pending'",[$r['id']]);$db->execute("UPDATE territory_campaigns SET status='marching' WHERE id=?",[$c['id']]);
+        $db->execute("UPDATE rallies SET status='marching',launch_at=?,arrival_time=?,return_time=? WHERE id=?",[TerritoryService::date($at),TerritoryService::date($at+$seconds),TerritoryService::date($at+$seconds+$returnSeconds),$r['id']]);$db->execute("UPDATE rally_participants SET status='marching' WHERE rally_id=? AND status='pending'",[$r['id']]);$db->execute("UPDATE territory_campaigns SET status='marching' WHERE id=?",[$c['id']]);
     }
     public static function tick(?int $world=null,?int $now=null,int $limit=100): void
     {
@@ -82,15 +84,17 @@ final class TerritoryRally
         $defenders=[];$defAid=(int)$t['owner_alliance_id'];
         if($t['kind']==='crown'){$control=$db->query('SELECT alliance_id FROM territory_crown_control WHERE cycle_id=? AND objective=? FOR UPDATE',[$c['crown_cycle_id'],$c['objective']])->fetchColumn();$defAid=(int)$control;if($defAid===$aid){$result=['outcome'=>'cancelled','cancelled'=>true,'reason'=>'Dieses Belagerungsziel steht bereits unter eurer Kontrolle.','armies'=>$armies];self::finish($c,$result,$at,'cancelled');return $result;}}
         if($t['kind']!=='crown')foreach($db->query("SELECT * FROM territory_garrisons WHERE world_id=? AND target_id=? AND status='active' AND alliance_id=? ORDER BY id FOR UPDATE",[$world,$t['id'],$defAid])->fetchAll() as $g)$defenders[]=['player_id'=>(int)$g['player_id'],'city_id'=>(int)$g['city_id'],'troops'=>json_decode($g['troops_json'],true),'army_snapshot'=>json_decode($g['army_snapshot']??'null',true),'garrison_id'=>(int)$g['id']];
-        $attack=0.;$defense=0.;$attSnapshots=[];$defSnapshots=[];
-        foreach($eligible as $a){$s=self::combatSnapshot($a,$world,true);$attack+=array_sum(array_column($s['troops'],'strength'));$attSnapshots[]=$s;}
-        foreach($defenders as $a){$s=self::combatSnapshot($a,$world,false);$defense+=array_sum(array_column($s['troops'],'strength'));$defSnapshots[]=$s;}
+        $attack=0.;$defense=0.;$attSnapshots=[];$defSnapshots=[];$attackTroops=[];$defenseTroops=[];
+        foreach($eligible as $a)foreach($a['troops'] as $code=>$count)$attackTroops[$code]=($attackTroops[$code]??0)+$count;
+        foreach($defenders as $a)foreach($a['troops'] as $code=>$count)$defenseTroops[$code]=($defenseTroops[$code]??0)+$count;
+        foreach($eligible as $a){$s=self::combatSnapshot($a,$world,true,$defenseTroops);$attack+=array_sum(array_column($s['troops'],'strength'));$attSnapshots[]=$s;}
+        foreach($defenders as $a){$s=self::combatSnapshot($a,$world,false,$attackTroops);$defense+=array_sum(array_column($s['troops'],'strength'));$defSnapshots[]=$s;}
         // Neutral militia disappears on ordinary ownership; crown objectives retain their fixed guards.
         $npcCount=(!$defAid||$t['kind']==='crown')?(int)$rules['npc_troops'][$t['kind']]:0;$troopCode=(int)array_key_first(TroopData::all());$npcScore=PvpRules::strength($troopCode,$npcCount,[]);$defense=($defense+$npcScore)*(1.1+(int)$t['fortification']*.01);
         $support=(int)$db->query("SELECT COUNT(*) FROM territory_support WHERE world_id=? AND target_id=? AND alliance_id=? AND kind='supply' AND created_at<=? AND created_at>=DATE_SUB(?,INTERVAL 1 DAY)",[$world,$t['id'],$aid,TerritoryService::date($at),TerritoryService::date($at)])->fetchColumn();$attack*=1+min(.1,$support*.01);
         $won=PvpRules::attackerWins($attack,$defense);$result=['outcome'=>$won?'attacker_wins':'defender_wins','cancelled'=>false,'armies'=>$returned,'target_name'=>$t['name'],'territory_id'=>$t['id'],'campaign_id'=>(int)$c['id'],'objective'=>$c['objective'],'attacker_score'=>(int)$attack,'defender_score'=>(int)$defense,'npc_troops'=>$npcCount,'at'=>TerritoryService::date($at)];
-        foreach($eligible as $i=>$a){$loss=PvpRules::losses($a['troops'],$defense<=0?0:($won?.10:.30));HospitalService::addWounded((int)$a['city_id'],$loss['wounded']);$result['armies'][]=$a+$loss+['loot'=>[]];$attSnapshots[$i]=CombatReport::settle($attSnapshots[$i],$loss);if($won)TerritoryEconomy::reward($t,(int)$a['player_id'],$aid,'campaign:'.$c['id'],['gold'=>$rules['conquest_reward_gold']],$at);}
-        foreach($defenders as $i=>$a){$loss=PvpRules::losses($a['troops'],$won?.30:.10);HospitalService::addWounded((int)$a['city_id'],$loss['wounded']);$db->execute('UPDATE territory_garrisons SET troops_json=? WHERE id=?',[json_encode($loss['survivors']),$a['garrison_id']]);$defSnapshots[$i]=CombatReport::settle($defSnapshots[$i],$loss);if(!$won)TerritoryEconomy::reward($t,(int)$a['player_id'],$defAid,'defense:'.$c['id'],['gold'=>$rules['conquest_reward_gold']],$at);}
+        foreach($eligible as $i=>$a){$loss=PvpRules::losses($a['troops'],$defense<=0?0:($won?.10:.30),$a['army_snapshot']['buffs']??BuffEngine::getBuffs((int)$a['player_id'],$world),$defenseTroops);HospitalService::addWounded((int)$a['city_id'],$loss['wounded']);$result['armies'][]=$a+$loss+['loot'=>[]];$attSnapshots[$i]=CombatReport::settle($attSnapshots[$i],$loss);if($won)TerritoryEconomy::reward($t,(int)$a['player_id'],$aid,'campaign:'.$c['id'],['gold'=>$rules['conquest_reward_gold']],$at);}
+        foreach($defenders as $i=>$a){$loss=PvpRules::losses($a['troops'],$won?.30:.10,$a['army_snapshot']['buffs']??BuffEngine::getBuffs((int)$a['player_id'],$world),$attackTroops);HospitalService::addWounded((int)$a['city_id'],$loss['wounded']);$db->execute('UPDATE territory_garrisons SET troops_json=? WHERE id=?',[json_encode($loss['survivors']),$a['garrison_id']]);$defSnapshots[$i]=CombatReport::settle($defSnapshots[$i],$loss);if(!$won)TerritoryEconomy::reward($t,(int)$a['player_id'],$defAid,'defense:'.$c['id'],['gold'=>$rules['conquest_reward_gold']],$at);}
         $result['combat']=['version'=>1,'attacker'=>CombatReport::side($attSnapshots,(int)$attack),'defender'=>CombatReport::side($defSnapshots,(int)$defense),'npc_troops'=>$npcCount,'fortification'=>(int)$t['fortification']];
         if($won){
             if($t['kind']==='crown')TerritoryCrown::control((int)$c['crown_cycle_id'],$c['objective'],$aid,$at);
@@ -105,9 +109,12 @@ final class TerritoryRally
     {
         Connection::getInstance()->execute('UPDATE territory_campaigns SET status=?,slot_reserved=0,result_json=?,resolved_at=? WHERE id=?',[$status,json_encode($result,JSON_THROW_ON_ERROR),TerritoryService::date($at),$c['id']]);
     }
-    private static function combatSnapshot(array $a,int $world,bool $rally): array
+    private static function combatSnapshot(array $a,int $world,bool $rally,array $enemyTroops=[]): array
     {
-        $snap=$a['army_snapshot']??self::snapshot((int)$a['player_id'],(int)$a['city_id'],$world,$a['troops'],['bonus_pct'=>$a['march_speed_bonus_pct']??0],$rally);$report=$snap['report'];
+        $snap=$a['army_snapshot']??self::snapshot((int)$a['player_id'],(int)$a['city_id'],$world,$a['troops'],['bonus_pct'=>$a['march_speed_bonus_pct']??0],$rally);
+        $buffs=\Conquer\Game\Player\TalentEffects::combat($snap['buffs'],$rally?'pvp':'field_defense',$rally,$enemyTroops);
+        $report=$snap['report'];
+        foreach($report['troops'] as &$troop)$troop['strength']=PvpRules::strength((int)$troop['code'],(int)$troop['sent'],$buffs);unset($troop);
         // A stationed army may already have taken losses in an earlier defense.
         foreach($report['troops'] as &$troop){$count=(int)($a['troops'][$troop['code']]??0);$troop['strength']=$troop['sent']>0?$troop['strength']*$count/$troop['sent']:0;$troop['sent']=$count;}unset($troop);
         return $report;

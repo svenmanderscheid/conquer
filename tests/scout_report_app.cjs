@@ -12,8 +12,8 @@ const output=path.resolve('artifacts/scout-report');fs.mkdirSync(output,{recursi
   const context=await browser.newContext({viewport:{width:1280,height:900},hasTouch:true});
   await context.addInitScript(()=>{if(location.pathname.endsWith('/city')&&!location.hash)history.replaceState(null,'','#world');});
   const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(20000);
-  await page.goto(base+'/?zugang=login');await page.locator("[name=identifier], [name=username]").fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');
-  await Promise.all([page.waitForURL(url=>url.pathname==='/city'),page.locator("form[action$=\"/auth/local\"] button[type=\"submit\"]").click()]);
+  await page.goto(base+'/?zugang=login',{waitUntil:'domcontentloaded',timeout:60000});await page.locator("[name=identifier], [name=username]").fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');
+  await Promise.all([page.waitForURL(url=>url.pathname==='/city',{waitUntil:'domcontentloaded',timeout:60000}),page.locator("form[action$=\"/auth/local\"] button[type=\"submit\"]").click()]);
   await page.locator('#navigation [data-id="reports"]').click();await page.locator('.mail-open').first().waitFor();
   const open=async index=>{await page.locator('.mail-open').nth(index).click();await page.locator('.scout-report').waitFor();await page.waitForFunction(()=>!document.querySelector('[data-action="mailbox-detail-star"]')?.disabled);};
   const close=async()=>{await page.locator('[data-action="mailbox-back"]').click();await page.waitForFunction(()=>!document.querySelector('#game-dialog').open&&!history.state?.conquerScoutReport);};
@@ -26,6 +26,10 @@ const output=path.resolve('artifacts/scout-report');fs.mkdirSync(output,{recursi
   assert.equal(await page.locator('.sr-relic img').count(),6);
   assert.match(await page.locator('.sr-relic').first().innerText(),/Stufe 7/,'Target level must not come from the viewer');
   assert.match(await page.locator('.sr-mastery .sr-total').innerText(),/49/);
+  assert.equal(await page.locator('.sr-mastery-card').count(),6,'All six recorded talent branches');
+  assert.equal(await page.locator('.sr-talents dd').count(),7,'Historical ranks stay recorded');
+  assert.match(await page.locator('.sr-bonuses').innerText(),/\+10 AP/,'AP reserve is flat, never a percentage');
+  assert.doesNotMatch(await page.locator('.sr-bonuses').innerText(),/1\.000 %/);
   for(const [width,height]of [[1280,900],[390,844],[320,568],[568,320],[844,390]]){
    await page.setViewportSize({width,height});await page.locator('.sr-scroll').evaluate(e=>e.scrollTop=0);
    await page.screenshot({path:path.join(output,`${width}x${height}-top.png`)});
@@ -47,7 +51,7 @@ const output=path.resolve('artifacts/scout-report');fs.mkdirSync(output,{recursi
   await page.waitForFunction(()=>document.querySelector('[data-action="mailbox-detail-star"]')?.getAttribute('aria-pressed')==='true');
   assert.equal(await page.locator('.sr-scroll').evaluate(e=>e.scrollTop),scroll,'Favorite preserves scroll');
   await close();await open(1);assert.match(await page.locator('.sr-troops').innerText(),/Keine Truppen/);assert.equal(await page.locator('.sr-slot-empty').count(),6);assert.equal(await page.locator('.sr-resource>b').first().innerText(),'0');await close();
-  await open(2);assert.match(await page.locator('.sr-target').innerText(),/<img src=x/);assert.equal(await page.locator('.scout-report img[src="x"]').count(),0);assert.equal(await page.locator('.sr-resource>b').first().innerText(),'—');assert.match(await page.locator('.sr-equipment').innerText(),/nicht erfasst/);await close();
+  await open(2);assert.match(await page.locator('.sr-target').innerText(),/<img src=x/);assert.equal(await page.locator('.scout-report img[src="x"]').count(),0);assert.equal(await page.locator('.sr-resource>b').first().innerText(),'—');assert.match(await page.locator('.sr-equipment').innerText(),/nicht erfasst/);assert.equal(await page.locator('.sr-mastery-card').count(),4,'Historical four-branch plan stays readable');assert.equal(await page.locator('.sr-talents dd').count(),1);await close();
   await open(3);assert.match(await page.locator('.sr-blocked').innerText(),/Spähschutz aktiv/);assert.equal(await page.locator('.sr-resource,.sr-troop,.sr-relic').count(),0);await page.keyboard.press('Escape');await page.waitForFunction(()=>!document.querySelector('#game-dialog').open&&!history.state?.conquerScoutReport);
   await open(0);await page.goBack();await page.waitForFunction(()=>!document.querySelector('#game-dialog').open);assert.equal(await page.locator('#panel-dialog').evaluate(e=>e.open),true,'Browser back returns to Post');
   await page.locator('.mail-open').nth(4).click();await page.locator('.mail-detail').waitFor();assert.equal(await page.locator('.scout-report').count(),0,'Defender gets only a notification');assert.doesNotMatch(await page.locator('.mail-detail').innerText(),/275\.842\.667/);await close();

@@ -98,6 +98,9 @@ final class GameHandler
         $monsterMixed=\Conquer\Game\Research\ResearchEffects::armyBuffs($monsterBuffs,$mixedFormation);
         $rallyBuffs=\Conquer\Game\Player\TalentEffects::combat($buffs,'monster',true);
         $rallyMixed=\Conquer\Game\Research\ResearchEffects::armyBuffs($rallyBuffs,$mixedFormation,true);
+        $formations=['none'=>[50100101=>1,50200101=>1],'infantry'=>[50100101=>100,50200101=>1,50300101=>1],'ranged'=>[50100101=>1,50200101=>100,50300101=>1],'combined'=>$mixedFormation];
+        $monsterFormationBuffs=[];$rallyFormationBuffs=[];
+        foreach($formations as $key=>$army){$monsterFormationBuffs[$key]=\Conquer\Game\Research\ResearchEffects::armyBuffs($monsterBuffs,$army);$rallyFormationBuffs[$key]=\Conquer\Game\Research\ResearchEffects::armyBuffs($rallyBuffs,$army,true);}
         $troopDefs=[];
         foreach(TroopData::forCity($state,$buffs,$research,$trainingBoost) as $troop){
             $code=(int)$troop['code'];
@@ -120,10 +123,13 @@ final class GameHandler
             $troop['monster_power_single_type']=\Conquer\Game\March\ArmyPower::unit($troop,\Conquer\Game\Research\ResearchEffects::armyBuffs($monsterBuffs,[$code=>1]));
             $troop['monster_rally_power']=\Conquer\Game\March\ArmyPower::unit($troop,$rallyMixed);
             $troop['monster_rally_power_single_type']=\Conquer\Game\March\ArmyPower::unit($troop,\Conquer\Game\Research\ResearchEffects::armyBuffs($rallyBuffs,[$code=>1],true));
+            $troop['monster_power_by_formation']=array_map(static fn($b)=>\Conquer\Game\March\ArmyPower::unit($troop,$b),$monsterFormationBuffs);
+            $troop['monster_rally_power_by_formation']=array_map(static fn($b)=>\Conquer\Game\March\ArmyPower::unit($troop,$b),$rallyFormationBuffs);
             $troop['gather_carry']=\Conquer\Game\Research\ResearchEffects::carryPerTroop($code,\Conquer\Game\Player\TalentEffects::gather($buffs));
             $troop+=\Conquer\Game\March\MarchSpeed::readModel($code,$buffs,$marchSkinMultiplier);
             $troop['gather_speed']=\Conquer\Game\March\GatherService::troopSpeed($code,$buffs,(float)$world['speed_factor'],false,$marchSkinMultiplier);
             $troop['field_attack_speed']=\Conquer\Game\March\GatherService::troopSpeed($code,$buffs,(float)$world['speed_factor'],true,$marchSkinMultiplier);
+            $troop['cavalry_field_attack_speed']=\Conquer\Game\March\GatherService::troopSpeed($code,\Conquer\Game\Player\TalentEffects::cavalryMarch($buffs,[50300101=>1]),(float)$world['speed_factor'],true,$marchSkinMultiplier);
             $troopDefs[]=$troop;
         }
         $researchQueue = $db->query('SELECT id,research_code,level_to,started_at,finishes_at FROM research_queue WHERE player_id = ? AND world_id = ? AND is_processed = 0', [$pid,$worldId])->fetchAll();
@@ -152,6 +158,7 @@ final class GameHandler
         Response::ok($state + [
             'world'=>$world+['map_profile'=>$mapProfile,'width'=>$mapProfile['width'],'height'=>$mapProfile['height']],
             'territory'=>TerritoryService::compactState($pid,$worldId),
+            'dungeon_entrances'=>array_values(array_filter([\Conquer\Game\Dungeon\DungeonEntrance::forWorld($worldId)])),
             'beginner_journey'=>\Conquer\Game\Tutorial\BeginnerJourney::state($pid,$worldId),
             'return_summary'=>$returnSince === null ? null : \Conquer\Game\City\ReturnSummary::since($city, $returnSince),
             'active_effects'=>\Conquer\Game\Buff\ActiveEffectService::forPlayer($pid,$worldId),
@@ -167,6 +174,7 @@ final class GameHandler
             'extra_events'=>$extraEvents,
             'map_center'=>['x'=>$mapX,'y'=>$mapY,'radius'=>$mapRadius],
             'server_time' => time(), 'monsters' => $monsters, 'nodes' => $nodes, 'neutral_villages'=>$villages, 'players'=>$players, 'charms'=>$charms,'land_progression'=>$landState,
+            'monster_ap_discount'=>max(0,-(float)($buffs['talent_monster_ap_cost']??0)),
             'training_promotions'=>$db->query("SELECT id,source_code,target_code,count,started_at,finishes_at FROM defense_promotions WHERE city_id=? AND state='training'",[$city['id']])->fetchAll(),
             'troop_defs' => $troopDefs, 'army_limits'=>\Conquer\Game\Research\ResearchEffects::limits($buffs), 'building_progression'=>\Conquer\Game\City\BuildingProgression::forPlayer($pid,$worldId), 'research' => $research,
             // Locked and advanced technologies must remain visible in the full tree.

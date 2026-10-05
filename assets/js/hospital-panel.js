@@ -19,7 +19,7 @@ window.ConquerHospital=function(ctx){
     }
     function quote(){
         const cost=Object.fromEntries(Object.keys(resources).map(k=>[k,0]));let count=0,seconds=0;
-        for(const w of units()){const n=selection[w.troop_code]||0;count+=n;seconds+=n*w.seconds_per_troop;for(const k in cost)cost[k]+=n*Number(w.resources[k]||0);}
+        for(const w of units()){const n=selection[w.troop_code]||0,monster=Math.min(n,w.monster_waiting_count||0);count+=n;seconds+=(n-monster)*w.seconds_per_troop+monster*(w.monster_seconds_per_troop??w.seconds_per_troop);for(const k in cost)cost[k]+=n*Number(w.resources[k]||0);}
         seconds=count?Math.max(1,Math.ceil(seconds)):0;
         return {cost,count,seconds,affordable:Object.entries(cost).every(([k,n])=>Number(S().city[k])>=n)};
     }

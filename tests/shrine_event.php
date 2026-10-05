@@ -38,6 +38,7 @@ try{
  $db=Connection::init($temp);\Conquer\Logger::init($temp.'/test.log');
  // Adjacent module schemas are required by the current shared BuffEngine, only in this test DB.
  $db->getPdo()->exec(file_get_contents(ROOT_DIR.'/migrations/0068_progression_and_events.sql'));
+ foreach(['0129_world_vip.sql','0130_hunter_constellations.sql'] as $schema)\Conquer\Db\MigrationSql::apply($db->getPdo(),file_get_contents(ROOT_DIR.'/migrations/'.$schema));
  for($pid=1;$pid<=3;$pid++){$db->execute("INSERT INTO players(id,username,email,password_hash) VALUES(?,?,?,'unused')",[$pid,'ShrineFixture'.$pid,'shrine'.$pid.'@invalid.test']);$db->execute("INSERT INTO cities(id,player_id,world_id,name,coord_x,coord_y) VALUES(?,?,1,'Test city',?,40)",[$pid,$pid,30+$pid*5]);$db->execute('INSERT INTO city_troops(city_id,troop_code,count) VALUES(?,50100101,200000)',[$pid]);}
  $db->execute("INSERT INTO alliances(id,world_id,name,tag,leader_id) VALUES(1,1,'Forest Fixture','FOR',1),(2,1,'Lava Fixture','LAV',3)");
  $db->execute("INSERT INTO alliance_members(alliance_id,player_id,role) VALUES(1,1,'leader'),(1,2,'member'),(2,3,'leader')");

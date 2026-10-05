@@ -8,14 +8,19 @@ use Conquer\Game\World\WorldContext;
 /** Lord and hunting progression are the same, scoped to the active world. */
 final class LordLevel
 {
-    public const MAX_LEVEL = 60;
+    public const MAX_LEVEL = 50;
+
+    public static function talentPoints(int $level): int
+    {
+        $level=max(1,min(self::MAX_LEVEL,$level));
+        return $level+2*intdiv($level,10);
+    }
 
     public static function xpForLevel(int $level): int
     {
         if ($level <= 1 || $level > self::MAX_LEVEL) return 0;
         // Preserve cumulative legacy thresholds 2–50. Level 1 now starts at zero.
         if ($level === 2) return 250;
-        if ($level > 50) return (int) ceil(self::legacyStep(50) * pow(1.08, $level - 50));
         return self::legacyStep($level);
     }
 
@@ -78,7 +83,7 @@ final class LordLevel
             }
             // Imported XP above cap stays intact; no further XP is awarded at cap.
             $before=(int)$db->query('SELECT xp FROM player_lord_progress WHERE player_id=? AND world_id=? FOR UPDATE',[$playerId,$worldId])->fetchColumn();
-            $credited=max(0,min($xp,self::totalForLevel(60)-$before));
+            $credited=max(0,min($xp,self::totalForLevel(self::MAX_LEVEL)-$before));
             $db->execute('UPDATE player_lord_progress SET xp=xp+? WHERE player_id=? AND world_id=?',[$credited,$playerId,$worldId]);
             if($source!==null)$db->execute('INSERT INTO lord_xp_receipts(player_id,world_id,source,xp) VALUES(?,?,?,?)',[$playerId,$worldId,$source,$credited]);
             return $credited;

@@ -63,8 +63,14 @@ final class RallyService
             // A stale browser countdown must never reserve an army that cannot join.
             $travel=$db->query('SELECT UTC_TIMESTAMP() AS joined_at,DATE_ADD(UTC_TIMESTAMP(),INTERVAL ? SECOND) AS arrival_time,DATE_ADD(UTC_TIMESTAMP(),INTERVAL ? SECOND)<=? AS arrives_in_time',[$seconds,$seconds,$r['launch_at']])->fetch();
             if(!(bool)$travel['arrives_in_time'])throw new \RuntimeException(\Conquer\Game\Locale::t('rally.join.too_late'));
+            $apCost=0;
+            if(($r['target_kind']??'city')==='monster'){
+                $definition=$meta['monster'];
+                $apCost=\Conquer\Game\Player\ActionPoints::monsterCost((int)($definition['action_point_cost']??\Conquer\Game\Player\ActionPoints::costForMonster($definition['name'])),$buffs);
+                \Conquer\Game\Player\ActionPoints::deduct($playerId,$apCost);
+            }
             MarchArmy::reserve($db,$cityId,$clean);if(($r['target_kind']??'city')!=='monster')WorldRules::relinquishShield($playerId,$cityId);
-            $db->execute("INSERT INTO rally_participants(rally_id,player_id,city_id,march_skin,march_speed_bonus_pct,troops_json,status,joined_at,arrival_time) VALUES(?,?,?,?,?,?,'joining',?,?)",[$rallyId,$playerId,$cityId,$skinSnapshot['march_skin'],$skinSnapshot['bonus_pct'],json_encode($clean),$travel['joined_at'],$travel['arrival_time']]);
+            $db->execute("INSERT INTO rally_participants(rally_id,player_id,city_id,march_skin,march_speed_bonus_pct,troops_json,ap_cost_paid,status,joined_at,arrival_time) VALUES(?,?,?,?,?,?,?,'joining',?,?)",[$rallyId,$playerId,$cityId,$skinSnapshot['march_skin'],$skinSnapshot['bonus_pct'],json_encode($clean),$apCost,$travel['joined_at'],$travel['arrival_time']]);
             if(($r['target_kind']??'city')==='territory')$db->execute('UPDATE rally_participants SET territory_army_snapshot=? WHERE rally_id=? AND player_id=?',[json_encode(\Conquer\Game\Territory\TerritoryRally::snapshot($playerId,$cityId,(int)$r['world_id'],$clean,$skinSnapshot),JSON_THROW_ON_ERROR),$rallyId,$playerId]);
             RallySupport::refresh($r);
         }));
@@ -168,15 +174,24 @@ final class RallyService
             catch(\PDOException $e){throw $e;}
         catch(\RuntimeException $e){self::cancelGathering($r,$e->getMessage());return;}
         }
-        $db=Connection::getInstance();self::settleJoiners($r,true);$r=RallySupport::refresh($r);$armies=self::armies($r);$origin=WorldRules::origin((int)$r['leader_player_id'],(int)$r['leader_city_id'],(int)$r['world_id']);$speed=INF;
-        foreach($armies as $army){if(!empty($army['is_ai']))continue;$buffs=BuffEngine::getBuffs($army['player_id'],(int)$r['world_id']);$skinMultiplier=MarchSkinService::speedMultiplier(['bonus_pct'=>$army['march_speed_bonus_pct']??0]);foreach($army['troops'] as $code=>$count){if($count<=0)continue;$speed=min($speed,MarchSpeed::rally((int)$code,$buffs,($r['target_kind']??'city')==='monster',$skinMultiplier));}}
+        $db=Connection::getInstance();self::settleJoiners($r,true);$r=RallySupport::refresh($r);$armies=self::armies($r);$origin=WorldRules::origin((int)$r['leader_player_id'],(int)$r['leader_city_id'],(int)$r['world_id']);$speed=INF;$returnSpeed=INF;$monster=($r['target_kind']??'city')==='monster';
+        foreach($armies as $army){
+            if(!empty($army['is_ai']))continue;
+            $raw=BuffEngine::getBuffs($army['player_id'],(int)$r['world_id']);$buffs=$monster?$raw:\Conquer\Game\Player\TalentEffects::cavalryMarch($raw,$army['troops']);$returnBuffs=$monster?$raw:\Conquer\Game\Player\TalentEffects::cavalryMarch($raw,$army['troops'],true);
+            $skinMultiplier=MarchSkinService::speedMultiplier(['bonus_pct'=>$army['march_speed_bonus_pct']??0]);
+            foreach($army['troops'] as $code=>$count){if($count<=0)continue;$speed=min($speed,MarchSpeed::rally((int)$code,$buffs,$monster,$skinMultiplier));$returnSpeed=min($returnSpeed,MarchSpeed::rally((int)$code,$returnBuffs,$monster,$skinMultiplier));}
+        }
         $seconds=MarchSpeed::duration(hypot($r['target_x']-$origin['coord_x'],$r['target_y']-$origin['coord_y']),$speed,(int)$r['world_id']);
-        $db->execute("UPDATE rallies SET status='marching',launch_at=UTC_TIMESTAMP(),arrival_time=DATE_ADD(UTC_TIMESTAMP(),INTERVAL ? SECOND),return_time=DATE_ADD(UTC_TIMESTAMP(),INTERVAL ? SECOND) WHERE id=?",[$seconds,$seconds*2,$r['id']]);$db->execute("UPDATE rally_participants SET status='marching' WHERE rally_id=? AND status='pending'",[$r['id']]);
+        $returnSeconds=MarchSpeed::duration(hypot($r['target_x']-$origin['coord_x'],$r['target_y']-$origin['coord_y']),$returnSpeed,(int)$r['world_id']);
+        $db->execute("UPDATE rallies SET status='marching',launch_at=UTC_TIMESTAMP(),arrival_time=DATE_ADD(UTC_TIMESTAMP(),INTERVAL ? SECOND),return_time=DATE_ADD(UTC_TIMESTAMP(),INTERVAL ? SECOND) WHERE id=?",[$seconds,$seconds+$returnSeconds,$r['id']]);$db->execute("UPDATE rally_participants SET status='marching' WHERE rally_id=? AND status='pending'",[$r['id']]);
     }
     public static function describe(array $row): array
     {
         $meta=json_decode($row['result_json']??'{}',true)?:[];
-        if(($row['target_kind']??'city')==='monster')$row['target_name']=($meta['monster']['name']??'Monster').' Lv. '.($meta['monster']['level']??1);
+        if(($row['target_kind']??'city')==='monster'){
+            $row['target_name']=($meta['monster']['name']??'Monster').' Lv. '.($meta['monster']['level']??1);
+            $row['ap_cost_base']=max(0,(int)($meta['monster']['action_point_cost']??\Conquer\Game\Player\ActionPoints::costForMonster($meta['monster']['name']??'')));
+        }
         if(($row['target_kind']??'city')==='territory')$row['target_name']=$meta['target_name']??'Eroberungsziel';
         $row['capacity']=$meta['capacity']??null;$row['human_capacity_remaining']=isset($meta['capacity'])?max(0,(int)$meta['capacity']-array_sum(array_map(static fn($a)=>!empty($a['is_ai'])?0:array_sum($a['troops']),self::armies($row)))):null;
         return $row;
@@ -188,6 +203,7 @@ final class RallyService
         $db=Connection::getInstance();$db->execute("UPDATE rally_participants SET status='pending' WHERE rally_id=? AND status='joining' AND arrival_time<=UTC_TIMESTAMP()",[$r['id']]);
         if(!$launching)return;
         $late=$db->query("SELECT player_id,city_id,troops_json FROM rally_participants WHERE rally_id=? AND status='joining'",[$r['id']])->fetchAll();
+        self::refundParticipantAp((int)$r['id'],'joining');
         foreach($late as $army)self::refund([['player_id'=>(int)$army['player_id'],'city_id'=>(int)$army['city_id'],'troops'=>json_decode($army['troops_json'],true)?:[]]]);
         $db->execute("UPDATE rally_participants SET status='cancelled' WHERE rally_id=? AND status='joining'",[$r['id']]);
     }
@@ -197,7 +213,10 @@ final class RallyService
         if(($row['target_kind']??'city')==='territory'){\Conquer\Game\Territory\TerritoryRally::cancelGathering($row,$reason);return;}
         $db=Connection::getInstance();self::refund(self::armies($row));
         $meta=json_decode($row['result_json']??'{}',true)?:[];$meta['reason']=$reason;
-        if(($row['target_kind']??'city')==='monster')$db->execute('UPDATE players SET action_points=LEAST(?,action_points+?) WHERE id=?',[\Conquer\Game\Player\ActionPoints::MAX_AP,(int)($meta['ap_cost']??0),$row['leader_player_id']]);
+        if(($row['target_kind']??'city')==='monster'){
+            \Conquer\Game\Player\ActionPoints::refund((int)$row['leader_player_id'],(int)($meta['ap_cost']??0));
+            self::refundParticipantAp((int)$row['id']);
+        }
         $db->execute("UPDATE rallies SET status='cancelled',result_json=? WHERE id=?",[json_encode($meta),$row['id']]);
         $db->execute("UPDATE rally_participants SET status='cancelled' WHERE rally_id=?",[$row['id']]);
     }
@@ -213,6 +232,16 @@ final class RallyService
             foreach(($army['items']??[]) as $code=>$amount)\Conquer\Game\Inventory\InventoryService::addItems($army['player_id'],(int)$code,(int)$amount,$world);
             \Conquer\Game\Rewards\RewardCatalog::grantFragments($army['player_id'],$army['fragments']??[]);
             $db->execute('UPDATE cities SET food=food+?,lumber=lumber+?,stone=stone+?,gold=gold+? WHERE id=?',[$loot['food']??0,$loot['lumber']??0,$loot['stone']??0,$loot['gold']??0,$army['city_id']]);
+        }
+    }
+
+    private static function refundParticipantAp(int $rallyId,?string $status=null): void
+    {
+        $db=Connection::getInstance();$sql='SELECT id,player_id,ap_cost_paid FROM rally_participants WHERE rally_id=? AND ap_cost_paid>0';$params=[$rallyId];
+        if($status!==null){$sql.=' AND status=?';$params[]=$status;}
+        foreach($db->query($sql.' FOR UPDATE',$params)->fetchAll() as $participant){
+            \Conquer\Game\Player\ActionPoints::refund((int)$participant['player_id'],(int)$participant['ap_cost_paid']);
+            $db->execute('UPDATE rally_participants SET ap_cost_paid=0 WHERE id=?',[$participant['id']]);
         }
     }
 }

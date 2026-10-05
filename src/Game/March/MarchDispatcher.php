@@ -42,7 +42,7 @@ final class MarchDispatcher
      *
      * @throws \RuntimeException
      */
-    public static function assertSlotAvailable(int $playerId,?int $worldId=null,bool $gather=false): void
+    public static function assertSlotAvailable(int $playerId,?int $worldId=null,bool $gather=false,bool $hunt=false): void
     {
         $db = Connection::getInstance();
 
@@ -59,7 +59,11 @@ final class MarchDispatcher
 
         $limits = \Conquer\Game\Research\ResearchEffects::limits(\Conquer\Game\Research\BuffEngine::getBuffs($playerId,$worldId));
         $gathering=(int)$db->query("SELECT COUNT(*) FROM marches WHERE player_id=? AND world_id=? AND march_type=9 AND state IN ('marching','resolving','returning','arrived')",[$playerId,$worldId])->fetchColumn();
-        if ($active >= $limits['march_slots']+$limits['gather_march_slots'] || (!$gather && $active-$gathering >= $limits['march_slots'])) {
+        $hunting=(int)$db->query("SELECT COUNT(*) FROM marches WHERE player_id=? AND world_id=? AND march_type=5 AND state IN ('marching','resolving','returning','arrived')",[$playerId,$worldId])->fetchColumn();
+        $reservedGather=min($gathering,$limits['gather_march_slots']);$reservedHunt=min($hunting,$limits['hunt_march_slots']);
+        $generalUsed=$active-$reservedGather-$reservedHunt;
+        $canUseReserved=($gather&&$gathering<$limits['gather_march_slots'])||($hunt&&$hunting<$limits['hunt_march_slots']);
+        if ($generalUsed >= $limits['march_slots']&&!$canUseReserved) {
             throw new \RuntimeException('MARCH_SLOT_FULL');
         }
     }
@@ -138,7 +142,7 @@ final class MarchDispatcher
         if ((int) $monster['hp_current'] <= 0) {
             throw new \RuntimeException('Das Monster ist bereits besiegt.');
         }
-        $actionPointCost=max(0,(int)($definition['action_point_cost']??ActionPoints::costForMonster((string)($definition['name']??''))));
+        $actionPointCost=ActionPoints::monsterCost(max(0,(int)($definition['action_point_cost']??ActionPoints::costForMonster((string)($definition['name']??'')))),$buffs);
 
         // ── Calculate march duration (SPEC §8.3) ─────────────────────────────
         $distance  = sqrt(($targetX - $originX) ** 2 + ($targetY - $originY) ** 2);
@@ -163,7 +167,7 @@ final class MarchDispatcher
             $monsterId, $troopsJson, $marchSecs, $cleanTroops,$worldId,$snapshotJson,$requestId,$payloadHash,$skinSnapshot,$actionPointCost,
         ): int {
             if($requestId!==null&&($existing=self::existingRequest($db,$playerId,$worldId,$requestId,$payloadHash,self::MARCH_MONSTER))!==null)return $existing;
-            self::assertSlotAvailable($playerId,$worldId);
+            self::assertSlotAvailable($playerId,$worldId,false,true);
             $current=$db->query('SELECT coord_x,coord_y,hp_current FROM field_monsters WHERE id=? FOR UPDATE',[$monsterId])->fetch();
             if(!$current||(int)$current['coord_x']!==$targetX||(int)$current['coord_y']!==$targetY||(int)$current['hp_current']<=0)throw new \RuntimeException('Das Monster ist nicht mehr auf diesem Feld. Wähle das Ziel auf der Karte erneut.');
             ActionPoints::deduct($playerId,$actionPointCost);
@@ -451,12 +455,19 @@ final class MarchDispatcher
             }else{$target=\Conquer\Game\WorldRules::assertCityAttackAllowed($playerId,$targetX,$targetY,$targetPlayerId,$world);}
             $speed=200.0;
             $skinMultiplier=MarchSkinService::speedMultiplier($skinSnapshot);
-            if($clean){$speed=PHP_FLOAT_MAX;foreach($clean as $code=>$count){$speed=min($speed,$type===self::MARCH_ATTACK_PLAYER?MarchSpeed::pvp((int)$code,$buffs,$skinMultiplier):MarchSpeed::generic((int)$code,$buffs,$skinMultiplier));}}
+            $travelBuffs=$type===self::MARCH_ATTACK_PLAYER?\Conquer\Game\Player\TalentEffects::cavalryMarch($buffs,$clean):$buffs;
+            if($clean){$speed=PHP_FLOAT_MAX;foreach($clean as $code=>$count){$speed=min($speed,$type===self::MARCH_ATTACK_PLAYER?MarchSpeed::pvp((int)$code,$travelBuffs,$skinMultiplier):MarchSpeed::generic((int)$code,$buffs,$skinMultiplier));}}
             else $speed*=$skinMultiplier;
             $seconds=MarchSpeed::duration(hypot($targetX-(int)$origin['coord_x'],$targetY-(int)$origin['coord_y']),$speed,(int)$origin['world_id'],$type===self::MARCH_SCOUT?2:5);
+            $travel=[];
+            if($type===self::MARCH_ATTACK_PLAYER){
+                $returnBuffs=\Conquer\Game\Player\TalentEffects::cavalryMarch($buffs,$clean,true);$returnSpeed=PHP_FLOAT_MAX;
+                foreach($clean as $code=>$count)$returnSpeed=min($returnSpeed,MarchSpeed::pvp((int)$code,$returnBuffs,$skinMultiplier));
+                $travel['pvp_return_seconds']=MarchSpeed::duration(hypot($targetX-(int)$origin['coord_x'],$targetY-(int)$origin['coord_y']),$returnSpeed,$world);
+            }
             if($clean)MarchArmy::reserve($db,$cityId,$clean);
             if($type!==self::MARCH_SUPPORT)\Conquer\Game\WorldRules::relinquishShield($playerId,$cityId);
-            $db->execute("INSERT INTO marches(player_id,world_id,march_type,march_skin,march_speed_bonus_pct,origin_city_id,target_x,target_y,target_type,target_id,troops_json,departure_time,arrival_time,state) VALUES(?,?,?,?,?,?,?, ?,2,?,?,UTC_TIMESTAMP(),DATE_ADD(UTC_TIMESTAMP(),INTERVAL ? SECOND),'marching')",[$playerId,$world,$type,$skinSnapshot['march_skin'],$skinSnapshot['bonus_pct'],$cityId,$targetX,$targetY,(int)$target['id'],json_encode($clean),$seconds]);
+            $db->execute("INSERT INTO marches(player_id,world_id,march_type,march_skin,march_speed_bonus_pct,origin_city_id,target_x,target_y,target_type,target_id,troops_json,haul_json,departure_time,arrival_time,state) VALUES(?,?,?,?,?,?,?, ?,2,?,?,?,UTC_TIMESTAMP(),DATE_ADD(UTC_TIMESTAMP(),INTERVAL ? SECOND),'marching')",[$playerId,$world,$type,$skinSnapshot['march_skin'],$skinSnapshot['bonus_pct'],$cityId,$targetX,$targetY,(int)$target['id'],json_encode($clean),json_encode($travel),$seconds]);
             return $db->lastInsertId();
         }));}finally{$db->query('SELECT RELEASE_LOCK(?)',[$lock]);}
     }

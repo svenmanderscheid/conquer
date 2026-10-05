@@ -518,11 +518,12 @@ final class InventoryService
             return ['ok' => false, 'effect' => 'AP refill has no amount.'];
         }
 
+        $maximum=\Conquer\Game\Player\ActionPoints::get($playerId)['max'];
         Connection::getInstance()->execute(
             'UPDATE players
-             SET    action_points = LEAST(action_points + ?, 200)
+             SET    action_points = LEAST(action_points + ?, ?)
              WHERE  id = ?',
-            [$apAmount, $playerId],
+            [$apAmount, $maximum, $playerId],
         );
 
         return [

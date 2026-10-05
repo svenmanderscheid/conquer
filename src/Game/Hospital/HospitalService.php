@@ -14,12 +14,12 @@ final class HospitalService
 {
     private const BASE_CAPACITY=1000;
 
-    public static function addWounded(int $cityId,array $troops): void
+    public static function addWounded(int $cityId,array $troops,bool $monster=false): void
     {
         $db=Connection::getInstance();
         foreach($troops as $code=>$count){
             if((int)$count<=0)continue;
-            $db->execute('INSERT INTO hospital_wounded(city_id,troop_code,count) VALUES(?,?,?) ON DUPLICATE KEY UPDATE count=count+VALUES(count)',[$cityId,(int)$code,(int)$count]);
+            $db->execute('INSERT INTO hospital_wounded(city_id,troop_code,count,monster_count) VALUES(?,?,?,?) ON DUPLICATE KEY UPDATE count=count+VALUES(count),monster_count=monster_count+VALUES(monster_count)',[$cityId,(int)$code,(int)$count,$monster?(int)$count:0]);
         }
     }
 
@@ -27,13 +27,13 @@ final class HospitalService
     {
         $db=Connection::getInstance();
         $settle=static function()use($db,$cityId):void{
-            $rows=$db->query('SELECT id,troop_code,count,healing_count,healing_batch FROM hospital_wounded WHERE city_id=? AND healing_count>0 AND healing_ends_at<=UTC_TIMESTAMP() FOR UPDATE',[$cityId])->fetchAll();
+            $rows=$db->query('SELECT id,troop_code,count,healing_count,healing_batch,monster_healing_count FROM hospital_wounded WHERE city_id=? AND healing_count>0 AND healing_ends_at<=UTC_TIMESTAMP() FOR UPDATE',[$cityId])->fetchAll();
             $completed=[];
             foreach($rows as $row){
                 $count=min((int)$row['count'],(int)$row['healing_count']);
                 if($count>0)$db->execute('INSERT INTO city_troops(city_id,troop_code,count) VALUES(?,?,?) ON DUPLICATE KEY UPDATE count=count+VALUES(count)',[$cityId,TroopData::activeCode((int)$row['troop_code']),$count]);
                 if($count===(int)$row['count'])$db->execute('DELETE FROM hospital_wounded WHERE id=?',[$row['id']]);
-                else $db->execute('UPDATE hospital_wounded SET count=count-?,healing_count=0,healing_ends_at=NULL,healing_started_at=NULL,healing_batch=NULL WHERE id=?',[$count,$row['id']]);
+                else $db->execute('UPDATE hospital_wounded SET count=count-?,monster_count=GREATEST(0,CAST(monster_count AS SIGNED)-?),monster_healing_count=0,healing_count=0,healing_ends_at=NULL,healing_started_at=NULL,healing_batch=NULL WHERE id=?',[$count,(int)$row['monster_healing_count'],$row['id']]);
                 if($count>0){$batch=(string)($row['healing_batch']??$row['id']);$completed[$batch]=($completed[$batch]??0)+$count;}
             }
             foreach($completed as $batch=>$count)\Conquer\Game\Notification\NotificationService::pushCityCompletion(
@@ -64,14 +64,16 @@ final class HospitalService
 
     public static function getStatus(int $cityId): array
     {
-        $rows=Connection::getInstance()->query('SELECT troop_code,count,healing_count,healing_ends_at,healing_started_at,healing_batch FROM hospital_wounded WHERE city_id=? ORDER BY troop_code',[$cityId])->fetchAll();
+        $rows=Connection::getInstance()->query('SELECT troop_code,count,healing_count,healing_ends_at,healing_started_at,healing_batch,monster_count,monster_healing_count FROM hospital_wounded WHERE city_id=? ORDER BY troop_code',[$cityId])->fetchAll();
         [$buffs,$factor]=self::factor($cityId);$wounded=[];$used=0;$healing=0;$ends=null;$starts=null;$batch=null;
         foreach($rows as$row){
             $code=(int)$row['troop_code'];$count=(int)$row['count'];$active=(int)$row['healing_count'];$unit=TroopData::get($code);
             $used+=$count;$healing+=$active;
             if($active>0){$ends=max($ends??'',$row['healing_ends_at']);$starts=min($starts??$row['healing_started_at'],$row['healing_started_at']);$batch=$row['healing_batch'];}
             $wounded[]=['troop_code'=>$code,'name'=>$unit['name_de']??$unit['name']??'Truppen','count'=>$count,'waiting_count'=>$count-$active,'healing_count'=>$active,
-                'healing_ends_at'=>$active?$row['healing_ends_at']:null,'resources'=>self::healingResources($code),'seconds_per_troop'=>max(.5,(float)($unit['heal_time']??1))*$factor];
+                'healing_ends_at'=>$active?$row['healing_ends_at']:null,'resources'=>self::healingResources($code),'seconds_per_troop'=>max(.5,(float)($unit['heal_time']??1))*$factor,
+                'monster_waiting_count'=>max(0,(int)$row['monster_count']-(int)$row['monster_healing_count']),
+                'monster_seconds_per_troop'=>max(.5,(float)($unit['heal_time']??1))*max(.05,1-(float)($buffs['healing_time_reduced']??0))/max(1,1+(float)($buffs['healing_speed']??0)+(float)($buffs['talent_monster_healing_speed']??0))];
         }
         return ['wounded'=>$wounded,'used'=>$used,'waiting'=>$used-$healing,'healing'=>$healing,
             'capacity'=>(int)floor(self::BASE_CAPACITY*(1+max(0.0,(float)($buffs['hospital_capacity']??0))))+max(0,(int)($buffs['hospital_capacity_flat']??0)),
@@ -114,7 +116,8 @@ final class HospitalService
         foreach($troops as$code=>$n){
             if(!ctype_digit((string)$code)||!is_int($n)||$n<=0||!isset($available[$code])||$n>$available[$code]['waiting_count'])throw new \DomainException('Die Verwundeten haben sich geändert. Bitte wähle erneut.');
             foreach($cost as$key=>$_)$cost[$key]+=$available[$code]['resources'][$key]*$n;
-            $count+=$n;$seconds+=$available[$code]['seconds_per_troop']*$n;
+            $monster=min($n,$available[$code]['monster_waiting_count']);
+            $count+=$n;$seconds+=$available[$code]['seconds_per_troop']*($n-$monster)+$available[$code]['monster_seconds_per_troop']*$monster;
         }
         $seconds=max(1,(int)ceil($seconds));
         if(isset($body['expected_resources'])&&$body['expected_resources']!=$cost)throw new \DomainException('Die Ressourcenkosten haben sich geändert. Bitte bestätige erneut.');
@@ -122,7 +125,7 @@ final class HospitalService
         if($db->execute('UPDATE cities SET food=food-?,lumber=lumber-?,stone=stone-?,gold=gold-? WHERE id=? AND food>=? AND lumber>=? AND stone>=? AND gold>=?',array_merge(array_values($cost),[$cityId],array_values($cost)))!==1)throw new \DomainException('Nicht genügend Ressourcen für die Heilung.');
         $batch=(string)$body['operation_key'];
         foreach($troops as$code=>$n){
-            $db->execute('UPDATE hospital_wounded SET healing_count=?,healing_started_at=UTC_TIMESTAMP(),healing_ends_at=DATE_ADD(UTC_TIMESTAMP(),INTERVAL ? SECOND),healing_batch=? WHERE city_id=? AND troop_code=?',[$n,$seconds,$batch,$cityId,$code]);
+            $db->execute('UPDATE hospital_wounded SET healing_count=?,monster_healing_count=?,healing_started_at=UTC_TIMESTAMP(),healing_ends_at=DATE_ADD(UTC_TIMESTAMP(),INTERVAL ? SECOND),healing_batch=? WHERE city_id=? AND troop_code=?',[$n,min($n,$available[$code]['monster_waiting_count']),$seconds,$batch,$cityId,$code]);
         }
         return ['message'=>"Die Heilung von $count Truppen wurde gestartet.",'resources_spent'=>$cost,'gems_spent'=>0,'troops_healed'=>0,'troops_started'=>$count,'duration_seconds'=>$seconds,'batch_id'=>$batch];
     }

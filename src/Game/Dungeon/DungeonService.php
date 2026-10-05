@@ -170,7 +170,7 @@ final class DungeonService
     private static function prepareMember(int $playerId,array $body): array
     {
         $role=self::enum($body['role']??'',self::ROLES,'Rolle');$eligible=self::eligibleRoles($playerId);if(!in_array($role,$eligible,true))throw new DungeonException('ROLE_NOT_SPECIALIZED','Diese Rolle passt nicht zu deinen verteilten Lord-Talenten.');
-        $city=WorldContext::city($playerId,WorldContext::id(),true);$troops=self::troops($body['troops']??null);$buffs=BuffEngine::getBuffs($playerId,WorldContext::id());$attack=$defense=$hp=$carry=$speed=0.0;$typeStats=[];
+        $city=WorldContext::city($playerId,WorldContext::id(),true);$troops=self::troops($body['troops']??null);$buffs=\Conquer\Game\Research\ResearchEffects::armyBuffs(BuffEngine::getBuffs($playerId,WorldContext::id()),$troops);$attack=$defense=$hp=$carry=$speed=0.0;$typeStats=[];
         foreach($troops as$code=>$count){$t=TroopData::get((int)$code);if(!$t)throw new DungeonException('INVALID_TROOPS','Die Armee enthält unbekannte Truppen.');$typeCode=(string)(int)$t['type'];$type=[1=>'infantry',2=>'ranged',3=>'cavalry'][(int)$t['type']]??null;$a=(int)$t['attack']*$count*BuffEngine::effectiveMultiplier($buffs,$type,'atk');$de=(int)$t['defense']*$count*BuffEngine::effectiveMultiplier($buffs,$type,'def');$h=(int)$t['hp']*$count*BuffEngine::effectiveMultiplier($buffs,$type,'hp');$attack+=$a;$defense+=$de;$hp+=$h;$carry+=(int)$t['carry']*$count;$speed+=(int)$t['speed']*$count;$typeStats[$typeCode]['attack']=($typeStats[$typeCode]['attack']??0)+$a;$typeStats[$typeCode]['defense']=($typeStats[$typeCode]['defense']??0)+$de;$typeStats[$typeCode]['hp']=($typeStats[$typeCode]['hp']??0)+$h;}
         $ranks=self::roleRanks($playerId);$pve=1+max(0,(float)($buffs['vs_monster_attack']??0));$attack*=$pve;foreach($typeStats as&$s)$s['attack']*=$pve;unset($s);$roleEffects=['attack_pct'=>0.0,'defense_pct'=>0.0,'hp_pct'=>0.0];
         if($role==='attack'){$roleEffects['attack_pct']=min(.30,.02*$ranks[$role]);$attack*=1+$roleEffects['attack_pct'];foreach($typeStats as&$s)$s['attack']*=1+$roleEffects['attack_pct'];unset($s);}
@@ -218,7 +218,14 @@ final class DungeonService
         return ['fragments'=>$fragments,'treasure_code'=>(int)($base['treasure_code']??0),'grade'=>(string)($base['grade']??'normal'),'item_code'=>$item,'item_quantity'=>$item?(int)($base['item_quantity']??1):0,'success'=>$won];
     }
     private static function assertNoActive(int $playerId): void {if(Connection::getInstance()->query("SELECT m.run_id FROM dungeon_members m JOIN dungeon_runs r ON r.id=m.run_id WHERE m.player_id=? AND r.world_id=? AND r.status IN ('recruiting','running','decision') LIMIT 1 FOR UPDATE",[$playerId,WorldContext::id()])->fetchColumn())throw new DungeonException('ALREADY_ACTIVE','Du gehörst bereits zu einer aktiven Dungeon-Gruppe.');}
-    private static function roleRanks(int $playerId): array {$out=array_fill_keys(self::ROLES,0);foreach(Connection::getInstance()->query("SELECT talent_code,rank FROM player_lord_talents WHERE player_id=? AND world_id=? AND (talent_code LIKE 'attack\\_%' OR talent_code LIKE 'defense\\_%' OR talent_code LIKE 'gather\\_%' OR talent_code LIKE 'hunter\\_%')",[$playerId,WorldContext::id()])->fetchAll()as$r){$branch=explode('_',(string)$r['talent_code'])[0];if(isset($out[$branch]))$out[$branch]+=(int)$r['rank'];}return$out;}
+    private static function roleRanks(int $playerId): array
+    {
+        $out=array_fill_keys(self::ROLES,0);
+        $roles=['attack'=>['attack'],'defense'=>['defense'],'gather'=>['gather'],'hunter'=>['hunter'],'infantry'=>['defense'],'archer'=>['attack'],'cavalry'=>['attack'],'monster'=>['hunter'],'combat'=>['attack','defense'],'gathering'=>['gather']];
+        foreach(Connection::getInstance()->query('SELECT talent_code,rank FROM player_lord_talents WHERE player_id=? AND world_id=?',[$playerId,WorldContext::id()])->fetchAll() as $r)
+            foreach($roles[explode('_',(string)$r['talent_code'])[0]]??[] as $role)$out[$role]+=(int)$r['rank'];
+        return $out;
+    }
     private static function eligibleRoles(int $playerId): array {$r=self::roleRanks($playerId);return array_keys(array_filter($r,fn($v)=>$v>0));}
     private static function rotation(): array {return DungeonRules::weeklyRotation()['available'];}
     private static function definition(string $code): array {foreach(DungeonRules::catalog()['dungeons']as$d)if(($d['dungeon_code']??null)===$code)return$d;throw new DungeonException('DUNGEON_UNKNOWN','Dungeon-Konfiguration fehlt.',500);}

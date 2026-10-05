@@ -68,13 +68,20 @@ final class GatherService
             }
             $selected=MarchArmy::clean($selected,$cap);MarchArmy::reserve($db,$cityId,$selected);
             $world=$db->query('SELECT speed_factor,gather_factor FROM worlds WHERE id=?',[$worldId])->fetch();
-            $speed=min(array_map(static fn($code)=>self::troopSpeed((int)$code,$buffs,(float)$world['speed_factor'],$attack),array_keys($selected)))
+            $travelBuffs=$attack?TalentEffects::cavalryMarch($buffs,$selected):$buffs;
+            $speed=min(array_map(static fn($code)=>self::troopSpeed((int)$code,$travelBuffs,(float)$world['speed_factor'],$attack),array_keys($selected)))
                 * MarchSkinService::speedMultiplier($skinSnapshot);
             $distance=hypot($targetX-(int)$city['coord_x'],$targetY-(int)$city['coord_y']);
             $seconds=MarchSpeed::duration($distance,$speed,$worldId);
             $resource=FieldObjectService::RESOURCE_BY_TYPE[(int)$obj['object_type']];
             $snapshot=['gather'=>['rate'=>self::rate($resource,(int)$obj['level'],$buffs,(float)$world['gather_factor']),'capacity'=>ResearchEffects::carryCapacity($selected,TalentEffects::gather($buffs))]];
-            if($attack){$snapshot['field_attack_march_id']=(int)$occupant['id'];WorldRules::relinquishShield($playerId,$cityId);}
+            if($attack){
+                $snapshot['field_attack_march_id']=(int)$occupant['id'];
+                $returnBuffs=TalentEffects::cavalryMarch($buffs,$selected,true);
+                $returnSpeed=min(array_map(static fn($code)=>self::troopSpeed((int)$code,$returnBuffs,(float)$world['speed_factor'],true),array_keys($selected)))*MarchSkinService::speedMultiplier($skinSnapshot);
+                $snapshot['pvp_return_seconds']=MarchSpeed::duration($distance,$returnSpeed,$worldId);
+                WorldRules::relinquishShield($playerId,$cityId);
+            }
             $db->execute("INSERT INTO marches(player_id,world_id,march_type,march_skin,march_speed_bonus_pct,origin_city_id,target_x,target_y,target_type,target_id,troops_json,haul_json,departure_time,arrival_time,state) VALUES(?,?,?,?,?,?,?,?,5,?,?,?,UTC_TIMESTAMP(),DATE_ADD(UTC_TIMESTAMP(),INTERVAL ? SECOND),'marching')",[$playerId,$worldId,$attack?self::FIELD_ATTACK:9,$skinSnapshot['march_skin'],$skinSnapshot['bonus_pct'],$cityId,$targetX,$targetY,$obj['id'],json_encode($selected),json_encode($snapshot),$seconds]);
             $id=(int)$db->lastInsertId();
             return ['march_id'=>$id];
@@ -208,7 +215,7 @@ final class GatherService
 
     private static function returnHome(array $march,array $loot,int $leaveAt,?string $reason=null,array $items=[],array $fragments=[]): void
     {
-        $db=Connection::getInstance();$travel=max(5,strtotime($march['arrival_time'].' UTC')-strtotime($march['departure_time'].' UTC'));
+        $db=Connection::getInstance();$haul=json_decode($march['haul_json']??'{}',true)?:[];$travel=max(5,(int)($haul['pvp_return_seconds']??(strtotime($march['arrival_time'].' UTC')-strtotime($march['departure_time'].' UTC'))));
         $db->execute('UPDATE field_objects SET gatherer_march_id=NULL WHERE id=? AND world_id=? AND gatherer_march_id=?',[$march['target_id'],$march['world_id'],$march['id']]);
         $db->execute("UPDATE marches SET state='returning',haul_json=?,return_time=?,gathering_finishes_at=NULL WHERE id=?",[json_encode(['loot'=>$loot,'items'=>$items,'fragments'=>$fragments,'survivors'=>json_decode($march['troops_json'],true)?:[],'reason'=>$reason]),gmdate('Y-m-d H:i:s',$leaveAt+$travel),$march['id']]);
     }

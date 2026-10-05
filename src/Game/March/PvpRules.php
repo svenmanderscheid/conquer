@@ -23,11 +23,12 @@ final class PvpRules
         return $attack > $defense;
     }
 
-    public static function losses(array $troops, float $rate): array
+    public static function losses(array $troops, float $rate,array $buffs=[],array $enemyTroops=[]): array
     {
         $result = ['survivors'=>[], 'wounded'=>[], 'dead'=>[]];
         foreach ($troops as $code=>$count) {
-            $lost = min((int)$count, (int)ceil($count * max(0, $rate)));
+            $factor=\Conquer\Game\Player\TalentEffects::lossFactor($buffs,ResearchEffects::troopType((int)$code),$enemyTroops);
+            $lost = min((int)$count, (int)ceil($count * max(0, $rate)*$factor-1e-8));
             $wounded = (int)floor($lost * .3);
             $result['survivors'][$code] = $count - $lost;
             $result['wounded'][$code] = $wounded;

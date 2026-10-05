@@ -59,10 +59,10 @@ final class MonsterReport
             $equipped[] = array_intersect_key($item, array_flip(['treasure_code','name','name_de','icon','grade','level','equipped_slot','stats_at_level']));
         }
         $talents = [];
-        $nodes = MasteryService::nodes();
+        $nodes = MasteryService::activeNodes($playerId,$worldId);
         foreach ($db->query('SELECT talent_code,rank FROM player_lord_talents WHERE player_id=? AND world_id=? AND rank>0', [$playerId,$worldId])->fetchAll() as $rank) {
             $node = $nodes[$rank['talent_code']] ?? null;
-            if ($node) $talents[] = ['code'=>$rank['talent_code'],'name'=>$node['name'],'rank'=>(int)$rank['rank'],'branch'=>$node['branch']];
+            if ($node) $talents[] = ['code'=>$rank['talent_code'],'name'=>$node['name'],'name_key'=>$node['name_key']??null,'rank'=>(int)$rank['rank'],'max_rank'=>$node['max_level'],'branch'=>$node['branch']];
         }
         return ['identity'=>$identity, 'equipment'=>$equipped, 'hunter'=>[
             'level'=>LordLevel::snapshot($playerId,$worldId)['level'], 'talents'=>$talents,

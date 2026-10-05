@@ -82,6 +82,13 @@ await page.evaluate(()=>{openMarch('players');march.onClick('march-max',{});});a
 check('Gather-only talent slot cannot dispatch a fourth combat army',()=>{});
 await page.evaluate(()=>{state.marches[0].march_type=9;march.update();});assert.equal(await page.locator('#march-confirm').isDisabled(),false);
 check('Gathering in reserved slot leaves the third combat slot available',()=>{});
+await page.evaluate(()=>{state.army_limits.hunt_march_slots=1;state.marches=[{march_type:7},{march_type:7},{march_type:7}];state.monsters[0].definition.type='solo';openMarch('monsters');});
+check('Hunter-only slot permits a solo hunt after three PvP marches',()=>{});assert.equal(await page.locator('#march-confirm').isDisabled(),false);
+await page.evaluate(()=>{openMarch('players');march.onClick('march-max',{});});check('Unused Hunter-only slot cannot launch PvP',()=>{});assert.equal(await page.locator('#march-confirm').isDisabled(),true);
+await page.evaluate(()=>{state.marches[0].march_type=5;march.update();});check('Solo hunt in its reserved slot leaves a regular slot available',()=>{});assert.equal(await page.locator('#march-confirm').isDisabled(),false);
+await page.evaluate(()=>{state.marches=[];state.monster_ap_discount=.1;state.city.action_points=23;openMarch('monsters');});check('AP cost preview rounds the discounted 25 AP up to 23',()=>{});assert.equal(await page.locator('#march-action-points').textContent(),'23 / 23');assert.equal(await page.locator('#march-confirm').isDisabled(),false);
+await page.evaluate(()=>{state.city.action_points=22;march.update();});check('Discounted monster attack still requires enough AP',()=>{});assert.equal(await page.locator('#march-confirm').isDisabled(),true);
+await page.evaluate(()=>{state.army_limits.hunt_march_slots=0;state.monster_ap_discount=0;state.city.action_points=200;});
 await page.evaluate(()=>{state.marches=[];openMarch('shrine');state.shrines[0].event.ends_at='2000-01-01 00:00:00';march.onClick('march-send',{})});const expiredRequests=await page.evaluate(()=>sent.length);check('Expired shrine event blocks dispatch from stale composer',()=>assert.equal(expiredRequests,0));
 const etaKinds={monsters:20,'monster-rally':25,charms:30,players:40,rally:50,'rally-join':50,congress:60,'congress-garrison':60,shrine:60,'shrine-garrison':60,nodes:80,'node-attack':90};
 for(const [kind,speed] of Object.entries(etaKinds)){

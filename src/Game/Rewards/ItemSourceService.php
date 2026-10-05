@@ -59,7 +59,7 @@ final class ItemSourceService
         $alliance=(int)$db->query('SELECT alliance_id FROM alliance_members WHERE player_id=? AND world_id=?',[$playerId,$world])->fetchColumn();
         $troops=(int)$db->query('SELECT COALESCE(SUM(count),0) FROM city_troops WHERE city_id=?',[$city['id']])->fetchColumn();
         $inventory=array_column(InventoryService::getInventory($playerId),'quantity','item_code');
-        $sources=[];$monsterSources=[];$codes=[];
+        $sources=[];$monsterSources=[];$codes=[];$talents=\Conquer\Game\Player\MasteryService::bonuses($playerId,$world);
         foreach(array_unique(array_merge(array_column(RewardCatalog::json('monsters')['monsters'],'code'),array_column(RewardCatalog::json('world_spawn')['monsters'],'code')))as$code){
             $code=(int)$code;if(!MonsterData::isActive($code))continue;$d=MonsterData::get($code);$level=max(1,(int)$d['level']);
             $rewards=self::drops($query,array_merge($d['drops']??[],$d['fragment_drops']??[]));if(!$rewards)continue;
@@ -67,7 +67,7 @@ final class ItemSourceService
             $codes[$code]=$group;
             if(isset($monsterSources[$group]))continue;
             $rally=$d['type']==='rally';$needs=[self::note('sources.victory')];
-            $needs[]=self::note('sources.monster_cost',['ap'=>max(0,(int)($d['action_point_cost']??ActionPoints::costForMonster($d['name']))),'level'=>$level]);
+            $needs[]=self::note('sources.monster_cost',['ap'=>ActionPoints::monsterCost(max(0,(int)($d['action_point_cost']??ActionPoints::costForMonster($d['name']))),$talents),'level'=>$level]);
             if($rally)$needs[]=self::note('sources.rally');
             if($troops<1)$needs[]=self::note('sources.train');
             if($rally&&$alliance<1)$needs[]=self::note('sources.join_alliance');

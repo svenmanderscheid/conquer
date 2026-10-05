@@ -39,10 +39,10 @@ final class CombatReport
                 'level'=>$item['level'], 'grade'=>$item['grade'], 'icon'=>$item['icon']];
         }
         $talents = [];
-        $nodes = MasteryService::nodes();
+        $nodes = MasteryService::activeNodes($pid,$world);
         foreach ($db->query('SELECT talent_code,rank FROM player_lord_talents WHERE player_id=? AND world_id=? ORDER BY talent_code', [$pid,$world])->fetchAll() as $rank) {
             $node = $nodes[$rank['talent_code']] ?? null;
-            if ($node) $talents[] = ['code'=>$rank['talent_code'], 'name'=>$node['name'], 'rank'=>(int)$rank['rank'], 'branch'=>$node['branch']];
+            if ($node) $talents[] = ['code'=>$rank['talent_code'], 'name'=>$node['name'],'name_key'=>$node['name_key']??null, 'rank'=>(int)$rank['rank'],'max_rank'=>$node['max_level'], 'branch'=>$node['branch']];
         }
         $xp = (int)$db->query('SELECT xp FROM player_lord_progress WHERE player_id=? AND world_id=?', [$pid,$world])->fetchColumn();
         return ['player_id'=>$pid, 'name'=>$owner['username'], 'avatar'=>$owner['avatar'], 'city_name'=>$owner['name'],

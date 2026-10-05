@@ -110,13 +110,15 @@ window.ConquerBeginnerGuide = function(ctx) {
         const marches=s.marches||[],kind={gather:9,monster:5,charm:6}[goal.id];
         if(marches.some(m=>Number(m.march_type)===kind))return waiting;
         if(!Object.values(s.troops||{}).some(n=>Number(n)>0))return {ready:false,reason:'Bilde zuerst Truppen aus oder warte auf ihre Rückkehr.'};
-        const slots=Number(s.army_limits?.march_slots||3),gatherSlots=Number(s.army_limits?.gather_march_slots||0),gathering=marches.filter(m=>Number(m.march_type)===9).length;
-        if(marches.length>=slots+gatherSlots||goal.id!=='gather'&&marches.length-gathering>=slots)return {ready:false,reason:'Deine Marschplätze sind gerade belegt.'};
+        const slots=Number(s.army_limits?.march_slots||3),gatherSlots=Number(s.army_limits?.gather_march_slots||0),huntSlots=Number(s.army_limits?.hunt_march_slots||0),gathering=marches.filter(m=>Number(m.march_type)===9).length,hunting=marches.filter(m=>Number(m.march_type)===5).length;
+        const used=marches.length-Math.min(gathering,gatherSlots)-Math.min(hunting,huntSlots),reserved=(goal.id==='gather'&&gathering<gatherSlots)||(goal.id==='monster'&&hunting<huntSlots);
+        if(used>=slots&&!reserved)return {ready:false,reason:'Deine Marschplätze sind gerade belegt.'};
         if(goal.id==='charm'&&!(s.charms||[]).some(c=>c.collectible!==false))return {ready:false,reason:'In diesem Kartenausschnitt ist gerade kein Charm sichtbar.'};
         if(goal.id==='monster'){
             const ap=Number(getKingdom()?.profile?.action_points??s.city?.action_points??0);
             const candidates=(s.monsters||[]).filter(m=>m.monster_type!=='rally'&&m.definition?.type!=='rally'&&Number(m.hp_current)>0);
-            if(candidates.length&&!candidates.some(m=>Number(m.definition?.action_point_cost??10)<=ap)||!candidates.length&&ap<10)return {ready:false,reason:'Warte auf neue Aktionspunkte.'};
+            const cost=m=>Math.max(1,Math.ceil(Number(m?.definition?.action_point_cost??10)*(1-Number(s.monster_ap_discount||0))-1e-8));
+            if(candidates.length&&!candidates.some(m=>cost(m)<=ap)||!candidates.length&&ap<cost(null))return {ready:false,reason:'Warte auf neue Aktionspunkte.'};
         }
         return ready;
     }
@@ -128,7 +130,7 @@ window.ConquerBeginnerGuide = function(ctx) {
     }
     function openWorldGoal(kind) {
         const s=getState(),ap=Number(getKingdom()?.profile?.action_points??s.city?.action_points??0);
-        const targets=(s[kind]||[]).filter(t=>kind==='monsters'?t.monster_type!=='rally'&&t.definition?.type!=='rally'&&Number(t.hp_current)>0&&Number(t.definition?.action_point_cost??10)<=ap:kind==='nodes'?Number(t.resource_amount)>0&&!t.gatherer_march_id:kind==='charms'?t.collectible!==false:true);
+        const targets=(s[kind]||[]).filter(t=>kind==='monsters'?t.monster_type!=='rally'&&t.definition?.type!=='rally'&&Number(t.hp_current)>0&&Math.max(1,Math.ceil(Number(t.definition?.action_point_cost??10)*(1-Number(s.monster_ap_discount||0))-1e-8))<=ap:kind==='nodes'?Number(t.resource_amount)>0&&!t.gatherer_march_id:kind==='charms'?t.collectible!==false:true);
         const distance=t=>Math.hypot(Number(t.coord_x??t.x)-Number(s.city.coord_x),Number(t.coord_y??t.y)-Number(s.city.coord_y));
         const target=targets.slice().sort((a,b)=>(kind==='monsters'?Number(a.effective_monster_level??a.definition?.level??1)-Number(b.effective_monster_level??b.definition?.level??1):0)||distance(a)-distance(b))[0];
         if(target)ctx.openWorldTarget({x:Number(target.coord_x??target.x),y:Number(target.coord_y??target.y),kind,id:target.id},Number(s.city.world_id));

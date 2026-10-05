@@ -40,14 +40,17 @@ final class CityCombat
         $hasDefendingTroops=array_sum(array_map(static fn(array $army):int=>array_sum(array_map('intval',$army['troops'])),$defenders))>0;
         $attackScore=0.0;$defenseScore=0.0;
         $attackSnapshots=[];$defenseSnapshots=[];
+        $attackTroops=[];$defenseTroops=[];
+        foreach($armies as $army)foreach($army['troops'] as $code=>$count)$attackTroops[$code]=($attackTroops[$code]??0)+$count;
+        foreach($defenders as $army)foreach($army['troops'] as $code=>$count)$defenseTroops[$code]=($defenseTroops[$code]??0)+$count;
         foreach($armies as $army){
-            $buffs=self::combatBuffs($army,$rallyId!==null,false,$x,$y);
+            $buffs=self::combatBuffs($army,$rallyId!==null,false,$x,$y,$defenseTroops);
             $snapshot=CombatReport::army($army,$buffs);
             $attackScore+=array_sum(array_column($snapshot['troops'],'strength'));
             $attackSnapshots[]=$snapshot;
         }
         foreach($defenders as $army){
-            $buffs=self::combatBuffs($army,false,true,$x,$y);
+            $buffs=self::combatBuffs($army,false,true,$x,$y,$attackTroops);
             $factor=1/max(.05,1+(float)($buffs['talent_city_damage_taken']??0));
             $snapshot=CombatReport::army($army,$buffs,$factor);
             $defenseScore+=array_sum(array_column($snapshot['troops'],'strength'));
@@ -71,7 +74,7 @@ final class CityCombat
         $defenderDead=[];$defenderWounded=[];
         foreach($defenders as $index=>$army){
             $reduction=max(.05,1+(float)(BuffEngine::getBuffs((int)$army['player_id'],$world)['talent_city_damage_taken']??0));
-            $loss=self::losses($army['troops'],($wins?.30:.10)*$reduction);HospitalService::addWounded((int)$army['city_id'],$loss['wounded']);
+            $loss=self::losses($army['troops'],($wins?.30:.10)*$reduction,BuffEngine::getBuffs((int)$army['player_id'],$world),$attackTroops);HospitalService::addWounded((int)$army['city_id'],$loss['wounded']);
             $defenseSnapshots[$index]=CombatReport::settle($defenseSnapshots[$index],$loss);
             if(isset($army['reinforcement_id']))$db->execute('UPDATE reinforcements SET troops_json=? WHERE id=?',[json_encode($loss['survivors']),$army['reinforcement_id']]);
             else foreach($army['troops'] as $code=>$count){$db->execute('UPDATE city_troops SET count=count-? WHERE city_id=? AND troop_code=?',[$count-($loss['survivors'][$code]??0),$targetCityId,$code]);$defenderDead[$code]=$loss['dead'][$code]??0;$defenderWounded[$code]=$loss['wounded'][$code]??0;}
@@ -83,7 +86,7 @@ final class CityCombat
             // An empty city cannot inflict troop casualties. Its wall still loses
             // durability and its unprotected resources can still be plundered.
             $attackerLossRate=$hasDefendingTroops?($wins?.10:.30):0.0;
-            $loss=self::losses($army['troops'],$attackerLossRate);$buffs=BuffEngine::getBuffs((int)$army['player_id'],$world);$capacity=0;
+            $buffs=BuffEngine::getBuffs((int)$army['player_id'],$world);$loss=self::losses($army['troops'],$attackerLossRate,$buffs,$defenseTroops);$capacity=0;
             foreach($loss['survivors'] as $code=>$count)$capacity+=$count*ResearchEffects::carryPerTroop((int)$code,$buffs);
             $share=array_sum($army['troops'])/max(1,$totalTroops);$loot=[];
             foreach($lootPool as $resource=>$amount){$loot[$resource]=(int)min($capacity,floor($amount*$share));$capacity-=$loot[$resource];$looted[$resource]+=$loot[$resource];}
@@ -114,17 +117,17 @@ final class CityCombat
         return $result;
     }
 
-    private static function combatBuffs(array $army,bool $rally,bool $defending=false,?int $x=null,?int $y=null): array
+    private static function combatBuffs(array $army,bool $rally,bool $defending=false,?int $x=null,?int $y=null,array $enemyTroops=[]): array
     {
         $world=(int)Connection::getInstance()->query('SELECT world_id FROM cities WHERE id=?',[$army['city_id']])->fetchColumn();
-        $buffs=ResearchEffects::armyBuffs(BuffEngine::getBuffs((int)$army['player_id'],$world,$x,$y),$army['troops'],$rally);$buffs=\Conquer\Game\Player\TalentEffects::combat($buffs,$defending?'city_defense':'pvp',$rally);
+        $buffs=ResearchEffects::armyBuffs(BuffEngine::getBuffs((int)$army['player_id'],$world,$x,$y),$army['troops'],$rally);$buffs=\Conquer\Game\Player\TalentEffects::combat($buffs,$defending?'city_defense':'pvp',$rally,$enemyTroops);
         if($defending)foreach(['infantry'=>'infantrys','ranged'=>'archers','cavalry'=>'cavalrys'] as $type=>$key)foreach(['hp','def','atk'] as $stat)$buffs[$type.'_'.$stat]=($buffs[$type.'_'.$stat]??0)+(float)($buffs['castle_defending_'.$key.'_'.$stat]??0);
         return $buffs;
     }
 
-    private static function losses(array $troops,float $rate): array
+    private static function losses(array $troops,float $rate,array $buffs=[],array $enemyTroops=[]): array
     {
-        return PvpRules::losses($troops,$rate);
+        return PvpRules::losses($troops,$rate,$buffs,$enemyTroops);
     }
 
     private static function report(int $playerId,int $cityId,int $defenderId,int $targetId,int $x,int $y,?int $marchId,string $outcome,array $data): void

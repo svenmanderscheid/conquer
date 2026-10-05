@@ -72,7 +72,7 @@ Kristalle als Währung verwenden seit 23. September 2026 die freigegebene Amethy
 - **Bedienung:** primäre Knöpfe ungefähr 40–44 px hoch; kompakte Rangknöpfe mindestens 32 px. Wichtige Aktionen bleiben erreichbar. Inhalte dürfen scrollen, ohne seitlich aus dem Fenster zu ragen.
 - **Symbole:** große, weiche Silhouetten, dunkelbraune Konturen, dieselben Dorf-Farben. Vorhandene Seltenheitsfarben und Gegenstandsillustrationen bleiben als Information erhalten; sie bestimmen nicht die Farbe des ganzen Fensters.
 
-Die vier Talentbereiche dürfen ihre Rollenfarben tragen: Angriff rot, Verteidigung blau, Sammler grün und Jäger orangebraun. Zustände müssen auch durch Rang, Text, Symbol oder gesperrte Bedienung verständlich sein. Violett als Menüakzent ersetzt keine Seltenheitsfarben, blauen Verteidigungswerte oder Freund/Feind-Markierungen. Die Schriftdateien liegen mit ihren Lizenzen unter `assets/fonts/`; ihre Einbindung in `assets/css/fantasy-fonts.css` benötigt keine externen Dienste.
+Die sechs Hunter-Talentbereiche bewahren ihre Rollenfarben: Infanterie blau, Bogenschützen grün, Kavallerie orangebraun, Monster erdfarben, Kampf rot und Sammeln grün. Das Sternengitter beginnt oben mit einem bezahlten Wegknoten. Verbundene Wege zeigen die Freischaltung; Rangänderungen erfolgen im antippbaren Detailfenster. Die Speicherleiste bleibt beim Scrollen erreichbar. Zustände müssen auch durch Rang, Text, Symbol oder gesperrte Bedienung verständlich sein. Violett als Menüakzent ersetzt keine Seltenheitsfarben, blauen Verteidigungswerte oder Freund/Feind-Markierungen. Die Schriftdateien liegen mit ihren Lizenzen unter `assets/fonts/`; ihre Einbindung in `assets/css/fantasy-fonts.css` benötigt keine externen Dienste.
 
 ### Aufgabenlisten
 

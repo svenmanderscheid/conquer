@@ -186,6 +186,11 @@
             else if(kind==='players'||kind==='neutral_villages')field='pvp_march_speed';
             else if(kind==='rally'||kind==='rally-join')field='pvp_rally_speed';
             else if(landmark(kind))field=kind.endsWith('-garrison')||target?.alliance_id==null?'shrine_neutral_speed':'shrine_occupied_speed';
+            if(['players','node-attack','rally'].includes(kind)||(landmark(kind)&&!kind.endsWith('-garrison')&&target?.alliance_id!=null)){
+                const counts=selected();let totalPower=0,cavalryPower=0;
+                for(const unit of getState().troop_defs){const p=Number(counts[unit.code]||0)*Number(unit.power||0);totalPower+=p;if(Number(unit.type)===3)cavalryPower+=p;}
+                if(totalPower>0&&cavalryPower/totalPower>=.7)field=kind==='players'?'cavalry_pvp_march_speed':kind==='node-attack'?'cavalry_field_attack_speed':kind==='rally'?'cavalry_pvp_rally_speed':'cavalry_shrine_occupied_speed';
+            }
             return Number(troop[field]||troop.march_speed||troop.speed||65);
         };
         function setCounts(counts) { rows.forEach(t=>{const input=$(`#march-unit-${t.code}`);if(input)input.value=counts[t.code]||0;});update(); }
@@ -269,7 +274,8 @@
             rows=state.troop_defs.filter(t=>Number(t.tier)===1||countOf(t)>0).sort((a,b)=>b.tier-a.tier||a.type-b.type);
             const join=kind==='rally-join',joiningMonster=monsterJoin(),allianceCenter=kind==='alliance-center-garrison',shrine=kind.startsWith('shrine'),congress=landmark(kind),garrison=kind.endsWith('-garrison'),pvp=['players','rally','rally-join'].includes(kind),monster=kind.startsWith('monster'),charm=kind==='charms',monsterRally=kind==='monster-rally',fieldAttack=kind==='node-attack',combat=monster||pvp||congress||fieldAttack,resource={1:'food',2:'lumber',3:'stone',4:'gold',5:'crystal'}[target.object_type]||'food';
             const targetHp=Math.max(0,Number(target.hp_current)||0),targetMaxHp=Math.max(1,targetHp,Number(target.hp_max)||0);
-            encounter.actionPointCost=join?0:Number(target.definition?.action_point_cost||target.action_point_cost||0);
+            const baseAp=monster?Number(target.definition?.action_point_cost??target.action_point_cost??0):joiningMonster?Number(options.rally_ap_cost??0):0;
+            encounter.actionPointCost=baseAp>0?Math.max(1,Math.ceil(baseAp*(1-Number(state.monster_ap_discount||0))-1e-8)):0;
             const resourceName={food:'Nahrung',lumber:'Holz',stone:'Stein',gold:'Gold',crystal:'Kristalle'}[resource];
             const rawTitle=allianceCenter?target.alliance_name||'Allianzzentrum':congress?target.name||'Kongress':pvp?target.display_name||target.username:monster?target.definition.name:charm?`${{normal:'Normaler',epic:'Epischer',legendary:'Legendärer'}[target.grade]||'Magischer'} Charm`:resourceName;
             const title=congress?rawTitle:pvp?rawTitle:monster?(/skeleton/i.test(rawTitle)?'Skeletttrupp':/golem/i.test(rawTitle)?'Steingolem':/orc/i.test(rawTitle)?'Orktrupp':rawTitle):charm?rawTitle:({food:'Getreidehof',lumber:'Holzfällerlager',stone:'Steinbruch',gold:'Goldmine',crystal:'Kristallader'}[resource]);
@@ -306,16 +312,20 @@
         function update() {
             if(!$('#game-dialog')?.open||!$('#game-dialog').dataset.march)return;
             const state=getState(),target=findTarget(),counts=selected(),total=Object.values(counts).reduce((a,b)=>a+b,0),available=rows.reduce((a,t)=>a+countOf(t),0);
-            cap=selectionCapacity(state);const baseSlots=state.army_limits?.march_slots||3,extraSlots=state.army_limits?.gather_march_slots||0;
+            cap=selectionCapacity(state);const baseSlots=state.army_limits?.march_slots||3,extraSlots=state.army_limits?.gather_march_slots||0,huntSlots=state.army_limits?.hunt_march_slots||0;
             const gathering=state.marches.filter(m=>Number(m.march_type)===9).length;
-            const slots=baseSlots+(encounter.kind==='nodes'?extraSlots:Math.min(extraSlots,gathering));
+            const hunting=state.marches.filter(m=>Number(m.march_type)===5).length;
+            const slots=baseSlots+(encounter.kind==='nodes'?extraSlots:Math.min(extraSlots,gathering))+(encounter.kind==='monsters'?huntSlots:Math.min(huntSlots,hunting));
             const selectedTypes=new Set(rows.filter(t=>Number(counts[t.code])>0).map(t=>Number(t.type))),singleType=selectedTypes.size===1;
+            const basePower=[0,0,0];for(const t of rows)basePower[Number(t.type)-1]+=Math.max(0,Number(counts[t.code]||0))*Number(t.power||0);
+            const totalBasePower=basePower.reduce((a,n)=>a+n,0),shares=basePower.map(p=>totalBasePower?p/totalBasePower:0),formation=shares[0]>=.7?'infantry':shares[1]>=.7?'ranged':Math.min(...shares)>=.2?'combined':'none';
             let invalid=false,invalidUnit=null,attack=0,power=0,carry=0;
             rows.forEach(t=>{
                 const n=Number(counts[t.code]||0),stock=countOf(t),input=$(`#march-unit-${t.code}`),range=$(`[data-unit-range="${t.code}"]`),bad=!Number.isSafeInteger(n)||n<0||n>stock;
                 invalid ||= bad;if(bad&&!invalidUnit)invalidUnit=t;attack+=Math.max(0,n)*Number(t.attack||0);
                 const rally=encounter.kind==='monster-rally'||monsterJoin(),powerField=rally?(singleType?'monster_rally_power_single_type':'monster_rally_power'):(singleType?'monster_power_single_type':'monster_power');
-                power+=Math.max(0,n)*Number(t[powerField]??t.power??0);carry+=Math.max(0,n)*Number(state.troop_defs.find(u=>u.code===t.code)?.gather_carry??t.carry??0);
+                const unitPower=!singleType?t[rally?'monster_rally_power_by_formation':'monster_power_by_formation']?.[formation]:undefined;
+                power+=Math.max(0,n)*Number(unitPower??t[powerField]??t.power??0);carry+=Math.max(0,n)*Number(state.troop_defs.find(u=>u.code===t.code)?.gather_carry??t.carry??0);
                 input.max=Math.min(stock,cap);input.disabled=stock===0&&n===0;input.setAttribute('aria-invalid',String(bad));
                 range.max=Math.min(stock,cap);range.disabled=stock===0||cap===0;range.value=Number.isFinite(n)?n:0;
                 range.style.setProperty('--fill',`${stock&&cap?Math.min(100,Math.max(0,n/Math.min(stock,cap)*100)):0}%`);

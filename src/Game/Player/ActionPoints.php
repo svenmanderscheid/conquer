@@ -43,15 +43,17 @@ final class ActionPoints
             $row=$db->query('SELECT action_points,last_ap_regen FROM players WHERE id=? FOR UPDATE',[$playerId])->fetch();
             if(!$row)throw new \RuntimeException('Player not found.');
             $saved=$db->query('SELECT rate,fraction FROM player_ap_regeneration WHERE player_id=?',[$playerId])->fetch()?:['rate'=>1,'fraction'=>0];
-            $rate=1+max(0,(float)(MasteryService::bonuses($playerId)['talent_ap_regen']??0));
+            $bonuses=MasteryService::bonuses($playerId);
+            $rate=1+max(0,(float)($bonuses['talent_ap_regen']??0));
+            $maximum=self::MAX_AP+max(0,(int)($bonuses['talent_max_ap']??0));
             $elapsed=max(0,time()-strtotime($row['last_ap_regen'].' UTC'));
-            $stored=min(self::MAX_AP,max(0,(int)$row['action_points']));
+            $stored=min($maximum,max(0,(int)$row['action_points']));
             $credit=$elapsed/300*(float)$saved['rate']+(float)$saved['fraction'];
-            $current=min(self::MAX_AP,$stored+(int)floor($credit+1e-9));
-            $fraction=$current===self::MAX_AP?0:max(0,$credit-floor($credit+1e-9));
+            $current=min($maximum,$stored+(int)floor($credit+1e-9));
+            $fraction=$current===$maximum?0:max(0,$credit-floor($credit+1e-9));
             $db->execute('UPDATE players SET action_points=?,last_ap_regen=UTC_TIMESTAMP() WHERE id=?',[$current,$playerId]);
             $db->execute('INSERT INTO player_ap_regeneration(player_id,rate,fraction) VALUES(?,?,?) ON DUPLICATE KEY UPDATE rate=VALUES(rate),fraction=VALUES(fraction)',[$playerId,$rate,$fraction]);
-            return ['current'=>$current,'max'=>self::MAX_AP,'regen_per_hour'=>self::REGEN_PER_HOUR*$rate];
+            return ['current'=>$current,'max'=>$maximum,'regen_per_hour'=>self::REGEN_PER_HOUR*$rate];
         };
         return $db->getPdo()->inTransaction()?$regenerate($db):$db->transaction($regenerate);
     }
@@ -111,5 +113,17 @@ final class ActionPoints
         }
 
         return 10;
+    }
+
+    public static function monsterCost(int $baseCost,array $bonuses): int
+    {
+        return $baseCost<=0?0:max(1,(int)ceil($baseCost*max(.05,1+(float)($bonuses['talent_monster_ap_cost']??0))-1e-8));
+    }
+
+    public static function refund(int $playerId,int $paid): void
+    {
+        if($paid<=0)return;
+        $state=self::get($playerId);
+        Connection::getInstance()->execute('UPDATE players SET action_points=LEAST(?,action_points+?) WHERE id=?',[$state['max'],$paid,$playerId]);
     }
 }

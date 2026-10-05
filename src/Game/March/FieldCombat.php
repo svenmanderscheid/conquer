@@ -14,15 +14,13 @@ final class FieldCombat
     public static function resolve(array &$attacker,array &$defender): array
     {
         $db=Connection::getInstance();
-        $attack=self::strength($attacker);$defense=self::strength($defender,true)*1.1;
+        $attackTroops=json_decode($attacker['troops_json'],true)?:[];$defenseTroops=json_decode($defender['troops_json'],true)?:[];
+        $attack=self::strength($attacker,false,$defenseTroops);$defense=self::strength($defender,true,$attackTroops)*1.1;
         $won=$attack>$defense;$armies=[$attacker,$defender];$losses=[];
         foreach($armies as $i=>$army){
             $troops=json_decode($army['troops_json'],true)?:[];
-            $rate=($i===0)===$won?.1:.3;$loss=['survivors'=>[],'wounded'=>[],'dead'=>[]];
-            foreach($troops as $code=>$count){
-                $lost=min((int)$count,(int)ceil($count*$rate));$wounded=(int)floor($lost*.3);
-                $loss['survivors'][$code]=$count-$lost;$loss['wounded'][$code]=$wounded;$loss['dead'][$code]=$lost-$wounded;
-            }
+            $rate=($i===0)===$won?.1:.3;
+            $loss=PvpRules::losses($troops,$rate,BuffEngine::getBuffs((int)$army['player_id'],(int)$army['world_id']),$i===0?$defenseTroops:$attackTroops);
             HospitalService::addWounded((int)$army['origin_city_id'],$loss['wounded']);
             $haul=json_decode($army['haul_json'],true)?:[];
             if(isset($haul['gather']))$haul['gather']['capacity']=min((int)$haul['gather']['capacity'],ResearchEffects::carryCapacity($loss['survivors'],TalentEffects::gather(BuffEngine::getBuffs((int)$army['player_id'],(int)$army['world_id']))));
@@ -41,10 +39,10 @@ final class FieldCombat
         return ['won'=>$won];
     }
 
-    private static function strength(array $march,bool $defending=false): float
+    private static function strength(array $march,bool $defending=false,array $enemyTroops=[]): float
     {
         $troops=json_decode($march['troops_json'],true)?:[];
-        $buffs=TalentEffects::combat(ResearchEffects::armyBuffs(BuffEngine::getBuffs((int)$march['player_id'],(int)$march['world_id'],(int)$march['target_x'],(int)$march['target_y']),$troops),$defending?'field_defense':'pvp');
+        $buffs=TalentEffects::combat(ResearchEffects::armyBuffs(BuffEngine::getBuffs((int)$march['player_id'],(int)$march['world_id'],(int)$march['target_x'],(int)$march['target_y']),$troops),$defending?'field_defense':'pvp',false,$enemyTroops);
         $score=0.0;
         foreach($troops as $code=>$count){
             $def=TroopData::get((int)$code);if(!$def)continue;$type=ResearchEffects::troopType((int)$code);

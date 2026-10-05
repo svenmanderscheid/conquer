@@ -2820,6 +2820,7 @@ body.mobile-game #panel-dialog[data-panel="mastery"] .lord-emblem { background:v
 body.mobile-game #panel-dialog[data-panel="mastery"] .lord-emblem strong { color:var(--ui-card-light);text-shadow:none; }
 body.mobile-game #panel-dialog[data-panel="mastery"] .talent-button.is-primary:not(:disabled) { background:var(--ui-green);color:var(--ui-card-light);border-color:var(--ui-green-dark); }
 body.mobile-game #panel-dialog[data-panel="mastery"] .talent-point-sources { display:block;margin:2px 0;font:11px/1.2 var(--ui-font);color:var(--ui-muted); }
+body.mobile-game #panel-dialog[data-panel="mastery"] img.talent-art { object-fit:contain;user-select:none; }
 
 /* Shared quantity picker: scroll the stock, keep the amount and action in sight. */
 body.mobile-game #game-dialog:has(.queue-speedup-picker) { width:min(580px,calc(100dvw - 24px))!important;height:min(740px,calc(100dvh - 24px))!important;max-height:calc(100dvh - 24px)!important; }

@@ -53,7 +53,7 @@ final class MonsterRally
             MarchDispatcher::assertSlotAvailable($playerId);
             $troops=MarchArmy::clean($troops,ResearchEffects::limits(BuffEngine::getBuffs($playerId))['march_capacity']);
             $capacity=self::capacity($playerId,$cityId);if(array_sum($troops)>$capacity)throw new \RuntimeException('Die Allianzhalle bietet nicht genug Platz für diese Rally.');
-            $cost=max(0,(int)($definition['action_point_cost']??ActionPoints::costForMonster($definition['name'])));
+            $cost=ActionPoints::monsterCost(max(0,(int)($definition['action_point_cost']??ActionPoints::costForMonster($definition['name']))),BuffEngine::getBuffs($playerId,$world));
             ActionPoints::deduct($playerId,$cost);MarchArmy::reserve($db,$cityId,$troops);
             $meta=['alliance_id'=>$alliance,'monster'=>$definition,'monster_code'=>(int)$target['monster_code'],'capacity'=>$capacity,'ap_cost'=>$cost,'drops'=>self::drops($definition)];
             $db->execute("INSERT INTO rallies(world_id,leader_player_id,leader_city_id,march_skin,march_speed_bonus_pct,target_kind,target_monster_id,target_x,target_y,rally_minutes,troops_json,message,result_json,status,launch_at) VALUES(?,?,?,?,?,'monster',?,?,?,?,?,?,?,'gathering',DATE_ADD(UTC_TIMESTAMP(),INTERVAL ? MINUTE))",[$world,$playerId,$cityId,$skinSnapshot['march_skin'],$skinSnapshot['bonus_pct'],$target['id'],$x,$y,$minutes,json_encode($troops),mb_substr($message,0,512),json_encode($meta),$minutes]);
@@ -102,7 +102,7 @@ final class MonsterRally
         }else{$db->execute('UPDATE field_monsters SET hp_current=? WHERE id=? AND world_id=?',[$result['new_monster_hp'],$target['id'],$world]);}
         foreach($result['armies'] as $i=>&$army){
             if(!empty($army['is_ai'])){$army['loot']=[];$army['items']=[];$army['fragments']=[];continue;}
-            $pid=$army['player_id'];HospitalService::addWounded($army['city_id'],$army['wounded']);
+            $pid=$army['player_id'];HospitalService::addWounded($army['city_id'],$army['wounded'],true);
             $army['loot']=\Conquer\Game\Player\TalentEffects::monsterLoot($loot[$i]??[],$armies[$i]['buffs']);$army['items']=$items[$i]??[];
             $army['fragments']=$fragments[$i]??[];
             $earned=$result['monster_killed']?LordLevel::addXp($pid,$xp[$i]??0,$world,'monster-rally:'.$r['id']):0;
