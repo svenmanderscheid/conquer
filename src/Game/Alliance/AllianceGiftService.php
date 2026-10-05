@@ -106,9 +106,9 @@ final class AllianceGiftService
 
         // Load gift — must be alive
         $gift = $db->query(
-            'SELECT id, alliance_id, gift_json
-             FROM   alliance_gifts
-             WHERE  id = ? AND expires_at > UTC_TIMESTAMP()',
+            'SELECT g.id, g.alliance_id, g.gift_json, a.world_id
+             FROM alliance_gifts g JOIN alliances a ON a.id=g.alliance_id
+             WHERE g.id = ? AND g.expires_at > UTC_TIMESTAMP()',
             [$giftId],
         )->fetch();
 
@@ -153,7 +153,7 @@ final class AllianceGiftService
             [$giftId, $playerId],
         );
 
-        InventoryService::addItems($playerId, $itemCode, $quantity);
+        InventoryService::addItems($playerId, $itemCode, $quantity, (int)$gift['world_id']);
     }
 
     // -------------------------------------------------------------------------

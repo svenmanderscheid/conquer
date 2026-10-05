@@ -54,5 +54,5 @@ window.ConquerGameComfort = function({base,getState,nextGoal,openGoal,openDialog
     });
     function leave(){if(document.hidden)save();}
     document.addEventListener('visibilitychange',leave);window.addEventListener('pagehide',save);
-    return {since,update,showGoal(){load();saved.hideGoal=false;save();update();}};
+    return {since,update,showReturn,hasReturn:()=>summary!==null,showGoal(){load();saved.hideGoal=false;save();update();}};
 };

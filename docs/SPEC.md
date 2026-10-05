@@ -2628,9 +2628,9 @@ Future plan: link multiple worlds via cross-world tournaments. Out of scope for 
 
 ### 17.1 Overview
 
-VIP is a 20-level account-wide progression system providing passive bonuses. Players earn **VIP Points** to level up, then receive permanent bonuses at each level reached.
+VIP is a 20-level progression system with independent points and passive bonuses in each world. Players earn **VIP Points** to level up, then receive permanent bonuses at each level reached.
 
-**VIP is account-bound, NOT city-bound.** Even after city teleport or future world migration, VIP level persists.
+**VIP belongs to the village’s world.** Teleporting within that world keeps its VIP progress; points, bonuses, daily claims and unused VIP consumables do not transfer to another world. Each account creates one village in one world. A second village requires a separate account. Existing villages from earlier multiworld versions remain accessible, with separate VIP progress.
 
 ### 17.2 VIP point sources
 

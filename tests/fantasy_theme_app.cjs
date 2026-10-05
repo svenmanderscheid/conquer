@@ -52,6 +52,7 @@ async function actualFonts(page, selector) {
     const page = await context.newPage();
     page.setDefaultTimeout(15000);
     page.on('pageerror', error => errors.push(error.message));
+    page.on('console', message => { if (message.text().startsWith('Game refresh failed:')) errors.push(message.text()); });
     page.on('response', response => { if (response.url().includes('/assets/') && response.status() >= 400) badAssets.push(response.status() + ' ' + response.url()); });
     page.on('response', response => { if (response.url().includes('/api/') && response.status() >= 400) badApis.push(response.status() + ' ' + new URL(response.url()).pathname); });
     await page.goto(fixture.base, { waitUntil: 'networkidle' });
@@ -87,6 +88,7 @@ async function actualFonts(page, selector) {
     await Promise.all([page.waitForURL('**/city'), page.locator('form[action$="/auth/local"] button[type="submit"], #auth-submit').first().click()]);
     await page.waitForFunction(() => document.querySelector('#player-hud-name')?.textContent.includes('PreviewPlayer'));
     await page.locator('#resources .resource strong').first().waitFor();
+    await page.locator('#app-start').waitFor({state:'detached'});
     await page.evaluate(async () => { await new Promise(requestAnimationFrame); await document.fonts.ready; });
     const glyphs = await actualFonts(page, '#resources .resource strong');
     report.push({ fonts: glyphs, resourceFont: await page.locator('#resources .resource strong').first().evaluate(element => getComputedStyle(element).font) });
@@ -98,7 +100,7 @@ async function actualFonts(page, selector) {
     async function openPanel(id) {
       await closeDialogs();
       if (id === 'profile') await page.locator('#account-button').click();
-      else if (['inventory', 'alliance', 'reports'].includes(id)) await page.locator('#navigation [data-action="tab"][data-id="' + id + '"]').click();
+      else if (['inventory', 'alliance', 'reports'].includes(id) && await page.locator('#navigation [data-action="tab"][data-id="' + id + '"]').isVisible()) await page.locator('#navigation [data-action="tab"][data-id="' + id + '"]').click();
       else {
         await page.locator('#hud-menu').click();
         await page.locator('#game-dialog [data-action="dialog-tab"][data-id="' + id + '"]').click();

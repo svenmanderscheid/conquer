@@ -9,7 +9,7 @@ use Conquer\Game\Treasure\{TreasureData,TreasureService};
 use Conquer\Game\Vip\VipService;
 use Conquer\Game\World\WorldContext;
 
-/** Server-owned offers, account-wide VIP stock, and atomic currency/item exchanges. */
+/** Server-owned offers, world-specific VIP stock, and atomic currency/item exchanges. */
 final class TradingShopService
 {
     public static function catalog(): array
@@ -55,7 +55,7 @@ final class TradingShopService
             usort($offers,static fn($a,$b)=>strcmp(hash('sha256',$seed.$a['id']),hash('sha256',$seed.$b['id'])));
             $offers=array_slice($offers,0,self::offerCount($marketLevel));
         }
-        $rows=Connection::getInstance()->query('SELECT offer_id,quantity FROM trading_shop_purchases WHERE player_id=? AND scope_world_id=? AND shop_mode=? AND rotation=?',[$playerId,$mode==='vip'?0:$world,$mode,$period['rotation']])->fetchAll();
+        $rows=Connection::getInstance()->query('SELECT offer_id,quantity FROM trading_shop_purchases WHERE player_id=? AND scope_world_id=? AND shop_mode=? AND rotation=?',[$playerId,$world,$mode,$period['rotation']])->fetchAll();
         $purchased=array_column($rows,'quantity','offer_id');
         foreach($offers as &$offer){
             $offer['remaining']=max(0,(int)$offer['limit']-(int)($purchased[$offer['id']]??0));
@@ -96,7 +96,7 @@ final class TradingShopService
             $grant=$quantity*(int)$offer['quantity'];
             if(isset($offer['item_code']))InventoryService::addItems($playerId,(int)$offer['item_code'],$grant);
             else TreasureService::addFragments($playerId,(int)$offer['treasure_code'],$grant);
-            $db->execute('INSERT INTO trading_shop_purchases(player_id,scope_world_id,shop_mode,rotation,offer_id,quantity)VALUES(?,?,?,?,?,?) ON DUPLICATE KEY UPDATE quantity=quantity+VALUES(quantity)',[$playerId,$mode==='vip'?0:WorldContext::id(),$mode,$rotation,$offerId,$quantity]);
+            $db->execute('INSERT INTO trading_shop_purchases(player_id,scope_world_id,shop_mode,rotation,offer_id,quantity)VALUES(?,?,?,?,?,?) ON DUPLICATE KEY UPDATE quantity=quantity+VALUES(quantity)',[$playerId,WorldContext::id(),$mode,$rotation,$offerId,$quantity]);
             return ['message'=>$grant.' × '.($offer['item']['name_de']??$offer['item']['name']).' erhalten.','item_code'=>$offer['item_code']??null,'treasure_code'=>$offer['treasure_code']??null,'quantity'=>$grant,'cost'=>['resource'=>$resource,'amount'=>$cost],'remaining'=>$offer['remaining']-$quantity];
         };
         // KingdomService already holds its player lock and a transaction. Standalone callers use the same lock.

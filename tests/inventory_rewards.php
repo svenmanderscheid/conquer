@@ -88,7 +88,7 @@ try {
     InventoryService::addItems(1,10105003,1);
     $before=lootBalances();
     try { lootUse(10105003,'loot_invalid_reward_once'); throw new LogicException('Invalid reward accepted'); }
-    catch (RuntimeException $e) { lootCheck(!($e instanceof LogicException),'invalid configured reward is rejected'); }
+    catch (RuntimeException|DomainException $e) { lootCheck($e instanceof DomainException||!($e instanceof LogicException),'invalid configured reward is rejected'); }
     lootCheck(lootBalances()===$before,'failed grant rolls back inventory consumption');
     lootCheck((int)$db->query("SELECT COUNT(*) FROM game_operation_receipts WHERE operation_key='loot_invalid_reward_once'")->fetchColumn()===0,'failed grant leaves no success receipt');
 

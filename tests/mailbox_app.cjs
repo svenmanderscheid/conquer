@@ -13,7 +13,7 @@ const output=fs.mkdtempSync(path.join(os.tmpdir(),'conquer-mailbox-app-'));
   if(process.env.MAILBOX_DEBUG)page.on('response',async r=>{if(r.url().includes('/api/mailbox/state')){const j=await r.json();console.log(r.status(),r.url(),j.data?.entries?.length??j);}});
   await page.goto(base);await page.goto(new URL('?zugang=login', page.url()).href);await page.locator("[name=identifier], [name=username]").fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');
   await Promise.all([page.waitForURL('**/city'),page.locator("form[action$=\"/auth/local\"] button[type=\"submit\"]").click()]);
-  const dock=page.locator('#navigation [data-id="reports"]');await dock.waitFor();await page.locator('.mail-dock-badge:not([hidden])').waitFor();
+  const dock=page.locator('#navigation [data-id="reports"]');await dock.waitFor();await page.locator('.mail-dock-badge:not([hidden]):visible').waitFor();
   await dock.click();await page.locator('.mail-card').first().waitFor();assert.equal(await page.locator('#page-title').textContent(),'Berichte');
   const tab=async id=>{await page.locator(`[data-action="mailbox-tab"][data-id="${id}"]`).first().click();await page.waitForFunction(id=>document.querySelector('.mail-toolbar strong')?.textContent?.startsWith(({war:'Krieg',alliance:'Allianz',system:'System',reports:'Berichte',starred:'Favoriten',private:'Privat',sent:'Gesendet'})[id])&&document.querySelector('.mail-list')?.getAttribute('aria-busy')==='false',id);};
   for(const [width,height] of [[1280,800],[390,844],[320,568],[568,320],[844,390]]){
@@ -56,7 +56,7 @@ const output=fs.mkdtempSync(path.join(os.tmpdir(),'conquer-mailbox-app-'));
   for(const [width,height]of [[320,568],[568,320]]){await page.setViewportSize({width,height});const box=await page.locator('.mail-compose button[type="submit"]').boundingBox();assert.ok(box.y>=0&&box.y+box.height<=height);await page.screenshot({path:path.join(output,`${width}x${height}-compose.png`)});}
   await page.locator('.mail-compose button[type="submit"]').click();await page.waitForFunction(()=>document.querySelector('.mail-toolbar strong')?.textContent.startsWith('Gesendet')&&!document.querySelector('#game-dialog')?.open);await page.locator('.mail-card').filter({hasText:'Re: Treffen'}).waitFor();
   assert.equal(await page.locator('.mailbox-shell script').count(),0);
-  await page.locator("#panel-dialog .panel-close:visible, #panel-dialog .mobile-page-back:visible").first().click();await page.setViewportSize({width:390,height:844});await dock.click();await page.locator('.mailbox-shell').waitFor();await page.goBack();await page.waitForFunction(()=>!document.querySelector('#panel-dialog').open);
+  await page.locator("#panel-dialog .panel-close:visible, #panel-dialog .mobile-page-back:visible").first().click();await page.setViewportSize({width:390,height:844});await page.locator('#hud-mail').click();await page.locator('.mailbox-shell').waitFor();await page.goBack();await page.waitForFunction(()=>!document.querySelector('#panel-dialog').open);
   assert.deepEqual(errors,[]);console.log('PASS full Post application: 30 responsive category layouts, pagination, scroll, favorites, protected deletion, reward claim, private reply/draft/send, escaping and browser back. '+output);
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

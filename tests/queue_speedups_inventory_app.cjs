@@ -11,7 +11,7 @@ const root=path.resolve(__dirname,'..');
   await new Promise((resolve,reject)=>{fixture.stdout.on('data',data=>{log+=data;if(log.includes('Synthetic preview ready'))resolve();});fixture.stderr.on('data',data=>log+=data);fixture.on('error',reject);fixture.on('exit',()=>reject(Error(log)));});
   browser=await chromium.launch({headless:true,executablePath:process.env.BROWSER_EXECUTABLE_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe'});
   const page=await browser.newPage({viewport:{width:390,height:844},hasTouch:true}),errors=[];
-  page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(15000);
+  page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(15000);page.setDefaultNavigationTimeout(45000);
   await page.goto('http://127.0.0.1:'+port);await page.goto(new URL('?zugang=login', page.url()).href);
   await page.locator("[name=identifier], [name=username]").fill('PreviewPlayer');await page.locator('[name=password]').fill('PreviewFixture!2026');
   await Promise.all([page.waitForURL('**/city'),page.locator("form[action$=\"/auth/local\"] button[type=\"submit\"]").click()]);

@@ -58,11 +58,11 @@ final class ItemSourceService
         $buildings=array_column($db->query('SELECT building_code,level FROM city_buildings WHERE city_id=?',[$city['id']])->fetchAll(),'level','building_code');
         $alliance=(int)$db->query('SELECT alliance_id FROM alliance_members WHERE player_id=? AND world_id=?',[$playerId,$world])->fetchColumn();
         $troops=(int)$db->query('SELECT COALESCE(SUM(count),0) FROM city_troops WHERE city_id=?',[$city['id']])->fetchColumn();
-        $inventory=array_column($db->query('SELECT item_code,quantity FROM player_inventory WHERE player_id=?',[$playerId])->fetchAll(),'quantity','item_code');
+        $inventory=array_column(InventoryService::getInventory($playerId),'quantity','item_code');
         $sources=[];$monsterSources=[];$codes=[];
         foreach(array_unique(array_merge(array_column(RewardCatalog::json('monsters')['monsters'],'code'),array_column(RewardCatalog::json('world_spawn')['monsters'],'code')))as$code){
             $code=(int)$code;if(!MonsterData::isActive($code))continue;$d=MonsterData::get($code);$level=max(1,(int)$d['level']);
-            $rewards=self::drops($query,$d['drops']??[]);if(!$rewards)continue;
+            $rewards=self::drops($query,array_merge($d['drops']??[],$d['fragment_drops']??[]));if(!$rewards)continue;
             $group=($d['name']??'').':'.$level.':'.hash('sha256',json_encode($rewards,JSON_THROW_ON_ERROR));
             $codes[$code]=$group;
             if(isset($monsterSources[$group]))continue;

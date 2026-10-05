@@ -36,12 +36,13 @@ final class PasswordAuth
             if (strlen($password) < 10 || strlen($password) > 72) { return 'Bitte wähle ein Passwort mit 10 bis 72 UTF-8-Bytes.'; }
             try {
                 $alphaKey = $_POST['alpha_key'] ?? null;
-                $id = $db->transaction(static function (Connection $db) use ($name,$email,$password,$alphaKey): int {
+                $worldId=isset($_POST['world_id'])?\Conquer\Game\World\WorldContext::integer($_POST['world_id']):null;
+                $id = $db->transaction(static function (Connection $db) use ($name,$email,$password,$alphaKey,$worldId): int {
                     $alphaKeyId = AlphaAccess::consume($db, $alphaKey);
-                    $db->execute('INSERT INTO players (username,email,password_hash,alpha_access_key_id,last_login) VALUES (?,?,?,?,UTC_TIMESTAMP())',
+                    $db->execute('INSERT INTO players (username,email,password_hash,alpha_access_key_id,last_login,beginner_shield_until) VALUES (?,?,?,?,UTC_TIMESTAMP(),DATE_ADD(UTC_TIMESTAMP(),INTERVAL 7 DAY))',
                         [$name,$email,password_hash($password,PASSWORD_DEFAULT),$alphaKeyId]);
                     $id = $db->lastInsertId();
-                    OAuth::createDefaultCity($db, $id, $name);
+                    OAuth::createDefaultCity($db, $id, $name,$worldId);
                     return $id;
                 });
                 AccountService::sendVerification($id);

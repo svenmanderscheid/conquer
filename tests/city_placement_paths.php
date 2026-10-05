@@ -52,6 +52,11 @@ namespace Conquer\Game\Map {
     }
 }
 namespace Conquer\Game\World {
+    final class WorldEntry {
+        public static function defaultWorld(): int { return 1; }
+        public static function settings(int $world): ?array { return null; }
+        public static function position(\Conquer\Db\Connection $db,int $world,?int $ignore=null): ?array { return null; }
+    }
     final class WorldContext { public static function assertActionAvailable(int $world):void {} }
     final class WorldService { public static function initializeWorld(int $world):void {} }
     final class WorldMapProfile { public static function forWorld(int $world):array { return ['key'=>'legacy','width'=>256,'height'=>256]; } }

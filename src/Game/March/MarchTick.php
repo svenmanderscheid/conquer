@@ -209,7 +209,8 @@ final class MarchTick
             if (!empty($loot['gems'])) {
                 $db->execute('UPDATE players SET gems = gems + ? WHERE id = ?', [(int) $loot['gems'], $playerId]);
             }
-            foreach(($haul['items']??[]) as $code=>$count)\Conquer\Game\Inventory\InventoryService::addItems($playerId,(int)$code,(int)$count);
+            foreach(($haul['items']??[]) as $code=>$count)\Conquer\Game\Inventory\InventoryService::addItems($playerId,(int)$code,(int)$count,(int)$march['world_id']);
+            \Conquer\Game\Rewards\RewardCatalog::grantFragments($playerId,$haul['fragments']??[]);
             $db->execute(
                 "UPDATE marches SET state = 'complete' WHERE id = ?",
                 [$marchId],
@@ -258,10 +259,12 @@ final class MarchTick
             $result['report']['source_snapshot']=MonsterReport::capture($playerId,$cityId,WorldContext::id());
             $result['loot']=$result['monster_killed']?($monsterDef['resource_reward']??['food'=>100,'lumber'=>100,'stone'=>50,'gold'=>50]):[];
             $result['items']=$result['monster_killed']?\Conquer\Game\Rewards\RewardCatalog::rollItems($monsterDef['drops']??[]):[];
+            $result['fragments']=$result['monster_killed']?\Conquer\Game\Rewards\RewardCatalog::rollFragments($monsterDef['fragment_drops']??[]):[];
             $gems=$monsterDef['gems_drop']??[];
             if($result['monster_killed']&&\Conquer\Game\Rewards\RewardCatalog::roll((float)($gems['chance']??0)))$result['loot']['gems']=(int)($gems['amount']??0);
             $result['loot']=\Conquer\Game\Player\TalentEffects::monsterLoot($result['loot'],$buffs);
             $result['report']['items']=$result['items'];$result['report']['item_rewards']=[];
+            $result['report']['fragments']=$result['fragments'];
             foreach($result['items'] as $code=>$count){$item=InventoryService::getItemDef((int)$code);$result['report']['item_rewards'][]=['code'=>(int)$code,'count'=>$count,'name'=>$item['name_de']??$item['name']??'Gegenstand'];}
             $result['report']['loot']=$result['loot'];
             $xp=isset($monsterDef['xp'])?(int)$monsterDef['xp']:max(1,(int)($monster['effective_monster_level']??$monsterDef['level']??1))*(str_contains(strtolower($monsterDef['name']??''),'deathkar')?20:10);
@@ -269,7 +272,7 @@ final class MarchTick
             if ($result['monster_killed']) {
                 $settlement=\Conquer\Game\Charm\MonsterCharmLifecycle::settle(
                     WorldContext::id(),$monster,$monsterDef,'solo',$marchId,$playerId,null,
-                    ['resources'=>$result['loot'],'items'=>$result['items'],'lord_xp'=>$xp],
+                    ['resources'=>$result['loot'],'items'=>$result['items'],'fragments'=>$result['fragments'],'lord_xp'=>$xp],
                 );
                 if(!$settlement['created']){
                     self::finalizeMarch($db,$marchId,$troops,[],'defender_wins');
@@ -316,7 +319,7 @@ final class MarchTick
                      haul_json   = :haul
                  WHERE id = :id",
                 [
-                    ':haul' => json_encode(['survivors' => $result['attacker_survivors'], 'loot' => $result['loot'], 'items'=>$result['items']]),
+                    ':haul' => json_encode(['survivors' => $result['attacker_survivors'], 'loot' => $result['loot'], 'items'=>$result['items'],'fragments'=>$result['fragments']]),
                     ':id'   => $marchId,
                 ],
             );

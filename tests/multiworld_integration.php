@@ -20,6 +20,13 @@ $schema='conquer_world_test_'.bin2hex(random_bytes(6));$original=$cfg['database'
 function verifyAdmin(bool $condition,string $label):void{if(!$condition)throw new RuntimeException($label);echo "PASS $label\n";}
 function rejectsAdmin(callable $callback,string $label):void{try{$callback();}catch(InvalidArgumentException|DomainException|ExpeditionException $e){verifyAdmin(true,$label);return;}throw new RuntimeException('Accepted invalid request: '.$label);}
 function adminAction(string $action,array $body=[],?string $op=null,int $admin=1):array{return AdminService::execute($admin,$action,array_replace(['world_id'=>1,'player_id'=>1,'reason'=>'Isolated integration test','operation_id'=>$op??bin2hex(random_bytes(16))],$body));}
+/** Existing extra villages are seeded directly; creation APIs must now reject them. */
+function legacyVillage(Connection $db,int $player,int $world):void{
+    WorldService::initializeWorld($world);
+    $db->execute("INSERT INTO cities(player_id,world_id,name,coord_x,coord_y,food,lumber,stone,gold)VALUES(?,?,'Legacy village',?,40,100000,100000,100000,100000)",[$player,$world,30+20*$player]);
+    $city=$db->lastInsertId();foreach(\Conquer\Game\City\CityState::BUILDING_CODES as$code)$db->execute('INSERT INTO city_buildings(city_id,building_code,level)VALUES(?,?,1)',[$city,$code]);
+    \Conquer\Game\Vip\VipService::ensure($player,$world);
+}
 try {
     if(!preg_match('/^[A-Za-z0-9_]+$/D',$original))throw new RuntimeException('Unsupported database name.');
     $server->exec('CREATE DATABASE `'.$schema.'` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');$created=true;
@@ -37,15 +44,18 @@ try {
     foreach(['0083_reward_overrides.sql','0084_land_progression.sql','0085_monster_charms.sql','0086_reward_world_revisions.sql','0087_charm_compatibility.sql'] as $file) \Conquer\Db\MigrationSql::apply($pdo,(string)file_get_contents(ROOT_DIR.'/migrations/'.$file));
     $db->execute("INSERT INTO worlds(id,name,slug,status,map_size,map_seed) VALUES(1,'Alpha','alpha','running',256,42),(2,'Beta','beta','running',256,42),(3,'Paused','paused','paused',256,42),(4,'Empty','empty','running',256,42)");
     $db->execute("INSERT INTO players(id,username,email,password_hash,gems) VALUES(1,'AlphaPlayer','alpha@example.invalid','unused',1000),(2,'BetaPlayer','beta@example.invalid','unused',500),(3,'GammaPlayer','gamma@example.invalid','unused',0)");
-    OAuth::createDefaultCity($db,1,'AlphaPlayer',1);OAuth::createDefaultCity($db,2,'BetaPlayer',1);OAuth::createDefaultCity($db,2,'BetaPlayer',2);
+    \Conquer\Db\MigrationSql::apply($pdo,(string)file_get_contents(ROOT_DIR.'/migrations/0129_world_vip.sql'));
+    OAuth::createDefaultCity($db,1,'AlphaPlayer',1);OAuth::createDefaultCity($db,2,'BetaPlayer',1);legacyVillage($db,2,2);
     $city1=(int)$db->query('SELECT id FROM cities WHERE player_id=1 AND world_id=1')->fetchColumn();
     $db->execute("INSERT INTO sessions(id,player_id,token,csrf_token,ip_address,user_agent,expires_at,active_world_id)VALUES(1,1,?,?,'127.0.0.1','isolated test',DATE_ADD(UTC_TIMESTAMP(),INTERVAL 1 HOUR),1)",[str_repeat('a',64),str_repeat('b',64)]);
     $_COOKIE[Session::COOKIE_NAME]=str_repeat('a',64);$session=Session::current();
     verifyAdmin(WorldContext::id()===1&&(int)$session['active_world_id']===1,'session binds owned world');
     verifyAdmin(count(WorldService::state(1)['worlds'])===4,'world picker exposes status and owned worlds');
     $join=['action'=>'join','world_id'=>2,'expected_world_id'=>1,'request_id'=>'world_join_beta_00001'];
+    rejectsAdmin(fn()=>WorldService::action($session,$join),'account with a village cannot create another village');
+    legacyVillage($db,1,2);
     $joined=WorldService::action($session,$join);$city2=(int)$joined['city_id'];
-    verifyAdmin($city2!==$city1&&WorldContext::id()===2&&(int)$db->query('SELECT active_world_id FROM sessions WHERE id=1')->fetchColumn()===2,'join creates and persistently selects separate city');
+    verifyAdmin($city2!==$city1&&WorldContext::id()===2&&(int)$db->query('SELECT active_world_id FROM sessions WHERE id=1')->fetchColumn()===2,'existing legacy village remains selectable');
     verifyAdmin((int)$db->query('SELECT COUNT(*) FROM city_buildings WHERE city_id=?',[$city2])->fetchColumn()===count(\Conquer\Game\City\CityState::BUILDING_CODES)&&(int)$db->query('SELECT COUNT(*) FROM shrines WHERE world_id=2')->fetchColumn()===5,'new world receives all canonical buildings and five landmarks');
     verifyAdmin(WorldService::action($session,$join)['duplicate']&&(int)$db->query('SELECT COUNT(*) FROM cities WHERE player_id=1')->fetchColumn()===2,'join retry creates neither extra city nor extra buildings');
     rejectsAdmin(fn()=>WorldService::action($session,array_replace($join,['world_id'=>4])),'operation ID cannot be reused with altered target');

@@ -36,13 +36,14 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/game-feel-
   await page.reload();await page.locator('#hud-menu').waitFor();await page.waitForFunction(()=>document.querySelector('#save-state').textContent.includes('gespeichert'));assert(await page.locator('.comfort-hint').isHidden(),'dismissal survives reload');
   await page.addInitScript(()=>{const key='conquer:comfort:v1::1:1',value=JSON.parse(localStorage.getItem(key)||'{}');localStorage.setItem(key,JSON.stringify({...value,lastSeen:Math.floor(Date.now()/1000)-3600}));});
   await page.reload();await page.locator('[data-comfort=return]').waitFor();
+  const openReturn=async()=>{if(await page.locator('[data-comfort=return]').isVisible())await page.locator('[data-comfort=return]').click();else{await page.locator('#hud-menu').click();await page.locator('[data-action=show-return-summary]').click();}};
   for(const [width,height]of [[1280,800],[390,844],[320,568],[844,390],[568,320]]){
-   await page.setViewportSize({width,height});await page.locator('[data-comfort=return]').click();await page.locator('.return-summary').waitFor();
+   await page.setViewportSize({width,height});await openReturn();await page.locator('.return-summary').waitFor();
    assert.match(await page.locator('.return-summary').textContent(),/40 Truppen ausgebildet/);assert.match(await page.locator('.return-summary').textContent(),/1 Rückmärsche/);
    const layout=await page.locator('#game-dialog').evaluate(el=>{const r=el.getBoundingClientRect();return {fits:r.x>=0&&r.y>=0&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1,overflow:el.scrollWidth-el.clientWidth};});assert(layout.fits&&layout.overflow<=1);checks.push({screen:'return',width,height,...layout});
    await page.screenshot({path:path.join(out,`return-${width}x${height}.png`)});await page.keyboard.press('Escape');
   }
-  await page.locator('[data-comfort=return]').click();await page.locator('[data-comfort=done]').click();assert(await page.locator('.comfort-hint').isHidden(),'return dismissal retains goal preference');
+  await openReturn();await page.locator('[data-comfort=done]').click();assert(await page.locator('.comfort-hint').isHidden(),'return dismissal retains goal preference');
   await page.setViewportSize({width:390,height:844});await page.locator('#hud-menu').click();await page.locator('#game-dialog [data-id=help]').click();
   await page.locator('[data-action=show-goal-hint]').click();await page.keyboard.press('Escape');await page.locator('[data-comfort=goal]').waitFor();
   await page.locator('#navigation [data-id=quests]').click();

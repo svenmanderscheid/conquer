@@ -348,7 +348,7 @@ final class CommunityService
     {
         $db=Connection::getInstance();$city=$db->query('SELECT * FROM cities WHERE id=? FOR UPDATE',[$cityId])->fetch();self::require((bool)$city,'Die Stadt existiert nicht mehr.');$buildings=[];
         foreach($db->query('SELECT building_code,level FROM city_buildings WHERE city_id=?',[$cityId])->fetchAll()as$row)$buildings[$row['building_code']]=['level'=>(int)$row['level']];
-        $owner=(int)$city['player_id'];$world=(int)$city['world_id'];$vip=\Conquer\Game\Vip\VipService::status($owner)['bonuses'];
+        $owner=(int)$city['player_id'];$world=(int)$city['world_id'];$vip=\Conquer\Game\Vip\VipService::status($owner,$world)['bonuses'];
         $buffs=\Conquer\Game\Research\BuffEngine::getBuffs($owner,$world);$member=self::member($owner,$world);$shared=$member?AllianceResearchService::getProductionBonuses((int)$member['alliance_id']):[];
         foreach(self::RESOURCES as$resource){$vip[$resource.'_prod_pct']=(float)($buffs[$resource.'_production']??0)+(float)($shared[$resource.'_pct']??0);$vip[$resource.'_capacity_pct']=(float)($buffs[$resource.'_capacity']??0)+(float)($buffs['resource_capacity']??0);}
         $speed=(float)$db->query('SELECT speed_factor FROM worlds WHERE id=?',[$world])->fetchColumn();ResourceTick::persist($city,$buildings,max(.01,$speed),$vip);

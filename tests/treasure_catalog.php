@@ -9,13 +9,15 @@ function catalogCheck(bool $ok,string $label):void{global $checks;if(!$ok)throw 
 try{
  $all=TreasureData::all();$refs=json_decode(file_get_contents(__DIR__.'/fixtures/treasure_reference_manifest.json'),true,512,JSON_THROW_ON_ERROR);
  $legacy=json_decode(file_get_contents(__DIR__.'/fixtures/treasure_legacy_balance.json'),true,512,JSON_THROW_ON_ERROR);
- catalogCheck(count($all)===82,'82 catalogue entries');catalogCheck(count($refs)===77,'77 supplied original cards');catalogCheck(count($legacy)===24,'24 protected original balances');
+ catalogCheck(count($all)===75,'75 available catalogue entries');catalogCheck(count($refs)===77,'77 archived original cards');catalogCheck(count($legacy)===24,'24 archived original balances');
  catalogCheck(count(array_unique(array_column($refs,'source_reference')))===77,'one mapping for every source');
  catalogCheck(count(array_unique(array_column($refs,'treasure_code')))===77,'one code per source');
  catalogCheck(count(array_unique(array_column($refs,'icon')))===77,'one unchanged image per source');
  $observed=['normal'=>0,'rare'=>0,'epic'=>0,'legendary'=>0,'mythic'=>0];$existing=0;
  foreach($refs as$ref){
-  $code=$ref['treasure_code'];$def=$all[$code]??null;catalogCheck($def!==null,'reference exists '.$code);
+  $code=$ref['treasure_code'];$def=$all[$code]??null;
+  if($ref['grade']==='mythic'){catalogCheck(TreasureData::isRetired($code)&&$def===null,'mythic reference retired '.$code);continue;}
+  catalogCheck($def!==null,'reference exists '.$code);
   foreach(['source_reference','icon','grade']as$field)catalogCheck($def[$field]===$ref[$field],'source mapping '.$code.' '.$field);
   catalogCheck($def['icon_framed']===true,'original frame retained '.$code);
   catalogCheck(preg_match('/^treasures\/[a-z0-9-]+\.png$/D',$def['icon'])===1,'safe local path '.$code);
@@ -24,10 +26,12 @@ try{
   $size=getimagesize($path);catalogCheck($size!==false&&$size[2]===IMAGETYPE_PNG&&$size[0]>=128&&$size[1]>=128,'full PNG source '.$code);
   $observed[$ref['grade']]++;if($ref['existing_code'])$existing++;
  }
- catalogCheck($observed===['normal'=>14,'rare'=>15,'epic'=>26,'legendary'=>16,'mythic'=>6],'all77 inspected frame colors agree with rarity');
- catalogCheck($existing===19,'19 existing source codes reused');
+ catalogCheck($observed===['normal'=>14,'rare'=>15,'epic'=>26,'legendary'=>16,'mythic'=>0],'71 available source cards agree with rarity');
+ catalogCheck($existing===18,'18 available existing source codes reused');
+ catalogCheck(TreasureData::getCodesByGrade('mythic')===[],'no mythic random drop pool');
  $files=glob(ROOT_DIR.'/assets/art/items/treasures/*.png');catalogCheck(count($files)===77,'exact77 original image assets');
  foreach($legacy as$protected){
+  if(TreasureData::isRetired($protected['code'])){catalogCheck(!isset($all[$protected['code']]),'retired legacy code hidden '.$protected['code']);continue;}
   $current=$all[$protected['code']]??null;catalogCheck($current!==null,'old code preserved '.$protected['code']);
   foreach(['stats','max_level','fragments_per_level']as$field)catalogCheck($current[$field]===$protected[$field],'old balance preserved '.$protected['code'].' '.$field);
  }
@@ -78,7 +82,7 @@ try{
    catalogCheck(is_numeric($effect['boost_max'])&&is_finite((float)$effect['boost_max'])&&is_numeric($effect['master_value'])&&is_finite((float)$effect['master_value'])&&($effect['boost_max']!=0||$effect['master_value']!=0),'valid star/master progression including signed debuffs '.$code);
   }
  }
- catalogCheck($native===5,'five own legacy relics retained');
- catalogCheck(array_sum(array_map(static fn($grade)=>count(TreasureData::getCodesByGrade($grade)),array_keys($observed)))===77,'exactly 77 active cards, five legacy definitions are ownership-only');
- echo "ALL $checks TREASURE CATALOG CHECKS PASSED (77 active cards,5 ownership-only legacy relics,24 preserved base balances).\n";
+ catalogCheck($native===4,'four non-mythic legacy relics retained');
+ catalogCheck(array_sum(array_map(static fn($grade)=>count(TreasureData::getCodesByGrade($grade)),array_keys($observed)))===71,'exactly 71 active cards, four legacy definitions are ownership-only');
+ echo "ALL $checks TREASURE CATALOG CHECKS PASSED (71 active cards,4 ownership-only legacy relics,no mythic relics).\n";
 }catch(Throwable $e){fwrite(STDERR,'FAIL '.$e->getMessage()."\n");exit(1);}

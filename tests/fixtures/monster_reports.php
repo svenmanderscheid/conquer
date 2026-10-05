@@ -16,6 +16,7 @@ $baseReport['source_snapshot']=$source;
 $baseReport['loot']=['food'=>106000,'lumber'=>106000,'stone'=>21200,'gold'=>5300,'gems'=>30];
 $baseReport['lord_xp']=450;
 $baseReport['item_rewards']=[['code'=>10103001,'name'=>'5 Minuten Beschleunigung','count'=>3]];
+$baseReport['fragments']=[60100001=>3,60300115=>1];
 $baseReport['charm']=['x'=>75,'y'=>65];
 $legacy=$baseReport;unset($legacy['source_snapshot'],$legacy['combat_snapshot'],$legacy['monster_snapshot'],$legacy['report_version']);
 // Stay below the current training monster's required power (40); ten per type

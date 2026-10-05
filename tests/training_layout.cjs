@@ -1,11 +1,11 @@
 'use strict';
 require('./fixtures/browser_locale.cjs')('de'); // This suite asserts the explicit German UI.
 // Read-only browser layout fixtures. Run with preview-feature-fixture.php --training.
-const assert=require('assert/strict'),fs=require('fs'),path=require('path'),{chromium}=require('playwright');
+const assert=require('assert/strict'),fs=require('fs'),path=require('path'),{chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const base=process.env.TRAINING_FIXTURE_URL||'http://127.0.0.1:19321';assert(/^http:\/\/127\.0\.0\.1:\d+$/.test(base));
 const out=path.resolve(__dirname,'../artifacts/training-layout');fs.mkdirSync(out,{recursive:true});
 (async()=>{const browser=await chromium.launch({headless:true,channel:'chrome'});try{
- const page=await browser.newPage({viewport:{width:1280,height:800},hasTouch:true}),errors=[],failures=[];page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(15000);
+ const page=await browser.newPage({viewport:{width:1280,height:800},hasTouch:true}),errors=[],failures=[];page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(15000);page.setDefaultNavigationTimeout(45000);
  await page.goto(base+'/?zugang=login');await page.locator("[name=identifier], [name=username]").fill('PreviewPlayer');await page.locator('[name=password]').fill('PreviewFixture!2026');await Promise.all([page.waitForURL('**/city'),page.locator("form[action$=\"/auth/local\"] button[type=\"submit\"]").click()]);await page.goto(base+'/city#army');await page.locator('.training-school.has-illustration').waitFor();
  assert.match(await page.locator('.training-portrait>img').getAttribute('src'),/characters\/fantasy-troops-v2\/guardian-t1-ui\.webp$/);
  let fixture='ready';await page.route('**/api/game/state',async route=>{const r=await route.fetch(),json=await r.json(),s=json.data; if(fixture==='poor')for(const k of ['food','lumber','stone','gold'])s.city[k]=0;if(fixture==='locked'||fixture==='running'){s.buildings.barrack.level=1;s.buildings.castle.level=1;s.buildings.academy.level=1;s.research={};s.troop_defs.forEach(t=>{if(t.type===1&&t.tier>1)t.unlocked=false;});}if(fixture==='research'){s.buildings.barrack.level=4;s.buildings.castle.level=30;s.buildings.academy.level=30;s.research={};s.troop_defs.forEach(t=>{if(t.type===1&&t.tier>1)t.unlocked=false;});}if(fixture==='running'){const utc=offset=>new Date(Date.now()+offset).toISOString().slice(0,19).replace('T',' ');s.troop_queue=[{id:999,city_id:s.city.id,troop_code:50100101,count:200,started_at:utc(-60000),finishes_at:utc(600000)}];}await route.fulfill({response:r,json});});

@@ -71,15 +71,28 @@ const completed=[
    }
   };
   const refreshCity=async()=>{await page.goto(base+'/city#city');await page.reload();await page.locator('.painted-village-scene').waitFor();await badge('treasure_house').waitFor();};
+  const reachablePoint=locator=>locator.evaluate(node=>{
+   const r=node.getBoundingClientRect();
+   for(const x of [.5,.8,.2])for(const y of [.5,.2,.8]){
+    if(node.contains(document.elementFromPoint(r.left+r.width*x,r.top+r.height*y)))return {x:r.width*x,y:r.height*y};
+   }
+   return null;
+  });
   const reveal=async locator=>{
    await locator.evaluate(node=>{
     const scroller=node.closest('.painted-village-scroll');const b=node.getBoundingClientRect(),r=scroller.getBoundingClientRect();
     scroller.scrollLeft+=b.left+b.width/2-r.left-r.width/2;scroller.scrollTop+=b.top+b.height/2-r.top-r.height/2;
    });
    await page.waitForTimeout(150);
-   assert(await locator.evaluate(node=>{const r=node.getBoundingClientRect();return node.contains(document.elementFromPoint(r.left+r.width/2,r.top+r.height/2));}),'Building readiness action is reachable after panning');
+   assert(await reachablePoint(locator),'Building readiness action is reachable after panning');
   };
-  const openBadge=async code=>{await reveal(badge(code));await badge(code).tap();};
+  const openBadge=async code=>{const target=badge(code);await reveal(target);await target.tap({position:await reachablePoint(target)});};
+  const assertNoMenu=async()=>{
+   assert.equal(await page.locator('#panel-dialog').evaluate(node=>node.open),false,'Completion acknowledgement keeps the panel closed');
+   assert.equal(await page.locator('#game-dialog').evaluate(node=>node.open),false,'Completion acknowledgement keeps the building dialog closed');
+   assert.equal(await page.locator('.painted-building-menu:visible').count(),0,'Completion acknowledgement does not select the building');
+   assert.equal(new URL(page.url()).hash,'#city','Completion acknowledgement keeps the city active');
+  };
   const realKingdom=async()=>{const response=await page.request.get(base+'/api/kingdom/state');const json=await response.json();assert(json.ok,JSON.stringify(json));return json.data;};
   assert.equal((await realKingdom()).profile.display_name,'PreviewPlayer');
 
@@ -96,34 +109,29 @@ const completed=[
    assert.equal(layout.find(item=>item.code==='academy').kind,'research');
    await page.screenshot({path:path.join(output,`${width}x${height}-city.png`)});
    for(const code of ['academy','treasure_house','hospital','stable','archery_range','barrack','farm'])await reveal(badge(code));
-   // A normal tap must open the relevant destination directly, without selecting the building first.
+   // Only chests and research open a menu; other completion markers are dismissed in the city.
    await openBadge('treasure_house');await page.locator('.treasury-chest-page').waitFor();
    await page.screenshot({path:path.join(output,`${width}x${height}-chests.png`)});await closePanel();
    assert.equal(await badge('treasure_house').count(),1,'Opening the chest window does not claim a chest');
-   await openBadge('barrack');await page.locator('.training-school').first().waitFor();
-   assert.equal(await page.locator('[data-action="training-school"][data-id="barrack"]').getAttribute('aria-pressed'),'true');
-   assert.equal(await page.locator('[data-action="training-tier"][data-id="1"]').getAttribute('aria-pressed'),'true','The completed troop tier is selected');
-   await page.screenshot({path:path.join(output,`${width}x${height}-training.png`)});await closePanel();
-   await page.waitForFunction(()=>!document.querySelector('.painted-building-ready[data-id="barrack"]:not([hidden])'));
+   await openBadge('academy');await page.locator('.rt-scroll').waitFor();
+   assert.equal(await page.locator('.rt-focused[data-id="food_production"]').count(),1,'Research readiness focuses the completed research');await closePanel();
+   for(const code of ['barrack','archery_range','stable','hospital','farm']){
+    await openBadge(code);
+    await page.waitForFunction(code=>!document.querySelector('.painted-building-ready[data-id="'+code+'"]:not([hidden])'),code);
+    await assertNoMenu();
+   }
+   await page.screenshot({path:path.join(output,`${width}x${height}-dismissed.png`)});
    assert(readRequests.some(ids=>ids.includes(8101)&&ids.includes(8102)),'A grouped training badge acknowledges both completions');
    console.log('PASS readiness layout and touch navigation '+width+'x'+height);
   }
 
   await page.setViewportSize({width:1280,height:800});acknowledged.clear();await refreshCity();
-  for(const code of ['archery_range','stable']){
-   await openBadge(code);await page.locator('.training-school').first().waitFor();
-   assert.equal(await page.locator('[data-action="training-school"][data-id="'+code+'"]').getAttribute('aria-pressed'),'true','Badge opens its own training school');await closePanel();
-  }
-  await openBadge('academy');await page.locator('.rt-scroll').waitFor();assert.equal(await page.locator('.rt-focused[data-id="food_production"]').count(),1,'Research readiness focuses the completed research');await closePanel();
-  await openBadge('hospital');await page.locator('.hospital-shell').waitFor();await closePanel();
-  await openBadge('farm');await page.locator('.levelup-shell').waitFor();await closePanel();
-
   // A failed acknowledgement leaves the server-backed marker available to retry.
   records=completed.filter(row=>row.data.building_code==='barrack');acknowledged.clear();failRead=true;await refreshCity();
   const failedRead=page.waitForResponse(response=>response.url().endsWith('/api/notifications/read')&&response.status()===503);
-  await openBadge('barrack');await failedRead;await page.locator('.training-school').first().waitFor();await closePanel();
+  await openBadge('barrack');await failedRead;await assertNoMenu();
   assert.equal(await badge('barrack').count(),1,'Failed acknowledgement preserves readiness');
-  await openBadge('barrack');await page.locator('.training-school').first().waitFor();await closePanel();
+  await openBadge('barrack');await assertNoMenu();
   await page.waitForFunction(()=>!document.querySelector('.painted-building-ready[data-id="barrack"]:not([hidden])'));
   await page.reload();await badge('treasure_house').waitFor();assert.equal(await badge('barrack').count(),0,'Confirmed acknowledgement remains gone on reload');
 
@@ -163,7 +171,7 @@ const completed=[
   await closePanel();await page.waitForFunction(()=>!document.querySelector('.painted-building-ready[data-id="treasure_house"]:not([hidden])'));
   const claimed=await realKingdom();assert.equal(claimed.chests.free_silver_available,false);assert.equal(claimed.chests.free_gold_available,false);
   assert.deepEqual(errors,[],'No browser exceptions');assert.deepEqual(missingAssets,[],'All requested artwork and application assets loaded');
-  console.log('PASS completion destinations, grouped acknowledgement/retry, drag safety, reduced motion, authoritative queue readiness and real chest claims. '+output);
+  console.log('PASS research/chest menus, menu-free training/healing/build acknowledgements, grouped acknowledgement/retry, drag safety, reduced motion, authoritative queue readiness and real chest claims. '+output);
  }catch(error){
   if(page){await page.screenshot({path:path.join(output,'failure.png')}).catch(()=>{});fs.writeFileSync(path.join(output,'failure.json'),JSON.stringify({message:error.message,url:page.url(),text:await page.locator('body').innerText().catch(()=>''),badges:await page.locator('.painted-building-ready').evaluateAll(nodes=>nodes.map(node=>({html:node.outerHTML,box:node.getBoundingClientRect().toJSON()}))).catch(()=>[])},null,2));}
   throw error;

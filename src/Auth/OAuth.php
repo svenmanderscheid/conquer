@@ -339,7 +339,7 @@ final class OAuth
      */
     public static function createDefaultCity(Connection $db, int $playerId, string $username,?int $worldId=null): void
     {
-        $worldId??=(int)($db->query("SELECT id FROM worlds WHERE status IN ('open','running') ORDER BY id LIMIT 1")->fetchColumn()?:0);
+        $worldId??=\Conquer\Game\World\WorldEntry::defaultWorld();
         if($worldId<1)throw new \DomainException('Momentan ist keine Welt für neue Königreiche geöffnet.');
         if (!$db->getPdo()->inTransaction()) {
             $db->transaction(static function (Connection $db) use ($playerId, $username,$worldId): void {
@@ -349,8 +349,16 @@ final class OAuth
         }
 
         // Reserve a dry, unoccupied 4×4 footprint until the city is inserted.
+        // Serialize every creation path, including two different target worlds.
+        if(!$db->query('SELECT id FROM players WHERE id=? FOR UPDATE',[$playerId])->fetchColumn())throw new \DomainException('Spieler nicht gefunden.',404);
         \Conquer\Game\World\WorldContext::assertActionAvailable($worldId);
-        if($db->query('SELECT id FROM cities WHERE player_id=? AND world_id=?',[$playerId,$worldId])->fetchColumn())return;
+        if($db->query('SELECT id FROM cities WHERE player_id=? AND world_id=?',[$playerId,$worldId])->fetchColumn()){
+            \Conquer\Game\Vip\VipService::ensure($playerId,$worldId);
+            return;
+        }
+        if($db->query('SELECT id FROM cities WHERE player_id=? LIMIT 1',[$playerId])->fetchColumn()){
+            throw new \DomainException(\Conquer\Game\Locale::t('worlds.one_village'),409);
+        }
         \Conquer\Game\World\WorldService::initializeWorld($worldId);
         $coord = self::randomCoord($db,$worldId);
 
@@ -359,15 +367,17 @@ final class OAuth
             static fn(string $code): int => \Conquer\Game\City\BuildingData::getTotalPower($code, 1),
             CityState::BUILDING_CODES,
         ));
+        $starting=(int)(\Conquer\Game\World\WorldEntry::settings($worldId)['starting_resources']??100000);
         $db->execute(
             'INSERT INTO cities
                  (player_id, world_id, name, coord_x, coord_y,
                   food, lumber, stone, gold,
                   wall_hp_current, wall_hp_max, castle_level, power)
-             VALUES (?, ?, ?, ?, ?, 100000, 100000, 100000, 100000, 5000, 5000, 1, ?)',
-            [$playerId,$worldId, $cityName, $coord['x'], $coord['y'], $initialPower],
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 5000, 5000, 1, ?)',
+            [$playerId,$worldId, $cityName, $coord['x'], $coord['y'], $starting,$starting,$starting,$starting,$initialPower],
         );
         $cityId = $db->lastInsertId();
+        \Conquer\Game\Vip\VipService::ensure($playerId,$worldId);
 
         // Insert all canonical buildings at level 1.
         foreach (CityState::BUILDING_CODES as $code) {
@@ -387,6 +397,8 @@ final class OAuth
     private static function randomCoord(Connection $db,int $worldId, ?int $ignoreCityId = null): array
     {
         WorldPlacement::lockWorld($db, $worldId);
+        $entry=\Conquer\Game\World\WorldEntry::position($db,$worldId,$ignoreCityId);
+        if ($entry!==null) return $entry;
         $profile = \Conquer\Game\World\WorldMapProfile::forWorld($worldId);
         $width = (int)$profile['width']; $height = (int)$profile['height'];
         $min = min($width, $height) > 22 ? 10 : 1;

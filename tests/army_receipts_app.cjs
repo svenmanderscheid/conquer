@@ -22,12 +22,12 @@ const root=path.resolve(__dirname,'..');
   },{times:1});
   await page.locator('form[data-form=defense-dispatch] button[type=submit]').click();
   await page.locator('[data-action=command-retry]').waitFor();assert.match(sent.operation_key,/^[a-f0-9-]{36}$/);
-  fs.mkdirSync(path.join(root,'artifacts/security-recovery'),{recursive:true});
+  fs.mkdirSync(path.join(root,'artifacts/alpha-2026-10-04/security-recovery'),{recursive:true});
   for(const [width,height]of[[1280,800],[390,844],[320,568],[844,390]]){
    await page.setViewportSize({width,height});await page.reload({waitUntil:'domcontentloaded',timeout:30000});
    const button=page.locator('[data-action=command-retry]');await button.waitFor();
    const rect=await button.boundingBox();assert.ok(rect&&rect.x>=0&&rect.y>=0&&rect.x+rect.width<=width&&rect.y+rect.height<=height,'recovery action visible');
-   await page.screenshot({path:path.join(root,`artifacts/security-recovery/${width}x${height}.png`)});
+   await page.screenshot({path:path.join(root,`artifacts/alpha-2026-10-04/security-recovery/${width}x${height}.png`)});
   }
   const retried=page.waitForResponse(r=>r.url().endsWith('/api/defense/action')&&r.request().method()==='POST');
   await page.locator('[data-action=command-retry]').click();const replay=await retried;

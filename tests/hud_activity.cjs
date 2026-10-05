@@ -4,7 +4,7 @@ const fs=require('fs'),path=require('path'),os=require('os'),assert=require('ass
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const root=path.resolve(__dirname,'..'),output=fs.mkdtempSync(path.join(os.tmpdir(),'conquer-hud-activity-'));
 const php=`define('ROOT_DIR',${JSON.stringify(root.replaceAll('\\','/'))});define('APP_BASE','');require ROOT_DIR.'/src/Autoloader.php';(new \\Conquer\\Autoloader(ROOT_DIR.'/src'))->register();$session=['username'=>'HUD Fixture'];$uiLayoutProfiles=\\Conquer\\Game\\Ui\\LayoutSettings::defaults();if(\\Conquer\\Db\\Connection::isInitialized())throw new RuntimeException('Unexpected database initialization');require ROOT_DIR.'/views/game.php';if(\\Conquer\\Db\\Connection::isInitialized())throw new RuntimeException('Unexpected database initialization');`;
-const html=execFileSync(process.env.PHP_BINARY||'C:/xampp/php/php.exe',['-r',php],{encoding:'utf8',maxBuffer:8*1024*1024}).replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'');
+const html=execFileSync(process.env.PHP_BINARY||'C:/xampp/php/php.exe',['-r',php],{encoding:'utf8',maxBuffer:8*1024*1024}).replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'').replace(/<section id="app-start"[\s\S]*?<\/section>/,'');
 (async()=>{
  const browser=await chromium.launch({headless:true,channel:process.env.PLAYWRIGHT_CHANNEL||'chrome'});
  try{
@@ -37,7 +37,7 @@ const html=execFileSync(process.env.PHP_BINARY||'C:/xampp/php/php.exe',['-r',php
   assert.equal(await page.locator('#hud-energy-fill').evaluate(e=>e.style.width),'65%');
   assert.equal(await page.locator('#hud-hunter-xp').innerText(),'125 / 500 XP');
   assert.equal(await page.locator('#hud-hunter-fill').evaluate(e=>e.style.width),'25%');
-  assert.deepEqual(await page.locator('.hud-right-tools [data-id]').evaluateAll(buttons=>buttons.map(button=>button.dataset.id)),['events'],'Retired Feldzüge and Meisterschaft shortcuts stay out of the HUD');
+  assert.deepEqual(await page.locator('.hud-right-tools [data-id]').evaluateAll(buttons=>buttons.map(button=>button.dataset.id)),['reports','events'],'Post and event shortcuts remain accessible.');
   const stateOf=id=>page.locator('#'+id).getAttribute('data-job-state');
   assert.equal(await page.locator('#hud-healing').isVisible(),false);
   assert.equal(await stateOf('hud-research'),'idle');assert.equal(await stateOf('hud-build-second'),'locked');
@@ -115,7 +115,7 @@ const html=execFileSync(process.env.PHP_BINARY||'C:/xampp/php/php.exe',['-r',php
    const chatResult=await page.evaluate(()=>{
     const chat=document.querySelector('#world-chat'),r=chat.getBoundingClientRect(),dock=document.querySelector('#navigation'),dr=dock.getBoundingClientRect(),bad=[];
     if(r.left<0||r.top<0||r.right>innerWidth||r.bottom>innerHeight)bad.push('Chat outside viewport');
-    const chatHeight=parseFloat(getComputedStyle(chat).getPropertyValue('--world-chat-height'));
+    const chatStyle=getComputedStyle(chat),chatHeight=parseFloat(chatStyle.getPropertyValue('--world-chat-height'))*(parseFloat(chatStyle.zoom)||1);
     if(!Number.isFinite(chatHeight)||Math.abs(r.height-chatHeight)>3)bad.push(`Chat preview must match its shared HUD clearance (${r.height}px / ${chatHeight}px)`);
     // The dock frame includes transparent padding above its buttons; compare the
     // actual targets and protruding artwork instead of that unused outer area.

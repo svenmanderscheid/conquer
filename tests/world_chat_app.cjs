@@ -22,9 +22,9 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
   const browser=await chromium.launch({headless:true,channel:process.env.PLAYWRIGHT_CHANNEL||'chrome'});
   try {
   const page=await browser.newPage({viewport:{width:390,height:844}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
-  await page.goto(pathToFileURL(file).href);await page.waitForSelector('.world-chat-preview-message');
+  await page.goto(pathToFileURL(file).href);await page.waitForSelector('.world-chat-preview-message:visible');
   assert.equal(await page.locator('.world-chat-preview-message').count(),2,'preview shows exactly the last two messages');
-  let box=await page.locator('#world-chat').boundingBox();assert.ok(box.height>=60&&box.height<=90,'preview matches the dock height: '+JSON.stringify(box));
+  let box=await page.locator('#world-chat').boundingBox();assert.ok(box.height>=44&&box.height<=65,'compact preview retains a reachable touch target: '+JSON.stringify(box));
   await page.locator('.world-chat-preview').dispatchEvent('pointerdown',{clientX:280,clientY:30});
   await page.locator('.world-chat-preview').dispatchEvent('pointerup',{clientX:100,clientY:30});
   await page.locator('.world-chat-preview').dispatchEvent('click');

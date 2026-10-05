@@ -1,4 +1,4 @@
-const { chromium } = require('playwright');
+const { chromium } = require(process.env.PLAYWRIGHT_MODULE||'playwright');
 
 (async () => {
   const base = process.env.BASE_URL || 'http://127.0.0.1:18988';

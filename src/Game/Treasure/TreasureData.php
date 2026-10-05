@@ -10,6 +10,14 @@ namespace Conquer\Game\Treasure;
  */
 final class TreasureData
 {
+    /** Removed mythic relic IDs must never be reused or restored from legacy saves. */
+    public const RETIRED_CODES = [60400003,60500001,60500101,60500102,60500103,60500104,60500105];
+
+    public static function isRetired(int $code): bool
+    {
+        return in_array($code,self::RETIRED_CODES,true);
+    }
+
     /** @var array<int, array<string, mixed>>|null Indexed by treasure code. */
     private static ?array $cache = null;
 
@@ -161,7 +169,7 @@ final class TreasureData
         self::$cache = [];
         foreach ($decoded['treasures'] as $treasure) {
             $code = (int) ($treasure['code'] ?? 0);
-            if ($code > 0) {
+            if ($code > 0 && !self::isRetired($code) && ($treasure['grade']??'')!=='mythic') {
                 $catalogEffects = $effectsByCode[(string) $code]['effects'] ?? null;
                 if (is_array($catalogEffects) && $catalogEffects !== []) {
                     $treasure['effects'] = $catalogEffects;

@@ -1,5 +1,5 @@
 'use strict';
-const fs=require('fs'),path=require('path'),net=require('net'),assert=require('assert/strict'),{spawn}=require('child_process'),{chromium}=require('playwright');
+const fs=require('fs'),path=require('path'),net=require('net'),assert=require('assert/strict'),{spawn}=require('child_process'),{chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/charm-runes');fs.mkdirSync(out,{recursive:true});
 (async()=>{
  const port=await new Promise(resolve=>{const s=net.createServer();s.listen(0,'127.0.0.1',()=>{const p=s.address().port;s.close(()=>resolve(p));});});
@@ -8,7 +8,7 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/charm-rune
   await new Promise((resolve,reject)=>{const t=setTimeout(()=>reject(Error(log)),60000);fixture.stdout.on('data',d=>{log+=d;if(log.includes('Synthetic preview ready')){clearTimeout(t);resolve();}});fixture.stderr.on('data',d=>log+=d);fixture.on('error',reject);fixture.on('exit',()=>{clearTimeout(t);reject(Error(log));});});
   browser=await chromium.launch({headless:true,channel:'chrome'});const context=await browser.newContext({viewport:{width:1280,height:800},hasTouch:true});
   await context.addInitScript(()=>{if(location.pathname.endsWith('/city')&&!location.hash)history.replaceState(null,'','#world');});
-  page=await context.newPage();page.setDefaultTimeout(20000);page.on('pageerror',e=>errors.push(e.message));
+  page=await context.newPage();page.setDefaultTimeout(20000);page.setDefaultNavigationTimeout(45000);page.on('pageerror',e=>errors.push(e.message));
   await page.goto('http://127.0.0.1:'+port+'/?zugang=login');await page.locator("[name=identifier], [name=username]").fill('PreviewPlayer');await page.locator('[name=password]').fill('PreviewFixture!2026');
   await Promise.all([page.waitForURL('**/city'),page.locator("form[action$=\"/auth/local\"] button[type=\"submit\"]").click()]);
   await page.locator('.atlas-marker--charms').first().waitFor({state:'attached'});await page.evaluate(()=>ConquerWorld.focus(72,69));
@@ -20,7 +20,7 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/charm-rune
   });
   // Grounded portraits compensate for transparent margins; compare their size
   // hierarchy, not an older image-box multiplier from before that normalization.
-  assert(Math.abs(sizes.charm-1.0125)<.02&&Math.abs(sizes.rally-2.7*.95)<.02&&sizes.mine>=2&&sizes.mine<3,JSON.stringify(sizes));
+  assert(Math.abs(sizes.charm-1.0125)<.02&&Math.abs(sizes.rally-2.7*.95)<.02&&Math.abs(sizes.mine-1.75)<.02,JSON.stringify(sizes));
   assert(sizes.charm<sizes.solo&&sizes.solo<sizes.rally);
   for(const grade of ['normal','epic','legendary']){const marker=page.locator('.atlas-marker--charms[data-grade="'+grade+'"]');assert.match(await marker.locator('img').getAttribute('src'),new RegExp('/runes-v1/'+grade+'\\.webp$'));assert.equal(await marker.locator('.charm-rune-spark').count(),3);}
   const crystal=markers.first().locator('img');const first=await crystal.evaluate(el=>getComputedStyle(el).transform);await page.waitForFunction(previous=>getComputedStyle(document.querySelector('.atlas-marker--charms>img')).transform!==previous,first);

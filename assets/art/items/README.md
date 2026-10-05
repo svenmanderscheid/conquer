@@ -1,5 +1,7 @@
 # Inventory artwork
 
+Since 5 October 2026, speedups use one approved painted motif per activity, resolved before individual duration artwork by `assets/js/item-art.js`: universal `painted-v2/10103001.webp`, building `10103011.webp`, research `10103021.webp`, training `10103031.webp`, healing `10103041.webp`. The same helper resolves overview aliases and provides live duration labels and tiers. Grey covers less than one hour, blue less than one day, violet less than seven days and orange seven days upward. `assets/css/village-theme.css` applies those backgrounds to inventory/details, queue icons, quest rewards, receipts and shop offers. Time is below the illustration; stock or bundle quantity is a separate badge. All other item artwork and server-owned rarity data are unchanged.
+
 The inventory uses server-owned item definitions. Consumable and relic frames follow their declared rarity: grey, blue, violet, orange and red for mythic items. Counts, durations, levels and fragment progress remain live UI overlays.
 
 ## Original code-native SVG icons

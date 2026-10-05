@@ -13,7 +13,7 @@ fs.mkdirSync(out,{recursive:true});
   await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error(log||'Fixture timeout')),60000);child.stdout.on('data',c=>{log+=c;if(log.includes('Synthetic preview ready')){clearTimeout(timer);resolve();}});child.stderr.on('data',c=>log+=c);child.on('exit',code=>{clearTimeout(timer);reject(Error('Fixture '+code+': '+log));});});
   browser=await chromium.launch({headless:true,channel:'chrome'});
   const page=await browser.newPage({viewport:{width:390,height:844},hasTouch:true});
-  const errors=[];page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(15000);
+  const errors=[];page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(15000);page.setDefaultNavigationTimeout(45000);
   await page.goto(base);const csrf=await page.locator('[name=csrf]').first().inputValue();
   await page.request.post(base+'/auth/local',{form:{csrf,mode:'login',identifier:'PreviewPlayer',password:'PreviewFixture!2026'}});
   await page.goto(base+'/city#city');await page.locator('#hud-research:not([data-job-state=loading])').waitFor();

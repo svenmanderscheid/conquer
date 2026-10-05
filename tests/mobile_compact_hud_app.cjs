@@ -52,7 +52,7 @@ function measureNumbers(){return [...document.querySelectorAll('.hud-compact-pow
   const sizes=process.env.MOBILE_HUD_SIZES?process.env.MOBILE_HUD_SIZES.split(',').map(value=>value.split('x').map(Number)):[[390,844],[320,568],[844,390],[568,320],[480,320],[1280,800]];
   for(const [width,height] of sizes)for(const mode of ['city','world']){
    await page.setViewportSize({width,height});await page.goto(base+'/city#'+mode,{waitUntil:'domcontentloaded'});
-   await page.locator(mode==='city'?'.painted-village-scene':'.atlas-viewport').first().waitFor();await page.locator('#resources .resource').first().waitFor();await page.locator('#world-chat:not([hidden])').waitFor();await page.waitForFunction(()=>!document.querySelector('.scene-transition.is-active'));await page.waitForTimeout(200);
+   await page.locator(mode==='city'?'.painted-village-scene':'.atlas-viewport').first().waitFor();await page.locator('#resources .resource').first().waitFor();await page.locator('#world-chat:not([hidden])').waitFor();await page.waitForFunction(()=>!document.querySelector('.scene-transition.is-active'));await page.locator('#app-start').waitFor({state:'detached'});
    await page.evaluate(()=>document.fonts.ready);await page.screenshot({path:path.join(output,`${phase}-${width}x${height}-${mode}.png`)});
    const result={scene:mode,...await page.evaluate(measureHud)};results.push(result);console.log(`${phase} ${width}x${height} ${mode}: center ${result.centerHeight.toFixed(1)}px (${(result.centerFraction*100).toFixed(1)}%)`);
    if(phase==='before')continue;
@@ -81,7 +81,9 @@ function measureNumbers(){return [...document.querySelectorAll('.hud-compact-pow
    }else{
     assert.equal(await page.locator('.hud-power').isVisible(),true,'Desktop retains the expanded profile');
     assert.equal(await page.locator('.hud-compact-power').isVisible(),false,'Desktop has no duplicate power value');
-    assert.equal(result.centerHeight,528,'Desktop center geometry remains unchanged');
+    const scale=width>=1101&&height>=600?1.15:1;
+    assert(Math.abs(result.boxes['#navigation'].width-Math.min(720*scale,width-12*scale))<2,'Desktop navigation uses the larger interface size');
+    assert(result.centerHeight>=height-320,'The larger desktop interface preserves the central playfield');
    }
    // Reach the complete views with actual taps. No reward, purchase or production action is triggered.
    for(const selector of ['#account-button','#hud-energy','#hud-vip-button','#lord-talent-button','#hud-gems'])await opensPanel(selector);
@@ -109,7 +111,7 @@ function measureNumbers(){return [...document.querySelectorAll('.hud-compact-pow
    stressProfile=true;
    for(const [width,height] of [[320,568],[390,844],[480,320],[568,320],[844,390]]){
     await page.setViewportSize({width,height});await page.goto(base+'/city#city');await page.reload();await page.locator('.painted-village-scene').waitFor();await page.waitForFunction(()=>!document.querySelector('.scene-transition.is-active'));
-    await page.waitForFunction(()=>document.querySelector('#player-hud-name')?.textContent==='Commander Alexandria Nightingale');await page.locator('#hud-bonuses').waitFor();await page.locator('#hud-debuffs').waitFor();
+    await page.waitForFunction(()=>document.querySelector('#player-hud-name')?.textContent==='Commander Alexandria Nightingale');await page.locator('#hud-bonuses').waitFor();await page.locator('#hud-debuffs').waitFor();await page.locator('#app-start').waitFor({state:'detached'});
     await page.screenshot({path:path.join(output,`after-${width}x${height}-long-profile-effects.png`)});
     const stress=await page.evaluate(measureHud);
     for(const item of stress.controls){assert(item.width>=43.5&&item.height>=43.5&&item.x>=-.5&&item.right<=width+.5,'Large values preserve touch controls: '+JSON.stringify(item));assert(item.reachable,'Large values preserve hit target: '+JSON.stringify(item));}
@@ -126,7 +128,7 @@ function measureNumbers(){return [...document.querySelectorAll('.hud-compact-pow
    }
    for(const locale of ['de','fr']){
     await page.setViewportSize({width:320,height:568});await Promise.all([page.waitForNavigation({waitUntil:'domcontentloaded'}),page.evaluate(locale=>ConquerLocale.setLocale(locale),locale)]);await page.locator('.painted-village-scene').waitFor();await page.locator('#hud-bonuses').waitFor();
-    await page.waitForFunction(locale=>document.documentElement.lang===locale,locale);
+    await page.waitForFunction(locale=>document.documentElement.lang===locale,locale);await page.locator('#app-start').waitFor({state:'detached'});
     const numbers=await page.evaluate(measureNumbers);
     assert(numbers.length>=7,'Localized compact values are present');assert(numbers.every(value=>value.fits),'Localized values fit: '+JSON.stringify({locale,numbers}));
     const localized=await page.evaluate(measureHud);for(const item of localized.controls)assert(item.reachable,'Localized touch control reachable: '+JSON.stringify({locale,item}));

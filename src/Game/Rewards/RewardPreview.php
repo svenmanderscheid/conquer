@@ -5,6 +5,8 @@ namespace Conquer\Game\Rewards;
 
 use Conquer\Db\Connection;
 use Conquer\Game\Inventory\InventoryService;
+use Conquer\Game\Locale;
+use Conquer\Game\Treasure\TreasureData;
 
 /** Read-only projections for the reward editor. Never rolls or credits rewards. */
 final class RewardPreview
@@ -45,6 +47,16 @@ final class RewardPreview
         }
 
         $gemRule = is_array($config['gems_drop'] ?? null) ? $config['gems_drop'] : [];
+        $fragments=[];
+        foreach($config['fragment_drops']??[] as $drop){
+            $definition=isset($drop['treasure_code'])?TreasureData::get((int)$drop['treasure_code']):null;
+            $quantity=max(0,(int)$drop['count']);$chance=self::chance($drop['probability']);
+            $fragments[]=[
+                'treasure_code'=>$drop['treasure_code']??null,
+                'name'=>$definition?Locale::text($definition['name_de']??$definition['name']):Locale::t('admin.drops.fragment_random_'.$drop['fragment_grade']),
+                'quantity_on_drop'=>$quantity,'chance'=>$chance,'expected_per_100'=>$quantity*$chance*100,
+            ];
+        }
         $gemChance = self::chance($gemRule['chance'] ?? 0);
         $gemAmount = max(0, (int)($gemRule['amount'] ?? 0));
         $resources = [];
@@ -58,6 +70,7 @@ final class RewardPreview
             'scope_world_id' => $scopeWorld,
             'resources_per_victory' => $resources,
             'items' => $items,
+            'fragments' => $fragments,
             'gems' => [
                 'quantity_on_drop' => $gemAmount,
                 'chance' => $gemChance,

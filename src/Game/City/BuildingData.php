@@ -155,9 +155,9 @@ final class BuildingData
         $storageLevel       = (int) ($buildings['storage']['level']       ?? 1);
         $treasureHouseLevel = (int) ($buildings['treasure_house']['level'] ?? 1);
 
-        // Base 100k at L1, scales ×1.2 per level
-        $fls = (int) round(100_000 * pow(1.2, $storageLevel - 1));
-        $g   = (int) round(60_000  * pow(1.2, $treasureHouseLevel - 1));
+        // Alpha grants 500k of each resource; leave room for the first mission rewards.
+        $fls = (int) round(600_000 * pow(1.2, $storageLevel - 1));
+        $g   = (int) round(600_000 * pow(1.2, $treasureHouseLevel - 1));
 
         return [
             'food'   => $fls,

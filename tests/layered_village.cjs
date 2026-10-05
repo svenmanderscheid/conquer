@@ -44,7 +44,7 @@ const root=path.resolve(__dirname,'..');
   assert(await page.locator('[data-id="academy"]').evaluate(e=>e.classList.contains('is-empty')));
   assert.equal(await page.locator('[data-id="castle"] .painted-building-sprite').evaluate(e=>getComputedStyle(e).visibility),'visible');
   assert(await page.locator('[data-id="castle"] .painted-scaffold').isVisible());
-  assert.equal(await page.locator('[data-id="castle"] .painted-scaffold>img').count(),2);
+  assert.equal(await page.locator('[data-id="castle"] .painted-scaffold .painted-construction-art image').count(),2,'Approved scaffold is used in the stationary base and isolated hammer layer');
   assert.equal(await page.locator('[data-id="castle"] .painted-motion').isVisible(),true);
   assert.equal(await page.locator('[data-id="academy"] .painted-motion').isVisible(),false);
   assert.equal(await page.locator('.painted-village-building.is-building').count(),1);
@@ -54,7 +54,7 @@ const root=path.resolve(__dirname,'..');
   await page.emulateMedia({reducedMotion:'reduce'});
   assert.equal(await flag.evaluate(e=>getComputedStyle(e).animationName),'none');
   assert.equal(await page.locator('.painted-river').isVisible(),false);
-  assert.equal(await page.locator('[data-id="castle"] .painted-scaffold-motion').evaluate(e=>getComputedStyle(e).animationName),'none');
+  assert.equal(await page.locator('[data-id="castle"] .painted-construction-hammer').evaluate(e=>getComputedStyle(e).animationName),'none');
   await page.emulateMedia({reducedMotion:'no-preference'});
   for(const [width,height] of [[1536,1024],[390,844],[844,390],[320,700]]){
    await page.setViewportSize({width,height});

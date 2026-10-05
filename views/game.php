@@ -137,9 +137,11 @@ $base = htmlspecialchars(APP_BASE, ENT_QUOTES);
 <script src="<?= $base ?>/assets/js/graphics-quality.js?v=<?= filemtime(__DIR__ . '/../assets/js/graphics-quality.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/city-painted.js?v=<?= filemtime(__DIR__ . '/../assets/js/city-painted.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/alliance-ranks.js?v=<?= filemtime(ROOT_DIR.'/assets/js/alliance-ranks.js') ?>" defer></script>
+<script src="<?= $base ?>/assets/js/relic-presentation.js?v=<?= filemtime(ROOT_DIR.'/assets/js/relic-presentation.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/mvp-panels.js?v=<?= filemtime(__DIR__ . '/../assets/js/mvp-panels.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/inventory-overview.js?v=<?= filemtime(__DIR__ . '/../assets/js/inventory-overview.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/item-sources.js?v=<?= filemtime(ROOT_DIR.'/assets/js/item-sources.js') ?>" defer></script>
+<script src="<?= $base ?>/assets/js/requirements.js?v=<?= filemtime(ROOT_DIR.'/assets/js/requirements.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/research-tree.js?v=<?= filemtime(__DIR__ . '/../assets/js/research-tree.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/boss-mechanic.js?v=<?= filemtime(ROOT_DIR.'/assets/js/boss-mechanic.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/battle-preview.js?v=<?= filemtime(__DIR__ . '/../assets/js/battle-preview.js') ?>" defer></script>
@@ -158,7 +160,7 @@ $base = htmlspecialchars(APP_BASE, ENT_QUOTES);
 <script src="<?= $base ?>/assets/js/defense-panel.js?v=features1" defer></script>
 <script src="<?= $base ?>/assets/js/lord-talents.js?v=<?= filemtime(ROOT_DIR.'/assets/js/lord-talents.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/progression-panel.js?v=<?= filemtime(ROOT_DIR.'/assets/js/progression-panel.js') ?>" defer></script>
-<script src="<?= $base ?>/assets/js/world-panel.js?v=worlds1" defer></script>
+<script src="<?= $base ?>/assets/js/world-panel.js?v=<?= filemtime(ROOT_DIR . '/assets/js/world-panel.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/world-chat.js?v=<?= filemtime(__DIR__ . '/../assets/js/world-chat.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/trading-panel.js?v=<?= filemtime(__DIR__ . '/../assets/js/trading-panel.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/treasure-panel.js?v=<?= filemtime(__DIR__ . '/../assets/js/treasure-panel.js') ?>" defer></script>

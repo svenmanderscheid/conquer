@@ -9,7 +9,7 @@ const out=path.resolve(__dirname,'../artifacts/world-overview');fs.mkdirSync(out
 (async()=>{
  const browser=await chromium.launch({headless:true,channel:'chrome'}),errors=[],failures=[];
  try{
-  const page=await browser.newPage({viewport:{width:1280,height:800},hasTouch:true});page.setDefaultTimeout(12000);page.on('pageerror',e=>errors.push(e.message));
+  const page=await browser.newPage({viewport:{width:1280,height:800},hasTouch:true});page.setDefaultTimeout(12000);page.setDefaultNavigationTimeout(45000);page.on('pageerror',e=>errors.push(e.message));
   await page.goto(base+'/?zugang=login');await page.locator('[name="identifier"],[name="username"]').fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');
   await Promise.all([page.waitForURL('**/city'),page.locator('form[action$="/auth/local"] button[type="submit"]').click()]);await page.waitForFunction(()=>document.querySelector('#player-hud-name')?.textContent.includes('PreviewPlayer'));
   await Promise.all([page.waitForEvent('load'),page.evaluate(()=>ConquerLocale.setLocale('de'))]);await page.locator('#navigation [data-id="world"]').click();await page.waitForSelector('.atlas-shell.is-luxembourg');

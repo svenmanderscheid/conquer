@@ -76,7 +76,7 @@ final class KingdomInventory
             KingdomService::require($quantity===1, 'Bitte verwende jeweils einen Gegenstand.');
         }
         $db = Connection::getInstance();
-        $owned = (int) $db->query('SELECT quantity FROM player_inventory WHERE player_id=? AND item_code=? FOR UPDATE', [$playerId,$code])->fetchColumn();
+        $owned = InventoryService::quantity($playerId,$code,null,true);
         KingdomService::require($owned>0 && $owned >= $quantity, 'Dieser Gegenstand liegt nicht in ausreichender Menge in deinem Inventar.');
         $cityId = (int) $state['city']['id'];
         if ($useAll || $quantity > 1) {

@@ -715,10 +715,10 @@
       "category": "chest",
       "subcategory": "platinum",
       "chest_type": "platinum",
-      "description": "A platinum chest containing the finest items, including legendary and mythic fragments.",
+      "description": "A platinum chest containing the finest items, including legendary fragments.",
       "icon": "chest-platinum.svg",
       "name_de": "Platintruhe",
-      "description_de": "Enthält zufällige Gegenstände und möglicherweise Reliktfragmente. Auch legendäre und mythische Beute ist möglich.",
+      "description_de": "Enthält zufällige Gegenstände und möglicherweise Reliktfragmente. Auch legendäre Beute ist möglich.",
       "rarity": "legendary",
       "icon_framed": false,
       "is_usable": true,
@@ -2769,23 +2769,6 @@
       "icon": "fragment-legendary.svg",
       "name_de": "Reliktfragmente · Legendär",
       "description_de": "Gewährt 5 Fragmente eines zufälligen Relikts der Seltenheit „Legendär“. Fragmente erhöhen automatisch dessen Stufe.",
-      "icon_framed": false,
-      "is_usable": true,
-      "loot_sources": [
-        "platinum"
-      ]
-    },
-    {
-      "code": 10207005,
-      "name": "Reliktfragmente · Mythisch",
-      "category": "fragment_pack",
-      "subcategory": "fragments",
-      "fragment_grade": "mythic",
-      "fragment_amount": 3,
-      "rarity": "mythic",
-      "icon": "fragment-mythic.svg",
-      "name_de": "Reliktfragmente · Mythisch",
-      "description_de": "Gewährt 3 Fragmente eines zufälligen Relikts der Seltenheit „Mythisch“. Fragmente erhöhen automatisch dessen Stufe.",
       "icon_framed": false,
       "is_usable": true,
       "loot_sources": [

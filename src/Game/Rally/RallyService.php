@@ -204,6 +204,15 @@ final class RallyService
 
     public static function refund(array $armies): void
     {
-        $db=Connection::getInstance();foreach($armies as $army){if(!empty($army['is_ai']))continue;foreach(($army['survivors']??$army['troops']) as $code=>$count)if($count>0)$db->execute('INSERT INTO city_troops(city_id,troop_code,count) VALUES(?,?,?) ON DUPLICATE KEY UPDATE count=count+VALUES(count)',[$army['city_id'],\Conquer\Game\City\TroopData::activeCode((int)$code),$count]);$loot=$army['loot']??[];if(!empty($loot['gems']))$db->execute('UPDATE players SET gems=gems+? WHERE id=?',[(int)$loot['gems'],$army['player_id']]);foreach(($army['items']??[]) as $code=>$amount)\Conquer\Game\Inventory\InventoryService::addItems($army['player_id'],(int)$code,(int)$amount);$db->execute('UPDATE cities SET food=food+?,lumber=lumber+?,stone=stone+?,gold=gold+? WHERE id=?',[$loot['food']??0,$loot['lumber']??0,$loot['stone']??0,$loot['gold']??0,$army['city_id']]);}
+        $db=Connection::getInstance();
+        foreach($armies as $army){
+            if(!empty($army['is_ai']))continue;
+            foreach(($army['survivors']??$army['troops']) as $code=>$count)if($count>0)$db->execute('INSERT INTO city_troops(city_id,troop_code,count) VALUES(?,?,?) ON DUPLICATE KEY UPDATE count=count+VALUES(count)',[$army['city_id'],\Conquer\Game\City\TroopData::activeCode((int)$code),$count]);
+            $world=(int)$db->query('SELECT world_id FROM cities WHERE id=?',[$army['city_id']])->fetchColumn();$loot=$army['loot']??[];
+            if(!empty($loot['gems']))$db->execute('UPDATE players SET gems=gems+? WHERE id=?',[(int)$loot['gems'],$army['player_id']]);
+            foreach(($army['items']??[]) as $code=>$amount)\Conquer\Game\Inventory\InventoryService::addItems($army['player_id'],(int)$code,(int)$amount,$world);
+            \Conquer\Game\Rewards\RewardCatalog::grantFragments($army['player_id'],$army['fragments']??[]);
+            $db->execute('UPDATE cities SET food=food+?,lumber=lumber+?,stone=stone+?,gold=gold+? WHERE id=?',[$loot['food']??0,$loot['lumber']??0,$loot['stone']??0,$loot['gold']??0,$army['city_id']]);
+        }
     }
 }

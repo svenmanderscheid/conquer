@@ -79,7 +79,7 @@ final class Session
         $db  = Connection::getInstance();
         $row = $db->query(
             'SELECT s.id, s.player_id, s.csrf_token, s.expires_at,s.active_world_id,
-                    p.username, p.is_banned, p.vip_level, p.gems
+                    p.username, p.is_banned, p.gems
              FROM   sessions s
              JOIN   players  p ON p.id = s.player_id
              WHERE  s.token = ?
@@ -98,6 +98,7 @@ final class Session
         $owned=$db->query('SELECT id FROM cities WHERE player_id=? AND world_id=?',[$row['player_id'],$row['active_world_id']])->fetchColumn();
         if(!$owned){$fallback=$db->query('SELECT world_id FROM cities WHERE player_id=? ORDER BY world_id LIMIT 1',[$row['player_id']])->fetchColumn();if($fallback){$row['active_world_id']=(int)$fallback;$db->execute('UPDATE sessions SET active_world_id=? WHERE id=?',[$fallback,$row['id']]);}}
         \Conquer\Game\World\WorldContext::bind((int)$row['active_world_id'],(int)$row['player_id']);
+        $row['vip_level']=\Conquer\Game\Vip\VipService::status((int)$row['player_id'],(int)$row['active_world_id'])['level'];
 
         // Touch last_active — best-effort, no exception on failure
         try {
@@ -127,7 +128,10 @@ final class Session
     /** The world service already persists and validates selection before updating the request cache. */
     public static function setActiveWorld(int $worldId): void
     {
-        if(self::$current!==null)self::$current['active_world_id']=$worldId;
+        if(self::$current!==null){
+            self::$current['active_world_id']=$worldId;
+            self::$current['vip_level']=\Conquer\Game\Vip\VipService::status((int)self::$current['player_id'],$worldId)['level'];
+        }
         \Conquer\Game\World\WorldContext::bind($worldId,self::$current===null?null:(int)self::$current['player_id']);
     }
 

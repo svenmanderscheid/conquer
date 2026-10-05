@@ -64,9 +64,9 @@ try{
  $db->execute('UPDATE field_objects SET gatherer_march_id=? WHERE id=?',[$march,$node]);
  GatherService::finish($march);GatherService::finish($march);
  $haul=json_decode($db->query('SELECT haul_json FROM marches WHERE id=?',[$march])->fetchColumn(),true);
- checkBalance($haul['items'][120603026]===1&&$haul['loot']['food']===100,'depleted field carries its guaranteed source drop and resources home');
+ checkBalance(!isset($haul['items'][120603026])&&$haul['loot']['food']===100,'depleted field carries resources home without an unassigned source item');
  $db->execute('UPDATE marches SET return_time=UTC_TIMESTAMP() WHERE id=?',[$march]);MarchTick::runForPlayer(1);MarchTick::runForPlayer(1);
- checkBalance(balanceOwned(120603026)===1,'gathering drop credited exactly once at return');
+ checkBalance(balanceOwned(120603026)===0,'unassigned gathering item remains absent after repeated returns');
  $db->execute("INSERT INTO marches(player_id,world_id,march_type,origin_city_id,target_x,target_y,target_type,target_id,troops_json,haul_json,departure_time,arrival_time,state,gathering_finishes_at)VALUES(1,1,9,1,90,90,5,?,'{\"50100101\":1}',?,DATE_SUB(UTC_TIMESTAMP(),INTERVAL 12 SECOND),DATE_SUB(UTC_TIMESTAMP(),INTERVAL 2 SECOND),'arrived',DATE_ADD(UTC_TIMESTAMP(),INTERVAL 100 SECOND))",[$node,json_encode(['gather'=>['rate'=>10,'capacity'=>100]])]);$march=(int)$db->lastInsertId();
  $db->execute('UPDATE field_objects SET resource_amount=100,gatherer_march_id=? WHERE id=?',[$march,$node]);
  GatherService::finish($march,true);$haul=json_decode($db->query('SELECT haul_json FROM marches WHERE id=?',[$march])->fetchColumn(),true);

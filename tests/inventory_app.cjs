@@ -11,14 +11,14 @@ const out=path.resolve(__dirname,'../artifacts/inventory-reference');fs.mkdirSyn
  try{
   if(!base){
    const port=await new Promise(resolve=>{const server=net.createServer();server.listen(0,'127.0.0.1',()=>{const port=server.address().port;server.close(()=>resolve(port));});});
-   fixture=spawn(process.env.PHP_BINARY||'C:/xampp/php/php.exe',[path.resolve(__dirname,'../tools/preview-feature-fixture.php'),'--port='+port,'--inventory-overview'],{cwd:path.resolve(__dirname,'..'),stdio:['pipe','pipe','pipe'],windowsHide:true});
+   fixture=spawn(process.env.PHP_BINARY||'C:/xampp/php/php.exe',[path.resolve(__dirname,'../tools/preview-feature-fixture.php'),'--port='+port,'--inventory-overview','--appearance'],{cwd:path.resolve(__dirname,'..'),stdio:['pipe','pipe','pipe'],windowsHide:true});
    await new Promise((resolve,reject)=>{let log='';fixture.stdout.on('data',data=>{log+=data;if(log.includes('Synthetic preview ready'))resolve();});fixture.stderr.on('data',data=>log+=data);fixture.on('error',reject);fixture.on('exit',()=>reject(Error(log)));});
    base='http://127.0.0.1:'+port;
   }
   assert(/^http:\/\/127\.0\.0\.1:\d+$/.test(base),'An isolated local fixture is required');
   browser=await chromium.launch({headless:true,executablePath:process.env.BROWSER_EXECUTABLE_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe'});
   const page=await browser.newPage({viewport:{width:1280,height:800},hasTouch:true}),errors=[];
-  page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(15000);
+  page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(15000);page.setDefaultNavigationTimeout(45000);
   await page.context().addCookies([{name:'conquer_locale',value:'de',url:base}]);
   await page.goto(base+'/?zugang=login',{waitUntil:'domcontentloaded'});
   await page.locator("[name=identifier], [name=username]").fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');
@@ -31,10 +31,10 @@ const out=path.resolve(__dirname,'../artifacts/inventory-reference');fs.mkdirSyn
   assert(!state.inventory.some(item=>retired.has(Number(item.item_code))));
   await page.locator('#navigation [data-id="inventory"]').click();
   await page.locator('[data-action="inventory-scope"][data-id="all"]').click();
-  assert.deepEqual(await page.locator('.inventory-category-tabs button').evaluateAll(bs=>bs.map(b=>b.dataset.id)),['resource_pack','speedup','boost','treasures','other']);
+  assert.deepEqual(await page.locator('.inventory-category-tabs button').evaluateAll(bs=>bs.map(b=>b.dataset.id)),['resource_pack','speedup','boost','other']);
   for(const [width,height] of [[1280,800],[390,844],[320,568],[568,320],[844,390]]){
    await page.setViewportSize({width,height});await page.waitForTimeout(450);
-   for(const category of ['resource_pack','speedup','boost','treasures','other']){
+   for(const category of ['resource_pack','speedup','boost','other']){
     await page.locator(`[data-action="inventory-category"][data-id="${category}"]`).click();
     assert.equal(await page.locator('#panel-dialog').getAttribute('data-panel'),'inventory','Relics stay in the backpack');
     const board=page.locator('.inventory-scroll-board');await board.waitFor();

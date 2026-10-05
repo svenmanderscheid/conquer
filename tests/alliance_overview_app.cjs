@@ -9,7 +9,7 @@ const root = path.resolve(__dirname, '..');
 const view = fs.readFileSync(path.join(root, 'views/game.php'), 'utf8');
 const stylesheets = [...view.matchAll(/assets\/css\/([^?"']+)\?/g)].map(match => match[1]);
 const styles = stylesheets.map(name => fs.readFileSync(path.join(root, 'assets/css', name), 'utf8')).join('\n');
-const source = fs.readFileSync(path.join(root, 'assets/js/alliance-ranks.js'), 'utf8') + '\n' + fs.readFileSync(path.join(root, 'assets/js/mvp-panels.js'), 'utf8');
+const source = fs.readFileSync(path.join(root, 'assets/js/alliance-ranks.js'), 'utf8') + '\n' + fs.readFileSync(path.join(root, 'assets/js/relic-presentation.js'), 'utf8') + '\n' + fs.readFileSync(path.join(root, 'assets/js/mvp-panels.js'), 'utf8');
 const output = fs.mkdtempSync(path.join(os.tmpdir(), 'conquer-alliance-overview-'));
 
 function playwright() {
@@ -34,7 +34,7 @@ async function main() {
             const esc = value => String(value ?? '').replace(/[&<>"']/g, character => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]));
             const members = Array.from({length:12}, (_, index) => ({player_id:index+1,display_name:index?'Gefährte '+index:'Sven von Grünland',avatar:'knight',role:index?'member':'leader',power:158495}));
             const kingdom = window.kingdom = {profile:{id:1},alliance:{id:1,name:'Wächter des Grünlands',tag:'WGR',leader_id:1,role:'leader',member_count:12,max_members:50,description:'Gemeinsam schützen wir das Grünland. Sprecht eure Feldzüge ab und unterstützt neue Gefährten.',members,treasury:{food:0,lumber:0,stone:0,gold:0}},alliances:[]};
-            const panels = window.panels = ConquerPanels({base:'',esc,fmt:value=>Number(value).toLocaleString('de-DE'),date:value=>new Date(value),duration:()=>'',countdown:()=>'',openDialog:html=>document.querySelector('#dialog-content').innerHTML=html,action:()=>{},api:()=>{},navigate:()=>{},refresh:()=>{},render:()=>panels.render('alliance'),toast:()=>{},costHtml:()=>'',getState:()=>({city:{world_id:1},world:{map_profile:{key:'luxembourg'}}}),getKingdom:()=>kingdom,getExpeditions:()=>({}),getMarket:()=>({}),getErrors:()=>({})});
+            const panels = window.panels = ConquerPanels({base:'',esc,fmt:value=>Number(value).toLocaleString('de-DE'),date:value=>new Date(value),duration:()=>'',countdown:()=>'',openDialog:html=>document.querySelector('#dialog-content').innerHTML=html,action:()=>{},api:()=>Promise.resolve({world_id:1,alliance_id:1,targets:[],goal:null}),navigate:()=>{},refresh:()=>{},render:()=>panels.render('alliance'),toast:()=>{},costHtml:()=>'',getState:()=>({city:{world_id:1},world:{map_profile:{key:'luxembourg'}}}),getKingdom:()=>kingdom,getExpeditions:()=>({}),getMarket:()=>({}),getErrors:()=>({})});
             document.addEventListener('click',event=>{const button=event.target.closest('[data-action]');if(button)panels.onClick(button.dataset.action,button);});
             panels.render('alliance');
             document.querySelector('#panel-dialog').showModal();
@@ -52,8 +52,8 @@ async function main() {
                 return {
                     actions:actions.length,
                     tabs:document.querySelectorAll('.alliance-home-tabs .subtab').length,
-                    about:overview.querySelector('[data-alliance-details="about"]').textContent,
-                    detailsOpen:overview.querySelector('[data-alliance-details="about"]').open,
+                    about:overview.querySelector('.alliance-home-profile').textContent,
+                    description:overview.querySelector('.alliance-full-description').textContent,
                     target:overview.querySelector('[data-action="territory-open"]').dataset.id,
                     frame:{left:frame.left,top:frame.top,right:frame.right,bottom:frame.bottom},
                     horizontalOverflow:overview.scrollWidth>overview.clientWidth+2,
@@ -61,10 +61,10 @@ async function main() {
                     lastReachable:last.top>=area.top-2&&last.bottom<=area.bottom+2,
                 };
             });
-            assert.equal(metrics.actions,4,'The overview exposes only four everyday destinations.');
+            assert.equal(metrics.actions,8,'The overview exposes all current alliance destinations.');
             assert.equal(metrics.tabs,3,'One navigation row groups overview, members and more.');
             assert.equal(metrics.target,'goal','Territories opens the shared objective first.');
-            assert.equal(metrics.detailsOpen,false,'Secondary alliance facts start collapsed.');
+            assert.match(metrics.description,/Gemeinsam schützen/,'The alliance description remains readable.');
             assert.match(metrics.about,/Sven von Grünland/,'Alliance details retain the real leader.');
             assert.match(metrics.about,/1\.901\.940/,'Member power is still aggregated in alliance details.');
             assert.equal(metrics.horizontalOverflow,false,'The overview must not scroll sideways.');
@@ -74,9 +74,8 @@ async function main() {
             await page.locator('.alliance-home-scroll').evaluate(overview => { overview.scrollTop = 0; });
             await page.screenshot({path:path.join(output,`alliance-${width}x${height}.png`)});
         }
-        await page.locator('[data-alliance-details="about"]>summary').click();
         await page.evaluate(()=>panels.render('alliance'));
-        assert.equal(await page.locator('[data-alliance-details="about"]').evaluate(details=>details.open),true,'A server refresh preserves expanded alliance details.');
+        assert.match(await page.locator('.alliance-home-profile').textContent(),/Sven von Grünland/,'A server refresh preserves alliance details.');
         await page.locator('.alliance-home-tabs [data-id="members"]').click();
         assert.equal(await page.locator('.alliance-home-members .member-identity').count(),12,'The member list exposes every member without pagination.');
         assert.equal(await page.locator('.panel-pagination').count(),0);

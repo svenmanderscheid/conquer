@@ -165,7 +165,7 @@ final class AdminService
     {
         $id=WorldSettings::integer($input['player_id']??0,1,2147483647,'Spieler-ID');
         $world=WorldSettings::integer($input['world_id']??0,1,2147483647,'Welt-ID');
-        $player=$db->query('SELECT id,username,is_banned,gems,vip_level,vip_points FROM players WHERE id=? FOR UPDATE',[$id])->fetch();
+        $player=$db->query('SELECT id,username,is_banned,gems FROM players WHERE id=? FOR UPDATE',[$id])->fetch();
         if(!$player)throw new \InvalidArgumentException('Spieler nicht gefunden.');
         $city=$db->query('SELECT * FROM cities WHERE player_id=? AND world_id=? FOR UPDATE',[$id,$world])->fetch();
         if(!$city)throw new \InvalidArgumentException('Der Spieler hat in dieser Welt keine Stadt.');
@@ -183,11 +183,12 @@ final class AdminService
                 $db->execute('UPDATE players SET gems=? WHERE id=?',[$after['gems'],$id]);break;
             case 'set-account-values':
                 $gems=WorldSettings::integer($input['gems']??null,0,2000000000,'Edelsteine');
-                $vip=WorldSettings::integer($input['vip_level']??null,1,15,'VIP-Stufe');
                 $points=WorldSettings::integer($input['vip_points']??null,0,2000000000,'VIP-Punkte');
-                $before=['gems'=>(int)$player['gems'],'vip_level'=>(int)$player['vip_level'],'vip_points'=>(int)$player['vip_points']];
-                $after=['gems'=>$gems,'vip_level'=>$vip,'vip_points'=>$points];
-                $db->execute('UPDATE players SET gems=?,vip_level=?,vip_points=? WHERE id=?',[$gems,$vip,$points,$id]);break;
+                $vip=\Conquer\Game\Vip\VipService::status($id,$world);
+                $before=['gems'=>(int)$player['gems'],'vip_level'=>$vip['level'],'vip_points'=>$vip['points']];
+                $after=['gems'=>$gems,'vip_level'=>\Conquer\Game\Vip\VipService::levelForPoints($points),'vip_points'=>$points];
+                \Conquer\Game\Vip\VipService::setPoints($id,$points,$world);
+                $db->execute('UPDATE players SET gems=? WHERE id=?',[$gems,$id]);break;
             case 'grant-shield':
                 $hours=WorldSettings::integer($input['hours']??0,1,720,'Schutzdauer');
                 $before=['is_shielded'=>$city['is_shielded'],'shield_expires_at'=>$city['shield_expires_at']];
@@ -252,13 +253,13 @@ final class AdminService
             $pid=(int)$recipient['player_id'];$cid=(int)$recipient['id'];
             $player=$db->query('SELECT gems FROM players WHERE id=? FOR UPDATE',[$pid])->fetch();
             $city=$db->query('SELECT food,lumber,stone,gold FROM cities WHERE id=? FOR UPDATE',[$cid])->fetch();
-            $oldItem=$item?(int)$db->query('SELECT quantity FROM player_inventory WHERE player_id=? AND item_code=? FOR UPDATE',[$pid,$item])->fetchColumn():0;
+            $oldItem=$item?InventoryService::quantity($pid,$item,$world,true):0;
             $before=array_map('intval',$city);$before['gems']=(int)$player['gems'];$before['item_quantity']=$oldItem;$after=$before;
             foreach(['food','lumber','stone','gold','gems'] as $r)$after[$r]+=$rewards[$r];$after['item_quantity']+=$quantity;
             if($after['gems']>2000000000||$after['item_quantity']>4000000000)throw new \InvalidArgumentException('Ein Empfänger würde das Bestandslimit überschreiten.');
             $db->execute('UPDATE cities SET food=food+?,lumber=lumber+?,stone=stone+?,gold=gold+? WHERE id=?',[$rewards['food'],$rewards['lumber'],$rewards['stone'],$rewards['gold'],$cid]);
             $db->execute('UPDATE players SET gems=gems+? WHERE id=?',[$rewards['gems'],$pid]);
-            if($item)InventoryService::addItems($pid,$item,$quantity);
+            if($item)InventoryService::addItems($pid,$item,$quantity,$world);
             $db->execute('INSERT INTO admin_gifts(operation_id,player_id,world_id,title,message,rewards_json,before_json,after_json) VALUES(?,?,?,?,?,?,?,?)',[$operation,$pid,$world,$title,$message,json_encode($rewards,JSON_THROW_ON_ERROR),json_encode($before,JSON_THROW_ON_ERROR),json_encode($after,JSON_THROW_ON_ERROR)]);
             $giftId=$db->lastInsertId();
             $db->execute("INSERT INTO notifications(player_id,type,data_json) VALUES(?,'admin_gift',?)",[$pid,json_encode(['gift_id'=>$giftId,'title'=>$title,'message'=>$message,'rewards'=>$rewards,'world_id'=>$world],JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR)]);

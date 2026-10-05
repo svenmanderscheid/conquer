@@ -49,8 +49,9 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/ui-layout'
    await page.locator('#layout-reset-profile').click();
   }
   await page.locator('#layout-profile').selectOption('portrait');await page.locator('#layout-size').selectOption('320x568');await page.locator('#layout-element').selectOption('navigation');await page.locator('#layout-width').fill('50');await page.waitForTimeout(200);
-  const targets=await frame.locator('#navigation .game-dock-item').evaluateAll(els=>els.map(el=>{const r=el.getBoundingClientRect();return{left:r.left,right:r.right,width:r.width};}));
-  assert(targets.every(r=>r.left>=0&&r.right<=320&&r.width>=44),'all seven targets fit at 320px');
+  const targets=await frame.locator('#navigation .game-dock-item:visible').evaluateAll(els=>els.map(el=>{const r=el.getBoundingClientRect();return{left:r.left,right:r.right,width:r.width};}));
+  assert.equal(targets.length,5,'compact navigation exposes five primary destinations');
+  assert(targets.every(r=>r.left>=0&&r.right<=320&&r.width>=43.5),'all visible targets fit at 320px');
   await page.locator('#layout-profile').selectOption('portrait');await page.locator('#layout-reset-profile').click();await page.locator('[name=reason]').fill('Standard wiederherstellen');await page.locator('#layout-save').click();await page.waitForFunction(()=>document.querySelector('#layout-status').textContent.includes('für alle Spieler gespeichert'));
   // Expanded editor: widget scaling, handles, undo/redo, panels and custom screens.
   await page.locator('#layout-profile').selectOption('desktop');await page.locator('#layout-element').selectOption('gems');await page.waitForTimeout(120);

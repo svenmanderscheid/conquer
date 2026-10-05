@@ -19,6 +19,7 @@ function formConfig(string $type,array $cfg):array{
     foreach($cfg[$type==='chest'?'drop_table':($type==='dungeon'?'items':'drops')]as$r)$form['rows'][]=['target'=>isset($r['fragment_grade'])?'fragment:'.$r['fragment_grade']:(string)$r['item_code'],'quantity'=>$r['quantity']??$r['count']??1,'chance'=>($r['probability']??0)*100,'weight'=>$r['weight']??1];
     if($type==='monster'){$form['resources']=$cfg['resource_reward'];$form['gems_chance']=$cfg['gems_drop']['chance']*100;$form['gems_amount']=$cfg['gems_drop']['amount'];$form['charms']['chance']*=100;}
     if($type==='dungeon')$form['item_chance']*=100;
+    $form['fragment_rows']=array_map(static fn(array $r):array=>['target'=>isset($r['treasure_code'])?'treasure:'.$r['treasure_code']:'fragment:'.$r['fragment_grade'],'quantity'=>$r['count'],'chance'=>$r['probability']*100],$cfg['fragment_drops']??[]);
     return $form;
 }
 function action(string $type,string $key,array $form,int $revision=0,?string $op=null,int $admin=1,string $action='reward-save'):array{
@@ -30,6 +31,7 @@ try{
     $db->execute("INSERT INTO admin_users(id,username,password_hash,role) VALUES(1,'RewardAdmin',?,'superadmin'),(2,'RewardModerator',?,'moderator')",[password_hash('Fixture-Reward-123!',PASSWORD_DEFAULT),password_hash('Fixture-Reward-123!',PASSWORD_DEFAULT)]);
     foreach(['monster','farm','dungeon','chest','expedition']as$type){foreach(R::sources($type)as$key=>$source){$cfg=R::defaults($type,(string)$key);R::validate($type,(string)$key,formConfig($type,$cfg));}ck(true,'Every '.$type.' source has a valid, editable default');}
     $f=formConfig('monster',R::defaults('monster','20209901'));$f['rows']=[['target'=>'10103001','quantity'=>7,'chance'=>100],['target'=>'10103002','quantity'=>9,'chance'=>0]];$f['gems_chance']=100;$f['gems_amount']=11;
+    $f['fragment_rows']=[['target'=>'treasure:60100001','quantity'=>3,'chance'=>100],['target'=>'fragment:epic','quantity'=>2,'chance'=>100],['target'=>'treasure:60100002','quantity'=>7,'chance'=>0]];
     $op=bin2hex(random_bytes(16));$a=action('monster','20209901',$f,0,$op);$b=action('monster','20209901',$f,0,$op);
     ck(!$a['duplicate']&&$b['duplicate']&&(int)$db->query('SELECT COUNT(*) FROM reward_overrides')->fetchColumn()===1,'Duplicate save creates exactly one revision');
     ck((int)$db->query("SELECT COUNT(*) FROM admin_audit_log WHERE action='admin.reward-save'")->fetchColumn()===1,'Save and audit commit together');
@@ -42,6 +44,12 @@ try{
     $bad=$f;$bad['rows'][0]['quantity']=-1;reject(fn()=>action('monster','20209901',$bad,1),'Negative quantity is rejected');
     $bad=$f;$bad['rows'][0]['chance']=['100'];reject(fn()=>action('monster','20209901',$bad,1),'Array payload is rejected');
     $bad=$f;$bad['rows'][]=$bad['rows'][0];reject(fn()=>action('monster','20209901',$bad,1),'Duplicate item rows are rejected');
+    foreach(['treasure:60500101','fragment:mythic','treasure:99999999','10103001'] as $target){$bad=$f;$bad['fragment_rows'][0]['target']=$target;reject(fn()=>action('monster','20209901',$bad,1),'Unavailable fragment target rejected: '.$target);}
+    $bad=$f;$bad['fragment_rows'][]=$bad['fragment_rows'][0];reject(fn()=>action('monster','20209901',$bad,1),'Duplicate fragment rows are rejected');
+    $bad=$f;$bad['fragment_rows'][0]['quantity']=0;reject(fn()=>action('monster','20209901',$bad,1),'Zero fragment quantity is rejected');
+    $bad=$f;$bad['fragment_rows'][0]['chance']=101;reject(fn()=>action('monster','20209901',$bad,1),'Fragment chance above 100 is rejected');
+    $bad=$f;$bad['fragment_rows'][0]['chance']=['100'];reject(fn()=>action('monster','20209901',$bad,1),'Array fragment chance is rejected');
+    $bad=$f;$bad['fragment_rows'][0]['chance']=12.3456;ck(R::validate('monster','20209901',$bad)['fragment_drops'][0]['probability']===.123456,'Fractional fragment chance is preserved');
     reject(fn()=>action('monster','../../config/database.php',$f),'Arbitrary source paths are rejected');
     ck((int)$db->query('SELECT revision FROM reward_overrides')->fetchColumn()===1,'Rejected requests do not change the saved revision');
     action('monster','20209901',[],1,null,1,'reward-reset');
@@ -75,14 +83,22 @@ try{
     $db->execute("INSERT INTO marches(player_id,world_id,march_type,origin_city_id,target_x,target_y,target_type,target_id,departure_time,arrival_time,state,troops_json) VALUES(1,1,5,1,70,70,3,?,DATE_SUB(UTC_TIMESTAMP(),INTERVAL 120 SECOND),DATE_SUB(UTC_TIMESTAMP(),INTERVAL 1 SECOND),'marching',?)",[$monsterId,json_encode(['50100101'=>1000])]);$marchId=$db->lastInsertId();
     \Conquer\Game\World\WorldContext::bind(1,1);\Conquer\Game\March\MarchTick::runForPlayer(1);
     $haul=json_decode($db->query('SELECT haul_json FROM marches WHERE id=?',[$marchId])->fetchColumn(),true);
+    ck(($haul['fragments'][60100001]??0)===3&&array_sum($haul['fragments'])===5&&!isset($haul['fragments'][60100002]),'Solo victory freezes specific and random fragment drops and excludes zero chance');
+    $randomCode=(int)array_values(array_diff(array_keys($haul['fragments']),[60100001]))[0];
+    ck(\Conquer\Game\Treasure\TreasureData::get($randomCode)['grade']==='epic','Random fragment roll selects an available relic of the configured grade');
+    ck((int)$db->query('SELECT COUNT(*) FROM player_treasures WHERE player_id=1')->fetchColumn()===0,'Solo fragments wait for the army return');
+    $report=\Conquer\Game\Rewards\RewardPresentation::report(json_decode($db->query('SELECT data_json FROM battle_reports WHERE march_id=?',[$marchId])->fetchColumn(),true));
+    ck(count($report['fragment_rewards'])===2&&array_sum(array_column($report['fragment_rewards'],'count'))===5,'Monster report presents confirmed relic fragments with catalogue metadata');
     ck(($haul['items'][10103001]??null)===7&&($haul['loot']['gems']??null)===11,'Actual solo combat stores configured items and gems in the return haul');
     ck((int)$db->query('SELECT quantity FROM player_inventory WHERE player_id=1 AND item_code=10103001')->fetchColumn()===6,'Solo rewards wait for the army return');
     $db->execute('UPDATE marches SET return_time=UTC_TIMESTAMP() WHERE id=?',[$marchId]);\Conquer\Game\March\MarchTick::runForPlayer(1);\Conquer\Game\March\MarchTick::runForPlayer(1);
     ck((int)$db->query('SELECT quantity FROM player_inventory WHERE player_id=1 AND item_code=10103001')->fetchColumn()===13&&(int)$db->query('SELECT gems FROM players WHERE id=1')->fetchColumn()===11,'Returning solo army credits items and gems exactly once');
+    ck((int)$db->query('SELECT fragments FROM player_treasures WHERE player_id=1 AND treasure_code=60100001')->fetchColumn()===3&&(int)$db->query('SELECT SUM(fragments) FROM player_treasures WHERE player_id=1')->fetchColumn()===5,'Returning solo army credits the stored relic fragments exactly once');
     action('monster','20209901',[],3,null,1,'reward-reset');
-    $farm=['rows'=>[['target'=>'10103001','quantity'=>3,'chance'=>100],['target'=>'10103002','quantity'=>2,'chance'=>0]]];
+    $farm=['rows'=>[['target'=>'10103001','quantity'=>3,'chance'=>100],['target'=>'10103002','quantity'=>2,'chance'=>0]],'fragment_rows'=>[['target'=>'treasure:60100001','quantity'=>1,'chance'=>100]]];
     action('farm','20100101.1',$farm);
     ck(R::rollItems(R::effective('farm','20100101.1',1)['drops'])===[10103001=>3],'Farm uses saved independent item chances');
+    ck(R::rollFragments(R::effective('farm','20100101.1',1)['fragment_drops'])===[60100001=>1],'Farm fragment settings save and roll independently of items');
     reject(fn()=>action('farm','20100101.999',$farm),'Unknown farm level rejected');
     reject(fn()=>action('farm','20100101.1',$farm,0),'Stale farm save rejected');
     action('farm','20100101.1',[],1,null,1,'reward-reset');

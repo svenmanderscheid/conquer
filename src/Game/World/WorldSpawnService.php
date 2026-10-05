@@ -58,6 +58,7 @@ final class WorldSpawnService
         $villageExisting=(int)$db->query('SELECT COUNT(*) FROM neutral_villages WHERE world_id=?',[$worldId])->fetchColumn();
         $villageBudget=min((int)ceil($budget*.20),max(0,$villageTarget-$villageExisting));
         $budget-=$villageBudget;
+        $entry=WorldEntry::settings($worldId);
         foreach(['resource','monster'] as $kind) {
             $table=$kind==='resource'?'field_objects':'field_monsters';
             $existing=(int)$db->query('SELECT COUNT(*) FROM '.$table.' WHERE world_id=?',[$worldId])->fetchColumn();
@@ -78,6 +79,12 @@ final class WorldSpawnService
                 $placed=false;
                 for($attempt=0;$attempt<30;$attempt++) {
                     $x=random_int(1,$width-2);$y=random_int(1,$height-2);
+                    if ($entry && $entry['spawn_x']!==null && random_int(1,10)<=7) {
+                        $r=(int)$entry['spawn_radius'];
+                        $x=random_int(max(1,(int)$entry['spawn_x']-$r),min($width-2,(int)$entry['spawn_x']+$r));
+                        $y=random_int(max(1,(int)$entry['spawn_y']-$r),min($height-2,(int)$entry['spawn_y']+$r));
+                        if ($entry['spawn_canton']!==null && (LuxembourgGeography::at($x,$y)['canton_id']??null)!==$entry['spawn_canton']) continue;
+                    }
                     if($kind==='resource'&&!WorldPlacement::canPlace($db,$worldId,$kind,$x,$y))continue;
                     if($kind==='monster'){
                         $candidates=RegionalSpawns::candidates($worldId,$type,$x,$y,$cfg['monster_level_min'],$cfg['monster_level_max'],random_int(1,10)===1);

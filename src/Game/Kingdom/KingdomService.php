@@ -62,6 +62,7 @@ final class KingdomService
                 'inventory_catalog'=>KingdomInventory::catalog($playerId),
                 'inventory_shop'=>KingdomInventory::shop(),
                 'quests'=>DailyQuestService::getQuests($playerId),
+                'alpha_entry'=>\Conquer\Game\World\WorldEntry::settings(WorldContext::id()),
                 'quest_resets_at'=>gmdate('Y-m-d 00:00:00', strtotime('tomorrow UTC')),
                 'hospital'=>$hospital,
                 'treasures'=>TreasureService::state($playerId),
@@ -285,7 +286,7 @@ final class KingdomService
             'alliance'=>$membership ?: null,'stats'=>$p['stats'],'achievements'=>$achievements,
             'created_at'=>$extra['created_at'],'is_self'=>$target===$viewer];
         if ($target === $viewer) {
-            $balances = $db->query('SELECT gems,vip_points FROM players WHERE id=?', [$viewer])->fetch();
+            $balances = $db->query('SELECT gems FROM players WHERE id=?', [$viewer])->fetch();
             $ap = ActionPoints::get($viewer);
             $profile['gems'] = (int) $balances['gems'];
             $profile['action_points'] = $ap['current'];
@@ -294,7 +295,7 @@ final class KingdomService
             $profile['lord_xp'] = $lord['xp'];
             $profile['lord_xp_into'] = $lord['xp_into_level'];
             $profile['lord_xp_next'] = $lord['xp_next'];
-            $profile['prestige_points'] = (int) $balances['vip_points'];
+            $profile['prestige_points'] = \Conquer\Game\Vip\VipService::status($viewer,WorldContext::id())['points'];
         }
         return $profile;
     }

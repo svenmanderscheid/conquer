@@ -7,6 +7,7 @@ use Conquer\Db\Connection;
 use Conquer\Game\Hospital\HospitalService;
 use Conquer\Game\Vip\VipService;
 use Conquer\Game\Buff\ActiveBuffService;
+use Conquer\Game\World\WorldContext;
 
 /**
  * Player item inventory — add, remove, and use consumable items.
@@ -33,8 +34,8 @@ final class InventoryService
     /** Path to item definitions. Resolved from ROOT_DIR at runtime. */
     private const ITEMS_FILE = 'data/items.json';
 
-    /** Removed timed construction/research boosts. Never reuse these saved inventory IDs. */
-    public const RETIRED_ITEMS = [10102021, 10102031, 10202010, 10202011];
+    /** Removed boosts and mythic relic fragments. Never reuse these saved inventory IDs. */
+    public const RETIRED_ITEMS = [10102021, 10102031, 10202010, 10202011, 10207005];
 
     public static function isRetired(int $code): bool
     {
@@ -82,6 +83,13 @@ final class InventoryService
         return array_diff_key(self::$defs ?? [], array_flip(self::RETIRED_ITEMS));
     }
 
+    /** Historical placeholder inventory stays intact; it must never enter new loot. */
+    public static function isDropEligible(int $code): bool
+    {
+        $def=self::getItemDef($code);
+        return $def!==null && !preg_match('/^(?:Unassigned item|Unzugeordneter Gegenstand)\b/i',(string)($def['name_de']??$def['name']??''));
+    }
+
     // -------------------------------------------------------------------------
     // Inventory mutations
     // -------------------------------------------------------------------------
@@ -90,17 +98,19 @@ final class InventoryService
      * Grants $quantity of $itemCode to a player.
      * Creates the row if it doesn't exist yet.
      */
-    public static function addItems(int $playerId, int $itemCode, int $quantity): void
+    public static function addItems(int $playerId, int $itemCode, int $quantity, ?int $worldId = null): void
     {
-        if ($quantity <= 0 || self::isRetired($itemCode)) {
+        if ($quantity <= 0 || !self::isDropEligible($itemCode)) {
             return;
         }
 
+        $scope=self::scope($itemCode,$worldId);
+        if($scope>0)WorldContext::city($playerId,$scope);
         Connection::getInstance()->execute(
-            'INSERT INTO player_inventory (player_id, item_code, quantity)
-             VALUES (?, ?, ?)
+            'INSERT INTO player_inventory (player_id, world_id, item_code, quantity)
+             VALUES (?, ?, ?, ?)
              ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity)',
-            [$playerId, $itemCode, $quantity],
+            [$playerId, $scope, $itemCode, $quantity],
         );
     }
 
@@ -109,7 +119,7 @@ final class InventoryService
      *
      * Returns false if the player doesn't have enough quantity (no mutation happens).
      */
-    public static function removeItems(int $playerId, int $itemCode, int $quantity): bool
+    public static function removeItems(int $playerId, int $itemCode, int $quantity, ?int $worldId = null): bool
     {
         if ($quantity <= 0) {
             return true;
@@ -123,19 +133,30 @@ final class InventoryService
              SET    quantity = quantity - ?
              WHERE  player_id = ?
                AND  item_code = ?
+               AND  world_id = ?
                AND  quantity  >= ?',
-            [$quantity, $playerId, $itemCode, $quantity],
+            [$quantity, $playerId, $itemCode, self::scope($itemCode,$worldId), $quantity],
         );
 
         return $affected > 0;
     }
 
-    /**
-     * Returns the full inventory for a player, enriched with item definitions.
-     *
-     * @return list<array<string, mixed>>
-     */
-    public static function getInventory(int $playerId): array
+    /** Only VIP consumables are world-bound; the remaining inventory keeps scope 0. */
+    private static function scope(int $itemCode, ?int $worldId = null): int
+    {
+        return (self::getItemDef($itemCode)['category']??'')==='vip_point' ? ($worldId??WorldContext::id()) : 0;
+    }
+
+    public static function quantity(int $playerId, int $itemCode, ?int $worldId = null, bool $lock = false): int
+    {
+        return (int)Connection::getInstance()->query(
+            'SELECT quantity FROM player_inventory WHERE player_id=? AND world_id=? AND item_code=?'.($lock?' FOR UPDATE':''),
+            [$playerId,self::scope($itemCode,$worldId),$itemCode],
+        )->fetchColumn();
+    }
+
+    /** Returns the inventory visible in this world, enriched with item definitions. */
+    public static function getInventory(int $playerId, ?int $worldId = null): array
     {
         self::loadDefs();
 
@@ -143,11 +164,11 @@ final class InventoryService
 
         try {
             $rows = $db->query(
-                'SELECT item_code, quantity
+                'SELECT item_code, quantity, world_id
                  FROM   player_inventory
-                 WHERE  player_id = ? AND quantity > 0
+                 WHERE  player_id = ? AND quantity > 0 AND world_id IN (0,?)
                  ORDER  BY item_code ASC',
-                [$playerId],
+                [$playerId,$worldId??WorldContext::id()],
             )->fetchAll();
         } catch (\PDOException) {
             return [];
@@ -157,6 +178,7 @@ final class InventoryService
 
         foreach ($rows as $row) {
             $code = (int) $row['item_code'];
+            if((int)$row['world_id']!==self::scope($code,$worldId))continue;
             if (self::isRetired($code)) continue;
             $def  = self::$defs[$code] ?? null;
 

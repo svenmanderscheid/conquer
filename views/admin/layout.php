@@ -27,6 +27,7 @@ $newBugCount=(int)$db->query("SELECT COUNT(*) FROM bug_reports WHERE world_id=? 
 <?php if($activePage==='layout_editor'): ?><link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/layout-editor.css?v=<?= filemtime(ROOT_DIR.'/assets/css/layout-editor.css') ?>"><?php endif ?>
 <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/village-theme.css?v=<?= filemtime(ROOT_DIR.'/assets/css/village-theme.css') ?>">
 <?php require ROOT_DIR.'/views/partials/localization-head.php'; ?>
+<?php if($activePage==='rewards'): ?><script src="<?= APP_BASE ?>/assets/js/relic-presentation.js?v=<?= filemtime(ROOT_DIR.'/assets/js/relic-presentation.js') ?>" defer></script><?php endif ?>
 <script src="<?= APP_BASE ?>/assets/js/admin-backoffice.js?v=<?= filemtime(ROOT_DIR.'/assets/js/admin-backoffice.js') ?>" defer></script>
 </head><body class="admin-village" data-i18n-scope>
 <a class="skip-link" href="#main">Zum Inhalt</a>

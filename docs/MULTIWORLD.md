@@ -14,7 +14,22 @@ replaying an old selection cannot undo a subsequent selection. An old browser
 tab must send its original world with `X-World-ID` or `expected_world_id` so the
 request guard can reject stale actions with HTTP 409.
 
-Account profile, gems, VIP, items and treasures remain account-wide. Cities,
+Each account can create exactly one village in one world. A person may register
+a separate account for another village. Existing multiworld villages remain
+accessible for now. Creation locks the player row so concurrent requests for
+different worlds cannot both add a village to the same account.
+Registration lets a new account choose an open/running world, with the configured
+default world preselected. The server validates the selection inside the account
+creation transaction, so a closed world consumes neither the account nor its key.
+
+VIP progress, daily claims, bonuses and VIP consumables belong to their world.
+Migration 0129 preserves the previous account progress and unused VIP packs once,
+in the oldest surviving city (smallest city ID). Other existing worlds start at
+VIP 1 with 200 points. Legacy player VIP columns are retained for migration only.
+VIP shop weekly stock is also world-specific. Reapplying the migration does not
+overwrite world progress. Creating a first village starts a fresh VIP profile.
+
+Account profile, gems, other items and treasures retain their existing scope. Cities,
 resources, building/research queues, garrisons, rankings, arena challenges,
 alliances, mail/chat, shipments and expeditions follow the selected world.
 Alliance membership is unique per player and world. Historic expedition rewards

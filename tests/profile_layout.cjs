@@ -9,7 +9,7 @@ const assert = require('assert');
 
 const root = path.resolve(__dirname, '..');
 const view = fs.readFileSync(path.join(root, 'views/game.php'), 'utf8');
-const panels = fs.readFileSync(path.join(root, 'assets/js/alliance-ranks.js'), 'utf8') + '\n' + fs.readFileSync(path.join(root, 'assets/js/mvp-panels.js'), 'utf8');
+const panels = fs.readFileSync(path.join(root, 'assets/js/alliance-ranks.js'), 'utf8') + '\n' + fs.readFileSync(path.join(root, 'assets/js/relic-presentation.js'), 'utf8') + '\n' + fs.readFileSync(path.join(root, 'assets/js/mvp-panels.js'), 'utf8');
 const sheets = [...view.matchAll(/assets\/css\/([^?"']+)\?/g)].map(match => match[1]);
 const styles = sheets.map(name => fs.readFileSync(path.join(root, 'assets/css', name), 'utf8')).join('\n');
 const output = fs.mkdtempSync(path.join(os.tmpdir(), 'conquer-profile-layout-'));

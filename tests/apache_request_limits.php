@@ -11,7 +11,7 @@ $binary = $apache.'/bin/httpd.exe';
 if (!is_file($binary) || !is_file($php.'/php8apache2_4.dll')) {
     fwrite(STDERR,"XAMPP Apache/PHP module required; no server configuration changed.\n"); exit(2);
 }
-$root = str_replace('\\','/',sys_get_temp_dir()).'/conquer_http_limits_'.bin2hex(random_bytes(6));
+$root = str_replace('\\','/',dirname(__DIR__)).'/.codex-tmp/conquer_http_limits_'.bin2hex(random_bytes(6));
 $server = null; $checks = 0;
 function checkHttp(bool $ok, string $label): void {
     global $checks;
@@ -52,12 +52,13 @@ try {
     foreach(['authz_core','alias','rewrite','headers','mime'] as $module)$modules.="LoadModule {$module}_module \"$apache/modules/mod_$module.so\"\n";
     $config="ServerRoot \"$apache\"\nListen 127.0.0.1:$port\nServerName localhost\nPidFile \"$root/httpd.pid\"\nErrorLog \"$root/error.log\"\nLogLevel warn\n".$modules
         ."LoadFile \"$php/php8ts.dll\"\nLoadFile \"$php/libpq.dll\"\nLoadFile \"$php/libsqlite3.dll\"\nLoadModule php_module \"$php/php8apache2_4.dll\"\nPHPIniDir \"$php\"\n"
-        ."TypesConfig \"$apache/conf/mime.types\"\nDocumentRoot \"$root/www\"\n<Directory \"$root/www\">\nAllowOverride All\nOptions FollowSymLinks\nRequire all granted\n</Directory>\n"
+        ."TypesConfig \"$apache/conf/mime.types\"\nDocumentRoot \"$root/www\"\n<Directory />\nAllowOverride None\nRequire all denied\n</Directory>\n<Directory \"$root/www\">\nAllowOverride All\nOptions FollowSymLinks\nRequire all granted\n</Directory>\n"
         ."<FilesMatch \\\.php$>\nSetHandler application/x-httpd-php\n</FilesMatch>\n";
     file_put_contents($root.'/httpd.conf',$config);
-    $syntax=proc_open([$binary,'-t','-f',$root.'/httpd.conf'],[0=>['pipe','r'],1=>['file',$root.'/syntax.log','w'],2=>['file',$root.'/syntax.log','a']],$pipes,$apache.'/bin',null,['bypass_shell'=>true]);
+    $nativeConfig='httpd.conf';
+    $syntax=proc_open([$binary,'-t','-f',$nativeConfig,'-d',$root],[0=>['pipe','r'],1=>['file',$root.'/syntax.log','w'],2=>['file',$root.'/syntax.log','a']],$pipes,$root,null,['bypass_shell'=>true]);
     fclose($pipes[0]);checkHttp(is_resource($syntax)&&proc_close($syntax)===0,'isolated Apache configuration syntax');
-    $server=proc_open([$binary,'-f',$root.'/httpd.conf','-DFOREGROUND'],[0=>['pipe','r'],1=>['file',$root.'/server.log','a'],2=>['file',$root.'/server.log','a']],$pipes,$apache.'/bin',null,['bypass_shell'=>true]);
+    $server=proc_open([$binary,'-f',$nativeConfig,'-d',$root,'-DFOREGROUND'],[0=>['pipe','r'],1=>['file',$root.'/server.log','a'],2=>['file',$root.'/server.log','a']],$pipes,$root,null,['bypass_shell'=>true]);
     if(!is_resource($server))throw new RuntimeException('Cannot start isolated Apache');fclose($pipes[0]);
     $ready=false;
     for($attempt=0;$attempt<50;$attempt++){$probe=@fsockopen('127.0.0.1',$port,$errno,$error,.1);if($probe){fclose($probe);$ready=true;break;}usleep(100000);}

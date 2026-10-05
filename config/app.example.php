@@ -27,6 +27,7 @@ return [
     'world_speed_factor' => 1.0,
     'max_players_per_world' => 5000,
     'beginner_shield_days' => 7,
+    'alpha_no_payments' => true,
     'inactive_hide_days' => 30,
 
     // Local-only convenience. Keep false outside a private development database.

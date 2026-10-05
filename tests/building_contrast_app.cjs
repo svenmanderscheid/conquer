@@ -33,6 +33,7 @@ assert(ratio(hex('#8f99a6'),hex('#213e57'))<4.5,'Regression oracle rejects its d
    Object.assign(b,{level:1,cost:{food:6800,lumber:6800,stone:6800,gold:4080},seconds:120,requirements:{castle:2,barrack:2},item_requirements:[],rally_capacity:{base:50000,next_base:75000,research_bonus:0.4,total:70000,next_total:105000,levels:[]}});
    Object.assign(s.buildings.castle,{level:2});Object.assign(s.buildings.barrack,{level:2});
    Object.assign(s.city,{food:mode==='blocked'?1879:99999,lumber:mode==='blocked'?3844:99999,stone:99999,gold:99999});
+   if(mode==='prerequisites'){b.requirements={barrack:2,castle:4};s.buildings.castle.level=2;}
    if(mode==='complete')b.level=30;
    s.build_queue=mode==='active'?[{id:991,building_code:'hall_of_alliance',level_to:2,started_at:new Date(Date.now()-60000).toISOString().slice(0,19).replace('T',' '),finishes_at:new Date(Date.now()+600000).toISOString().slice(0,19).replace('T',' ')}]:[];
    if(mode.startsWith('queue-')){
@@ -42,17 +43,19 @@ assert(ratio(hex('#8f99a6'),hex('#213e57'))<4.5,'Regression oracle rejects its d
    }
    await route.fulfill({response,json});
   });
-  await page.goto(app.base,{waitUntil:'networkidle'});
+  await page.goto(app.base,{waitUntil:'domcontentloaded'});
   const csrf=await page.locator('[name="csrf"]').first().inputValue();
   await page.request.post(app.base+'/auth/local',{form:{csrf,mode:'login',identifier:'PreviewPlayer',password:'PreviewFixture!2026'}});
-  await page.goto(app.base+'/city',{waitUntil:'networkidle'});
+  await page.goto(app.base+'/city',{waitUntil:'domcontentloaded'});
 
   let viewSequence=0;
   async function open(code='hall_of_alliance'){
    // A fresh URL makes this one full navigation, even after the previous
    // dialog leaves the address at #city; same-document navigation keeps it open.
-   await page.goto(app.base+'/city?visual_check='+(++viewSequence)+'#city',{waitUntil:'networkidle'});
+   await page.goto(app.base+'/city?visual_check='+(++viewSequence)+'#city',{waitUntil:'domcontentloaded'});
    await page.locator('.painted-village').waitFor();
+   await page.locator('#app-start').waitFor({state:'detached'});
+   await page.locator('#scene-transition').waitFor({state:'hidden'});
    const building=page.locator('.painted-village-building[data-id="'+code+'"]');
    await building.evaluate(el=>el.scrollIntoView({block:'center',inline:'center'}));
    const position=await building.evaluate(el=>{const r=el.getBoundingClientRect();for(const fy of [.5,.7,.3,.9,.1])for(const fx of [.5,.7,.3,.9,.1]){const x=r.width*fx,y=r.height*fy;if(el.contains(document.elementFromPoint(r.x+x,r.y+y)))return{x,y};}return null;});
@@ -72,12 +75,12 @@ assert(ratio(hex('#8f99a6'),hex('#213e57'))<4.5,'Regression oracle rejects its d
    assert.deepEqual((await overview.locator('.levelup-levels').innerText()).split(/\s+/),['Stufe','1','➜','Stufe','2']);
    assert.deepEqual(await overview.locator('.levelup-stat :is(strong,b)').allInnerTexts(),['50.000','75.000','70.000','105.000']);
    assert.equal((await dialog.locator('.building-requirements .research-requirements-heading span').innerText()).trim(),'2 / 2 erfüllt');assert.equal(await dialog.locator('.building-requirements .requirement-met').count(),2);
-   const costs=(await dialog.locator('.levelup-resource-row').allInnerTexts()).map(x=>x.trim().replace(/\s+/g,' '));assert.deepEqual(costs,['! Nahrung 1.879/6.800','! Holz 3.844/6.800','✓ Stein 99.999/6.800','✓ Gold 99.999/4.080']);
+   const costs=(await dialog.locator('.levelup-resource-row').allInnerTexts()).map(x=>x.trim().replace(/\s+/g,' '));assert.deepEqual(costs,['! Nahrung 1.879/6.800 Es fehlen 4.921','! Holz 3.844/6.800 Es fehlen 2.956','✓ Stein 99.999/6.800 Vorhanden','✓ Gold 99.999/4.080 Vorhanden']);
    assert.equal(await dialog.locator('.levelup-resource-row.is-missing').count(),2);
    assert(await upgrade.isDisabled());assert.equal((await upgrade.innerText()).trim(),'Ausbau auf Stufe 2 starten');await upgrade.scrollIntoViewIfNeeded();
    const reachable=await upgrade.evaluate(el=>{const r=el.getBoundingClientRect();return{left:r.left,right:r.right,top:r.top,bottom:r.bottom,height:r.height,innerWidth,innerHeight};});assert(reachable.left>=0&&reachable.right<=reachable.innerWidth+1&&reachable.top>=0&&reachable.bottom<=reachable.innerHeight+1,'Disabled upgrade remains scroll-reachable at '+size.join('x')+': '+JSON.stringify(reachable));
    const close=await dialog.locator('.dialog-close:visible,.mobile-page-back:visible').first().evaluate(el=>{const r=el.getBoundingClientRect();return{left:r.left,right:r.right,top:r.top,bottom:r.bottom,height:r.height};});assert(close.left>=0&&close.right<=size[0]+1&&close.top>=0&&close.bottom<=size[1]+1&&close.height>0,'Close/scroll control remains visible at '+size.join('x'));
-   const samples=await contrast('.levelup-levels span,.levelup-levels strong,.levelup-stat>span:first-child,.levelup-stat strong,.levelup-stat b,.levelup-resource-row strong,.levelup-resource-values,#game-dialog [data-action="upgrade"]');
+   const samples=await contrast('.levelup-levels span,.levelup-levels strong,.levelup-stat>span:first-child,.levelup-stat strong,.levelup-stat b,.levelup-resource-row strong,.levelup-resource-values,.requirements-overview strong,.requirement-status,.requirement-levels b,.requirement-card-footer strong,#game-dialog [data-action="upgrade"]');
    assert(samples.length>=12,'All requested dialog text samples exist');for(const sample of samples){assert.deepEqual(sample.gradients,[],`${size.join('x')} text background chain has an unmeasured gradient: ${sample.text}`);assert(sample.ratio>=4.5,`${size.join('x')} contrast ${sample.ratio.toFixed(2)}: ${sample.text} (${sample.color} on ${sample.background})`);}
    const scroll=dialog.locator('.levelup-scroll');assert.equal(await scroll.count(),1,'Upgrade content shares one scroll area');
    assert(await overview.evaluate(el=>el.querySelector('.levelup-stats').getBoundingClientRect().bottom<=el.getBoundingClientRect().bottom+1),'Improvement values stay inside the overview surface');
@@ -88,6 +91,24 @@ assert(ratio(hex('#8f99a6'),hex('#213e57'))<4.5,'Regression oracle rejects its d
    report.push({size:size.join('x'),samples});await page.screenshot({path:path.join(output,'alliance-upgrade-'+size.join('x')+'.png')});
   }
   for(const size of [[1280,800],[390,844],[320,568],[844,390],[568,320]])await inspect(size);
+  for(const size of [[1280,800],[390,844],[320,568],[844,390],[568,320]]){
+   await page.setViewportSize({width:size[0],height:size[1]});mode='prerequisites';await open();
+   const cards=page.locator('.building-requirements .requirement-card');
+   assert.equal(await cards.first().getAttribute('data-id'),'castle','Unmet upgrade precedes the fulfilled barracks');
+   assert.match(await cards.first().innerText(),/Aktuell\s+Stufe 2\s+→\s+Benötigt\s+Stufe 4/);
+   assert.match(await cards.first().innerText(),/Noch 2 Stufen nötig/);
+   assert.equal(await cards.first().locator('[role=progressbar]').getAttribute('aria-valuenow'),'2');
+   assert.equal(await cards.first().locator('[role=progressbar]').getAttribute('aria-valuemax'),'4');
+   assert.equal(await cards.last().locator('[role=progressbar]').getAttribute('aria-valuenow'),'2');
+   assert.match(await page.locator('.requirements-overview').innerText(),/Noch 1 Voraussetzung offen/);
+   assert(await page.locator('[data-action=upgrade]').isDisabled());
+   await cards.first().scrollIntoViewIfNeeded();
+   assert(await cards.evaluateAll(elements=>elements.every(el=>el.scrollWidth<=el.clientWidth+1)),'Requirement copy fits each card');
+   const samples=await contrast('.requirement-status,.requirement-levels b,.requirement-card-footer strong,.requirements-overview strong');
+   for(const sample of samples)assert(sample.ratio>=4.5,'Prerequisite contrast: '+sample.text);
+   await page.screenshot({path:path.join(output,'building-prerequisites-'+size.join('x')+'.png')});
+   await cards.first().click();assert.equal(await page.locator('#game-dialog').getAttribute('data-building'),'castle','Requirement opens its actual upgrade menu');
+  }
   for(const size of [[1280,800],[390,844],[844,390]]){
    await page.setViewportSize({width:size[0],height:size[1]});
    for(const scenario of ['queue-free','queue-full','queue-vip3','queue-items']){
@@ -99,9 +120,9 @@ assert(ratio(hex('#8f99a6'),hex('#213e57'))<4.5,'Regression oracle rejects its d
    }
   }
   for(const scenario of ['affordable','active']){mode=scenario;await open();if(scenario==='affordable'){const button=page.locator('#game-dialog [data-action="upgrade"]');assert(!await button.isDisabled());assert.equal((await button.innerText()).trim(),'Ausbau auf Stufe 2 starten');}else{assert.equal((await page.locator('#game-dialog .popup-heading h2').textContent()).trim(),'Ausbau läuft');assert.match(await page.locator('#dialog-content').innerText(),/Stufe 2 wird gebaut/);}report.push({scenario});}
-  mode='affordable';await page.goto(app.base+'/city?visual_check='+(++viewSequence)+'#city',{waitUntil:'networkidle'});await page.locator('#hud-build').click();await page.locator('#game-dialog[open][data-building]').waitFor();assert.equal((await page.locator('#game-dialog .levelup-main-title>span').textContent()).trim(),'Empfohlen');report.push({suggestedBuilding:await page.locator('#game-dialog').getAttribute('data-building')});await page.locator("#game-dialog .dialog-close:visible, #game-dialog .mobile-page-back:visible").first().click();await page.waitForLoadState('networkidle');
-  mode='active';await page.goto(app.base+'/city?visual_check='+(++viewSequence)+'#city',{waitUntil:'networkidle'});await page.locator('#hud-build').click();await page.locator('#game-dialog[open][data-building="hall_of_alliance"]').waitFor();assert.equal((await page.locator('#game-dialog .popup-heading h2').textContent()).trim(),'Ausbau läuft');report.push({activeBuilding:'hall_of_alliance'});await page.locator("#game-dialog .dialog-close:visible, #game-dialog .mobile-page-back:visible").first().click();await page.waitForLoadState('networkidle');
-  mode='affordable';await page.waitForLoadState('networkidle');
+  mode='affordable';await page.goto(app.base+'/city?visual_check='+(++viewSequence)+'#city',{waitUntil:'domcontentloaded'});await page.locator('#hud-build').click();await page.locator('#game-dialog[open][data-building]').waitFor();assert.equal((await page.locator('#game-dialog .levelup-main-title>span').textContent()).trim(),'Empfohlen');report.push({suggestedBuilding:await page.locator('#game-dialog').getAttribute('data-building')});await page.locator("#game-dialog .dialog-close:visible, #game-dialog .mobile-page-back:visible").first().click();await page.locator('#app-start').waitFor({state:'detached'});
+  mode='active';await page.goto(app.base+'/city?visual_check='+(++viewSequence)+'#city',{waitUntil:'domcontentloaded'});await page.locator('#hud-build').click();await page.locator('#game-dialog[open][data-building="hall_of_alliance"]').waitFor();assert.equal((await page.locator('#game-dialog .popup-heading h2').textContent()).trim(),'Ausbau läuft');report.push({activeBuilding:'hall_of_alliance'});await page.locator("#game-dialog .dialog-close:visible, #game-dialog .mobile-page-back:visible").first().click();await page.locator('#app-start').waitFor({state:'detached'});
+  mode='affordable';await page.locator('#app-start').waitFor({state:'detached'});
   const buildingCodes=await page.evaluate(async()=>Object.keys((await(await fetch('api/game/state')).json()).data.buildings));
   for(const code of buildingCodes){await open(code);const samples=await contrast('.levelup-levels span,.levelup-levels strong,.levelup-stat>span:first-child,.levelup-stat strong,.levelup-stat b,.levelup-resource-row strong,.levelup-resource-values,#game-dialog .levelup-footer button');for(const sample of samples){assert.deepEqual(sample.gradients,[],`${code} text background chain has an unmeasured gradient: ${sample.text}`);assert(sample.ratio>=4.5,`${code} contrast ${sample.ratio.toFixed(2)}: ${sample.text}`);}}
   report.push({buildingDialogs:buildingCodes});

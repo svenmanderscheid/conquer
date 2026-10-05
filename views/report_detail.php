@@ -51,11 +51,12 @@ $troops  = $data['troops'] ?? [];
 
 // ── Player / city stats ───────────────────────────────────────────────────────
 $playerStats = $db->query(
-    'SELECT p.username, p.vip_level, c.castle_level, c.power, c.name AS city_name
+    'SELECT p.username, c.castle_level, c.power, c.name AS city_name
      FROM players p JOIN cities c ON c.player_id = p.id
-     WHERE p.id = ? LIMIT 1',
-    [$playerId],
+     WHERE p.id = ? AND c.world_id = ? LIMIT 1',
+    [$playerId,(int)$row['world_id']],
 )->fetch() ?: [];
+$playerStats['vip_level']=\Conquer\Game\Vip\VipService::status($playerId,(int)$row['world_id'])['level'];
 
 // ── Attacker combat totals ────────────────────────────────────────────────────
 $totalSent       = 0;

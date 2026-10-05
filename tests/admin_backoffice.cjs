@@ -12,6 +12,44 @@ const out=path.join(os.tmpdir(),'conquer-admin-ui');fs.mkdirSync(out,{recursive:
   await page.context().addCookies([{name:'conquer_locale',value:'de',url:base}]);
   await page.goto(base+'/admin/login');await page.locator("[name=identifier], [name=username]").fill('RewardAdmin');await page.locator('[name=password]').fill('Fixture-Reward-123!');await page.getByRole('button',{name:'Anmelden',exact:true}).click();await page.waitForURL(base+'/admin');
   assert.equal(await page.locator('.quick-action').count(),7);
+  if(process.env.ADMIN_FRAGMENTS_ONLY==='1'){
+   const fragmentOut=path.join(__dirname,'../output/playwright/relic-fragment-drops');fs.mkdirSync(fragmentOut,{recursive:true});
+   page.on('dialog',dialog=>dialog.accept());
+   for(const [locale,width,height] of [['en',1440,1000],['de',390,844],['en',320,700],['fr',568,320]]){
+    await page.context().addCookies([{name:'conquer_locale',value:locale,url:base}]);await page.setViewportSize({width,height});
+    for(const type of ['monster','farm']){
+     const source=type==='monster'?'20209901':'20100101.1';
+     await page.goto(base+`/admin/rewards?type=${type}&source=${source}`);
+     while(await page.locator('[data-remove-fragment]').count())await page.locator('[data-remove-fragment]').last().click();
+     await page.locator('[data-add-fragment]').click();let row=page.locator('.fragment-row').last();
+     assert.equal(await row.locator('input[name$="[chance]"]').inputValue(),'0','New fragment row starts disabled');
+     assert.equal(await row.locator('option[value="fragment:mythic"]').count(),0,'Retired rarity is absent');
+     await row.locator('select').selectOption('treasure:60100001');await row.locator('input[name$="[quantity]"]').fill('3');await row.locator('input[name$="[chance]"]').fill('12.3456');
+     assert.equal(await row.locator('option:checked').innerText(),await page.evaluate(()=>ConquerRelicPresentation.name({treasure_code:60100001})),'Admin selection uses the same current relic name as the game');
+     await page.locator('[data-add-fragment]').click();row=page.locator('.fragment-row').last();
+     await row.locator('select').selectOption('fragment:epic');await row.locator('input[name$="[quantity]"]').fill('1');await row.locator('input[name$="[chance]"]').fill('100');
+     assert((await page.locator('[data-fragment-summary]').innerText()).includes('137'),'Live fragment expectation includes both rows');
+     await page.locator('.reward-editor [name=reason]').fill('Isolated relic fragment browser check');
+     await page.locator('.reward-editor form.admin-form button[type=submit]').click();await page.waitForURL('**/admin/rewards?world_id=1&type='+type+'&source='+source+'&scope=global');
+     assert.equal(await page.locator('.fragment-row').count(),2,'Saving keeps both fragment rows');
+     assert.equal(await page.locator('.fragment-row').first().locator('select').inputValue(),'treasure:60100001');
+     assert.equal(await page.locator('.fragment-row').first().locator('input[name$="[chance]"]').inputValue(),'12.3456','Exact percentage survives save');
+     await page.reload();assert.equal(await page.locator('.fragment-row').last().locator('select').inputValue(),'fragment:epic','Random rarity survives reload');
+     await page.locator('.reward-fragments').evaluate(async el=>{await document.fonts.ready;el.scrollIntoView({block:'start',behavior:'instant'});await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));});
+     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+2),false,'Fragment editor fits at '+width);
+     assert(await page.locator('.fragment-row').evaluateAll(rows=>rows.every(row=>[...row.querySelectorAll('select,input,button')].every(e=>{const r=e.getBoundingClientRect();return r.width>=44&&r.height>=44;}))),'Fragment inputs and removal buttons have touch targets at '+width);
+     assert.equal(await page.evaluate(()=>getComputedStyle(document.documentElement).scrollbarWidth),'none','Scrollbars stay hidden');
+     await page.screenshot({path:path.join(fragmentOut,`${type}-${locale}-${width}x${height}.png`)});
+    }
+   }
+   await page.goto(base+'/admin/rewards?type=farm&source=20100101.1&scope=world&world_id=1');
+   await page.locator('.fragment-row').first().locator('input[name$="[quantity]"]').fill('7');
+   await page.locator('.reward-editor [name=reason]').fill('World-specific fragment fixture');
+   await page.locator('.reward-editor form.admin-form button[type=submit]').click();await page.waitForURL('**/admin/rewards?world_id=1&type=farm&source=20100101.1&scope=world');
+   await page.reload();assert.equal(await page.locator('.fragment-row').first().locator('input[name$="[quantity]"]').inputValue(),'7','World-specific fragment quantity survives reload');
+   await page.goto(base+'/admin/rewards?type=farm&source=20100101.1&scope=global');assert.equal(await page.locator('.fragment-row').first().locator('input[name$="[quantity]"]').inputValue(),'3','World override preserves the global fragment rule');
+   assert.deepEqual(errors,[],'No browser errors in fragment editors');console.log('RELIC FRAGMENT ADMIN BROWSER CHECKS PASSED · '+fragmentOut);return;
+  }
   if(process.env.ADMIN_TABLE_ONLY==='1'){
    for(const width of [1440,390,320,568]){
     await page.setViewportSize({width,height:width===568?320:844});await page.goto(base+'/admin/rewards?type=monster');

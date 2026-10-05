@@ -98,7 +98,8 @@ foreach(RewardCatalog::sources('monster') as $entry) {
             $drops=array_column(RewardCatalog::availableDrops($def['drops']),null,'item_code');
             foreach([10203022,10203030] as $speedup)balanceCheck(isset($drops[$speedup])&&(int)$drops[$speedup]['count']===(int)$def['level']&&(float)$drops[$speedup]['probability']===1.0,'Active reward policy preserves both guaranteed level-based speedups');
         }else{
-            balanceCheck(RewardCatalog::availableDrops($def['drops'])===RewardCatalog::availableDrops($source['drops']),'Unchanged source rewards reach real monster lookup with exact codes, quantities and probabilities');
+            $activeDrops=array_values(array_filter(RewardCatalog::availableDrops($def['drops']),static fn($drop)=>(int)$drop['item_code']!==\Conquer\Game\Rewards\MonsterRewardRules::ALLIANCE_BADGE));
+            balanceCheck($activeDrops===RewardCatalog::availableDrops($source['drops']),'Source rewards retain codes, quantities and probabilities alongside the adopted alliance badge');
         }
         balanceCheck($def['stats']===$source['stats']&&$def['xp']===$source['xp'],'Source stats reach battle lookup');
     }

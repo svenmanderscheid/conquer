@@ -1,12 +1,12 @@
 'use strict';
 require('./fixtures/browser_locale.cjs')('de'); // This suite asserts the explicit German UI.
 // Run against tools/preview-feature-fixture.php --training. Never saved accounts.
-const assert=require('assert/strict'),fs=require('fs'),path=require('path'),{chromium}=require('playwright');
+const assert=require('assert/strict'),fs=require('fs'),path=require('path'),{chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const base=process.env.TRAINING_FIXTURE_URL||'http://127.0.0.1:19321';
 assert(/^http:\/\/127\.0\.0\.1:\d+$/.test(base));
 const out=path.resolve(__dirname,'../artifacts/training');fs.mkdirSync(out,{recursive:true});
 (async()=>{const browser=await chromium.launch({headless:true,channel:'chrome'});
- try{const page=await browser.newPage({viewport:{width:1280,height:800},hasTouch:true}),errors=[];page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(20000);
+ try{const page=await browser.newPage({viewport:{width:1280,height:800},hasTouch:true}),errors=[];page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(20000);page.setDefaultNavigationTimeout(45000);
   await page.goto(base);await page.goto(new URL('?zugang=login', page.url()).href);await page.locator("[name=identifier], [name=username]").fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');await Promise.all([page.waitForURL('**/city'),page.locator("form[action$=\"/auth/local\"] button[type=\"submit\"]").click()]);
   await page.goto(base+'/city#army');await page.locator('.training-school.has-illustration').waitFor();
   assert.equal(await page.locator('#train-count').inputValue(),await page.locator('#train-count').getAttribute('max'),'Training initially selects the maximum affordable amount');

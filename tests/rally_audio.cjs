@@ -12,6 +12,10 @@ function fixture(saved={}){
         get currentTime(){return now/1000;}
         createGain(){return {gain:parameter(),connect(){},disconnect(){}};}
         createOscillator(){return {frequency:parameter(),connect(){},disconnect(){},start(){},stop(){this.onended?.();}};}
+        sampleRate=22050;
+        createBuffer(channels,length){return {getChannelData:()=>new Float32Array(length)};}
+        createBufferSource(){return {connect(){},disconnect(){},start(){},stop(){this.onended?.();}};}
+        createBiquadFilter(){return {frequency:parameter(),Q:parameter(),connect(){},disconnect(){}};}
         addEventListener(){}removeEventListener(){}
         resume(){this.state='running';return Promise.resolve();}
         suspend(){this.state='suspended';return Promise.resolve();}

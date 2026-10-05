@@ -41,6 +41,9 @@ final class RewardPresentation
     /** Add display fields to historical mail without changing combat or payout values. */
     public static function report(array $details): array
     {
+        if(isset($details['treasures']))$details['treasures']=array_values(array_filter($details['treasures'],static fn(array $relic):bool=>!TreasureData::isRetired((int)($relic['treasure_code']??0))&&($relic['grade']??'')!=='mythic'));
+        if(isset($details['items']))unset($details['items'][10207005]);
+        if(isset($details['item_rewards']))$details['item_rewards']=array_values(array_filter($details['item_rewards'],static fn(array $reward):bool=>(int)($reward['code']??$reward['item_code']??0)!==10207005));
         if (empty($details['item_rewards']) && !empty($details['items'])) {
             foreach ($details['items'] as $code=>$count) {
                 if (is_numeric($code) && is_numeric($count) && (int)$count>0) {
@@ -50,6 +53,11 @@ final class RewardPresentation
         }
         foreach ($details['item_rewards'] ?? [] as $i=>$reward) {
             $details['item_rewards'][$i] += self::item((int)($reward['code'] ?? $reward['item_code'] ?? 0));
+        }
+        $details['fragment_rewards']=[];
+        foreach($details['fragments']??[] as $code=>$count){
+            $fragment=self::fragment((int)$code);
+            if($fragment&&(int)$count>0)$details['fragment_rewards'][]=$fragment+['count'=>(int)$count];
         }
         return $details;
     }

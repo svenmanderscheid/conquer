@@ -14,6 +14,7 @@ final class FeatureDatabase
     {
         if(is_resource($this->server))throw new \RuntimeException('Fixture server already running.');
         $router="<?php declare(strict_types=1); define('ROOT_DIR',".var_export(ROOT_DIR,true)."); require ROOT_DIR.'/src/Autoloader.php'; (new \\Conquer\\Autoloader(ROOT_DIR.'/src'))->register(); date_default_timezone_set('UTC'); \\Conquer\\Db\\Connection::init(__DIR__); \\Conquer\\Logger::init(__DIR__.'/http.log'); ". $routes;
+        $router=substr($router,0,strlen($router)-strlen($routes))."if(preg_match('~(/locale-assets/[^?]+)$~D',parse_url(\$_SERVER['REQUEST_URI'],PHP_URL_PATH),\$match)){\$asset=\\Conquer\\Game\\Locale::assetResponse(\$match[1],\$_SERVER['REQUEST_METHOD'],\$_SERVER['HTTP_IF_NONE_MATCH']??'');http_response_code(\$asset['status']);foreach(\$asset['headers'] as \$key=>\$value)header(\$key.': '.\$value);echo \$asset['body'];exit;} ".$routes;
         file_put_contents($this->directory.'/router.php',$router);
         $socket=stream_socket_server('tcp://127.0.0.1:0',$errno,$error);
         if(!$socket)throw new \RuntimeException('No fixture HTTP port.');
@@ -51,7 +52,7 @@ final class FeatureDatabase
             \Conquer\Db\MigrationSql::apply(\Conquer\Db\Connection::getInstance()->getPdo(), (string)file_get_contents(ROOT_DIR.'/migrations/0105_admin_password_change.sql'));
             \Conquer\Db\MigrationSql::apply(\Conquer\Db\Connection::getInstance()->getPdo(), (string)file_get_contents(ROOT_DIR.'/migrations/0106_alpha_waitlist.sql'));
             \Conquer\Db\MigrationSql::apply(\Conquer\Db\Connection::getInstance()->getPdo(), (string)file_get_contents(ROOT_DIR.'/migrations/0113_rally_join_travel.sql'));
-            foreach(['0119_world_map_profiles.sql','0120_territory_conquest.sql','0121_community_social.sql','0122_alliance_community.sql','0123_community_news.sql','0126_extra_event_button.sql','0128_completion_report_preferences.sql'] as $migration){
+            foreach(['0119_world_map_profiles.sql','0120_territory_conquest.sql','0121_community_social.sql','0122_alliance_community.sql','0123_community_news.sql','0126_extra_event_button.sql','0127_alpha_entry_and_missions.sql','0128_completion_report_preferences.sql','0129_world_vip.sql'] as $migration){
                 \Conquer\Db\MigrationSql::apply(\Conquer\Db\Connection::getInstance()->getPdo(),(string)file_get_contents(ROOT_DIR.'/migrations/'.$migration));
             }
             // The cloned source may already contain 0107. Replay its additive
@@ -61,8 +62,16 @@ final class FeatureDatabase
             }
         }catch(\Throwable $e){$this->close();throw $e;}
     }
+    public function sessionPath(): string { return $this->directory; }
+
     public function close(): void
     {
+        // A failed data migration can leave a transaction holding metadata locks.
+        // Release only this fixture's transaction before its admin connection drops it.
+        try{
+            $fixturePdo=\Conquer\Db\Connection::getInstance()->getPdo();
+            if($fixturePdo->inTransaction()&&$fixturePdo->query('SELECT DATABASE()')->fetchColumn()===$this->name)$fixturePdo->rollBack();
+        }catch(\PDOException){} // A disconnected fixture cannot retain its transaction.
         if(is_resource($this->server)){proc_terminate($this->server);proc_close($this->server);$this->server=null;}
         foreach(['router.php','http.log','server.log'] as $name){$path=$this->directory.'/'.$name;if(is_file($path))unlink($path);}
         foreach(glob($this->directory.'/sess_*')?:[] as $path)if(is_file($path))unlink($path);

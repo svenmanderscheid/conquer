@@ -37,7 +37,7 @@ try{
         crystalCheck(CrystalShop::offers()===$offers,'no weekly stock depletion '.$code);
         crystalReject(fn()=> $db->transaction(fn()=>KingdomInventory::buy(1,array_replace($body,['quantity'=>3]),true)),'receipt rejects changed quantity '.$code);
     }
-    crystalCheck(VipService::status(1)['points']===0,'purchased VIP packs wait in inventory');
+    crystalCheck(VipService::status(1)['points']===200,'purchased VIP packs wait in world inventory');
     foreach($vipOffers as $offer){
         $code=(int)$offer['item_code'];$points=VipService::status(1)['points'];
         $body=['action'=>'inventory.use','item_code'=>$code,'quantity'=>2,'operation_key'=>'crystal-vip-use-'.$code,'vip_points'=>999999];

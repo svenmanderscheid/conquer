@@ -17,6 +17,7 @@
  const send=data=>{if(preview)parent.postMessage({channel:'uok-layout',...data},location.origin);};
  const clamp=(v,min,max)=>Math.max(Math.min(min,max),Math.min(max,v));
  const rect=el=>{const r=el.getBoundingClientRect();return{x:r.x,y:r.y,width:r.width,height:r.height,right:r.right,bottom:r.bottom};};
+ const zoom=el=>{let value=1;for(let node=el;node;node=node.parentElement)value*=parseFloat(getComputedStyle(node).zoom)||1;return value;};
  const visible=el=>el&&el.getClientRects().length&&!el.closest('[hidden]')&&getComputedStyle(el).visibility!=='hidden';
  function set(el,key,value){if(!originals.has(el))originals.set(el,new Map());const map=originals.get(el);if(!map.has(key))map.set(key,[el.style.getPropertyValue(key),el.style.getPropertyPriority(key)]);el.style.setProperty(key,value,'important');}
  function restore(){for(const [el,map]of originals)for(const [key,[value,priority]]of map)value?el.style.setProperty(key,value,priority):el.style.removeProperty(key);originals.clear();}
@@ -34,25 +35,25 @@
    if(matchMedia('(max-width:700px), (max-width:1100px) and (max-height:520px) and (orientation:landscape)').matches&&el.matches('#panel-dialog,#game-dialog.mobile-detail-page,.world-chat.is-open'))continue;
    const base=rect(el);if(!base.width||!base.height)continue;
    elements[key]=el;metrics[key]=base;const s=settings[key];if(!s)continue;
-   const availableW=w-edge.left-edge.right,availableH=h-edge.top-edge.bottom;
+   const availableW=w-edge.left-edge.right,availableH=h-edge.top-edge.bottom,z=zoom(el);
    const width=clamp(base.width*s.width/100,def.minWidth,availableW),height=clamp(base.height*s.height/100,def.minHeight,availableH);
    if(def.mode==='scale'){set(el,'transform-origin','0 0');set(el,'scale',`${width/base.width} ${height/base.height}`);}
    else{
-    for(const [prop,value]of Object.entries({width:width+'px',height:height+'px','max-width':availableW+'px','max-height':availableH+'px','min-width':'0','min-height':'0'}))set(el,prop,value);
-    if(key==='navigation')el.querySelectorAll('.game-dock-item').forEach(child=>set(child,'height',Math.max(44,height-9)+'px'));
-    if(key==='resources')el.querySelectorAll('.resource').forEach(child=>{set(child,'min-width','0');set(child,'flex','1 1 0');set(child,'height',height+'px');});
+    for(const [prop,value]of Object.entries({width:width/z+'px',height:height/z+'px','max-width':availableW/z+'px','max-height':availableH/z+'px','min-width':'0','min-height':'0'}))set(el,prop,value);
+    if(key==='navigation')el.querySelectorAll('.game-dock-item').forEach(child=>set(child,'height',Math.max(44,height/z-9)+'px'));
+    if(key==='resources')el.querySelectorAll('.resource').forEach(child=>{set(child,'min-width','0');set(child,'flex','1 1 0');set(child,'height',height/z+'px');});
     if(def.group==='Spielfenster')set(el,'overflow','auto');
    }
    const now=rect(el);let x=base.x+(base.width-now.width)/2,y=['navigation','chat'].includes(key)?base.bottom-now.height:base.y;
    const anchor=s.anchor||'auto';
    if(anchor!=='auto'){x=anchor.includes('left')?edge.left:anchor.includes('right')?w-edge.right-now.width:(w-now.width)/2;y=anchor.includes('top')?edge.top:anchor.includes('bottom')?h-edge.bottom-now.height:(h-now.height)/2;}
    x=clamp(x+s.x,edge.left,w-edge.right-now.width);y=clamp(y+s.y,edge.top,h-edge.bottom-now.height);
-   let sx=1,sy=1;for(let ancestor=el.parentElement;ancestor&&ancestor!==document.body;ancestor=ancestor.parentElement){const scale=getComputedStyle(ancestor).scale.split(' ').map(Number);if(Number.isFinite(scale[0])){sx*=scale[0];sy*=scale[1]||scale[0];}}
+   let sx=z,sy=z;for(let ancestor=el.parentElement;ancestor&&ancestor!==document.body;ancestor=ancestor.parentElement){const scale=getComputedStyle(ancestor).scale.split(' ').map(Number);if(Number.isFinite(scale[0])){sx*=scale[0];sy*=scale[1]||scale[0];}}
    set(el,'translate',`${(x-now.x)/sx}px ${(y-now.y)/sy}px`);
   }
   const nav=elements.navigation,chat=elements.chat;
   if(nav&&chat&&(settings.chat||settings.navigation)&&(!settings.chat?.anchor||settings.chat.anchor==='auto')){
-   const n=rect(nav),c=rect(chat);if(c.bottom>n.y-8&&c.x<n.right&&c.right>n.x){const t=getComputedStyle(chat).translate.split(' ').map(parseFloat);set(chat,'translate',`${t[0]||0}px ${(t[1]||0)+Math.max(edge.top,n.y-c.height-8)-c.y}px`);}
+   const n=rect(nav),c=rect(chat);if(c.bottom>n.y-8&&c.x<n.right&&c.right>n.x){const t=getComputedStyle(chat).translate.split(' ').map(parseFloat);set(chat,'translate',`${t[0]||0}px ${(t[1]||0)+(Math.max(edge.top,n.y-c.height-8)-c.y)/zoom(chat)}px`);}
   }
   for(const [key,el]of Object.entries(elements))if(!modal||el===modal||modal.contains(el))boxes[key]=rect(el);
   const warnings=[];

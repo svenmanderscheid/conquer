@@ -76,7 +76,7 @@ final class MonsterRally
             $army['source_snapshot']=\Conquer\Game\March\MonsterReport::capture($army['player_id'],$army['city_id'],$world);
         }unset($army);
         $result=BattleEngine::resolveMonsterArmies($armies,$target,$meta['monster']);
-        $loot=[];$items=[];$xp=[];$settlement=null;
+        $loot=[];$items=[];$fragments=[];$xp=[];$settlement=null;
         if($result['monster_killed']){
             $basePool=$meta['monster']['resource_reward']??['food'=>100,'lumber'=>100,'stone'=>50,'gold'=>50];
             $gems=$meta['monster']['gems_drop']??[];
@@ -86,12 +86,13 @@ final class MonsterRally
                 foreach($basePool as $resource=>$amount)if(in_array($resource,['food','lumber','stone','gold'],true))$loot[$i][$resource]=(int)$amount;
                 if(self::roll((float)($gems['chance']??0)))$loot[$i]['gems']=(int)($gems['amount']??0);
                 foreach($meta['drops'] as $drop)if(self::roll((float)$drop['probability']))$items[$i][(int)$drop['item_code']]=($items[$i][(int)$drop['item_code']]??0)+(int)$drop['count'];
+                $fragments[$i]=\Conquer\Game\Rewards\RewardCatalog::rollFragments($meta['monster']['fragment_drops']??[]);
                 $xp[$i]=$baseXp;
             }
             $settlement=\Conquer\Game\Charm\MonsterCharmLifecycle::settle(
                 $world,$target,$meta['monster'],'rally',(int)$r['id'],(int)$r['leader_player_id'],
                 isset($meta['alliance_id'])?(int)$meta['alliance_id']:null,
-                ['resources_by_army'=>$loot,'items_by_army'=>$items,'xp_by_army'=>$xp],
+                ['resources_by_army'=>$loot,'items_by_army'=>$items,'fragments_by_army'=>$fragments,'xp_by_army'=>$xp],
             );
             if(!$settlement['created'])return ['armies'=>$armies,'reason'=>'Das Monster wurde bereits besiegt.','cancelled'=>true,'outcome'=>'cancelled'];
             $regionalBase=\Conquer\Game\Territory\TerritoryEconomy::regionalBaseResources(array_replace($meta['monster'],['drops'=>$meta['drops']??[]]));
@@ -100,15 +101,16 @@ final class MonsterRally
             $db->execute('DELETE FROM field_monsters WHERE id=? AND world_id=?',[$target['id'],$world]);
         }else{$db->execute('UPDATE field_monsters SET hp_current=? WHERE id=? AND world_id=?',[$result['new_monster_hp'],$target['id'],$world]);}
         foreach($result['armies'] as $i=>&$army){
-            if(!empty($army['is_ai'])){$army['loot']=[];$army['items']=[];continue;}
+            if(!empty($army['is_ai'])){$army['loot']=[];$army['items']=[];$army['fragments']=[];continue;}
             $pid=$army['player_id'];HospitalService::addWounded($army['city_id'],$army['wounded']);
             $army['loot']=\Conquer\Game\Player\TalentEffects::monsterLoot($loot[$i]??[],$armies[$i]['buffs']);$army['items']=$items[$i]??[];
+            $army['fragments']=$fragments[$i]??[];
             $earned=$result['monster_killed']?LordLevel::addXp($pid,$xp[$i]??0,$world,'monster-rally:'.$r['id']):0;
             if($result['monster_killed']){DailyQuestService::trackProgress($pid,'attack_monster');$db->execute('UPDATE players SET kill_count=kill_count+1 WHERE id=?',[$pid]);}
             $ownTroops=[];
             foreach($army['troops'] as $code=>$count){$def=\Conquer\Game\City\TroopData::get((int)$code);$ownTroops[]=['code'=>(int)$code,'name'=>$def['name'],'tier'=>$def['tier'],'sent'=>$count,'injured'=>$army['wounded'][$code]??0,'survived'=>$army['survivors'][$code]??0];}
             $itemRewards=[];foreach($army['items'] as $code=>$count)$itemRewards[]=['code'=>(int)$code,'name'=>InventoryService::getItemDef((int)$code)['name'],'count'=>$count];
-            $report=$result['report']+['type'=>'monster_rally','rally_id'=>(int)$r['id'],'loot'=>$army['loot'],'items'=>$army['items'],'lord_xp'=>$earned,'own_survivors'=>$army['survivors'],'own_wounded'=>$army['wounded']];
+            $report=$result['report']+['type'=>'monster_rally','rally_id'=>(int)$r['id'],'loot'=>$army['loot'],'items'=>$army['items'],'fragments'=>$army['fragments'],'lord_xp'=>$earned,'own_survivors'=>$army['survivors'],'own_wounded'=>$army['wounded']];
             if($settlement!==null)$report['charm']=$result['charm'];
             $report['troops']=$ownTroops;$report['item_rewards']=$itemRewards;
             $report['ai_support']=$meta['ai_support']??[];

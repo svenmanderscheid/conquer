@@ -50,7 +50,7 @@ final class MonsterData
         $monster['hp_max'] = max(1, (int)$monster['hp_current'], (int)round((float)($definition['stats']['hp'] ?? 0) * (int)($definition['amount'] ?? 0)));
         $monster['required_power']=(int)$definition['required_power'];
         $monster['required_power_current']=MonsterPower::currentRequired($definition,(int)$monster['hp_current']);
-        $monster['definition'] = array_intersect_key($definition, array_flip(['name','title','biome','art','footprint','level','type','stats','amount','required_power','resource_reward','drops','gems_drop','action_point_cost','boss_mechanic']));
+        $monster['definition'] = array_intersect_key($definition, array_flip(['name','title','biome','art','footprint','level','type','stats','amount','required_power','resource_reward','drops','fragment_drops','gems_drop','action_point_cost','boss_mechanic']));
         return $monster;
     }
 
@@ -72,6 +72,11 @@ final class MonsterData
         $definition=\Conquer\Game\Rewards\RewardCatalog::monster($definition);
         foreach ($definition['drops'] ?? [] as $i=>$drop) {
             $definition['drops'][$i]=$drop+\Conquer\Game\Rewards\RewardPresentation::item((int)$drop['item_code']);
+        }
+        foreach($definition['fragment_drops']??[] as $i=>$drop){
+            $definition['fragment_drops'][$i]=$drop+(isset($drop['treasure_code'])
+                ?\Conquer\Game\Rewards\RewardPresentation::fragment((int)$drop['treasure_code'])
+                :['name'=>\Conquer\Game\Locale::t('admin.drops.fragment_random_'.$drop['fragment_grade']),'icon'=>'fragment-'.$drop['fragment_grade'].'.svg','grade'=>$drop['fragment_grade']]);
         }
         return $definition;
     }

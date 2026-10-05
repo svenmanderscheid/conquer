@@ -4,11 +4,12 @@ declare(strict_types=1);
 namespace Conquer\Game\Vip;
 
 use Conquer\Db\Connection;
+use Conquer\Game\World\WorldContext;
 
 /**
  * VIP system — level thresholds, passive bonuses, daily login reward.
  *
- * VIP is a 20-level account-wide system (SPEC §17).
+ * Each player's world has its own 20-level VIP system.
  * Players earn VIP points through daily logins and item use.
  * Higher levels grant passive percentage bonuses to construction,
  * research, resource production, and troop training speed.
@@ -55,7 +56,7 @@ final class VipService
 
     /**
      * Bonuses per VIP level (additive percentage).
-     * Keys: construction_speed, research_speed, resource_production, troop_training_speed
+     * Percentage perks plus a separate, flat Hunter point allowance.
      *
      * @var array<int, array{int, int, int, int}>
      */
@@ -113,7 +114,7 @@ final class VipService
     /**
      * Returns the bonus array for a given VIP level.
      *
-     * @return array{construction_speed: int, research_speed: int, resource_production: int, troop_training_speed: int}
+     * @return array{construction_speed: int, research_speed: int, resource_production: int, troop_training_speed: int, hunter_points: int}
      */
     public static function bonuses(int $level): array
     {
@@ -125,32 +126,43 @@ final class VipService
             'research_speed'       => $raw[1],
             'resource_production'  => $raw[2],
             'troop_training_speed' => $raw[3],
+            'hunter_points'        => self::hunterPoints($level),
         ];
     }
 
-    /**
-     * Returns the full VIP status for a player, reading from DB.
-     *
-     * @return array{level: int, points: int, next_level_points: int, bonuses: array<string, int>}
-     */
-    public static function status(int $playerId): array
+    /** Total extra spendable Hunter points at this VIP level, not a per-level grant. */
+    public static function hunterPoints(int $level): int
+    {
+        return max(0, min(self::MAX_LEVEL, $level) - 1);
+    }
+
+    /** Create only the starting state for an existing world profile; never copy account points. */
+    public static function ensure(int $playerId, ?int $worldId = null): void
+    {
+        $worldId ??= WorldContext::id();
+        Connection::getInstance()->execute(
+            'INSERT IGNORE INTO player_world_vip(player_id,world_id)
+             SELECT player_id,world_id FROM cities WHERE player_id=? AND world_id=?',
+            [$playerId,$worldId],
+        );
+    }
+
+    /** Returns this world's full status; a player without a village receives zero perks. */
+    public static function status(int $playerId, ?int $worldId = null): array
     {
         $db = Connection::getInstance();
-
+        $worldId ??= WorldContext::id();
         $row = $db->query(
-            'SELECT vip_points, vip_level, last_vip_login FROM players WHERE id = ?',
-            [$playerId],
+            'SELECT vip_points, vip_level, last_vip_login FROM player_world_vip WHERE player_id=? AND world_id=?',
+            [$playerId,$worldId],
         )->fetch();
 
-        if ($row === false) {
-            // Player not found — return zero state
-            return [
-                'level'             => 0,
-                'points'            => 0,
-                'next_level_points' => self::THRESHOLDS[1] ?? 0,
-                'bonuses'           => self::bonuses(0),
-            ];
+        if($row===false){
+            self::ensure($playerId,$worldId);
+            $row=$db->query('SELECT vip_points, vip_level, last_vip_login FROM player_world_vip WHERE player_id=? AND world_id=?',[$playerId,$worldId])->fetch();
         }
+
+        if ($row === false) $row=['vip_points'=>0,'vip_level'=>0,'last_vip_login'=>null];
 
         $points = (int) $row['vip_points'];
         $level  = self::levelForPoints($points);
@@ -161,6 +173,7 @@ final class VipService
             : 0;
 
         return [
+            'world_id'          => $worldId,
             'level'             => $level,
             'points'            => $points,
             'next_level_points' => $nextLevelPoints,
@@ -195,14 +208,17 @@ final class VipService
      *
      * Returns true if points were awarded, false if already claimed today.
      */
-    public static function dailyLogin(int $playerId): bool
+    public static function dailyLogin(int $playerId, ?int $worldId = null): bool
     {
         $db = Connection::getInstance();
-        $claim=static function()use($db,$playerId):bool{
-            $row=$db->query('SELECT vip_points,last_vip_login FROM players WHERE id=? FOR UPDATE',[$playerId])->fetch();
+        $worldId ??= WorldContext::id();
+        $claim=static function()use($db,$playerId,$worldId):bool{
+            WorldContext::city($playerId,$worldId,true);
+            self::ensure($playerId,$worldId);
+            $row=$db->query('SELECT vip_points,last_vip_login FROM player_world_vip WHERE player_id=? AND world_id=? FOR UPDATE',[$playerId,$worldId])->fetch();
             if(!$row||($row['last_vip_login']!==null&&$row['last_vip_login']>=gmdate('Y-m-d')))return false;
-            self::addPoints($playerId,self::DAILY_POINTS);
-            $db->execute('UPDATE players SET last_vip_login=? WHERE id=?',[gmdate('Y-m-d'),$playerId]);
+            self::addPoints($playerId,self::DAILY_POINTS,$worldId);
+            $db->execute('UPDATE player_world_vip SET last_vip_login=? WHERE player_id=? AND world_id=?',[gmdate('Y-m-d'),$playerId,$worldId]);
             return true;
         };
         return $db->getPdo()->inTransaction()?$claim():$db->transaction($claim);
@@ -218,30 +234,42 @@ final class VipService
      * Adds arbitrary VIP points to a player (e.g. from item use).
      * Recomputes and persists the level.
      */
-    public static function addPoints(int $playerId, int $points): void
+    public static function addPoints(int $playerId, int $points, ?int $worldId = null): void
     {
-        if ($points <= 0) {
-            return;
-        }
+        if ($points > 0) self::updatePoints($playerId,$points,$worldId,true);
+    }
+
+    /** Administrative correction of this world's total; the level follows its thresholds. */
+    public static function setPoints(int $playerId, int $points, ?int $worldId = null): void
+    {
+        if($points<0||$points>2147483647)throw new \InvalidArgumentException('Invalid VIP points.');
+        self::updatePoints($playerId,$points,$worldId,false);
+    }
+
+    private static function updatePoints(int $playerId, int $points, ?int $worldId, bool $relative): void
+    {
 
         $db = Connection::getInstance();
 
-        $credit=static function()use($db,$playerId,$points):void{
-            $row=$db->query('SELECT vip_points FROM players WHERE id=? FOR UPDATE',[$playerId])->fetch();
+        $worldId ??= WorldContext::id();
+        $credit=static function()use($db,$playerId,$points,$worldId,$relative):void{
+            WorldContext::city($playerId,$worldId,true);
+            self::ensure($playerId,$worldId);
+            $row=$db->query('SELECT vip_points FROM player_world_vip WHERE player_id=? AND world_id=? FOR UPDATE',[$playerId,$worldId])->fetch();
             if(!$row)return;
             $oldPoints=max(0,(int)$row['vip_points']);
-            // The legacy column is a signed INT. Keep earned totals without overflow.
-            $newPoints=$oldPoints+min($points,2147483647-$oldPoints);
+            // Keep earned totals within the signed INT storage limit.
+            $newPoints=$relative?$oldPoints+min($points,2147483647-$oldPoints):$points;
             $newLevel=self::levelForPoints($newPoints);
             if($newLevel!==self::levelForPoints($oldPoints)) {
-                // Account-wide perks start now, never retroactively over offline production.
-                foreach($db->query('SELECT * FROM cities WHERE player_id=? ORDER BY id',[$playerId])->fetchAll() as $city) {
+                // Settle only this world's production with its old perks.
+                foreach($db->query('SELECT * FROM cities WHERE player_id=? AND world_id=?',[$playerId,$worldId])->fetchAll() as $city) {
                     $buildings=[];
                     foreach($db->query('SELECT building_code,level FROM city_buildings WHERE city_id=?',[$city['id']])->fetchAll() as $building)$buildings[$building['building_code']]=['level'=>(int)$building['level']];
                     \Conquer\Game\City\ResourceTick::persist($city,$buildings);
                 }
             }
-            $db->execute('UPDATE players SET vip_points=?,vip_level=? WHERE id=?',[$newPoints,$newLevel,$playerId]);
+            $db->execute('UPDATE player_world_vip SET vip_points=?,vip_level=? WHERE player_id=? AND world_id=?',[$newPoints,$newLevel,$playerId,$worldId]);
         };
         if($db->getPdo()->inTransaction())$credit();else $db->transaction($credit);
     }

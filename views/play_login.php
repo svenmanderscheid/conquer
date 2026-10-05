@@ -6,6 +6,13 @@ $loginError = $loginError ?? '';
 $username = htmlspecialchars(is_string($_POST['username'] ?? null) ? $_POST['username'] : '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 $email = htmlspecialchars(is_string($_POST['email'] ?? null) ? $_POST['email'] : '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 $identifier = htmlspecialchars(is_string($_POST['identifier'] ?? null) ? $_POST['identifier'] : '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+$registrationWorlds=[];$registrationWorld=0;
+if($mode==='register'){
+    $registrationWorlds=\Conquer\Db\Connection::getInstance()->query("SELECT id,name FROM worlds WHERE status IN ('open','running') ORDER BY id")->fetchAll();
+    try{$registrationWorld=\Conquer\Game\World\WorldEntry::defaultWorld();}catch(\DomainException){}
+    $requestedWorld=$_POST['world_id']??$_GET['world_id']??null;
+    if(is_string($requestedWorld)&&ctype_digit($requestedWorld))$registrationWorld=(int)$requestedWorld;
+}
 ?>
 <!doctype html>
 <html lang="<?= htmlspecialchars(\Conquer\Game\Locale::current(), ENT_QUOTES) ?>">
@@ -50,6 +57,11 @@ $identifier = htmlspecialchars(is_string($_POST['identifier'] ?? null) ? $_POST[
           <?php if ($mode === 'register'): ?>
           <label><span data-i18n="waitlist.email">Email address</span><input type="email" name="email" required maxlength="254" autocomplete="email" autocapitalize="none" spellcheck="false" value="<?= $email ?>"></label>
           <label><span data-i18n="login.username_short">Player name</span><input name="username" required minlength="3" maxlength="25" pattern="[A-Za-z0-9_]+" autocomplete="username" autocapitalize="none" spellcheck="false" value="<?= $username ?>"></label>
+          <label><span data-i18n="registration.world">World</span><select name="world_id" required>
+            <option value="" disabled<?= !in_array($registrationWorld,array_map('intval',array_column($registrationWorlds,'id')),true)?' selected':'' ?> data-i18n="registration.choose_world">Choose a world</option>
+            <?php foreach($registrationWorlds as $registrationChoice): ?><option value="<?= (int)$registrationChoice['id'] ?>"<?= (int)$registrationChoice['id']===$registrationWorld?' selected':'' ?> data-user-content><?= htmlspecialchars($registrationChoice['name'],ENT_QUOTES|ENT_SUBSTITUTE,'UTF-8') ?></option><?php endforeach ?>
+          </select></label>
+          <p class="play-world-rule" data-i18n="registration.village_rule">This account will have one village in this world. Create another account for a second village.</p>
           <?php else: ?>
           <label><span>Email or player name</span><input name="identifier" required maxlength="254" autocomplete="username" autocapitalize="none" spellcheck="false" value="<?= $identifier ?>"></label>
           <?php endif ?>

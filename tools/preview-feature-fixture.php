@@ -40,6 +40,14 @@ try{
  }
  foreach(\Conquer\Game\City\CityState::BUILDING_CODES as$code)$db->execute('INSERT INTO city_buildings(city_id,building_code,level) VALUES(1,?,?)',[$code,$code==='castle'?12:7]);
  if(in_array('--crystal-shop',$argv,true))$db->execute("UPDATE city_buildings SET level=0 WHERE city_id=1 AND building_code='trading_post'");
+ if(in_array('--vip-worlds',$argv,true)){
+  $db->execute("INSERT INTO worlds(id,name,slug,status,map_size,map_seed)VALUES(2,'Legacy second village','vip-world-two','running',256,42),(3,'Separate account required','vip-world-three','running',256,42)");
+  $db->execute("INSERT INTO cities(id,player_id,world_id,name,coord_x,coord_y,castle_level,food,lumber,stone,gold)VALUES(2,1,2,'Existing second village',65,65,12,100000,100000,100000,100000)");
+  foreach(\Conquer\Game\City\CityState::BUILDING_CODES as$code)$db->execute('INSERT INTO city_buildings(city_id,building_code,level)VALUES(2,?,?)',[$code,$code==='castle'?12:7]);
+  \Conquer\Game\Vip\VipService::setPoints(1,1000,1);
+  \Conquer\Game\Vip\VipService::ensure(1,2);
+  \Conquer\Game\Inventory\InventoryService::addItems(1,10206002,2,1);
+ }
  foreach([50100101,50200101,50300101]as$code)$db->execute('INSERT INTO city_troops(city_id,troop_code,count) VALUES(1,?,500)',[$code]);
  if(in_array('--territory',$argv,true))require ROOT_DIR.'/tests/fixtures/territory_preview.php';
  if(in_array('--march-roster',$argv,true)){
@@ -78,7 +86,7 @@ try{
   foreach([10102021,10102031,10202010,10202011] as $code)$db->execute('INSERT INTO player_inventory(player_id,item_code,quantity) VALUES(1,?,5) ON DUPLICATE KEY UPDATE quantity=5',[$code]);
   foreach(['construction_speed'=>10102021,'research_speed'=>10102031] as $type=>$code)$db->execute("INSERT INTO player_charms_active(player_id,stat_category,grade,charm_code,bonus_pct,expires_at) VALUES(1,?,'normal',?,25,DATE_ADD(UTC_TIMESTAMP(),INTERVAL 8 HOUR))",[$type,$code]);
   $db->execute("INSERT INTO active_buffs(player_id,buff_type,multiplier,expires_at) VALUES(1,'research_boost',1.25,DATE_ADD(UTC_TIMESTAMP(),INTERVAL 8 HOUR))");
-  $db->execute('UPDATE players SET vip_points=200000,vip_level=10 WHERE id=1');
+  \Conquer\Game\Vip\VipService::setPoints(1,200000,1);
   \Conquer\Game\World\WorldContext::bind(1);
   foreach([10102001] as $code){
    \Conquer\Game\Inventory\InventoryService::addItems(1,$code,1);
@@ -220,6 +228,18 @@ try{
   foreach([10101001=>108000,10101011=>106800,10101021=>22200,10101031=>11220,10101041=>700,10104001=>150,10106001=>80,10103003=>1879,10103011=>255,10103021=>890,10103031=>600,10103041=>392]as$code=>$quantity){
    \Conquer\Game\Inventory\InventoryService::addItems(1,$code,$quantity);
   }
+ }
+ if(in_array('--inventory-relics',$argv,true)){
+  \Conquer\Game\Treasure\TreasureService::addFragments(1,60100002,30);
+  \Conquer\Game\Treasure\TreasureService::upgradeEffect(1,60100002,0);
+  \Conquer\Game\Treasure\TreasureService::equipTreasure(1,60100002,2,7,1);
+ }
+ if(in_array('--alpha-entry',$argv,true)){
+  $db->execute('DELETE FROM city_troops WHERE city_id=1');
+  $db->execute('DELETE FROM city_buildings WHERE city_id=1');
+  $db->execute('DELETE FROM cities WHERE id=1');
+  \Conquer\Game\World\AlphaRealm::setup();
+  \Conquer\Auth\OAuth::createDefaultCity($db,1,'PreviewPlayer');
  }
  $port=18942;foreach($argv as $arg)if(preg_match('/^--port=([0-9]{4,5})$/D',$arg,$match))$port=(int)$match[1];if($port<1024||$port>65535)throw new RuntimeException('Invalid preview port.');
  mkdir($dir.'/sessions',0700,true);

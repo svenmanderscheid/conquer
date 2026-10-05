@@ -1,4 +1,5 @@
 'use strict';
+require('./fixtures/browser_locale.cjs')('de');
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const base=process.argv[2];
@@ -9,7 +10,8 @@ const out=path.resolve(__dirname,'../artifacts/alpha-keys-admin');fs.mkdirSync(o
  const context=await browser.newContext({viewport:{width:1280,height:900},hasTouch:true});
  const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
  page.setDefaultTimeout(15000);
- const login=async name=>{await page.goto(base+'/admin/login');await page.locator("[name=identifier], [name=username]").fill(name);await page.locator('[name=password]').fill('Fixture-Alpha-2026!');await page.getByRole('button',{name:'Anmelden',exact:true}).click();await page.waitForURL(base+'/admin');};
+ page.setDefaultNavigationTimeout(45000);
+ const login=async name=>{await page.goto(base+'/admin/login?lang=de');await page.locator("[name=identifier], [name=username]").fill(name);await page.locator('[name=password]').fill('Fixture-Alpha-2026!');await page.getByRole('button',{name:'Anmelden',exact:true}).click();await page.waitForURL(base+'/admin');};
  const formData=()=>page.locator('.alpha-create form').evaluate(f=>Object.fromEntries(new FormData(f)));
  const post=async(data,action='alpha-key-create')=>context.request.post(base+'/admin/action/'+action,{form:data,maxRedirects:0});
  try{

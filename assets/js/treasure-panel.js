@@ -3,8 +3,8 @@ window.ConquerTreasures = function(ctx){
     'use strict';
     const {base,esc,fmt,getKingdom,action,navigate,toast}=ctx;
     const host=()=>document.querySelector('#content');
+    const relics=window.ConquerRelicPresentation;
     const grades={normal:'Gewöhnlich',rare:'Selten',epic:'Episch',legendary:'Legendär',mythic:'Mythisch'};
-    const bonusNames={all_attack:'Truppenangriff',all_defense:'Truppenverteidigung',all_hp:'Truppen-Lebenspunkte',cavalry_attack:'Kavallerieangriff',cavalry_defense:'Kavallerieverteidigung',cavalry_hp:'Kavallerie-Lebenspunkte',cavalry_load:'Kavallerietraglast',cavalry_speed:'Kavalleriegeschwindigkeit',construction_speed:'Baugeschwindigkeit',food_gathering_speed:'Nahrung sammeln',food_production:'Nahrungsproduktion',food_protection_capacity:'Nahrungsschutz',food_storage_capacity:'Nahrungslager',gathering_speed:'Sammelgeschwindigkeit',gold_gathering_speed:'Gold sammeln',gold_production:'Goldproduktion',gold_protection_capacity:'Goldschutz',gold_storage_capacity:'Goldlager',hospital_capacity:'Lazarettkapazität',infantry_attack:'Infanterieangriff',infantry_defense:'Infanterieverteidigung',infantry_hp:'Infanterie-Lebenspunkte',infantry_load:'Infanterietraglast',infantry_speed:'Infanteriegeschwindigkeit',lumber_gathering_speed:'Holz sammeln',lumber_production:'Holzproduktion',lumber_protection_capacity:'Holzschutz',lumber_storage_capacity:'Holzlager',march_capacity:'Marschkapazität',march_speed:'Marschgeschwindigkeit',ranged_attack:'Fernkampfangriff',ranged_defense:'Fernkampfverteidigung',ranged_hp:'Fernkampf-Lebenspunkte',ranged_load:'Fernkampftraglast',ranged_speed:'Fernkampfgeschwindigkeit',research_speed:'Forschungsgeschwindigkeit',resource_production:'Rohstoffproduktion',resource_protection:'Rohstoffschutz',stone_gathering_speed:'Stein sammeln',stone_production:'Steinproduktion',stone_protection_capacity:'Steinschutz',stone_storage_capacity:'Steinlager',training_speed:'Ausbildungsgeschwindigkeit',vs_monster_attack:'Angriff gegen Monster'};
     const bonusDescriptions={
         all_attack:'Erhöht den Angriff aller eigenen Truppen.',all_defense:'Erhöht die Verteidigung aller eigenen Truppen.',all_hp:'Erhöht die Lebenspunkte aller eigenen Truppen.',
         cavalry_attack:'Erhöht den Angriff deiner Kavallerie.',construction_speed:'Verkürzt die Bauzeit neuer Gebäude und Ausbauten.',food_production:'Erhöht die Nahrungsproduktion deiner Stadt.',
@@ -13,80 +13,6 @@ window.ConquerTreasures = function(ctx){
         march_capacity:'Erhöht die maximale Truppenanzahl pro Marsch.',march_speed:'Erhöht die Bewegungsgeschwindigkeit deiner Märsche.',ranged_attack:'Erhöht den Angriff deiner Fernkämpfer.',
         research_speed:'Verkürzt die Forschungszeit.',resource_protection:'Erhöht die Rohstoffmenge, die bei einem Angriff geschützt bleibt.',stone_production:'Erhöht die Steinproduktion deiner Stadt.',
         training_speed:'Verkürzt die Ausbildungszeit neuer Truppen.',vs_monster_attack:'Erhöht den Schaden deiner Truppen gegen Monster.'
-    };
-    const treasurePresentation={60100001:['Magischer Dünger','manure.png'],60100002:['Amulett des Holzfällers','woodcutter.png'],60100003:['Steinamulett','stone-amulet.png'],60100006:['Federkappe','feather-cap.png'],60200001:['Eiserner Schild','iron-shield.png'],60200002:['Bogen des Jägers','hunters-bow.png'],60200003:['Kavalleriesporen','cavalry-spurs.png'],60200004:['Hammer des Baumeisters','builders-hammer.png'],60200006:['Horn des Ausbilders','drillmasters-horn.png'],60300001:['Drachenschuppenschild','dragon-shield.png'],60300002:['Phönixfederbogen','phoenix-bow.png'],60300003:['Schattenklinge','shadow-blade.png'],60300004:['Stab des Erzmagiers','archmage-staff.png'],60300005:['Banner des Kriegsherrn','warlord-banner.png'],60300006:['Ernteidol','harvest-idol.png'],60400001:['Panzerhandschuh des Titanen','titan-gauntlet.png'],60400003:['Auge des Orakels','oracles-eye.png'],60400004:['Blutmondtotem','blood-moon-totem.png'],60500002:['Schuppe der Weltschlange','serpent-scale.png']};
-    const relicPresentationV2={
-        60100001:['Kornhorn der Ernte','rel-001-kornhorn-der-ernte.png','normal'],
-        60100107:['Fass der Waldquelle','rel-002-fass-der-waldquelle.png','normal'],
-        60100101:['Zeichen des Steinmetzen','rel-003-zeichen-des-steinmetzen.png','normal'],
-        60100105:['Lampe der Tiefen','rel-004-lampe-der-tiefen.png','normal'],
-        60100103:['Sichel der Kornpfade','rel-005-sichel-der-kornpfade.png','normal'],
-        60100002:['Axt des Grünhains','rel-006-axt-des-gruenhains.png','normal'],
-        60100003:['Meißel der Felsader','rel-007-meissel-der-felsader.png','normal'],
-        60100102:['Spitzhacke der Goldspur','rel-008-spitzhacke-der-goldspur.png','normal'],
-        60100104:['Klinge der Vorhut','rel-009-klinge-der-vorhut.png','normal'],
-        60100108:['Bogen des Weitblicks','rel-010-bogen-des-weitblicks.png','normal'],
-        60100106:['Speer des Sturmritts','rel-011-speer-des-sturmritts.png','normal'],
-        60100109:['Schild der Eichenwacht','rel-012-schild-der-eichenwacht.png','normal'],
-        60100006:['Kapuze des Falken','rel-013-kapuze-des-falken.png','normal'],
-        60200003:['Sporn des Windreiters','rel-014-sporn-des-windreiters.png','normal'],
-        60200102:['Ast des Vierfachen Segens','rel-015-ast-des-vierfachen-segens.png','rare'],
-        60200106:['Pflugschar der Sommerflur','rel-016-pflugschar-der-sommerflur.png','rare'],
-        60200107:['Säge des Flüsterwalds','rel-017-saege-des-fluesterwalds.png','rare'],
-        60200104:['Runenmeißel der Tiefen','rel-018-runenmeissel-der-tiefen.png','rare'],
-        60200105:['Sternenpicke','rel-019-sternenpicke.png','rare'],
-        60300005:['Banner der Drei Heere','rel-020-banner-der-drei-heere.png','rare'],
-        60200108:['Elixier des Löwenmuts','rel-021-elixier-des-loewenmuts.png','rare'],
-        60200110:['Elixier der Eisenhaut','rel-022-elixier-der-eisenhaut.png','rare'],
-        60200103:['Elixier des Lebensstroms','rel-023-elixier-des-lebensstroms.png','rare'],
-        60200109:['Elixier des Windlaufs','rel-024-elixier-des-windlaufs.png','rare'],
-        60200111:['Silberapfel der Eile','rel-025-silberapfel-der-eile.png','rare'],
-        60200004:['Lastenhammer der Kolonne','rel-026-lastenhammer-der-kolonne.png','rare'],
-        60200001:['Bastionsschild der Vorhut','rel-027-bastionsschild-der-vorhut.png','rare'],
-        60200002:['Mondbogen der Waldwacht','rel-028-mondbogen-der-waldwacht.png','rare'],
-        60200101:['Zaum des Nachtreiters','rel-029-zaum-des-nachtreiters.png','rare'],
-        60300115:['Portalsphäre','rel-030-portalsphaere.png','epic'],
-        60300116:['Amulett der Vier Quellen','rel-031-amulett-der-vier-quellen.png','epic'],
-        60300006:['Sonnenähre','rel-032-sonnenaehre.png','epic'],
-        60300109:['Goldblattbeil','rel-033-goldblattbeil.png','epic'],
-        60300110:['Runenhammer der Hochmauer','rel-034-runenhammer-der-hochmauer.png','epic'],
-        60300111:['Kronenpicke der Erzfürsten','rel-035-kronenpicke-der-erzfuersten.png','epic'],
-        60300113:['Mal des Steinlöwen','rel-036-mal-des-steinloewen.png','epic'],
-        60300119:['Pfeil des Sonnenfalken','rel-037-pfeil-des-sonnenfalken.png','epic'],
-        60300120:['Lanze des Donnerhufs','rel-038-lanze-des-donnerhufs.png','epic'],
-        60300003:['Klinge des Schwurschattens','rel-039-klinge-des-schwurschattens.png','epic'],
-        60300102:['Panzer des Aschenwächters','rel-040-panzer-des-aschenwaechters.png','epic'],
-        60400001:['Handschuh der Blutnacht','rel-041-handschuh-der-blutnacht.png','epic'],
-        60300106:['Herzstein des Golems','rel-042-herzstein-des-golems.png','epic'],
-        60300004:['Stab der Verdorrnis','rel-043-stab-der-verdorrnis.png','epic'],
-        60300114:['Obsidianbastion','rel-044-obsidianbastion.png','epic'],
-        60300118:['Schriftrolle der Erschöpfung','rel-045-schriftrolle-der-erschoepfung.png','epic'],
-        60400004:['Nachtkern der Schweigenden','rel-046-nachtkern-der-schweigenden.png','epic'],
-        60300112:['Brecher der Werkhallen','rel-047-brecher-der-werkhallen.png','epic'],
-        60300101:['Amulett des Lebensquells','rel-048-amulett-des-lebensquells.png','epic'],
-        60300107:['Vitalis-Smaragd','rel-049-vitalis-smaragd.png','epic'],
-        60300117:['Kappe des Sternenweisen','rel-050-kappe-des-sternenweisen.png','epic'],
-        60300108:['Gabe der Tiefenschmiede','rel-051-gabe-der-tiefenschmiede.png','epic'],
-        60500002:['Schuppenpanzer des Himmelswurms','rel-052-schuppenpanzer-des-himmelswurms.png','epic'],
-        60300103:['Reißzahn der Purpurflamme','rel-053-reisszahn-der-purpurflamme.png','epic'],
-        60300104:['Phiole des Drachengeists','rel-054-phiole-des-drachengeists.png','epic'],
-        60300105:['Glutblüte der Vorräte','rel-055-glutbluete-der-vorraete.png','epic'],
-        60400108:['Seele des Unbezwungenen','rel-056-seele-des-unbezwungenen.png','legendary'],
-        60400113:['Schwinge des Morgenritts','rel-057-schwinge-des-morgenritts.png','legendary'],
-        60300001:['Schild des Firmaments','rel-058-schild-des-firmaments.png','legendary'],
-        60400110:['Klinge der Letzten Dämmerung','rel-059-klinge-der-letzten-daemmerung.png','legendary'],
-        60400107:['Frucht des Sternenhains','rel-060-frucht-des-sternenhains.png','legendary'],
-        60400101:['Kelch der Erdgöttin','rel-061-kelch-der-erdgoettin.png','legendary'],
-        60400104:['Kern der Weltenwurzel','rel-062-kern-der-weltenwurzel.png','legendary'],
-        60200006:['Horn des Ersten Feldzugs','rel-063-horn-des-ersten-feldzugs.png','legendary'],
-        60400105:['Herz des Polarsterns','rel-064-herz-des-polarsterns.png','legendary'],
-        60400111:['Zügel des Heermeisters','rel-065-zuegel-des-heermeisters.png','legendary'],
-        60400102:['Phiole des Kristallquells','rel-066-phiole-des-kristallquells.png','legendary'],
-        60400112:['Siegel des Großen Baumeisters','rel-067-siegel-des-grossen-baumeisters.png','legendary'],
-        60400106:['Speer des Herzensjägers','rel-068-speer-des-herzensjaegers.png','legendary'],
-        60300002:['Bogen des Sternenwyrms','rel-069-bogen-des-sternenwyrms.png','legendary'],
-        60400103:['Bollwerk des Wyrmbanns','rel-070-bollwerk-des-wyrmbanns.png','legendary'],
-        60400109:['Prisma des Einklangs','rel-071-prisma-des-einklangs.png','legendary']
     };
     let selectedSlot=1,selectedCode=null,selectedPreset=1,busy=false,detailOpen=false,exchangeOpen=false,exchangeAmount=1,tab='equipment',lastDrops=[],mobileBonuses=false;
     let resetRequested='';
@@ -97,11 +23,11 @@ window.ConquerTreasures = function(ctx){
     const remaining=v=>Math.max(0,Math.ceil((stamp(v)-now())/1000));
     const clock=v=>{const n=remaining(v);return [Math.floor(n/3600),Math.floor(n%3600/60),n%60].map(x=>String(x).padStart(2,'0')).join(':');};
     const gradeRank={normal:0,rare:1,epic:2,legendary:3,mythic:4};
-    const grade=i=>relicPresentationV2[i.treasure_code]?.[2]||(Object.hasOwn(grades,i.grade)?i.grade:'normal');
+    const grade=relics.grade;
     const fragmentImage=g=>base+'/assets/art/items/fragment-'+(Object.hasOwn(grades,g)?g:'normal')+'.svg';
-    const items=()=>[...(data()?.items||[])].sort((a,b)=>Number(Boolean(b.is_unlocked))-Number(Boolean(a.is_unlocked))||gradeRank[grade(a)]-gradeRank[grade(b)]||num(a.treasure_code)-num(b.treasure_code));
-    const name=i=>{const value=relicPresentationV2[i.treasure_code]?.[0]||i.name_de||treasurePresentation[i.treasure_code]?.[0]||i.name||'Unbekanntes Relikt';return window.ConquerLocale?.text(value)??value;};
-    const image=i=>relicPresentationV2[i.treasure_code]?base+'/assets/art/relics-v4-storybook/'+relicPresentationV2[i.treasure_code][1]+'?v=relics-v4-storybook':base+'/assets/art/items/'+(i.icon||treasurePresentation[i.treasure_code]?.[1]||'compass.svg')+'?v='+encodeURIComponent(window.CONQUER_ITEM_ART_VERSION||'catalog3');
+    const items=()=>(data()?.items||[]).filter(i=>i.grade!=='mythic').sort((a,b)=>Number(Boolean(b.is_unlocked))-Number(Boolean(a.is_unlocked))||gradeRank[grade(a)]-gradeRank[grade(b)]||num(a.treasure_code)-num(b.treasure_code));
+    const name=relics.name;
+    const image=i=>relics.image(base,i);
     const num=n=>Number(n||0);
     const value=n=>num(n).toLocaleString(window.ConquerLocale?.locale??'en',{maximumFractionDigits:2});
     const unit=(key,kind='percent')=>kind==='flat'?'':' %';
@@ -112,7 +38,7 @@ window.ConquerTreasures = function(ctx){
     const effectStar=effect=>`<span class="treasury-effect-star" aria-label="${fmt(effect.parts)} von 5 Sternteilen">${Array.from({length:5},(_,n)=>`<i class="${n<num(effect.parts)?'is-filled':''}" aria-hidden="true"></i>`).join('')}</span>`;
     function tile(i,context='collection'){
         const unlocked=Boolean(i.is_unlocked),fragments=num(i.fragments),showProgress=context==='collection'&&!unlocked&&fragments>0;
-        return `<span class="treasury-tile grade-${grade(i)} ${!relicPresentationV2[i.treasure_code]&&i.icon_framed?'is-framed':''} ${unlocked?'':'is-locked'}"><span class="treasury-tile-level">${unlocked?'ST. '+fmt(i.level):'🔒'}</span><img src="${image(i)}" alt="" loading="lazy">${showProgress?`<span class="treasury-tile-count"><img src="${fragmentImage(grade(i))}" alt="" aria-hidden="true"><strong>${fmt(fragments)}/10</strong></span>`:''}${context==='collection'&&Number.isFinite(Number(i.stars))&&num(i.stars)>0?`<span class="treasury-tile-stars" aria-label="${num(i.stars)} Sterne">${'★'.repeat(Math.min(5,num(i.stars)))}</span>`:''}${i.equipped_slot?'<span class="treasury-tile-equipped" aria-label="Ausgerüstet">✓</span>':''}</span>`;
+        return `<span class="treasury-tile grade-${grade(i)} ${relics.framed(i)?'is-framed':''} ${unlocked?'':'is-locked'}"><span class="treasury-tile-level">${unlocked?'ST. '+fmt(i.level):'🔒'}</span><img src="${image(i)}" alt="" loading="lazy">${showProgress?`<span class="treasury-tile-count"><img src="${fragmentImage(grade(i))}" alt="" aria-hidden="true"><strong>${fmt(fragments)}/10</strong></span>`:''}${context==='collection'&&Number.isFinite(Number(i.stars))&&num(i.stars)>0?`<span class="treasury-tile-stars" aria-label="${num(i.stars)} Sterne">${'★'.repeat(Math.min(5,num(i.stars)))}</span>`:''}${i.equipped_slot?'<span class="treasury-tile-equipped" aria-label="Ausgerüstet">✓</span>':''}</span>`;
     }
     const presets=()=>data()?.presets||Array.from({length:5},(_,n)=>({slot:n+1,saved:false,items:Array(6).fill(null)}));
     const currentPreset=()=>presets().find(p=>num(p.slot)===selectedPreset);
@@ -186,7 +112,7 @@ window.ConquerTreasures = function(ctx){
         const status=equipped?'Angelegt auf Platz '+i.equipped_slot:!i.is_unlocked?'Noch nicht freigeschaltet':!i.is_usable?'Sammlerrelikt · keine aktiven Boni':'Bereit zum Anlegen';
         const universal=num(data()?.universal_fragments?.[grade(i)]);
         const exchangeLabel=`<span class="treasury-fragment-exchange-copy"><img src="${fragmentImage(grade(i))}" alt="" aria-hidden="true"><span><strong>Puzzlefragmente umwandeln</strong><small>${fmt(universal)} verfügbar</small></span></span><b class="treasury-fragment-exchange-plus" aria-hidden="true">+</b>`;
-        const effectRows=effects.map(effect=>{const done=num(effect.parts)>=5,cost=num(effect.upgrade_cost),canUpgrade=i.is_unlocked&&!done&&num(i.fragments)>=cost&&!busy;const upgrade=done?'<span class="treasury-effect-max">MAX</span>':button(`<span class="treasury-effect-cost"><img src="${fragmentImage(grade(i))}" alt=""><b>${fmt(cost)}</b></span><span>Aufwerten</span>`,'effect-upgrade',`${i.treasure_code}:${effect.index}`,'treasury-effect-upgrade',canUpgrade?'': 'disabled');return `<div class="treasury-effect-row"><div class="treasury-effect-main">${effectStar(effect)}<span><b>${esc(bonusNames[effect.type]||effect.label_de||effect.type)}</b><strong>${num(effect.current_value)>=0?'+':''}${value(effect.current_value)}${unit(effect.type,effect.unit)}${done?'':` <em>→ ${num(effect.next_value)>=0?'+':''}${value(effect.next_value)}${unit(effect.type,effect.unit)}</em>`}</strong></span>${upgrade}</div><div class="treasury-effect-master ${effect.master_unlocked?'is-unlocked':'is-locked'}"><i aria-hidden="true">${effect.master_unlocked?'✓':'🔒'}</i><span><b>${esc(bonusNames[effect.master_type]||effect.master_label_de||effect.master_type||effect.type)} ${num(effect.master_value)>=0?'+':''}${value(effect.master_value)}${unit(effect.master_type||effect.type,effect.master_unit)}</b><small>Meisterbonus</small></span></div></div>`;}).join('');
+        const effectRows=effects.map(effect=>{const done=num(effect.parts)>=5,cost=num(effect.upgrade_cost),canUpgrade=i.is_unlocked&&!done&&num(i.fragments)>=cost&&!busy;const upgrade=done?'<span class="treasury-effect-max">MAX</span>':button(`<span class="treasury-effect-cost"><img src="${fragmentImage(grade(i))}" alt=""><b>${fmt(cost)}</b></span><span>Aufwerten</span>`,'effect-upgrade',`${i.treasure_code}:${effect.index}`,'treasury-effect-upgrade',canUpgrade?'': 'disabled');return `<div class="treasury-effect-row"><div class="treasury-effect-main">${effectStar(effect)}<span><b>${esc(relics.bonusName(effect.type,effect.label_de||effect.type))}</b><strong>${num(effect.current_value)>=0?'+':''}${value(effect.current_value)}${unit(effect.type,effect.unit)}${done?'':` <em>→ ${num(effect.next_value)>=0?'+':''}${value(effect.next_value)}${unit(effect.type,effect.unit)}</em>`}</strong></span>${upgrade}</div><div class="treasury-effect-master ${effect.master_unlocked?'is-unlocked':'is-locked'}"><i aria-hidden="true">${effect.master_unlocked?'✓':'🔒'}</i><span><b>${esc(relics.bonusName(effect.master_type||effect.type,effect.master_label_de||effect.master_type||effect.type))} ${num(effect.master_value)>=0?'+':''}${value(effect.master_value)}${unit(effect.master_type||effect.type,effect.master_unit)}</b><small>Meisterbonus</small></span></div></div>`;}).join('');
         return `<aside id="treasury-inspector" class="treasury-inspector" aria-labelledby="treasury-item-name"><div class="treasury-inspector-hero">${tile(i)}<div><small class="treasury-grade grade-${grade(i)}">${grades[grade(i)]}</small><h3 id="treasury-item-name">${esc(name(i))}</h3><span>${i.is_unlocked?'Relikt freigeschaltet':'Noch '+fmt(Math.max(0,10-num(i.fragments)))+' Fragmente bis zur Freischaltung'}</span></div></div><div class="treasury-fragments"><div><span>${maxLevel?'Alle Effekte gemeistert':'Verfügbare Reliktfragmente'}</span><strong>${fmt(i.fragments)}</strong></div>${button(exchangeLabel,'exchange-open',i.treasure_code,'treasury-fragment-exchange',maxLevel?'disabled':'' )}</div><button type="button" class="button secondary item-source-link" data-action="item-sources" data-treasure-code="${num(i.treasure_code)}">${esc(window.ConquerLocale?.t('sources.find_fragments')||'Find fragments')}</button><div class="treasury-effect-table"><div class="treasury-effect-head"><b>Relikt-Effekte</b><b>Meisterboni</b></div>${effectRows||'<p class="treasury-stat-empty">Dieses Relikt hat keine aktiven Boni.</p>'}</div><div class="treasury-inspector-footer"><p class="treasury-status ${equipped?'is-active':''}">${esc(status)}</p>${equipped?button('Ablegen · Platz '+i.equipped_slot,'unequip',i.treasure_code,'blue',busy?'disabled':''):eligible?`${target?`<p class="treasury-replace-note">Ersetzt ${esc(name(target))} auf Platz ${selectedSlot}.</p>`:''}${button(target?'Ersetzen · Platz '+selectedSlot:'Anlegen · Platz '+selectedSlot,'equip',i.treasure_code,'gold',busy?'disabled':'')}`:button('Puzzlefragmente umwandeln','exchange-open',i.treasure_code,'blue',maxLevel?'disabled':'')}${!equipped&&usable(i)&&!slotCount()?'<small>Baue zuerst deine Schatzkammer.</small>':''}</div></aside>`;
     }
     function fragmentExchange(i){
@@ -195,7 +121,7 @@ window.ConquerTreasures = function(ctx){
     }
     function bonuses(){
         const all=Object.entries(data().bonuses||{}).filter(([,v])=>num(v)!==0);
-        return `<section class="treasury-active-bonuses" aria-label="Treasure Boosts der angelegten Relikte"><h3>Treasure Boosts</h3><div class="treasury-bonus-scroll" tabindex="0" aria-label="Gesamtwerte aller angelegten Relikte">${all.length?all.map(([key,v])=>`<div class="treasury-bonus-row"><span>${esc(bonusNames[key]||key)}</span><strong>+${value(v)}${unit(key)}</strong></div>`).join(''):'<div class="treasury-bonus-empty">Noch keine Treasure Boosts.<small>Lege oben ein freigeschaltetes Relikt an.</small></div>'}</div></section>`;
+        return `<section class="treasury-active-bonuses" aria-label="Treasure Boosts der angelegten Relikte"><h3>Treasure Boosts</h3><div class="treasury-bonus-scroll" tabindex="0" aria-label="Gesamtwerte aller angelegten Relikte">${all.length?all.map(([key,v])=>`<div class="treasury-bonus-row"><span>${esc(relics.bonusName(key))}</span><strong>+${value(v)}${unit(key)}</strong></div>`).join(''):'<div class="treasury-bonus-empty">Noch keine Treasure Boosts.<small>Lege oben ein freigeschaltetes Relikt an.</small></div>'}</div></section>`;
     }
     async function presetAction(operation){
         if(busy)return;

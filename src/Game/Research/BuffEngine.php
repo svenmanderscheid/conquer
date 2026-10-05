@@ -126,7 +126,7 @@ final class BuffEngine
         }
         // Construction and production already receive VIP through CityState/ResourceTick.
         // Research and training consume this shared map for both previews and real queues.
-        $vip=\Conquer\Game\Vip\VipService::status($playerId)['bonuses'];
+        $vip=\Conquer\Game\Vip\VipService::status($playerId,$worldId)['bonuses'];
         $result['research_speed']=($result['research_speed']??0.0)+$vip['research_speed']/100;
         $result['training_speed']=($result['training_speed']??0.0)+$vip['troop_training_speed']/100;
         return ResearchEffects::normalize($result) + \Conquer\Game\City\BuildingProgression::forPlayer($playerId,$worldId);

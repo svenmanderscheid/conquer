@@ -26,7 +26,8 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/audio-2026
    await page.locator('[data-audio-start]').scrollIntoViewIfNeeded();await page.screenshot({path:path.join(out,`settings-${width}x${height}.png`)});
   }
   await page.setViewportSize({width:390,height:844});
-  for(const kind of ['confirm','training','building','reward','rally']){await page.locator(`[data-audio-demo=${kind}]`).tap();assert.equal((await status()).lastSound,kind);await page.waitForFunction(()=>ConquerAudio.status().voices===0);}
+  const demoKinds=await page.locator('[data-audio-demo]').evaluateAll(buttons=>buttons.map(button=>button.dataset.audioDemo));assert.equal(demoKinds.length,21);
+  for(const kind of demoKinds){await page.locator(`[data-audio-demo=${kind}]`).tap();await page.waitForFunction(kind=>ConquerAudio.status().lastSound===kind,kind);await page.waitForFunction(()=>ConquerAudio.status().voices===0);}
   const setVolume=async(key,value)=>{await page.locator(`[data-audio-setting=${key}]`).evaluate((el,value)=>{el.value=value;el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));},value);};
   await setVolume('musicVolume',13);await setVolume('effectsVolume',34);
   await page.locator('[data-audio-setting=rallyAlerts]').uncheck();assert.equal((await status()).settings.rallyAlerts,false);
@@ -67,10 +68,14 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/audio-2026
    await page.evaluate(locale=>ConquerLocale.setLocale(locale),locale);await page.waitForFunction(title=>document.querySelector('.audio-settings h2')?.textContent===title,title);
    assert.equal(await page.locator('[data-audio-demo=reward]').textContent(),reward);
    assert.equal(await page.locator('[data-audio-demo=rally]').textContent(),await page.evaluate(()=>ConquerLocale.t('audio.rally')));
+   for(const kind of demoKinds)assert.equal(await page.locator(`[data-audio-demo=${kind}]`).textContent(),await page.evaluate(kind=>ConquerLocale.t('audio.'+kind),kind));
+   assert.equal(await page.locator('[data-audio-setting=effectsVolume]').getAttribute('aria-label'),await page.evaluate(()=>ConquerLocale.t('audio.effects_volume')));
   }
   checks.push({gesture:true,downloads,lifecycle:true,savedMute:true,trainingPosts,confirmedOrders:true,locales:['de','en','fr']});
   // Isolated engine exercises completion snapshots, exclusions and failure recovery.
-  const isolated=await context.newPage();isolated.on('pageerror',e=>errors.push(e.message));
+  // A fresh context keeps the installed PWA worker from replacing mock documents.
+  const engineContext=await browser.newContext({serviceWorkers:'block',viewport:{width:1280,height:900}});
+  const isolated=await engineContext.newPage();isolated.on('pageerror',e=>errors.push(e.message));
   await isolated.route('**/__audio-fixture',route=>route.fulfill({contentType:'text/html',body:'<!doctype html><html><body></body></html>'}));
   await isolated.goto(base+'/__audio-fixture');await isolated.addScriptTag({url:base+'/assets/js/game-audio.js'});
   await isolated.evaluate(()=>{window.testAudio=ConquerAudio.create({base:''});document.body.innerHTML=testAudio.controls();});await isolated.locator('[data-audio-start]').click();await isolated.waitForFunction(()=>ConquerAudio.status().musicPlaying);
@@ -81,8 +86,9 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/audio-2026
   await isolated.evaluate(()=>testAudio.observe({...sample,server_time:1002,trained_total:10}));assert.equal(await isolated.evaluate(()=>ConquerAudio.status().lastSound),'trained');await quiet();
   await isolated.evaluate(()=>testAudio.observe({...sample,server_time:1003,research:{food_production:1}}));assert.equal(await isolated.evaluate(()=>ConquerAudio.status().lastSound),'research');await quiet();
   await isolated.evaluate(()=>{testAudio.observe({...sample,server_time:1004,buildings:{farm:{level:9}},return_summary:{}});testAudio.observe({...sample,server_time:1405,buildings:{farm:{level:10}}});testAudio.observe({...sample,server_time:1406,city:{player_id:99,world_id:2},buildings:{farm:{level:11}}});});assert.equal(await isolated.evaluate(()=>ConquerAudio.status().playedCount),3,'return summary, absence and world switches do not replay completion sounds');
+  await isolated.evaluate(()=>{document.dispatchEvent(new Event('visibilitychange'));testAudio.observe({...sample,server_time:1407,buildings:{farm:{level:12}}});});assert.equal(await isolated.evaluate(()=>ConquerAudio.status().playedCount),3,'foreground refresh establishes a silent completion baseline');
   await isolated.close();
-  const fallback=await context.newPage();fallback.on('pageerror',e=>errors.push(e.message));let failedLoads=0;
+  const fallback=await engineContext.newPage();fallback.on('pageerror',e=>errors.push(e.message));let failedLoads=0;
   await fallback.route('**/__audio-fixture',route=>route.fulfill({contentType:'text/html',body:'<!doctype html><html><body></body></html>'}));
   await fallback.route('**/assets/audio/village-daylight-v1.wav',route=>{failedLoads++;return route.fulfill({status:503,body:'Audio temporarily unavailable'});});
   await fallback.goto(base+'/__audio-fixture');await fallback.addScriptTag({url:base+'/assets/js/game-audio.js'});

@@ -9,6 +9,7 @@ final class PaymentGatewayFactory
     public static function configured(): PaymentGateway
     {
         $config=Bootstrap::getConfig();$payment=$config['premium_payments']??[];
+        if (($config['alpha_no_payments']??true)===true) return new UnavailablePaymentGateway();
         if (($config['env']??'production')!=='production'
             && ($payment['provider']??null)==='preview'
             && ($payment['preview']['enabled']??false)===true

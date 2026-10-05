@@ -10,7 +10,7 @@ const output=fs.mkdtempSync(path.join(os.tmpdir(),'conquer-active-effects-'));
  const browser=await chromium.launch({headless:true,channel:process.env.PLAYWRIGHT_CHANNEL||'chrome'});
  try{
   const page=await browser.newPage({viewport:{width:1280,height:800},hasTouch:true}),errors=[],failures=[];
-  page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(20000);
+  page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(20000);page.setDefaultNavigationTimeout(45000);
   let mode='normal';
   await page.route('**/api/game/state*',async route=>{
    const response=await route.fetch(),json=await response.json();
@@ -32,7 +32,9 @@ const output=fs.mkdtempSync(path.join(os.tmpdir(),'conquer-active-effects-'));
    const layout=await page.evaluate(()=>{
     const bad=[],up=document.querySelector('#hud-bonuses'),down=document.querySelector('#hud-debuffs');
     const a=up.getBoundingClientRect(),b=down.getBoundingClientRect();
-    if(a.x!==b.x||a.bottom>b.top)bad.push('Debuff is not below the bonus arrow');
+    const compact=matchMedia('(max-width:700px), (max-width:1100px) and (max-height:520px)').matches;
+    if(compact){if(a.right>b.left+1||Math.abs(a.y-b.y)>1)bad.push('Compact effect controls must share one separate row');}
+    else if(a.x!==b.x||a.bottom>b.top)bad.push('Debuff is not below the bonus arrow');
     const visible=e=>{const r=e.getBoundingClientRect();return r.width&&r.height&&getComputedStyle(e).visibility!=='hidden';};
     const other=[...document.querySelectorAll('.topbar button:not(.hud-effect-button),#hud-left-tools button,.hud-right-tools button')].filter(visible);
     for(const e of [up,down]){const r=e.getBoundingClientRect();

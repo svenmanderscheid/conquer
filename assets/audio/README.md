@@ -1,5 +1,56 @@
 # Dorfmusik und Spieleffekte
 
+## Aktionssounds (5. Oktober 2026)
+
+Die gemeinsame Audio-Engine bietet 21 kurze Hörproben unter **Menü → Optionen
+→ Musik & Klänge**. Zusätzlich zu Bestätigung, Ausbildung, Bau, Forschung,
+Abschlüssen, Belohnung, Rally und Fehler gibt es eigene Klänge für entsandte
+Truppen, Angriffe, Sammeln, Spähen, Rückruf, Heilung, Truhen, Käufe,
+Beschleuniger, Reliktausrüstung/-aufwertung und Teleportation.
+
+Die vom Nutzer gewählte Richtung verbindet **episch & kräftig** mit
+**verspielt & gemütlich**: Armee, Angriff, Bau und Reliktaufwertung verwenden
+tiefe Trommelimpulse, warme Hornharmonien und satte Schlagtexturen. Bestätigungen,
+Sammeln und Einkäufe bekommen federnde Plopps und gezupfte Klänge; Forschung,
+Heilung und Belohnungen märchenhafte Glöckchen mit leisen Obertönen.
+Truhen, fertige Gebäude und Teleporter verbinden beide Klangwelten.
+Alle Signale bleiben kurz (unter 1,2 Sekunden); gespeicherte Lautstärken gelten
+weiter. Ein Effekt verwendet höchstens 24 gleichzeitig geplante Tonstimmen,
+ergänzt um seine kurzen Rauschtexturen.
+
+Alle Effekte werden im vorhandenen AudioContext synthetisiert. Kurze gefilterte
+Rauschimpulse ergänzen Schritte, Holz, Metall und magisches Rauschen. Dafür
+wird genau ein 0,8 Sekunden langer Mono-Puffer erzeugt und wiederverwendet;
+es gibt keine zusätzlichen Audiodownloads, externen Samples oder Dienste.
+Beendete Klangquellen und Filter werden getrennt und entfernt.
+
+Die Zuordnung liegt in `assets/js/game-audio.js` bei `confirmed()`. Sie wird
+von der zentralen API-Funktion erst nach erfolgreicher Serverantwort aufgerufen.
+Vorschauen, Zustandsabfragen, Chat und Benachrichtigungs-Lesebestätigungen bleiben
+stumm. Ergebnisfelder unterscheiden Teleporter, Beschleuniger und Pakete bei
+`inventory.use`; bestätigte Käufe haben Vorrang vor enthaltenen Drops.
+Die letzten 128 bestätigten Vorgangskennungen werden pro laufender Engine
+und Welt abgegrenzt, damit dieselbe Antwort keinen weiteren Erfolgston erzeugt.
+Diese Begrenzung ist nur Audiofeedback; die Spielregeln und dauerhaften
+Vorgangsbelege bleiben auf dem Server.
+
+Stummschaltung, Effektregler, erste Benutzereingabe und Hintergrundpause gelten
+für alle Effekte. Beim Zurückkehren beginnt die Abschlussbeobachtung mit einem
+stillen Ausgangsstand. Hörproben und Beschriftungen sind vollständig Englisch,
+Deutsch und Französisch; Englisch bleibt Standard und Rückfall.
+
+Prüfungen: `tests/action_audio.cjs` (46 Aktionszuordnungen, Vorschauen,
+Wiederholungen, Einstellungen, Lebenszyklus), `tests/rally_audio.cjs` und
+`tests/game_audio_app.cjs` (echte Haupt-App mit isoliertem Spielstand, alle
+Hörproben, fünf Bildschirmformate, Übersetzungen, Pause, Musikfehler).
+`tests/action_audio_render.cjs` rendert die echten Effektgraphen mit dem nativen
+OfflineAudioContext des Browsers: 21 verschiedene Wellenformen, keine
+Übersteuerung bei 100 % Effektlautstärke und freigegebene Klangquellen.
+Es erzeugt `artifacts/action-audio/sound-preview-epic-storybook-v2.wav`
+(sowie `sound-preview.wav` als aktuelle Fassung) mit allen Hörproben in
+derselben Reihenfolge wie in den Optionen (je 1,2 Sekunden einschließlich Pause)
+sowie ein Pegelprotokoll. Die Abnahme auf echten iOS-/Android-Geräten steht aus.
+
 Seit dem 1. Oktober 2026 spielt Union of Kingdoms die bereits vorhandene
 hellere Fassung `village-daylight-v1.wav`: eine Melodie in G-Dur,
 84 BPM, 4/4-Takt, rund 45,7 Sekunden. Weiche glöckchenartige Töne, sparsame

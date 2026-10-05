@@ -163,7 +163,8 @@ final class ChestService
         }
 
         $rolls   = (int) ($config['rolls'] ?? 1);
-        $entries = (array) $config['drop_table'];
+        $entries = array_values(array_filter((array)$config['drop_table'],\Conquer\Game\Rewards\RewardCatalog::isDropEligible(...)));
+        if (!$entries) throw new \DomainException(\Conquer\Game\Locale::t('alpha.error.empty_chest'));
         $results = [];
 
         for ($i = 0; $i < $rolls; $i++) {

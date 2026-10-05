@@ -11,6 +11,9 @@ const output=path.resolve(__dirname,'../artifacts/map-search');fs.mkdirSync(outp
  try{
   const page=await browser.newPage({viewport:{width:1280,height:800}});page.on('pageerror',e=>{errors.push(e.stack);console.error(e.stack);});
   const searchTrace=[];
+  // Keep real searches within the production 15-per-minute token budget.
+  let previousSearch=0;
+  await page.route('**/api/map/search?*',async route=>{const wait=Math.max(0,previousSearch+4100-Date.now());if(wait)await new Promise(resolve=>setTimeout(resolve,wait));previousSearch=Date.now();await route.continue();});
   for(const event of ['request','requestfailed','response'])page.on(event,item=>{if(item.url().includes('/api/map/search'))searchTrace.push({event,at:Date.now(),url:item.url(),status:event==='response'?item.status():undefined,failure:event==='requestfailed'?item.failure():undefined});});
   await page.addInitScript(()=>{window.searchPointerTrace=[];for(const event of ['pointerdown','pointerup','click'])document.addEventListener(event,e=>{const b=e.target.closest?.('[data-atlas="search-next"]');if(b)searchPointerTrace.push({event,at:performance.now(),disabled:b.disabled,text:b.textContent});},true);});
   await page.addInitScript(()=>{window.mapHistoryLog=[];for(const name of ['pushState','replaceState','back']){const original=history[name].bind(history);history[name]=(...args)=>{mapHistoryLog.push([name,args[0],location.hash]);return original(...args);};}window.addEventListener('popstate',()=>mapHistoryLog.push(['popstate',history.state,location.hash]));});

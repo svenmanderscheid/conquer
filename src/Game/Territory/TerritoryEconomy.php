@@ -42,7 +42,7 @@ final class TerritoryEconomy
         if($r['claimed_at'])return ['message'=>'Diese Belohnung wurde bereits abgeholt.','reward_id'=>$id];
         $reward=json_decode($r['reward_json'],true);$city=$db->query('SELECT id FROM cities WHERE world_id=? AND player_id=? ORDER BY id LIMIT 1 FOR UPDATE',[$world,$player])->fetchColumn();TerritoryService::require((bool)$city,'Stadt nicht gefunden.');
         $db->execute('UPDATE cities SET food=food+?,lumber=lumber+?,stone=stone+?,gold=gold+? WHERE id=?',[$reward['food']??0,$reward['lumber']??0,$reward['stone']??0,$reward['gold']??0,$city]);
-        foreach($reward['items']??[] as $code=>$count)\Conquer\Game\Inventory\InventoryService::addItems($player,(int)$code,(int)$count);
+        foreach($reward['items']??[] as $code=>$count)\Conquer\Game\Inventory\InventoryService::addItems($player,(int)$code,(int)$count,$world);
         $db->execute('UPDATE territory_rewards SET claimed_at=UTC_TIMESTAMP() WHERE id=?',[$id]);return ['message'=>'Die verdiente Belohnung wurde gutgeschrieben.','reward_id'=>$id,'reward'=>$reward];
     }
     public static function support(int $player,int $world,array $body): array

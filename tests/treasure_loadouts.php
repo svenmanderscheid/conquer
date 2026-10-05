@@ -29,7 +29,7 @@ try{
  tc((int)$balances[60400002]===70&&(int)$balances[60100107]===0,'first-star migration charges exactly ten fragments once');
  MigrationSql::apply($db->getPdo(),$starSql);tc($db->query('SELECT treasure_code,fragments FROM player_treasures ORDER BY treasure_code')->fetchAll()===$before,'repeated first-star migration preserves every balance');
  tc(T::getEquippedStats(1,1)===T::getEquippedStats(1,2)&&T::getEquippedStats(1,1)!==[],'saved legacy equipment survives in both worlds');
- $catalog=T::state(1);tc(count($catalog['items'])===78&&$catalog['slots']===6&&$catalog['slot_unlock_levels']===[1,1,5,10,20,25],'77 active cards plus one owned legacy card are shown');
+ $catalog=T::state(1);tc(count($catalog['items'])===72&&$catalog['slots']===6&&$catalog['slot_unlock_levels']===[1,1,5,10,20,25],'71 active cards plus one owned non-mythic legacy card are shown');
  tc(!in_array(60400002,TreasureData::getCodesByGrade('legendary'),true),'legacy equipment stays outside the random pool');
  foreach($catalog['items'] as $item)tc($item['is_usable']&&$item['preview_stats']!==[]&&is_file(ROOT_DIR.'/assets/art/items/'.$item['icon']),'usable illustrated card '.$item['treasure_code']);
  tc(!T::equipTreasure(1,60500001,1,25),'unowned legacy relic rejected');

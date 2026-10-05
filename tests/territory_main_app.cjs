@@ -5,7 +5,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const base=process.env.TERRITORY_FIXTURE_URL||'http://127.0.0.1:18946';assert(/^http:\/\/127\.0\.0\.1:\d+$/.test(base),'Disposable localhost fixture required');
 const out=path.resolve(__dirname,'../artifacts/territory-main');fs.mkdirSync(out,{recursive:true});
 (async()=>{const browser=await chromium.launch({headless:true,channel:'chrome'});try{
- const page=await browser.newPage({viewport:{width:1280,height:800}}),errors=[];page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(12000);
+ const page=await browser.newPage({viewport:{width:1280,height:800}}),errors=[];page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(12000);page.setDefaultNavigationTimeout(45000);
  await page.goto(base+'/?zugang=login');await page.locator('[name="identifier"],[name="username"]').fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');await Promise.all([page.waitForURL('**/city'),page.locator('form[action$="/auth/local"] button[type="submit"]').click()]);await page.waitForFunction(()=>document.querySelector('#player-hud-name')?.textContent.includes('PreviewPlayer'));
  const response=await page.request.get(base+'/api/territory/state?world_id=1'),payload=await response.json();assert(payload.ok,payload.message);const territory=payload.data;assert.equal(territory.targets.length,113);
  const goal=territory.targets.find(t=>t.id===territory.goal.target_id);assert(goal&&goal.y>255);

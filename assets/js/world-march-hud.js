@@ -97,12 +97,14 @@ window.ConquerMarchHud=function({host,getContext,follow,locate,stop,focus,getSel
       // buttons, otherwise the selected army card is pushed under the dock.
       const buttons=[...document.querySelectorAll('.hud-right-tools button')].filter(b=>b.getClientRects().length&&getComputedStyle(b).visibility!=='hidden').map(b=>b.getBoundingClientRect()),dock=document.querySelector('#navigation')?.getBoundingClientRect();
       panel.style.left=`${Math.max(8,viewport.width-parseFloat(panel.style.width)-24)}px`;
-      panel.style.top=`${Math.max(top,buttons.length?Math.max(...buttons.map(r=>r.bottom))-viewport.top+8:90)}px`;
+      const cardBottom=Math.min(viewport.bottom,dock?.top||viewport.bottom)-viewport.top-8;
+      const controlsBottom=buttons.length?Math.max(...buttons.map(r=>r.bottom))-viewport.top+8:90;
+      panel.style.top=`${Math.max(top,Math.min(controlsBottom,cardBottom-146))}px`;
       if(chat&&chat.height>36){
         const clearWidth=viewport.right-chat.right-24;
         if(clearWidth>=220){panel.style.width=`${Math.min(parseFloat(panel.style.width),clearWidth)}px`;panel.style.left=`${viewport.width-parseFloat(panel.style.width)-16}px`;}
       }
-      panel.style.maxHeight=`${Math.max(146,(dock?.top||viewport.bottom)-viewport.top-parseFloat(panel.style.top)-8)}px`;
+      panel.style.maxHeight=`${Math.max(96,cardBottom-parseFloat(panel.style.top))}px`;
       if(viewport.width<=700&&viewport.height<=360){
         // The focused army replaces its list on very short phones, leaving
         // room above the dock instead of squeezing controls under it.

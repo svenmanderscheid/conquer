@@ -4,7 +4,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const root=path.resolve(__dirname,'..');
 const output=path.join(root,'artifacts/rally-hud');fs.mkdirSync(output,{recursive:true});
 const php=`define('ROOT_DIR',${JSON.stringify(root.replaceAll('\\','/'))});define('APP_BASE','');require ROOT_DIR.'/src/Autoloader.php';(new \\Conquer\\Autoloader(ROOT_DIR.'/src'))->register();$session=['username'=>'Rally Fixture'];$uiLayoutProfiles=\\Conquer\\Game\\Ui\\LayoutSettings::defaults();if(\\Conquer\\Db\\Connection::isInitialized())throw new RuntimeException('Unexpected database initialization');require ROOT_DIR.'/views/game.php';if(\\Conquer\\Db\\Connection::isInitialized())throw new RuntimeException('Unexpected database initialization');`;
-const html=execFileSync(process.env.PHP_BINARY||'C:/xampp/php/php.exe',['-r',php],{encoding:'utf8',maxBuffer:8*1024*1024}).replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'');
+const html=execFileSync(process.env.PHP_BINARY||'C:/xampp/php/php.exe',['-r',php],{encoding:'utf8',maxBuffer:8*1024*1024}).replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'').replace(/<section id="app-start"[\s\S]*?<\/section>/,'');
 async function assertRallySkillSnapshots(page){
  await page.setViewportSize({width:1280,height:800});
  for(const name of ['boss-mechanic','rally-panel'])await page.addScriptTag({content:fs.readFileSync(path.join(root,'assets/js',name+'.js'),'utf8')});

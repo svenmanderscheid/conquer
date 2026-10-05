@@ -93,42 +93,6 @@
       "icon_framed": false,
       "source_reference": null,
       "legacy_only": true
-    },
-    {
-      "code": 60500001,
-      "name": "Eternal Flame Crown",
-      "grade": "mythic",
-      "slot_type": "any",
-      "description": "Die flammende Krone stärkt Angriff, Verteidigung und Lebenspunkte der Armee und vergrößert ihre Märsche.",
-      "stats": [
-        {
-          "type": "all_attack",
-          "base_value": 15.0,
-          "per_level": 3.0
-        },
-        {
-          "type": "all_defense",
-          "base_value": 10.0,
-          "per_level": 2.5
-        },
-        {
-          "type": "all_hp",
-          "base_value": 8.0,
-          "per_level": 2.0
-        },
-        {
-          "type": "march_capacity",
-          "base_value": 2000,
-          "per_level": 500
-        }
-      ],
-      "max_level": 10,
-      "fragments_per_level": 150,
-      "name_de": "Krone der Ewigen Flamme",
-      "icon": "prestige.svg",
-      "icon_framed": false,
-      "source_reference": null,
-      "legacy_only": true
     }
   ],
   "version": 1,

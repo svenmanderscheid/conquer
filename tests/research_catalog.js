@@ -47,6 +47,9 @@ check('actual PHP loader exposes all nodes without silently overwriting an ID', 
     assert.deepEqual(loaded.map(node=>node.code).sort(),defs.map(node=>node.code).sort());
 });
 const env={window:{}};
+const requirementCatalog=JSON.parse(fs.readFileSync(path.join(root,'data/i18n/de.json'),'utf8'));
+env.window.ConquerLocale={formatNumber:value=>Number(value).toLocaleString('de-DE'),t:(key,params={})=>Object.entries(params).reduce((text,[name,value])=>text.split('{'+name+'}').join(String(value)),requirementCatalog[key]||key),text:value=>value};
+vm.runInNewContext(fs.readFileSync(path.join(root,'assets/js/requirements.js'),'utf8'),env);
 vm.runInNewContext(fs.readFileSync(path.join(root,'assets/js/research-tree.js'),'utf8'),env);
 const ui=env.window.ConquerResearch;
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -126,7 +129,7 @@ check('all names remain readable and bonus formats match actual effects', () => 
 });
 check('illustrated details retain every actual research and Academy prerequisite',()=>{
     const node=byCode.get('research_speed'),html=ui.renderRequirements({requirements:node.levels[0].requirements,state,base:'/conquer',esc});
-    for(const req of node.levels[0].requirements){const code=req.type==='academy'?'academy':req.code;assert(html.includes(`data-id="${code}"`));assert(html.includes(`Stufe ${req.level} benötigt`));}
+    for(const req of node.levels[0].requirements){const code=req.type==='academy'?'academy':req.code;assert(html.includes(`data-id="${code}"`));assert(html.includes(`benötigt Stufe ${req.level}`));}
     assert.equal((html.match(/class="rt-node-art/g)||[]).length,node.levels[0].requirements.length);
 });
 check('next-level locked and active/completed node states use actual requirements and queue',()=>{

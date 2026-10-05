@@ -165,7 +165,7 @@ final class DailyQuestService
             ];
         }
 
-        return $result;
+        return array_merge($result,StarterMissionService::quests($playerId));
     }
 
     /**
@@ -226,6 +226,7 @@ final class DailyQuestService
      */
     public static function claimReward(int $playerId, string $questCode): array
     {
+        if (str_starts_with($questCode,'starter_')) return StarterMissionService::claim($playerId,$questCode);
         // Both the kingdom action and the legacy quest endpoint use this path.
         // Keep the claim marker and every item/currency grant in one transaction.
         return Connection::getInstance()->transaction(

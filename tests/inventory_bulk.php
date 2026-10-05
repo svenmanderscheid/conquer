@@ -58,10 +58,11 @@ try {
     foreach (['resource_pack'=>'gems','vip_point'=>null] as $category=>$subtype) {
         $def=findBulk($category,$subtype);$code=(int)$def['code'];$field=$category==='vip_point'?'vip_points':'gems';
         InventoryService::addItems(1,$code,4);
-        $before=(int)$db->query("SELECT $field FROM players WHERE id=1")->fetchColumn();
+        $balanceSql=$field==='vip_points'?'SELECT vip_points FROM player_world_vip WHERE player_id=1 AND world_id=1':'SELECT gems FROM players WHERE id=1';\Conquer\Game\Vip\VipService::ensure(1,1);
+        $before=(int)$db->query($balanceSql)->fetchColumn();
         $result=useBulk($code,'bulk_'.$field.'_once');
         $amount=(int)($def['vip_points']??$def['amount'])*4;
-        checkBulk(stockBulk($code)===0 && (int)$db->query("SELECT $field FROM players WHERE id=1")->fetchColumn()===$before+$amount, 'full '.$field.' stack is credited');
+        checkBulk(stockBulk($code)===0 && (int)$db->query($balanceSql)->fetchColumn()===$before+$amount, 'full '.$field.' stack is credited');
     }
 
     foreach (['gathering_speed','city_shield','anti_spy'] as $type) {

@@ -101,7 +101,7 @@ final class ResourceTick
         $owner=(int)$fresh['player_id'];
         $speedFactor??=max(.01,(float)$db->query('SELECT speed_factor FROM worlds WHERE id=?',[(int)$fresh['world_id']])->fetchColumn());
         if(!$vipBonuses){
-            $vipBonuses=\Conquer\Game\Vip\VipService::status($owner)['bonuses'];
+            $vipBonuses=\Conquer\Game\Vip\VipService::status($owner,(int)$fresh['world_id'])['bonuses'];
             $buffs=\Conquer\Game\Research\BuffEngine::getBuffs($owner,(int)$fresh['world_id']);
             $alliance=$db->query('SELECT alliance_id FROM alliance_members WHERE player_id=? AND world_id=?',[$owner,(int)$fresh['world_id']])->fetchColumn();
             $shared=$alliance===false?[]:\Conquer\Game\Alliance\AllianceResearchService::getProductionBonuses((int)$alliance);

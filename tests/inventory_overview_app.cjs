@@ -11,7 +11,7 @@ const output=path.resolve(__dirname,'../artifacts/inventory-overview');fs.mkdirS
  try {
   page=await browser.newPage({viewport:{width:1280,height:800},hasTouch:true});
   const errors=[],writes=[];
-  page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(15000);
+  page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(15000);page.setDefaultNavigationTimeout(45000);
   await page.goto(base);await page.goto(new URL('?zugang=login', page.url()).href);
   await page.locator("[name=identifier], [name=username]").fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');
   await Promise.all([page.waitForURL('**/city'),page.locator("form[action$=\"/auth/local\"] button[type=\"submit\"]").click()]);

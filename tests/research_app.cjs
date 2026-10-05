@@ -21,10 +21,10 @@ fs.mkdirSync(output,{recursive:true});
  try{
   page=await browser.newPage({viewport:{width:1280,height:800},hasTouch:true});
   page.setDefaultTimeout(15000);
+  page.setDefaultNavigationTimeout(45000);
   page.on('pageerror',error=>{errors.push(error.message);console.error('Browser error: '+error.message);});
   page.on('response',response=>{if(response.url().startsWith(base+'/api/')&&response.status()>=400)failures.push(response.status()+' '+response.url());});
-  await page.context().addCookies([{name:'conquer_locale',value:'de',url:base}]);
-  await page.goto(base+'/?zugang=login',{waitUntil:'domcontentloaded'});
+  await page.goto(base,{waitUntil:'domcontentloaded'});
   await page.locator("[name=identifier], [name=username]").fill('PreviewPlayer');
   await page.locator('[name="password"]').fill('PreviewFixture!2026');
   await Promise.all([page.waitForURL('**/city'),page.locator("form[action$=\"/auth/local\"] button[type=\"submit\"]").click()]);
@@ -36,6 +36,33 @@ fs.mkdirSync(output,{recursive:true});
   for(const node of catalogs)assert.deepEqual(data.research_defs.find(def=>def.code===node.code).levels.map(level=>[level.resources,level.time]),node.levels.map(level=>[level.resources,level.time]));
   checks++;
   // Resource help and building dialogs must show the same increased server rates.
+  if(process.env.RESEARCH_REQUIREMENTS_ONLY==='1'){
+   await page.locator('#hud-research').click();await page.locator('.rt-continuous').waitFor();
+   for(const [width,height]of[[1280,800],[390,844],[320,568],[844,390],[568,320]]){
+    await page.setViewportSize({width,height});await page.waitForTimeout(250);
+    await page.locator('.rt-branch[data-id="military"]').click();
+    await page.locator('.rt-node[data-id="ranged_def"]').click();await page.locator('#game-dialog[open]').waitFor();
+    const detail=page.locator('#game-dialog'),cards=detail.locator('.requirement-card');
+    assert.equal(await cards.count(),2);assert.equal(await cards.first().getAttribute('data-id'),'ranged_hp');
+    assert.match(await cards.first().innerText(),/Noch 2 Stufen nötig/);
+    assert.equal(await cards.first().locator('[role="progressbar"]').getAttribute('aria-valuenow'),'0');
+    assert.equal(await cards.first().locator('[role="progressbar"]').getAttribute('aria-valuemax'),'2');
+    assert.equal(await cards.last().getAttribute('data-id'),'academy');
+    assert.match(await cards.last().locator('.requirement-status').innerText(),/Erfüllt/);
+    assert.match(await detail.locator('.requirements-overview').innerText(),/Noch 1 Voraussetzung offen/);
+    assert(await detail.locator('[data-action="research"]').isDisabled());
+    await cards.first().scrollIntoViewIfNeeded();
+    await cards.first().locator('img').evaluate(img=>img.decode());
+    assert(await cards.first().locator('.rt-node-art').evaluate(el=>{const r=el.getBoundingClientRect(),img=el.querySelector('img').getBoundingClientRect();return img.top>=r.top-1&&img.bottom<=r.bottom+1&&img.left>=r.left-1&&img.right<=r.right+1;}),'Research artwork is fully contained');
+    assert(await cards.evaluateAll(elements=>elements.every(el=>el.scrollWidth<=el.clientWidth+1)),'Requirement cards never scroll sideways');
+    assert(await detail.locator('.levelup-scroll').evaluate(el=>el.scrollWidth<=el.clientWidth+1));
+    assert(await detail.locator('.levelup-primary').evaluate(el=>{const r=el.getBoundingClientRect();return r.height>=44&&r.left>=0&&r.top>=0&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1;}),'Research action stays reachable');
+    await page.screenshot({path:path.join(output,`requirements-${width}x${height}.png`)});
+    await cards.first().click();assert.match(await detail.locator('.levelup-art>span:last-child').innerText(),/Ausdauer der Schützen/);
+    await detail.locator('.dialog-close:visible,.mobile-page-back:visible').first().click();
+   }
+   assert.deepEqual(errors,[]);assert.deepEqual(failures,[]);console.log('PASS research prerequisites, missing-first order and direct navigation in five viewports');return;
+  }
   for(const [width,height]of[[1280,800],[320,568],[568,320]]){
    await page.setViewportSize({width,height});await page.waitForTimeout(250);
    for(const [resource,building]of Object.entries({food:'farm',lumber:'lumber_camp',stone:'quarry',gold:'gold_mine'})){

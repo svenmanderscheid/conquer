@@ -1,5 +1,5 @@
 'use strict';
-const fs=require('fs'),path=require('path'),assert=require('assert/strict'),crypto=require('crypto'),sharp=require('sharp');
+const fs=require('fs'),path=require('path'),assert=require('assert/strict'),crypto=require('crypto'),sharp=require(process.env.SHARP_MODULE||'sharp');
 const root=path.resolve(__dirname,'..');
 const ids=['forest','fire','water','wind','ironkeep','rosehall','sandspire','tidewatch','winterhold','jadecourt','emberforge','ravenloft','clockwork','sapphire','astral','leviathan','yggdrasil','tempest','eclipse'];
 (async()=>{

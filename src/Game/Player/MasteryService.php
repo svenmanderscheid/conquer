@@ -6,6 +6,8 @@ use Conquer\Db\Connection;
 use Conquer\Game\World\WorldContext;
 use Conquer\Game\City\ResourceTick;
 use Conquer\Game\Defense\DefenseService;
+use Conquer\Game\Vip\VipService;
+use Conquer\Game\Locale;
 
 final class MasteryService
 {
@@ -28,14 +30,14 @@ final class MasteryService
     }
 
     /** Validate the entire plan, including dependencies after removing a rank. */
-    public static function validate(array $ranks,int $level): array
+    public static function validate(array $ranks,int $level,int $vipLevel=1): array
     {
         $nodes=self::nodes(); $clean=[];
         foreach($ranks as $code=>$rank) {
             if(!isset($nodes[$code])||!is_int($rank)||$rank<0||$rank>5) throw new \DomainException('Ungültiger Talentrang.');
             if($rank) $clean[$code]=$rank;
         }
-        if(array_sum($clean)>min(60,$level)) throw new \DomainException('Nicht genügend Talentpunkte.');
+        if(array_sum($clean)>min(LordLevel::MAX_LEVEL,$level)+VipService::hunterPoints($vipLevel)) throw new \DomainException('Nicht genügend Talentpunkte.');
         foreach($clean as $code=>$rank) {
             $n=$nodes[$code]; $earlier=0;
             foreach($clean as $other=>$points) if($nodes[$other]['branch']===$n['branch']&&$nodes[$other]['tier']<$n['tier']) $earlier+=$points;
@@ -68,13 +70,15 @@ final class MasteryService
     {
         $worldId??=WorldContext::id(); WorldContext::city($playerId,$worldId);
         $lord=LordLevel::snapshot($playerId,$worldId); $ranks=self::ranks($playerId,$worldId);
+        $vipPoints=VipService::status($playerId,$worldId)['bonuses']['hunter_points'];
+        $earned=$lord['level']+$vipPoints;
         $row=Connection::getInstance()->query('SELECT revision,last_respec_at FROM player_lord_progress WHERE player_id=? AND world_id=?',[$playerId,$worldId])->fetch()?:[];
         $ready=empty($row['last_respec_at'])?0:strtotime($row['last_respec_at'].' UTC')+86400;
-        return ['world_id'=>$worldId,'lord'=>$lord,'earned'=>$lord['level'],'spent'=>array_sum($ranks),'available'=>max(0,$lord['level']-array_sum($ranks)),
+        return ['world_id'=>$worldId,'lord'=>$lord,'earned'=>$earned,'points_from_hunter'=>$lord['level'],'points_from_vip'=>$vipPoints,'spent'=>array_sum($ranks),'available'=>max(0,$earned-array_sum($ranks)),
             'revision'=>(int)($row['revision']??0),'ranks'=>$ranks?:new \stdClass(),
             'branches'=>self::catalog()['branches'],'nodes'=>array_values(array_map(static fn($n)=>$n+['level'=>$ranks[$n['code']]??0],self::nodes())),
             'respec_available_at'=>$ready,'blocked_reason'=>self::blockedReason($playerId,$worldId),'server_time'=>time(),
-            'rule'=>'Ein Talentpunkt je Lord-Level · maximal 60 Punkte. Umskillen einmal alle 24 Stunden kostenlos. Neue Punkte kannst du jederzeit bei zurückgekehrten Armeen vergeben.'];
+            'rule'=>Locale::t('talents.points_rule')];
     }
 
     public static function change(int $playerId,array $body,?int $worldId=null): array
@@ -87,7 +91,7 @@ final class MasteryService
             $row=$db->query('SELECT * FROM player_lord_progress WHERE player_id=? AND world_id=? FOR UPDATE',[$playerId,$worldId])->fetch();
             if(!is_int($body['revision']??null)||$body['revision']!==(int)$row['revision']) throw new \DomainException('Die Talentverteilung hat sich geändert. Bitte neu laden.');
             if(!is_array($body['ranks']??null)) throw new \DomainException('Talentplan fehlt.');
-            $ranks=self::validate($body['ranks'],LordLevel::levelFromTotalXp((int)$row['xp']));
+            $ranks=self::validate($body['ranks'],LordLevel::levelFromTotalXp((int)$row['xp']),VipService::status($playerId,$worldId)['level']);
             $old=self::ranks($playerId,$worldId); ksort($old);
             if($ranks===$old) return ['message'=>'Diese Talente sind bereits aktiv.','mastery'=>self::snapshot($playerId,$worldId)];
             if($reason=self::blockedReason($playerId,$worldId)) throw new \DomainException($reason);
@@ -112,7 +116,7 @@ final class MasteryService
     {
         $worldId??=WorldContext::id(); $out=[]; $nodes=self::nodes();
         $ranks=self::ranks($playerId,$worldId);
-        try {$ranks=self::validate($ranks,LordLevel::snapshot($playerId,$worldId)['level']);}
+        try {$ranks=self::validate($ranks,LordLevel::snapshot($playerId,$worldId)['level'],VipService::status($playerId,$worldId)['level']);}
         catch(\DomainException) {return [];}
         foreach($ranks as $code=>$rank) {
             $n=$nodes[$code]; $out[$n['stat']]=($out[$n['stat']]??0)+$n['bonus']*$rank;

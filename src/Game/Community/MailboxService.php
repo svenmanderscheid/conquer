@@ -214,7 +214,7 @@ final class MailboxService
         $reward=self::decode($gift['gift_json']);$code=(int)($reward['item_code']??0);$quantity=(int)($reward['quantity']??0);
         if($code<=0||$quantity<=0||!InventoryService::getItemDef($code))throw new \DomainException('Diese Belohnung ist derzeit nicht verfügbar.');
         $added=$db->execute('INSERT IGNORE INTO alliance_gift_claims(gift_id,player_id)VALUES(?,?)',[$entry['source_id'],$player]);
-        if($added)InventoryService::addItems($player,$code,$quantity);
+        if($added)InventoryService::addItems($player,$code,$quantity,$world);
         $db->execute("UPDATE mailbox_entries SET reward_status='claimed' WHERE id=?",[$entry['id']]);
         return $added?1:0;
     }

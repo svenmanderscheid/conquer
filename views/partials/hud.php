@@ -19,14 +19,17 @@ try {
 
     // Player info + VIP
     $_hud_player = $_hud_db->query(
-        'SELECT username, vip_level, vip_points, gems FROM players WHERE id = ?',
+        'SELECT username, gems FROM players WHERE id = ?',
         [(int) $session['player_id']]
     )->fetch() ?: [];
 
+    $_hud_vip=\Conquer\Game\Vip\VipService::status((int)$session['player_id'],(int)$session['active_world_id']);
+    $_hud_player['vip_level']=$_hud_vip['level'];$_hud_player['vip_points']=$_hud_vip['points'];
+
     // City resources + power
     $_hud_city = $_hud_db->query(
-        'SELECT food, lumber, stone, gold, power FROM cities WHERE player_id = ? LIMIT 1',
-        [(int) $session['player_id']]
+        'SELECT food, lumber, stone, gold, power FROM cities WHERE player_id = ? AND world_id = ?',
+        [(int) $session['player_id'],(int)$session['active_world_id']]
     )->fetch() ?: [];
 
     // Active charms

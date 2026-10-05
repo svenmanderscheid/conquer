@@ -124,7 +124,7 @@ final class CityState
         $city=array_replace($city,\Conquer\Game\Defense\DefenseService::syncWall($cityId));
 
         // Load VIP status — used for production and build-time bonuses.
-        $vip        = VipService::status($playerId);
+        $vip        = VipService::status($playerId,$worldId);
         $vipBonuses = $vip['bonuses'];
 
         // Apply active production buffs multiplicatively.

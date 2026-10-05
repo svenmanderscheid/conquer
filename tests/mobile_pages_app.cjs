@@ -47,7 +47,7 @@ fs.mkdirSync(out,{recursive:true});
   assert.equal(await page.locator('.rt-scroll').evaluate(e=>e.scrollTop),before);
   await page.locator('#panel-dialog .mobile-page-back').click();await page.locator('#panel-dialog').waitFor({state:'hidden'});
   assert.equal(new URL(page.url()).hash,'#city');
-  await page.locator('#navigation [data-id=chat]').click();await page.locator('.world-chat.is-open').waitFor();
+  await page.locator('.world-chat-preview').click();await page.locator('.world-chat.is-open').waitFor();
   const chat=await frame('.world-chat-window');assert.equal(chat.w,390);assert.equal(chat.h,844);
   await page.screenshot({path:path.join(out,'chat-390x844.png')});
   // The real chat shell uses the same overlay, fonts and touch targets as isolated fixtures.
@@ -95,15 +95,17 @@ fs.mkdirSync(out,{recursive:true});
       assert.equal(await control.evaluate(el=>{const r=el.getBoundingClientRect(),hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return hit===el||el.contains(hit);}),true,selector+' remains reachable');
      }
     }
-    assert(text&&text.width>=160&&text.height>=40,'two preview lines have usable space at '+scene+' '+width+'x'+height);
+    const compact=width<=700||(height<=520&&width>height);
+    assert(text&&text.width>=160&&text.height>=(compact?16:40),'visible preview text has usable space at '+scene+' '+width+'x'+height);
     const lines=await page.locator('.world-chat-preview-message').evaluateAll(elements=>elements.map(el=>{const r=el.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height};}));
     assert.equal(lines.length,2,'two preview messages');
-    assert(lines[0].y+lines[0].h<=lines[1].y+1,'preview lines do not overlap');
+    if(compact)assert.equal(lines[0].h,0,'compact ribbon shows the latest message');
+    else assert(lines[0].y+lines[0].h<=lines[1].y+1,'preview lines do not overlap');
    }
   }
   await page.evaluate(()=>location.hash='city');await page.locator('body.city-mode').waitFor();
   await page.setViewportSize({width:390,height:844});
-  await page.locator('#navigation [data-id=chat]').click();
+  await page.locator('.world-chat-preview').click();
   await page.setViewportSize({width:390,height:420});
   const input=await frame('#world-chat-message');assert(input.y+input.h<=420&&input.h>=44,'Chat input stays inside the reduced viewport');
   await page.locator('.world-chat-back').click();await page.locator('.world-chat.is-open').waitFor({state:'detached'});

@@ -97,8 +97,11 @@ final class TreasureService
 
     public static function universalFragments(int $playerId): array
     {
-        $result=['normal'=>0,'rare'=>0,'epic'=>0,'legendary'=>0,'mythic'=>0];
-        foreach(Connection::getInstance()->query('SELECT grade,quantity FROM player_universal_treasure_fragments WHERE player_id=?',[$playerId])->fetchAll() as $row)$result[(string)$row['grade']]=(int)$row['quantity'];
+        $result=['normal'=>0,'rare'=>0,'epic'=>0,'legendary'=>0];
+        foreach(Connection::getInstance()->query('SELECT grade,quantity FROM player_universal_treasure_fragments WHERE player_id=?',[$playerId])->fetchAll() as $row){
+            $grade=(string)$row['grade'];
+            if(array_key_exists($grade,$result))$result[$grade]=(int)$row['quantity'];
+        }
         return $result;
     }
 
@@ -252,7 +255,10 @@ final class TreasureService
         self::atomic($playerId,static function(Connection $db)use($playerId,$preset,$worldId):void{
             WorldContext::city($playerId,$worldId,true);
             $items=array_fill(0,6,null);
-            foreach($db->query('SELECT slot,treasure_code FROM player_treasure_loadouts WHERE player_id=? AND world_id=? ORDER BY slot FOR UPDATE',[$playerId,$worldId])->fetchAll()as$row)$items[(int)$row['slot']-1]=$row['treasure_code']===null?null:(int)$row['treasure_code'];
+            foreach($db->query('SELECT slot,treasure_code FROM player_treasure_loadouts WHERE player_id=? AND world_id=? ORDER BY slot FOR UPDATE',[$playerId,$worldId])->fetchAll()as$row){
+                $code=$row['treasure_code']===null?null:(int)$row['treasure_code'];
+                $items[(int)$row['slot']-1]=$code!==null&&TreasureData::isRetired($code)?null:$code;
+            }
             self::validatePreset($db,$playerId,$worldId,$items);
             $db->execute('INSERT INTO player_treasure_presets(player_id,world_id,preset,items_json) VALUES(?,?,?,?) ON DUPLICATE KEY UPDATE items_json=VALUES(items_json),updated_at=UTC_TIMESTAMP()',[$playerId,$worldId,$preset,json_encode($items,JSON_THROW_ON_ERROR)]);
         });
@@ -280,6 +286,7 @@ final class TreasureService
         $items=json_decode($json,true);
         if(!is_array($items)||!array_is_list($items)||count($items)!==6)throw new \DomainException('Dieses Preset ist ungültig. Speichere es erneut.');
         foreach($items as$code)if($code!==null&&(!is_int($code)||$code<=0))throw new \DomainException('Dieses Preset enthält ein ungültiges Relikt.');
+        $items=array_map(static fn(?int $code):?int=>$code!==null&&TreasureData::isRetired($code)?null:$code,$items);
         return $items;
     }
 

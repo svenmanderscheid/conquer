@@ -28,3 +28,24 @@ function adminDropRow(string $type,int|string $index,array $row): void {
     adminNumber($weighted?'Gewichtung':'Chance (%)',$prefix.($weighted?'[weight]':'[chance]'),$row[$weighted?'weight':'chance']??($weighted?1:100),0,$weighted?1000000:100,$weighted?'1':'.01');
     echo '<div class="drop-row-end"><span class="drop-probability" aria-live="polite"></span><button type="button" class="secondary remove-drop" aria-label="Beuteeintrag entfernen">✕</button></div></div>';
 }
+
+function adminFragmentRow(int|string $index,array $row): void {
+    $prefix='config[fragment_rows]['.$index.']';
+    $target=is_string($row['target']??null)?$row['target']:'';
+    echo '<div class="fragment-row"><label>'.\Conquer\Game\Locale::html('admin.drops.fragment_relic').'<select name="'.ah($prefix.'[target]').'" required><option value="">'.\Conquer\Game\Locale::html('admin.drops.fragment_select').'</option>';
+    echo '<optgroup label="'.\Conquer\Game\Locale::html('admin.drops.fragment_random_group').'">';
+    foreach(['normal','rare','epic','legendary'] as $grade){
+        $value='fragment:'.$grade;
+        echo '<option value="'.$value.'"'.($target===$value?' selected':'').'>'.\Conquer\Game\Locale::html('admin.drops.fragment_random_'.$grade).'</option>';
+    }
+    echo '</optgroup><optgroup label="'.\Conquer\Game\Locale::html('admin.drops.fragment_specific_group').'">';
+    foreach(\Conquer\Game\Treasure\TreasureData::all() as $code=>$def){
+        if(!empty($def['legacy_only']))continue;
+        $value='treasure:'.$code;
+        echo '<option value="'.$value.'"'.($target===$value?' selected':'').'>'.ah(\Conquer\Game\Locale::text($def['name_de']??$def['name'])).'</option>';
+    }
+    echo '</optgroup></select></label>';
+    adminNumber(\Conquer\Game\Locale::t('admin.drops.fragment_quantity'),$prefix.'[quantity]',$row['quantity']??1,1,100000);
+    adminNumber(\Conquer\Game\Locale::t('admin.drops.fragment_chance'),$prefix.'[chance]',$row['chance']??0,0,100,'.0001');
+    echo '<div class="drop-row-end"><button type="button" class="secondary" data-remove-fragment aria-label="'.\Conquer\Game\Locale::html('admin.drops.fragment_remove').'">✕</button></div><small class="fragment-outcome" aria-live="polite"></small></div>';
+}

@@ -3,6 +3,9 @@ body.play-login-page{margin:0;min-height:100svh;overflow-x:hidden;background:var
 .play-login-page *{box-sizing:border-box}
 .play-login-page a{text-decoration:none}
 .play-login-page button,.play-login-page input{font:inherit}
+.play-login-page select{font:inherit;display:block;width:100%;min-height:48px;margin-top:6px;padding:11px 13px;border:1px solid var(--ui-line);border-radius:9px;background:var(--ui-card-light);color:var(--ui-ink);font-size:16px}
+.play-login-page select:focus-visible{outline:3px solid var(--ui-primary-dark);outline-offset:3px}
+.play-world-rule{margin:8px 0 0;color:var(--ui-muted);font-size:14px;line-height:1.4}
 .play-shell{position:relative;isolation:isolate;display:flex;min-height:100svh;padding:max(24px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
 .play-shell::before{content:"";position:fixed;inset:0;z-index:-1;background:linear-gradient(180deg,color-mix(in srgb,var(--ui-primary-dark) 20%,transparent),color-mix(in srgb,var(--ui-primary-dark) 62%,transparent)),url('../marketing/village-1920.webp') center/cover no-repeat;pointer-events:none}
 .play-panel{width:min(100%,420px);min-width:0;margin:auto}

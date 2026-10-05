@@ -9,6 +9,7 @@ use Conquer\Db\Connection;
 function secAccount(bool $ok,string $label):void{if(!$ok)throw new RuntimeException($label);echo "PASS $label\n";}
 function rejectsAccount(callable $fn,string $label):void{try{$fn();}catch(DomainException $e){secAccount(true,$label);return;}throw new RuntimeException($label);}
 $fixture=new \ConquerTests\FeatureDatabase();$mail=tempnam(sys_get_temp_dir(),'account-mail-');$log=tempnam(sys_get_temp_dir(),'account-log-');
+ini_set('session.save_path',$fixture->sessionPath());
 define('CONQUER_TEST_MAIL_FILE',$mail);require __DIR__.'/Support/AccountMailSink.php';
 try{
     $db=Connection::getInstance();\Conquer\Logger::init($log);$_SERVER['REMOTE_ADDR']='127.0.0.1';$_SERVER['HTTP_HOST']='attacker.invalid';

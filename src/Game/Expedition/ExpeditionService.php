@@ -323,7 +323,7 @@ final class ExpeditionService
         $rules=EncounterCatalog::rules($raid);
         $reward['items']=\Conquer\Game\Rewards\RewardCatalog::rollItems($rules['reward_drops']??[]);
         $reward['gems']=(int)($rules['reward_gems']??0);
-        foreach($reward['items'] as $code=>$count)\Conquer\Game\Inventory\InventoryService::addItems($playerId,(int)$code,$count);
+        foreach($reward['items'] as $code=>$count)\Conquer\Game\Inventory\InventoryService::addItems($playerId,(int)$code,$count,(int)$raid['world_id']);
         if($reward['gems']>0)$db->execute('UPDATE players SET gems=gems+? WHERE id=?',[$reward['gems'],$playerId]);
         $db->execute('INSERT INTO expedition_rewards(expedition_id,player_id,reward_json) VALUES(?,?,?)', [(int) $raid['id'], $playerId, json_encode($reward, JSON_THROW_ON_ERROR)]);
         if ($db->execute('UPDATE cities SET food=food+?,lumber=lumber+?,stone=stone+?,gold=gold+? WHERE id=? AND player_id=? AND world_id=?', [$reward['food'], $reward['lumber'], $reward['stone'], $reward['gold'], (int) $participant['city_id'], $playerId,(int)$raid['world_id']]) !== 1) {

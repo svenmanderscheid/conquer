@@ -20,6 +20,7 @@ $previewNumber=static function(int|float $number):string{$rounded=round((float)$
 $rows=[];
 foreach($cfg[$type==='chest'?'drop_table':($type==='dungeon'?'items':'drops')] as $row)$rows[]=['target'=>isset($row['fragment_grade'])?'fragment:'.$row['fragment_grade']:(string)$row['item_code'],'quantity'=>$row['count']??$row['quantity']??1,'chance'=>round(($row['probability']??0)*100,4),'weight'=>$row['weight']??1];
 $form=$cfg;$form['rows']=$rows;
+$form['fragment_rows']=array_map(static fn(array $row):array=>['target'=>isset($row['treasure_code'])?'treasure:'.$row['treasure_code']:'fragment:'.$row['fragment_grade'],'quantity'=>$row['count'],'chance'=>round($row['probability']*100,4)],$cfg['fragment_drops']??[]);
 if($type==='monster'){$form['resources']=$cfg['resource_reward'];$form['gems_chance']=round($cfg['gems_drop']['chance']*100,4);$form['gems_amount']=$cfg['gems_drop']['amount'];$form['charms']['chance']=round($cfg['charms']['chance']*100,4);}
 if($type==='dungeon')$form['item_chance']=round($cfg['item_chance']*100,4);
 if(isset($_GET['discard']))unset($_SESSION['admin_reward_draft']);
@@ -37,6 +38,7 @@ foreach($sources as $entryKey=>$entry){
     $effective=RewardCatalog::effective($type,(string)$entryKey,$scopeWorld);
     $pool=$effective[$type==='chest'?'drop_table':($type==='dungeon'?'items':'drops')];
     $enabled=count(array_filter($pool,static fn($r)=>($r['weight']??$r['probability']??0)>0));
+    $enabled+=count(array_filter($effective['fragment_drops']??[],static fn($r)=>($r['probability']??0)>0));
     if($type==='dungeon'&&$effective['item_chance']<=0)$enabled=0;
     $level=(int)($entry['definition']['level']??0);if($level)$levels[$level]=$level;
     $sourceOverview[$entryKey]=['enabled'=>$enabled,'level'=>$level,'custom'=>isset($sourceRecords[$type.':'.$entryKey]['config']),'config'=>$effective];
@@ -85,6 +87,17 @@ sort($levels);
 <div><small><?= Locale::html('admin.drops.expected') ?></small><strong data-drop-expected>—</strong></div>
 <p><?= Locale::html($type==='farm'?'admin.drops.farm_basis':($type==='dungeon'?'admin.drops.dungeon_basis':($type==='chest'?'admin.drops.chest_basis':'admin.drops.basis'))) ?> <?= Locale::html('admin.drops.draft_preview') ?></p>
 </section>
+<?php if(in_array($type,['monster','farm'],true)): ?>
+<section class="reward-section reward-fragments" aria-labelledby="reward-fragments-title">
+<div class="split drop-heading"><h3 id="reward-fragments-title"><?= Locale::html('admin.drops.fragment_title') ?></h3><button class="secondary" type="button" data-add-fragment>＋ <?= Locale::html('admin.drops.fragment_add') ?></button></div>
+<p class="subtle"><?= Locale::html($type==='farm'?'admin.drops.fragment_farm_hint':'admin.drops.fragment_monster_hint') ?></p>
+<p class="subtle"><?= Locale::html('admin.drops.fragment_rule_hint') ?></p>
+<div class="fragment-rows" data-fragment-rows><?php foreach(is_array($form['fragment_rows']??null)?$form['fragment_rows']:[] as $index=>$row)if(is_array($row))adminFragmentRow($index,$row); ?></div>
+<p class="empty" data-fragment-empty><?= Locale::html('admin.drops.fragment_empty') ?></p>
+<p class="subtle" data-fragment-summary aria-live="polite"></p>
+<template id="fragment-row-template"><?php adminFragmentRow('__ROW__',[]); ?></template>
+</section>
+<?php endif ?>
 <?php if($retired&&!$custom): ?><details class="hint"><summary><?= count($retired) ?> alte Gegenstandsreferenzen sind nicht mehr verfügbar</summary><p>Diese historischen Einträge werden nicht ausgezahlt. Wähle über „Gegenstand hinzufügen“ passende Items aus dem aktuellen Katalog.</p><ul><?php foreach($retired as $drop): ?><li><?= ah($drop['label']??'Gegenstand') ?> · alte Nr. <?= (int)$drop['item_code'] ?></li><?php endforeach ?></ul></details><?php endif ?>
 <?php if($type==='dungeon'): ?>
 <h3>Garantierte Reliktfragmente bei Erfolg</h3><div class="fields"><label>Relikt<select name="config[treasure_code]" data-treasure-select><?php foreach(\Conquer\Game\Treasure\TreasureData::all() as $code=>$def): ?><option value="<?= (int)$code ?>" data-image="<?= ah(ItemPresentation::image('items/'.($def['icon']??'fragment.svg'))) ?>" <?= (string)$code===(string)($form['treasure_code']??'')?'selected':'' ?>><?= ah($def['name_de']??$def['name']) ?> · <?= ah(ItemPresentation::GRADES[$def['grade']]??$def['grade']) ?></option><?php endforeach ?></select></label><?php adminNumber('Fragmente pro Spieler · Basis','config[fragments]',$form['fragments']??3,0,10000); ?></div><div class="treasure-preview"><?= adminIcon('items/fragment.svg') ?><span data-treasure-name></span></div>
@@ -124,6 +137,7 @@ sort($levels);
  <div class="stat"><?= adminIcon('items/gems.svg') ?><small>Edelsteine je 100 Siege</small><strong><?= $previewNumber($preview['gems']['expected_per_100']) ?></strong><span><?= $previewNumber($preview['gems']['quantity_on_drop']) ?> bei Treffer · <?= $previewNumber($preview['gems']['chance']*100) ?> % Chance</span></div>
  <?php foreach(['food'=>['Nahrung','ui-resources/food.png'],'lumber'=>['Holz','ui-resources/lumber.png'],'stone'=>['Stein','ui-resources/stone.png'],'gold'=>['Gold','ui-resources/gold.png']] as $resource=>[$label,$icon]): ?><div class="stat"><?= adminIcon($icon) ?><small><?= $label ?> je Sieg</small><strong><?= $previewNumber($preview['resources_per_victory'][$resource]) ?></strong><span>Basis vor Talentboni</span></div><?php endforeach ?>
  </div>
+ <?php if($preview['fragments']): ?><h3><?= Locale::html('admin.drops.fragment_preview') ?></h3><div class="table-wrap"><table><thead><tr><th><?= Locale::html('admin.drops.fragment_relic') ?></th><th><?= Locale::html('admin.drops.fragment_quantity') ?></th><th><?= Locale::html('admin.drops.fragment_chance') ?></th><th><?= Locale::html('admin.drops.expected') ?></th></tr></thead><tbody><?php foreach($preview['fragments'] as $fragment): ?><tr><td <?= $fragment['treasure_code']?'data-fragment-relic-code="'.(int)$fragment['treasure_code'].'"':'' ?>><?= ah($fragment['name']) ?></td><td><?= $previewNumber($fragment['quantity_on_drop']) ?></td><td><?= $previewNumber($fragment['chance']*100) ?> %</td><td><?= $previewNumber($fragment['expected_per_100']) ?></td></tr><?php endforeach ?></tbody></table></div><?php endif ?>
  <h3>Gegenstände & Pakete je 100 Siege</h3><p class="subtle">Die Rohstoff- und Edelsteinwerte oben enthalten nur direkte Beute. Pakete stehen separat in dieser Liste.</p>
  <?php if($preview['items']): ?><div class="table-wrap"><table><thead><tr><th>Gegenstand</th><th>Menge bei Treffer</th><th>Chance je Sieg</th><th>Erwartungswert je 100</th></tr></thead><tbody><?php foreach($preview['items'] as $item): ?><tr><td><strong><?= ah($item['name']) ?></strong><br><small>Nr. <?= (int)$item['item_code'] ?></small></td><td><?= $previewNumber($item['quantity_on_drop']) ?></td><td><?= $previewNumber($item['chance']*100) ?> %</td><td><strong><?= $previewNumber($item['expected_per_100']) ?></strong></td></tr><?php endforeach ?></tbody></table></div><?php else: ?><p class="empty">Keine Gegenstände in der aktuell wirksamen Beuteliste.</p><?php endif ?>
  <div class="notice">Die Werte sind langfristige Durchschnittswerte. Ein Erwartungswert von 25 bedeutet nicht, dass in den nächsten 100 Siegen genau 25 Gegenstände fallen.</div>

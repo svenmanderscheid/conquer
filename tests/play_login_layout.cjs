@@ -28,6 +28,8 @@ const server=http.createServer((req,res)=>{
  if(file.startsWith(root+path.sep+'assets'+path.sep)&&fs.existsSync(file)&&fs.statSync(file).isFile()){
   res.setHeader('Content-Type',({'.css':'text/css','.js':'text/javascript','.svg':'image/svg+xml','.png':'image/png','.webp':'image/webp','.woff2':'font/woff2'})[path.extname(file)]||'application/octet-stream');res.end(fs.readFileSync(file));return;
  }
+ if(['/conquer/favicon.ico','/conquer/apple-touch-icon.png'].includes(url.pathname)){res.setHeader('Content-Type',path.extname(file)==='.ico'?'image/x-icon':'image/png');res.end(fs.readFileSync(file));return;}
+ if(url.pathname==='/conquer/manifest.php'){res.setHeader('Content-Type','application/manifest+json');res.end(execFileSync(process.env.PHP_BINARY||'php',['-r',"define('APP_BASE','/conquer');require 'manifest.php';"],{cwd:root}));return;}
  res.statusCode=404;res.end();
 });
 (async()=>{

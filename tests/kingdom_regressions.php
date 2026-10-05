@@ -31,7 +31,8 @@ try {
     try { KingdomService::action($pid,['action'=>'skin.save','city_skin'=>'unknown']); } catch(\Throwable $e) { $rejected=true; }
     expectKingdom($rejected&&KingdomService::state($pid)['profile']['city_skin']==='default','invalid skin cannot change saved appearance');
 
-    $db->execute('UPDATE players SET gems=123,action_points=77,last_ap_regen=UTC_TIMESTAMP(),vip_points=40 WHERE id=?',[$pid]);
+    $db->execute('UPDATE players SET gems=123,action_points=77,last_ap_regen=UTC_TIMESTAMP() WHERE id=?',[$pid]);
+    \Conquer\Game\Vip\VipService::setPoints($pid,40,1);
     $own=KingdomService::state($pid)['profile'];
     expectKingdom($own['gems']===123 && $own['action_points']===77 && $own['action_points_max']===200 && $own['prestige_points']===40,'own profile shows exact persisted reward balances');
     $publicTarget=(int)$db->query('SELECT player_id FROM cities WHERE player_id<>? AND world_id=1 LIMIT 1',[$pid])->fetchColumn();

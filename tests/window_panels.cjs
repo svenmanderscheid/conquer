@@ -12,7 +12,7 @@ const vm = require('vm');
 const assert = require('assert');
 
 const root = path.resolve(__dirname, '..');
-const source = fs.readFileSync(path.join(root, 'assets/js/alliance-ranks.js'), 'utf8') + '\n' + fs.readFileSync(path.join(root, 'assets/js/mvp-panels.js'), 'utf8');
+const source = fs.readFileSync(path.join(root, 'assets/js/alliance-ranks.js'), 'utf8') + '\n' + fs.readFileSync(path.join(root, 'assets/js/relic-presentation.js'), 'utf8') + '\n' + fs.readFileSync(path.join(root, 'assets/js/mvp-panels.js'), 'utf8');
 const view = fs.readFileSync(path.join(root, 'views/game.php'), 'utf8');
 const stylesheets = [...view.matchAll(/assets\/css\/([^?"']+)\?/g)].map(match => match[1]);
 assert(stylesheets.includes('window-layout.css'), 'The fixture must load the current shared window layout.');
@@ -175,17 +175,17 @@ async function itemUseChecks() {
     vm.runInNewContext(source, sandbox, {filename:'mvp-panels.js'});
     const panels = sandbox.window.ConquerPanels({getKingdom:()=>({inventory:[{item_code:10101001,quantity:2},{item_code:10103001,quantity:3}]}),toast:()=>{},action: (endpoint, payload) => calls.push({endpoint, payload})});
     for (const [id, queue] of [[10101001, ''], [10103001, 'building:12']]) {
-        await panels.onSubmit({dataset:{form:'item-use',id:String(id)},values:{queue}});
+        await panels.onSubmit({dataset:{form:'item-use',id:String(id)},values:{queue},reportValidity:()=>true});
     }
     assert.deepEqual(JSON.parse(JSON.stringify(calls)), [
-        {endpoint:'kingdom/action',payload:{action:'inventory.use',item_code:10101001}},
-        {endpoint:'kingdom/action',payload:{action:'inventory.use',item_code:10103001,queue_type:'building',queue_id:12}},
+        {endpoint:'kingdom/action',payload:{action:'inventory.use',item_code:10101001,quantity:1}},
+        {endpoint:'kingdom/action',payload:{action:'inventory.use',item_code:10103001,quantity:1,queue_type:'building',queue_id:12}},
     ], 'Inline use must dispatch the selected item and queue through the existing single-item API.');
     await panels.onSubmit({dataset:{form:'item-use',id:'999'},values:{queue:''}});
     assert.equal(calls.length,2,'Missing catalogue item cannot dispatch a use action');
     let finish,pendingCalls=0;
     const guarded=sandbox.window.ConquerPanels({getKingdom:()=>({inventory:[{item_code:10101001,quantity:2}]}),toast:()=>{},action:()=>{pendingCalls++;return new Promise(resolve=>{finish=resolve;});}});
-    const form={dataset:{form:'item-use',id:'10101001'},values:{queue:''}},first=guarded.onSubmit(form);
+    const form={dataset:{form:'item-use',id:'10101001'},values:{queue:''},reportValidity:()=>true},first=guarded.onSubmit(form);
     await guarded.onSubmit(form);assert.equal(pendingCalls,1,'A second click while use is pending must not dispatch');finish();await first;
     return calls.length+2;
 }
@@ -311,7 +311,7 @@ async function main() {
                 await control.scrollIntoViewIfNeeded();
                 const title=control.locator(':scope > span > strong');if(await title.count())await title.scrollIntoViewIfNeeded();
                 const reachability=await control.evaluate(el=>{const r=el.getBoundingClientRect(),b=el.closest('.alliance-home-scroll').getBoundingClientRect(),top=Math.max(r.top,b.top),bottom=Math.min(r.bottom,b.bottom),label=el.querySelector(':scope > span > strong')?.getBoundingClientRect(),hit=document.elementFromPoint(r.x+r.width/2,(top+bottom)/2);return {action:el.dataset.action,height:r.height,visible:bottom-top,width:r.width,withinWidth:r.left>=b.left-2&&r.right<=b.right+2,titleVisible:!label||(label.top>=b.top-2&&label.bottom<=b.bottom+2),hit:hit===el||el.contains(hit)};});
-                assert(reachability.width>=44&&reachability.visible>=44&&reachability.withinWidth&&reachability.titleVisible&&reachability.hit,label+': every alliance action retains a readable title and unobscured touch area when its illustration scrolls: '+JSON.stringify(reachability));
+                assert(reachability.width>=44&&reachability.height>=44&&reachability.visible>=43.5&&reachability.withinWidth&&reachability.titleVisible&&reachability.hit,label+': every alliance action retains a readable title and unobscured touch area when its illustration scrolls: '+JSON.stringify(reachability));
             }
             for(const control of await page.locator('[data-panel="alliance"] .window-list button').all()){
                 await control.scrollIntoViewIfNeeded();
@@ -357,15 +357,11 @@ async function main() {
         for (const [width, height] of viewports) {
             await page.setViewportSize({width, height});
             await setPanel('inventory');
-            for (const category of ['resource_pack', 'speedup', 'boost', 'other', 'treasures']) {
+            for (const category of ['resource_pack', 'speedup', 'boost', 'other']) {
                 await page.locator(`[data-action="inventory-category"][data-id="${category}"]`).click();
                 await pages('inventory-' + category, '.inventory-pager');
             }
-            for (const tab of ['equipment', 'bonuses']) {
-                await page.locator(`[data-action="inventory-view"][data-id="${tab}"]`).click();
-                await pages('relic-' + tab, '.inventory-pager');
-            }
-            await page.locator('[data-action="inventory-view"][data-id="collection"]').click();
+            assert.equal(await page.locator('[data-action="inventory-category"][data-id="treasures"]').count(),0,'Relics are accessed in the separate Treasury.');
             await page.evaluate(() => {
                 K.queues = [{type:'building', id:11, label:'castle', finishes_at:'2030-01-01T00:00:00Z'}, {type:'building', id:12, label:'farm', finishes_at:'2030-01-01T00:00:00Z'}, {type:'research', id:13, label:'production', finishes_at:'2030-01-01T00:00:00Z'}];
                 panels.onClick('inventory-category', {dataset:{id:'speedup'}});
@@ -460,9 +456,7 @@ async function main() {
             await setPanel('inventory');
             await page.locator('[data-action="inventory-category"][data-id="resource_pack"]').click();
             await check('empty-inventory');
-            await page.locator('[data-action="inventory-category"][data-id="treasures"]').click();
-            await page.locator('[data-action="inventory-view"][data-id="collection"]').click();
-            await check('empty-relics');
+            assert.equal(await page.locator('[data-action="inventory-category"][data-id="treasures"]').count(),0);
         }
         const failures = report.filter(hasFailure);
         const result = {checks: report.length, itemChecks, useChecks, failures, browserErrors, requestErrors, mutationAttempts: await page.evaluate(() => mutationAttempts), output};

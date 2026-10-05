@@ -59,7 +59,7 @@ try{
  cc(snapshot()===$before&&(int)$db->query('SELECT gems FROM players WHERE id=1')->fetchColumn()===$gems,'rejected purchases leave currency and rewards unchanged');
  // Invalid free rewards must still roll back the cooldown.
  $cache=new ReflectionProperty(ChestService::class,'dropTableCache');$original=$cache->getValue();$cache->setValue(null,['chests'=>['gold'=>['rolls'=>1,'drop_table'=>[['item_code'=>99999999,'quantity'=>1,'weight'=>1]]]]]);
- $before=snapshot();try{ChestService::openFreeChest(1,'gold');throw new LogicException('invalid reward allowed');}catch(RuntimeException $e){cc(!($e instanceof LogicException),'invalid reward fails');}cc(snapshot()===$before,'reward failure rolls back free chest cooldown');$cache->setValue(null,$original);
+ $before=snapshot();try{ChestService::openFreeChest(1,'gold');throw new LogicException('invalid reward allowed');}catch(RuntimeException|DomainException $e){cc($e instanceof DomainException||!($e instanceof LogicException),'invalid reward fails');}cc(snapshot()===$before,'reward failure rolls back free chest cooldown');$cache->setValue(null,$original);
 
  // Two independent database connections contend for the same free gold claim.
  $dir=(new ReflectionProperty($fixture,'directory'))->getValue($fixture);

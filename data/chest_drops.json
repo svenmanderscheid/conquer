@@ -1435,11 +1435,6 @@
           "quantity": 1
         },
         {
-          "weight": 8,
-          "fragment_grade": "mythic",
-          "quantity": 1
-        },
-        {
           "weight": 50,
           "item_code": 10201004,
           "quantity": 1
@@ -1817,11 +1812,6 @@
         {
           "weight": 35,
           "item_code": 10207004,
-          "quantity": 1
-        },
-        {
-          "weight": 8,
-          "item_code": 10207005,
           "quantity": 1
         },
         {

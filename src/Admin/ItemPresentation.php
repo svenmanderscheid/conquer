@@ -31,7 +31,7 @@ final class ItemPresentation
     public static function catalog(bool $fragments=false): array
     {
         $out=array_values(array_map(self::item(...),\Conquer\Game\Inventory\InventoryService::allDefs()));
-        if($fragments)foreach(['normal','rare','epic','legendary','mythic'] as $grade)$out[]=['code'=>'fragment:'.$grade,'name'=>self::GRADES[$grade].' · zufällige Reliktfragmente','category'=>'fragments','category_name'=>'Reliktfragmente','rarity'=>$grade,'image'=>self::image('items/fragment-'.$grade.'.svg'),'description'=>'Fragmente eines zufälligen Relikts dieser Seltenheit.'];
+        if($fragments)foreach(['normal','rare','epic','legendary'] as $grade)$out[]=['code'=>'fragment:'.$grade,'name'=>self::GRADES[$grade].' · zufällige Reliktfragmente','category'=>'fragments','category_name'=>'Reliktfragmente','rarity'=>$grade,'image'=>self::image('items/fragment-'.$grade.'.svg'),'description'=>'Fragmente eines zufälligen Relikts dieser Seltenheit.'];
         return $out;
     }
 }

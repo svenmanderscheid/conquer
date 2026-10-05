@@ -37,7 +37,7 @@ final class PlayerHandler
         $worldId=\Conquer\Game\World\WorldContext::id();
 
         $player = $db->query(
-            'SELECT p.id, p.username, p.vip_level, p.kill_count,
+            'SELECT p.id, p.username, p.kill_count,
                     c.castle_level, c.power, c.coord_x, c.coord_y,
                     a.tag AS alliance_tag, a.name AS alliance_name
              FROM   players p
@@ -63,7 +63,7 @@ final class PlayerHandler
             'castle_level'   => (int) ($player['castle_level'] ?? 1),
             'power'          => (int) ($player['power'] ?? 0),
             'kill_count'     => (int) $player['kill_count'],
-            'vip_level'      => (int) $player['vip_level'],
+            'vip_level'      => \Conquer\Game\Vip\VipService::status($playerId,$worldId)['level'],
             'lord_level'     => $lordLv,
             'lord_xp'        => $lordXp,
             'lord_xp_into'   => LordLevel::xpIntoCurrentLevel($lordXp),
@@ -91,7 +91,7 @@ final class PlayerHandler
         $worldId=\Conquer\Game\World\WorldContext::id();
 
         $player = $db->query(
-            'SELECT p.id, p.username, p.kill_count, p.vip_level,
+            'SELECT p.id, p.username, p.kill_count,
                     c.castle_level, c.power, c.coord_x, c.coord_y, c.is_hidden,
                     a.tag AS alliance_tag, a.name AS alliance_name
              FROM   players p
@@ -119,7 +119,7 @@ final class PlayerHandler
             'castle_level'  => (int) ($player['castle_level'] ?? 1),
             'power'         => (int) ($player['power'] ?? 0),
             'kill_count'    => (int) $player['kill_count'],
-            'vip_level'     => (int) $player['vip_level'],
+            'vip_level'     => \Conquer\Game\Vip\VipService::status($targetId,$worldId)['level'],
             'lord_level'    => LordLevel::snapshot($targetId,$worldId)['level'],
             'world_id'      => $worldId,
         ]);

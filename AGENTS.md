@@ -12,6 +12,8 @@ Das Spiel heißt **Union of Kingdoms**. Verwende diesen Namen in sichtbaren Ober
 
 Lies vor jeder sichtbaren Änderung an Menüs, Dialogen, HUD, Karten-Overlays oder Backoffice `docs/UI_STYLE_GUIDE.md`. Die zentrale Oberfläche liegt in `assets/css/village-theme.css` und wird zuletzt geladen. Verbindlich ist die vom Nutzer gewählte Variante A: dunkelviolette Fensterköpfe, warme beigefarbene Flächen, dezente Goldakzente und weiche Formen. Verwende die gemeinsamen `--ui-*`-Variablen, Almendra für Texte und Lora für Zahlen. Die lokal geladene Schriftfamilie `Conquer UI` kombiniert beide automatisch. Neue Komponenten dürfen keine eigene Farbpalette oder kantige Metallhaut einführen. Bewahre die Farbbedeutung von Aktionen, Zuständen und Seltenheiten; das violette Menüdesign ersetzt keine blauen Verteidigungs- oder sonstigen Rollenfarben. Prüfe neue Oberflächen im Desktop-, Handy- und Querformat.
 
+Browser-Scrollleisten bleiben in allen bestehenden und zukünftigen Welten unsichtbar. Die gemeinsame Regel in `assets/css/village-theme.css` gilt unabhängig von Welt-ID, Region und Kartenart für Seiten und innere Scrollbereiche. Scrollen per Mausrad, Touch und Tastatur muss erhalten bleiben; neue Ansichten dürfen die Scrollleisten nicht wieder einblenden oder zum Ausblenden benötigtes Scrollen mit `overflow:hidden` sperren.
+
 ## Verbindliche Gestaltung der gezeichneten Welt
 
 Lies vor sichtbaren Änderungen an Stadt, Welt, Gebäuden, Figuren oder Dekoration `docs/ART_DIRECTION.md`. Die Stilvorlage bleibt `assets/art/village2.png`; die aktive Stadt verwendet `assets/js/city-painted.js` und die dort referenzierten freigegebenen Bilder.

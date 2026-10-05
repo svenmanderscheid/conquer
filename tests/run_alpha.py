@@ -24,6 +24,13 @@ APP.append('alliance_ranks_app')
 STATIC.append('alliance_ranks_ui')
 APP.append('rally_boss_skills_app')
 STATIC.append('boss_mechanic_ui')
+BACKEND += ['alpha_entry', 'crystal_shop']
+APP += ['crystal_shop_app', 'city_construction_app', 'city_readiness_app', 'mobile_compact_hud_app']
+APP.append('alpha_entry_app')
+APP.append('city_terrain_app')
+BACKEND.append('retired_mythic_relics')
+APP.append('retired_mythic_relics_app')
+APP.append('inventory_relics_app')
 FIXTURE_FLAGS={'territory_main_report':['--territory'],'monster_report_app':['--monster-reports'],'hospital_quick_heal_app':['--hospital'],'map_search_app':['--regional-bosses','--chat','--map-search'],'research_app':['--speed-bonuses']}
 
 def main():
@@ -46,6 +53,10 @@ def main():
             if args.only and name not in args.only: continue
             started=time.monotonic()
             command=[runtime,str(ROOT/'tests'/(name+extension))]
+            if group=='backend':
+                session_dir=out/'fixture-sessions'/name
+                session_dir.mkdir(parents=True,exist_ok=True,mode=0o700)
+                command=[runtime,'-d','session.save_path='+str(session_dir),str(ROOT/'tests'/(name+extension))]
             # These suites own and dispose their browser HTTP fixtures.
             if name in ('reward_admin','alpha_keys_admin'): command.append('--browser')
             environment=os.environ.copy()

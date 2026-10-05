@@ -171,6 +171,7 @@
     if(editor?.dataset.hasDraft==='1')markDirty();
     function updateRows(){
         if(!editor)return;
+        updateFragmentRows();
         const rows=$$('.drop-row',editor),weighted=['chest','dungeon'].includes(editor.dataset.rewardEditor);
         const total=rows.reduce((sum,r)=>sum+Math.max(0,Number($('input[name$="[weight]"]',r)?.value)||0),0);
         const query=$('[data-drop-search]').value.trim().toLocaleLowerCase('de');let visible=0;
@@ -209,6 +210,32 @@
         const row=appendDrop();if(!row)return;
         markDirty();updateRows();$('[data-item-picker]',row).click();
     });
+    function updateFragmentRows(){
+        const container=$('[data-fragment-rows]',editor);if(!container)return;
+        const rows=$$('.fragment-row',container);let active=0,expected=0;
+        rows.forEach(row=>{
+            const select=$('select',row);
+            if(window.ConquerRelicPresentation&&!select.dataset.relicNames){
+                [...select.options].forEach(option=>{if(option.value.startsWith('treasure:'))option.textContent=window.ConquerRelicPresentation.name({treasure_code:Number(option.value.slice(9))});});
+                select.dataset.relicNames='1';
+            }
+            const chance=Math.min(100,Math.max(0,Number($('input[name$="[chance]"]',row).value)||0));
+            const quantity=Math.max(0,Number($('input[name$="[quantity]"]',row).value)||0);
+            if($('select',row).value&&chance>0)active++;
+            const count=$('select',row).value?quantity*chance:0;expected+=count;
+            $('.fragment-outcome',row).textContent=rewardText('fragment_outcome',{chance:matrixFormat(chance),count:matrixFormat(count)});
+        });
+        $('[data-fragment-empty]',editor).hidden=rows.length>0;
+        $('[data-fragment-summary]',editor).textContent=rewardText('fragment_summary',{active,count:matrixFormat(expected)});
+        $('[data-add-fragment]',editor).disabled=rows.length>=100||form.querySelector('fieldset').disabled;
+    }
+    $('[data-add-fragment]')?.addEventListener('click',()=>{
+        if(form.querySelector('fieldset').disabled)return;
+        const rows=$$('.fragment-row',editor);if(rows.length>=100)return;
+        const index=Math.max(-1,...rows.map(row=>Number($('select',row).name.match(/\[fragment_rows\]\[(\d+)\]/)?.[1])||0))+1;
+        $('[data-fragment-rows]',editor).insertAdjacentHTML('beforeend',$('#fragment-row-template').innerHTML.replaceAll('__ROW__',String(index)));
+        markDirty();updateFragmentRows();$$('.fragment-row select',editor).at(-1).focus();
+    });
     function focusLinkedDrop(){
         if(!matrix||!editor||$('#reward-editor').hidden)return;
         const code=location.hash.match(/^#drop-item-(\d+)$/)?.[1],item=byCode.get(code);
@@ -236,10 +263,11 @@
         });
     }
     $('[data-drop-search]')?.addEventListener('input',updateRows);
-    editor?.addEventListener('click',e=>{const remove=e.target.closest('.remove-drop');if(remove){remove.closest('.drop-row').remove();markDirty();updateRows();}});
+    editor?.addEventListener('click',e=>{const fragment=e.target.closest('[data-remove-fragment]');if(fragment){fragment.closest('.fragment-row').remove();markDirty();updateFragmentRows();}const remove=e.target.closest('.remove-drop');if(remove){remove.closest('.drop-row').remove();markDirty();updateRows();}});
     form?.addEventListener('input',e=>{if(e.target.name)markDirty();updateRows();});form?.addEventListener('change',e=>{if(e.target.name)markDirty();updateRows();});
     form?.addEventListener('invalid',e=>{for(let detail=e.target.closest('details');detail;detail=detail.parentElement?.closest('details'))detail.open=true;const row=e.target.closest('.drop-row');if(row?.hidden){$('[data-drop-search]').value='';updateRows();row.scrollIntoView({block:'center'});}},true);
     function previewTreasure(){const select=$('[data-treasure-select]');if(!select)return;const option=select.selectedOptions[0];if(option){$('.treasure-preview img').src=option.dataset.image;$('[data-treasure-name]').textContent=option.textContent;}}
+    $$('[data-fragment-relic-code]').forEach(node=>{if(window.ConquerRelicPresentation)node.textContent=window.ConquerRelicPresentation.name({treasure_code:Number(node.dataset.fragmentRelicCode)});});
     $('[data-treasure-select]')?.addEventListener('change',previewTreasure);previewTreasure();updateRows();
     focusLinkedDrop();window.addEventListener('hashchange',focusLinkedDrop);
     window.addEventListener('beforeunload',e=>{if(dirty&&!submitting){e.preventDefault();e.returnValue='';}});

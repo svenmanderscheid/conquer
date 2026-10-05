@@ -9,7 +9,8 @@ final class WorldService
     public static function state(int $playerId): array
     {
         $worlds=Connection::getInstance()->query('SELECT w.id,w.name,w.slug,w.status,w.map_size,w.speed_factor,w.gather_factor,w.haul_factor,c.id AS city_id,c.name AS city_name,c.castle_level FROM worlds w LEFT JOIN cities c ON c.world_id=w.id AND c.player_id=? ORDER BY w.id',[$playerId])->fetchAll();
-        foreach($worlds as &$world){$world['id']=(int)$world['id'];$world['map_profile']=WorldMapProfile::forWorld($world['id']);$world['map_width']=$world['map_profile']['width'];$world['map_height']=$world['map_profile']['height'];$world['owned']=$world['city_id']!==null;$world['selected']=$world['id']===WorldContext::id();$world['can_join']=!$world['owned']&&in_array($world['status'],['open','running'],true);$world['can_select']=$world['owned'];}unset($world);
+        $hasVillage=count(array_filter($worlds,static fn(array $world):bool=>$world['city_id']!==null))>0;
+        foreach($worlds as &$world){$world['id']=(int)$world['id'];$world['map_profile']=WorldMapProfile::forWorld($world['id']);$world['map_width']=$world['map_profile']['width'];$world['map_height']=$world['map_profile']['height'];$world['owned']=$world['city_id']!==null;$world['selected']=$world['id']===WorldContext::id();$world['can_join']=!$hasVillage&&in_array($world['status'],['open','running'],true);$world['can_select']=$world['owned'];}unset($world);
         return ['active_world_id'=>WorldContext::id(),'worlds'=>$worlds,'server_time'=>time()];
     }
     public static function action(array $session,array $body): array
@@ -28,7 +29,7 @@ final class WorldService
                 if((int)$current['active_world_id']!==$expected)throw new \DomainException('Die aktive Welt hat sich bereits geändert. Lade die Weltauswahl neu.',409);
                 $target=$db->query('SELECT id,status FROM worlds WHERE id=? FOR UPDATE',[$world])->fetch();if(!$target)throw new \DomainException('Diese Welt existiert nicht.');
                 $city=$db->query('SELECT id FROM cities WHERE player_id=? AND world_id=?',[$player,$world])->fetchColumn();
-                if(!$city){if($action!=='join')throw new \DomainException('Tritt dieser Welt zuerst bei.',403);WorldContext::assertActionAvailable($world);self::initializeWorld($world);OAuth::createDefaultCity($db,$player,$current['username'],$world);$city=$db->query('SELECT id FROM cities WHERE player_id=? AND world_id=?',[$player,$world])->fetchColumn();}
+                if(!$city){if($action!=='join')throw new \DomainException('Tritt dieser Welt zuerst bei.',403);OAuth::createDefaultCity($db,$player,$current['username'],$world);$city=$db->query('SELECT id FROM cities WHERE player_id=? AND world_id=?',[$player,$world])->fetchColumn();}
                 $db->execute('UPDATE sessions SET active_world_id=? WHERE id=? AND player_id=?',[$world,$sessionId,$player]);
                 $result=['active_world_id'=>$world,'city_id'=>(int)$city,'duplicate'=>false,'message'=>$action==='join'?'Dein Königreich in dieser Welt ist bereit.':'Welt gewechselt.'];
                 $db->execute('INSERT INTO world_operations(player_id,session_id,request_id,payload_hash,action,world_id,result_json) VALUES(?,?,?,?,?,?,?)',[$player,$sessionId,$request,$hash,$action,$world,json_encode($result,JSON_THROW_ON_ERROR)]);return $result;
