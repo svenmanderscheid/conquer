@@ -15,8 +15,8 @@ const styles=sheets.map(file=>fs.readFileSync(path.join(root,'assets/css',file),
   const fixtureHtml='<!doctype html><html lang="de"><head><base href="https://trade.fixture/"></head><body class="mobile-game playfield-mode city-mode"><main id="main"><section id="playfield-content"></section></main><dialog id="panel-dialog" data-panel="market"><div class="page-heading"><h1 id="page-title">Handelsposten</h1><button class="panel-close">×</button></div><section id="content"></section></dialog></body></html>';
   await page.route('**/*',async route=>{const u=new URL(route.request().url()),pathname=decodeURIComponent(u.pathname);if(u.origin==='https://trade.fixture'&&pathname==='/')return route.fulfill({body:fixtureHtml,contentType:'text/html; charset=utf-8'});const file=pathname.startsWith('/fonts/')?path.resolve(root,'assets'+pathname):path.resolve(root,'.'+pathname);if(u.origin!=='https://trade.fixture'||!file.startsWith(path.join(root,'assets')+path.sep)||!fs.existsSync(file))return route.abort();return route.fulfill({body:fs.readFileSync(file),contentType:{'.woff2':'font/woff2','.svg':'image/svg+xml','.png':'image/png'}[path.extname(file)]||'application/octet-stream'});});
   await page.goto('https://trade.fixture/');
-  await page.addStyleTag({content:styles});await page.addScriptTag({content:require('./fixtures/isolated_locale.cjs')('de')});await page.addScriptTag({path:path.join(root,'assets/js/trading-panel.js')});
-  await page.evaluate(defs=>{
+  await page.addStyleTag({content:styles});await page.addScriptTag({content:require('./fixtures/isolated_locale.cjs')('de')});await page.addScriptTag({path:path.join(root,'assets/js/item-art.js')});await page.addScriptTag({path:path.join(root,'assets/js/trading-panel.js')});
+  await page.evaluate(({defs,crystalCatalog})=>{
    window.testNow=Date.now();window.calls=[];window.toasts=[];window.refreshes=0;window.upgrades=0;window.fail=false;window.hold=false;
    const make=(item,n)=>({id:'offer-'+n,item,item_code:item.code,quantity:1,price:{resource:n%2?'gems':'gold',amount:100+n},remaining:10,limit:10,discount:40,vip_level:Math.floor(n/4)+1,locked:n>=12});
    window.K={profile:{gems:1000000},trading:{market_level:15,server_time:new Date(testNow).toISOString(),refresh_at:new Date(testNow+28800000).toISOString(),rotation:'cycle-a',offers:defs.slice(0,15).map((i,n)=>({...make(i,n),locked:false,remaining:1,limit:1})),vip:{level:3,rotation:'week-a',reset_at:new Date(testNow+604800000).toISOString(),offers:defs.slice(0,52).map(make)}}};
@@ -25,12 +25,13 @@ const styles=sheets.map(file=>fs.readFileSync(path.join(root,'assets/css',file),
    const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
    window.panel=ConquerTrading({base:'',esc,fmt:v=>Number(v).toLocaleString('de-DE'),getKingdom:()=>K,getState:()=>S,getMarket:()=>M,now:()=>testNow,onUpgrade:()=>upgrades++,toast:m=>toasts.push(m),refresh:()=>refreshes++,action:async(endpoint,payload)=>{
     calls.push({endpoint,payload});if(hold)await new Promise(r=>window.release=r);if(fail)throw new Error('Test: Angebot abgelaufen.');
-    const list=payload.mode==='vip'?K.trading.vip:K.trading,o=list.offers.find(o=>o.id===payload.offer_id);o.remaining-=payload.quantity;
+    const list=payload.action==='crystal.buy'?K.trading.crystals:payload.mode==='vip'?K.trading.vip:K.trading,o=list.offers.find(o=>payload.action==='crystal.buy'?o.item_code===payload.item_code:o.id===payload.offer_id);if(payload.action!=='crystal.buy')o.remaining-=payload.quantity;
     if(o.price.resource==='gems')K.profile.gems-=o.price.amount*payload.quantity;else S.city[o.price.resource]-=o.price.amount*payload.quantity;
-    panel.render();
+    panel.render();return {result:{}};
    }});
+   K.trading.crystals={offers:crystalCatalog.map((row,n)=>{const i=defs.find(i=>i.code===row.item_code);return {...make(i,n),id:'crystal-'+i.code,price:{resource:'gems',amount:row.price_crystals},locked:false,remaining:100,limit:100,discount:0};})};
    document.addEventListener('click',e=>{const b=e.target.closest('[data-action]');if(b)panel.onClick(b.dataset.action,b);});document.querySelector('#panel-dialog').showModal();panel.render();
-  },definitions);
+  },{defs:definitions,crystalCatalog:JSON.parse(fs.readFileSync(path.join(root,'data/crystal_shop.json'),'utf8')).offers});
   const tab=id=>page.locator(`[data-action="trading-tab"][data-id="${id}"]`);
   const viewFilter=id=>page.locator(`[data-action="trading-view"][data-id="${id}"]`);
   const categoryFilter=id=>page.locator(`[data-action="trading-category"][data-id="${id}"]`);
@@ -43,11 +44,34 @@ const styles=sheets.map(file=>fs.readFileSync(path.join(root,'assets/css',file),
   };
   assert.deepEqual(await page.locator('.shop-tabs [data-action="trading-tab"]').allTextContents(),['Händler','Kristall-Shop','VIP-Shop','Karawane']);checks.push('Shop opens with four direct tabs');
   await tab('crystals').click();assert.equal(await page.locator('.trading-summary h2').innerText(),'Kristall-Shop');
+  assert.equal(await page.locator('.shop-merchant-card').count(),0);assert.equal(await page.locator('.trading-card').count(),JSON.parse(fs.readFileSync(path.join(root,'data/crystal_shop.json'),'utf8')).offers.length);
+  assert.equal(await page.locator('.trading-vip-level').count(),0);
+  const crystalFirst=await page.evaluate(()=>K.trading.crystals.offers[0]);
+  await page.locator('[data-action="trading-buy"][data-id="'+crystalFirst.id+'"]').click();
+  await page.waitForFunction(()=>calls.at(-1)?.payload.action==='crystal.buy');
+  const crystalCall=await page.evaluate(()=>calls.at(-1).payload);
+  assert.equal(crystalCall.item_code,crystalFirst.item_code);assert.equal(crystalCall.quantity,1);assert.match(crystalCall.request_id,/^[a-z0-9-]{36}$/);
+  assert.equal(await page.evaluate(()=>K.trading.crystals.offers[0].remaining),100);
+  assert.equal(await page.evaluate(()=>K.trading.vip.offers[0].remaining),10);
+  for(const category of ['resource_pack','speedup','teleport','boost']){
+   await page.locator('[data-action="trading-crystal-category"][data-id="'+category+'"]').click();
+   assert(await page.locator('.trading-card').count()>0);assert(await page.evaluate(cat=>[...document.querySelectorAll('.trading-buy')].every(b=>K.trading.crystals.offers.find(o=>o.id===b.dataset.id).item.category===cat),category));
+  }
+  await page.locator('[data-action="trading-crystal-category"][data-id="all"]').click();
+  const firstRequest=crystalCall.request_id;
+  const crystalBuy=()=>page.locator('[data-action="trading-buy"][data-id="'+crystalFirst.id+'"]');
+  await page.evaluate(()=>{fail=true;});await crystalBuy().click();await page.waitForFunction(()=>toasts.length===1);
+  const retryRequest=await page.evaluate(()=>calls.at(-1).payload.request_id);assert.notEqual(firstRequest,retryRequest);
+  await page.evaluate(()=>{fail=false;});await crystalBuy().click();await page.waitForFunction(()=>calls.filter(c=>c.payload.action==='crystal.buy').length===3);
+  assert.equal(await page.evaluate(()=>calls.at(-1).payload.request_id),retryRequest);await page.evaluate(()=>toasts=[]);
+  checks.push('Crystal Shop keeps the purchase receipt on errors and generates a new receipt after success');
+  checks.push('Independent Crystal Shop uses its own purchase action, no VIP gates, no weekly depletion and four category filters');
   await tab('merchant').click();assert.equal(await page.locator('.shop-merchant-card').count(),2);assert.equal(await page.locator('.shop-merchant-reward img').count(),2);assert.equal(await page.locator('.shop-merchant-reward strong').first().innerText(),'+1.000 Holz');assert.equal(await page.locator('.shop-merchant-cost strong').first().innerText(),'1.000');assert(await page.locator('.shop-merchant-action.pays-gems').isVisible());assert.equal(await page.locator('[data-trading-countdown]').innerText(),'1d 00:00:00');assert((await page.locator('.trading-footer').innerText()).includes('Nach jedem Kauf'));checks.push('Merchant cards show received material art, replacement rule, daily timer and icon-labelled costs');
   await page.evaluate(async()=>{await document.fonts.load('16px \"Conquer UI\"','Äé Kingdom 0123456789');await document.fonts.ready;});
   assert(await page.evaluate(()=>document.fonts.check('16px \"Conquer UI\"','Äé Kingdom 0123456789')),'Layout uses the loaded shared typeface');
   for(const [width,height]of [[1280,720],[390,844],[320,568],[568,320]]){
    await page.setViewportSize({width,height});await tab('merchant').click();await check(width+'x'+height+' merchant');assert.equal(await page.locator('.shop-merchant-card').count(),2);await page.screenshot({path:path.join(output,width+'x'+height+'-merchant.png')});
+   await tab('crystals').click();await check(width+'x'+height+' crystals');await page.locator('.trading-buy').last().scrollIntoViewIfNeeded();assert(await page.locator('.trading-buy').last().evaluate(b=>{const r=b.getBoundingClientRect(),hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return b===hit||b.contains(hit);}));await page.locator('.trading-scroll').evaluate(e=>e.scrollTop=0);await page.screenshot({path:path.join(output,width+'x'+height+'-crystals.png')});
    await tab('caravan').click();await check(width+'x'+height+' caravan');assert.equal(await page.locator('.trading-card').count(),15);await page.screenshot({path:path.join(output,width+'x'+height+'-caravan.png')});
    await tab('vip').click();await viewFilter('mine').click();await check(width+'x'+height+' personal VIP');assert.equal(await page.locator('.trading-card').count(),12);assert.equal(await page.locator('.trading-level-group').count(),3);await page.screenshot({path:path.join(output,width+'x'+height+'-vip-personal.png')});
    await viewFilter('all').click();await check(width+'x'+height+' all VIP');assert.equal(await page.locator('.trading-card').count(),52);assert.equal(await page.locator('.trading-level-group').count(),13);await page.locator('.trading-card').last().scrollIntoViewIfNeeded();await check(width+'x'+height+' last VIP offer reachable');await page.screenshot({path:path.join(output,width+'x'+height+'-vip-all.png')});
@@ -60,7 +84,7 @@ const styles=sheets.map(file=>fs.readFileSync(path.join(root,'assets/css',file),
     assert(tabs.scrollable&&tabs.activeHit&&tabs.pageOverflow<=1,`${locale} ${width} ${id}: selected tab reachable within its own strip`);
     assert(tabs.buttons.every(b=>b.height>=44&&!b.clipped&&b.wrap==='nowrap'),`${locale} ${width} ${id}: complete labels and 44px targets`);
     await check(`${locale} ${width}x${height} ${id} full shop tabs`);
-    if(locale==='fr'&&id==='crystals'){assert.equal(await tab(id).innerText(),'Boutique de cristal');await page.screenshot({path:path.join(output,`${width}x${height}-fr-shop-tabs.png`)});}
+    if(locale==='fr'&&id==='crystals'){assert.equal(await tab(id).innerText(),'Boutique de cristaux');await page.screenshot({path:path.join(output,`${width}x${height}-fr-shop-tabs.png`)});}
    }
    await page.evaluate(()=>{document.querySelector('.shop-tabs').scrollLeft=0;document.dispatchEvent(new CustomEvent('conquer:locale'));});
    await page.waitForFunction(()=>{const strip=document.querySelector('.shop-tabs'),a=strip.querySelector('[aria-pressed="true"]').getBoundingClientRect(),b=strip.getBoundingClientRect();return a.left>=b.left-1&&a.right<=b.right+1;});
@@ -74,6 +98,7 @@ const styles=sheets.map(file=>fs.readFileSync(path.join(root,'assets/css',file),
   await page.evaluate(()=>{hold=true;fail=true;});await buy(0,1).click();assert(await buy(2,1).isDisabled());await page.evaluate(()=>panel.onClick('trading-buy',{dataset:{id:'offer-2',quantity:'1'}}));assert.equal(await page.evaluate(()=>calls.length),before+1);await page.evaluate(()=>release());await page.waitForFunction(()=>toasts.length===1);assert(!(await buy(0,1).isDisabled()));assert.equal(await page.evaluate(()=>K.trading.vip.offers[0].remaining),10);checks.push('Pending actions cannot duplicate; server errors restore controls without changing stock');
   await page.evaluate(()=>{window.oldCard=document.querySelector('.trading-card');testNow+=1000;panel.updateTime();});assert(await page.evaluate(()=>oldCard===document.querySelector('.trading-card')));checks.push('Countdown updates without rebuilding catalogue');
   await page.evaluate(()=>{testNow+=604800000;panel.updateTime();panel.updateTime();});assert.equal(await page.evaluate(()=>refreshes),1);assert(await buy(0,1).isDisabled());checks.push('Expired offers block purchases and request one refresh');
+  await tab('crystals').click();await page.evaluate(()=>{K.profile.gems=1000000;panel.render();});assert(await page.locator('.trading-buy').first().isEnabled());checks.push('Crystal Shop remains available after VIP reset');
   assert.deepEqual(errors,[]);console.log(JSON.stringify({checks:checks.length,output},null,2));
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);console.error('Screenshots: '+output);process.exitCode=1;});

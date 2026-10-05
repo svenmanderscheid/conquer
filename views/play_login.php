@@ -24,6 +24,7 @@ $identifier = htmlspecialchars(is_string($_POST['identifier'] ?? null) ? $_POST[
 <script src="<?= $base ?>/assets/js/localization.js?v=<?= filemtime(ROOT_DIR.'/assets/js/localization.js') ?>" defer></script>
 </head>
 <body class="play-login-page" data-i18n-scope>
+<?php require ROOT_DIR.'/views/partials/app-start.php'; ?>
 <main class="play-shell">
   <section class="play-panel" aria-labelledby="play-login-title">
     <div class="play-card">

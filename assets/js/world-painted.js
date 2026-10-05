@@ -7,6 +7,7 @@ const files={castle:'world-castle-v2.png',gold:'world-gold-v2.png',farm:'world-f
 const monsterIds=new Set(['orc','skeleton','golem','treasure-goblin','green-dragon','red-dragon','gold-dragon','magdar']);
 const cache=new Map();let tiles=[],trees=[],base='',invalidate=()=>{},pauseMotionBuild=()=>false;
 const hitBoundsCache=new Map(),hitBindings=new WeakMap();
+const drawBindings=new WeakMap();
 const hash=(x,y)=>{let h=Math.imul(x,374761393)^Math.imul(y,668265263)^1979;h=Math.imul(h^(h>>>13),1274126177);return(h^(h>>>16))>>>0;};
 const load=src=>new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(new Error('World artwork unavailable: '+src));image.src=src;});
 function alphaBounds(image){
@@ -46,7 +47,7 @@ function updateHitBounds(img,binding){
  });
 }
 export function key(target){
- if(['home','players'].includes(target.kind))return window.ConquerCastleSkins.get(target.data.city_skin).id==='default'?'castle':null;
+ if(['home','players','neutral_villages'].includes(target.kind))return window.ConquerCastleSkins.get(target.data.city_skin).id==='default'?'castle':null;
  if(target.kind==='nodes')return files[target.resource?.art]?target.resource.art:null;
  if(target.kind!=='monsters')return null;
  const name=(target.art||'').split('/').pop().replace(/\.png.*$/,'').replace('-turquoise','');
@@ -97,10 +98,12 @@ function itemFor(target){
  item.h=item.w;cache.set(id,item);
  load(source(target)).then(image=>{item.image=image;matchDragonSize(item);invalidate();}).catch(error=>{item.failed=true;console.warn(error);});return item;
 }
+// One visual hierarchy; authoritative footprints and coordinates remain separate.
+const mapSize=(item,target)=>item.id==='castle'?3.65:files[item.id]?1.75:item.id==='magdar'?2.6:item.id.includes('dragon')?item.w/70*(target.data.definition?.type==='rally'?.9:.65):item.id==='orc'?1.4:1.35;
 export function bind(button,target){
  const id=key(target),img=button.querySelector('img');
  if(!id){if(button.dataset.painted){delete button.dataset.painted;img.style.cssText='';button.querySelector('.atlas-painted-motion')?.remove();}bindHitBounds(button,target,img);return;}
- button.dataset.painted=id;const item=itemFor(target),size=id==='castle'?3.85:files[id]?2.4:item.w/70;
+ button.dataset.painted=id;const item=itemFor(target),size=mapSize(item,target);
  button.style.setProperty('--painted-size',String(size));button.style.setProperty('--painted-padding',String(item.groundPadding));
  // Preserve img geometry for the target-menu placement calculations.
  img.style.width=img.style.height=`calc(var(--tile-size,44px) * ${size})`;
@@ -114,13 +117,25 @@ export function draw(button,target,time,reduced){
  const working=target.kind==='nodes'&&Boolean(target.data.gatherer_march_id);
  const layers=working?workLayers(item.id,base,invalidate):null;
  if(!reduced&&(!files[item.id]||item.id==='castle')&&!item.framesRequested){item.framesRequested=true;buildMotionFrames(item.image,item.id,{shouldPause:()=>pauseMotionBuild()}).then(frames=>{item.motionFrames=frames;invalidate();}).catch(error=>console.warn(error));}
- let canvas=button.querySelector('.atlas-painted-motion');
- if(!canvas){canvas=document.createElement('canvas');canvas.className='atlas-painted-motion';canvas.width=canvas.height=192;canvas.setAttribute('aria-hidden','true');button.querySelector('img').after(canvas);}
+ let binding=drawBindings.get(button);
+ if(!binding||!binding.canvas.isConnected){
+  const img=button.querySelector('img'),canvas=document.createElement('canvas');canvas.className='atlas-painted-motion';canvas.setAttribute('aria-hidden','true');img.after(canvas);
+  binding={img,canvas,ctx:canvas.getContext('2d'),geometry:null};drawBindings.set(button,binding);
+ }
+ const {canvas,img,ctx:g}=binding;
+ // Small encounters need small backing stores, rather than 192px for every sprite.
+ const resolution=Math.min(192,Math.max(80,Math.ceil(mapSize(item,target)*(button.mapTileSize||44))));
+ if(canvas.width!==resolution){canvas.width=canvas.height=resolution;canvas.paintStamp=null;}
+ if(img.style.opacity!=='0')img.style.opacity='0';
+ const geometry=img.style.cssText;
+ if(binding.geometry!==geometry){binding.geometry=geometry;canvas.style.cssText=geometry;canvas.style.opacity='1';}
  const animated=!reduced&&(!files[item.id]||item.id==='castle'||working);
  const stamp=`${item.id}:${working}:${layers?.ready}:${!!item.motionFrames}:${animated?Math.floor(time*24):'still'}`;if(canvas.paintStamp===stamp)return;canvas.paintStamp=stamp;
- canvas.dataset.working=String(working);canvas.dataset.workReady=String(working&&(item.id==='crystal'||!!layers?.ready));
- const img=button.querySelector('img');canvas.style.cssText=img.style.cssText;img.style.opacity='0';canvas.style.opacity='1';
- const g=canvas.getContext('2d'),id=item.id,t=reduced?0:time+(Number(target.id)||0)*.013;
+ const workingState=String(working),readyState=String(working&&(item.id==='crystal'||!!layers?.ready));
+ if(canvas.dataset.working!==workingState)canvas.dataset.working=workingState;
+ if(canvas.dataset.workReady!==readyState)canvas.dataset.workReady=readyState;
+ g.setTransform(resolution/192,0,0,resolution/192,0,0);
+ const id=item.id,t=reduced?0:time+(Number(target.id)||0)*.013;
  g.clearRect(0,0,192,192);const breath=!files[id]&&!item.motionFrames&&!reduced?Math.sin(t*(id==='golem'?1.4:2.2))*.035:0;
  g.save();const foot=192*(1-item.groundPadding);g.translate(96,foot);g.scale(1-breath*.35,1+breath);g.drawImage(motionFrame(item,t,reduced),-96,-foot,192,192);g.restore();
  if(working)drawWork(g,id,layers,item.image,t);
@@ -128,6 +143,11 @@ export function draw(button,target,time,reduced){
 }
 export function shadow(c,x,y,s,target,tiles){
  const id=key(target);if(!id)return false;
- const item=itemFor(target),size=id==='castle'?3.85:files[id]?2.4:item.w/70;
+ const item=itemFor(target),size=mapSize(item,target);
  const foot=y+tiles*s/2;ellipse(c,x+2,foot-2,size*s*.3,size*s*.08,'rgba(59,73,37,.22)');return true;
+}
+export function visible(target,x,y,tile,tiles,width,height){
+ const item=itemFor(target);if(!item)return false;
+ const size=mapSize(item,target)*tile,bottom=y+tiles*tile/2+size*item.groundPadding;
+ return x+size/2>=0&&x-size/2<=width&&bottom>=0&&bottom-size<=height;
 }

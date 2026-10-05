@@ -17,7 +17,7 @@ const root=path.resolve(__dirname,'..');
    await new Promise(requestAnimationFrame);
   });
   assert.equal(await page.locator('.painted-building-sprite').count(),15,'Separate approved-style sprites');
-  assert.match(await page.locator('.painted-village-scene>img').getAttribute('src'),/village-layered-v2\/runtime\/terrain\.webp$/);
+  assert.match(await page.locator('.painted-village-scene>img').getAttribute('src'),/village-layered-v2\/runtime\/terrain-extended\.webp$/);
   const castle=page.locator('[data-id="castle"] .painted-building-sprite');
   await page.evaluate(()=>{fixture.citySkin='fire';ConquerPaintedCity.render(fixture);});
   assert.equal(await page.locator('[data-id="castle"]').getAttribute('data-castle-skin'),'fire');
@@ -50,6 +50,14 @@ const root=path.resolve(__dirname,'..');
   await page.waitForFunction(()=>[...document.querySelectorAll('.painted-village img')].every(i=>i.complete&&i.naturalWidth>0));
   for(const size of [{width:1280,height:720},{width:390,height:844},{width:844,height:390},{width:320,height:700}]){
    await page.setViewportSize(size);
+   await page.evaluate(()=>new Promise(requestAnimationFrame));
+   assert(await page.evaluate(()=>{
+    const scroll=document.querySelector('.painted-village-scroll');
+    scroll.scrollTop=scroll.scrollHeight;
+    const ground=document.querySelector('.painted-village-ground').getBoundingClientRect();
+    const terrain=document.querySelector('.painted-village-scene>img').getBoundingClientRect();
+    return terrain.bottom>=ground.bottom&&terrain.bottom-ground.bottom<2;
+   }),'Bottom scroll edge ends within the continuous terrain painting');
    await page.evaluate(()=>{const s=document.querySelector('.painted-village-scroll');s.scrollLeft=100;s.scrollTop=0;window.buildingClicks=0;document.querySelector('#host').onclick=e=>{if(e.target.closest('[data-action="building"]'))window.buildingClicks++;};});
    const before=await page.locator('.painted-village-scroll').evaluate(s=>s.scrollLeft);
    await page.mouse.move(size.width/2,180);await page.mouse.down();

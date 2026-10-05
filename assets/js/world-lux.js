@@ -12,7 +12,7 @@ window.ConquerLuxWorld=(()=>{
       const [geo,water,{createHydrology}]=await Promise.all([
         fetch(local(profile.geography_url),{credentials:'same-origin'}).then(r=>{if(!r.ok)throw new Error('Die Gemeindegrenzen konnten nicht geladen werden.');return r.json();}),
         fetch(local(profile.hydrology_url),{credentials:'same-origin'}).then(r=>{if(!r.ok)throw new Error('Die Gewässer konnten nicht geladen werden.');return r.json();}),
-        import(`${base}/assets/world-lux-preview/hydrology.mjs?v=1`)
+        import(`${base}/assets/world-lux-preview/hydrology.mjs?v=2`)
       ]);
       const grid=geo.grid,rows=grid.rows.map(r=>{const values=new Uint16Array(grid.width);let col=0;for(let i=0;i<r.length;i+=2){values.fill(r[i],col,col+r[i+1]);col+=r[i+1];}if(col!==grid.width)throw new Error('Die Kartendefinition ist unvollständig.');return values;});
       const communes=geo.communes.map(r=>({...r,shape:shape(r.rings)})),cantons=geo.cantons.map(r=>({...r,shape:shape(r.rings)})),land=new Path2D();cantons.forEach(c=>land.addPath(c.shape));

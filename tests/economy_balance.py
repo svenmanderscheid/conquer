@@ -10,6 +10,8 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 FILES = ['buildings.json'] + [f'research/{tree}.json' for tree in ('production', 'battle', 'advanced')]
 RESOURCES = ('food', 'lumber', 'stone', 'gold')
+sys.path.insert(0, str(ROOT / 'tools'))
+from economy_balance import apply_costs
 
 
 def read(path):
@@ -45,8 +47,61 @@ for tree in ('production', 'battle', 'advanced'):
 assert buildings['castle']['30']['resources'] == dict(food=4304834, lumber=4304834, stone=4304834, gold=1549817)
 assert buildings['academy']['30']['resources'] == dict(food=0, lumber=4607860, stone=4607860, gold=4608029)
 assert buildings['farm']['30']['resources'] == dict(food=0, lumber=1285797, stone=1285797, gold=385612)
-for code, amount in [('warrior', 74402), ('knight', 316322), ('guardian', 616214), ('crusader', 1040235)]:
+for code, amount in [('warrior', 52082), ('longbow_man', 52082), ('horseman', 52082), ('knight', 316322), ('guardian', 616214), ('crusader', 1040235)]:
     assert nodes[code]['levels'][0]['resources'] == dict.fromkeys(RESOURCES, amount)
+
+# Early combat improvements and the transition to normal T3-era prices.
+for code, level, expected in [
+    ('infantry_hp', 1, (245, 123, 368, 258)),
+    ('infantry_def', 1, (1764, 882, 2646, 1853)),
+    ('infantry_atk', 1, (5145, 2573, 7718, 5403)),
+    ('infantry_training_amount', 1, (21484, 10742, 32226, 32226)),  # Academy 11
+    ('infantry_training_amount', 3, (38249, 19125, 57373, 57373)),  # Academy 12
+    ('infantry_training_amount', 5, (67593, 33797, 101389, 101389)),  # Academy 13
+    ('march_size', 1, (66633, 66633, 66633, 66633)),  # Academy 14
+    ('march_size', 3, (115298, 115298, 115298, 115298)),  # Academy 15
+    ('march_size', 5, (198756, 198756, 198756, 198756)),  # Academy 16: unchanged
+]:
+    assert nodes[code]['levels'][level - 1]['resources'] == dict(zip(RESOURCES, expected)), (code, level)
+
+# Reconstruct the previous policy to prove that only early military prices move.
+catalogs = {tree: read(ROOT / f'data/research/{tree}.json') for tree in ('production', 'battle', 'advanced')}
+previous = copy.deepcopy(catalogs)
+policy = read(ROOT / 'data/economy_balance.json')
+policy['research']['early_military']['resource_factor'] = '1.00'
+policy['research']['early_military']['gold']['resource_factor'] = '1.00'
+apply_costs({}, previous, ROOT / 'data/balance-source', policy)
+changed = 0
+for tree, catalog in catalogs.items():
+    for node, old_node in zip(catalog['nodes'], previous[tree]['nodes'], strict=True):
+        for row, old_row in zip(node['levels'], old_node['levels'], strict=True):
+            academy = max((req['level'] for req in row['requirements'] if req['type'] == 'academy'), default=1)
+            if tree != 'battle' or academy >= 16:
+                assert row == old_row, 'Other trees and later military levels retain existing prices'
+            else:
+                assert all(row['resources'][r] <= old_row['resources'][r] for r in RESOURCES)
+                assert sum(row['resources'].values()) < sum(old_row['resources'].values())
+                changed += 1
+assert changed == 118
+
+# The additional gold relief ends before T2, without reducing other resources again.
+before_gold = copy.deepcopy(catalogs)
+gold_policy = read(ROOT / 'data/economy_balance.json')
+gold_policy['research']['early_military']['gold']['resource_factor'] = '1.00'
+apply_costs({}, before_gold, ROOT / 'data/balance-source', gold_policy)
+for tree, catalog in catalogs.items():
+    for node, old_node in zip(catalog['nodes'], before_gold[tree]['nodes'], strict=True):
+        for row, old_row in zip(node['levels'], old_node['levels'], strict=True):
+            academy = max((req['level'] for req in row['requirements'] if req['type'] == 'academy'), default=1)
+            for resource in RESOURCES:
+                if tree == 'battle' and academy < 10 and resource == 'gold':
+                    assert 0 < row['resources'][resource] < old_row['resources'][resource]
+                else:
+                    assert row['resources'][resource] == old_row['resources'][resource]
+for code, level, gold in [('infantry_atk', 3, 8869), ('infantry_spd', 1, 10936),
+                          ('infantry_spd', 3, 16900), ('infantry_spd', 5, 27416),
+                          ('troops_storage', 3, 27343)]:
+    assert nodes[code]['levels'][level - 1]['resources']['gold'] == gold
 
 # Include every sequential prerequisite, counting shared branches only once.
 needed = {}
@@ -59,11 +114,15 @@ def require(code, level):
         for req in row['requirements']:
             if req['type'] == 'research':
                 require(req['code'], req['level'])
+require('warrior', 1)
+assert sum(needed.values()) == 28
+assert sum(sum(row['resources'].values()) for code, level in needed.items() for row in nodes[code]['levels'][:level]) == 926461
+needed.clear()
 require('crusader', 1)
 total = {resource: sum(row['resources'][resource] for code, level in needed.items() for row in nodes[code]['levels'][:level]) for resource in RESOURCES}
 assert sum(needed.values()) == 104
-assert 53_000_000 < sum(total.values()) < 55_000_000
-assert 14_000_000 < total['gold'] < 15_000_000
+assert sum(total.values()) == 52611876
+assert total['gold'] == 13986111
 print('PASS monotonic costs for 420 building and 963 research levels; T5 path includes all 104 prerequisites/upgrades:', total)
 
 # Run generators outside the working tree; a price update must not reset other

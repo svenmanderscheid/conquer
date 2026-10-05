@@ -148,6 +148,7 @@ final class GameHandler
         $zoneBounds=$mapProfile['key']==='luxembourg'?[]:\Conquer\Game\World\LandGeometry::zoneBounds((int)$world['map_size']);
         $zones=$mapProfile['key']==='luxembourg'?[]:array_map(static fn(array $zone):array=>$zone+['bounds'=>$zoneBounds[$zone['key']]??null],\Conquer\Game\World\LandUnlockService::status($worldId));
         $landState=['parcel_size'=>8,'map_size'=>(int)$world['map_size'],'width'=>$mapProfile['width'],'height'=>$mapProfile['height'],'zones'=>$zones,'current'=>$land?array_intersect_key($land,array_flip(['id','level','zone','open'])):null];
+        $extraEvents=\Conquer\Game\Ui\ExtraEventButton::activeEvents($worldId);
         Response::ok($state + [
             'world'=>$world+['map_profile'=>$mapProfile,'width'=>$mapProfile['width'],'height'=>$mapProfile['height']],
             'territory'=>TerritoryService::compactState($pid,$worldId),
@@ -162,6 +163,8 @@ final class GameHandler
             'player' => ['name' => $session['username'], 'csrf' => $session['csrf_token'],
                 'name_frame'=>(string)($db->query("SELECT COALESCE(name_frame,'default') FROM kingdom_profiles WHERE player_id=?",[$pid])->fetchColumn()?:'default')],
             'active_rally_count'=>count($rallyMarches),
+            'extra_event_button'=>$extraEvents[0]??null,
+            'extra_events'=>$extraEvents,
             'map_center'=>['x'=>$mapX,'y'=>$mapY,'radius'=>$mapRadius],
             'server_time' => time(), 'monsters' => $monsters, 'nodes' => $nodes, 'neutral_villages'=>$villages, 'players'=>$players, 'charms'=>$charms,'land_progression'=>$landState,
             'training_promotions'=>$db->query("SELECT id,source_code,target_code,count,started_at,finishes_at FROM defense_promotions WHERE city_id=? AND state='training'",[$city['id']])->fetchAll(),

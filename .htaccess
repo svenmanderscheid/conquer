@@ -14,6 +14,11 @@
 # Front controller pattern — route all non-existing requests to index.php
 RewriteEngine On
 
+# Consolidate public website URLs without replaying submitted forms.
+RewriteCond %{HTTP_HOST} ^www\.unionofkingdoms\.com$ [NC]
+RewriteCond %{REQUEST_METHOD} ^(?:GET|HEAD)$
+RewriteRule ^ https://unionofkingdoms.com%{REQUEST_URI} [R=301,L]
+
 # Redirect before internal routing; use 308 to preserve methods and request bodies.
 RewriteCond %{HTTPS} off
 RewriteCond %{HTTP_HOST} !^(localhost|127\.0\.0\.1)(:\d+)?$ [NC]
@@ -33,7 +38,7 @@ LimitRequestBody 65536
 </If>
 
 # Relative rules protect both domain-root and /conquer installations.
-RewriteRule ^(?:src|config|migrations|cron|tests|docs|data|vendor|node_modules|logs|sessions|cache|tmp|tools|bin|artifacts|outputs|preview|asset-workflow|views|\.git|\.github|\.claude|\.codex[^/]*)(?:/|$) - [F,L,NC]
+RewriteRule ^(?:src|config|migrations|cron|tests|docs|data|vendor|node_modules|mobile|logs|sessions|cache|tmp|tools|bin|artifacts|outputs|preview|asset-workflow|views|\.git|\.github|\.claude|\.codex[^/]*)(?:/|$) - [F,L,NC]
 
 # Local documents and exports at the project root are not public game assets.
 # Intentional downloadable assets belong below assets/.
@@ -82,6 +87,10 @@ RedirectMatch 403 ^/(src|config|migrations|cron|tests|docs|data|vendor|node_modu
 # ============================================================================
 # Performance — caching for static assets
 # ============================================================================
+<IfModule mod_mime.c>
+    # ES modules must have a JavaScript MIME type when nosniff is enabled.
+    AddType application/javascript .mjs
+</IfModule>
 <IfModule mod_expires.c>
     ExpiresActive On
     

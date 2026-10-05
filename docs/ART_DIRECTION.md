@@ -10,13 +10,38 @@ Files are project-local under `assets/art/`. The production village is `village2
 
 ## Active painted-world style rules
 
+World-map proportions (3 October 2026): default castles use a 3.65-tile illustration, resource sites 1.75 tiles, basic solo monsters approximately 1.35 tiles and Magdar 2.6 tiles. Dragon silhouettes retain their transparent-padding and optical-height compensation. Regional bosses remain approximately 2.6–2.7 tiles, and Congress uses a 6.2-tile illustration above its unchanged 7×7 authoritative footprint. Actual coordinates, occupancy, gathering and battle rules do not change. Sprite backing stores follow displayed size (80–192 px); animation geometry stays stable between frames and buffered off-screen sprites are not animated. Checks: `tests/world_painted.cjs`, `tests/world_drag_rendering.cjs`, `tests/world_optimization_app.cjs`. Main-app captures: `artifacts/map-optimization/`.
+
 Since 26 September 2026 the game uses only the painted city (`assets/js/city-painted.js`) and the existing illustrated world map. The separate 3D/2.5D city, Three.js runtime and GLB models were removed at the user's request; see `REMOVED_3D_2026-09-26.md`. `village2.png` remains the binding style reference. Current city and world asset paths are defined by the active renderer modules; preserve those approved illustrations.
+
+The city terrain uses `assets/art/village-layered-v2/runtime/terrain-extended.webp` (1 October 2026), with additional woodland outside the walls. The painting scrolls with the existing 3:2 building area and fills the space behind the HUD; do not add a separately scaled fixed copy behind it. The original `terrain.webp` remains available. The built-in Imagegen prompt and source coordinates are recorded in `terrain-extended.source.json` beside the artwork. Desktop, narrow portrait, short landscape and building-action captures are under `artifacts/terrain-extension/`.
 
 Use chunky, rounded silhouettes, warm ivory walls, saturated roof colors, dark espresso outlines and two broad light values. Paths are warm tan with soft edges and sparse irregular marks. Landscapes use muted sage grass and varied tree silhouettes. Characters use large heads, short limbs and clear, oversized role equipment. Avoid photographic textures and glossy realism. Add interface depth through restrained shadows, layering and light edges, using the shared UI variables.
 
 Animation stays calm, supports reduced motion and never obscures labels, selection or touch controls. Inspect the whole city and building dialogs in the actual app at desktop, narrow portrait and landscape sizes. Keep images compressed and reuse sprites.
 
-Construction reuses the approved scaffold artwork with a fixed frame and worker silhouette. Only the isolated hammer moves, with small timed dust/chip accents at the strike point; do not stack transparent whole-frame poses or move the entire building. The detail SVG is mounted only for an authoritative active build queue, retained across refreshes and removed when that queue settles. Countdown expiry alone does not finish the work. Timer labels stay above the scaffold. Light graphics retains the small tool motion and omits particles; reduced motion uses a fully still worksite. Dialogs, hidden tabs and the world view pause construction. Check `tests/city_construction_app.cjs` and `tests/painted_city.cjs`.
+Construction reuses the approved scaffold artwork with a fixed frame and worker silhouette. Since 1 October 2026, each of the 16 buildings also has an individual construction task, drawn with the scaffold's rounded forms and existing world pigments. Only the isolated hammer and the task's tools, ropes or materials move; do not stack transparent whole-frame poses or move the entire building. Workpieces stay inside the scaffold, away from timer labels and touch controls. They use small inline SVG shapes and CSS transforms, without extra raster downloads or a JavaScript animation loop.
+
+| Building | Upgrade work |
+| --- | --- |
+| Castle | Pulley lifts a masonry block above the new stone course |
+| Academy | Rune-inscribed stones float into alignment above a base |
+| Treasure house | Vault locking wheel is fitted and turned |
+| Hospital | Brush paints the cross on the new hospital sign |
+| Alliance hall | Crest banner is raised between wooden supports |
+| Trading post | New striped awning is unfolded over its frame |
+| Storage | Timber plank slides into the new storage rack |
+| Watch tower | Rope hoists a ladder up the scaffold |
+| Stable | New stall gate swings on its hinge |
+| Archery range | Target is aligned on a new wooden stand |
+| Barracks | Mallet fixes a shield to the armoury stand |
+| Farm | Terracotta tiles are lowered onto new roof rafters |
+| Lumber camp | Saw cuts a beam resting on trestles |
+| Gold mine | Cart delivers timber and stone along newly laid rails |
+| Quarry | Chisel shapes a stone block with small chips |
+| Wall | Crenellation block is lowered onto a new wall section |
+
+The detail SVG is mounted only for an authoritative active build queue, retained across refreshes and removed when that queue settles. Countdown expiry alone does not finish the work. Timer labels stay above the scaffold. Light graphics (also selected automatically on phones) retains the small worker-tool and individual task movements, omitting all particles; reduced motion uses a fully still worksite. Dialogs, hidden tabs and the world view pause all construction motion. Check `tests/city_construction_app.cjs` (all 16 tasks, visible detail movement, mobile touch, pauses, motion settings and queue cleanup) and `tests/painted_city.cjs`. Actual-app captures are saved under `artifacts/city-upgrade-animations/`.
 
 Luxembourg conquest landmarks use the eight transparent illustrations in `assets/art/territory-v2/`: six commune benefits, a canton fortress and the Royal Castle. The 30 September revision gives them broader halls, stronger foundations, heavier bastions and more substantial walls while retaining the original roof colors and benefit emblems. Map and territory dialogs share `assets/js/territory-art.js`; their illustrated size follows the authoritative footprint. Sources, prompts, compression and visual checks are documented in `TERRITORY_ART.md`. The previous `territory-v1` set remains available for comparison.
 
@@ -68,3 +93,9 @@ Single cute chibi chunky stone golem with an oversized square gray rock head, ti
 ## World prompt
 
 Landscape background for a top-down 2D chibi cartoon fantasy strategy game world map. Simple thick dark green outlines, flat muted sage and olive colors, two-tone cel shading, very simple clean graphic shapes matching cute mobile RPG art. Broad open grassy clearing across the center 70 percent of image, small clustered rounded pine tree forests at corners and edges, a narrow winding tan trail, small turquoise pond in far lower right corner, tiny gray stone clusters and mushrooms at edges. View directly from above, not perspective. Keep center very clear so many interactive game markers can overlay without visual clutter. No buildings, no characters, no icons, no text, no labels, no grid, no interface, no realistic shading or textures. Premium hand-drawn cartoon world, friendly and inviting.
+
+### Approved inventory icons (3 October 2026)
+
+On 4 October 2026 the user approved installation of all 190 individual item illustrations from `artifacts/item-icons-unique-preview/`. Their transparent 256px WebP files are shipped in `assets/art/items/painted-v2/` (about 3.1 MB in total). The shared item-art helper resolves exact catalog item codes before generic motifs, including quantity and duration variants. Inventory, quest rewards, reward receipts, shop offers and queue speedup choices use those exact illustrations. Existing unique relic portraits and authoritative amount/time labels and rarity frames remain in place. Unknown future items retain their existing fallback artwork. The preview folder preserves generation prompts, provenance and review evidence.
+
+The user approved the twelve chunky, espresso-outlined inventory motifs. Transparent 256px WebP assets live in `assets/art/items/painted-v1/`; the approved transparent source and preparation record remain alongside them. `assets/js/item-art.js` maps compatible resource packs, generic/building/research speedups, action-point potions, city shields, gold chests and epic fragment packs. Amount/time labels and rarity frames remain authoritative. Training/healing, other chest grades and unique relic portraits retain their distinct existing artwork. Inventory, summaries, reward receipts and item shop offers share this mapping.

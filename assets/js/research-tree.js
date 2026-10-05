@@ -3,8 +3,8 @@
     const localText=value=>window.ConquerLocale?.text(value)??value;
 
     const branches = [
-        {id:'economy', name:'Wirtschaft', subtitle:'Vorräte für ein wachsendes Reich', icon:'harvest'},
         {id:'military', name:'Militär', subtitle:'Stärke für deine Truppen', icon:'swords'},
+        {id:'economy', name:'Wirtschaft', subtitle:'Vorräte für ein wachsendes Reich', icon:'harvest'},
         {id:'development', name:'Fortgeschritten', subtitle:'Kriegskunst, Verteidigung und gemeinsame Feldzüge', icon:'shield'}
     ];
     const names = {
@@ -35,7 +35,8 @@
         arrow:'M4 12h16m-6-6 6 6-6 6',
         box:'m3 7 9-5 9 5v11l-9 4-9-4V7Zm0 0 9 5 9-5m-9 5v10M7 4l10 6'
     };
-    let selectedBranch = 'economy', selectedGroup = 'all', searchQuery = '', focusCode = '', pendingFocus = false, lastDefs = [];
+    let selectedBranch = 'military', selectedGroup = 'all', searchQuery = '', focusCode = '', pendingFocus = false, lastDefs = [];
+    let pendingAutoScroll = true, autoScrollCode = '';
     const icon = key => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${paths[key] || paths.book}"/></svg>`;
     const branchOf = node => node.tree === 'advanced' ? 'development' : node.tree === 'battle' ? 'military' : 'economy';
     const groupNames = {food:'Nahrung',wood:'Holz',stone:'Stein',general:'Reich & Versorgung',infantry:'Infanterie',ranged:'Schützen',cavalry:'Reiterei',counter:'Konter',castle_def:'Stadtverteidigung',composed:'Reine Truppentypen',rally:'Reich & Sammelangriffe'};
@@ -228,6 +229,12 @@
             const unmet=(next?.requirements||[]).some(req=>req.type==='academy'?academy<Number(req.level):req.type==='research'?Number(researched[req.code]||0)<Number(req.level):false);
             return [node.code,{level,next,running,status:running?'running':!next?'complete':unmet?'locked':'available',requirements:researchRequirements(node,next)}];
         }));
+        if (!searchQuery && !pendingFocus && (pendingAutoScroll || options.autoScroll)) {
+            const available = nodes.filter(node => models.get(node.code).status === 'available');
+            const affordable = available.find(node => Object.entries(models.get(node.code).next.resources || {}).every(([resource, amount]) => Number(state.city?.[resource] || 0) >= Number(amount)));
+            autoScrollCode = (affordable || available[0] || nodes.find(node => models.get(node.code).status === 'running'))?.code || '';
+        }
+        pendingAutoScroll = false;
         lastEdges=searchQuery?[]:nodes.flatMap(node=>models.get(node.code).requirements.map(req=>({from:req.code,to:node.code,level:req.level,external:!slots.has(req.code),met:Number(researched[req.code]||0)>=req.level})));
         lastTreeInfo={branch:selectedBranch,codes,columns:3,rows:steps.length,direction:'vertical',edges:lastEdges};
         const active=queue[0],branchCount=defs.filter(node=>branchOf(node)===selected.id).length;
@@ -285,24 +292,25 @@
                 edge.querySelector('circle').setAttribute('cx',String(tx));edge.querySelector('circle').setAttribute('cy',String(ty));
             }
         }
-        if(pendingFocus){
-            const target=[...container.querySelectorAll('.rt-node')].find(node=>node.dataset.id===focusCode);
+        if(pendingFocus || autoScrollCode){
+            const target=[...container.querySelectorAll('.rt-node')].find(node=>node.dataset.id===(pendingFocus ? focusCode : autoScrollCode));
             const scroll=container.querySelector('.rt-scroll');
             if(target&&scroll){
                 const nodeRect=target.getBoundingClientRect(),scrollRect=scroll.getBoundingClientRect();
                 scroll.scrollLeft+=nodeRect.left-scrollRect.left-(scroll.clientWidth-nodeRect.width)/2;
                 scroll.scrollTop+=nodeRect.top-scrollRect.top-(scroll.clientHeight-nodeRect.height)/2;
-                target.focus({preventScroll:true});
+                if(pendingFocus)target.focus({preventScroll:true});
             }
             pendingFocus=false;
+            autoScrollCode='';
         }
     }
     window.ConquerResearch={
         render,renderRequirements,title,bonus,nodeArt,afterRender,
-        selectBranch(id){if(!branches.some(branch=>branch.id===id))return false;selectedBranch=id;selectedGroup='all';searchQuery='';focusCode='';pendingFocus=false;return true;},
+        selectBranch(id){if(!branches.some(branch=>branch.id===id))return false;selectedBranch=id;selectedGroup='all';searchQuery='';focusCode='';pendingFocus=false;pendingAutoScroll=true;return true;},
         getBranch(){return selectedBranch;},
         setGroup(id){if(id==='all'){selectedGroup='all';return true;}const node=lastDefs.find(node=>branchOf(node)===selectedBranch&&(node.row||'general')===id);if(!node)return false;selectedGroup=id;return this.focus(node.code);},
-        setSearch(value){searchQuery=String(value||'').trim().slice(0,80);focusCode='';pendingFocus=false;},
+        setSearch(value){searchQuery=String(value||'').trim().slice(0,80);focusCode='';pendingFocus=false;autoScrollCode='';pendingAutoScroll=!searchQuery;},
         focus(code,defs=lastDefs){const node=defs.find(node=>node.code===code);if(!node)return false;lastDefs=defs;selectedBranch=branchOf(node);selectedGroup='all';searchQuery='';focusCode=code;pendingFocus=true;return true;},
         getTreeInfo(){return lastTreeInfo?{...lastTreeInfo,codes:[...lastTreeInfo.codes],edges:lastTreeInfo.edges.map(edge=>({...edge}))}:null;},
         getChapters(defs=lastDefs,branch=selectedBranch){return chaptersFor(defs,branch).map(ch=>({id:ch.id,name:ch.name,codes:ch.columns.flat().filter(Boolean)}));}

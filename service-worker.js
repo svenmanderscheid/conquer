@@ -1,6 +1,6 @@
 'use strict';
 // Never put authenticated documents, API responses, admin screens, or auth requests in CacheStorage.
-const BUILD='union-of-kingdoms-public-v8';
+const BUILD='union-of-kingdoms-public-v9';
 const ROOT=new URL(self.registration.scope),PREFIX=ROOT.pathname,CACHE=BUILD+':'+PREFIX;
 const OFFLINE=new URL('offline.html',ROOT).href;
 const PRELOAD=['offline.html','favicon.ico','apple-touch-icon.png','assets/icons/conquer-32.png','assets/icons/conquer-maskable-512.png','assets/icons/conquer-192.png','assets/icons/conquer-512.png'];

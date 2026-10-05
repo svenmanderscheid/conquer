@@ -2,7 +2,7 @@
 declare(strict_types=1);
 // Public, session-independent branding shared by website, game and account pages.
 $brandBase = htmlspecialchars(APP_BASE, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-$brandVersion = '20261001b';
+$brandVersion = '20261004-rally';
 $brandManifestVersion = filemtime(ROOT_DIR . '/manifest.php') . '-' . $brandVersion;
 ?>
 <meta name="application-name" content="Union of Kingdoms">

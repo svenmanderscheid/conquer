@@ -20,11 +20,16 @@ async function png(size, opaque = false) {
   for (const size of sizes) images.set(size, await png(size));
   for (const size of [16, 32, 192, 512]) fs.writeFileSync(path.join(iconDir, `conquer-${size}.png`), images.get(size));
   fs.writeFileSync(path.join(root, 'apple-touch-icon.png'), await png(180, true));
-  // This separately framed master keeps the whole motif in the launcher safe area.
-  const maskable = await sharp(path.join(iconDir, 'union-of-kingdoms-painted-maskable-master.png'))
+  // Keep the full battle scene inside the safe circle of launcher masks.
+  const inset = await sharp(source).resize(700, 700).png().toBuffer();
+  const maskableMaster = await sharp({ create: { width: 1254, height: 1254, channels: 3, background } })
+    .composite([{ input: inset, gravity: 'centre' }]).png({ compressionLevel: 9 }).toBuffer();
+  fs.writeFileSync(path.join(iconDir, 'union-of-kingdoms-painted-maskable-master.png'), maskableMaster);
+  const maskable = await sharp(maskableMaster)
     .resize(512, 512).flatten({ background })
     .png({ compressionLevel: 9 }).toBuffer();
   fs.writeFileSync(path.join(iconDir, 'conquer-maskable-512.png'), maskable);
+  fs.writeFileSync(path.join(root, 'mobile/android/app/src/main/res/drawable-nodpi/uok_launcher.png'), images.get(512));
   // ICO supports PNG frames; keep actual 16/32/48-pixel renditions for small tabs.
   const frames = [16, 32, 48];
   const header = Buffer.alloc(6 + frames.length * 16);

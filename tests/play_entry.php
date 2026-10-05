@@ -19,6 +19,13 @@ try {
         $home = HttpApp::request($base, '/', 'GET', $headers);
         entryAssert($home['status'] === 200 && str_contains($home['body'], 'id="waitlist-form"') && !str_contains($home['body'], 'name="password"'), "$host serves only the waitlist, without a hidden credential form");
         entryAssert(str_contains($home['body'], 'href="https://play.unionofkingdoms.com/"'), 'website links to game login');
+        entryAssert(str_contains($home['body'], '<link rel="canonical" href="https://unionofkingdoms.com/">'), 'public hosts share one canonical URL');
+        entryAssert(str_contains($home['body'], '<title>Union of Kingdoms – Fantasy Browser Strategy Game</title>') && !str_contains($home['body'], 'ten tiers each'), 'search metadata describes the current browser strategy alpha');
+        entryAssert(!in_array('x-robots-tag: noindex, nofollow', $home['headers'], true), 'public homepage remains indexable');
+        $sitemap = HttpApp::request($base, '/sitemap.xml', 'GET', $headers);
+        entryAssert($sitemap['status'] === 200 && str_contains($sitemap['body'], '<loc>https://unionofkingdoms.com/</loc>') && substr_count($sitemap['body'], '<url>') === 1, 'sitemap lists only the canonical public homepage');
+        $robots = HttpApp::request($base, '/robots.txt', 'GET', $headers);
+        entryAssert(str_contains($robots['body'], 'Sitemap: https://unionofkingdoms.com/sitemap.xml'), 'crawler discovery uses the canonical sitemap');
         foreach (['/?zugang=login' => '/', '/?mode=register' => '/?mode=register', '/auth/recover?backup=1' => '/auth/recover?backup=1', '/auth/reset?token=abc&redirect=https://evil.invalid' => '/auth/reset?token=abc', '/auth/google/callback?code=secret&state=secret' => '/'] as $path => $target) {
             $r = HttpApp::request($base, $path, 'GET', $headers);
             entryAssert($r['status'] === 303 && in_array('location: https://play.unionofkingdoms.com' . $target, $r['headers'], true), "legacy route $path uses the fixed game origin");
@@ -31,6 +38,9 @@ try {
         $r = HttpApp::request($base, '/', 'GET', ['Host: ' . $host]);
         entryAssert($r['status'] === 200 && str_contains($r['body'], 'name="identifier"') && !str_contains($r['body'], 'id="waitlist-form"'), "$host opens the game login");
         entryAssert(in_array('cache-control: private, no-store', $r['headers'], true), 'session-bound entry cannot be shared-cache stored');
+        entryAssert(in_array('x-robots-tag: noindex, nofollow', $r['headers'], true), 'game login is excluded from search results');
+        $sitemap = HttpApp::request($base, '/sitemap.xml', 'GET', ['Host: ' . $host]);
+        entryAssert(!str_contains($sitemap['body'], '<url>'), 'game login is not advertised in a sitemap');
         $r = HttpApp::request($base, '/?mode=register', 'GET', ['Host: ' . $host]);
         entryAssert(str_contains($r['body'], 'name="alpha_key"') && str_contains($r['body'], 'name="email"'), 'game registration retains alpha-key and email fields');
         $r = HttpApp::request($base, '/auth/local', 'POST', ['Host: ' . $host, 'Content-Type: application/x-www-form-urlencoded'], 'mode=login&identifier=Nobody&password=secret');

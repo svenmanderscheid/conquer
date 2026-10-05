@@ -61,6 +61,22 @@ async function startFixture(){const server=net.createServer();await new Promise(
    assert.match(await stacked.locator('.quest-reward-value').innerText(),/×2/,'Multiple identical items show their quantity beside the unobstructed icon');
    const stackedItem=kingdom.inventory_catalog.find(i=>Number(i.item_code)===10103002);
    assert(stackedItem&&(await stacked.locator('img').first().getAttribute('src')).includes(stackedItem.icon),'Generic speedups use their catalogue artwork');
+   for(const code of ['upgrade_building_1','train_troops_100','research_complete_1']){
+    const quest=kingdom.quests.find(q=>q.quest_code===code),row=page.locator(`[data-quest-code="${code}"]`);
+    assert.equal(await row.locator('.quest-reward-item').count(),quest.rewards.length,'Every added starter resource pack is shown');
+    const packs=quest.rewards.filter(reward=>reward.item_code&&kingdom.inventory_catalog.find(item=>Number(item.item_code)===Number(reward.item_code))?.category==='resource_pack');
+    assert.equal(packs.length,code==='train_troops_100'?2:3);
+    await row.scrollIntoViewIfNeeded();
+    for(const reward of packs){
+     const item=kingdom.inventory_catalog.find(item=>Number(item.item_code)===Number(reward.item_code));
+     const icon=row.locator('.quest-reward-item img').filter({visible:true});
+     assert((await icon.evaluateAll(imgs=>imgs.map(img=>img.getAttribute('src')))).some(src=>src.includes(item.icon)),'Resource pack uses its existing catalogue image');
+    }
+    const clipped=await row.evaluate(el=>{const bounds=el.getBoundingClientRect();return [...el.querySelectorAll('.quest-reward-item')].some(item=>{const r=item.getBoundingClientRect();return r.left<bounds.left-1||r.right>bounds.right+1;});});
+    assert.equal(clipped,false,'Added resource rewards fit the quest row');
+   }
+   await page.screenshot({path:path.join(output,`${width}x${height}-resource-rewards.png`)});
+   await page.locator('.quest-list').evaluate(list=>list.scrollTop=0);
    await page.screenshot({path:path.join(output,`${width}x${height}-quests.png`)});
    await page.locator("#panel-dialog .panel-close:visible, #panel-dialog .mobile-page-back:visible").first().click();
    console.log('PASS illustrated quest layout '+width+'x'+height);

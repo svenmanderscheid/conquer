@@ -28,7 +28,7 @@ window.ConquerMailbox=function(ctx){
     };
     const icon=r=>r.source==='battle'&&r.category==='reports'?monsterIcon(r):`${base}/assets/art/hud/${r.source==='alliance_gift'?'inventory':r.category==='war'?'expeditions':r.category==='alliance'?'alliance':r.category==='system'?'quest':'reports'}.svg`;
     const btn=(label,act,extra='',style='')=>`<button type="button" class="mail-button ${style}" data-action="mailbox-${act}" ${extra}>${label}</button>`;
-    function badge(){const b=document.querySelector('#navigation [data-id="reports"]');if(!b)return;let count=b.querySelector('.mail-dock-badge');if(!count){count=document.createElement('span');count.className='dock-badge mail-dock-badge';count.setAttribute('aria-hidden','true');b.append(count);}const n=loadedWorld===world()?Number(data?.unread||0):0;count.hidden=!n;count.textContent=n>99?'99+':fmt(n);b.setAttribute('aria-label',n?`Post öffnen · ${fmt(n)} ungelesen`:'Post öffnen');}
+    function badge(){const n=loadedWorld===world()?Number(data?.unread||0):0;for(const b of document.querySelectorAll('#navigation [data-id="reports"],#hud-mail')){let count=b.querySelector('.mail-dock-badge');if(!count){count=document.createElement('span');count.className='dock-badge mail-dock-badge';count.setAttribute('aria-hidden','true');b.append(count);}count.hidden=!n;count.textContent=n>99?'99+':fmt(n);b.setAttribute('aria-label',window.ConquerLocale.t(n?'hud.mail.unread':'hud.mail.open',{count:fmt(n)}));}}
     function render(){
         if(loadedWorld!==world()){sequence++;detailSequence++;data=null;entries=[];error='';loading=false;loadedWorld=world();lastLoad=0;}
         draw();load(false);return true;

@@ -35,8 +35,29 @@ fs.mkdirSync(output,{recursive:true});
   const catalogs=['production','battle','advanced'].flatMap(tree=>JSON.parse(fs.readFileSync(path.join(__dirname,'../data/research',tree+'.json'),'utf8')).nodes);
   for(const node of catalogs)assert.deepEqual(data.research_defs.find(def=>def.code===node.code).levels.map(level=>[level.resources,level.time]),node.levels.map(level=>[level.resources,level.time]));
   checks++;
+  // Resource help and building dialogs must show the same increased server rates.
+  for(const [width,height]of[[1280,800],[320,568],[568,320]]){
+   await page.setViewportSize({width,height});await page.waitForTimeout(250);
+   for(const [resource,building]of Object.entries({food:'farm',lumber:'lumber_camp',stone:'quarry',gold:'gold_mine'})){
+    await page.locator(`#resources [data-action="resource"][data-id="${resource}"]`).tap();
+    await page.locator('#game-dialog[open]').waitFor();
+    const shown=await page.locator('#game-dialog .detail-row').filter({hasText:'Produktion pro Stunde'}).locator('strong').innerText();
+    assert.equal(Number(shown.replace(/\D/g,'')),Math.floor(data.production_rates[building]),`${resource} hourly production matches the server`);checks++;
+    assert.equal(data.buildings[building].production,data.production_rates[building]);checks++;
+    await page.locator(`#game-dialog [data-action="building"][data-id="${building}"]`).tap();
+    const production=page.locator('#game-dialog .levelup-stat').filter({hasText:'Produktion je Stunde'});
+    assert.equal(Number((await production.locator('strong').innerText()).replace(/\D/g,'')),Math.floor(data.production_rates[building]),`${building} shows the same hourly rate`);checks++;
+    const inside=await page.locator('#game-dialog').evaluate(el=>{const r=el.getBoundingClientRect();return r.left>=-1&&r.top>=-1&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1&&el.scrollWidth<=el.clientWidth+1;});
+    assert(inside,'Production window fits the viewport');checks++;
+    await page.screenshot({path:path.join(output,`production-${width}x${height}-${resource}.png`)});
+    await page.locator('#game-dialog>.dialog-close:visible, #game-dialog .mobile-page-back:visible').first().tap();
+   }
+  }
+  await page.setViewportSize({width:1280,height:800});await page.waitForTimeout(250);
   await page.locator('#hud-research').click();
   await page.locator('.rt-continuous').waitFor();
+  assert.equal(await page.locator('.rt-branch').first().getAttribute('data-id'),'military');
+  assert.equal(await page.locator('.rt-branch.is-selected').getAttribute('data-id'),'military');checks+=2;
   for(const [width,height]of[[1280,800],[390,844],[320,568],[844,390],[568,320]]){
    await page.setViewportSize({width,height});
    // The app debounces orientation layout by 150 ms. Measure after it settles.
@@ -50,7 +71,16 @@ fs.mkdirSync(output,{recursive:true});
     assert.deepEqual((await page.locator('.rt-node').evaluateAll(nodes=>nodes.map(node=>node.dataset.id))).sort(),expected);checks++;
     assert.equal(await page.locator('.rt-pagination,[data-action="research-page"],#research-chapter').count(),0);checks++;
     const metrics=await page.evaluate(()=>{const el=document.querySelector('.rt-scroll');return{w:el.clientWidth,h:el.clientHeight,sw:el.scrollWidth,sh:el.scrollHeight,left:el.scrollLeft,top:el.scrollTop};});
-    assert(metrics.h>=80,`Tree has usable height at ${width}×${height}: ${JSON.stringify(metrics)}`);assert(metrics.sw<=metrics.w);assert(metrics.sh>metrics.h);assert.equal(metrics.left,0);assert.equal(metrics.top,0);checks+=5;
+    assert(metrics.h>=80,`Tree has usable height at ${width}×${height}: ${JSON.stringify(metrics)}`);assert(metrics.sw<=metrics.w);assert(metrics.sh>metrics.h);assert.equal(metrics.left,0);assert(metrics.top>=0);checks+=5;
+    const currentResearchState=await page.evaluate(async()=> (await (await fetch('/api/game/state')).json()).data);
+    const nextVisible=await page.locator('.rt-scroll').evaluate((scroll,data)=>{
+     const available=[...scroll.querySelectorAll('.rt-available')];
+     const target=available.find(el=>{const def=data.research_defs.find(n=>n.code===el.dataset.id),next=def.levels.find(l=>l.level===Number(data.research[def.code]||0)+1);return Object.entries(next.resources||{}).every(([key,value])=>Number(data.city[key]||0)>=Number(value));})||available[0]||scroll.querySelector('.rt-running');
+     if(!target)return true;
+     const rect=target.getBoundingClientRect(),view=scroll.getBoundingClientRect();
+     return rect.bottom>view.top&&rect.top<view.bottom;
+    },currentResearchState);
+    assert(nextVisible,'Next available research is immediately visible');checks++;
     const layout=await page.locator('.rt-board').evaluate(board=>{
      const nodes=[...board.querySelectorAll('.rt-node')],byCode=new Map(nodes.map(n=>[n.dataset.id,n]));
      return{

@@ -3,8 +3,10 @@ window.ConquerRewards = (() => {
     'use strict';
     const resourceNames={food:'Nahrung',lumber:'Holz',stone:'Stein',gold:'Gold',gems:'Edelsteine'};
     const rarities={normal:'Gewöhnlich',common:'Gewöhnlich',uncommon:'Ungewöhnlich',rare:'Selten',epic:'Episch',legendary:'Legendär',mythic:'Mythisch'};
-    function asset(base,file){return /^[a-zA-Z0-9_/-]+\.(svg|png|webp)$/.test(file||'')&&!file.includes('..')?`${base}/assets/art/items/${file}?v=${encodeURIComponent(window.CONQUER_ITEM_ART_VERSION||'catalog3')}`:'';}
+    function asset(base,file){return /^[a-zA-Z0-9_/-]+\.(svg|png|webp)$/.test(file||'')&&!file.includes('..')?(window.ConquerItemArt?.url(base,file)??`${base}/assets/art/items/${file}?v=${encodeURIComponent(window.CONQUER_ITEM_ART_VERSION||'catalog3')}`):'';}
     function presentationFile(item,rawIcon){
+        const painted=window.ConquerItemArt?.forItem(item);
+        if(painted)return painted;
         if(item.category==='speedup'&&!item.icon_framed&&(!rawIcon||rawIcon==='speedup.svg')){
             const specialty=['building','training','research','healing'].includes(item.subcategory)?`-${item.subcategory}`:'';
             return `backpack/speedup${specialty}.svg`;

@@ -39,7 +39,7 @@ final class KingdomService
             $standings = Connection::getInstance()->transaction(static fn(): array => self::standings());
             $alliance = self::alliance($playerId, $standings);
             $db = Connection::getInstance();
-            $settings = $db->query('SELECT reduced_motion,compact_numbers,confirm_actions FROM kingdom_profiles WHERE player_id=?', [$playerId])->fetch();
+            $settings = $db->query('SELECT reduced_motion,compact_numbers,confirm_actions,report_build_complete,report_research_complete,report_train_complete FROM kingdom_profiles WHERE player_id=?', [$playerId])->fetch();
             $hospital = HospitalService::getStatus($cityId);
             foreach ($hospital['wounded'] as &$w) { $w['name'] = TroopData::get($w['troop_code'])['name'] ?? 'Truppen'; }
             unset($w);
@@ -110,6 +110,7 @@ final class KingdomService
                     'alliance.leave','alliance.update','alliance.kick','alliance.transfer','alliance.donate','alliance.withdraw'=>self::manageAlliance($playerId, $body, (int) $cityState['city']['id']),
                     'inventory.use'=>KingdomInventory::use($playerId, $cityState, $body),
                     'inventory.buy'=>KingdomInventory::buy($playerId, $body),
+                    'crystal.buy'=>KingdomInventory::buy($playerId, $body, true),
                     'vip.daily'=>\Conquer\Game\Vip\VipService::claimDaily($playerId),
                     'quest.claim'=>self::claimQuest($playerId, $body),
                     'hospital.heal'=>HospitalService::perform($playerId,(int)$cityState['city']['id'],$body),
@@ -348,8 +349,16 @@ final class KingdomService
             self::require(isset($body[$key]) && is_bool($body[$key]), 'Einstellungen müssen wahr oder falsch sein.');
             $values[] = (int) $body[$key];
         }
+        $assignments = ['reduced_motion=?','compact_numbers=?','confirm_actions=?'];
+        // Older clients may omit the new preferences; preserve the saved choices.
+        foreach (['report_build_complete','report_research_complete','report_train_complete'] as $key) {
+            if (!array_key_exists($key, $body)) continue;
+            self::require(is_bool($body[$key]), 'Einstellungen müssen wahr oder falsch sein.');
+            $assignments[] = $key . '=?';
+            $values[] = (int) $body[$key];
+        }
         $values[] = $playerId;
-        Connection::getInstance()->execute('UPDATE kingdom_profiles SET reduced_motion=?,compact_numbers=?,confirm_actions=? WHERE player_id=?', $values);
+        Connection::getInstance()->execute('UPDATE kingdom_profiles SET ' . implode(',', $assignments) . ' WHERE player_id=?', $values);
         return ['message'=>'Deine Einstellungen wurden gespeichert.'];
     }
 

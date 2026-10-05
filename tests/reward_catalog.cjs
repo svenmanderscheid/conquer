@@ -12,5 +12,19 @@ for(const item of catalog){
  assert(reward.icon.includes('/'+expected+'?'),'Inventory presentation icon '+item.code);assert(fs.existsSync(path.join(root,'assets/art/items',expected)),'Real item asset '+item.code);assert.equal(reward.name,item.name_de||item.name);
 }
 for(const item of treasures){const reward=resolve({type:'fragment',treasure_code:item.code,quantity:3},kingdom);assert.equal(reward.kind,'Reliktfragmente');assert(reward.icon.includes('/'+item.icon+'?'));}
+vm.runInNewContext(fs.readFileSync(path.join(root,'assets/js/item-art.js'),'utf8'),sandbox);
+const uniqueIcons=new Set();
+for(const item of catalog){
+ const expected=`painted-v2/${item.code}.webp`;
+ assert.equal(sandbox.window.ConquerItemArt.forItem(item),expected);
+ assert.equal(sandbox.window.ConquerItemArt.forItem({code:item.code}),expected);
+ const reward=resolve({item_code:item.code,count:7},kingdom,'/conquer');
+ assert(reward.icon.includes('/'+expected+'?'),'Unique reward icon '+item.code);
+ assert(fs.existsSync(path.join(root,'assets/art/items',expected)));
+ uniqueIcons.add(expected);
+}
+assert.equal(uniqueIcons.size,catalog.length);
+assert.equal(sandbox.window.ConquerItemArt.forItem({code:999999999}),null);
+for(const item of treasures){const reward=resolve({type:'fragment',treasure_code:item.code,quantity:3},kingdom);assert(reward.icon.includes('/'+item.icon+'?'));}
 assert.equal(sandbox.window.ConquerRewards.asset('','../private.png'),'');assert.equal(sandbox.window.ConquerRewards.asset('','https://outside.invalid/icon.png'),'');
 console.log(`PASS ${catalog.length} inventory and ${treasures.length} relic reward icons, names, amounts, ambiguous labels and safe asset paths.`);

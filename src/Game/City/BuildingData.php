@@ -8,6 +8,7 @@ namespace Conquer\Game\City;
  *
  * Upgrade values come from the supplied balance tables. Production and storage
  * retain their existing curves: those values are absent from the source files.
+ * Passive resource production has a permanent 30% increase to its base rates.
  */
 final class BuildingData
 {
@@ -102,10 +103,10 @@ final class BuildingData
     public static function getHourlyRate(string $code, int $level, array $vipBonuses = []): float
     {
         $base = match ($code) {
-            'farm'        => 300.0,   // food/hour at L1
-            'lumber_camp' => 300.0,   // lumber/hour
-            'quarry'      => 240.0,   // stone/hour
-            'gold_mine'   => 150.0,   // gold/hour
+            'farm'        => 390.0,   // food/hour at L1
+            'lumber_camp' => 390.0,   // lumber/hour
+            'quarry'      => 312.0,   // stone/hour
+            'gold_mine'   => 195.0,   // gold/hour
             default       => 0.0,
         };
 

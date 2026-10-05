@@ -31,25 +31,27 @@ final class KingdomInventory
     }
 
     /** Called under KingdomService's player lock and transaction. */
-    public static function buy(int $playerId,array $body): array
+    public static function buy(int $playerId,array $body,bool $crystalShop=false): array
     {
         WorldContext::assertActionAvailable();
         $code=KingdomService::integer($body,'item_code');
         $quantity=isset($body['quantity'])?KingdomService::integer($body,'quantity'):1;
         KingdomService::require($quantity>=1&&$quantity<=100,'Kaufe zwischen 1 und 100 Gegenstände.');
         $item=InventoryService::getItemDef($code);$price=(int)($item['price_gems']??0);
-        \Conquer\Game\CrystalEconomy::requireItem($item);
+        if($crystalShop)$price=\Conquer\Game\Trading\CrystalShop::price($code);
+        else \Conquer\Game\CrystalEconomy::requireItem($item);
         KingdomService::require($price>0,'Dieser Gegenstand wird nicht zum Kauf angeboten.');
         $request=$body['request_id']??'';
         KingdomService::require(is_string($request)&&preg_match('/^[A-Za-z0-9_-]{16,80}$/D',$request)===1,'Eine eindeutige Kaufkennung wird benötigt.');
-        $world=WorldContext::id();$hash=hash('sha256',json_encode(['inventory.buy',$world,$code,$quantity],JSON_THROW_ON_ERROR));$db=Connection::getInstance();
+        $purchaseAction=$crystalShop?'crystal.buy':'inventory.buy';
+        $world=WorldContext::id();$hash=hash('sha256',json_encode([$purchaseAction,$world,$code,$quantity],JSON_THROW_ON_ERROR));$db=Connection::getInstance();
         $receipt=$db->query('SELECT payload_hash,result_json FROM world_operations WHERE player_id=? AND request_id=? FOR UPDATE',[$playerId,$request])->fetch();
         if($receipt){KingdomService::require(hash_equals($receipt['payload_hash'],$hash),'Diese Kaufkennung wurde bereits anders verwendet.');return json_decode($receipt['result_json'],true,32,JSON_THROW_ON_ERROR)+['duplicate'=>true];}
         $cost=$price*$quantity;
         KingdomService::require($db->execute('UPDATE players SET gems=gems-? WHERE id=? AND gems>=?',[$cost,$playerId,$cost])===1,'Du hast nicht genügend Edelsteine.');
         InventoryService::addItems($playerId,$code,$quantity);
         $result=['message'=>$quantity.' × '.$item['name'].' wurde deinem Inventar hinzugefügt.','item_code'=>$code,'quantity'=>$quantity,'cost_gems'=>$cost];
-        $db->execute("INSERT INTO world_operations(player_id,session_id,request_id,payload_hash,action,world_id,result_json)VALUES(?,0,?,?,'inventory.buy',?,?)",[$playerId,$request,$hash,$world,json_encode($result,JSON_THROW_ON_ERROR)]);
+        $db->execute("INSERT INTO world_operations(player_id,session_id,request_id,payload_hash,action,world_id,result_json)VALUES(?,0,?,?,?,?,?)",[$playerId,$request,$hash,$purchaseAction,$world,json_encode($result,JSON_THROW_ON_ERROR)]);
         return $result+['duplicate'=>false];
     }
 
@@ -67,18 +69,19 @@ final class KingdomInventory
             KingdomService::require(isset($body['operation_key']), 'Eine eindeutige Vorgangskennung ist erforderlich.');
         }
         $quantity = isset($body['quantity']) ? KingdomService::integer($body, 'quantity', 1, 10000) : 1;
-        if (($def['category'] ?? '') !== 'speedup') {
+        if (!in_array($def['category'] ?? '', ['resource_pack','speedup','chest','ap_refill','vip_point','boost','resource_box','fragment_pack'], true)) {
             KingdomService::require($quantity===1, 'Bitte verwende jeweils einen Gegenstand.');
         }
         $db = Connection::getInstance();
         $owned = (int) $db->query('SELECT quantity FROM player_inventory WHERE player_id=? AND item_code=? FOR UPDATE', [$playerId,$code])->fetchColumn();
         KingdomService::require($owned>0 && $owned >= $quantity, 'Dieser Gegenstand liegt nicht in ausreichender Menge in deinem Inventar.');
         $cityId = (int) $state['city']['id'];
-        if ($useAll) {
-            $result = self::useAll($playerId, $cityId, $def, $body, $owned);
-            $quantity = (int)($result['quantity'] ?? $owned);
+        if ($useAll || $quantity > 1) {
+            KingdomService::require(isset($body['operation_key']), 'Eine eindeutige Vorgangskennung ist erforderlich.');
+            $result = self::useAll($playerId, $cityId, $def, $body, $useAll ? $owned : $quantity);
+            $quantity = (int)($result['quantity'] ?? ($useAll ? $owned : $quantity));
             KingdomService::require(InventoryService::removeItems($playerId, $code, $quantity), 'Die Gegenstände wurden bereits verwendet.');
-            return array_replace($result, ['item_code'=>$code,'quantity'=>$quantity,'use_all'=>true]);
+            return array_replace($result, ['item_code'=>$code,'quantity'=>$quantity,'use_all'=>$useAll]);
         }
         $result = match ($def['category']) {
             'resource_pack'=>self::resource($playerId, $cityId, $def),

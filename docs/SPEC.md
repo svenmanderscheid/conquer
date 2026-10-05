@@ -208,6 +208,8 @@ The JSON files in `/data/` are the **source of truth** for game balance. The dat
 
 **Cost policy, 2026-09-30:** New building and research orders use reduced resource prices generated from the archived originals and `data/economy_balance.json`. See `docs/BALANCE_IMPORT.md` for the active curves and repeatable `--costs-only` import. This supersedes earlier building/research price assumptions in this specification. Troop prices, production, gathering, timers and stored building cost receipts retain their existing rules.
 
+**Early economy update, 2026-10-02:** Early military research now receives a tapering resource discount and further gold relief for its first academy requirements. Passive food, lumber, stone and gold production is 30% higher at every building level. The building, training and research daily quests also award guaranteed resource packs. The current rules and amounts in `docs/BALANCE_IMPORT.md` supersede earlier production and quest-reward assumptions below; gathering, storage caps and troop prices remain unchanged.
+
 ### 2.5 Why no framework
 
 The owner explicitly chose to write his own thin MVC layer rather than learn Laravel. Reasons:
@@ -2719,7 +2721,7 @@ total_resource_production_bonus = 1.00 (VIP)
 
 ### 18.2 GEMS spending
 
-Current owner decision (2026-09-18): **crystals buy the server-owned VIP catalogue and skins**. The VIP shop contains all 52 offers transcribed from the supplied reference images, including speedups, resources, boosts, chests and fragments at their pictured VIP prices and weekly limits. Higher VIP levels retain access to lower-level offers.
+Current owner decision (2026-10-03): **the Crystal Shop and VIP Shop are separate**. The Crystal Shop has its own fixed server catalogue (`data/crystal_shop.json`) with resource packs, speedups, teleports and buffs at regular crystal prices, without VIP requirements, a Trading Post requirement or weekly stock limits. `crystal.buy` grants inventory items atomically and uses purchase receipts to prevent double charges on retries. The VIP Shop retains its discounted catalogue and weekly limits. Crystals also buy skins. The VIP shop contains all 52 offers transcribed from the supplied reference images, including speedups, resources, boosts, chests and fragments at their pictured VIP prices and weekly limits. Higher VIP levels retain access to lower-level offers.
 
 There is no general crystal-to-time conversion. Direct building, research and healing completions, purchases through the inventory shop or caravan, and legacy purchase URLs remain restricted to their explicitly allowed cases. Existing resource-priced trades, owned items and earned rewards remain available. Details and healing balance: `docs/CRYSTAL_ECONOMY.md`.
 

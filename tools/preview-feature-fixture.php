@@ -33,12 +33,13 @@ try{
   \Conquer\Game\World\WorldMapProfile::configureEmptyWorld(1);
   \Conquer\Game\World\WorldService::initializeWorld(1);
  }
- if(in_array('--march-skins',$argv,true))$db->execute('UPDATE players SET gems=10000 WHERE id=1');
+ if(in_array('--march-skins',$argv,true)||in_array('--crystal-shop',$argv,true))$db->execute('UPDATE players SET gems=10000 WHERE id=1');
  $db->execute("INSERT INTO cities(id,player_id,world_id,name,coord_x,coord_y,castle_level,food,lumber,stone,gold) VALUES(1,1,1,'Vorschaukönigreich',65,65,12,100000,100000,100000,100000)");
  if(in_array('--charm-runes',$argv,true)){
   foreach(['normal','epic','legendary'] as $index=>$grade)$db->execute("INSERT INTO map_charms(world_id,coord_x,coord_y,stat_category,grade,charm_code,bonus_pct,effect_duration_seconds,spawned_at,expires_at) VALUES(1,?,69,'research',?,?,5,7200,UTC_TIMESTAMP(),DATE_ADD(UTC_TIMESTAMP(),INTERVAL 1 DAY))",[69+$index*3,$grade,10700001+$index]);
  }
  foreach(\Conquer\Game\City\CityState::BUILDING_CODES as$code)$db->execute('INSERT INTO city_buildings(city_id,building_code,level) VALUES(1,?,?)',[$code,$code==='castle'?12:7]);
+ if(in_array('--crystal-shop',$argv,true))$db->execute("UPDATE city_buildings SET level=0 WHERE city_id=1 AND building_code='trading_post'");
  foreach([50100101,50200101,50300101]as$code)$db->execute('INSERT INTO city_troops(city_id,troop_code,count) VALUES(1,?,500)',[$code]);
  if(in_array('--territory',$argv,true))require ROOT_DIR.'/tests/fixtures/territory_preview.php';
  if(in_array('--march-roster',$argv,true)){
@@ -200,6 +201,7 @@ try{
    });
   }
  }
+ if(in_array('--map-optimization',$argv,true))$db->execute("INSERT INTO shrines(world_id,shrine_code,tier,coord_x,coord_y)VALUES(1,'CONGRESS','S',128,128)");
  if(in_array('--boss-skills',$argv,true))require ROOT_DIR.'/tests/fixtures/rally_boss_skills.php';
  if(in_array('--map-search',$argv,true)){
   foreach([[48,65],[43,65]] as [$x,$y])$db->transaction(static function($db)use($x,$y):void{

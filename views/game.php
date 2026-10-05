@@ -59,6 +59,7 @@ $base = htmlspecialchars(APP_BASE, ENT_QUOTES);
   <link rel="stylesheet" href="<?= $base ?>/assets/css/village-theme.css?v=<?= filemtime(__DIR__ . '/../assets/css/village-theme.css') ?>">
 </head>
 <body class="mobile-game">
+<?php require ROOT_DIR.'/views/partials/app-start.php'; ?>
 <a class="skip-link" href="#main">Zum Spielinhalt</a>
 <header class="topbar">
   <div class="hud-profile">
@@ -95,9 +96,13 @@ $base = htmlspecialchars(APP_BASE, ENT_QUOTES);
   <button id="hud-marches" class="hud-edge-button" data-world-only data-action="hud-marches" aria-label="Truppenmärsche öffnen"><span class="hud-edge-art"><img src="<?= $base ?>/assets/art/items/army.svg" alt=""></span><span class="hud-edge-label">Truppen</span><small id="hud-march-status" class="hud-edge-status">0 unterwegs</small></button>
 </nav>
 <nav class="hud-edge-tools hud-right-tools" aria-label="Spielmenü und Ereignisse">
+  <button type="button" id="hud-mail" class="hud-edge-button hud-mail-button" data-action="tab" data-id="reports" aria-label="<?= htmlspecialchars(\Conquer\Game\Locale::t('hud.mail.open'), ENT_QUOTES) ?>"><span class="hud-edge-art"><img src="<?= $base ?>/assets/art/menu-icons/reports.png" alt=""></span><span class="hud-edge-label" data-i18n="hud.mail.label"><?= htmlspecialchars(\Conquer\Game\Locale::t('hud.mail.label'), ENT_QUOTES) ?></span></button>
   <button id="hud-report" class="hud-edge-button hud-report-button" data-action="bug-report-open" aria-label="Bug oder Idee melden" aria-haspopup="dialog"><span class="hud-edge-art" aria-hidden="true"><img src="<?= $base ?>/assets/art/menu-icons/bug-report.png" alt=""></span><span class="hud-edge-label">Melden</span></button>
   <button id="hud-menu" class="hud-edge-button" data-action="menu-more" aria-label="Spielmenü öffnen" aria-haspopup="dialog"><span class="hud-edge-art"><img src="<?= $base ?>/assets/art/menu-icons/menu.png" alt=""></span><span class="hud-edge-label">Menü</span></button>
+  <div class="hud-event-stack">
   <button type="button" id="hud-alliance-rallies" class="hud-edge-button hud-rally-alert" data-world-only data-action="rally-list" aria-label="<?= htmlspecialchars(\Conquer\Game\Locale::t('rally.hud.open'), ENT_QUOTES) ?>" hidden><span class="hud-edge-art"><img src="<?= $base ?>/assets/art/menu-icons/alliance.png" alt=""><b id="hud-rally-count" class="hud-rally-count" aria-hidden="true">0</b></span><span class="hud-edge-label" data-i18n="rally.hud.label"><?= htmlspecialchars(\Conquer\Game\Locale::t('rally.hud.label'), ENT_QUOTES) ?></span><small id="hud-rally-status" class="hud-edge-status"></small></button>
+  <button type="button" id="hud-extra-event" class="hud-edge-button hud-extra-event" data-action="tab" hidden><span class="hud-edge-art"><img src="<?= $base ?>/assets/art/menu-icons/events.png" alt=""></span><span class="hud-edge-label" data-user-content></span></button>
+  </div>
   <button class="hud-edge-button" data-action="tab" data-id="events" aria-label="Weltereignisse öffnen"><span class="hud-edge-art"><img src="<?= $base ?>/assets/art/menu-icons/events.png" alt=""></span><span class="hud-edge-label">Events</span></button>
 </nav>
 <aside id="world-chat" class="world-chat" aria-label="Welt- und Allianzchat" hidden></aside>
@@ -109,8 +114,9 @@ $base = htmlspecialchars(APP_BASE, ENT_QUOTES);
 </dialog>
 <dialog id="game-dialog" aria-label="Spielfenster"><button type="button" class="dialog-report-button" data-action="bug-report-open" aria-label="Bug oder Idee in diesem Fenster melden" title="Bug oder Idee melden"><img src="<?= $base ?>/assets/art/menu-icons/bug-report.png" alt="" aria-hidden="true"></button><button class="dialog-close" aria-label="Fenster schließen">×</button><div id="dialog-content"></div></dialog>
 <div id="toast" role="status" aria-live="polite"></div>
-<script>window.CONQUER_ITEM_ART_VERSION = <?= max(filemtime(__DIR__ . '/../data/items.json'), ...array_map('filemtime', array_merge(glob(__DIR__ . '/../assets/art/items/*.svg'), glob(__DIR__ . '/../assets/art/items/backpack/*.svg'), glob(__DIR__ . '/../assets/art/items/reference/*.png')))) ?>;window.CONQUER_WORLD = <?= \Conquer\Game\World\WorldContext::id() ?>;window.CONQUER_BASE = <?= json_encode(APP_BASE, JSON_HEX_TAG | JSON_HEX_AMP) ?>;</script>
+<script>window.CONQUER_ITEM_ART_VERSION = <?= max(filemtime(__DIR__ . '/../data/items.json'), ...array_map('filemtime', array_merge(glob(__DIR__ . '/../assets/art/items/*.svg'), glob(__DIR__ . '/../assets/art/items/backpack/*.svg'), glob(__DIR__ . '/../assets/art/items/reference/*.png'), glob(__DIR__ . '/../assets/art/items/painted-v1/*.webp'), glob(__DIR__ . '/../assets/art/items/painted-v2/*.webp')))) ?>;window.CONQUER_WORLD = <?= \Conquer\Game\World\WorldContext::id() ?>;window.CONQUER_BASE = <?= json_encode(APP_BASE, JSON_HEX_TAG | JSON_HEX_AMP) ?>;</script>
 <script src="<?= $base ?>/assets/js/browser-compat.js?v=<?= filemtime(__DIR__ . '/../assets/js/browser-compat.js') ?>" defer></script>
+<script src="<?= $base ?>/assets/js/item-art.js?v=<?= filemtime(ROOT_DIR.'/assets/js/item-art.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/reward-dialog.js?v=<?= filemtime(__DIR__ . '/../assets/js/reward-dialog.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/castle-skins.js?v=<?= filemtime(__DIR__ . '/../assets/js/castle-skins.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/march-skins.js?v=<?= filemtime(__DIR__ . '/../assets/js/march-skins.js') ?>" defer></script>
@@ -171,6 +177,7 @@ $base = htmlspecialchars(APP_BASE, ENT_QUOTES);
 <script src="<?= $base ?>/assets/js/app-polling.js?v=<?= filemtime(__DIR__ . '/../assets/js/app-polling.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/game-comfort.js?v=<?= filemtime(__DIR__ . '/../assets/js/game-comfort.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/game-audio.js?v=<?= filemtime(__DIR__ . '/../assets/js/game-audio.js') ?>" defer></script>
+<script src="<?= $base ?>/assets/js/extra-events.js?v=<?= filemtime(__DIR__ . '/../assets/js/extra-events.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/game.js?v=<?= filemtime(__DIR__ . '/../assets/js/game.js') ?>" defer></script>
 <script type="application/json" id="uok-layout-config"><?= json_encode($uiLayoutProfiles ?? \Conquer\Game\Ui\LayoutSettings::read()['profiles'],JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_THROW_ON_ERROR) ?></script>
 <script type="application/json" id="uok-layout-catalog"><?= json_encode(\Conquer\Game\Ui\LayoutSettings::catalog(),JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_THROW_ON_ERROR) ?></script>

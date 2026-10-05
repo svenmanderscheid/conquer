@@ -24,6 +24,14 @@
 /* Currency identity follows the approved amethyst mine; action/rarity colours stay separate. */
 body.mobile-game #hud-gems { background:linear-gradient(var(--ui-crystal-soft),var(--ui-crystal-light));border-color:var(--ui-crystal);color:var(--ui-crystal-dark);box-shadow:inset 0 1px var(--ui-card-light),0 3px var(--ui-crystal-dark); }
 body.mobile-game .crystal-shop-summary strong { color:var(--ui-crystal-dark); }
+/* Crystal offers start at the top so long catalogues remain fully scrollable. */
+body.mobile-game .shop-crystal-view { display:block; }
+body.mobile-game .shop-crystal-view > h3 { margin:12px 0; color:var(--ui-ink); }
+body.mobile-game .trading-shell > .crystal-categories { flex:0 0 44px; padding:0 4px; }
+body.mobile-game .crystal-categories button { min-height:44px; }
+@media (max-height:440px) {
+  body.mobile-game .trading-shell:has(.shop-crystal-view) .trading-summary p { display:none; }
+}
 body.mobile-game .march-gem { color:var(--ui-crystal);text-shadow:0 0 24px var(--ui-crystal-light); }
 
 /* Troop tiers: the same semantic palette for every troop type and portrait surface. */
@@ -1989,13 +1997,18 @@ body.mobile-game .march-time-dialog h2 { margin:0; font-size:22px; }
 body.mobile-game .march-time-dialog button { cursor:pointer; font:inherit; border:2px solid var(--ui-line); border-radius:10px; background:var(--ui-card); color:var(--ui-ink); min-height:44px; }
 body.mobile-game #game-dialog.march-dialog #march-action-points { white-space:normal; overflow:visible; font-size:12px; line-height:1.35; }
 body.mobile-game #game-dialog.march-dialog #march-button-ap { white-space:nowrap; font-size:.85em; }
-.painted-village { position:absolute; inset:0; overflow:hidden; background:var(--ui-green); background-size:cover; background-position:center top; }
-.painted-village-scroll { position:absolute; inset:0; overflow:auto; touch-action:pan-x pan-y; overscroll-behavior:contain; padding-top:var(--painted-headroom,0px); padding-bottom:160px; box-sizing:border-box; }
-.painted-village-scene { position:relative; width:max(calc(100% + 240px),1200px,150dvh); aspect-ratio:3/2; }
+.painted-village { position:absolute; inset:0; overflow:hidden; background:var(--ui-green); }
+.painted-village-scroll { position:absolute; inset:0; overflow:auto; touch-action:pan-x pan-y; overscroll-behavior:contain; }
+/* Clip the extended painting to the actual scrollable space, including HUD room.
+   An overflowing image must not create another empty strip past the terrain. */
+.painted-village-ground { position:relative; width:max(calc(100% + 240px),1200px,150dvh); padding-top:var(--painted-headroom,0px); padding-bottom:var(--painted-footroom,160px); overflow:hidden; }
+/* Stretch only the outer forest when a safe-area or custom HUD needs more room. */
+.painted-village-ground::before { content:''; position:absolute; inset:0 0 auto; height:0; border-style:solid; border-color:transparent; border-width:var(--painted-headroom,0px) 0 0; border-image:var(--painted-terrain-image) 99 113 168 106 / 1 0 0 / 0 stretch; z-index:1; pointer-events:none; }
+.painted-village-scene { position:relative; width:100%; aspect-ratio:3/2; }
 .painted-village-scroll { cursor:grab; user-select:none; }
 .painted-village-scroll.is-dragging, .painted-village-scroll.is-dragging * { cursor:grabbing; }
-.painted-village-scroll.is-dragging .painted-village-building>span { display:none; }
-.painted-village-scene>img { display:block; width:100%; height:100%; position:absolute; inset:0; object-fit:fill; pointer-events:none; }
+.painted-village-scroll.is-dragging .painted-village-building>.painted-scaffold { display:none; }
+.painted-village-scene>img { display:block; width:100%; max-width:none; height:100%; position:absolute; inset:0; object-fit:fill; pointer-events:none; }
 .painted-village-building { position:absolute; display:block; padding:0; border:0; border-radius:35%; background:transparent; cursor:pointer; min-width:44px; min-height:44px; }
 .painted-building-sprite { display:block; width:100%; height:100%; object-fit:contain; object-position:center bottom; pointer-events:none; transition:filter .16s ease; }
 .painted-village-building.has-castle-skin .painted-building-sprite { opacity:1; visibility:visible; filter:drop-shadow(0 3px 2px #44354952); }
@@ -2041,6 +2054,61 @@ body.reduced-motion :is(.painted-accent,.painted-river), body[data-graphics-qual
 .painted-construction-dust { opacity:0; animation:painted-construction-dust 3.6s ease-out var(--construction-delay,0s) infinite; }
 .painted-construction-chip { opacity:0; fill:var(--ui-gold); animation:painted-construction-chip-left 3.6s ease-out var(--construction-delay,0s) infinite; }
 .painted-construction-chip--right { animation-name:painted-construction-chip-right; }
+/* Workpieces use the pigments of the approved painted scaffold and buildings. */
+.painted-construction-worksite { fill:none; stroke:#513322; stroke-width:3; stroke-linejoin:round; stroke-linecap:round; }
+.construction-wood { fill:#BF8245; }
+.construction-stone { fill:#D7C9AC; }
+.construction-metal { fill:#929697; }
+.construction-gold { fill:#DBAC50; }
+.construction-paper { fill:#FFF0D2; }
+.construction-straw { fill:#E4C578; }
+.construction-clay { fill:#CD7745; }
+.construction-cloth { fill:#6E80A4; }
+.construction-healing { fill:#A75046; }
+.construction-line { fill:none; stroke-width:2; }
+.construction-rope { fill:none; stroke:#A77D45; stroke-width:4; }
+.construction-magic-base { fill:#B9A0C7; }
+.construction-rune { fill:none; stroke:#8655A4; stroke-width:3; }
+.construction-spark { fill:none; stroke:#EACB86; stroke-width:3; }
+.painted-construction-detail { transform-box:view-box; animation:var(--construction-task) 4.8s ease-in-out var(--construction-delay,0s) infinite; }
+.painted-construction-particle { opacity:0; animation:painted-construction-spark 4.8s ease-out var(--construction-delay,0s) infinite; }
+.painted-construction--castle-lift { --construction-task:painted-castle-lift; }
+.painted-construction--castle-rope { --construction-task:painted-castle-rope; }
+.painted-construction--academy-runes { --construction-task:painted-academy-runes; }
+.painted-construction--vault-lock { --construction-task:painted-vault-lock; }
+.painted-construction--hospital-brush { --construction-task:painted-hospital-brush; }
+.painted-construction--alliance-banner { --construction-task:painted-alliance-banner; }
+.painted-construction--market-awning { --construction-task:painted-market-awning; }
+.painted-construction--storage-plank { --construction-task:painted-storage-plank; }
+.painted-construction--tower-ladder { --construction-task:painted-tower-ladder; }
+.painted-construction--tower-rope { --construction-task:painted-tower-rope; }
+.painted-construction--stable-gate { --construction-task:painted-stable-gate; }
+.painted-construction--archery-target { --construction-task:painted-archery-target; }
+.painted-construction--barrack-mallet { --construction-task:painted-barrack-mallet; }
+.painted-construction--farm-tiles { --construction-task:painted-farm-tiles; }
+.painted-construction--lumber-saw { --construction-task:painted-lumber-saw; }
+.painted-construction--mine-cart { --construction-task:painted-mine-cart; }
+.painted-construction--quarry-chisel { --construction-task:painted-quarry-chisel; }
+.painted-construction--wall-merlon { --construction-task:painted-wall-merlon; }
+@keyframes painted-castle-lift { 0%,12%,100% { transform:translateY(0); } 42%,65% { transform:translateY(-36px); } }
+@keyframes painted-castle-rope { 0%,12%,100% { transform:scaleY(1); } 42%,65% { transform:scaleY(.37931); } }
+@keyframes painted-academy-runes { 0%,100% { transform:translateY(0) rotate(-5deg); } 50% { transform:translateY(-16px) rotate(6deg); } }
+@keyframes painted-vault-lock { 0%,18%,100% { transform:rotate(0); } 42%,66% { transform:rotate(90deg); } }
+@keyframes painted-hospital-brush { 0%,15%,90%,100% { transform:translate(0,0) rotate(-8deg); } 35%,65% { transform:translate(-11px,-14px) rotate(6deg); } 50% { transform:translate(2px,0) rotate(-8deg); } }
+@keyframes painted-alliance-banner { 0%,12%,100% { transform:translateY(0); } 48%,76% { transform:translateY(-18px); } }
+@keyframes painted-market-awning { 0%,12%,100% { transform:scaleY(.64); } 45%,72% { transform:scaleY(1); } }
+@keyframes painted-storage-plank { 0%,12%,100% { transform:translate(14px,-12px) rotate(-5deg); } 46%,75% { transform:translate(0,0) rotate(0); } }
+@keyframes painted-tower-ladder { 0%,12%,100% { transform:translateY(0); } 45%,70% { transform:translateY(-24px); } }
+@keyframes painted-tower-rope { 0%,12%,100% { transform:scaleY(1); } 45%,70% { transform:scaleY(.61); } }
+@keyframes painted-stable-gate { 0%,20%,100% { transform:scaleX(1) skewY(0); } 48%,68% { transform:scaleX(.75) skewY(-6deg); } }
+@keyframes painted-archery-target { 0%,15%,100% { transform:rotate(-12deg); } 40%,72% { transform:rotate(0); } 52% { transform:rotate(4deg); } }
+@keyframes painted-barrack-mallet { 0%,12%,75%,100% { transform:rotate(12deg); } 25%,48% { transform:rotate(38deg); } 33%,56% { transform:rotate(-18deg); } }
+@keyframes painted-farm-tiles { 0%,12%,100% { transform:translate(-8px,-20px) rotate(-8deg); } 45%,76% { transform:translate(0,0) rotate(0); } }
+@keyframes painted-lumber-saw { 0%,18%,50%,82%,100% { transform:translate(0,0); } 34%,66% { transform:translate(15px,3px); } }
+@keyframes painted-mine-cart { 0%,14%,100% { transform:translateX(0); } 45%,66% { transform:translateX(16px); } }
+@keyframes painted-quarry-chisel { 0%,14%,76%,100% { transform:translateY(0) rotate(0); } 26%,48% { transform:translateY(-8px) rotate(8deg); } 32%,54% { transform:translateY(2px) rotate(-3deg); } }
+@keyframes painted-wall-merlon { 0%,12%,100% { transform:translateY(-21px); } 43%,76% { transform:translateY(0); } }
+@keyframes painted-construction-spark { 0%,30%,58%,100% { opacity:0; transform:translateY(0); } 34%,54% { opacity:.85; } 44%,65% { opacity:0; transform:translateY(-8px); } }
 @keyframes painted-construction-strike {
   0%,12%,72%,100% { transform:rotate(0deg); }
   22% { transform:rotate(-12deg); }
@@ -2080,16 +2148,23 @@ body.reduced-motion :is(.painted-accent,.painted-river), body[data-graphics-qual
  :is(.painted-training-time,.painted-building-time)>span { font-size:13px; }
 }
 body:not(.city-mode) .painted-scaffold *,body.popup-mode .painted-scaffold *,body:has(dialog[open]) .painted-scaffold *,.painted-village.is-paused .painted-scaffold * { animation-play-state:paused; }
-/* Light graphics keeps only the small work cue; no ambient dust or chips. */
-body[data-graphics-quality="light"] .painted-construction-impact { display:none; }
+/* Keep the small, distinct work cue on the automatic mobile/light profile too.
+   Only active queues mount these transforms; light mode drops all particles. */
+body[data-graphics-quality="light"] :is(.painted-construction-impact,.painted-construction-particle) { display:none; }
 body.reduced-motion .painted-scaffold * { animation:none; }
-body.reduced-motion .painted-construction-impact { display:none; }
-@media(prefers-reduced-motion:reduce) { .painted-scaffold * { animation:none!important; } .painted-construction-impact { display:none; } }
+body.reduced-motion :is(.painted-construction-impact,.painted-construction-particle) { display:none; }
+@media(prefers-reduced-motion:reduce) { .painted-scaffold * { animation:none!important; } .painted-construction-impact,.painted-construction-particle { display:none; } }
 .painted-village-building.is-empty .painted-building-sprite { visibility:hidden; }
 .painted-village-building.is-empty::after { content:'+'; position:absolute; bottom:15%; left:40%; border:1px solid var(--ui-gold); border-radius:50%; width:32px; height:32px; background:var(--ui-paper); color:var(--ui-ink); font:24px var(--ui-font); }
 .painted-village-building:focus-visible { outline:none; background:transparent; }
-.painted-village-building>.painted-building-label { display:none; position:absolute; top:100%; left:50%; transform:translateX(-50%); width:max-content; max-width:190px; padding:4px 8px; border:1px solid var(--ui-gold); border-radius:8px; background:var(--ui-paper); color:var(--ui-ink); font:14px var(--ui-font); z-index:2; }
-.painted-village-building:focus-visible>.painted-building-label { display:block; }
+.painted-village-building>.painted-building-label { display:block; position:absolute; top:100%; left:50%; transform:translateX(-50%); width:max-content; max-width:160px; box-sizing:border-box; padding:4px 8px; border:1px solid var(--ui-gold); border-radius:8px; background:var(--ui-paper); color:var(--ui-ink); font:14px/1.15 var(--ui-font); text-align:center; box-shadow:0 2px 4px color-mix(in srgb,var(--ui-primary-dark) 24%,transparent); z-index:5; pointer-events:none; }
+.painted-building-name { display:block; font-weight:400; white-space:normal; }
+.painted-building-level { display:block; margin-top:2px; color:var(--ui-muted); font:12px/1.15 var(--ui-font); white-space:nowrap; }
+/* Keep activity in the same flowing label so names and timers never overlap. */
+.painted-village-building .painted-building-label>.painted-build-status { position:static; transform:none; margin:5px -5px -1px; min-width:0; }
+.painted-village-building:is(.is-building,.is-training)>.painted-building-label { top:auto; bottom:-34px; max-width:none; }
+@media(max-width:420px), (max-height:500px) { .painted-village-building:is(.is-building,.is-training)>.painted-building-label { bottom:-31px; } }
+.painted-village-building:focus-visible>.painted-building-label { outline:3px solid var(--ui-primary-dark); outline-offset:2px; }
 .painted-building-notices { position:absolute; inset:0; z-index:12; pointer-events:none; }
 .painted-building-ready { position:absolute; display:grid; place-items:center; width:54px; height:54px; min-width:44px; min-height:44px; padding:5px; transform:translate(-50%,-50%); border:2px solid var(--ui-primary-dark); border-radius:16px; background:var(--ui-card); color:var(--ui-ink); box-shadow:inset 0 0 0 2px var(--ui-gold-soft),0 3px 0 var(--ui-gold),0 5px 9px color-mix(in srgb,var(--ui-primary-dark) 28%,transparent); cursor:pointer; pointer-events:auto; touch-action:pan-x pan-y; }
 .painted-building-ready::after { content:''; position:absolute; bottom:-8px; left:calc(50% - 6px); width:10px; height:10px; transform:rotate(45deg); border-right:2px solid var(--ui-primary-dark); border-bottom:2px solid var(--ui-primary-dark); border-radius:0 0 3px; background:var(--ui-card); }
@@ -2123,11 +2198,10 @@ body.reduced-motion .painted-construction-impact { display:none; }
  .painted-building-actions button { flex-basis:46px; width:46px; height:46px; min-width:46px; min-height:46px; }
 }
 .painted-village-building[aria-pressed="true"] { box-shadow:none; }
-.painted-village-building[aria-pressed="true"]>.painted-building-label { display:none!important; }
+.painted-village-building[aria-pressed="true"]>.painted-building-label { border-color:var(--ui-primary); }
 @media(hover:hover) {
  .painted-village-building:hover:not([aria-pressed="true"]) { box-shadow:none; }
  .painted-village-building:hover:not([aria-pressed="true"])>:is(.painted-building-sprite,.painted-motion) { filter:drop-shadow(2px 0 0 var(--ui-gold-soft)) drop-shadow(-2px 0 0 var(--ui-gold-soft)) drop-shadow(0 2px 0 var(--ui-gold-soft)) drop-shadow(0 -2px 0 var(--ui-gold-soft)) drop-shadow(0 0 5px var(--ui-gold)); }
- .painted-village-building:hover>.painted-building-label { display:block; }
 }
 body.mobile-game .march-time-dialog header button { width:44px; font-size:28px; }
 body.mobile-game .march-time-options { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; padding:20px; }
@@ -2279,11 +2353,11 @@ body.mobile-game #player-hud-name { font-weight:700; }
   body.mobile-game #navigation .game-dock-item.hud-scene-switch { width:64px; height:59px; margin:0 0 0 4px; }
   body.mobile-game #navigation .hud-scene-switch .dock-icon { top:-14px; width:60px; height:57px; }
 }
-/* Bosses reserve 2 x 2 tiles; their tall silhouette rises above their feet. */
+/* Bosses reserve 2 x 2 tiles; artwork shares the painted encounters' 5% reduction. */
 .mobile-game .map-overlay-shell .atlas-marker--monsters.is-regional-boss > img {
-  width:calc(var(--tile-size,44px)*2.7);
-  height:calc(var(--tile-size,44px)*2.88);
-  margin-left:calc(var(--tile-size,44px)*-1.35);
+  width:calc(var(--tile-size,44px)*2.7*.95);
+  height:calc(var(--tile-size,44px)*2.88*.95);
+  margin-left:calc(var(--tile-size,44px)*-1.35*.95);
   bottom:calc(var(--tile-size,44px)*.06);
   mix-blend-mode:normal;
 }
@@ -3253,6 +3327,13 @@ body.mobile-game #panel-dialog .audio-settings .button { min-height:44px;white-s
 .setting-row-select select { min-width:132px;min-height:44px;padding:8px 32px 8px 10px;border:1px solid var(--ui-line);border-radius:9px;background:var(--ui-card-light);color:var(--ui-ink);font:inherit; }
 @media(max-width:420px) { .setting-row-select { align-items:flex-start;flex-direction:column; }.setting-row-select select { width:100%; } }
 .audio-settings input[type=checkbox] { flex:none;width:24px;height:24px;accent-color:var(--ui-primary); }
+.completion-report-settings { min-width:0;margin:24px 0 0;padding:14px;border:1px solid var(--ui-line);border-radius:12px;background:var(--ui-card);color:var(--ui-ink); }
+.completion-report-settings legend { padding:0 6px;font-size:18px; }
+.completion-report-settings .setting-row { min-height:44px;gap:12px;cursor:pointer;border-color:var(--ui-line); }
+.completion-report-settings .setting-row>span { min-width:0; }
+.completion-report-settings .setting-row strong { color:var(--ui-ink); }
+.completion-report-settings .setting-row small { color:var(--ui-muted); }
+.completion-report-settings input[type=checkbox] { flex:none;width:24px;height:24px;accent-color:var(--ui-primary); }
 .audio-volume { display:grid;grid-template-columns:minmax(0,1fr) 60px;align-items:center;gap:0 12px;margin:0 0 14px;color:var(--ui-ink); }
 .audio-volume>span { grid-column:1/-1; }
 .audio-settings .audio-volume input[type=range] { width:100%;min-width:0;height:44px;margin:0;padding:0;border:0;background:transparent;accent-color:var(--ui-primary);cursor:pointer; }
@@ -3306,11 +3387,12 @@ body.mobile-game .map-overlay-shell .is-charm[data-grade=epic] { --charm-grade:#
 body.mobile-game .map-overlay-shell .is-charm[data-grade=legendary] { --charm-grade:#FFB72C;--charm-grade-dark:#805C2B; }
 /* Solo creatures remain larger than collectibles; legacy rally art keeps a smaller footprint. */
 .mobile-game .map-overlay-shell .atlas-marker--monsters[data-monster-type=solo] > img {
- width:calc(var(--tile-size,44px)*1.75);height:calc(var(--tile-size,44px)*1.75);margin-left:calc(var(--tile-size,44px)*-.875);
+ width:calc(var(--tile-size,44px)*1.35);height:calc(var(--tile-size,44px)*1.35);margin-left:calc(var(--tile-size,44px)*-.675);
 }
 .mobile-game .map-overlay-shell .atlas-marker--monsters[data-monster-type=rally]:not(.is-regional-boss) > img {
- width:calc(var(--tile-size,44px)*1.17);height:calc(var(--tile-size,44px)*1.17);margin-left:calc(var(--tile-size,44px)*-.585);
+ width:calc(var(--tile-size,44px)*2.6);height:calc(var(--tile-size,44px)*2.6);margin-left:calc(var(--tile-size,44px)*-1.3);
 }
+.mobile-game .map-overlay-shell .atlas-marker--congress > img { width:calc(var(--tile-size,44px)*6.2);height:calc(var(--tile-size,44px)*6.2);margin-left:calc(var(--tile-size,44px)*-3.1); }
 .mobile-game .map-overlay-shell .atlas-marker--nodes > img:is([data-life-kind=quarry],[data-life-kind=gold],[data-life-kind=crystal]) {
  width:calc(var(--tile-size,44px)*2.3125);height:calc(var(--tile-size,44px)*2.3125);margin-left:calc(var(--tile-size,44px)*-1.15625);
 }
@@ -4815,6 +4897,38 @@ body.mobile-game #game-dialog.march-dialog .march-command .march-rewards strong 
 /* Lebendig rollout: march composer — end */
 
 /* Compact phone playfield: shallow HUD bands and quiet, touch-sized edge controls. */
+body.mobile-game #hud-mail { display:none; }
+body.mobile-game .hud-event-stack { display:flex;flex-direction:column;align-items:center;gap:5px; }
+body.mobile-game .hud-event-stack:has(#hud-extra-event[hidden]):has(#hud-alliance-rallies[hidden]) { display:none; }
+body.admin-village .extra-event-preview { display:flex;align-items:center;gap:10px;margin:12px 0;color:var(--ui-ink); }
+body.mobile-game #hud-extra-event .hud-edge-art { border-color:var(--ui-gold)!important; }
+body.mobile-game #hud-extra-event[hidden] { display:none!important; }
+body.mobile-game:has(#hud-extra-event:not([hidden])) .hud-right-tools>button[data-id="events"] { display:none!important; }
+body.mobile-game #hud-extra-event { position:relative; }
+body.mobile-game #hud-extra-event .extra-events-count { position:absolute;top:-3px;right:0;min-width:18px;height:18px;padding:0 3px;border:1px solid var(--ui-card-light);border-radius:9px;background:var(--ui-red);color:var(--ui-card-light);font:700 11px/16px var(--ui-font-number); }
+body.mobile-game #hud-extra-event .extra-events-count[hidden] { display:none; }
+body.mobile-game #game-dialog:has(.extra-events) { width:min(640px,calc(100vw - 20px));height:min(580px,calc(100dvh - 32px)); }
+body.mobile-game #game-dialog[open]:has(.extra-events) { display:flex;flex-direction:column; }
+body.mobile-game #game-dialog:has(.extra-events) #dialog-content { display:flex;flex:1;min-height:0;overflow:hidden!important; }
+body.mobile-game .extra-events { display:flex;flex:1;flex-direction:column;gap:12px;min-width:0;min-height:0; }
+body.mobile-game .extra-event-tabs { display:flex;gap:6px;overflow-x:auto;padding:4px 2px 8px;flex-shrink:0;scrollbar-width:thin; }
+body.mobile-game .extra-event-tabs [role="tab"] { display:flex;align-items:center;gap:7px;flex:0 0 auto;max-width:240px;min-height:44px;padding:6px 12px;border:1px solid var(--ui-line);border-radius:10px;background:var(--ui-card);color:var(--ui-ink);font:700 15px var(--ui-font); }
+body.mobile-game .extra-event-tabs [role="tab"][aria-selected="true"] { background:var(--ui-gold-soft);border-color:var(--ui-gold); }
+body.mobile-game .extra-event-tabs [role="tab"] img { width:28px;height:28px;object-fit:contain; }
+body.mobile-game .extra-event-tabs [role="tab"] span { min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+body.mobile-game .extra-events [role="tabpanel"] { display:flex;flex:1;flex-direction:column;min-height:0;overflow:hidden;border:1px solid var(--ui-line);border-radius:var(--ui-radius);background:var(--ui-card); }
+body.mobile-game .extra-event-details { flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding:18px; }
+body.mobile-game .extra-event-footer { flex:none;padding:10px 18px;border-top:1px solid var(--ui-line);background:var(--ui-card); }
+body.mobile-game .extra-event-footer .button { min-height:44px; }
+body.mobile-game .extra-event-hero { display:flex;align-items:center;gap:16px;margin-bottom:16px; }
+body.mobile-game .extra-event-hero img { width:72px;height:72px;object-fit:contain; }
+body.mobile-game .extra-event-hero h3 { margin:0;overflow-wrap:anywhere; }
+body.mobile-game .extra-event-description { white-space:pre-wrap;overflow-wrap:anywhere; }
+body.mobile-game .extra-event-description:empty { display:none; }
+body.mobile-game .extra-event-time strong { font-family:var(--ui-font-number); }
+body.admin-village .extra-event-admin-tabs { display:flex;flex-wrap:wrap;gap:8px;margin:14px 0; }
+body.admin-village .extra-event-admin-tabs a { min-height:44px;display:flex;align-items:center;padding:8px 12px;border:1px solid var(--ui-line);border-radius:10px;background:var(--ui-card);color:var(--ui-ink);overflow-wrap:anywhere; }
+body.admin-village .extra-event-admin-tabs a[aria-current] { background:var(--ui-gold-soft);border-color:var(--ui-gold); }
 body.mobile-game :is(.hud-compact-power,.hud-energy-compact,.hud-gems-compact,.hud-value-compact) { display:none; }
 body.mobile-game #hud-gems>.hud-gems-compact { display:none; }
 @media(max-width:700px), (max-width:1100px) and (max-height:520px) and (orientation:landscape) {
@@ -4832,12 +4946,12 @@ body.mobile-game #hud-gems>.hud-gems-compact { display:none; }
   body.mobile-game .hud-profile:has(.hud-effect-button:not([hidden])) {
     grid-column:1;grid-row:1;display:grid;grid-template-columns:minmax(0,1fr) 44px 44px 54px;grid-template-rows:44px;
     width:100%;max-width:none;min-width:0;height:44px;min-height:0;margin:0;padding:0;gap:3px;
-    border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;
+    border:0!important;border-radius:9px!important;background:color-mix(in srgb,var(--ui-card) 94%,transparent)!important;box-shadow:none!important;
   }
   body.mobile-game #account-button {
     grid-column:1;grid-row:1;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:2px;
     width:100%;height:44px;min-height:44px;padding:2px 3px 2px 42px;border-radius:9px!important;
-    background:color-mix(in srgb,var(--ui-card) 90%,transparent)!important;box-shadow:none!important;
+    background:transparent!important;box-shadow:none!important;
   }
   body.mobile-game #account-button .avatar { left:2px;top:2px;width:36px;height:40px;border-width:1px;border-radius:8px; }
   body.mobile-game #player-hud-name,body.mobile-game #player-hud-name.name-frame {
@@ -4853,7 +4967,7 @@ body.mobile-game #hud-gems>.hud-gems-compact { display:none; }
   body.mobile-game #hud-energy.hud-energy {
     grid-row:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
     width:100%;height:44px!important;min-height:44px!important;margin:0;padding:2px;
-    border:0!important;border-radius:9px!important;background:color-mix(in srgb,var(--ui-card) 90%,transparent)!important;color:var(--ui-ink)!important;box-shadow:none!important;
+    border:0!important;border-radius:0!important;background:transparent!important;color:var(--ui-ink)!important;box-shadow:none!important;
   }
   body.mobile-game .hud-rank.hud-vip { grid-column:2; }
   body.mobile-game #lord-talent-button.hud-hunter { grid-column:3;position:relative; }
@@ -4876,11 +4990,11 @@ body.mobile-game #hud-gems>.hud-gems-compact { display:none; }
   body.mobile-game #hud-gems img { width:19px;height:19px; }
   body.mobile-game #hud-gems>strong,body.mobile-game #hud-gems>span:not(.hud-gems-compact) { display:none; }
   body.mobile-game #hud-gems>.hud-gems-compact { display:block;margin:0;color:var(--ui-crystal-dark);font:700 13px/16px var(--ui-font-number); }
-  body.mobile-game #resources { grid-column:1/-1;grid-row:2;display:grid;grid-template-columns:repeat(4,minmax(44px,1fr));gap:2px;width:100%;max-width:none;height:44px;margin:0;padding:0; }
+  body.mobile-game #resources { grid-column:1/-1;grid-row:2;display:grid;grid-template-columns:repeat(4,minmax(44px,1fr));gap:2px;width:100%;max-width:none;height:44px;margin:0;padding:0;border-radius:9px;background:color-mix(in srgb,var(--ui-primary-dark) 88%,transparent); }
   body.mobile-game #resources .resource { display:flex;flex-direction:row;align-items:center;justify-content:center;gap:3px;height:44px;min-height:44px;padding:2px;border:0!important;border-radius:8px!important;background:transparent!important;box-shadow:none!important; }
   body.mobile-game #resources .resource-icon { width:24px;height:28px;flex:0 0 24px;margin:0; }
   body.mobile-game #resources .resource-icon img { width:26px;height:26px; }
-  body.mobile-game #resources .resource>span:last-child { display:block;min-width:0;padding:4px 5px;border-radius:7px;background:color-mix(in srgb,var(--ui-primary-dark) 90%,transparent);color:var(--ui-card-light); }
+  body.mobile-game #resources .resource>span:last-child { display:block;min-width:0;padding:4px 5px;background:transparent;color:var(--ui-card-light); }
   body.mobile-game #resources .resource strong { color:var(--ui-card-light)!important;font:700 13px/17px var(--ui-font-number);white-space:nowrap; }
   body.mobile-game #resources .resource small,body.mobile-game .hud-value-full { display:none!important; }
   body.mobile-game .hud-value-compact { display:inline; }
@@ -4895,6 +5009,7 @@ body.mobile-game #hud-gems>.hud-gems-compact { display:none; }
   body.mobile-game .hud-edge-tools .hud-edge-art { width:38px;height:38px;border-width:1px!important;border-radius:11px;box-shadow:0 1px 0 var(--ui-primary-dark)!important; }
   body.mobile-game .hud-edge-tools .hud-edge-art img { width:36px;height:36px; }
   body.mobile-game .hud-edge-tools .hud-edge-label { display:none!important; }
+  body.mobile-game #hud-extra-event .hud-edge-label { display:block!important;width:44px;max-width:44px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:1px 2px;border-radius:4px;background:var(--ui-card);color:var(--ui-primary-dark);font:700 11px/14px var(--ui-font);text-shadow:none; }
   body.mobile-game #hud-left-tools .hud-job { width:48px;height:48px;min-height:44px;padding:1px;gap:0;border-width:1px;border-radius:10px;box-shadow:none; }
   body.mobile-game #hud-left-tools .hud-job .hud-edge-art { width:26px;height:26px;background:transparent;box-shadow:none!important; }
   body.mobile-game #hud-left-tools .hud-job .hud-edge-art :is(img,svg) { width:26px;height:26px; }
@@ -4907,6 +5022,12 @@ body.mobile-game #hud-gems>.hud-gems-compact { display:none; }
     border:0!important;border-radius:8px!important;background:transparent!important;box-shadow:none!important;
   }
   body.mobile-game #navigation .game-dock-item.current { background:var(--ui-gold-soft)!important; }
+  body.mobile-game #navigation.game-dock { grid-template-columns:repeat(5,minmax(0,1fr))!important; }
+  body.mobile-game #navigation .game-dock-item:is([data-id="reports"],[data-id="chat"]) { display:none!important; }
+  body.mobile-game #navigation [data-id="shop"] { order:4; }
+  body.mobile-game #navigation .hud-scene-switch { order:5; }
+  body.mobile-game #hud-mail { display:flex;position:fixed;top:auto;left:auto;right:calc(var(--edge-gap) + env(safe-area-inset-right,0px));bottom:calc(var(--world-chat-bottom) + 48px + env(safe-area-inset-bottom,0px));width:44px;min-height:44px; }
+  body.mobile-game #hud-mail .mail-dock-badge { position:absolute;top:-3px;right:0;min-width:17px;height:17px;padding:0 3px;border:1px solid var(--ui-card-light);border-radius:9px;background:var(--ui-red);color:var(--ui-card-light);font:700 11px/15px var(--ui-font-number); }
   body.mobile-game #navigation .game-dock-item .dock-icon,body.mobile-game #navigation .game-dock-item.hud-scene-switch .dock-icon,body.mobile-game #navigation .game-dock-item:last-child .dock-icon { position:static!important;transform:none!important;width:28px!important;height:28px!important;margin:0!important;filter:none!important; }
   body.mobile-game #navigation .game-dock-item .dock-label,body.mobile-game #navigation .game-dock-item.current .dock-label { position:static;display:block;flex:none;width:100%;height:15px;min-height:15px!important;margin:0;padding:0!important;background:transparent!important;color:var(--ui-ink)!important;font-size:11px!important;line-height:15px!important;white-space:nowrap; }
   body.mobile-game #navigation .dock-badge { top:-5px;right:1px;min-width:17px;height:17px;padding:0 3px;border-width:1px;font-size:11px;line-height:15px; }
@@ -4927,7 +5048,7 @@ body.mobile-game #hud-gems>.hud-gems-compact { display:none; }
   body.mobile-game.world-mode:not(.world-search-open) .map-overlay-shell .map-overlay-search-toggle { top:auto!important;left:calc(var(--edge-gap) + env(safe-area-inset-left,0px))!important;bottom:calc(var(--world-chat-bottom) + 48px + env(safe-area-inset-bottom,0px))!important; }
   body.mobile-game.world-mode .map-overlay-search-toggle .map-overlay-scroll { border-width:1px;box-shadow:none; }
   body.mobile-game.world-mode .map-overlay-search-toggle .map-overlay-scroll svg { width:25px!important;height:25px!important; }
-  body.mobile-game.world-mode .map-overlay-shell .map-overlay-coordinate-toggle { top:auto;left:auto;right:calc(var(--edge-gap) + env(safe-area-inset-right,0px));bottom:calc(var(--world-chat-bottom) + 48px + env(safe-area-inset-bottom,0px));width:164px;min-width:164px;height:44px;border-width:1px;border-radius:12px;box-shadow:none;transform:none; }
+  body.mobile-game.world-mode .map-overlay-shell .map-overlay-coordinate-toggle { top:auto;left:auto;right:calc(var(--edge-gap) + 52px + env(safe-area-inset-right,0px));bottom:calc(var(--world-chat-bottom) + 48px + env(safe-area-inset-bottom,0px));width:164px;min-width:164px;height:44px;border-width:1px;border-radius:12px;box-shadow:none;transform:none; }
   body.mobile-game.world-mode .map-overlay-coordinate-toggle .atlas-coordinates { font-size:11px; }
 }
 @media(max-width:1100px) and (max-height:520px) and (orientation:landscape) {
@@ -4935,7 +5056,7 @@ body.mobile-game #hud-gems>.hud-gems-compact { display:none; }
   body.mobile-game #hud-left-tools { flex-direction:row;width:auto; }
   body.mobile-game.city-mode #hud-objective { display:none; }
   body.mobile-game.world-mode:not(.world-search-open) .map-overlay-shell .map-overlay-search-toggle { left:calc(var(--edge-gap) + env(safe-area-inset-left,0px))!important; }
-  body.mobile-game.world-mode .map-overlay-shell .map-overlay-coordinate-toggle { right:calc(var(--edge-gap) + env(safe-area-inset-right,0px));left:auto; }
+  body.mobile-game.world-mode .map-overlay-shell .map-overlay-coordinate-toggle { right:calc(var(--edge-gap) + 52px + env(safe-area-inset-right,0px));left:auto; }
 }
 @media(min-width:540px) and (max-width:1100px) and (max-height:520px) and (orientation:landscape) {
   body.mobile-game { --edge-top:56px; }
@@ -4953,3 +5074,10 @@ body.mobile-game #hud-gems>.hud-gems-compact { display:none; }
   body.mobile-game #resources .resource-icon img { width:20px;height:20px; }
   body.mobile-game #resources .resource>span:last-child { padding:4px 3px; }
 }
+/* Inventory quantities use the shared touch-friendly field style. */
+.inventory-dialog input[name="quantity"] { width:100%; min-width:0; min-height:44px; box-sizing:border-box; background:var(--ui-card-light); color:var(--ui-ink); border:1px solid var(--ui-line); border-radius:9px; font-family:var(--ui-font-number); }
+.app-start{position:fixed;inset:0;z-index:2147483000;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:16px;padding:max(28px,env(safe-area-inset-top)) max(24px,env(safe-area-inset-right)) max(32px,env(safe-area-inset-bottom)) max(24px,env(safe-area-inset-left));box-sizing:border-box;background:var(--ui-primary-dark);color:var(--ui-card);font-family:var(--ui-font);isolation:isolate;transition:opacity .3s ease}
+.app-start-art{position:absolute;inset:0;z-index:-2}.app-start-art img{width:100%;height:100%;object-fit:cover;object-position:center}.app-start:before{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(68,48,82,.55),transparent 45%,rgba(68,48,82,.86))}.app-start-brand{text-align:center}.app-start-brand img{width:min(360px,65vw);height:auto;filter:drop-shadow(0 6px 10px rgba(68,48,82,.5))}.app-start-brand p{margin:0;font-size:clamp(18px,3vw,24px);text-shadow:0 2px 4px var(--ui-primary-dark)}
+.app-start-card{width:min(440px,100%);box-sizing:border-box;text-align:center;padding:18px 24px;border:2px solid var(--ui-window-frame-edge);border-radius:18px;background:var(--ui-paper);color:var(--ui-ink);box-shadow:0 8px 30px rgba(68,48,82,.4)}.app-start-card p{margin:0 0 12px;font-size:20px}.app-start-track{height:18px;overflow:hidden;border:1px solid var(--ui-line);border-radius:12px;background:var(--ui-inset)}.app-start-track i{display:block;width:0;height:100%;border-radius:inherit;background:linear-gradient(var(--ui-green),var(--ui-green-dark));transition:width .25s ease}.app-start-card strong{display:block;margin-top:8px;font-family:var(--ui-font-number);font-size:18px}.app-start-card button{min-height:44px;margin-top:12px;padding:8px 20px;background:var(--ui-primary);color:var(--ui-card);border:1px solid var(--ui-window-frame-edge);border-radius:9px;font:inherit}.app-start-card button[hidden]{display:none}.app-start.is-complete{opacity:0;pointer-events:none}
+@media(max-height:480px){.app-start{flex-direction:row;justify-content:center;gap:28px;padding-top:max(16px,env(safe-area-inset-top));padding-bottom:max(16px,env(safe-area-inset-bottom))}.app-start-brand{width:40%}.app-start-brand img{width:min(220px,100%)}.app-start-brand p{font-size:16px}.app-start-card{width:min(360px,50%);padding:14px 18px}}
+@media(prefers-reduced-motion:reduce){.app-start,.app-start-track i{transition:none}}
