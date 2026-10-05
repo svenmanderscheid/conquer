@@ -254,7 +254,7 @@ window.ConquerPaintedCity=(()=>{
  function render({host,base,state,kingdom,labels,countdown,citySkin}){
   if(!host.querySelector('.painted-village')){
    const art=`${base}/assets/art/village-layered-v2/runtime`;
-   host.innerHTML=`<div class="painted-village"><div class="painted-village-scroll" tabindex="0" aria-label="Dorfansicht – mit der Maus ziehen oder wischen"><div class="painted-village-ground"><div class="painted-village-scene"><img src="${art}/terrain-extended.webp" alt="Dorfuntergrund ohne Gebäude" draggable="false">${places.map(([code,x,y,w,h])=>`<button type="button" class="painted-village-building" data-action="building" data-id="${code}" style="left:${x}%;top:${y}%;width:${w}%;height:${h}%">${code==='wall'?'':`<img class="painted-building-sprite" src="${art}/${spriteName(code)}.webp" alt="" draggable="false">`}<span class="painted-scaffold" aria-hidden="true"></span><small class="painted-build-status"></small><span class="painted-building-label"></span></button>`).join('')}</div></div></div><button class="city-building-tool" data-action="buildings" aria-label="Gebäudeübersicht öffnen">♜ <small>Gebäude</small></button></div>`;
+   host.innerHTML=`<div class="painted-village"><div class="painted-village-scroll" tabindex="0" aria-label="Dorfansicht – mit der Maus ziehen oder wischen"><div class="painted-village-ground"><div class="painted-village-scene"><img src="${art}/terrain-extended.webp" alt="Dorfuntergrund ohne Gebäude" draggable="false">${places.map(([code,x,y,w,h])=>`<button type="button" class="painted-village-building" data-action="building" data-id="${code}" style="left:${x}%;top:${y}%;width:${w}%;height:${h}%">${code==='wall'?'':`<img class="painted-building-sprite" src="${art}/${spriteName(code)}.webp" alt="" draggable="false">`}<span class="painted-scaffold" aria-hidden="true"></span><span class="painted-building-label"><strong class="painted-building-name"></strong><small class="painted-building-level"></small><small class="painted-build-status"></small></span></button>`).join('')}</div></div></div><button class="city-building-tool" data-action="buildings" aria-label="Gebäudeübersicht öffnen">♜ <small>Gebäude</small></button></div>`;
    const terrain=host.querySelector('.painted-village-scene>img');
    const frame=terrainFrame;
    terrain.style.cssText=`left:${-frame.x/frame.width*100}%;top:${-frame.y/frame.height*100}%;width:${1448/frame.width*100}%;height:${1086/frame.height*100}%`;
@@ -363,7 +363,9 @@ window.ConquerPaintedCity=(()=>{
      :`<span class="painted-building-heading"><b>Ausbau</b><strong>Stufe ${Number(queue.level_to)||level+1}</strong></span><span class="painted-building-time"><small>Restzeit</small>${countdown(queue.finishes_at)}</span>`;
    }
    b.dataset.name=labels[code]||code;b.dataset.level=level;
-    b.setAttribute('aria-label',text);b.title=text;b.querySelector('.painted-building-label').textContent=text;
+   b.setAttribute('aria-label',text);b.title=text;
+   b.querySelector('.painted-building-name').textContent=b.dataset.name;
+   b.querySelector('.painted-building-level').textContent=window.ConquerLocale?.t('template.level',{level})||`Level ${level}`;
   }
   const selected=host.querySelector('.painted-village-building[aria-pressed="true"]');
   if(selected)host.querySelector('.painted-building-banner small').textContent=selected.dataset.status;
