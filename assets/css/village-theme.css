@@ -2365,7 +2365,47 @@ body.mobile-game #player-hud-name { font-weight:700; }
 [data-march-effect=leaf] .atlas-march-trail i:nth-child(odd) { border-radius:80% 0 80% 0; width:11px; }
 [data-march-effect=storm] .atlas-march-trail i:nth-child(odd) { width:13px; height:5px; border-radius:50%; }
 [data-march-effect=steam] .atlas-march-trail i { width:12px; height:10px; background:var(--ui-paper); }
-.map-overlay-shell .atlas-march-party:not(.is-moving) .atlas-party-type img { animation:none; }
+/* The ordinary formation keeps its painted figures, with staggered footfalls
+   and a separate mounted trot. Only the figures move; labels and hit areas stay fixed. */
+.map-overlay-shell .atlas-march-party .atlas-party-type img {
+  animation:none;
+  translate:none;
+  transform-origin:50% 88%;
+}
+.atlas-party-type--1 { --troop-gait:world-troop-step; --troop-cycle:.98s; --troop-phase:0s; }
+.atlas-party-type--2 { --troop-gait:world-troop-archer; --troop-cycle:1.12s; --troop-phase:-.23s; }
+.atlas-party-type--3 { --troop-gait:world-troop-trot; --troop-cycle:.8s; --troop-phase:-.41s; }
+.map-overlay-shell .atlas-march-party.is-moving:not(.is-skinned) .atlas-party-type img {
+  animation:var(--troop-gait,world-troop-step) var(--troop-cycle,.98s) ease-in-out infinite;
+  animation-delay:calc(var(--march-phase,0s) + var(--troop-phase,0s) + var(--rank-phase,0s));
+}
+.map-overlay-shell .atlas-party-type img+img { --rank-phase:-.27s; }
+@keyframes world-troop-step {
+  0%,50%,100% { transform:translate(0,0) rotate(0); }
+  10% { transform:translate(.3px,.4px) rotate(-1.4deg); }
+  28% { transform:translate(.7px,-2.8px) rotate(2.2deg); }
+  42% { transform:translate(.2px,-.8px) rotate(.7deg); }
+  60% { transform:translate(-.3px,.4px) rotate(1.4deg); }
+  78% { transform:translate(-.7px,-2.5px) rotate(-2deg); }
+  92% { transform:translate(-.2px,-.6px) rotate(-.6deg); }
+}
+@keyframes world-troop-archer {
+  0%,50%,100% { transform:translate(0,0) rotate(0); }
+  12% { transform:translate(.2px,.3px) rotate(-1deg); }
+  30% { transform:translate(.5px,-2.3px) rotate(1.6deg); }
+  43% { transform:translate(.2px,-.6px) rotate(.5deg); }
+  62% { transform:translate(-.2px,.3px) rotate(1deg); }
+  80% { transform:translate(-.5px,-2px) rotate(-1.5deg); }
+  93% { transform:translate(-.2px,-.5px) rotate(-.5deg); }
+}
+@keyframes world-troop-trot {
+  0%,50%,100% { transform:translate(0,0) rotate(-.8deg); }
+  12%,62% { transform:translate(.4px,.6px) rotate(-1.8deg); }
+  29% { transform:translate(.8px,-3.8px) rotate(1.8deg); }
+  43% { transform:translate(.3px,-1px) rotate(.6deg); }
+  79% { transform:translate(.6px,-3.3px) rotate(1.5deg); }
+  93% { transform:translate(.2px,-.8px) rotate(.4deg); }
+}
 .atlas-march-impact { position:absolute; left:0; top:0; z-index:5; width:0; height:0; pointer-events:none; color:var(--march-accent); }
 .atlas-impact-ring { position:absolute; left:-68px; top:-32px; width:136px; height:64px; border:5px solid currentColor; border-radius:50%; box-shadow:inset 0 0 0 2px var(--ui-card-light); animation:world-impact-ring 1.3s ease-out both; }
 .atlas-impact-ring.is-echo { animation-delay:.16s; border-width:2px; }
