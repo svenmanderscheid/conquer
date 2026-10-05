@@ -16,6 +16,8 @@ const root=path.resolve(__dirname,'..'),output=path.join(root,'artifacts/crystal
   await Promise.all([page.waitForURL('**/city'),page.locator('form[action$="/auth/local"] button[type=submit]').click()]);
   await page.locator('.painted-village-scene').waitFor();await page.waitForFunction(()=>!document.querySelector('.scene-transition.is-active'));
   for(let n=0;n<4;n++){const back=page.locator('dialog[open] .dialog-close:visible,dialog[open] .panel-close:visible,dialog[open] .mobile-page-back:visible').first();if(!await back.count())break;await back.tap();await page.waitForTimeout(100);}
+  await page.waitForFunction(()=>!document.querySelector('#app-start'));
+  await page.evaluate(()=>{window.ConquerStartup.ready();window.ConquerStartup.ready();});
   await page.locator('#navigation [data-action=shop-open]').tap();await page.locator('[data-action=trading-tab][data-id=crystals]').tap();
   const state=async()=> (await (await page.request.get(base+'/api/kingdom/state')).json()).data;
   const before=await state();assert(before.vip.level<=1);assert.equal(before.trading.market_level,0);assert.equal(await page.locator('.trading-vip-level').count(),0);

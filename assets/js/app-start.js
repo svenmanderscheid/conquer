@@ -5,13 +5,14 @@
     const track = document.getElementById('app-start-progress');
     const status = document.getElementById('app-start-status');
     const retry = document.getElementById('app-start-retry');
+    const percent = document.getElementById('app-start-percent');
     let progress = 0, pageReady = false, gameReady = screen.dataset.game !== 'true', finished = false;
     const text = key => window.ConquerLocale?.t(key) || status.textContent;
     function update(value) {
         progress = Math.max(progress, value);
         track.setAttribute('aria-valuenow', String(progress));
         track.firstElementChild.style.width = progress + '%';
-        document.getElementById('app-start-percent').textContent = progress + '%';
+        percent.textContent = progress + '%';
     }
     function finish() {
         if (finished || !pageReady || !gameReady) return;
@@ -28,7 +29,7 @@
     }
     const timeout = setTimeout(fail, 30000);
     retry.addEventListener('click', () => location.reload());
-    window.ConquerStartup = { ready() { gameReady = true; update(90); finish(); }, fail };
+    window.ConquerStartup = { ready() { if (finished) return; gameReady = true; update(90); finish(); }, fail };
     document.addEventListener('DOMContentLoaded', () => {
         update(20);
         const images = [...document.images].filter(img => img.loading !== 'lazy' && img.getAttribute('src'));
