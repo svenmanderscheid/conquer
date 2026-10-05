@@ -2046,91 +2046,18 @@ body:not(.city-mode) :is(.painted-moving,.painted-particle,.painted-river-glint)
 body.reduced-motion :is(.painted-moving,.painted-particle,.painted-river-glint), body[data-graphics-quality="light"] :is(.painted-moving,.painted-particle,.painted-river-glint) { animation:none; }
 body.reduced-motion :is(.painted-accent,.painted-river), body[data-graphics-quality="light"] :is(.painted-accent,.painted-river) { display:none; }
 @media(prefers-reduced-motion:reduce) { .painted-moving,.painted-particle,.painted-river-glint { animation:none; } .painted-accent,.painted-river { display:none; } }
-.painted-scaffold { display:none; position:absolute; z-index:3; inset:-27% -23% -14%; pointer-events:none; }
+/* Approved fitted worksites replace the underlying sprite only while loaded. */
+.painted-scaffold { display:none; position:absolute; z-index:3; inset:-10% -14% 0; pointer-events:none; }
 .painted-village-building.is-building .painted-scaffold { display:block; }
-.painted-construction-art { position:absolute; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none; }
-.painted-construction-hammer { transform-box:view-box; animation:painted-construction-strike 3.6s ease-in-out var(--construction-delay,0s) infinite; }
-.painted-construction-impact { fill:var(--ui-gold-soft); pointer-events:none; }
-.painted-construction-dust { opacity:0; animation:painted-construction-dust 3.6s ease-out var(--construction-delay,0s) infinite; }
-.painted-construction-chip { opacity:0; fill:var(--ui-gold); animation:painted-construction-chip-left 3.6s ease-out var(--construction-delay,0s) infinite; }
-.painted-construction-chip--right { animation-name:painted-construction-chip-right; }
-/* Workpieces use the pigments of the approved painted scaffold and buildings. */
-.painted-construction-worksite { fill:none; stroke:#513322; stroke-width:3; stroke-linejoin:round; stroke-linecap:round; }
-.construction-wood { fill:#BF8245; }
-.construction-stone { fill:#D7C9AC; }
-.construction-metal { fill:#929697; }
-.construction-gold { fill:#DBAC50; }
-.construction-paper { fill:#FFF0D2; }
-.construction-straw { fill:#E4C578; }
-.construction-clay { fill:#CD7745; }
-.construction-cloth { fill:#6E80A4; }
-.construction-healing { fill:#A75046; }
-.construction-line { fill:none; stroke-width:2; }
-.construction-rope { fill:none; stroke:#A77D45; stroke-width:4; }
-.construction-magic-base { fill:#B9A0C7; }
-.construction-rune { fill:none; stroke:#8655A4; stroke-width:3; }
-.construction-spark { fill:none; stroke:#EACB86; stroke-width:3; }
-.painted-construction-detail { transform-box:view-box; animation:var(--construction-task) 4.8s ease-in-out var(--construction-delay,0s) infinite; }
-.painted-construction-particle { opacity:0; animation:painted-construction-spark 4.8s ease-out var(--construction-delay,0s) infinite; }
-.painted-construction--castle-lift { --construction-task:painted-castle-lift; }
-.painted-construction--castle-rope { --construction-task:painted-castle-rope; }
-.painted-construction--academy-runes { --construction-task:painted-academy-runes; }
-.painted-construction--vault-lock { --construction-task:painted-vault-lock; }
-.painted-construction--hospital-brush { --construction-task:painted-hospital-brush; }
-.painted-construction--alliance-banner { --construction-task:painted-alliance-banner; }
-.painted-construction--market-awning { --construction-task:painted-market-awning; }
-.painted-construction--storage-plank { --construction-task:painted-storage-plank; }
-.painted-construction--tower-ladder { --construction-task:painted-tower-ladder; }
-.painted-construction--tower-rope { --construction-task:painted-tower-rope; }
-.painted-construction--stable-gate { --construction-task:painted-stable-gate; }
-.painted-construction--archery-target { --construction-task:painted-archery-target; }
-.painted-construction--barrack-mallet { --construction-task:painted-barrack-mallet; }
-.painted-construction--farm-tiles { --construction-task:painted-farm-tiles; }
-.painted-construction--lumber-saw { --construction-task:painted-lumber-saw; }
-.painted-construction--mine-cart { --construction-task:painted-mine-cart; }
-.painted-construction--quarry-chisel { --construction-task:painted-quarry-chisel; }
-.painted-construction--wall-merlon { --construction-task:painted-wall-merlon; }
-@keyframes painted-castle-lift { 0%,12%,100% { transform:translateY(0); } 42%,65% { transform:translateY(-36px); } }
-@keyframes painted-castle-rope { 0%,12%,100% { transform:scaleY(1); } 42%,65% { transform:scaleY(.37931); } }
-@keyframes painted-academy-runes { 0%,100% { transform:translateY(0) rotate(-5deg); } 50% { transform:translateY(-16px) rotate(6deg); } }
-@keyframes painted-vault-lock { 0%,18%,100% { transform:rotate(0); } 42%,66% { transform:rotate(90deg); } }
-@keyframes painted-hospital-brush { 0%,15%,90%,100% { transform:translate(0,0) rotate(-8deg); } 35%,65% { transform:translate(-11px,-14px) rotate(6deg); } 50% { transform:translate(2px,0) rotate(-8deg); } }
-@keyframes painted-alliance-banner { 0%,12%,100% { transform:translateY(0); } 48%,76% { transform:translateY(-18px); } }
-@keyframes painted-market-awning { 0%,12%,100% { transform:scaleY(.64); } 45%,72% { transform:scaleY(1); } }
-@keyframes painted-storage-plank { 0%,12%,100% { transform:translate(14px,-12px) rotate(-5deg); } 46%,75% { transform:translate(0,0) rotate(0); } }
-@keyframes painted-tower-ladder { 0%,12%,100% { transform:translateY(0); } 45%,70% { transform:translateY(-24px); } }
-@keyframes painted-tower-rope { 0%,12%,100% { transform:scaleY(1); } 45%,70% { transform:scaleY(.61); } }
-@keyframes painted-stable-gate { 0%,20%,100% { transform:scaleX(1) skewY(0); } 48%,68% { transform:scaleX(.75) skewY(-6deg); } }
-@keyframes painted-archery-target { 0%,15%,100% { transform:rotate(-12deg); } 40%,72% { transform:rotate(0); } 52% { transform:rotate(4deg); } }
-@keyframes painted-barrack-mallet { 0%,12%,75%,100% { transform:rotate(12deg); } 25%,48% { transform:rotate(38deg); } 33%,56% { transform:rotate(-18deg); } }
-@keyframes painted-farm-tiles { 0%,12%,100% { transform:translate(-8px,-20px) rotate(-8deg); } 45%,76% { transform:translate(0,0) rotate(0); } }
-@keyframes painted-lumber-saw { 0%,18%,50%,82%,100% { transform:translate(0,0); } 34%,66% { transform:translate(15px,3px); } }
-@keyframes painted-mine-cart { 0%,14%,100% { transform:translateX(0); } 45%,66% { transform:translateX(16px); } }
-@keyframes painted-quarry-chisel { 0%,14%,76%,100% { transform:translateY(0) rotate(0); } 26%,48% { transform:translateY(-8px) rotate(8deg); } 32%,54% { transform:translateY(2px) rotate(-3deg); } }
-@keyframes painted-wall-merlon { 0%,12%,100% { transform:translateY(-21px); } 43%,76% { transform:translateY(0); } }
-@keyframes painted-construction-spark { 0%,30%,58%,100% { opacity:0; transform:translateY(0); } 34%,54% { opacity:.85; } 44%,65% { opacity:0; transform:translateY(-8px); } }
-@keyframes painted-construction-strike {
-  0%,12%,72%,100% { transform:rotate(0deg); }
-  22% { transform:rotate(-12deg); }
-  28%,30% { transform:rotate(115deg); }
-  39% { transform:rotate(-5deg); }
-  46%,48% { transform:rotate(115deg); }
-  59% { transform:rotate(8deg); }
-}
-@keyframes painted-construction-dust {
-  0%,27%,45%,65%,100% { opacity:0; transform:translate(0,0) scale(.6); }
-  30%,48% { opacity:.65; transform:translate(0,-2px) scale(.85); }
-  43%,63% { opacity:0; transform:translate(7px,-18px) scale(1.6); }
-}
-@keyframes painted-construction-chip-left {
-  0%,27%,45%,63%,100% { opacity:0; transform:translate(0,0) rotate(0); }
-  29%,47% { opacity:.9; transform:translate(-3px,-3px) rotate(-10deg); }
-  42%,61% { opacity:0; transform:translate(-17px,8px) rotate(-65deg); }
-}
-@keyframes painted-construction-chip-right {
-  0%,27%,45%,63%,100% { opacity:0; transform:translate(0,0) rotate(0); }
-  29%,47% { opacity:.9; transform:translate(4px,-5px) rotate(10deg); }
-  42%,61% { opacity:0; transform:translate(21px,6px) rotate(80deg); }
+.painted-construction-art { position:absolute; inset:0; width:100%; height:100%; overflow:hidden; pointer-events:none; opacity:0; }
+.has-construction-art .painted-construction-art { opacity:1; }
+.painted-village-scroll:not(.is-dragging) .is-building.has-construction-art>:is(.painted-building-sprite,.painted-motion) { visibility:hidden; }
+.painted-construction-detail { transform-box:view-box; animation:painted-construction-poses 4.8s steps(1,end) var(--construction-delay,0s) infinite; }
+@keyframes painted-construction-poses {
+  0%,100% { transform:translateX(0); }
+  25% { transform:translateX(var(--construction-step)); }
+  50% { transform:translateX(calc(var(--construction-step) * 2)); }
+  75% { transform:translateX(calc(var(--construction-step) * 3)); }
 }
 .painted-build-status { display:none; position:absolute; left:50%; bottom:-16px; transform:translateX(-50%); padding:3px 7px; border:1px solid var(--ui-gold); border-radius:7px; white-space:nowrap; background:var(--ui-paper); color:var(--ui-ink); font:12px var(--ui-font); pointer-events:none; }
 .painted-village-building:is(.is-building,.is-training) .painted-build-status { display:block; }
@@ -2148,12 +2075,9 @@ body.reduced-motion :is(.painted-accent,.painted-river), body[data-graphics-qual
  :is(.painted-training-time,.painted-building-time)>span { font-size:13px; }
 }
 body:not(.city-mode) .painted-scaffold *,body.popup-mode .painted-scaffold *,body:has(dialog[open]) .painted-scaffold *,.painted-village.is-paused .painted-scaffold * { animation-play-state:paused; }
-/* Keep the small, distinct work cue on the automatic mobile/light profile too.
-   Only active queues mount these transforms; light mode drops all particles. */
-body[data-graphics-quality="light"] :is(.painted-construction-impact,.painted-construction-particle) { display:none; }
+/* Four small poses also run on the automatic mobile/light profile. */
 body.reduced-motion .painted-scaffold * { animation:none; }
-body.reduced-motion :is(.painted-construction-impact,.painted-construction-particle) { display:none; }
-@media(prefers-reduced-motion:reduce) { .painted-scaffold * { animation:none!important; } .painted-construction-impact,.painted-construction-particle { display:none; } }
+@media(prefers-reduced-motion:reduce) { .painted-scaffold * { animation:none!important; } }
 .painted-village-building.is-empty .painted-building-sprite { visibility:hidden; }
 .painted-village-building.is-empty::after { content:'+'; position:absolute; bottom:15%; left:40%; border:1px solid var(--ui-gold); border-radius:50%; width:32px; height:32px; background:var(--ui-paper); color:var(--ui-ink); font:24px var(--ui-font); }
 .painted-village-building:focus-visible { outline:none; background:transparent; }

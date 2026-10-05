@@ -6,75 +6,21 @@ window.ConquerPaintedCity=(()=>{
  const defaultCastleSprite=base=>`${base}/assets/art/village-layered-v2/runtime/castle_rounded.webp`;
  // The extended painting surrounds the existing 3:2 building coordinate area.
  const terrainFrame={x:106,y:99,width:1229,height:819};
- // Small authored workpieces sit inside the approved scaffold. Only tools,
- // materials and ropes move; buildings, workers and touch targets stay fixed.
- function constructionWorksite(code){
-  const moving=(kind,art,origin='60px 60px')=>`<g class="painted-construction-detail painted-construction--${kind}" style="transform-origin:${origin}">${art}</g>`;
-  const wood=(x,y,w,h)=>`<rect class="construction-wood" x="${x}" y="${y}" width="${w}" height="${h}" rx="3"/>`;
-  const stone=(x,y,w=30,h=19)=>`<rect class="construction-stone" x="${x}" y="${y}" width="${w}" height="${h}" rx="4"/><path class="construction-line" d="M${x+5} ${y+5}h${w-10}"/>`;
-  const rope=path=>`<path class="construction-rope" d="${path}"/>`;
-  const spark=(x,y)=>`<path class="painted-construction-particle construction-spark" d="M${x} ${y-5}v10m-5-5h10"/>`;
-  const plank=wood(8,76,104,9);
-  let art='';
-  switch(code){
-   case 'castle':
-    art=`${stone(12,60)}${stone(43,60)}${stone(74,60)}${wood(87,-54,9,130)}${wood(38,-57,67,9)}<circle class="construction-metal" cx="54" cy="-46" r="9"/>${moving('castle-rope',rope('M54-38V20'),'54px -38px')}${moving('castle-lift',`${stone(31,31,46,25)}${rope('M31 36 54 20 77 36')}`)}${plank}`;
-    break;
-   case 'academy':
-    art=`${stone(27,66,67,18)}<ellipse class="construction-magic-base" cx="60" cy="63" rx="40" ry="10"/>${moving('academy-runes',`${stone(30,24,25,22)}${stone(67,33,25,22)}<path class="construction-rune" d="m37 34 7-5 5 8m-5-8-1 13m30 1 11 6-9 2Z"/>`,'60px 46px')}${spark(22,40)}${spark(98,23)}`;
-    break;
-   case 'treasure_house':
-    art=`<path class="construction-stone" d="M20 78V32a40 40 0 0 1 80 0v46Z"/><path class="construction-metal" d="M32 78V34a28 28 0 0 1 56 0v44Z"/><path class="construction-gold" d="M31 37h57v8H31Zm0 25h57v8H31Z"/>${moving('vault-lock','<circle class="construction-gold" cx="60" cy="53" r="15"/><path class="construction-line" d="M48 53h24m-12-12v24"/>','60px 53px')}${spark(88,39)}${plank}`;
-    break;
-   case 'hospital':
-    art=`${wood(18,12,8,65)}${wood(93,12,8,65)}<rect class="construction-paper" x="25" y="18" width="68" height="49" rx="6"/><path class="construction-healing" d="M52 25h14v11h12v14H66v11H52V50H40V36h12Z"/>${moving('hospital-brush','<path class="construction-wood" d="m60 51 22-29 7 5-22 29Z"/><path class="construction-healing" d="m54 58 6-14 13 9-8 10Z"/>')}<path class="construction-metal" d="m87 65 4 16h19l4-16Z"/>${plank}`;
-    break;
-   case 'hall_of_alliance':
-    art=`${wood(18,-25,8,105)}${wood(96,-25,8,105)}${wood(16,-26,91,8)}${rope('M90-16V76')}${moving('alliance-banner','<path class="construction-cloth" d="M34-5h50v61L59 71 34 56Z"/><path class="construction-gold" d="m59 10 14 6v15c0 10-14 17-14 17S45 41 45 31V16Z"/><path class="construction-line" d="M52 28h14m-7-7v14"/>')}${plank}`;
-    break;
-   case 'trading_post':
-    art=`${wood(16,3,8,75)}${wood(96,3,8,75)}${moving('market-awning','<path class="construction-paper" d="M16 6h88l10 34c-5 10-16 10-22 0-5 10-16 10-22 0-5 10-16 10-22 0-5 10-16 10-22 0-6 10-16 10-20 0Z"/><path class="construction-clay" d="m30 6-4 34c6 10 17 10 22 0l1-34Zm39 0 1 34c6 10 17 10 22 0L87 6Z"/>','60px 6px')}${wood(12,2,97,7)}${plank}`;
-    break;
-   case 'storage':
-    art=`${wood(19,5,9,73)}${wood(91,5,9,73)}${wood(14,33,91,8)}${wood(14,66,91,8)}${wood(27,53,29,13)}${wood(61,53,27,13)}${moving('storage-plank',`${wood(25,18,63,10)}<path class="construction-line" d="M32 23h48"/>`)}${plank}`;
-    break;
-   case 'watch_tower':
-    art=`${wood(20,-57,9,135)}${wood(13,-59,93,9)}<circle class="construction-metal" cx="91" cy="-48" r="9"/>${moving('tower-rope',rope('M91-39V23'),'91px -39px')}${moving('tower-ladder',`${wood(48,0,8,76)}${wood(83,0,8,76)}${[12,30,48,66].map(y=>wood(54,y,31,6)).join('')}${rope('M56 3 73-10 88 3 91 23')}`)}${plank}`;
-    break;
-   case 'stable':
-    art=`${wood(13,12,11,68)}${wood(101,12,11,68)}${moving('stable-gate',`${wood(27,29,69,9)}${wood(27,62,69,9)}${[32,51,70,89].map(x=>wood(x,25,7,48)).join('')}<path class="construction-metal" d="M32 44v8c0 14 19 14 19 0v-8h-6v8c0 6-7 6-7 0v-8Z"/>`,'27px 50px')}${plank}`;
-    break;
-   case 'archery_range':
-    art=`<path class="construction-wood" d="m33 77 19-54h10L45 80Zm41-53h9l18 54-12 3Z"/>${moving('archery-target','<circle class="construction-straw" cx="65" cy="37" r="34"/><circle class="construction-paper" cx="65" cy="37" r="24"/><circle class="construction-clay" cx="65" cy="37" r="15"/><circle class="construction-straw" cx="65" cy="37" r="5"/><path class="construction-line" d="M36 37h6m46 0h6M65 8v6m0 46v6"/>','65px 37px')}${wood(12,74,96,9)}`;
-    break;
-   case 'barrack':
-    art=`${wood(54,-1,10,79)}<path class="construction-metal" d="m28 16 30-9 30 9v25c0 21-30 36-30 36S28 62 28 41Z"/><path class="construction-clay" d="m36 22 22-7 22 7v18c0 14-22 27-22 27S36 54 36 40Z"/><circle class="construction-gold" cx="77" cy="27" r="5"/>${moving('barrack-mallet','<path class="construction-wood" d="m86 62-4-38 7-1 5 38Z"/><rect class="construction-metal" x="71" y="14" width="29" height="15" rx="3"/>','90px 62px')}${spark(76,27)}${plank}`;
-    break;
-   case 'farm':
-    art=`<path class="construction-wood" d="m10 62 48-43 53 43-7 8-46-37-42 37Z"/><path class="construction-clay" d="m18 59 40-35 45 35-3 8H20Z"/><path class="construction-line" d="m32 47 10 18m5-31 16 32m6-30 19 30M26 52h66"/>${moving('farm-tiles','<path class="construction-clay" d="m42 30 13-14 14 14-4 5-10-9-9 9Z"/><path class="construction-clay" d="m42 23 13-14 14 14-4 5-10-9-9 9Z"/>')}${wood(17,66,8,13)}${wood(96,66,8,13)}${plank}`;
-    break;
-   case 'lumber_camp':
-    art=`<path class="construction-wood" d="m19 78 12-35h8l12 35h-9l-7-22-7 22Zm58 0 12-35h8l12 35h-9l-7-22-7 22Z"/><rect class="construction-wood" x="12" y="29" width="92" height="22" rx="8"/><ellipse class="construction-straw" cx="17" cy="40" rx="8" ry="11"/>${moving('lumber-saw','<path class="construction-metal" d="m37 17 66 13-3 10-7-4-5 3-5-5-5 3-5-5-5 3-5-5-5 3-5-5-5 3-9-4Z"/><path class="construction-wood" d="m26 11 16 3-4 20-16-4Zm3 7-1 6 5 1 1-6Z"/>')}${spark(66,40)}`;
-    break;
-   case 'gold_mine':
-    art=`${[21,50,79].map(x=>wood(x,72,12,16)).join('')}<path class="construction-metal" d="M5 73h111v5H5Zm0 11h111v5H5Z"/>${moving('mine-cart',`<circle class="construction-metal" cx="33" cy="68" r="8"/><circle class="construction-metal" cx="79" cy="68" r="8"/>${stone(49,22,36,20)}${wood(22,27,45,9)}${wood(27,17,48,9)}<path class="construction-wood" d="m18 37 10 27h59l9-27Z"/><path class="construction-metal" d="M20 38h75v7H20Z"/><path class="construction-line" d="M39 48v10m34-10v10"/>`)}`;
-    break;
-   case 'quarry':
-    art=`<path class="construction-stone" d="m17 74 4-30 20-17 43 5 19 20-5 26Z"/><path class="construction-line" d="m23 46 40 4 20-14M63 50l-4 23"/>${moving('quarry-chisel','<path class="construction-metal" d="m62 51 8-25 7 3-11 24Z"/><path class="construction-wood" d="m71 28 13-26 6 3-13 26Z"/><path class="construction-metal" d="m71 1 10-8 21 10-4 9Z"/>','78px 23px')}${spark(65,50)}${stone(4,79,19,10)}${stone(94,78,17,10)}`;
-    break;
-   case 'wall':
-    art=`${stone(8,62,33,21)}${stone(42,62,33,21)}${stone(76,62,33,21)}${stone(8,40,49,21)}${stone(59,40,49,21)}${stone(8,19,24,20)}${stone(85,19,24,20)}${moving('wall-merlon',`${stone(47,19,24,20)}${rope('M46 22 59 6 72 22')}`)}<path class="construction-line" d="M3 86h113"/>`;
-    break;
-  }
-  return `<g class="painted-construction-worksite" transform="translate(274 424) scale(2.05)">${art}</g>`;
- }
+ // Each approved site has four registered poses in one lightweight atlas.
+ // A discrete frame change never blends duplicate buildings or scaffolds.
+ const constructionAtlases={"castle":[384,373,"a731439a7968"],"academy":[384,367,"b61e0fd018dc"],"treasure_house":[384,370,"5e92d1eb03e8"],"hospital":[384,344,"d41b82889c22"],"hall_of_alliance":[384,350,"1cb6fc3cc6c5"],"trading_post":[384,329,"3265c26c88d7"],"storage":[384,376,"49d78d22bd5f"],"watch_tower":[324,384,"381af0f126a1"],"stable":[384,327,"bf2916f97cf5"],"archery_range":[384,323,"98110e9be806"],"barrack":[384,368,"10d1d87663e9"],"farm":[384,335,"ea0473d1bd6f"],"lumber_camp":[384,364,"329b95750c39"],"gold_mine":[384,320,"a56238f87933"],"quarry":[384,297,"caded5832281"],"wall":[377,384,"81827528d31c"]};
  function constructionArtwork(base,code){
-  const id='painted-construction-'+code,src=`${base}/assets/art/village-layered-v2/runtime/construction-scaffold-frame-1.webp`.replaceAll('&','&amp;').replaceAll('"','&quot;');
-  // Follow the tool silhouette through the transparent gap beside the cap.
-  // The hand is painted over its handle; no part of the face or scaffold moves.
-  const tool='M184 218 199 190 213 190 243 207 242 226 229 244 217 244 213 241 210 243 191 241 194 232 184 226Z';
-  const picture=`<image href="${src}" width="768" height="768"/>`;
-  return `<svg class="painted-construction-art" data-construction-kind="${code}" viewBox="0 0 768 768" preserveAspectRatio="xMidYMax meet" aria-hidden="true" focusable="false"><defs><mask id="${id}-base" maskUnits="userSpaceOnUse" x="0" y="0" width="768" height="768"><rect width="768" height="768" fill="white"/><path d="${tool}" fill="black"/></mask><clipPath id="${id}-tool"><path d="${tool}"/></clipPath></defs><g class="painted-construction-hammer" style="transform-origin:199px 249px"><g clip-path="url(#${id}-tool)">${picture}</g></g><g mask="url(#${id}-base)">${picture}</g>${constructionWorksite(code)}<g class="painted-construction-impact" transform="translate(232 290)"><g class="painted-construction-dust"><ellipse cx="-5" cy="0" rx="10" ry="6"/><ellipse cx="7" cy="-3" rx="8" ry="7"/></g><path class="painted-construction-chip painted-construction-chip--left" d="m-4-2 7-2-2 6Z"/><path class="painted-construction-chip painted-construction-chip--right" d="m1-1 6 1-3 5Z"/></g></svg>`;
+  const [width,height,version]=constructionAtlases[code],id='painted-construction-'+code;
+  const src=`${base}/assets/art/city-construction-v1/${code}.webp?v=${version}`.replaceAll('&','&amp;').replaceAll('"','&quot;');
+  return `<svg class="painted-construction-art" data-construction-kind="${code}" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMax meet" aria-hidden="true" focusable="false" style="--construction-step:-${width}px"><defs><clipPath id="${id}-clip"><rect width="${width}" height="${height}"/></clipPath></defs><g clip-path="url(#${id}-clip)"><image class="painted-construction-detail" href="${src}" width="${width*4}" height="${height}"/></g></svg>`;
+ }
+ function mountConstruction(scaffold,building,base,code){
+  scaffold.innerHTML=constructionArtwork(base,code);
+  const art=scaffold.firstElementChild,image=new Image();
+  // Keep the normal building until its entire worksite has loaded. Late
+  // image callbacks cannot hide a building whose queue has already settled.
+  image.onload=()=>{if(scaffold.firstElementChild===art&&building.classList.contains('is-building'))building.classList.add('has-construction-art');};
+  image.src=art.querySelector('image').getAttribute('href');
  }
  const villageSkinAsset=url=>url+(url.includes('?')?'&':'?')+'village=3';
  const trainingBuildingFor=(state,job)=>{
@@ -346,9 +292,9 @@ window.ConquerPaintedCity=(()=>{
    b.classList.toggle('is-building',Boolean(queue));
    const scaffold=b.querySelector('.painted-scaffold');
    if(queue&&!scaffold.firstChild){
-    scaffold.innerHTML=constructionArtwork(base,code);
+    mountConstruction(scaffold,b,base,code);
     scaffold.style.setProperty('--construction-delay',-(places.findIndex(place=>place[0]===code)%5)*.47+'s');
-   }else if(!queue&&scaffold.firstChild)scaffold.replaceChildren();
+   }else if(!queue){scaffold.replaceChildren();b.classList.remove('has-construction-art');}
    b.classList.toggle('is-training',Boolean(training));
    b.classList.toggle('is-empty',!queue&&level<=0&&code!=='wall');
    b.dataset.status=status;

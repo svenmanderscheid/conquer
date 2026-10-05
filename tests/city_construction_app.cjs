@@ -106,8 +106,8 @@ async function detailMotionSamples(art){
     await page.waitForTimeout(100);const first=await page.evaluate(animationState);let second=first;
     for(let sample=0;sample<(mode==='light'?6:1);sample++){await page.waitForTimeout(300);second=await page.evaluate(animationState);if(JSON.stringify(first.motion)!==JSON.stringify(second.motion))break;}
     if(mode==='light'){
-     assert(first.motion.some(node=>node.className.includes('painted-construction-hammer')),'Light graphics retain the useful hammer cue');
-     assert.notDeepEqual(first.motion,second.motion,'The lightweight hammer continues working');
+     assert(first.motion.some(node=>node.className.includes('painted-construction-detail')),'Light graphics retain the painted work poses');
+     assert.notDeepEqual(first.motion,second.motion,'The lightweight worksite continues working');
      assert.equal(await building.locator('.painted-construction-dust:visible,.painted-construction-chip:visible,.painted-construction-particle:visible').count(),0,'Light graphics omit decorative particles');
     }else{assertWorksiteStill(first,second,'Stable construction for '+mode);assert(first.motion.every(node=>node.playState==='paused'),'No work animation runs in '+mode);}
     assert.equal(await building.locator('.painted-scaffold').isVisible(),true,'Construction remains identifiable in '+mode);
@@ -131,6 +131,9 @@ async function detailMotionSamples(art){
     assert.equal(await target.locator('.painted-scaffold').isVisible(),true,'Construction adapts to '+code);assert.equal(await target.locator('.painted-construction-art').count(),1,'One site for '+code);
     assert.equal(await page.locator('.painted-construction-art').count(),1,'Only the authoritative building receives construction: '+code);
     const art=target.locator('.painted-construction-art');assert.equal(await art.getAttribute('data-construction-kind'),code,'Construction identifies its building task');
+    await page.waitForFunction(code=>document.querySelector('.painted-village-building[data-id="'+code+'"]').classList.contains('has-construction-art'),code);
+    const atlas=art.locator('image');assert.match(await atlas.getAttribute('href'),new RegExp('/city-construction-v1/'+code+'\\.webp\\?v='),'Uses the approved building-specific painted atlas');
+    if(code!=='wall')assert.equal(await target.locator('.painted-building-sprite').evaluate(node=>getComputedStyle(node).visibility),'hidden','The original building is hidden, preventing doubled roofs and walls');
     // Compare visible SVG geometry, not ids or variant labels: changing only a
     // data attribute or animation timing must not count as a new building task.
     const shape=await art.evaluate((node,code)=>JSON.stringify([...node.querySelectorAll('path,rect,circle,ellipse,line,polygon,polyline,image,use')].map(part=>[part.tagName,[...part.attributes].filter(attribute=>!['id','class','style','mask','clip-path'].includes(attribute.name)).map(attribute=>[attribute.name,attribute.value])])).replaceAll('painted-construction-'+code,'painted-construction-site'),code);
@@ -153,7 +156,7 @@ async function detailMotionSamples(art){
      const state=await page.evaluate(animationState,code);
      if(mode==='light'||mode==='auto'){
       assert.equal(await page.locator('body').getAttribute('data-graphics-quality'),'light','The small touch viewport uses the light profile for '+mode);
-      assert(state.motion.some(node=>node.className.includes('painted-construction-hammer')&&node.playState==='running'),'Light graphics retain the primary tool: '+code);
+      assert(state.motion.some(node=>node.className.includes('painted-construction-detail')&&node.playState==='running'),'Light graphics retain the painted work poses: '+code);
       const extra=state.motion.filter(node=>node.className.includes('painted-construction-detail'));assert(extra.length>0&&extra.every(node=>node.playState==='running'),'Light graphics retain the unique work detail for '+mode+': '+code);
       let changed=false;for(let sample=0;sample<8;sample++){await page.waitForTimeout(200);const next=(await page.evaluate(animationState,code)).motion.filter(node=>node.className.includes('painted-construction-detail'));if(JSON.stringify(extra)!==JSON.stringify(next)){changed=true;break;}}
       assert(changed,'Building-specific work moves naturally on mobile for '+mode+': '+code);
@@ -167,8 +170,11 @@ async function detailMotionSamples(art){
     results.push({code,first,second,detail});console.log('PASS distinct construction, detail motion, mobile touch and motion settings: '+code);
    }
    assert.equal(shapes.size,buildingCodes.length,'Every building has its own work artwork');
+   const manifest=JSON.parse(fs.readFileSync(path.join(root,'assets/art/city-construction-v1/manifest.json'),'utf8'));
+   assert.equal(new Set(Object.values(manifest.buildings).map(b=>b.sha256)).size,buildingCodes.length,'All sixteen sites have different raster artwork, not renamed copies');
    queueMode='removed';await page.waitForResponse(response=>response.url().includes('/api/game/state')&&response.status()===200);await page.waitForFunction(()=>!document.querySelector('.painted-construction-art'));
    assert.equal(await page.locator('.painted-scaffold svg').count(),0,'Removing the queue cleans every construction SVG');assert.equal(await page.locator('.painted-build-status[data-queue^="build:"]').count(),0,'Removing the queue clears every construction timer while training may continue');
+   assert.equal(await page.locator('.has-construction-art').count(),0,'Queue settlement restores the ordinary buildings');
    await page.evaluate(()=>ConquerGraphicsQuality.set('auto'));
   }
   assert.deepEqual(errors,[],'No browser exceptions');assert.deepEqual(missing,[],'All app and construction artwork loaded');fs.writeFileSync(path.join(output,phase+'-geometry.json'),JSON.stringify(results,null,2));console.log('PASS '+phase+' actual-app construction: '+output);

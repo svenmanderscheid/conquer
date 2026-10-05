@@ -20,14 +20,14 @@ Use chunky, rounded silhouettes, warm ivory walls, saturated roof colors, dark e
 
 Animation stays calm, supports reduced motion and never obscures labels, selection or touch controls. Inspect the whole city and building dialogs in the actual app at desktop, narrow portrait and landscape sizes. Keep images compressed and reuse sprites.
 
-Construction reuses the approved scaffold artwork with a fixed frame and worker silhouette. Since 1 October 2026, each of the 16 buildings also has an individual construction task, drawn with the scaffold's rounded forms and existing world pigments. Only the isolated hammer and the task's tools, ropes or materials move; do not stack transparent whole-frame poses or move the entire building. Workpieces stay inside the scaffold, away from timer labels and touch controls. They use small inline SVG shapes and CSS transforms, without extra raster downloads or a JavaScript animation loop.
+Since 5 October 2026, construction uses 16 individually approved painted worksites in `assets/art/city-construction-v1/`. Exterior timber scaffolds follow each building's walls, towers, eaves or rock terraces, with recognisable entrances and roof colours. Each compressed WebP atlas contains four registered poses of that building and its workers. A clipped SVG image switches poses every 1.2 seconds; never crossfade transparent whole-building frames. The loaded worksite replaces the underlying sprite during construction to avoid doubled walls and roofs. Until it loads, the original building remains visible. Building bounds, timer labels and touch controls stay fixed.
 
 | Building | Upgrade work |
 | --- | --- |
 | Castle | Pulley lifts a masonry block above the new stone course |
-| Academy | Rune-inscribed stones float into alignment above a base |
+| Academy | Workers hoist a finial beside the stepped tower scaffold |
 | Treasure house | Vault locking wheel is fitted and turned |
-| Hospital | Brush paints the cross on the new hospital sign |
+| Hospital | Painter and roofer work along the low wing scaffold |
 | Alliance hall | Crest banner is raised between wooden supports |
 | Trading post | New striped awning is unfolded over its frame |
 | Storage | Timber plank slides into the new storage rack |
@@ -41,7 +41,7 @@ Construction reuses the approved scaffold artwork with a fixed frame and worker 
 | Quarry | Chisel shapes a stone block with small chips |
 | Wall | Crenellation block is lowered onto a new wall section |
 
-The detail SVG is mounted only for an authoritative active build queue, retained across refreshes and removed when that queue settles. Countdown expiry alone does not finish the work. Timer labels stay above the scaffold. Light graphics (also selected automatically on phones) retains the small worker-tool and individual task movements, omitting all particles; reduced motion uses a fully still worksite. Dialogs, hidden tabs and the world view pause all construction motion. Check `tests/city_construction_app.cjs` (all 16 tasks, visible detail movement, mobile touch, pauses, motion settings and queue cleanup) and `tests/painted_city.cjs`. Actual-app captures are saved under `artifacts/city-upgrade-animations/`.
+The atlas is loaded only for an authoritative active build queue, retained across refreshes and removed when that queue settles. Countdown expiry alone does not finish the work. Light graphics also retains the four poses; reduced motion uses a fully still worksite. Dialogs, hidden tabs and the world view pause construction motion. Castle construction uses the approved standard castle worksite; the equipped skin returns after completion. Each atlas is below 200 KB, with a maximum frame dimension of 384 pixels. Source hashes and alignment are recorded in `manifest.json`; `tools/prepare-city-construction.cjs` packs approved source sheets without repainting them. Check `tests/city_construction_app.cjs` (all 16 tasks, mobile touch, pauses, motion settings and queue cleanup) and `tests/painted_city.cjs` (including missing and late atlas loads). Actual-app captures for this revision are under `output/city-scaffolds/app/`; browser checks do not establish physical-device coverage.
 
 Luxembourg conquest landmarks use the eight transparent illustrations in `assets/art/territory-v2/`: six commune benefits, a canton fortress and the Royal Castle. The 30 September revision gives them broader halls, stronger foundations, heavier bastions and more substantial walls while retaining the original roof colors and benefit emblems. Map and territory dialogs share `assets/js/territory-art.js`; their illustrated size follows the authoritative footprint. Sources, prompts, compression and visual checks are documented in `TERRITORY_ART.md`. The previous `territory-v1` set remains available for comparison.
 
