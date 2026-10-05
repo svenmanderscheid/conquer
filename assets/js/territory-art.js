@@ -7,9 +7,9 @@ window.ConquerTerritoryArt = (() => {
     rune: 'commune-rune', rune_watch: 'commune-rune'
   });
   function key(target) {
-    if (target?.kind === 'crown') return 'crown-krounbuerg';
-    if (target?.kind === 'canton') return 'canton-fortress';
+    if (target?.kind === 'crown') return 'congress-forum';
+    if (target?.kind === 'canton') return 'canton-shrine';
     return Object.hasOwn(communes, target?.benefit_type) ? communes[target.benefit_type] : 'commune-food';
   }
-  return Object.freeze({key, image: (base, target) => `${base}/assets/art/territory-v2/${key(target)}.webp`});
+  return Object.freeze({key, image: (base, target) => `${base}/assets/art/territory-v3/${key(target)}.webp`});
 })();

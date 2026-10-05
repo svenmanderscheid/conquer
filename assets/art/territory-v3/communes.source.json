@@ -1,0 +1,122 @@
+{
+  "generated": "2026-10-05",
+  "mode": "built-in image_gen",
+  "purpose": "Unfortified commune landmarks for Union of Kingdoms",
+  "processing": "Copy original sources; proportional resize with transparent padding to exactly 512x512; WebP quality 85 alphaQuality 100.",
+  "entries": [
+    {
+      "key": "food",
+      "prompt": "Use case: stylized-concept. Asset type: single transparent world-map landmark sprite for Union of Kingdoms. Primary request: Harvest market hall with a large rounded orange tiled roof, warm ivory walls and open wooden porch. Big golden wheat sheaves, a harvest basket and simple produce crates flank its welcoming open entrance. Broad low civilian building, farming commune identity. Style: extremely simple flat 2D chibi cartoon fantasy mobile RPG illustration, large soft slightly exaggerated forms, bold readable silhouette, thick dark espresso-brown outlines, two broad cel-shaded light values, flat calm colors, no textures, no glossy or photorealistic material, no 3D render. High angle three-quarter view, centered single complete landmark, full building entirely visible with generous transparent margin, square composition. A small soft irregular tan earth patch under the building only. Strong recognizable shape at tiny map size. Genuinely transparent background. No castle, no fortress, no fortifications, no towers, no battlements, no crenellations, no perimeter wall, no guardhouse, no weapons, no soldiers, no people, no text, no letters, no numbers, no UI, no border, no watermark.",
+      "source": "C:\\Users\\svenm\\.codex\\generated_images\\01a10cd9-3554-7121-8d9f-0b32cc165b64\\exec-5e63717c-b27c-41b1-adb8-19ed5b570dcf.png",
+      "file": "commune-food.webp",
+      "localSource": "source/commune-food.png",
+      "sourceSha256": "b7323b0b7e1cb01ef3eb4c23636c9d5d0cce4495368668efc8781c2af19d18ae",
+      "sourceDimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "output": {
+        "width": 512,
+        "height": 512,
+        "bytes": 43362,
+        "hasAlpha": true,
+        "transparentPixels": 158689
+      }
+    },
+    {
+      "key": "lumber",
+      "prompt": "Use case: stylized-concept. Asset type: single transparent world-map landmark sprite for Union of Kingdoms. Primary request: Cooperative timber workshop hall with a large rounded deep leaf-green tiled roof, warm ivory walls, chunky exposed timber beams and open woodworking porch. Several oversized cut logs with clear circular ends and one large rounded saw blade beside the porch. Broad low civilian building, lumber commune identity. Style: extremely simple flat 2D chibi cartoon fantasy mobile RPG illustration, large soft slightly exaggerated forms, bold readable silhouette, thick dark espresso-brown outlines, two broad cel-shaded light values, flat calm colors, no textures, no glossy or photorealistic material, no 3D render. High angle three-quarter view, centered single complete landmark, full building entirely visible with generous transparent margin, square composition. A small soft irregular tan earth patch under the building only. Strong recognizable shape at tiny map size. Genuinely transparent background. No castle, no fortress, no fortifications, no towers, no battlements, no crenellations, no perimeter wall, no guardhouse, no weapons, no soldiers, no people, no text, no letters, no numbers, no UI, no border, no watermark.",
+      "source": "C:\\Users\\svenm\\.codex\\generated_images\\01a10cd9-3554-7121-8d9f-0b32cc165b64\\exec-b3cf5cad-8556-4df2-8f1c-7d82c415cd7c.png",
+      "file": "commune-lumber.webp",
+      "localSource": "source/commune-lumber.png",
+      "sourceSha256": "ba7a15c2fb12c00fca03ea3d3c5df389fba3fa87fc510c23c4cd0ba255a2f267",
+      "sourceDimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "output": {
+        "width": 512,
+        "height": 512,
+        "bytes": 46044,
+        "hasAlpha": true,
+        "transparentPixels": 146962
+      }
+    },
+    {
+      "key": "stone",
+      "prompt": "Use case: stylized-concept. Asset type: single transparent world-map landmark sprite for Union of Kingdoms. Primary request: Stone masons' guild workshop with a broad rounded slate-blue tiled roof, warm ivory walls and an open working porch. Several chunky pale gray carved stone blocks, one large mallet and a stone carving on a stand beside the entrance. Broad low civilian building, quarry commune identity. Style: extremely simple flat 2D chibi cartoon fantasy mobile RPG illustration, large soft slightly exaggerated forms, bold readable silhouette, thick dark espresso-brown outlines, two broad cel-shaded light values, flat calm colors, no textures, no glossy or photorealistic material, no 3D render. High angle three-quarter view, centered single complete landmark, full building entirely visible with generous transparent margin, square composition. A small soft irregular tan earth patch under the building only. Strong recognizable shape at tiny map size. Genuinely transparent background. No castle, no fortress, no fortifications, no towers, no battlements, no crenellations, no perimeter wall, no guardhouse, no weapons, no soldiers, no people, no text, no letters, no numbers, no UI, no border, no watermark.",
+      "source": "C:\\Users\\svenm\\.codex\\generated_images\\01a10cd9-3554-7121-8d9f-0b32cc165b64\\exec-d72a99f6-fe28-44e7-b7b3-3402d25be145.png",
+      "file": "commune-stone.webp",
+      "localSource": "source/commune-stone.png",
+      "sourceSha256": "f9644729563025c036417eeecaaf787b1e24816541b67069202853b420c51b88",
+      "sourceDimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "output": {
+        "width": 512,
+        "height": 512,
+        "bytes": 48816,
+        "hasAlpha": true,
+        "transparentPixels": 127296
+      }
+    },
+    {
+      "key": "gold",
+      "prompt": "Use case: stylized-concept. Asset type: single transparent world-map landmark sprite for Union of Kingdoms. Primary request: Trade guild and exchange market hall with a broad rounded ochre-gold tiled roof, warm ivory walls and open merchant porch. One large simple brass balance scale and two oversized round gold coin motifs beside the entrance. Broad low civilian building, prosperous gold commune identity. Style: extremely simple flat 2D chibi cartoon fantasy mobile RPG illustration, large soft slightly exaggerated forms, bold readable silhouette, thick dark espresso-brown outlines, two broad cel-shaded light values, flat calm colors, no textures, no glossy or photorealistic material, no 3D render. High angle three-quarter view, centered single complete landmark, full building entirely visible with generous transparent margin, square composition. A small soft irregular tan earth patch under the building only. Strong recognizable shape at tiny map size. Genuinely transparent background. No castle, no fortress, no fortifications, no towers, no battlements, no crenellations, no perimeter wall, no guardhouse, no weapons, no soldiers, no people, no text, no letters, no numbers, no UI, no border, no watermark.",
+      "source": "C:\\Users\\svenm\\.codex\\generated_images\\01a10cd9-3554-7121-8d9f-0b32cc165b64\\exec-4c6e1dc3-ae67-4e61-8a88-82e5a3e323e3.png",
+      "file": "commune-gold.webp",
+      "localSource": "source/commune-gold.png",
+      "sourceSha256": "d35bfec97cd19ef07936c563e88186b806eedec995862314cbdd580ef343741b",
+      "sourceDimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "output": {
+        "width": 512,
+        "height": 512,
+        "bytes": 48228,
+        "hasAlpha": true,
+        "transparentPixels": 147619
+      }
+    },
+    {
+      "key": "abbey",
+      "prompt": "Use case: stylized-concept. Asset type: single transparent world-map landmark sprite for Union of Kingdoms. Primary request: Peaceful scholarly abbey library with a broad rounded rich purple tiled roof, warm ivory walls and a low open arched porch surrounding a tiny open garden with a flowering bush. An oversized open book on a low pedestal near the entrance. A single broad low civilian building, absolutely no tower or bell tower, learning commune identity. Style: extremely simple flat 2D chibi cartoon fantasy mobile RPG illustration, large soft slightly exaggerated forms, bold readable silhouette, thick dark espresso-brown outlines, two broad cel-shaded light values, flat calm colors, no textures, no glossy or photorealistic material, no 3D render. High angle three-quarter view, centered single complete landmark, full building entirely visible with generous transparent margin, square composition. A small soft irregular tan earth patch under the building only. Strong recognizable shape at tiny map size. Genuinely transparent background. No castle, no fortress, no fortifications, no towers, no battlements, no crenellations, no perimeter wall, no guardhouse, no weapons, no soldiers, no people, no text, no letters, no numbers, no UI, no border, no watermark.",
+      "source": "C:\\Users\\svenm\\.codex\\generated_images\\01a10cd9-3554-7121-8d9f-0b32cc165b64\\exec-95fc8677-451b-4c97-ae6a-16a1270fd6c3.png",
+      "file": "commune-abbey.webp",
+      "localSource": "source/commune-abbey.png",
+      "sourceSha256": "7bee752f5621f32baa9c409d0384afd8f3a47d2e0e6a2628a834594478c782d6",
+      "sourceDimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "output": {
+        "width": 512,
+        "height": 512,
+        "bytes": 49614,
+        "hasAlpha": true,
+        "transparentPixels": 139994
+      }
+    },
+    {
+      "key": "rune",
+      "prompt": "Use case: stylized-concept. Asset type: single transparent world-map landmark sprite for Union of Kingdoms. Primary request: Open scholarly rune pavilion with a broad rounded teal tiled roof supported by four chunky warm ivory columns. In front stands a simple circular arrangement of three short rounded rune stones surrounding a large softly luminous cyan rune crystal on a low plinth. Open-air, low friendly civil monument, arcane commune identity. Style: extremely simple flat 2D chibi cartoon fantasy mobile RPG illustration, large soft slightly exaggerated forms, bold readable silhouette, thick dark espresso-brown outlines, two broad cel-shaded light values, flat calm colors, no textures, no glossy or photorealistic material, no 3D render. High angle three-quarter view, centered single complete landmark, full building entirely visible with generous transparent margin, square composition. A small soft irregular tan earth patch under the building only. Strong recognizable shape at tiny map size. Genuinely transparent background. No castle, no fortress, no fortifications, no towers, no battlements, no crenellations, no perimeter wall, no guardhouse, no weapons, no soldiers, no people, no text, no letters, no numbers, no UI, no border, no watermark.",
+      "source": "C:\\Users\\svenm\\.codex\\generated_images\\01a10cd9-3554-7121-8d9f-0b32cc165b64\\exec-8e3bb66e-c532-45b0-a0e4-813f45a9551d.png",
+      "file": "commune-rune.webp",
+      "localSource": "source/commune-rune.png",
+      "sourceSha256": "7e294e3c618ec83eda02a360b194acf506094154c4f0555a9dc56e42f77ab3e3",
+      "sourceDimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "output": {
+        "width": 512,
+        "height": 512,
+        "bytes": 50114,
+        "hasAlpha": true,
+        "transparentPixels": 135796
+      }
+    }
+  ]
+}

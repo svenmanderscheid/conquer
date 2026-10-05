@@ -258,18 +258,19 @@ window.ConquerWorld = (() => {
     const id=own?mine:number(target.data.alliance_id),tag=own?context.alliance?.tag:target.data.alliance_tag;
     const relation=own?'own':id>0&&mine>0&&id===mine?'ally':id>0?'other':'none';
     const status=editorial(own?'Deine Burg':relation==='ally'?'Deine Allianz':relation==='other'?'Andere Allianz':'Ohne Allianz');
-    return {relation,text:id>0?`${tag?'['+tag+']':editorial('Allianz')} · ${status}`:own?editorial('Deine Burg · Ohne Allianz'):status};
+    return {relation,tag:id>0&&tag?String(tag):'',text:id>0?`${tag?'['+tag+']':editorial('Allianz')} · ${status}`:own?editorial('Deine Burg · Ohne Allianz'):status};
   }
+  const cityNameMarkup = (target,membership) => `${membership.tag?`<span class="atlas-city-alliance-tag" data-relation="${membership.relation}">[${escape(membership.tag)}]</span> `:''}${escape(target.name)}`;
   function targetsFromState(state) {
     const city=state.city;
-    const targets=[{key:'home',kind:'home',id:city.id,x:number(city.coord_x),y:number(city.coord_y),name:city.name&&!/^(Deine Stadt|.*['’]s City)$/.test(city.name)?city.name:state.player?.name||'Deine Stadt',level:number(city.castle_level)||1,art:castleArt(city.city_skin),data:city}];
+    const targets=[{key:'home',kind:'home',id:city.id,x:number(city.coord_x),y:number(city.coord_y),name:state.player?.name||city.name||'Deine Stadt',level:number(city.castle_level)||1,art:castleArt(city.city_skin),data:city}];
     for(const m of state.monsters||[])if(['solo','rally'].includes(m.definition?.type)){const sourceArt=context.monsterArt(m),artKey=monsterVisualKey(m);targets.push({key:`monsters:${m.id}`,kind:'monsters',id:m.id,x:number(m.coord_x),y:number(m.coord_y),name:monsterName(m)+(m.definition?.type==='rally'?' · Rally':''),level:number(m.definition?.level)||1,art:`${context.base}/assets/art/${sourceArt}.png`,artKey,data:m});}
     for(const n of state.nodes||[]){const r=resources[n.object_type]||resources[1];targets.push({key:`nodes:${n.id}`,kind:'nodes',id:n.id,x:number(n.coord_x),y:number(n.coord_y),name:r.name,level:number(n.level)||1,art:asset(r.art),resource:r,data:n});}
     for(const charm of state.charms||[]){const x=number(charm.x??charm.coord_x),y=number(charm.y??charm.coord_y);targets.push({key:`charms:${charm.id}`,kind:'charms',id:Number(charm.id),x,y,name:charmName(charm),level:{normal:1,epic:2,legendary:3}[charm.grade]||1,art:`${context.base}/assets/art/map/runes-v1/${['normal','epic','legendary'].includes(charm.grade)?charm.grade:'normal'}.webp`,data:{...charm,coord_x:x,coord_y:y}});}
     for(const p of state.players||[])targets.push({key:`players:${p.id}`,kind:'players',id:p.id,x:number(p.coord_x),y:number(p.coord_y),name:p.display_name||p.username||'Siedlung',level:number(p.castle_level)||1,art:castleArt(p.city_skin),data:p});
     for(const p of state.neutral_villages||[])targets.push({key:`neutral_villages:${p.id}`,kind:'neutral_villages',id:p.id,x:number(p.coord_x),y:number(p.coord_y),name:p.name||'Freies Dorf',level:number(p.level)||1,art:`${context.base}/assets/art/map/castle-default.png`,data:p});
-    if(!isLux()&&state.congress){const g=state.congress;targets.push({key:"congress",kind:"congress",id:g.id,x:number(g.coord_x),y:number(g.coord_y),name:g.name||"Kongress",level:1,art:`${context.base}/assets/art/map/congress.${motionPreference.matches||document.body.classList.contains("reduced-motion")?"png":"webp"}?v=zones1`,data:g});}
-    for(const g of (isLux()?[]:state.shrines)||[]){const element=shrineElement(g);if(!shrineElements[element]||!Number.isFinite(Number(g.coord_x))||!Number.isFinite(Number(g.coord_y)))continue;targets.push({key:`shrine:${g.id}`,kind:'shrine',id:g.id,element,x:number(g.coord_x),y:number(g.coord_y),name:g.name||`${shrineElements[element].label}schrein`,art:`${context.base}/assets/art/map/shrine-${element}.${motionPreference.matches||document.body.classList.contains('reduced-motion')?'png':'webp'}?v=shrines1`,data:g});}
+    if(!isLux()&&state.congress){const g=state.congress;targets.push({key:"congress",kind:"congress",id:g.id,x:number(g.coord_x),y:number(g.coord_y),name:g.name||"Kongress",level:1,art:`${context.base}/assets/art/territory-v3/congress-forum.webp`,data:g});}
+    for(const g of (isLux()?[]:state.shrines)||[]){const element=shrineElement(g);if(!shrineElements[element]||!Number.isFinite(Number(g.coord_x))||!Number.isFinite(Number(g.coord_y)))continue;targets.push({key:`shrine:${g.id}`,kind:'shrine',id:g.id,element,x:number(g.coord_x),y:number(g.coord_y),name:g.name||`${shrineElements[element].label}schrein`,art:`${context.base}/assets/art/map/painted-v2/shrine-${element}.${motionPreference.matches||document.body.classList.contains('reduced-motion')?'png':'webp'}?v=shrines1`,data:g});}
     for(const g of state.alliance_structures||[]){const kind=g.structure_type==='center'?'alliance_center':'outpost';targets.push({key:`${kind}:${g.id}`,kind,id:g.id,x:number(g.coord_x),y:number(g.coord_y),name:g.name||(`${g.alliance_tag?'['+g.alliance_tag+'] ':''}${kind==='alliance_center'?'Allianzzentrum':'Außenposten'}`),level:1,art:asset(kind==='alliance_center'?'alliance-center-v3.webp':'alliance-outpost'),data:g});}
     for(const g of state.territory?.map_targets||state.territory?.targets||[]){targets.push({key:`territory:${g.id}`,kind:'territory',id:g.id,x:number(g.x??g.coord_x),y:number(g.y??g.coord_y),name:g.name,level:1,art:window.ConquerTerritoryArt.image(context.base,g),artKey:window.ConquerTerritoryArt.key(g),data:g});}
     for(const target of targets){const [x,y]=targetCenter(target);target.biome=window.ConquerLandscape.biomeAt(x,y);}
@@ -525,12 +526,10 @@ window.ConquerWorld = (() => {
       }
       const allianceBuilding=['alliance_center','outpost'].includes(target.kind),levelNode=button.querySelector('.atlas-marker-level');levelNode.textContent=target.kind==='territory'?(target.data.owner_name||'NPC-Besatzung'):target.kind==='shrine'?shrineStatus(target):target.kind==='congress'?(target.data.alliance_tag?'['+target.data.alliance_tag+']':'Neutral'):['home','players'].includes(target.kind)?String(target.level):target.kind==='charms'?'':allianceBuilding?'':`Lv. ${target.level}`;levelNode.hidden=allianceBuilding;levelNode.toggleAttribute('aria-hidden',target.kind==='charms'||allianceBuilding);
       const nameNode=button.querySelector('.atlas-marker-name');
-      if(target.kind==='territory')button.setAttribute('translate','no');else button.removeAttribute('translate');
+      if(target.kind==='territory'){button.setAttribute('translate','no');button.dataset.territoryKind=target.data.kind;}else {button.removeAttribute('translate');delete button.dataset.territoryKind;}
       if(['home','players'].includes(target.kind)){
         nameNode.replaceChildren(levelNode);
-        const label=document.createElement('span');label.className='name-frame-label';label.textContent=target.name;label.setAttribute('data-user-content','');nameNode.append(label);
-        const membership=cityAlliance(target),badge=document.createElement('span');
-        badge.className='atlas-city-alliance';badge.dataset.relation=membership.relation;badge.textContent=membership.text;badge.title=membership.text;nameNode.append(badge);
+        const membership=cityAlliance(target),label=document.createElement('span');label.className='name-frame-label';label.innerHTML=cityNameMarkup(target,membership);label.title=`${membership.tag?'['+membership.tag+'] ':''}${target.name}`;label.setAttribute('data-user-content','');nameNode.append(label);
         button.dataset.allianceRelation=membership.relation;
       }else if(allianceBuilding){
         const label=document.createElement('strong'),meta=document.createElement('small');label.className='alliance-marker-name-text';label.setAttribute('data-user-content','');label.textContent=target.data.alliance_name||target.name;meta.textContent=`[${target.data.alliance_tag||'ALL'}] · Radius ${format(target.data.radius)}`;nameNode.replaceChildren(label,meta);
@@ -622,8 +621,8 @@ window.ConquerWorld = (() => {
         : `<small>Lv. ${target.level} · X ${target.x} · Y ${target.y}</small>`;
       const close=target.kind==='charms'?'':`<button data-atlas="clear" aria-label="Zielmenü schließen">${icon('close')}</button>`;
       const membership=['home','players'].includes(target.kind)?cityAlliance(target):null;
-      const alliance=membership?`<span class="atlas-city-alliance" data-user-content data-relation="${membership.relation}">${escape(membership.text)}</span>`:'';
-      return `<div class="atlas-village-banner"><strong${['territory','home','players','alliance_center'].includes(target.kind)?' data-user-content':''}>${escape(target.name)}</strong>${summary}${alliance}${close}</div><div class="atlas-actions-buttons">${actions}</div>`;
+      const name=membership?cityNameMarkup(target,membership):escape(target.name);
+      return `<div class="atlas-village-banner"><strong${['territory','home','players','alliance_center'].includes(target.kind)?' data-user-content':''}>${name}</strong>${summary}${close}</div><div class="atlas-actions-buttons">${actions}</div>`;
     }
     return `<div class="atlas-actions-heading"><span${['territory','home','players','alliance_center'].includes(target.kind)?' data-user-content':''}>${escape(target.name)} · ${target.x}, ${target.y}</span><button data-atlas="clear" aria-label="Zielmenü schließen">${icon('close')}</button></div>${target.kind==='shrine'?`<small class="atlas-actions-status" title="${escape(shrineStatus(target,true))}">${escape(shrineStatus(target))}</small>`:''}<div class="atlas-actions-buttons">${actions}</div>`;
   }

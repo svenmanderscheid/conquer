@@ -150,7 +150,7 @@ $base = htmlspecialchars(APP_BASE, ENT_QUOTES);
 <script src="<?= $base ?>/assets/js/monster-report.js?v=<?= filemtime(__DIR__ . '/../assets/js/monster-report.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/rally-panel.js?v=<?= filemtime(__DIR__ . '/../assets/js/rally-panel.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/village-menu.js?v=<?= filemtime(__DIR__ . '/../assets/js/village-menu.js') ?>" defer></script>
-<script src="<?= $base ?>/assets/js/congress-panel.js?v=shrines1" defer></script>
+<script src="<?= $base ?>/assets/js/congress-panel.js?v=<?= filemtime(__DIR__ . '/../assets/js/congress-panel.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/mailbox-panel.js?v=<?= filemtime(ROOT_DIR.'/assets/js/mailbox-panel.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/scout-report.js?v=<?= filemtime(ROOT_DIR.'/assets/js/scout-report.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/territory-panel.js?v=<?= filemtime(ROOT_DIR.'/assets/js/territory-panel.js') ?>" defer></script>

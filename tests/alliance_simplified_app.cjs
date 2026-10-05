@@ -110,7 +110,7 @@ async function freePort(){const server=net.createServer();await new Promise(reso
   await page.evaluate(()=>{window.allianceTestClock=Date.now;Date.now=()=>window.allianceTestClock()+16000;});
   await tab('manage').click();await tab('overview').click();
   await page.waitForFunction(()=>document.querySelector('.alliance-home-goal-copy')?.textContent.includes('has not chosen a goal'));
-  assert((await page.locator('[data-alliance-goal]>img').getAttribute('src')).endsWith('/territory-v2/canton-fortress.webp'),'Clearing the goal also removes the old target illustration');
+  assert((await page.locator('[data-alliance-goal]>img').getAttribute('src')).endsWith('/territory-v3/canton-shrine.webp'),'Clearing the goal also removes the old target illustration');
   await page.evaluate(()=>{Date.now=window.allianceTestClock;delete window.allianceTestClock;});await page.unroute(base+'/api/territory/state?world_id=1');
   checks.push({goalCleared:true,targetIllustrationReset:true});
   assert.deepEqual(writes,[],'Opening alliance/territory screens must never issue gameplay actions');assert.deepEqual(errors,[]);assert.deepEqual(badResponses,[]);assert.deepEqual(touchIssues,[],'Every main action remains touch-sized and reachable');

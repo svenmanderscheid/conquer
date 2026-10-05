@@ -38,8 +38,8 @@ const server=http.createServer(async(req,res)=>{
   assert.equal(await page.locator('[data-kind="territory"]').count(),113,'all live landmarks rendered from server state');
   await page.waitForFunction(()=>[...document.querySelectorAll('[data-kind="territory"] img')].every(img=>img.complete&&img.naturalWidth>0));
   const artSources=await page.locator('[data-kind="territory"] img').evaluateAll(imgs=>[...new Set(imgs.map(img=>img.getAttribute('src')))]);
-  assert.equal(artSources.length,8,'six commune benefits, a canton fortress and the crown have distinct art');
-  assert(artSources.every(src=>src.startsWith('/assets/art/territory-v2/')),'map uses the shared painted territory set');
+  assert.equal(artSources.length,8,'six commune benefits, a canton shrine and the Congress forum have distinct art');
+  assert(artSources.every(src=>src.startsWith('/assets/art/territory-v3/')),'map uses the shared painted territory set');
   await page.evaluate(()=>ConquerWorld.focus(700,1030));assert.deepEqual(await page.evaluate(()=>({x:ConquerWorld.getCenter().x,y:ConquerWorld.getCenter().y})),{x:700,y:1030});
   await page.locator('[data-atlas="navigation"]').click();assert.equal(await page.locator('.atlas-jump [name="x"]').getAttribute('max'),'767');assert.equal(await page.locator('.atlas-jump [name="y"]').getAttribute('max'),'1099');assert.equal(await page.locator('.atlas-zone-jumps').first().getByText('Kongress').count(),0);
   await page.locator('#atlas-navigation-panel [data-atlas="clear"]').click();await page.locator('#launch').click();await page.waitForSelector('.territory-overview');assert.equal(await page.locator('.territory-route-step').count(),3,'Overview starts with three clear conquest steps');await page.locator('[data-action=territory-tab][data-id=territories]').click();await page.waitForSelector('.territory-row');assert.equal(await page.locator('.territory-row').count(),113,'All objectives remain available as compact rows');

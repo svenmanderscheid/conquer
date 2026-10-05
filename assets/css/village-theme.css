@@ -303,6 +303,23 @@ body.mobile-game .map-overlay-shell .atlas-marker--territory>img {
   transform:translateX(-50%)!important;
   filter:drop-shadow(0 5px 3px #44354938);
 }
+/* Civic and sacred landmarks have a calm, permanent frame above the map. */
+body.mobile-game .map-overlay-shell :is(.atlas-marker--territory,.atlas-marker--shrine,.atlas-marker--congress)>.atlas-marker-name {
+  opacity:1; padding:5px 12px; max-width:min(220px,72vw);
+  border:2px solid var(--ui-gold); border-radius:12px;
+  background:var(--ui-primary-dark); color:var(--ui-card-light);
+  font:700 14px/1.1 var(--ui-font); text-shadow:none;
+  box-shadow:inset 0 1px var(--ui-primary-light),0 3px 5px #44354938;
+}
+body.mobile-game .map-overlay-shell .atlas-marker--territory>.atlas-marker-ground {
+  border:1px solid color-mix(in srgb,var(--ui-gold) 70%,transparent);
+  border-radius:50%!important;
+  background:radial-gradient(ellipse,color-mix(in srgb,var(--ui-gold-soft) 50%,transparent),transparent 72%);
+  pointer-events:none;
+}
+body.mobile-game .map-overlay-shell .atlas-marker--territory:is([data-territory-kind=canton],[data-territory-kind=crown])>img {
+  filter:drop-shadow(0 5px 3px #44354938) drop-shadow(0 0 5px var(--ui-gold-soft));
+}
 /* Alliance landmarks occupy several tiles. Keep their illustrated silhouette
    readable even when the atlas base stylesheet is loaded after world-map.css. */
 body.mobile-game .map-overlay-shell .atlas-marker--alliance_center>img {
@@ -3906,20 +3923,22 @@ body.mobile-game #game-dialog .territory-defend:not(:disabled){background:var(--
  body.mobile-game #game-dialog .territory-heading>button{font-size:.875rem;padding-inline:8px}
 }
 
-/* Membership is independent of the player's decorative castle/name-frame skin. */
-.map-overlay-shell :is(.atlas-marker--home,.atlas-marker--players) .atlas-marker-name { overflow:visible; }
-.map-overlay-shell .atlas-city-alliance {
- display:block;width:max-content;max-width:176px;padding:3px 8px;
- border:1px solid var(--ui-line);border-radius:8px;
- background:var(--ui-card);color:var(--ui-muted);
- font:600 12px/1.25 var(--ui-font);text-shadow:none;text-transform:none;letter-spacing:0;
- white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none;
- box-shadow:0 2px 0 color-mix(in srgb,var(--ui-ink),transparent 80%);
+/* Landmark details use the shared warm surfaces beneath the illustration. */
+body.mobile-game #game-dialog .congress-stats>div { background:var(--ui-card);border-color:var(--ui-line);border-radius:12px; }
+body.mobile-game #game-dialog .congress-stats small { color:var(--ui-muted)!important; }
+body.mobile-game #game-dialog :is(.congress-stats strong,.congress-rules>strong) { color:var(--ui-ink)!important; }
+body.mobile-game #game-dialog .congress-rules { background:var(--ui-inset);color:var(--ui-ink);border-left-color:var(--ui-gold);border-radius:10px; }
+body.mobile-game #game-dialog .congress-rules .shrine-event-time { color:var(--ui-primary-dark)!important; }
+body.mobile-game #game-dialog .shrine-panel .shrine-event-badge { background:var(--ui-inset);color:var(--ui-ink)!important;border-color:var(--ui-line); }
+body.mobile-game #game-dialog .shrine-panel .shrine-event-badge.is-active { background:var(--ui-green-soft);color:var(--ui-green-dark)!important;border-color:var(--ui-green); }
+/* Keep desktop landmark artwork inside the space left above rules and actions. */
+@media(min-width:601px) and (min-height:541px) {
+ body.mobile-game #game-dialog .congress-hero img { max-height:min(280px,100%); }
 }
-.map-overlay-shell .atlas-marker-name>.atlas-city-alliance { position:absolute;top:calc(100% - 3px);left:50%;transform:translateX(-50%); }
-.map-overlay-shell .atlas-city-alliance[data-relation="ally"] { background:var(--ui-blue-dark);border-color:var(--ui-blue-light);color:var(--ui-card-light); }
-.map-overlay-shell .atlas-city-alliance[data-relation="own"] { background:var(--ui-gold-soft);border-color:var(--ui-gold);color:var(--ui-ink); }
-.map-overlay-shell .atlas-village-banner>.atlas-city-alliance { position:static;margin:4px auto 0;max-width:100%; }
+
+/* Alliance tags share the player's single name row; allied tags retain their role colour. */
+.map-overlay-shell .atlas-city-alliance-tag { color:inherit; }
+.map-overlay-shell .atlas-city-alliance-tag[data-relation="ally"] { color:var(--ui-blue-dark); }
 
 /* Luxembourg atlas: a labelled, independently zoomable map and stable canton list. */
 body.world-mode:has(#atlas-navigation-panel.has-canton-overview:not([hidden])) :is(.topbar,.hud-edge-tools,#navigation,#world-chat,.world-chat-shell,.hud-menu-button,.hud-objective,.map-overlay-search-toggle,.map-overlay-coordinate-toggle) { visibility:hidden!important;pointer-events:none!important; }

@@ -76,8 +76,8 @@ window.ConquerPanels = function(ctx) {
             if(Number(S()?.city?.world_id)!==world||Number(K()?.alliance?.id)!==alliance||Number(K()?.profile?.id)!==player)return;
             const card=host()?.querySelector('[data-alliance-goal]');if(!card)return;
             const target=entry?.data?.targets?.find(t=>t.id===entry.data.goal?.target_id),copy=card.querySelector('.alliance-home-goal-copy');
-            if(target){copy.innerHTML=`<small>${esc(allianceText('shared_goal'))}</small><b translate="no">${esc(target.name)}</b><small>${esc(allianceText('goal_coordinates',{x:fmt(target.x),y:fmt(target.y)}))}</small>`;card.querySelector('img').src=window.ConquerTerritoryArt?.image(base,target)||base+'/assets/art/territory-v2/canton-fortress.webp';}
-            else {copy.innerHTML=`<small>${esc(allianceText(entry?.failed||!entry?.data?'territory_hint':'no_shared_goal'))}</small>`;card.querySelector('img').src=base+'/assets/art/territory-v2/canton-fortress.webp';}
+            if(target){copy.innerHTML=`<small>${esc(allianceText('shared_goal'))}</small><b translate="no">${esc(target.name)}</b><small>${esc(allianceText('goal_coordinates',{x:fmt(target.x),y:fmt(target.y)}))}</small>`;card.querySelector('img').src=window.ConquerTerritoryArt?.image(base,target)||base+'/assets/art/territory-v3/canton-shrine.webp';}
+            else {copy.innerHTML=`<small>${esc(allianceText(entry?.failed||!entry?.data?'territory_hint':'no_shared_goal'))}</small>`;card.querySelector('img').src=base+'/assets/art/territory-v3/canton-shrine.webp';}
         };
         if(cached){draw(cached);if(cached.pending||Date.now()-cached.loaded<15000)return;}
         const entry={...cached,pending:true};allianceGoalCache.set(key,entry);
@@ -106,12 +106,12 @@ window.ConquerPanels = function(ctx) {
         const description=a.description||allianceText('description_empty'),territories=S().world?.map_profile?.key==='luxembourg';
         const language=String(a.recruitment_language||'').trim();
         const languageName=window.ConquerLocale.supported?.[language]||language;
-        const sharedGoal=territories?`<button type="button" class="alliance-home-goal" data-action="territory-open" data-id="goal" data-alliance-goal><img src="${base}/assets/art/territory-v2/canton-fortress.webp" alt=""><span class="alliance-home-goal-copy"><small>${esc(allianceText('territory_hint'))}</small></span><span class="alliance-home-arrow" aria-hidden="true">›</span></button>`:'';
+        const sharedGoal=territories?`<button type="button" class="alliance-home-goal" data-action="territory-open" data-id="goal" data-alliance-goal><img src="${base}/assets/art/territory-v3/canton-shrine.webp" alt=""><span class="alliance-home-goal-copy"><small>${esc(allianceText('territory_hint'))}</small></span><span class="alliance-home-arrow" aria-hidden="true">›</span></button>`:'';
         const profile=`<section class="alliance-home-profile"><img class="alliance-home-emblem" src="${base}/assets/art/menu-icons/alliance.png" alt=""><h2 data-user-content>[${esc(a.tag)}] ${esc(a.name)}</h2><dl class="alliance-home-stats"><div><dt>${esc(allianceText('leader'))}</dt><dd${leaderMember?' data-user-content':''}>${leaderMember?esc(leaderMember.display_name):esc(allianceText('leadership'))}</dd></div><div><dt>${esc(allianceText('power'))}</dt><dd>${fmt(alliancePower)}</dd></div><div><dt>${esc(allianceText('members'))}</dt><dd>${fmt(a.member_count)} / ${fmt(a.max_members)}</dd></div>${language?`<div><dt>${esc(window.ConquerLocale.t('locale.label'))}</dt><dd translate="no">${esc(languageName)}</dd></div>`:''}</dl><div class="alliance-home-rank">${rankLabel(a.role)}</div></section>`;
         const notice=`<section class="alliance-home-notice"><header><strong>${esc(allianceText('description'))}</strong>${leader?button(esc(allianceText('edit')),'alliance-edit-dialog','','alliance-home-edit secondary'):''}</header><p class="alliance-full-description"${a.description?' data-user-content':''}>${esc(description)}</p></section>`;
         const destinations=homeLink('menu-icons/expeditions.png','rallies','','rally-list')
             +homeLink('items/chest-gold.svg','treasury','','panel-tab','treasury','data-group="alliance"')
-            +(territories?homeLink('territory-v2/canton-fortress.webp','territory','','territory-open','goal'):homeLink('buildings/hall_of_alliance-city-v2.png','buildings','','community-open','buildings'))
+            +(territories?homeLink('territory-v3/canton-shrine.webp','territory','','territory-open','goal'):homeLink('buildings/hall_of_alliance-city-v2.png','buildings','','community-open','buildings'))
             +homeLink('menu-icons/army.png','expeditions','','tab','expeditions')
             +homeLink('menu-icons/market.png','market','','tab','market')
             +homeLink('menu-icons/research.png','research','','community-open','research')

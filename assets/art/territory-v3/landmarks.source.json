@@ -1,0 +1,55 @@
+{
+  "generated": "2026-10-05",
+  "mode": "built-in image_gen; approved artwork reuse",
+  "processing": "Proportional resize with transparent padding to exactly 512x512; WebP quality 86 effort 6. No repainting or procedural drawing.",
+  "entries": [
+    {
+      "file": "congress-forum.webp",
+      "localSource": "source/congress-forum.png",
+      "prompt": "Use case: stylized-concept. Asset type: transparent game world-map landmark sprite for Union of Kingdoms. Primary request: Create a distinctive CONGRESS council meeting place that is absolutely not a castle or palace. A grand open circular council forum on a low round warm ivory stone terrace, six chunky empty council seats arranged around one very large round deliberation table, a turquoise and gold compass-star mosaic in the center, a tall sculptural gold laurel wreath and floating teal crystal at rear as the iconic central silhouette. Low broad ivory steps in front and two short curved open colonnade sections at rear, small violet fabric banners. Entirely open to sky: no roof, no dome, no turrets, no towers, no battlements, no crenellations, no fortress or defensive walls. Clear monumental civic silhouette readable at 150px, visually very different from a medieval blue roof castle. Style: flat 2D hand drawn chibi fantasy mobile strategy game, soft chunky overdrawn shapes, thick dark espresso outlines, simplified two-tone cel shading, matte warm ivory stone, muted teal and violet with restrained gold. High angle three quarter isometric view, centered complete single isolated landmark, 90 percent of square canvas with 5 percent clear margin, transparent background and genuine alpha. No characters, no labels, no letters, no interface, no separate icons, no ground landscape, no photorealism, no 3D gloss. Strong clean perimeter silhouette and flat calm surfaces.",
+      "uses": [
+        "Luxembourg crown target",
+        "classical Congress",
+        "target dialog",
+        "Congress march preview"
+      ],
+      "sourceSha256": "706a833b5c3ab7b4aa093b0419c866e57bdd612de5aad55d2d11f77ac8e701f3",
+      "output": {
+        "width": 512,
+        "height": 512,
+        "hasAlpha": true,
+        "bytes": 94670,
+        "cornerAlpha": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "sha256": "58d633feb32eb05c4b70b0779eadaa04d036af177f191281c4ce9627e33bf5a5"
+      }
+    },
+    {
+      "file": "canton-shrine.webp",
+      "existingSource": "../map/painted-v2/shrine-forest.png",
+      "uses": [
+        "Luxembourg canton shrine",
+        "territory dialog",
+        "alliance territory shortcut"
+      ],
+      "sourceSha256": "c9b4afa21ef7f1054a7a6f5485b960137228312441c2f516f9c83a7590b1297d",
+      "output": {
+        "width": 512,
+        "height": 512,
+        "hasAlpha": true,
+        "bytes": 50624,
+        "cornerAlpha": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "sha256": "49b2bc0a7886e4c1c5a30b4c1ab884e52434bb800179492a412b5580010e761e"
+      }
+    }
+  ]
+}

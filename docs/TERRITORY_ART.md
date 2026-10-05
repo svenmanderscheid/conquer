@@ -1,5 +1,19 @@
 # Eroberungsmotive für die Luxemburg-Welt
 
+## Aktive Reihe vom 5. Oktober 2026
+
+Auf Nutzerwunsch erhalten Shrines, Communes und Congress deutlich unterscheidbare Motive ohne Burg. Die aktive Zuordnung liegt in `assets/js/territory-art.js` und verwendet `assets/art/territory-v3/`:
+
+- `commune-food`, `commune-lumber`, `commune-stone`, `commune-gold`, `commune-abbey`, `commune-rune`: sechs zivile Markt-, Handwerks- und Versammlungsgebäude ohne Wehrtürme oder Zinnen; die bisherigen Vorteilsmerkmale bleiben erkennbar.
+- `canton-shrine`: wiederverwendeter freigegebener Waldschrein aus `map/painted-v2/shrine-forest.png`, mit heiligem Baum und Steinkreis.
+- `congress-forum`: neuer offener Ratsplatz mit Rundtisch, Sitzen, Lorbeer und Kristall. Auch Congress in klassischen Welten, sein Dialog und seine Marschvorschau verwenden dieses Motiv.
+
+Neue Illustrationen wurden mit dem eingebauten Imagegen-Werkzeug erzeugt; Originale und Herkunft liegen neben den WebP-Dateien. Alle Laufzeitbilder sind transparente 512 × 512 px WebP-Dateien. Die Aufbereitung verkleinert und komprimiert nur. Weltkarte, Gebietsfenster und Allianz-Zielvorschauen verwenden dieselben Zuordnungen. Dunkelviolette Namensschilder mit Goldkante machen Sonderorte zusätzlich erkennbar; Spielnamen, Besitzer, Grundflächen und Regeln bleiben unverändert. Die vorherigen Reihen werden aufbewahrt.
+
+Prüfung: `tests/territory_frontend.cjs` besteht in fünf Bildschirmgrößen, `tests/world_shrines.cjs` in vier Größen einschließlich System-/Spiel-Einstellung für reduzierte Bewegung. Die echte Haupt-App wurde mit einer isolierten Luxemburg-Testwelt bei 1280 × 800, 390 × 844 und 844 × 390 geprüft: alle acht Motive in Karte und Dialog, Stadtansicht und Gebäudeaktionen, keine fehlenden Bilder oder JavaScript-Fehler. Aufnahmen und Prüfprotokoll: `output/playwright/landmarks/`. Spielernamen wurden mit `tests/map_alliance_labels_app.cjs` in fünf Größen und bei wechselnden Mitgliedschaften geprüft. Physische Mobilgeräte wurden in dieser Änderung nicht getestet.
+
+## Vorherige Reihe vom 30. September 2026
+
 Stand: 30. September 2026. Acht zusammengehörige Bilder für **Union of Kingdoms**, überarbeitet mit dem eingebauten Imagegen-Werkzeug. Die neue Reihe `territory-v2` verwendet jeweils das bisherige Motiv aus `territory-v1` als Bearbeitungsvorlage und `assets/art/village2.png` als verbindliche Stilreferenz. Kein CLI-Fallback.
 
 Auf Nutzerwunsch wirken die Gebäude mächtiger: breitere Hauptgebäude, stärkere Sockel, schwere Tore, Stützpfeiler und kräftigere Wehrmauern. Die regionale Festung besitzt größere Bastionen; das Royal Castle eine gestaffelte Burganlage. Dachfarben, Rohstoffsymbole, weiche Formen und dunkelbraune Konturen bewahren die Erkennbarkeit. Die bisherige Reihe bleibt für den direkten Vergleich erhalten.
