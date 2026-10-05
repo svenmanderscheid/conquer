@@ -32,6 +32,7 @@ const root=path.resolve(__dirname,'..'),output=path.join(root,'artifacts/crystal
   fs.mkdirSync(output,{recursive:true});
   for(const [width,height]of [[390,844],[568,320],[1280,800]]){
    await page.setViewportSize({width,height});await page.locator('.trading-scroll').evaluate(e=>e.scrollTop=0);
+   assert.equal(await page.locator('.trading-scroll').evaluate(e=>getComputedStyle(e).scrollbarWidth),'none');
    const last=page.locator('.trading-buy').last();await last.scrollIntoViewIfNeeded();assert(await last.evaluate(b=>{const r=b.getBoundingClientRect(),hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return b===hit||b.contains(hit);}));
    await page.locator('.trading-scroll').evaluate(e=>e.scrollTop=0);await page.screenshot({path:path.join(output,width+'x'+height+'-app.png')});
   }
