@@ -5219,6 +5219,47 @@ body.mobile-game #game-dialog .queue-speedup-option>.queue-speedup-copy { displa
 @media(max-width:380px) { body.mobile-game #game-dialog .queue-speedup-option>.queue-speedup-art { width:42px;height:42px; } }
 @media(min-width:500px) and (max-height:480px) and (orientation:landscape) { body.mobile-game #game-dialog .queue-speedup-option>.queue-speedup-art { width:38px;height:38px; } }
 
+/* Item families share a readable value strip; owned stock has its own prominent badge. */
+body.mobile-game :is(#panel-dialog,#game-dialog) .loot-tile.item-icon .loot-art { inset:8% 5% 23%!important; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .loot-tile.item-icon[data-value-lines="0"] .loot-art { inset:18% 8% 8%!important; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .loot-tile.item-icon .loot-value {
+  display:flex;align-items:center;justify-content:center;gap:3px;top:auto!important;bottom:5%!important;left:6%;right:6%;
+  height:auto!important;padding:3px 1px!important;border-radius:7px;
+  background:var(--ui-primary-dark)!important;color:var(--ui-card-light)!important;
+  font:700 clamp(11px,20cqw,24px)/1.1 var(--ui-font-number)!important;white-space:nowrap;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) .loot-tile.item-icon .loot-value:empty { display:none; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .loot-tile.item-icon:is([data-value-lines="2"],[data-item-category="resource_box"],[data-item-category="vip_point"],[data-item-category="fragment_pack"],[data-item-category="ap_refill"]) .loot-value {
+  font-size:clamp(9px,14cqw,17px)!important;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.loot-value,.speedup-stamp,.trading-item-stamp)>span+span:before { content:'·';margin-right:3px; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .loot-tile.item-icon .loot-count {
+  top:3px!important;bottom:auto!important;right:3px!important;padding:3px 5px;max-width:calc(100% - 6px);
+  border:2px solid var(--ui-gold);border-radius:8px;background:var(--ui-gold-soft)!important;color:var(--ui-primary-dark)!important;
+  box-shadow:0 2px 3px #44305245;text-shadow:none;font:800 clamp(11px,19cqw,20px)/1.1 var(--ui-font-number)!important;
+  font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) .loot-tile.item-icon.is-unowned .loot-count {
+  background:var(--ui-disabled)!important;border-color:var(--ui-line);color:var(--ui-muted)!important;box-shadow:none;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) .inventory-dialog .inventory-owned {
+  display:inline-block;margin-top:5px;padding:5px 9px;border:1px solid var(--ui-gold);border-radius:8px;
+  background:var(--ui-gold-soft);color:var(--ui-primary-dark)!important;font:700 15px/1.2 var(--ui-font-number);
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.reward-art,.trading-item-art).item-value-art { position:relative;container-type:inline-size;overflow:hidden; }
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.reward-art,.trading-item-art).item-value-art>img { position:absolute;inset:8% 8% 30%;width:84%;height:62%;object-fit:contain; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .item-value-art :is(.speedup-stamp,.trading-item-stamp) {
+  display:flex;justify-content:center;gap:3px;position:absolute;z-index:2;top:auto!important;bottom:5%!important;left:5%;right:5%;padding:2px 1px;
+  border-radius:6px;background:var(--ui-primary-dark)!important;color:var(--ui-card-light)!important;text-shadow:none;
+  font:700 clamp(9px,17cqw,20px)/1.1 var(--ui-font-number);white-space:nowrap;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) .item-value-art[data-value-lines="2"] :is(.speedup-stamp,.trading-item-stamp) { font-size:clamp(9px,13cqw,16px)!important; }
+
+body.mobile-game :is(#panel-dialog,#game-dialog) .trading-item-art.item-value-art .trading-item-count {
+  top:3px;bottom:auto;right:3px;padding:3px 5px;border:2px solid var(--ui-gold);border-radius:8px;
+  background:var(--ui-gold-soft)!important;color:var(--ui-primary-dark)!important;font:800 clamp(11px,16cqw,20px)/1.1 var(--ui-font-number);
+}
+
 /* Hide browser scrollbars without disabling wheel, touch or keyboard scrolling.
    Override legacy module styles and avoid reserving an empty scrollbar gutter. */
 :root, * {

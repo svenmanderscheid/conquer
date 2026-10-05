@@ -29,7 +29,8 @@ window.ConquerRewards = (() => {
         const grade=relic?relic.grade(item):item.rarity||item.grade;
         const rarity=Object.hasOwn(rarities,grade)?grade:'normal';
         const speedupTier=window.ConquerItemArt?.speedupTier(item)||null;
-        return {name,icon,quantity:Number(drop.quantity??drop.count??drop.amount)||0,kind:fragment?'Reliktfragmente':resource?'Rohstoffe':rarities[rarity],rarity,code,speedupTier,stamp:speedupTier?window.ConquerItemArt.speedupLabel(item):''};
+        const labels=!fragment&&!resource?(window.ConquerItemArt?.labels(item)||[]):[];
+        return {name,icon,quantity:Number(drop.quantity??drop.count??drop.amount)||0,kind:fragment?'Reliktfragmente':resource?'Rohstoffe':rarities[rarity],rarity,code,speedupTier,labels,stamp:labels.join(' · ')};
     }
     function create(ctx){
         const {getState,getKingdom,openDialog,esc,fmt}=ctx,dialog=document.querySelector('#game-dialog');
@@ -59,7 +60,7 @@ window.ConquerRewards = (() => {
             if(!drops.length){dialog.close();return;}
             const rewards=drops.map(drop=>resolve(drop,getKingdom(),ctx.base)).filter(r=>r.quantity>0);
             const chest=payload.action==='chest.free'||(getKingdom()?.inventory_catalog||[]).some(i=>Number(i.item_code)===Number(payload.item_code)&&i.category==='chest');
-            show(chest?'Schatztruhe geöffnet':'Deine Belohnung',`<section class="reward-result" aria-label="Erhaltene Belohnungen"><p class="reward-confirmed">✓ Deinem Reich gutgeschrieben</p><ul class="reward-list">${rewards.map(r=>`<li class="reward-item" data-reward-code="${r.code}" data-reward-quantity="${r.quantity}"><span class="reward-art grade-${r.rarity}"${r.speedupTier?` data-speedup-tier="${r.speedupTier}"`:''}>${r.icon?`<img src="${esc(r.icon)}" alt="">`:'<span aria-hidden="true">✦</span>'}${r.stamp?`<strong class="speedup-stamp">${esc(r.stamp)}</strong>`:''}</span><span class="reward-name"><strong>${esc(r.name)}</strong><small>${esc(r.kind)}</small></span><strong class="reward-quantity">× ${fmt(r.quantity)}</strong></li>`).join('')}</ul><footer><button type="button" class="button wide" data-action="close-dialog">Weiter</button></footer></section>`);
+            show(chest?'Schatztruhe geöffnet':'Deine Belohnung',`<section class="reward-result" aria-label="Erhaltene Belohnungen"><p class="reward-confirmed">✓ Deinem Reich gutgeschrieben</p><ul class="reward-list">${rewards.map(r=>`<li class="reward-item" data-reward-code="${r.code}" data-reward-quantity="${r.quantity}"><span class="reward-art grade-${r.rarity}${r.stamp?' item-value-art':''}" data-value-lines="${r.labels.length}"${r.speedupTier?` data-speedup-tier="${r.speedupTier}"`:''}>${r.icon?`<img src="${esc(r.icon)}" alt="">`:'<span aria-hidden="true">✦</span>'}${r.stamp?`<strong class="speedup-stamp">${r.labels.map(label=>`<span>${esc(label)}</span>`).join('')}</strong>`:''}</span><span class="reward-name"><strong>${esc(r.name)}</strong><small>${esc(r.kind)}</small></span><strong class="reward-quantity">× ${fmt(r.quantity)}</strong></li>`).join('')}</ul><footer><button type="button" class="button wide" data-action="close-dialog">Weiter</button></footer></section>`);
         }
         function failure(error){if(error.definite){save(null);if(dialog.querySelector('.reward-recovery'))dialog.close();}else recovery();}
         function resume(){restore();if(pending)recovery();}

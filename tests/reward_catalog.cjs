@@ -15,17 +15,31 @@ for(const item of treasures){const reward=resolve({type:'fragment',treasure_code
 vm.runInNewContext(fs.readFileSync(path.join(root,'assets/js/item-art.js'),'utf8'),sandbox);
 const uniqueIcons=new Set();
 const speedupArt={generic:'painted-v2/10103001.webp',building:'painted-v2/10103011.webp',research:'painted-v2/10103021.webp',training:'painted-v2/10103031.webp',healing:'painted-v2/10103041.webp'};
+const familyKey=item=>item.category==='speedup'?'speedup:'+item.subcategory:item.category==='resource_pack'?'resource:'+item.resource:item.category==='boost'?'boost:'+item.boost_type:['ap_refill','vip_point','resource_box'].includes(item.category)?item.category:item.category==='fragment_pack'&&item.subcategory==='fragments'&&!item.treasure_code?'fragments:'+item.fragment_grade:'item:'+item.code;
+const familyIcons=new Map();
 for(const item of catalog){
- const expected=item.category==='speedup'?speedupArt[item.subcategory]:`painted-v2/${item.code}.webp`;
- assert.equal(sandbox.window.ConquerItemArt.forItem(item),expected);
+ const family=familyKey(item),expected=sandbox.window.ConquerItemArt.forItem(item);
+ if(!expected){const reward=resolve({item_code:item.code,count:7},kingdom,'/conquer');assert.equal(reward.quantity,7);assert(reward.icon.includes('/'+item.icon+'?'),'Future items retain catalog artwork '+item.code);continue;}
+ if(familyIcons.has(family))assert.equal(expected,familyIcons.get(family),'Same functional family keeps its motif '+family);
+ else familyIcons.set(family,expected);
  assert.equal(sandbox.window.ConquerItemArt.forItem({code:item.code}),expected);
  const reward=resolve({item_code:item.code,count:7},kingdom,'/conquer');
  assert(reward.icon.includes('/'+expected+'?'),'Approved reward identity '+item.code);
+ assert.equal(reward.quantity,7,'Package content never becomes the credited item count');
+ assert.equal(reward.rarity,item.rarity||'normal','Rarity is still authoritative '+item.code);
  assert(fs.existsSync(path.join(root,'assets/art/items',expected)));
  uniqueIcons.add(expected);
 }
 const speedups=catalog.filter(item=>item.category==='speedup');
-assert.equal(uniqueIcons.size,catalog.length-speedups.length+Object.keys(speedupArt).length,'Only durations of the same speedup type share artwork');
+assert.equal(uniqueIcons.size,familyIcons.size,'Different item effects keep different motifs');
+assert(uniqueIcons.size<catalog.length/2,'Amount and duration variants no longer create extra motifs');
+assert.notEqual(sandbox.window.ConquerItemArt.forItem({code:10300003}),sandbox.window.ConquerItemArt.forItem({code:10207003}),'A specific relic fragment stays distinct from a random epic pack');
+assert.notEqual(sandbox.window.ConquerItemArt.forItem({code:10207022}),sandbox.window.ConquerItemArt.forItem({code:10207003}),'Dragon eggs retain their distinct identity');
+assert.deepEqual(Array.from(sandbox.window.ConquerItemArt.labels({category:'boost',bonus_pct:20,duration_seconds:86400})),['+20%','1d'],'Shared boost motifs still show strength and duration');
+assert.deepEqual(Array.from(sandbox.window.ConquerItemArt.labels({category:'resource_box',box_level:3})),['Level 3']);
+assert.equal(sandbox.window.ConquerItemArt.stockLabel(9999),'9,999');
+assert.equal(sandbox.window.ConquerItemArt.stockLabel(10000),'10k');
+assert.equal(sandbox.window.ConquerItemArt.stockLabel(1000000000),'1B');
 for(const [seconds,tier,label]of [[60,'grey','1m'],[300,'grey','5m'],[600,'grey','10m'],[3599,'grey',null],[3600,'blue','1h'],[86399,'blue',null],[86400,'violet','1d'],[259200,'violet','3d'],[604799,'violet',null],[604800,'orange','7d'],[2592000,'orange','30d']]){
  const item={category:'speedup',duration_seconds:seconds};
  assert.equal(sandbox.window.ConquerItemArt.speedupTier(item),tier,'Duration boundary '+seconds);
