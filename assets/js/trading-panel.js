@@ -10,7 +10,7 @@ window.ConquerTrading = function(ctx){
     const num=n=>Number(n||0);
     const now=()=>ctx.now?ctx.now():Date.now()+clockOffset;
     const art=file=>window.ConquerItemArt?.url(base,file)??base+'/assets/art/items/'+file+'?v='+encodeURIComponent(window.CONQUER_ITEM_ART_VERSION||'catalog3');
-    const resourceArt=key=>key==='gems'?art('gems.svg'):base+'/assets/art/ui-resources/'+key+'.png';
+    const resourceArt=key=>window.ConquerItemArt?.resourceUrl(base,key) || (key==='gems'?art('gems.svg'):base+'/assets/art/ui-resources/'+key+'.png');
     const list=()=>mode==='crystals'?data()?.crystals:mode==='vip'?data()?.vip:data();
     const allOffers=()=>list()?.offers||[];
     const category=o=>({resource_pack:'resources',speedup:'speedups',boost:'boosts',vip_point:'progress',ap_refill:'progress',chest:'treasures',fragment_pack:'treasures'})[o.item?.category]||'other';

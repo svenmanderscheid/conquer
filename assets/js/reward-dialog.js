@@ -25,7 +25,7 @@ window.ConquerRewards = (() => {
         const item={...def,...drop},relic=fragment?window.ConquerRelicPresentation:null;
         const name=relic?relic.name(item):drop.name_de||def.name_de||drop.name||def.name||drop.label||(fragment?'Reliktfragmente':resource?resourceNames[drop.resource]:'Gegenstand');
         const file=fragment?(drop.icon||def.icon||'fragment.svg'):presentationFile(item,drop.icon||def.icon);
-        const icon=relic?relic.image(base,item):resource&&['food','lumber','stone','gold'].includes(drop.resource)?`${base}/assets/art/ui-resources/${drop.resource}.png`:asset(base,resource&&drop.resource==='gems'?'gems.svg':file);
+        const icon=relic?relic.image(base,item):resource&&['food','lumber','stone','gold'].includes(drop.resource)?`${window.ConquerItemArt?.resourceUrl(base,drop.resource) || `${base}/assets/art/ui-resources/${drop.resource}.png`}`:asset(base,resource&&drop.resource==='gems'?'gems.svg':file);
         const grade=relic?relic.grade(item):item.rarity||item.grade;
         const rarity=Object.hasOwn(rarities,grade)?grade:'normal';
         const speedupTier=window.ConquerItemArt?.speedupTier(item)||null;

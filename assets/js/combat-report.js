@@ -82,7 +82,7 @@ window.ConquerCombatReport = function ({base, esc, fmt, openDialog, toast, unitN
     }
     function loot() {
         const resources=report.details.resources_lost||report.details.loot||{};
-        return `<div class="cr-resources">${Object.entries({food:'Nahrung',lumber:'Holz',stone:'Stein',gold:'Gold'}).map(([key,label])=>`<div><img src="${base}/assets/art/ui-resources/${key}.png" alt=""><span>${label}<strong>${number(resources[key]||0)}</strong></span></div>`).join('')}</div>`;
+        return `<div class="cr-resources">${Object.entries({food:'Nahrung',lumber:'Holz',stone:'Stein',gold:'Gold'}).map(([key,label])=>`<div><img src="${window.ConquerItemArt?.resourceUrl(base,key) || `${base}/assets/art/ui-resources/${key}.png`}" alt=""><span>${label}<strong>${number(resources[key]||0)}</strong></span></div>`).join('')}</div>`;
     }
     function neighbors() {
         const reports=(getState()?.reports||[]).filter(item=>['city','rally','territory'].includes(item.details?.battle_kind));

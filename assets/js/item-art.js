@@ -121,6 +121,14 @@ window.ConquerItemArt = (() => {
         const n = Math.max(0,Number(quantity) || 0);
         return n >= 10000 ? shortNumber(n) : n.toLocaleString(window.ConquerLocale?.locale || 'en');
     }
+    function resourceUrl(base,resource) {
+        const path = familyArt[`resource:${resource}`];
+        return path ? url(base,path) : null;
+    }
+    function artUrl(base,path) {
+        const resource = /^ui-resources\/(food|lumber|stone|gold|gems)\.png$/.exec(path)?.[1] || (path === 'items/gems.svg' ? 'gems' : null);
+        return resource ? resourceUrl(base,resource) : `${base}/assets/art/${path}`;
+    }
     function url(base,path) { return `${base}/assets/art/items/${file(path)}?v=${encodeURIComponent(window.CONQUER_ITEM_ART_VERSION || 'painted-v1')}`; }
-    return {file,url,forItem,speedupTier,speedupLabel,labels,stockLabel};
+    return {file,url,resourceUrl,artUrl,forItem,speedupTier,speedupLabel,labels,stockLabel};
 })();

@@ -5271,3 +5271,6 @@ body.mobile-game :is(#panel-dialog,#game-dialog) .trading-item-art.item-value-ar
   width:0!important;
   height:0!important;
 }
+
+/* Shared resource motifs also replace inline emoji in costs and treasury values. */
+.resource-inline-icon{display:inline-block;width:1.4em;height:1.4em;object-fit:contain;vertical-align:middle;flex:none}

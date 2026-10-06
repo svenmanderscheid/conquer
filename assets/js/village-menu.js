@@ -119,8 +119,8 @@ window.ConquerVillage = function({base,esc,fmt,getState,getKingdom,openDialog,na
     }
     function bundleContentHtml(entry) {
         const resourceNames={food:'Nahrung',lumber:'Holz',stone:'Stein',gold:'Gold'};
-        const rows=Object.entries(entry.contents.resources||{}).filter(([,amount])=>Number(amount)>0).map(([key,amount])=>`<li><img src="${base}/assets/art/ui-resources/${key}.png" alt=""><span><small>${resourceNames[key]||esc(key)}</small><strong>${fmt(amount)}</strong></span></li>`);
-        if(Number(entry.contents.gems)>0)rows.push(`<li><img src="${base}/assets/art/items/gems.svg" alt=""><span><small>Edelsteine</small><strong>${fmt(entry.contents.gems)}</strong></span></li>`);
+        const rows=Object.entries(entry.contents.resources||{}).filter(([,amount])=>Number(amount)>0).map(([key,amount])=>`<li><img src="${window.ConquerItemArt?.resourceUrl(base,key) || `${base}/assets/art/ui-resources/${key}.png`}" alt=""><span><small>${resourceNames[key]||esc(key)}</small><strong>${fmt(amount)}</strong></span></li>`);
+        if(Number(entry.contents.gems)>0)rows.push(`<li><img src="${window.ConquerItemArt?.resourceUrl(base,'gems') || `${base}/assets/art/items/gems.svg`}" alt=""><span><small>Edelsteine</small><strong>${fmt(entry.contents.gems)}</strong></span></li>`);
         const cosmetic=entry.contents.cosmetic||{},typeName={name_frame:'Namensrahmen',frame:'Namensrahmen',march_skin:'Marsch-Skin',castle_skin:'Burg-Skin'}[cosmetic.type]||'Kosmetik';
         if(cosmetic.name)rows.push(`<li><span class="theme-bundle-cosmetic-icon" aria-hidden="true">${cosmetic.type==='castle_skin'?'♜':cosmetic.type==='march_skin'?'⚑':'✦'}</span><span><small>${typeName}${entry.cosmetic_owned?' · bereits im Besitz':''}</small><strong>${esc(cosmetic.name)}</strong></span></li>`);
         return `<ul class="theme-bundle-contents" aria-label="Paketinhalt">${rows.join('')}</ul>`;

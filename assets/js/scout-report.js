@@ -8,7 +8,7 @@ window.ConquerScoutReport = function(ctx) {
     const branchDefaults=[{code:'attack',name:'Angriff',icon:'shadow-blade.png'},{code:'defense',name:'Verteidigung',icon:'iron-shield.png'},{code:'gather',name:'Sammler',icon:'woodcutter.png'},{code:'hunter',name:'Jäger',icon:'hunters-bow.png'}];
     const section=(title,body,kind)=>`<section class="sr-section sr-${kind}"><h3>${title}</h3>${body}</section>`;
     const note=text=>`<p class="sr-note">${esc(text)}</p>`;
-    const image=(file,cls='')=>`<img class="${cls}" src="${esc(base+'/assets/art/'+file)}" alt="" loading="lazy">`;
+    const image=(file,cls='')=>`<img class="${cls}" src="${esc(window.ConquerItemArt?.artUrl(base,file) || base+'/assets/art/'+file)}" alt="" loading="lazy">`;
     const itemArt=icon=>{const raw=String(icon||''),path=raw.replace(/^assets\/art\//,'');return /^[a-zA-Z0-9_/-]+\.(png|svg|webp)$/.test(path)&&!path.includes('..')?(raw.startsWith('assets/art/')||path.startsWith('items/')?path:'items/'+path):'items/compass.svg';};
     const stat=(label,value)=>`<div><dt>${esc(label)}</dt><dd>${value}</dd></div>`;
     function troopList(rows,empty) {

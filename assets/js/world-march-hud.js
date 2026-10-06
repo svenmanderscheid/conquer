@@ -19,7 +19,7 @@ window.ConquerMarchHud=function({host,getContext,follow,locate,stop,focus,getSel
     const node=lastState?.nodes?.find(node=>String(node.id)===String(m.target_id));
     return ({1:'food',2:'lumber',3:'stone',4:'gold',5:'gems'})[number(node?.object_type)]||null;
   }
-  const image=m=>{const resource=targetResource(m);if(resource)return resource==='gems'?`${getContext().base}/assets/art/items/gems.svg`:`${getContext().base}/assets/art/ui-resources/${resource}.png`;return window.ConquerMarchSkins?.allIds.includes(m.march_skin)?window.ConquerMarchSkins.image(getContext().base,m.march_skin):`${getContext().base}/assets/art/map/march-infantry.svg`};
+  const image=m=>{const resource=targetResource(m);if(resource)return window.ConquerItemArt?.resourceUrl(getContext().base,resource) || (resource==='gems'?`${getContext().base}/assets/art/items/gems.svg`:`${getContext().base}/assets/art/ui-resources/${resource}.png`);return window.ConquerMarchSkins?.allIds.includes(m.march_skin)?window.ConquerMarchSkins.image(getContext().base,m.march_skin):`${getContext().base}/assets/art/map/march-infantry.svg`};
   const imageLabel=m=>{const resource=targetResource(m);return resource?`${resourceNames[resource]} sammeln`:`${status(m)}: Truppensymbol`};
   const active=()=>lastState?.marches?.find(m=>String(m.id)===selected);
   const recallable=m=>m&&m.march_type==='territory_garrison'?['marching','arrived'].includes(m.state):m&&/^\d+$/.test(String(m.id))&&![13,14].includes(number(m.march_type))&&((m.state==='marching'&&end(m)>getContext().now())||(number(m.march_type)===9&&m.state==='arrived'));

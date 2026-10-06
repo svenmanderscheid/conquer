@@ -106,7 +106,7 @@ window.ConquerMonsterReport = (() => {
         const reward=(label,count,src)=>`<div class="mr-reward">${src?`<img src="${src}" alt="${esc(label)}">`:'<span class="mr-reward-symbol" aria-hidden="true">✦</span>'}<span><span class="mr-reward-name">${esc(label)}</span><strong>× ${number(count)}</strong></span></div>`;
         for(const [key,label] of Object.entries({food:'Nahrung',lumber:'Holz',stone:'Stein',gold:'Gold',gems:'Edelsteine'})){
             const amount=d.loot?.[key]??(key==='lumber'?d.loot?.wood:0);
-            if(Number(amount)>0)rewards.push(reward(label,amount,key==='gems'?asset(base,'gems.svg'):`${base}/assets/art/ui-resources/${key}.png`));
+            if(Number(amount)>0)rewards.push(reward(label,amount,key==='gems'?asset(base,'gems.svg'):`${window.ConquerItemArt?.resourceUrl(base,key) || `${base}/assets/art/ui-resources/${key}.png`}`));
         }
         for(const item of d.item_rewards||[])if(Number(item.count??item.quantity)>0){const resolved=window.ConquerRewards?.resolve(item,kingdom,base);rewards.push(reward(resolved?.name||item.name,item.count??item.quantity,resolved?.icon||asset(base,item.icon)));}
         for(const fragment of d.fragment_rewards||[])if(Number(fragment.count)>0){const resolved=window.ConquerRewards?.resolve(fragment,kingdom,base);rewards.push(reward(resolved?.name||fragment.name,fragment.count,resolved?.icon||asset(base,fragment.icon)));}

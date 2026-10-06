@@ -120,7 +120,7 @@
     function nodeArt(node, base, esc) {
         const code=String(node.code||''),art=artFor(node),specific=code&&code!=='academy';
         const src=specific?`${base}/assets/art/research/characters-v10/${encodeURIComponent(code)}.png`:`${base}/assets/art/research/${art.key}.svg`;
-        const resourceSrc=art.resource?`${base}/assets/art/${art.resource==='crystal'?'items/gems.svg':'ui-resources/'+art.resource+'.png'}`:null;
+        const resourceSrc=art.resource?(window.ConquerItemArt?.resourceUrl(base,art.resource==='crystal'?'gems':art.resource) || `${base}/assets/art/${art.resource==='crystal'?'items/gems.svg':'ui-resources/'+art.resource+'.png'}`):null;
         const picture=specific?`<img src="${esc(src)}" alt="" loading="lazy">`:resourceSrc?`<img class="rt-resource-art" src="${esc(resourceSrc)}" alt="" loading="lazy"><img class="rt-resource-effect" src="${esc(src)}" alt="" loading="lazy">`:`<img src="${esc(src)}" alt="" loading="lazy">`;
         return `<span class="rt-node-art rt-illustrated${art.resource?' rt-resource':''}${specific?' rt-specific-art':''}" data-art="${art.key}"${specific?` data-research-art="${esc(code)}"`:''}>${picture}${art.advanced?'<small class="rt-art-rank" aria-hidden="true">II</small>':''}</span>`;
     }
