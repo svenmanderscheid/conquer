@@ -5,11 +5,12 @@ namespace Conquer\Game\Quest;
 
 use Conquer\Db\Connection;
 use Conquer\Game\Inventory\InventoryService;
+use Conquer\Game\Locale;
 
 /**
- * Daily Quest system — 8 quests reset each UTC day, tracked per player.
+ * Daily quests and activity rewards reset each UTC day, tracked per player.
  *
- * Quest definitions are loaded from data/daily_quests.json (version 1).
+ * Quest and milestone definitions are loaded from data/daily_quests.json.
  * The JSON is cached in a static property for the lifetime of the request.
  *
  * DB table: player_daily_quests
@@ -39,6 +40,8 @@ final class DailyQuestService
      * @var array<string, array<string, mixed>>|null
      */
     private static ?array $definitions = null;
+    private static array $milestones = [];
+    private static int $maxActivityPoints = 0;
 
     /**
      * Maps action names to the quest codes they affect.
@@ -90,6 +93,8 @@ final class DailyQuestService
         }
 
         self::$definitions = $map;
+        self::$milestones = array_column($decoded['activity']['milestones'] ?? [], null, 'code');
+        self::$maxActivityPoints = (int) ($decoded['activity']['max_points'] ?? 0);
         return self::$definitions;
     }
 
@@ -106,25 +111,28 @@ final class DailyQuestService
      *
      * Safe to call multiple times per day — INSERT IGNORE is idempotent.
      */
-    public static function ensureDailyQuests(int $playerId): void
+    public static function ensureDailyQuests(int $playerId): string
     {
         $db          = Connection::getInstance();
         $definitions = self::loadDefinitions();
+        // Bind every statement to one database day, including a request crossing midnight.
+        $date = (string) $db->query('SELECT UTC_DATE()')->fetchColumn();
 
-        // INSERT IGNORE one row per quest code for today.
-        foreach ($definitions as $code => $def) {
-            $target = (int) ($def['target'] ?? 1);
-
-            $db->execute(
-                'INSERT IGNORE INTO player_daily_quests
-                     (player_id, quest_code, quest_date, progress, target, completed, claimed)
-                 VALUES (?, ?, UTC_DATE(), 0, ?, 0, 0)',
-                [$playerId, $code, $target],
-            );
+        // Seed the whole day in one statement: state polling must not add a round trip per card.
+        $values = [];
+        $parameters = [];
+        foreach ($definitions + self::$milestones as $code => $def) {
+            $values[] = '(?, ?, ?, 0, ?, 0, 0)';
+            array_push($parameters, $playerId, $code, $date, (int) ($def['target'] ?? 1));
+        }
+        if ($values) {
+            $db->execute('INSERT IGNORE INTO player_daily_quests
+                (player_id,quest_code,quest_date,progress,target,completed,claimed) VALUES '.implode(',', $values), $parameters);
         }
 
         // Auto-complete the login quest.
-        self::autoCompleteLoginQuest($playerId);
+        self::autoCompleteLoginQuest($playerId, $date);
+        return $date;
     }
 
     /**
@@ -135,15 +143,20 @@ final class DailyQuestService
      */
     public static function getQuests(int $playerId): array
     {
-        self::ensureDailyQuests($playerId);
+        return self::getState($playerId)['quests'];
+    }
 
+    /** Daily rows, derived activity and reset time share the same UTC-date snapshot. */
+    public static function getState(int $playerId): array
+    {
+        $date = self::ensureDailyQuests($playerId);
         $db   = Connection::getInstance();
         $rows = $db->query(
             'SELECT quest_code, progress, target, completed, claimed
              FROM   player_daily_quests
-             WHERE  player_id = ? AND quest_date = UTC_DATE()
+             WHERE  player_id = ? AND quest_date = ?
              ORDER  BY quest_code ASC',
-            [$playerId],
+            [$playerId, $date],
         )->fetchAll();
 
         $definitions = self::loadDefinitions();
@@ -152,20 +165,48 @@ final class DailyQuestService
         foreach ($rows as $row) {
             $code = (string) $row['quest_code'];
             $def  = $definitions[$code] ?? null;
+            // Milestones have their own presentation; removed definitions are not claimable.
+            if ($def === null) continue;
 
             $result[] = [
                 'quest_code'  => $code,
-                'title'       => $def !== null ? (string) ($def['title'] ?? $code) : $code,
-                'description' => $def !== null ? (string) ($def['description'] ?? '') : '',
+                'title'       => isset($def['title_key']) ? Locale::t($def['title_key']) : Locale::text((string) ($def['title'] ?? $code)),
+                'description' => isset($def['description_key']) ? Locale::t($def['description_key']) : Locale::text((string) ($def['description'] ?? '')),
                 'progress'    => (int) $row['progress'],
                 'target'      => (int) $row['target'],
                 'completed'   => (bool) $row['completed'],
                 'claimed'     => (bool) $row['claimed'],
-                'rewards'     => $def !== null ? ($def['rewards'] ?? []) : [],
+                'activity_points' => (int) ($def['activity_points'] ?? 0),
+                'rewards'     => $def['rewards'] ?? [],
             ];
         }
 
-        return $result;
+        $points = self::activityPoints($rows);
+        $byCode = array_column($rows, null, 'quest_code');
+        $milestones = [];
+        foreach (self::$milestones as $code => $def) {
+            $target = (int) $def['target'];
+            $milestones[] = ['quest_code'=>$code, 'target'=>$target, 'progress'=>min($points,$target),
+                'completed'=>$points >= $target, 'claimed'=>(bool) ($byCode[$code]['claimed'] ?? false),
+                'rewards'=>$def['rewards'] ?? []];
+        }
+        $reset = (new \DateTimeImmutable($date, new \DateTimeZone('UTC')))->modify('+1 day')->format('Y-m-d 00:00:00');
+        return ['quests'=>$result,
+            'quest_activity'=>['points'=>$points, 'max_points'=>self::$maxActivityPoints, 'milestones'=>$milestones],
+            'quest_resets_at'=>$reset];
+    }
+
+    /** Only claimed ordinary dailies count; permanent missions and chests never feed activity. */
+    private static function activityPoints(array $rows): int
+    {
+        $points = 0;
+        $definitions = self::loadDefinitions();
+        foreach ($rows as $row) {
+            if (!empty($row['claimed']) && isset($definitions[$row['quest_code']])) {
+                $points += (int) ($definitions[$row['quest_code']]['activity_points'] ?? 0);
+            }
+        }
+        return $points;
     }
 
     /**
@@ -190,6 +231,7 @@ final class DailyQuestService
             return;
         }
 
+        $date = self::ensureDailyQuests($playerId);
         $db = Connection::getInstance();
 
         foreach ($questCodes as $code) {
@@ -199,9 +241,9 @@ final class DailyQuestService
                  SET    progress = LEAST(progress + ?, target)
                  WHERE  player_id  = ?
                    AND  quest_code = ?
-                   AND  quest_date = UTC_DATE()
+                    AND  quest_date = ?
                    AND  completed  = 0',
-                [$amount, $playerId, $code],
+                [$amount, $playerId, $code, $date],
             );
 
             // Mark completed where progress has reached or exceeded target.
@@ -210,10 +252,10 @@ final class DailyQuestService
                  SET    completed = 1
                  WHERE  player_id  = ?
                    AND  quest_code = ?
-                   AND  quest_date = UTC_DATE()
+                    AND  quest_date = ?
                    AND  completed  = 0
                    AND  progress  >= target',
-                [$playerId, $code],
+                [$playerId, $code, $date],
             );
         }
     }
@@ -238,34 +280,43 @@ final class DailyQuestService
     {
         $db = Connection::getInstance();
 
+        // Both endpoints serialize ordinary and activity claims using the same player row.
+        if (!$db->query('SELECT id FROM players WHERE id=? FOR UPDATE', [$playerId])->fetchColumn()) {
+            throw new \RuntimeException('Player not found.');
+        }
+        $date = self::ensureDailyQuests($playerId);
+        $definitions = self::loadDefinitions();
+        $isMilestone = isset(self::$milestones[$questCode]);
+        $def = $definitions[$questCode] ?? self::$milestones[$questCode] ?? null;
+        if ($def === null) throw new \RuntimeException('Quest-Definition nicht gefunden: ' . $questCode);
+
         // Load the quest row with a lock to prevent double-claiming.
         $row = $db->query(
             'SELECT completed, claimed, target
              FROM   player_daily_quests
              WHERE  player_id  = ?
-               AND  quest_code = ?
-               AND  quest_date = UTC_DATE()
+                AND  quest_code = ?
+                AND  quest_date = ?
              FOR UPDATE',
-            [$playerId, $questCode],
+            [$playerId, $questCode, $date],
         )->fetch();
 
         if ($row === false) {
             throw new \RuntimeException('Quest nicht gefunden oder gehört nicht zum heutigen Tag.');
         }
 
-        if (!(bool) $row['completed']) {
+        if ($isMilestone) {
+            // A locking read sees claims committed before our player lock, even in an outer transaction.
+            $dailyRows = $db->query('SELECT quest_code, claimed FROM player_daily_quests WHERE player_id=? AND quest_date=? ORDER BY quest_code FOR UPDATE', [$playerId, $date])->fetchAll();
+            if (self::activityPoints($dailyRows) < (int) $def['target']) {
+                throw new \RuntimeException(Locale::t('quests.error.activity_incomplete'));
+            }
+        } elseif (!(bool) $row['completed']) {
             throw new \RuntimeException('Quest noch nicht abgeschlossen.');
         }
 
         if ((bool) $row['claimed']) {
             throw new \RuntimeException('Belohnung wurde bereits abgeholt.');
-        }
-
-        $definitions = self::loadDefinitions();
-        $def         = $definitions[$questCode] ?? null;
-
-        if ($def === null) {
-            throw new \RuntimeException('Quest-Definition nicht gefunden: ' . $questCode);
         }
 
         /** @var list<array<string, mixed>> $rewards */
@@ -274,13 +325,13 @@ final class DailyQuestService
         // Reserve the claim; any failed grant also rolls back this marker.
         $affected = $db->execute(
             'UPDATE player_daily_quests
-             SET    claimed = 1
+             SET    claimed = 1, completed = 1, progress = IF(? = 1, target, progress)
              WHERE  player_id  = ?
                AND  quest_code = ?
-               AND  quest_date = UTC_DATE()
-               AND  completed  = 1
+                AND  quest_date = ?
+                AND  (completed = 1 OR ? = 1)
                AND  claimed    = 0',
-            [$playerId, $questCode],
+            [$isMilestone ? 1 : 0, $playerId, $questCode, $date, $isMilestone ? 1 : 0],
         );
 
         if ($affected === 0) {
@@ -302,7 +353,7 @@ final class DailyQuestService
      * Auto-completes the login_daily quest for today if it exists and is
      * not yet completed.
      */
-    private static function autoCompleteLoginQuest(int $playerId): void
+    private static function autoCompleteLoginQuest(int $playerId, string $date): void
     {
         $db = Connection::getInstance();
 
@@ -313,9 +364,9 @@ final class DailyQuestService
                     completed = 1
              WHERE  player_id  = ?
                AND  quest_code = ?
-               AND  quest_date = UTC_DATE()
+                AND  quest_date = ?
                AND  completed  = 0',
-            [$playerId, 'login_daily'],
+            [$playerId, 'login_daily', $date],
         );
     }
 

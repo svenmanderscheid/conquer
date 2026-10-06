@@ -6,6 +6,7 @@ namespace Conquer\Api\Handlers;
 use Conquer\Api\Response;
 use Conquer\Auth\Session;
 use Conquer\Game\Quest\DailyQuestService;
+use Conquer\Game\Kingdom\KingdomService;
 
 /**
  * Handles /api/quests/* endpoints.
@@ -35,10 +36,13 @@ final class QuestHandler
 
         $playerId = (int) $session['player_id'];
 
-        DailyQuestService::ensureDailyQuests($playerId);
-        $quests = DailyQuestService::getQuests($playerId);
-
-        Response::ok(['quests' => $quests]);
+        try {
+            $state = KingdomService::questState($playerId);
+        } catch (\DomainException $e) {
+            $status = in_array($e->getCode(), [403, 409, 503], true) ? $e->getCode() : 422;
+            Response::error($status, $status === 503 ? 'QUEST_BUSY' : 'QUEST_UNAVAILABLE', $e->getMessage());
+        }
+        Response::ok($state);
     }
 
     /**
@@ -77,7 +81,11 @@ final class QuestHandler
         $playerId = (int) $session['player_id'];
 
         try {
+            KingdomService::questState($playerId);
             $rewards = DailyQuestService::claimReward($playerId, $questCode);
+        } catch (\DomainException $e) {
+            $status = in_array($e->getCode(), [403, 409, 503], true) ? $e->getCode() : 422;
+            Response::error($status, $status === 503 ? 'QUEST_BUSY' : 'CLAIM_FAILED', $e->getMessage());
         } catch (\RuntimeException $e) {
             Response::error(422, 'CLAIM_FAILED', $e->getMessage());
         }

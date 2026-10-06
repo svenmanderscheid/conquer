@@ -1,12 +1,15 @@
 {
-  "version": 1,
+  "version": 2,
   "quests": [
     {
       "code": "attack_monster_1",
+      "title_key": "quests.daily.attack_monster_1.title",
+      "description_key": "quests.daily.attack_monster_1.description",
       "title": "Monster Jäger",
       "description": "Greife 1 Monster an",
       "type": "attack_monster",
       "target": 1,
+      "activity_points": 10,
       "rewards": [
         { "item_code": 10103002, "quantity": 2 },
         { "gems": 10 }
@@ -14,10 +17,13 @@
     },
     {
       "code": "attack_monster_3",
+      "title_key": "quests.daily.attack_monster_3.title",
+      "description_key": "quests.daily.attack_monster_3.description",
       "title": "Monster Vernichter",
       "description": "Greife 3 Monster an",
       "type": "attack_monster",
       "target": 3,
+      "activity_points": 10,
       "rewards": [
         { "item_code": 10103003, "quantity": 1 },
         { "gems": 20 }
@@ -25,10 +31,13 @@
     },
     {
       "code": "upgrade_building_1",
+      "title_key": "quests.daily.upgrade_building_1.title",
+      "description_key": "quests.daily.upgrade_building_1.description",
       "title": "Baumeister",
       "description": "Upgrade 1 Gebäude",
       "type": "upgrade_building",
       "target": 1,
+      "activity_points": 10,
       "rewards": [
         { "item_code": 10103011, "quantity": 1 },
         { "gems": 15 },
@@ -39,10 +48,13 @@
     },
     {
       "code": "train_troops_100",
+      "title_key": "quests.daily.train_troops_100.title",
+      "description_key": "quests.daily.train_troops_100.description",
       "title": "Rekrutenausbilder",
       "description": "Trainiere 100 Truppen",
       "type": "train_troops",
       "target": 100,
+      "activity_points": 10,
       "rewards": [
         { "item_code": 10103031, "quantity": 1 },
         { "gems": 15 },
@@ -52,10 +64,13 @@
     },
     {
       "code": "research_complete_1",
+      "title_key": "quests.daily.research_complete_1.title",
+      "description_key": "quests.daily.research_complete_1.description",
       "title": "Wissensdurst",
       "description": "Schliesse 1 Forschung ab",
       "type": "research_complete",
       "target": 1,
+      "activity_points": 10,
       "rewards": [
         { "item_code": 10103021, "quantity": 1 },
         { "gems": 20 },
@@ -66,10 +81,13 @@
     },
     {
       "code": "collect_resources",
+      "title_key": "quests.daily.collect_resources.title",
+      "description_key": "quests.daily.collect_resources.description",
       "title": "Sammler",
       "description": "Sammle 50.000 Ressourcen (Gather March)",
       "type": "gather_resources",
       "target": 50000,
+      "activity_points": 10,
       "rewards": [
         { "item_code": 10102001, "quantity": 1 },
         { "gems": 10 }
@@ -77,10 +95,13 @@
     },
     {
       "code": "login_daily",
+      "title_key": "quests.daily.login_daily.title",
+      "description_key": "quests.daily.login_daily.description",
       "title": "Täglicher Besucher",
       "description": "Logge dich ein",
       "type": "daily_login",
       "target": 1,
+      "activity_points": 10,
       "auto_complete_on_login": true,
       "rewards": [
         { "item_code": 10103001, "quantity": 1 },
@@ -89,13 +110,108 @@
     },
     {
       "code": "open_chest_1",
+      "title_key": "quests.daily.open_chest_1.title",
+      "description_key": "quests.daily.open_chest_1.description",
       "title": "Schatzsucher",
       "description": "Öffne 1 Schatzkiste",
       "type": "open_chest",
       "target": 1,
+      "activity_points": 10,
       "rewards": [
         { "gems": 50 }
       ]
+    },
+    {
+      "code": "gather_food_25000",
+      "title_key": "quests.daily.gather_food_25000.title",
+      "description_key": "quests.daily.gather_food_25000.description",
+      "type": "gather_food",
+      "target": 25000,
+      "activity_points": 10,
+      "rewards": [{ "item_code": 10201003, "quantity": 1 }]
+    },
+    {
+      "code": "gather_lumber_25000",
+      "title_key": "quests.daily.gather_lumber_25000.title",
+      "description_key": "quests.daily.gather_lumber_25000.description",
+      "type": "gather_lumber",
+      "target": 25000,
+      "activity_points": 10,
+      "rewards": [{ "item_code": 10201010, "quantity": 1 }]
+    },
+    {
+      "code": "gather_stone_25000",
+      "title_key": "quests.daily.gather_stone_25000.title",
+      "description_key": "quests.daily.gather_stone_25000.description",
+      "type": "gather_stone",
+      "target": 25000,
+      "activity_points": 10,
+      "rewards": [{ "item_code": 10201018, "quantity": 1 }]
+    },
+    {
+      "code": "gather_gold_25000",
+      "title_key": "quests.daily.gather_gold_25000.title",
+      "description_key": "quests.daily.gather_gold_25000.description",
+      "type": "gather_gold",
+      "target": 25000,
+      "activity_points": 10,
+      "rewards": [{ "item_code": 10201026, "quantity": 1 }]
+    },
+    {
+      "code": "alliance_help_5",
+      "title_key": "quests.daily.alliance_help_5.title",
+      "description_key": "quests.daily.alliance_help_5.description",
+      "type": "alliance_help",
+      "target": 5,
+      "activity_points": 10,
+      "rewards": [{ "item_code": 10103001, "quantity": 2 }]
     }
-  ]
+  ],
+  "activity": {
+    "max_points": 100,
+    "milestones": [
+      {
+        "code": "daily_activity_20",
+        "target": 20,
+        "rewards": [
+          { "item_code": 10201003, "quantity": 1 },
+          { "item_code": 10201010, "quantity": 1 },
+          { "item_code": 10201018, "quantity": 1 },
+          { "item_code": 10201026, "quantity": 1 }
+        ]
+      },
+      {
+        "code": "daily_activity_40",
+        "target": 40,
+        "rewards": [{ "item_code": 10103002, "quantity": 2 }]
+      },
+      {
+        "code": "daily_activity_60",
+        "target": 60,
+        "rewards": [
+          { "item_code": 10201003, "quantity": 2 },
+          { "item_code": 10201010, "quantity": 2 },
+          { "item_code": 10201018, "quantity": 2 },
+          { "item_code": 10201026, "quantity": 2 }
+        ]
+      },
+      {
+        "code": "daily_activity_80",
+        "target": 80,
+        "rewards": [{ "item_code": 10103011, "quantity": 1 }, { "item_code": 10103021, "quantity": 1 }]
+      },
+      {
+        "code": "daily_activity_100",
+        "target": 100,
+        "rewards": [
+          { "item_code": 10201003, "quantity": 2 },
+          { "item_code": 10201010, "quantity": 2 },
+          { "item_code": 10201018, "quantity": 2 },
+          { "item_code": 10201026, "quantity": 2 },
+          { "item_code": 10103003, "quantity": 1 },
+          { "gems": 20 }
+        ]
+      }
+    ]
+  }
 }
