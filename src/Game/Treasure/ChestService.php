@@ -113,7 +113,13 @@ final class ChestService
         foreach(self::rollDropTable($type)as$drop){
             $quantity=(int)$drop['quantity'];
             if ($quantity < 1) throw new \RuntimeException('Ungültige Beutemenge in der Schatztruhe.');
-            if(isset($drop['fragment_grade'])){
+            if(isset($drop['relic_code'])){
+                $code=(int)$drop['relic_code'];$result=TreasureService::addRelics($playerId,$code,$quantity);
+                $rewards[]=['type'=>'relic','quantity'=>$quantity]+$result+\Conquer\Game\Rewards\RewardPresentation::relic($code);
+            }elseif(isset($drop['treasure_code'])){
+                $code=(int)$drop['treasure_code'];$result=TreasureService::addFragments($playerId,$code,$quantity);
+                $rewards[]=['type'=>'fragment','quantity'=>$quantity]+$result+\Conquer\Game\Rewards\RewardPresentation::fragment($code);
+            }elseif(isset($drop['fragment_grade'])){
                 $result=TreasureService::addRandomFragment($playerId,(string)$drop['fragment_grade'],$quantity);
                 $rewards[]=['type'=>'fragment','quantity'=>$quantity]+$result
                     +\Conquer\Game\Rewards\RewardPresentation::fragment((int)$result['treasure_code']);

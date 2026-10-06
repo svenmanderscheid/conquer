@@ -13,6 +13,9 @@
 <body class="mobile-game mr-direct" data-i18n-scope>
 <main><a class="button" href="<?= APP_BASE ?>/city#reports">‹ Zur Post</a><div id="monster-report-root"></div><p id="report-error" role="alert"></p></main>
 <script src="<?= APP_BASE ?>/assets/js/boss-mechanic.js?v=<?= filemtime(ROOT_DIR.'/assets/js/boss-mechanic.js') ?>"></script>
+<script src="<?= APP_BASE ?>/assets/js/item-art.js?v=<?= filemtime(ROOT_DIR.'/assets/js/item-art.js') ?>"></script>
+<script src="<?= APP_BASE ?>/assets/js/relic-presentation.js?v=<?= filemtime(ROOT_DIR.'/assets/js/relic-presentation.js') ?>"></script>
+<script src="<?= APP_BASE ?>/assets/js/reward-dialog.js?v=<?= filemtime(ROOT_DIR.'/assets/js/reward-dialog.js') ?>"></script>
 <script src="<?= APP_BASE ?>/assets/js/monster-report.js?v=<?= filemtime(ROOT_DIR.'/assets/js/monster-report.js') ?>"></script>
 <script>
 document.addEventListener('DOMContentLoaded',async () => {

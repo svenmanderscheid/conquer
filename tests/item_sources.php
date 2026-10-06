@@ -19,6 +19,7 @@ try{
     $db->execute("INSERT INTO admin_users(id,username,password_hash,role)VALUES(1,'SourcesAdmin','unused','superadmin')");
     $config=RewardCatalog::defaults('monster','20209901');$config['drops']=[['item_code'=>10103001,'count'=>7,'probability'=>.4]];
     $config['fragment_drops']=[['treasure_code'=>60100001,'count'=>3,'probability'=>.2],['fragment_grade'=>'normal','count'=>2,'probability'=>.4]];
+    $config['relic_drops']=[['treasure_code'=>60100001,'count'=>1,'probability'=>.1],['treasure_code'=>60100002,'count'=>1,'probability'=>0]];
     $db->execute("INSERT INTO reward_world_overrides(world_id,source_type,source_key,config_json,revision,updated_by)VALUES(1,'monster','20209901',?,1,1)",[json_encode($config)]);RewardCatalog::resetCache();
     $db->execute("INSERT INTO field_monsters(world_id,monster_code,coord_x,coord_y,hp_current,expires_at)VALUES(1,20209901,14,10,100,NULL),(1,20209901,11,10,0,NULL),(1,20209901,12,10,100,DATE_SUB(UTC_TIMESTAMP(),INTERVAL 1 DAY)),(2,20209901,10,11,100,NULL)");
     $snapshot=static function()use($db):string{$all=[];foreach(['players','cities','player_inventory','player_chests','world_land_zones','world_land_parts','dungeon_runs','expeditions','trading_shop_purchases']as$table)$all[$table]=$db->query('SELECT * FROM '.$table)->fetchAll();return json_encode($all);};
@@ -29,7 +30,11 @@ try{
     sourceCheck($monsters[0]['rewards'][0]['quantity']===7&&$monsters[0]['rewards'][0]['chance']===.4,'effective world reward override is authoritative');
     $fragmentSources=array_values(array_filter(S::search(1,['treasure_code'=>60100001])['sources'],static fn($s)=>$s['type']==='monster'&&$s['destination']!==null));
     $pool=\Conquer\Game\Treasure\TreasureData::getCodesByGrade('normal');
-    sourceCheck(count($fragmentSources)===1&&count($fragmentSources[0]['rewards'])===2&&$fragmentSources[0]['rewards'][0]===['quantity'=>3,'chance'=>.2]&&abs($fragmentSources[0]['rewards'][1]['chance']-.4/count($pool))<1e-10,'Relic finder includes configured direct fragments and the exact random-relic selection chance');
+    sourceCheck(count($fragmentSources)===1&&count($fragmentSources[0]['rewards'])===3&&$fragmentSources[0]['rewards'][0]===['quantity'=>3,'chance'=>.2]&&abs($fragmentSources[0]['rewards'][1]['chance']-.4/count($pool))<1e-10,'Relic finder includes configured direct fragments and the exact random-relic selection chance');
+    sourceCheck($fragmentSources[0]['rewards'][2]===['quantity'=>1,'chance'=>.1,'reward_type'=>'relic'],'Relic finder distinguishes a complete relic from fragments of the same relic');
+    sourceCheck(S::matchReward(['treasure_code'=>60100001],['relic_code'=>60100001],.25,2)===['quantity'=>2,'chance'=>.25,'reward_type'=>'relic']&&S::matchReward(['treasure_code'=>60100002],['relic_code'=>60100001])===null,'Specific chest relic matches exactly its configured target');
+    $mapDefinition=\Conquer\Game\Map\MonsterData::mapData(['monster_code'=>20209901,'hp_current'=>100])['definition'];
+    sourceCheck(($mapDefinition['relic_drops'][0]['type']??'')==='relic'&&($mapDefinition['relic_drops'][0]['treasure_code']??0)===60100001,'Map payload preserves whole relic drop identity and presentation');
     sourceCheck($result['query']===['item_code'=>10103001]&&$result['world_id']===1,'unowned inventory lookup is scoped to current world');
     sourceCheck(!array_filter(S::search(1,['item_code'=>10201001])['sources'],static fn($s)=>$s['type']==='monster'&&$s['level']<1),'historical zero-based monster aliases use the displayed minimum level one');
     try{S::search(1,['item_code'=>10103001,'expected_world_id'=>2]);throw new RuntimeException('Stale world accepted');}catch(DomainException $e){sourceCheck($e->getCode()===409,'stale world navigation is rejected');}

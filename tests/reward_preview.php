@@ -57,6 +57,7 @@ try {
     ];
     $global['gems_drop'] = ['chance' => .25, 'amount' => 40];
     $global['fragment_drops']=[['treasure_code'=>60100001,'count'=>3,'probability'=>.25],['fragment_grade'=>'epic','count'=>2,'probability'=>1]];
+    $global['relic_drops']=[['treasure_code'=>60100001,'count'=>2,'probability'=>.15],['treasure_code'=>60100002,'count'=>1,'probability'=>0]];
     $globalJson = json_encode($global, JSON_THROW_ON_ERROR);
     $db->execute('INSERT INTO reward_overrides(source_type,source_key,config_json,revision,updated_by) VALUES(?,?,?,?,?)', ['monster', $monsterKey, $globalJson, 1, 1]);
     $db->execute('INSERT INTO reward_rule_revisions(scope_world_id,source_type,source_key,revision,config_json,updated_by,created_at) VALUES(?,?,?,?,?,?,?)', [0, 'monster', $monsterKey, 1, $globalJson, 1, '2026-09-12 10:00:00']);
@@ -67,6 +68,7 @@ try {
     previewCheck($globalPreview['items'][1]['expected_per_100'] === 300.0, 'Guaranteed item expectation is quantity times 100 victories');
     previewCheck($globalPreview['gems']['expected_per_100'] === 1000.0, 'Gem expectation multiplies amount, chance and 100 victories');
     previewCheck($globalPreview['fragments'][0]['expected_per_100']===75.0&&$globalPreview['fragments'][1]['expected_per_100']===200.0,'Fragment preview uses the configured quantities and independent chances');
+    previewCheck($globalPreview['relics'][0]['expected_per_100']===30.0&&$globalPreview['relics'][1]['expected_per_100']===0.0,'Whole relic preview counts complete relics separately from fragments');
     previewCheck($globalPreview['charm']['guaranteed_per_victory'] === 1 && $globalPreview['charm']['expected_per_100'] === 100, 'Every monster victory guarantees exactly one charm');
 
     $world = $global;

@@ -22,11 +22,21 @@ function adminItemPicker(string $name,mixed $code,bool $fragments=false,bool $op
 }
 function adminDropRow(string $type,int|string $index,array $row): void {
     $prefix='config[rows]['.$index.']';$weighted=in_array($type,['chest','dungeon'],true);
-    echo '<div class="drop-row"><div><span class="field-label">Gegenstand</span>';
+    echo '<div class="drop-row"><div><span class="field-label">'.($type==='chest'?\Conquer\Game\Locale::html('admin.drops.chest_reward'):'Gegenstand').'</span>';
     adminItemPicker($prefix.'[target]',$row['target']??'', $type==='chest');echo '</div>';
     if($type!=='dungeon')adminNumber('Anzahl',$prefix.'[quantity]',$row['quantity']??1,1,100000);
     adminNumber($weighted?'Gewichtung':'Chance (%)',$prefix.($weighted?'[weight]':'[chance]'),$row[$weighted?'weight':'chance']??($weighted?1:100),0,$weighted?1000000:100,$weighted?'1':'.01');
     echo '<div class="drop-row-end"><span class="drop-probability" aria-live="polite"></span><button type="button" class="secondary remove-drop" aria-label="Beuteeintrag entfernen">✕</button></div></div>';
+}
+function adminUiIcon(string $name):string {
+    $paths=['overview'=>'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+        'players'=>'<circle cx="9" cy="8" r="3"/><path d="M3 21v-3a6 6 0 0 1 12 0v3M16 5a3 3 0 0 1 0 6M21 21v-3a6 6 0 0 0-4-5"/>',
+        'worlds'=>'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c5 5 5 13 0 18M12 3c-5 5-5 13 0 18"/>',
+        'drops'=>'<path d="m3 7 9-4 9 4-9 4-9-4ZM3 7v10l9 4 9-4V7M12 11v10M7 5l10 4"/>',
+        'catalog'=>'<rect x="3" y="3" width="7" height="18" rx="1"/><rect x="14" y="3" width="7" height="18" rx="1"/><path d="M6 7h1M17 7h1"/>',
+        'access'=>'<circle cx="8" cy="8" r="5"/><path d="m12 12 9 9M17 17l3-3M14 14l3-3"/>',
+        'system'=>'<path d="M4 6h16M4 12h16M4 18h16"/><circle cx="8" cy="6" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="10" cy="18" r="2"/>'];
+    return '<svg class="admin-ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'.($paths[$name]??$paths['overview']).'</svg>';
 }
 
 function adminFragmentRow(int|string $index,array $row): void {
@@ -48,4 +58,19 @@ function adminFragmentRow(int|string $index,array $row): void {
     adminNumber(\Conquer\Game\Locale::t('admin.drops.fragment_quantity'),$prefix.'[quantity]',$row['quantity']??1,1,100000);
     adminNumber(\Conquer\Game\Locale::t('admin.drops.fragment_chance'),$prefix.'[chance]',$row['chance']??0,0,100,'.0001');
     echo '<div class="drop-row-end"><button type="button" class="secondary" data-remove-fragment aria-label="'.\Conquer\Game\Locale::html('admin.drops.fragment_remove').'">✕</button></div><small class="fragment-outcome" aria-live="polite"></small></div>';
+}
+
+function adminRelicRow(int|string $index,array $row): void {
+    $prefix='config[relic_rows]['.$index.']';
+    $target=is_string($row['target']??null)?$row['target']:'';
+    echo '<div class="relic-row"><label>'.\Conquer\Game\Locale::html('admin.drops.fragment_relic').'<select name="'.ah($prefix.'[target]').'" required><option value="">'.\Conquer\Game\Locale::html('admin.drops.relic_select').'</option>';
+    foreach(\Conquer\Game\Treasure\TreasureData::all() as $code=>$def){
+        if(!empty($def['legacy_only']))continue;
+        $value='relic:'.$code;
+        echo '<option value="'.$value.'"'.($target===$value?' selected':'').'>'.ah(\Conquer\Game\Locale::text($def['name_de']??$def['name'])).'</option>';
+    }
+    echo '</select></label>';
+    adminNumber(\Conquer\Game\Locale::t('admin.drops.relic_quantity'),$prefix.'[quantity]',$row['quantity']??1,1,100000);
+    adminNumber(\Conquer\Game\Locale::t('admin.drops.relic_chance'),$prefix.'[chance]',$row['chance']??0,0,100,'.0001');
+    echo '<div class="drop-row-end"><button type="button" class="secondary" data-remove-relic aria-label="'.\Conquer\Game\Locale::html('admin.drops.relic_remove').'">✕</button></div><small class="relic-outcome" aria-live="polite"></small></div>';
 }

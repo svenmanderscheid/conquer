@@ -102,7 +102,7 @@ try{
     checkG(rowG($a)['state']==='arrived'&&(int)nodeG($n)['gatherer_march_id']===$a&&WorldContext::id()===1,'settlement uses the stored world and restores the viewing context');
     checkG(F::withOccupations([nodeG($n)],2,2)[0]['can_attack'],'field ownership and alliance rules are scoped to the field world');
     $global=json_encode(['drops'=>[['item_code'=>10103001,'count'=>2,'probability'=>1]]]);
-    $worldReward=json_encode(['drops'=>[['item_code'=>10103001,'count'=>7,'probability'=>1],['item_code'=>10103002,'count'=>9,'probability'=>0]],'fragment_drops'=>[['treasure_code'=>60100001,'count'=>4,'probability'=>1],['fragment_grade'=>'epic','count'=>1,'probability'=>1],['treasure_code'=>60100002,'count'=>7,'probability'=>0]]]);
+    $worldReward=json_encode(['drops'=>[['item_code'=>10103001,'count'=>7,'probability'=>1],['item_code'=>10103002,'count'=>9,'probability'=>0]],'fragment_drops'=>[['treasure_code'=>60100001,'count'=>4,'probability'=>1],['fragment_grade'=>'epic','count'=>1,'probability'=>1],['treasure_code'=>60100002,'count'=>7,'probability'=>0]],'relic_drops'=>[['treasure_code'=>60100003,'count'=>1,'probability'=>1],['treasure_code'=>60100002,'count'=>9,'probability'=>0]]]);
     $db->execute("INSERT INTO reward_overrides(source_type,source_key,config_json,updated_by) VALUES('farm','20100101.1',?,1)",[$global]);
     $db->execute("INSERT INTO reward_world_overrides(world_id,source_type,source_key,config_json,updated_by) VALUES(2,'farm','20100101.1',?,1)",[$worldReward]);
     \Conquer\Game\Rewards\RewardCatalog::resetCache();
@@ -111,17 +111,21 @@ try{
     G::finish($a);$haul=json_decode(rowG($a)['haul_json'],true);
     checkG(($haul['items'][10103001]??0)===7&&!isset($haul['items'][10103002]),'depleted farm uses its own world override and excludes zero-chance items');
     checkG(($haul['fragments'][60100001]??0)===4&&array_sum($haul['fragments'])===5&&!isset($haul['fragments'][60100002]),'Only full depletion rolls the stored world-specific relic fragment rewards');
+    checkG($haul['relics']===[60100003=>1],'Full depletion freezes whole relics from the farm world and excludes zero chance');
     checkG((int)$db->query('SELECT COUNT(*) FROM player_treasures WHERE player_id=1')->fetchColumn()===0,'Mine fragments remain in the haul until homecoming');
     G::finish($a);checkG(json_decode(rowG($a)['haul_json'],true)['items']===$haul['items'],'repeat settlement does not roll farm drops twice');
     clearG();
     checkG((int)$db->query('SELECT SUM(fragments) FROM player_treasures WHERE player_id=1')->fetchColumn()===5,'Mine homecoming credits the frozen relic fragments');
     clearG();checkG((int)$db->query('SELECT SUM(fragments) FROM player_treasures WHERE player_id=1')->fetchColumn()===5,'Repeated mine homecoming cannot credit fragments twice');
-    $global=json_encode(['drops'=>[['item_code'=>10103001,'count'=>2,'probability'=>1]],'fragment_drops'=>[['treasure_code'=>60100001,'count'=>1,'probability'=>1]]]);
+    checkG((int)$db->query('SELECT COUNT(*) FROM player_treasure_effects WHERE player_id=1 AND treasure_code=60100003 AND effect_index=0')->fetchColumn()===1,'Mine homecoming unlocks the whole relic exactly once');
+    $global=json_encode(['drops'=>[['item_code'=>10103001,'count'=>2,'probability'=>1]],'fragment_drops'=>[['treasure_code'=>60100001,'count'=>1,'probability'=>1]],'relic_drops'=>[['treasure_code'=>60100003,'count'=>1,'probability'=>1]]]);
     $db->execute("UPDATE reward_overrides SET config_json=? WHERE source_type='farm' AND source_key='20100101.1'",[$global]);\Conquer\Game\Rewards\RewardCatalog::resetCache();
     $n=makeNodeG(90);$a=sendG(1,$n);dueG($a,3);settleG($a);G::finish($a,true);
     checkG(empty(json_decode(rowG($a)['haul_json'],true)['items']),'partial recall awards no items even with a guaranteed farm drop');clearG();
     checkG(empty(json_decode(rowG($a)['haul_json'],true)['fragments'])&&(int)$db->query('SELECT SUM(fragments) FROM player_treasures WHERE player_id=1')->fetchColumn()===5,'Partial recall awards no relic fragments even with 100% chance');
+    checkG(empty(json_decode(rowG($a)['haul_json'],true)['relics']),'Partial recall awards no whole relic even with 100% chance');
     $n=makeNodeG(95);$a=sendG(1,$n);dueG($a,100000);settleG($a);
     checkG(rowG($a)['state']==='returning'&&(int)nodeG($n)['resource_amount']>0&&empty(json_decode(rowG($a)['haul_json'],true)['fragments']),'Filling troop capacity without depleting the mine awards no fragments');clearG();
+    checkG(empty(json_decode(rowG($a)['haul_json'],true)['relics']),'Filling troop capacity without depleting the mine awards no whole relic');
     echo "ALL GATHERING LIFECYCLE CHECKS PASSED\n";
 }finally{$fixture->close();}

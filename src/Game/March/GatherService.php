@@ -165,7 +165,7 @@ final class GatherService
         $db=Connection::getInstance();
         $finish=strtotime($march['gathering_finishes_at'].' UTC');
         if(!$recall&&$finish>$at)return false;
-        $end=min($at,$finish);$obj=self::node($march);$loot=[];$items=[];$fragments=[];
+        $end=min($at,$finish);$obj=self::node($march);$loot=[];$items=[];$fragments=[];$relics=[];
         if($obj){
             $gather=(json_decode($march['haul_json'],true)?:[])['gather']??[];
             $elapsed=max(0,$end-strtotime($march['arrival_time'].' UTC'));
@@ -180,11 +180,12 @@ final class GatherService
                     $rewards=\Conquer\Game\Rewards\RewardCatalog::effective('farm',$definition['code'].'.'.$definition['level'],(int)$march['world_id']);
                     $items=\Conquer\Game\Rewards\RewardCatalog::rollItems($rewards['drops']);
                     $fragments=\Conquer\Game\Rewards\RewardCatalog::rollFragments($rewards['fragment_drops']);
+                    $relics=\Conquer\Game\Rewards\RewardCatalog::rollRelics($rewards['relic_drops']);
                 }
                 \Conquer\Game\World\LandProgressService::recordGather((int)$march['world_id'],(int)$march['id'],(int)$obj['coord_x'],(int)$obj['coord_y'],FieldObjectService::RESOURCE_BY_TYPE[(int)$obj['object_type']],$amount,(int)$march['player_id']);
             }
         }
-        self::returnHome($march,$loot,$recall?$at:$end,null,$items,$fragments);return true;
+        self::returnHome($march,$loot,$recall?$at:$end,null,$items,$fragments,$relics);return true;
     }
 
     private static function occupant(array $obj): array|false
@@ -213,11 +214,11 @@ final class GatherService
         return Connection::getInstance()->query('SELECT * FROM field_objects WHERE id=? AND world_id=? AND coord_x=? AND coord_y=? AND gatherer_march_id=? FOR UPDATE',[$march['target_id'],$march['world_id'],$march['target_x'],$march['target_y'],$march['id']])->fetch();
     }
 
-    private static function returnHome(array $march,array $loot,int $leaveAt,?string $reason=null,array $items=[],array $fragments=[]): void
+    private static function returnHome(array $march,array $loot,int $leaveAt,?string $reason=null,array $items=[],array $fragments=[],array $relics=[]): void
     {
         $db=Connection::getInstance();$haul=json_decode($march['haul_json']??'{}',true)?:[];$travel=max(5,(int)($haul['pvp_return_seconds']??(strtotime($march['arrival_time'].' UTC')-strtotime($march['departure_time'].' UTC'))));
         $db->execute('UPDATE field_objects SET gatherer_march_id=NULL WHERE id=? AND world_id=? AND gatherer_march_id=?',[$march['target_id'],$march['world_id'],$march['id']]);
-        $db->execute("UPDATE marches SET state='returning',haul_json=?,return_time=?,gathering_finishes_at=NULL WHERE id=?",[json_encode(['loot'=>$loot,'items'=>$items,'fragments'=>$fragments,'survivors'=>json_decode($march['troops_json'],true)?:[],'reason'=>$reason]),gmdate('Y-m-d H:i:s',$leaveAt+$travel),$march['id']]);
+        $db->execute("UPDATE marches SET state='returning',haul_json=?,return_time=?,gathering_finishes_at=NULL WHERE id=?",[json_encode(['loot'=>$loot,'items'=>$items,'fragments'=>$fragments,'relics'=>$relics,'survivors'=>json_decode($march['troops_json'],true)?:[],'reason'=>$reason]),gmdate('Y-m-d H:i:s',$leaveAt+$travel),$march['id']]);
     }
 
     private static function atomic(callable $work): mixed

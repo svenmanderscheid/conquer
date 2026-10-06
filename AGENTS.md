@@ -14,6 +14,8 @@ Lies vor jeder sichtbaren Änderung an Menüs, Dialogen, HUD, Karten-Overlays od
 
 Browser-Scrollleisten bleiben in allen bestehenden und zukünftigen Welten unsichtbar. Die gemeinsame Regel in `assets/css/village-theme.css` gilt unabhängig von Welt-ID, Region und Kartenart für Seiten und innere Scrollbereiche. Scrollen per Mausrad, Touch und Tastatur muss erhalten bleiben; neue Ansichten dürfen die Scrollleisten nicht wieder einblenden oder zum Ausblenden benötigtes Scrollen mit `overflow:hidden` sperren.
 
+**Vom Nutzer freigegebene Ausnahme für die Verwaltung (5. Oktober 2026):** Das Admin-Backoffice verwendet die moderne, eigenständige Gestaltung in `assets/css/admin-modern.css`: Systemschrift, neutrale helle Flächen und blaue Aktionen. Dieses nur auf `body.admin-modern` begrenzte Stylesheet wird nach `village-theme.css` geladen. Die sieben Hauptbereiche und die direkt bearbeitbaren Drop-Tabellen sind in `docs/ADMIN_BACKOFFICE.md` beschrieben. Die Spieloberfläche behält Variante A. Sprache, semantische Farben, unsichtbare Scrollleisten und mobile Bedienbarkeit gelten weiterhin.
+
 ## Verbindliche Gestaltung der gezeichneten Welt
 
 Lies vor sichtbaren Änderungen an Stadt, Welt, Gebäuden, Figuren oder Dekoration `docs/ART_DIRECTION.md`. Die Stilvorlage bleibt `assets/art/village2.png`; die aktive Stadt verwendet `assets/js/city-painted.js` und die dort referenzierten freigegebenen Bilder.

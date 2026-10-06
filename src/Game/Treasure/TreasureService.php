@@ -10,7 +10,7 @@ use Conquer\Game\World\WorldContext;
 final class TreasureService
 {
     public const SLOT_UNLOCK_LEVELS = [1,1,5,10,20,25];
-    private const UNLOCK_COST = 10;
+    public const UNLOCK_COST = 10;
     private const EFFECT_UPGRADE_BASE_COST = 10;
     private const EFFECT_CURVE = [0.0,0.10,0.25,0.45,0.70,1.0];
     /** Gewöhnliche Relikte: zwei frei aufwertbare Effekte mit je einem Meisterbonus. */
@@ -165,6 +165,23 @@ final class TreasureService
             $newlyUnlocked=self::unlockIfReady($db,$playerId,$treasureCode);
             $remaining=(int)$db->query('SELECT fragments FROM player_treasures WHERE player_id=? AND treasure_code=?',[$playerId,$treasureCode])->fetchColumn();
             return ['fragments'=>$remaining,'level'=>$newlyUnlocked?2:(self::isUnlocked($db,$playerId,$treasureCode)?2:0),'newly_unlocked'=>$newlyUnlocked];
+        });
+    }
+
+    /** A first whole relic unlocks its first effect without spending collected fragments. */
+    public static function addRelics(int $playerId,int $treasureCode,int $amount=1): array
+    {
+        $definition=TreasureData::get($treasureCode);
+        if($amount<1||$amount>intdiv(4294967295,self::UNLOCK_COST)||!$definition||!empty($definition['legacy_only'])||!self::effectDefinitions($definition,$treasureCode))throw new \InvalidArgumentException(\Conquer\Game\Locale::t('admin.drops.relic_invalid'));
+        return self::atomic($playerId,static function(Connection $db)use($playerId,$treasureCode,$amount):array{
+            $db->execute('INSERT IGNORE INTO player_treasures(player_id,treasure_code,fragments) VALUES(?,?,0)',[$playerId,$treasureCode]);
+            $before=(int)$db->query('SELECT fragments FROM player_treasures WHERE player_id=? AND treasure_code=? FOR UPDATE',[$playerId,$treasureCode])->fetchColumn();
+            $newlyUnlocked=!self::isUnlocked($db,$playerId,$treasureCode);
+            $duplicates=$amount-($newlyUnlocked?1:0);$fragments=$duplicates*self::UNLOCK_COST;
+            if($before>4294967295-$fragments)throw new \DomainException(\Conquer\Game\Locale::t('admin.drops.relic_overflow'));
+            if($newlyUnlocked)$db->execute('INSERT INTO player_treasure_effects(player_id,treasure_code,effect_index,parts) VALUES(?,?,0,1)',[$playerId,$treasureCode]);
+            if($fragments>0)$db->execute('UPDATE player_treasures SET fragments=fragments+? WHERE player_id=? AND treasure_code=?',[$fragments,$playerId,$treasureCode]);
+            return ['fragments'=>$before+$fragments,'level'=>2,'newly_unlocked'=>$newlyUnlocked,'duplicate_relics'=>$duplicates,'fragments_added'=>$fragments];
         });
     }
 

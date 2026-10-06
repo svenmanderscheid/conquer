@@ -26,9 +26,11 @@ const output=path.resolve(process.env.MONSTER_REPORT_OUTPUT||'artifacts/monster-
    assert.equal(await page.locator('.cr-identity.defender').evaluate(el=>getComputedStyle(el).borderBottomColor),'rgb(42, 114, 201)','Monster role keeps the blue defender accent');
    assert(await page.locator('.cr-banner').evaluate(el=>{const rgb=value=>value.startsWith('#')?value.slice(1).match(/../g).map(c=>parseInt(c,16)):value.match(/[\d.]+/g).slice(0,3).map(Number);const lum=value=>rgb(value).map(n=>n/255).map(n=>n<=.04045?n/12.92:((n+.055)/1.055)**2.4).reduce((s,n,i)=>s+n*[.2126,.7152,.0722][i],0);const paper=lum(getComputedStyle(el).getPropertyValue('--ui-paper').trim());return [...el.querySelectorAll('small,strong,time')].every(node=>{const ink=lum(getComputedStyle(node).color);return(Math.max(ink,paper)+.05)/(Math.min(ink,paper)+.05)>=4.5;});}),'Report metadata has readable contrast on its paper surface');
    assert(await page.locator('.mr-loot').evaluate(el=>el.offsetTop<document.querySelector('.mr-summary').offsetTop),'Loot precedes the detailed troop balance');
-   assert.equal(await page.locator('.mr-reward').count(),8,'Report includes five resources, one item and two relic fragment rewards');
+   assert.equal(await page.locator('.mr-reward').count(),9,'Report includes five resources, one item, two fragments and one whole relic reward');
    const fragmentName=await page.evaluate(()=>ConquerRelicPresentation.name({treasure_code:60100001}));
    assert(await page.locator('.mr-reward-name').filter({hasText:fragmentName}).count(),'Specific relic fragment uses the current shared relic name in the main app');
+   assert.equal(await page.locator('.mr-reward-name').filter({hasText:fragmentName}).count(),2,'Whole relic and fragments of the same relic remain separate');
+   assert.match(await page.locator('.mr-reward-name').last().innerText(),/Ganzes Relikt/,'The whole relic is explicitly labelled');
    assert.equal(await page.locator('.mr-troop-card').count(),4);assert.equal(await page.locator('.mr-boost-list li').count(),9);
    assert.equal(await page.locator('.mr-boost-list li').filter({hasText:'+0,0 %'}).count()>0,true);assert.equal(await page.locator('.mr-battle-values dt').count(),10);
    assert.match(await page.locator('.cr-identity.defender img').getAttribute('src'),/bright-v2\/orc\.png/);
@@ -66,6 +68,7 @@ const output=path.resolve(process.env.MONSTER_REPORT_OUTPUT||'artifacts/monster-
   await page.locator('[aria-label="Älterer Kampfbericht"]').click();assert.equal(await page.locator('.cr-bonuses').count(),0);assert.match(await page.locator('.cr-notice').innerText(),/damals nicht gespeichert/);
   await page.keyboard.press('Escape');await page.waitForFunction(()=>!document.querySelector('#game-dialog').open&&!history.state?.conquerMonsterReport);
   await page.goto(base+'/reports/'+id);await page.locator('.monster-report').waitFor();assert(await bounds('.cr-scroll'));
+  assert.match(await page.locator('.mr-reward-name').last().innerText(),/Ganzes Relikt/);assert.match(await page.locator('.mr-reward').last().locator('img').getAttribute('src'),/relics-v4-storybook/,'Direct report uses the approved whole relic artwork');
   await page.locator('[data-monster="details"]').click();assert.equal(await page.locator('#monster-combat-details .cr-troop').count(),3);await page.keyboard.press('Escape');await page.waitForFunction(()=>!history.state?.conquerMonsterReport);
   await page.screenshot({path:path.join(output,'direct-report.png')});
   const denied=await page.evaluate(async id=>(await fetch('/api/battle/report/'+id+'/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'})).status,id);assert.equal(denied,403);

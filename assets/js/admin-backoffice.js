@@ -7,7 +7,18 @@
     const rewardText = (key, values={}) => window.ConquerLocale.t('admin.drops.'+key, values);
     const rewardNumber = value => value.toLocaleString(window.ConquerLocale?.locale??'en',{maximumFractionDigits:2});
     const catalog = JSON.parse($('#admin-item-catalog')?.textContent || '[]');
+    const directCategories=['fragments','specific_fragments','relics'];
+    catalog.forEach(item=>{
+        if(!item.treasure_code||!window.ConquerRelicPresentation)return;
+        const relic={treasure_code:item.treasure_code};
+        item.name=rewardText(item.category==='relics'?'whole_named':'fragments_named',{name:window.ConquerRelicPresentation.name(relic)});
+        item.image=window.ConquerRelicPresentation.image(item.image.split('/assets/art/')[0],relic);
+    });
     const byCode = new Map(catalog.map(i=>[String(i.code),i]));
+    $$('.item-select').forEach(container=>{
+        const item=byCode.get($('input',container)?.value);if(!item?.treasure_code)return;
+        $('strong',container).textContent=item.name;$('img',container).src=item.image;
+    });
     const dialog = $('#item-picker-dialog');
     const esc = v => String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const menu = $('.mobile-menu');
@@ -26,7 +37,7 @@
         if(!activePicker)return;
         const query=$('#item-picker-search').value.trim().toLocaleLowerCase('de');
         const category=$('#item-picker-category').value;
-        const choices=catalog.filter(i=>(activePicker.dataset.fragments==='1'||i.category!=='fragments')&&(!category||i.category===category)&&`${i.name} ${i.code} ${i.description}`.toLocaleLowerCase('de').includes(query));
+        const choices=catalog.filter(i=>(activePicker.dataset.fragments==='1'||!directCategories.includes(i.category))&&(!category||i.category===category)&&`${i.name} ${i.code} ${i.description}`.toLocaleLowerCase('de').includes(query));
         $('.picker-count').textContent=`${choices.length} Gegenstände gefunden`;
         $('.picker-results').innerHTML=(activePicker.dataset.optional==='1'?'<button type="button" class="secondary picker-result" data-pick-item="0">Kein Gegenstand</button>':'')+choices.map(i=>`<button type="button" class="secondary picker-result" data-pick-item="${esc(i.code)}"><span class="item-tile rarity-${esc(i.rarity)}"><img src="${esc(i.image)}" alt="" loading="lazy"></span><span><strong>${esc(i.name)}</strong><small>${esc(i.category_name)} · Nr. ${esc(i.code)}</small></span></button>`).join('')+(choices.length?'':'<p class="empty">Keine Treffer. Versuche einen anderen Namen oder eine andere Kategorie.</p>');
     }
@@ -44,6 +55,7 @@
         const picker=event.target.closest('[data-item-picker]');
         if(picker){
             activePicker=picker.closest('.item-select');$('#item-picker-search').value='';$('#item-picker-category').value='';
+            $$('#item-picker-category option').forEach(option=>{option.hidden=activePicker.dataset.fragments!=='1'&&directCategories.includes(option.value);});
             pickerResults();dialog.showModal();$('#item-picker-search').focus();return;
         }
         const selected=event.target.closest('[data-pick-item]');
@@ -172,6 +184,7 @@
     function updateRows(){
         if(!editor)return;
         updateFragmentRows();
+        updateRelicRows();
         const rows=$$('.drop-row',editor),weighted=['chest','dungeon'].includes(editor.dataset.rewardEditor);
         const total=rows.reduce((sum,r)=>sum+Math.max(0,Number($('input[name$="[weight]"]',r)?.value)||0),0);
         const query=$('[data-drop-search]').value.trim().toLocaleLowerCase('de');let visible=0;
@@ -236,6 +249,32 @@
         $('[data-fragment-rows]',editor).insertAdjacentHTML('beforeend',$('#fragment-row-template').innerHTML.replaceAll('__ROW__',String(index)));
         markDirty();updateFragmentRows();$$('.fragment-row select',editor).at(-1).focus();
     });
+    function updateRelicRows(){
+        const container=$('[data-relic-rows]',editor);if(!container)return;
+        const rows=$$('.relic-row',container);let active=0,expected=0;
+        rows.forEach(row=>{
+            const select=$('select',row);
+            if(window.ConquerRelicPresentation&&!select.dataset.relicNames){
+                [...select.options].forEach(option=>{if(option.value.startsWith('relic:'))option.textContent=window.ConquerRelicPresentation.name({treasure_code:Number(option.value.slice(6))});});
+                select.dataset.relicNames='1';
+            }
+            const chance=Math.min(100,Math.max(0,Number($('input[name$="[chance]"]',row).value)||0));
+            const quantity=Math.max(0,Number($('input[name$="[quantity]"]',row).value)||0);
+            if(select.value&&chance>0)active++;
+            const count=select.value?quantity*chance:0;expected+=count;
+            $('.relic-outcome',row).textContent=rewardText('relic_outcome',{chance:matrixFormat(chance),count:matrixFormat(count)});
+        });
+        $('[data-relic-empty]',editor).hidden=rows.length>0;
+        $('[data-relic-summary]',editor).textContent=rewardText('relic_summary',{active,count:matrixFormat(expected)});
+        $('[data-add-relic]',editor).disabled=rows.length>=100||form.querySelector('fieldset').disabled;
+    }
+    $('[data-add-relic]')?.addEventListener('click',()=>{
+        if(form.querySelector('fieldset').disabled)return;
+        const rows=$$('.relic-row',editor);if(rows.length>=100)return;
+        const index=Math.max(-1,...rows.map(row=>Number($('select',row).name.match(/\[relic_rows\]\[(\d+)\]/)?.[1])||0))+1;
+        $('[data-relic-rows]',editor).insertAdjacentHTML('beforeend',$('#relic-row-template').innerHTML.replaceAll('__ROW__',String(index)));
+        markDirty();updateRelicRows();$$('.relic-row select',editor).at(-1).focus();
+    });
     function focusLinkedDrop(){
         if(!matrix||!editor||$('#reward-editor').hidden)return;
         const code=location.hash.match(/^#drop-item-(\d+)$/)?.[1],item=byCode.get(code);
@@ -263,7 +302,7 @@
         });
     }
     $('[data-drop-search]')?.addEventListener('input',updateRows);
-    editor?.addEventListener('click',e=>{const fragment=e.target.closest('[data-remove-fragment]');if(fragment){fragment.closest('.fragment-row').remove();markDirty();updateFragmentRows();}const remove=e.target.closest('.remove-drop');if(remove){remove.closest('.drop-row').remove();markDirty();updateRows();}});
+    editor?.addEventListener('click',e=>{const relic=e.target.closest('[data-remove-relic]');if(relic){relic.closest('.relic-row').remove();markDirty();updateRelicRows();}const fragment=e.target.closest('[data-remove-fragment]');if(fragment){fragment.closest('.fragment-row').remove();markDirty();updateFragmentRows();}const remove=e.target.closest('.remove-drop');if(remove){remove.closest('.drop-row').remove();markDirty();updateRows();}});
     form?.addEventListener('input',e=>{if(e.target.name)markDirty();updateRows();});form?.addEventListener('change',e=>{if(e.target.name)markDirty();updateRows();});
     form?.addEventListener('invalid',e=>{for(let detail=e.target.closest('details');detail;detail=detail.parentElement?.closest('details'))detail.open=true;const row=e.target.closest('.drop-row');if(row?.hidden){$('[data-drop-search]').value='';updateRows();row.scrollIntoView({block:'center'});}},true);
     function previewTreasure(){const select=$('[data-treasure-select]');if(!select)return;const option=select.selectedOptions[0];if(option){$('.treasure-preview img').src=option.dataset.image;$('[data-treasure-name]').textContent=option.textContent;}}

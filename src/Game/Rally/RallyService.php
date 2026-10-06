@@ -231,6 +231,7 @@ final class RallyService
             if(!empty($loot['gems']))$db->execute('UPDATE players SET gems=gems+? WHERE id=?',[(int)$loot['gems'],$army['player_id']]);
             foreach(($army['items']??[]) as $code=>$amount)\Conquer\Game\Inventory\InventoryService::addItems($army['player_id'],(int)$code,(int)$amount,$world);
             \Conquer\Game\Rewards\RewardCatalog::grantFragments($army['player_id'],$army['fragments']??[]);
+            \Conquer\Game\Rewards\RewardCatalog::grantRelics($army['player_id'],$army['relics']??[]);
             $db->execute('UPDATE cities SET food=food+?,lumber=lumber+?,stone=stone+?,gold=gold+? WHERE id=?',[$loot['food']??0,$loot['lumber']??0,$loot['stone']??0,$loot['gold']??0,$army['city_id']]);
         }
     }

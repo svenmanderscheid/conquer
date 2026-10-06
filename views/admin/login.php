@@ -92,9 +92,10 @@
     }
   </style>
   <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/village-theme.css?v=<?= filemtime(ROOT_DIR.'/assets/css/village-theme.css') ?>">
+<link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/admin-modern.css?v=<?= filemtime(ROOT_DIR.'/assets/css/admin-modern.css') ?>">
 <?php require ROOT_DIR.'/views/partials/localization-head.php'; ?>
 </head>
-<body class="admin-village" data-i18n-scope>
+<body class="admin-village admin-modern" data-i18n-scope>
 <div class="login-box">
   <h1>&#9876; Union of Kingdoms Admin</h1>
 

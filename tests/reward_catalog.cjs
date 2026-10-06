@@ -11,7 +11,7 @@ for(const item of catalog){
  const expected=item.category==='speedup'&&!item.icon_framed&&(!item.icon||item.icon==='speedup.svg')?`backpack/speedup${specialty}.svg`:item.category==='resource_pack'&&!item.icon&&['food','lumber','stone','gold','gems'].includes(item.resource)?`backpack/${item.resource}-${scale}.svg`:item.icon;
  assert(reward.icon.includes('/'+expected+'?'),'Inventory presentation icon '+item.code);assert(fs.existsSync(path.join(root,'assets/art/items',expected)),'Real item asset '+item.code);assert.equal(reward.name,item.name_de||item.name);
 }
-for(const item of treasures){const reward=resolve({type:'fragment',treasure_code:item.code,quantity:3},kingdom);assert.equal(reward.kind,'Reliktfragmente');assert(reward.icon.includes('/'+item.icon+'?'));}
+for(const item of treasures){const reward=resolve({type:'fragment',treasure_code:item.code,quantity:3},kingdom);assert.equal(reward.kind,'Relic fragments');assert(reward.icon.includes('/'+item.icon+'?'));}
 vm.runInNewContext(fs.readFileSync(path.join(root,'assets/js/item-art.js'),'utf8'),sandbox);
 const uniqueIcons=new Set();
 const speedupArt={generic:'painted-v2/10103001.webp',building:'painted-v2/10103011.webp',research:'painted-v2/10103021.webp',training:'painted-v2/10103031.webp',healing:'painted-v2/10103041.webp'};
@@ -63,12 +63,34 @@ for(const item of treasures){
   assert.equal(reward.icon,presentation.image('/conquer',item),'Approved relic portrait overrides historical receipt icon '+item.code);
   assert.equal(reward.rarity,presentation.grade(item),'Approved relic rarity '+item.code);
   assert.equal(reward.quantity,5,'Credited fragment quantity remains unchanged');
-  assert.equal(reward.kind,'Reliktfragmente');
+  assert.equal(reward.kind,'Relic fragments');
   assert(item.legacy_only||reward.icon.includes('/relics-v4-storybook/'),'Active relic has approved artwork '+item.code);
   assert(fs.existsSync(path.join(root,reward.icon.split('?')[0].slice('/conquer/'.length))));
  }
 }
 assert(resolve({treasure_code:60100101,quantity:5},{}).icon.includes('/rel-003-zeichen-des-steinmetzen.png'),'Hammer receipt uses its approved identity without type or catalog');
 assert(resolve({type:'fragment',treasure_code:99999999,icon:'fragment.svg',quantity:2},{}).icon.includes('/items/fragment.svg?'),'Unknown future relic keeps fallback artwork');
+for(const locale of ['en','de','fr','lb']){
+ const translations=JSON.parse(fs.readFileSync(path.join(root,'data/i18n',locale+'.json'),'utf8'));
+ sandbox.window.ConquerLocale={locale,t:(key,params={})=>Object.entries(params).reduce((text,[name,value])=>text.replaceAll('{'+name+'}',String(value)),translations[key]||key),text:value=>value};
+ const fragment=resolve({type:'fragment',treasure_code:60100001,quantity:7},kingdom,'/conquer');
+ const whole=resolve({type:'relic',treasure_code:60100001,quantity:2},kingdom,'/conquer');
+ assert.equal(whole.type,'relic');assert.equal(fragment.type,'fragment');
+ assert.equal(whole.kind,translations['reward.kind.relic'],'Whole relic label is translated '+locale);
+ assert.equal(fragment.kind,translations['reward.kind.fragment'],'Fragment label is translated '+locale);
+ assert.notEqual(whole.kind,fragment.kind,'Reward types are unambiguous '+locale);
+ assert.equal(whole.icon,fragment.icon,'Whole relics and fragments share approved artwork');
+ assert.equal(whole.name,fragment.name,'Both rewards name the selected relic');
+ assert.equal(whole.quantity,2);assert.equal(fragment.quantity,7,'Whole and fragment amounts remain separate');
+ const duplicate=resolve({type:'relic',treasure_code:60100001,quantity:2,duplicate_relics:2,fragments_added:60},kingdom);
+ assert.equal(duplicate.conversion,translations['reward.relic_duplicates'].replace('{count}','60'),'Duplicate conversion uses confirmed fragment count '+locale);
+ assert.equal(whole.conversion,'');assert.equal(fragment.conversion,'','Ordinary fragments never claim duplicate conversion');
+}
+vm.runInNewContext(fs.readFileSync(path.join(root,'assets/js/monster-report.js'),'utf8'),sandbox);
+const wholeOnly={id:1,outcome:'attacker_wins',reward_delivery:'returning',details:{monster_name:'Orc',relic_rewards:[{type:'relic',treasure_code:60100001,name:'Test relic',count:2}]}};
+assert.match(sandbox.window.ConquerMonsterReport.delivery(wholeOnly),/Rückmarsch/,'Whole-relic-only haul is recognized as loot');
+const wholeHtml=sandbox.window.ConquerMonsterReport.render(wholeOnly,{kingdom});
+assert(wholeHtml.includes(resolve(wholeOnly.details.relic_rewards[0],kingdom).kind),'Monster report identifies whole relics');
+assert(wholeHtml.includes('rel-001-kornhorn-der-ernte.png'),'Monster report uses the approved relic portrait');
 assert.equal(sandbox.window.ConquerRewards.asset('','../private.png'),'');assert.equal(sandbox.window.ConquerRewards.asset('','https://outside.invalid/icon.png'),'');
 console.log(`PASS ${catalog.length} inventory and ${treasures.length} relic reward icons, names, amounts, ambiguous labels and safe asset paths.`);

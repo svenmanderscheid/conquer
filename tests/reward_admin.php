@@ -16,10 +16,11 @@ function ck(bool $ok,string $message):void{global $checks;if(!$ok)throw new Runt
 function reject(callable $fn,string $message):void{try{$fn();}catch(InvalidArgumentException|DomainException $e){ck(true,$message);return;}throw new RuntimeException('Accepted invalid request: '.$message);}
 function formConfig(string $type,array $cfg):array{
     $form=$cfg;$form['rows']=[];
-    foreach($cfg[$type==='chest'?'drop_table':($type==='dungeon'?'items':'drops')]as$r)$form['rows'][]=['target'=>isset($r['fragment_grade'])?'fragment:'.$r['fragment_grade']:(string)$r['item_code'],'quantity'=>$r['quantity']??$r['count']??1,'chance'=>($r['probability']??0)*100,'weight'=>$r['weight']??1];
+    foreach($cfg[$type==='chest'?'drop_table':($type==='dungeon'?'items':'drops')]as$r)$form['rows'][]=['target'=>isset($r['relic_code'])?'relic:'.$r['relic_code']:(isset($r['treasure_code'])?'treasure:'.$r['treasure_code']:(isset($r['fragment_grade'])?'fragment:'.$r['fragment_grade']:(string)$r['item_code'])),'quantity'=>$r['quantity']??$r['count']??1,'chance'=>($r['probability']??0)*100,'weight'=>$r['weight']??1];
     if($type==='monster'){$form['resources']=$cfg['resource_reward'];$form['gems_chance']=$cfg['gems_drop']['chance']*100;$form['gems_amount']=$cfg['gems_drop']['amount'];$form['charms']['chance']*=100;}
     if($type==='dungeon')$form['item_chance']*=100;
     $form['fragment_rows']=array_map(static fn(array $r):array=>['target'=>isset($r['treasure_code'])?'treasure:'.$r['treasure_code']:'fragment:'.$r['fragment_grade'],'quantity'=>$r['count'],'chance'=>$r['probability']*100],$cfg['fragment_drops']??[]);
+    $form['relic_rows']=array_map(static fn(array $r):array=>['target'=>'relic:'.$r['treasure_code'],'quantity'=>$r['count'],'chance'=>$r['probability']*100],$cfg['relic_drops']??[]);
     return $form;
 }
 function action(string $type,string $key,array $form,int $revision=0,?string $op=null,int $admin=1,string $action='reward-save'):array{
@@ -103,9 +104,10 @@ try{
     reject(fn()=>action('farm','20100101.1',$farm,0),'Stale farm save rejected');
     action('farm','20100101.1',[],1,null,1,'reward-reset');
     ck(R::effective('farm','20100101.1',1)===R::defaults('farm','20100101.1'),'Farm reset restores defaults');
+    require ROOT_DIR.'/tests/admin_reward_batch.php';
     ck(\Conquer\Auth\AdminAuth::login('RewardAdmin','Fixture-Reward-123!'),'real admin login creates a current authenticated session');
     $_SESSION['admin_csrf']=str_repeat('a',64);
-    foreach(['monster','farm','dungeon','chest','expedition']as$type){$_GET=['world_id'=>1,'type'=>$type];ob_start();\Conquer\Admin\AdminController::rewards();$html=ob_get_clean();ck(str_contains($html,'data-reward-editor')&&!str_contains($html,'<div class="notice error">Die Ansicht konnte nicht geladen'),'Render '.$type.' editor');}
+    foreach(['monster','farm','dungeon','chest','expedition']as$type){$_GET=['world_id'=>1,'type'=>$type];ob_start();\Conquer\Admin\AdminController::rewards();$html=ob_get_clean();ck(str_contains($html,in_array($type,['monster','farm'],true)?'data-batch-editor':'data-reward-editor')&&!str_contains($html,'<div class="notice error">Die Ansicht konnte nicht geladen'),'Render '.$type.' editor');}
     $_GET=[];ob_start();\Conquer\Admin\AdminController::items();$html=ob_get_clean();ck(str_contains($html,'item-catalog-grid')&&!str_contains($html,'<div class="notice error">Die Ansicht konnte nicht geladen'),'Render illustrated catalog');
     echo "ALL $checks REWARD CHECKS PASSED\n";
     if(in_array('--browser',$argv,true)){
@@ -121,7 +123,7 @@ try{
         if($path==='/admin/login'){if($_SERVER['REQUEST_METHOD']==='POST')\Conquer\Admin\AdminController::loginPost();else \Conquer\Admin\AdminController::loginPage();}
         elseif($path==='/admin/logout')\Conquer\Admin\AdminController::logout();
         elseif(str_starts_with($path,'/admin/action/'))\Conquer\Admin\AdminController::handleAction();
-        else{match($path){'/admin'=>\Conquer\Admin\AdminController::dashboard(),'/admin/rewards'=>\Conquer\Admin\AdminController::rewards(),'/admin/items'=>\Conquer\Admin\AdminController::items(),'/admin/world'=>\Conquer\Admin\AdminController::world(),'/admin/lands'=>\Conquer\Admin\AdminController::lands(),'/admin/players'=>\Conquer\Admin\AdminController::players(),'/admin/bug-reports'=>\Conquer\Admin\AdminController::bugReports(),'/admin/audit'=>\Conquer\Admin\AdminController::auditLog(),default=>http_response_code(404)};}
+        else{match($path){'/admin'=>\Conquer\Admin\AdminController::dashboard(),'/admin/rewards'=>\Conquer\Admin\AdminController::rewards(),'/admin/items'=>\Conquer\Admin\AdminController::items(),'/admin/world'=>\Conquer\Admin\AdminController::world(),'/admin/world-create'=>\Conquer\Admin\AdminController::worldCreate(),'/admin/alliances'=>\Conquer\Admin\AdminController::alliances(),'/admin/alpha-keys'=>\Conquer\Admin\AdminController::alphaKeys(),'/admin/alpha-waitlist'=>\Conquer\Admin\AdminController::alphaWaitlist(),'/admin/chat'=>\Conquer\Admin\AdminController::chat(),'/admin/analytics'=>\Conquer\Admin\AdminController::analytics(),'/admin/layout'=>\Conquer\Admin\AdminController::layoutEditor(),'/admin/lands'=>\Conquer\Admin\AdminController::lands(),'/admin/players'=>\Conquer\Admin\AdminController::players(),'/admin/bug-reports'=>\Conquer\Admin\AdminController::bugReports(),'/admin/audit'=>\Conquer\Admin\AdminController::auditLog(),default=>http_response_code(404)};}
         PHP;
         $url=$fixture->serve($routes,['-d','session.save_path='.sys_get_temp_dir()]);
         $process=proc_open(['node',ROOT_DIR.'/tests/admin_backoffice.cjs',$url],[0=>['pipe','r'],1=>STDOUT,2=>STDERR],$pipes,ROOT_DIR,null,['bypass_shell'=>true]);

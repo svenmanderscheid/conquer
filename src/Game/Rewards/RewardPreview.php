@@ -57,6 +57,17 @@ final class RewardPreview
                 'quantity_on_drop'=>$quantity,'chance'=>$chance,'expected_per_100'=>$quantity*$chance*100,
             ];
         }
+        $relics=[];
+        foreach($config['relic_drops']??[] as $drop){
+            $definition=TreasureData::get((int)$drop['treasure_code']);
+            if(!$definition)continue;
+            $quantity=max(0,(int)$drop['count']);$chance=self::chance($drop['probability']);
+            $relics[]=[
+                'treasure_code'=>(int)$drop['treasure_code'],
+                'name'=>Locale::text($definition['name_de']??$definition['name']),
+                'quantity_on_drop'=>$quantity,'chance'=>$chance,'expected_per_100'=>$quantity*$chance*100,
+            ];
+        }
         $gemChance = self::chance($gemRule['chance'] ?? 0);
         $gemAmount = max(0, (int)($gemRule['amount'] ?? 0));
         $resources = [];
@@ -71,6 +82,7 @@ final class RewardPreview
             'resources_per_victory' => $resources,
             'items' => $items,
             'fragments' => $fragments,
+            'relics' => $relics,
             'gems' => [
                 'quantity_on_drop' => $gemAmount,
                 'chance' => $gemChance,

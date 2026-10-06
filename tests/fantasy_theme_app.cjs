@@ -182,9 +182,9 @@ async function actualFonts(page, selector) {
     for (const [width, height] of [[1280, 800], [390, 844]]) {
       await admin.setViewportSize({ width, height });
       await admin.evaluate(() => document.fonts.ready);
-      assert((await admin.locator('body').evaluate(element => getComputedStyle(element).fontFamily)).includes('Conquer UI'), 'Backoffice shares fantasy font');
-      assert.equal(await admin.locator('.topbar').evaluate(element => getComputedStyle(element).backgroundColor), 'rgb(92, 66, 112)', 'Backoffice header shares violet accent');
-      assert.equal(await admin.locator('.quick-action>span').first().evaluate(element => getComputedStyle(element).color), 'rgb(92, 66, 112)', 'Backoffice links share violet accent');
+      assert((await admin.locator('body').evaluate(element => getComputedStyle(element).fontFamily)).includes('system-ui'), 'Administration uses its approved independent typography');
+      assert.equal(await admin.locator('.topbar').evaluate(element => getComputedStyle(element).backgroundColor), 'rgb(255, 255, 255)', 'Administration uses a neutral header');
+      assert.equal(await admin.locator('.quick-action>span').first().evaluate(element => getComputedStyle(element).color), 'rgb(29, 70, 172)', 'Administration uses readable blue actions');
       await admin.screenshot({ path: path.join(output, `admin-${width}x${height}.png`), fullPage: true });
     }
     report.push({ errors, badAssets, badApis, appearanceFailures });

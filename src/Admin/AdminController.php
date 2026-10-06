@@ -124,7 +124,7 @@ final class AdminController
         if($action==='alpha-waitlist-update')$return='/admin/alpha-waitlist';
         $alphaAction=in_array($action,['alpha-key-create','alpha-key-revoke'],true);
         if($alphaAction)$return='/admin/alpha-keys';
-        $rewardAction=in_array($action,['reward-save','reward-reset'],true);
+        $rewardAction=in_array($action,['reward-save','reward-reset','reward-batch-save'],true);
         if($rewardAction){$return='/admin/rewards';$sourceType=is_string($_POST['source_type']??null)?$_POST['source_type']:'monster';$sourceKey=is_string($_POST['source_key']??null)?$_POST['source_key']:'';}
         try {
             $result=AdminService::execute((int)$admin['id'],$action,$_POST);
@@ -132,7 +132,7 @@ final class AdminController
             if($action==='world-create'){$return='/admin/world';unset($_SESSION['admin_world_create_draft']);}
             $_SESSION['admin_flash']=($result['duplicate']?'Bereits ausgeführt: ':'').$result['message'];
             $_SESSION['admin_flash_kind']='success';
-            if($rewardAction)unset($_SESSION['admin_reward_draft']);
+            if($rewardAction)unset($_SESSION['admin_reward_draft'],$_SESSION['admin_reward_batch_draft']);
             if($action==='alpha-key-create'){
                 unset($_SESSION['admin_alpha_draft']);
                 if(!empty($result['issued_keys']))$_SESSION['admin_alpha_issued']=['admin_id'=>(int)$admin['id'],'expires'=>time()+300,'keys'=>$result['issued_keys']];
@@ -143,6 +143,12 @@ final class AdminController
             $_SESSION['admin_flash']=$message;$_SESSION['admin_flash_kind']='error';
         } catch(\Throwable $e){error_log('Admin action failed: '.$e->getMessage());$_SESSION['admin_flash']='Der Vorgang konnte nicht gespeichert werden. Alle Änderungen wurden zurückgerollt.';$_SESSION['admin_flash_kind']='error';}
         if($rewardAction&&($_SESSION['admin_flash_kind']??'')==='error'&&$action==='reward-save')$_SESSION['admin_reward_draft']=$_POST;
+        if($action==='reward-batch-save'&&($_SESSION['admin_flash_kind']??'')==='error'){
+            $_SESSION['admin_reward_batch_draft']=[];
+            foreach(['source_type'=>32,'reward_scope'=>32,'world_id'=>20,'reason'=>500,'updates_json'=>1000000] as $field=>$limit){
+                if(is_string($_POST[$field]??null)&&strlen($_POST[$field])<=$limit)$_SESSION['admin_reward_batch_draft'][$field]=$_POST[$field];
+            }
+        }
         if($action==='alpha-key-create'&&($_SESSION['admin_flash_kind']??'')==='error'){
             $_SESSION['admin_alpha_draft']=[];
             foreach(['label','quantity','max_uses','expires_at','reason','operation_id'] as $field)if(is_string($_POST[$field]??null))$_SESSION['admin_alpha_draft'][$field]=mb_substr($_POST[$field],0,500);

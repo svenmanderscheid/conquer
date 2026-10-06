@@ -29,6 +29,7 @@ final class RewardPresentation
         $def = TreasureData::get($code);
         if ($def === null) return [];
         return [
+            'type'=>'fragment',
             'treasure_code'=>$code,
             'name'=>$def['name_de'] ?? $def['name'],
             'icon'=>$def['icon'] ?? 'fragment.svg',
@@ -36,6 +37,12 @@ final class RewardPresentation
             'rarity'=>$def['grade'] ?? 'normal',
             'grade'=>$def['grade'] ?? 'normal',
         ];
+    }
+
+    public static function relic(int $code): array
+    {
+        $metadata = self::fragment($code);
+        return $metadata ? ['type'=>'relic'] + $metadata : [];
     }
 
     /** Add display fields to historical mail without changing combat or payout values. */
@@ -58,6 +65,11 @@ final class RewardPresentation
         foreach($details['fragments']??[] as $code=>$count){
             $fragment=self::fragment((int)$code);
             if($fragment&&(int)$count>0)$details['fragment_rewards'][]=$fragment+['count'=>(int)$count];
+        }
+        $details['relic_rewards']=[];
+        foreach($details['relics']??[] as $code=>$count){
+            $relic=self::relic((int)$code);
+            if($relic&&(int)$count>0)$details['relic_rewards'][]=$relic+['count'=>(int)$count];
         }
         return $details;
     }

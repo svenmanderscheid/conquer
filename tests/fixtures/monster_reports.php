@@ -17,6 +17,14 @@ $baseReport['loot']=['food'=>106000,'lumber'=>106000,'stone'=>21200,'gold'=>5300
 $baseReport['lord_xp']=450;
 $baseReport['item_rewards']=[['code'=>10103001,'name'=>'5 Minuten Beschleunigung','count'=>3]];
 $baseReport['fragments']=[60100001=>3,60300115=>1];
+$baseReport['relics']=[60100001=>2];
+if (in_array('--relic-rewards', $argv, true)) {
+    foreach (['silver','gold'] as $chestType) {
+        $config=['rolls'=>1,'drop_table'=>[['relic_code'=>60100001,'quantity'=>2,'weight'=>1]]];
+        $db->execute('INSERT INTO reward_overrides(source_type,source_key,config_json,updated_by) VALUES(?,?,?,1) ON DUPLICATE KEY UPDATE config_json=VALUES(config_json)', ['chest',$chestType,json_encode($config)]);
+    }
+    \Conquer\Game\Rewards\RewardCatalog::resetCache();
+}
 $baseReport['charm']=['x'=>75,'y'=>65];
 $legacy=$baseReport;unset($legacy['source_snapshot'],$legacy['combat_snapshot'],$legacy['monster_snapshot'],$legacy['report_version']);
 // Stay below the current training monster's required power (40); ten per type

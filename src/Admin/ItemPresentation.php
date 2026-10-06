@@ -31,7 +31,15 @@ final class ItemPresentation
     public static function catalog(bool $fragments=false): array
     {
         $out=array_values(array_map(self::item(...),\Conquer\Game\Inventory\InventoryService::allDefs()));
-        if($fragments)foreach(['normal','rare','epic','legendary'] as $grade)$out[]=['code'=>'fragment:'.$grade,'name'=>self::GRADES[$grade].' · zufällige Reliktfragmente','category'=>'fragments','category_name'=>'Reliktfragmente','rarity'=>$grade,'image'=>self::image('items/fragment-'.$grade.'.svg'),'description'=>'Fragmente eines zufälligen Relikts dieser Seltenheit.'];
+        if($fragments){
+            foreach(['normal','rare','epic','legendary'] as $grade)$out[]=['code'=>'fragment:'.$grade,'name'=>self::GRADES[$grade].' · zufällige Reliktfragmente','category'=>'fragments','category_name'=>'Reliktfragmente','rarity'=>$grade,'image'=>self::image('items/fragment-'.$grade.'.svg'),'description'=>'Fragmente eines zufälligen Relikts dieser Seltenheit.'];
+            foreach(\Conquer\Game\Treasure\TreasureData::all() as $code=>$def){
+                if(!empty($def['legacy_only']))continue;
+                foreach(['treasure'=>'specific_fragments','relic'=>'relics'] as $prefix=>$category){
+                    $out[]=['code'=>$prefix.':'.$code,'treasure_code'=>(int)$code,'name'=>\Conquer\Game\Locale::t('admin.drops.'.($prefix==='relic'?'whole_named':'fragments_named'),['name'=>\Conquer\Game\Locale::text($def['name_de']??$def['name'])]),'category'=>$category,'category_name'=>\Conquer\Game\Locale::t('admin.drops.'.($prefix==='relic'?'relic_title':'fragment_title')),'rarity'=>$def['grade'],'image'=>self::image('items/'.($def['icon']??'fragment.svg')),'description'=>\Conquer\Game\Locale::t('admin.drops.'.($prefix==='relic'?'relic_picker_hint':'specific_fragment_hint'))];
+                }
+            }
+        }
         return $out;
     }
 }

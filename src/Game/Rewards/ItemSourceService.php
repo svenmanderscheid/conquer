@@ -35,6 +35,7 @@ final class ItemSourceService
         if(isset($query['item_code']))return $code===$query['item_code']?['quantity'=>$quantity,'chance'=>$chance]:null;
         $treasureCode=(int)$query['treasure_code'];$definition=TreasureData::get($treasureCode);
         if(!$definition)return null;
+        if(isset($entry['relic_code']))return (int)$entry['relic_code']===$treasureCode?['quantity'=>$quantity,'chance'=>$chance,'reward_type'=>'relic']:null;
         if(isset($entry['treasure_code']))return (int)$entry['treasure_code']===$treasureCode?['quantity'=>$quantity,'chance'=>$chance]:null;
         $pack=$code>0?InventoryService::getItemDef($code):null;
         if($code>0&&($pack['category']??'')!=='fragment_pack')return null;
@@ -62,7 +63,8 @@ final class ItemSourceService
         $sources=[];$monsterSources=[];$codes=[];$talents=\Conquer\Game\Player\MasteryService::bonuses($playerId,$world);
         foreach(array_unique(array_merge(array_column(RewardCatalog::json('monsters')['monsters'],'code'),array_column(RewardCatalog::json('world_spawn')['monsters'],'code')))as$code){
             $code=(int)$code;if(!MonsterData::isActive($code))continue;$d=MonsterData::get($code);$level=max(1,(int)$d['level']);
-            $rewards=self::drops($query,array_merge($d['drops']??[],$d['fragment_drops']??[]));if(!$rewards)continue;
+            $relicDrops=array_map(static fn(array $drop):array=>['relic_code'=>$drop['treasure_code']]+$drop,$d['relic_drops']??[]);
+            $rewards=self::drops($query,array_merge($d['drops']??[],$d['fragment_drops']??[],$relicDrops));if(!$rewards)continue;
             $group=($d['name']??'').':'.$level.':'.hash('sha256',json_encode($rewards,JSON_THROW_ON_ERROR));
             $codes[$code]=$group;
             if(isset($monsterSources[$group]))continue;

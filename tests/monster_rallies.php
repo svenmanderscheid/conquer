@@ -21,6 +21,7 @@ function badgeSnapshot(int $id):array{return array_values(array_filter(json_deco
 function badgeChance(float $probability):void{
  $key=(string)$GLOBALS['testMonsterCode'];$config=RewardCatalog::defaults('monster',$key);
  $config['fragment_drops']=[['treasure_code'=>60100001,'count'=>2,'probability'=>1],['fragment_grade'=>'epic','count'=>1,'probability'=>1],['treasure_code'=>60100002,'count'=>9,'probability'=>0]];
+ $config['relic_drops']=[['treasure_code'=>60100003,'count'=>1,'probability'=>$probability],['treasure_code'=>60100002,'count'=>9,'probability'=>0]];
  foreach($config['drops'] as &$drop)if((int)$drop['item_code']===119000002)$drop['probability']=$probability;unset($drop);
  Connection::getInstance()->execute("INSERT INTO reward_world_overrides(world_id,source_type,source_key,config_json)VALUES(1,'monster',?,?) ON DUPLICATE KEY UPDATE config_json=VALUES(config_json)",[$key,json_encode($config,JSON_PRESERVE_ZERO_FRACTION)]);
  RewardCatalog::resetCache();
@@ -70,7 +71,7 @@ try{
  ck($db->query('SELECT beginner_shield_until FROM players WHERE id=1')->fetchColumn()!==null,'monster rally preserves beginner protection');
  rejects(fn()=>RallyService::join(3,3,$id,[50100101=>100]),'outsider cannot join');
  RallyService::join(2,2,$id,[50100101=>5000]);
- ck(stock(2)===20000&&(int)$db->query('SELECT action_points FROM players WHERE id=2')->fetchColumn()===200,'joiner reserves troops without AP');
+ ck(stock(2)===20000&&(int)$db->query('SELECT action_points FROM players WHERE id=2')->fetchColumn()===175,'joiner reserves troops and pays the snapshotted monster AP cost');
  rejects(fn()=>RallyService::join(2,2,$id,[50100101=>50]),'repeat join cannot reserve again');
  rejects(fn()=>RallyService::cancel($id,2),'only captain can cancel');
  ck(count(RallyService::listForAlliance(1))===1&&str_contains(RallyService::listForAlliance(1)[0]['target_name'],\Conquer\Game\Map\MonsterData::get($testMonsterCode)['name']),'monster rallies appear in alliance list without a player target');
@@ -88,10 +89,12 @@ try{
  ck((json_decode($reports[0]['data_json'],true)['items'][119000002]??0)===$badgeReward&&(json_decode($reports[1]['data_json'],true)['items'][119000002]??0)===$badgeReward,'captain and actual participant reports each contain the full badge reward');
  ck(badges(1)===0&&badges(2)===0,'earned badges stay with returning armies until they arrive home');
  ck((int)$db->query('SELECT COUNT(*) FROM player_treasures')->fetchColumn()===0&&($result['armies'][0]['fragments'][60100001]??0)===2&&array_sum($result['armies'][1]['fragments'])===3,'Rally participants receive independent frozen fragment rolls that wait for return');
+ ck($result['armies'][0]['relics']===[60100003=>1]&&$result['armies'][1]['relics']===[60100003=>1],'Each rally participant receives the frozen whole relic and no zero-chance relic');
  ck((int)$db->query('SELECT gold FROM cities WHERE id=1')->fetchColumn()===$before&&stock(1)===20000,'troops and haul wait for return');
  RallyService::tick();ck((int)$db->query('SELECT COUNT(*) FROM battle_reports')->fetchColumn()===2,'repeated tick does not repeat rewards');
  home($id);home($id);ck(stock(1)===25000&&stock(2)===25000,'both armies return exactly once');
  ck((int)$db->query('SELECT SUM(fragments) FROM player_treasures WHERE player_id=1')->fetchColumn()===3&&(int)$db->query('SELECT SUM(fragments) FROM player_treasures WHERE player_id=2')->fetchColumn()===3&&(int)$db->query('SELECT COUNT(*) FROM player_treasures WHERE player_id=3')->fetchColumn()===0,'Rally return grants each participant relic fragments exactly once');
+ ck((int)$db->query('SELECT COUNT(*) FROM player_treasure_effects WHERE treasure_code=60100003 AND effect_index=0 AND parts=1')->fetchColumn()===2,'Rally return unlocks each participant relic exactly once without consuming fragments');
  ck(badges(1)===$badgeReward&&badges(2)===$badgeReward&&badges(3)===0,'captain and participant receive badges once despite repeated settlement and return processing');
  ck((int)$db->query('SELECT quantity FROM player_inventory WHERE player_id=1 AND item_code=10201025')->fetchColumn()===5&&(int)$db->query('SELECT quantity FROM player_inventory WHERE player_id=2 AND item_code=10201025')->fetchColumn()===5,'each player receives the guaranteed rally item quantity independently');
  ck((int)$db->query('SELECT xp FROM player_lord_progress WHERE player_id=1')->fetchColumn()===20&&(int)$db->query('SELECT xp FROM player_lord_progress WHERE player_id=2')->fetchColumn()===20,'each player receives full rally Lord XP independently');
@@ -107,6 +110,7 @@ try{
  ck((int)$db->query('SELECT SUM(count) FROM hospital_wounded')->fetchColumn()===3,'early failed rallies wound only a small share');home($id);ck(stock(1)===24998&&stock(2)===24999,'only surviving troops return after defeat');
  ck(badges(1)===$badgeReward&&badges(2)===$badgeReward,'failed rally and its army return grant no badges');
  ck((int)$db->query('SELECT SUM(fragments) FROM player_treasures')->fetchColumn()===6,'Failed and cancelled rallies grant no additional relic fragments');
+ ck((int)$db->query('SELECT COUNT(*) FROM player_treasure_effects WHERE treasure_code=60100003')->fetchColumn()===2&&empty($result['armies'][0]['relics']),'Failed and cancelled rallies grant no whole relics');
  $db->execute('DELETE FROM field_monsters');$mid=monster(60,400);$beforeLate=stock(2);$id=MonsterRally::start(1,1,60,60,[50100101=>5000],1,'');RallyService::join(2,2,$id,[50100101=>100]);ck(stock(2)===$beforeLate-100,'joining army is reserved while travelling to host');RallyService::launch($id,1);ck(stock(2)===$beforeLate&&$db->query("SELECT status FROM rally_participants WHERE rally_id=? AND player_id=2",[$id])->fetchColumn()==='cancelled','army missing host departure is returned automatically');arrive($id);home($id);home($id);
  ck(json_decode(rally($id)['result_json'],true)['monster_killed']&&badges(1)===$badgeReward*2&&badges(2)===$badgeReward,'successful captain receives badges while a member missing departure receives none');
  $db->execute('DELETE FROM field_monsters');$mid=monster(60,400);badgeChance(0.0);
@@ -114,6 +118,7 @@ try{
  ck((float)badgeSnapshot($id)[0]['probability']===0.0,'explicit 0% test override is captured before the no-drop victory');
  badgeChance(1.0);joinersArrive($id);RallyService::launch($id,1);arrive($id);$noDrop=json_decode(rally($id)['result_json'],true);
  ck($noDrop['monster_killed']&&empty($noDrop['armies'][0]['items'][119000002])&&empty($noDrop['armies'][1]['items'][119000002]),'saved 0% chance gives neither successful participant a badge even after a later rule change');
+ ck(empty($noDrop['armies'][0]['relics'])&&empty($noDrop['armies'][1]['relics']),'Rally whole relic probabilities remain frozen despite later admin changes');
  home($id);home($id);ck(badges(1)===$badgeReward*2&&badges(2)===$badgeReward,'zero-chance victory and repeated returns do not add badges');
  $db->execute("UPDATE worlds SET status='paused' WHERE id=1");rejects(fn()=>MonsterRally::start(1,1,60,60,[50100101=>1],1,''),'paused worlds reject new rallies');$db->execute("UPDATE worlds SET status='running' WHERE id=1");
  foreach(\Conquer\Game\Charm\CharmEffects::KEYS as $category=>$key){

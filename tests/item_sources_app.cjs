@@ -103,7 +103,7 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/item-sourc
   await page.locator('.treasury-card').filter({has:page.locator('.is-locked')}).first().click();
   const fragments=page.locator('.treasury-inspector [data-action=item-sources]');
   await fragments.click();await page.locator('.item-source-card').first().waitFor();
-  assert.match(await page.locator('.item-sources-selected').innerText(),/Relic fragments/);
+  assert.match(await page.locator('.item-sources-selected').innerText(),/Whole relics and fragments/);
   await page.keyboard.press('Escape');await page.waitForFunction(()=>!document.querySelector('#game-dialog').open);
   let release;const held=new Promise(resolve=>release=resolve);let intercepted;
   const requested=new Promise(resolve=>intercepted=resolve);

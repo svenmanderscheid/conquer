@@ -139,7 +139,7 @@ final class KingdomInventory
     /** Roll each random item independently, then credit each distinct reward once. */
     private static function bulkRewards(int $playerId, int $cityId, array $def, int $quantity): array
     {
-        $items = $fragments = $resources = $gradeCodes = [];
+        $items = $fragments = $relics = $resources = $gradeCodes = [];
         $resourceNames = ['food'=>'Nahrung','lumber'=>'Holz','stone'=>'Stein','gold'=>'Gold'];
         $category = $def['category'];
         for ($n = 0; $n < $quantity; $n++) {
@@ -154,7 +154,9 @@ final class KingdomInventory
             foreach ($drops as $drop) {
                 $amount = (int)$drop['quantity'];
                 KingdomService::require($amount > 0, 'Ungültige Beutemenge.');
-                if (isset($drop['fragment_grade']) || isset($drop['treasure_code'])) {
+                if(isset($drop['relic_code'])){
+                    $code=(int)$drop['relic_code'];$relics[$code]=($relics[$code]??0)+$amount;
+                }elseif (isset($drop['fragment_grade']) || isset($drop['treasure_code'])) {
                     $code = (int)($drop['treasure_code'] ?? 0);
                     if (!$code) {
                         $grade = (string)$drop['fragment_grade'];
@@ -174,6 +176,10 @@ final class KingdomInventory
         foreach ($items as $code=>$amount) {
             InventoryService::addItems($playerId, $code, $amount);
             $rewards[] = ['type'=>'item','quantity'=>$amount] + \Conquer\Game\Rewards\RewardPresentation::item($code);
+        }
+        foreach($relics as $code=>$amount){
+            $result=TreasureService::addRelics($playerId,$code,$amount);
+            $rewards[]=['type'=>'relic','quantity'=>$amount]+$result+\Conquer\Game\Rewards\RewardPresentation::relic($code);
         }
         foreach ($fragments as $code=>$amount) {
             TreasureService::addFragments($playerId, $code, $amount);

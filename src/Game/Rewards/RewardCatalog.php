@@ -57,9 +57,9 @@ final class RewardCatalog
     {
         $config = self::records($worldId??\Conquer\Game\World\WorldContext::id())[$type.':'.$key]['config'] ?? null;
         if ($config === null) return null;
-        foreach (['drops','items','drop_table','fragment_drops'] as $field) {
+        foreach (['drops','items','drop_table','fragment_drops','relic_drops'] as $field) {
             if (!isset($config[$field])) continue;
-            $config[$field] = array_values(array_filter($config[$field], $field==='fragment_drops'?self::isFragmentDropEligible(...):self::isDropEligible(...)));
+            $config[$field] = array_values(array_filter($config[$field], match($field){'fragment_drops'=>self::isFragmentDropEligible(...),'relic_drops'=>self::isRelicDropEligible(...),default=>self::isDropEligible(...)}));
         }
         // An old chest override containing only retired rewards falls back to its current default pool.
         if ($type === 'chest' && empty($config['drop_table'])) $config['drop_table'] = self::defaults($type, $key)['drop_table'];
@@ -126,7 +126,7 @@ final class RewardCatalog
         $source = self::sources($type)[$key] ?? null;
         if (!$source) throw new \InvalidArgumentException('Diese Beutequelle wurde nicht gefunden.');
         $d = $source['definition'];
-        if ($type === 'farm') return ['drops'=>self::availableDrops($d['drops']??[]),'fragment_drops'=>[]];
+        if ($type === 'farm') return ['drops'=>self::availableDrops($d['drops']??[]),'fragment_drops'=>[],'relic_drops'=>[]];
         if ($type === 'monster') {
             $drops = $d['drops'] ?? [];
             if ($d['type'] === 'rally' && !isset($d['source_code'])) {
@@ -137,7 +137,7 @@ final class RewardCatalog
             $drops=MonsterRewardRules::rallyDrops($d,$drops);
             $level = (int)$d['level']; $family = (int)floor((int)$key/100)%100;
             $weights = $level<=3?[82,18,0]:($level<=6?[70,30,0]:($level<=8?[0,80,20]:[0,50,50]));
-            return ['drops'=>self::availableDrops($drops),'fragment_drops'=>[],
+            return ['drops'=>self::availableDrops($drops),'fragment_drops'=>[],'relic_drops'=>[],
                 'resource_reward'=>$d['resource_reward']??['food'=>100,'lumber'=>100,'stone'=>50,'gold'=>50],
                 'gems_drop'=>$d['gems_drop']??['chance'=>0,'amount'=>0],
                 'charms'=>['chance'=>1,'normal'=>$weights[0],'epic'=>$weights[1],'legendary'=>$weights[2]]];
@@ -149,9 +149,9 @@ final class RewardCatalog
     public static function effective(string $type, string $key,?int $worldId=null): array
     {
         $config=self::override($type,$key,$worldId) ?? self::defaults($type,$key);
-        foreach (['drops','items','drop_table','fragment_drops'] as $field) if (isset($config[$field]))
-            $config[$field]=array_values(array_filter($config[$field],$field==='fragment_drops'?self::isFragmentDropEligible(...):self::isDropEligible(...)));
-        if(in_array($type,['monster','farm'],true))$config['fragment_drops']??=[];
+        foreach (['drops','items','drop_table','fragment_drops','relic_drops'] as $field) if (isset($config[$field]))
+            $config[$field]=array_values(array_filter($config[$field],match($field){'fragment_drops'=>self::isFragmentDropEligible(...),'relic_drops'=>self::isRelicDropEligible(...),default=>self::isDropEligible(...)}));
+        if(in_array($type,['monster','farm'],true)){$config['fragment_drops']??=[];$config['relic_drops']??=[];}
         if($type==='monster')$config['charms']['chance']=1;
         return $config;
     }
@@ -164,9 +164,9 @@ final class RewardCatalog
         // A few retired world aliases (for example Orc 20200100) have no editor row.
         if(!isset($catalogCodes[$key]))$key=(string)($d['code']??$key);
         $cfg = self::override('monster',$key);
-        if ($cfg === null) { $d['drops']=self::availableDrops($d['drops']??[]);$d['fragment_drops']=[];return $d; }
+        if ($cfg === null) { $d['drops']=self::availableDrops($d['drops']??[]);$d['fragment_drops']=[];$d['relic_drops']=[];return $d; }
         $cfg['charms']['chance']=1;
-        return array_replace($d, ['drops'=>$cfg['drops'],'fragment_drops'=>$cfg['fragment_drops']??[],'resource_reward'=>$cfg['resource_reward'],'gems_drop'=>$cfg['gems_drop'],'admin_charms'=>$cfg['charms'],'admin_reward_override'=>true]);
+        return array_replace($d, ['drops'=>$cfg['drops'],'fragment_drops'=>$cfg['fragment_drops']??[],'relic_drops'=>$cfg['relic_drops']??[],'resource_reward'=>$cfg['resource_reward'],'gems_drop'=>$cfg['gems_drop'],'admin_charms'=>$cfg['charms'],'admin_reward_override'=>true]);
     }
 
     /** Legacy monster tables contain retired IDs. Never award unknown inventory codes. */
@@ -182,6 +182,7 @@ final class RewardCatalog
     {
         if(isset($row['item_code'])&&!InventoryService::isDropEligible((int)$row['item_code']))return false;
         if(isset($row['treasure_code'])&&!TreasureData::get((int)$row['treasure_code']))return false;
+        if(isset($row['relic_code'])&&!self::isRelicDropEligible(['treasure_code'=>$row['relic_code']]))return false;
         if(isset($row['fragment_grade'])&&!TreasureData::getCodesByGrade((string)$row['fragment_grade']))return false;
         return true;
     }
@@ -209,6 +210,11 @@ final class RewardCatalog
             if (!is_string($target)&&!is_int($target)) throw new \InvalidArgumentException('Bitte einen Gegenstand auswählen.');
             $entry=[];
             if ($type==='chest' && in_array($target,['fragment:normal','fragment:rare','fragment:epic','fragment:legendary'],true)) $entry['fragment_grade']=substr($target,9);
+            elseif($type==='chest'&&is_string($target)&&preg_match('/^(treasure|relic):([1-9][0-9]*)$/D',$target,$match)){
+                $code=$integer($match[2],1,2147483647,Locale::t('admin.drops.fragment_relic'));
+                if(!self::isRelicDropEligible(['treasure_code'=>$code]))throw new \InvalidArgumentException(Locale::t('admin.drops.relic_invalid'));
+                $entry[$match[1]==='relic'?'relic_code':'treasure_code']=$code;
+            }
             else {
                 $code=$integer($target,1,2147483647,'Gegenstand');
                 if (InventoryService::getItemDef($code)===null) throw new \InvalidArgumentException('Dieser Gegenstand existiert nicht im Katalog.');
@@ -256,13 +262,24 @@ final class RewardCatalog
                 $fragments[]=$entry;
             }
         }
-        if ($type==='farm') return ['drops'=>$entries,'fragment_drops'=>$fragments];
+        $relics=[];$relicSeen=[];
+        $relicRows=$input['relic_rows']??[];
+        if(!is_array($relicRows)||count($relicRows)>100)throw new \InvalidArgumentException(Locale::t('admin.drops.relic_limit'));
+        foreach($relicRows as $row){
+            if(!is_array($row)||!is_string($row['target']??null)||!preg_match('/^relic:([1-9][0-9]*)$/D',$row['target'],$match))throw new \InvalidArgumentException(Locale::t('admin.drops.relic_invalid'));
+            $code=$integer($match[1],1,2147483647,Locale::t('admin.drops.fragment_relic'));
+            if(!self::isRelicDropEligible(['treasure_code'=>$code]))throw new \InvalidArgumentException(Locale::t('admin.drops.relic_invalid'));
+            if(isset($relicSeen[$code]))throw new \InvalidArgumentException(Locale::t('admin.drops.relic_duplicate'));
+            $relicSeen[$code]=true;
+            $relics[]=['treasure_code'=>$code,'count'=>$integer($row['quantity']??null,1,100000,Locale::t('admin.drops.relic_quantity')),'probability'=>$chance($row['chance']??null,Locale::t('admin.drops.relic_chance'))];
+        }
+        if ($type==='farm') return ['drops'=>$entries,'fragment_drops'=>$fragments,'relic_drops'=>$relics];
         $charms=$input['charms']??[];
         if (!is_array($charms)) throw new \InvalidArgumentException('Ungültige Talisman-Einstellung.');
         $c=['chance'=>1]; // Every defeated monster leaves exactly one map charm.
         foreach (['normal','epic','legendary'] as $grade) $c[$grade]=$integer($charms[$grade]??null,0,100,'Talismanverteilung');
         if (array_sum([$c['normal'],$c['epic'],$c['legendary']])!==100) throw new \InvalidArgumentException('Die drei Talisman-Anteile müssen zusammen 100 % ergeben.');
-        return ['drops'=>$entries,'fragment_drops'=>$fragments,'resource_reward'=>$resources($input['resources']??null),'gems_drop'=>['chance'=>$chance($input['gems_chance']??null,'Edelsteinchance'),'amount'=>$integer($input['gems_amount']??null,0,1000000,'Edelsteinmenge')],'charms'=>$c];
+        return ['drops'=>$entries,'fragment_drops'=>$fragments,'relic_drops'=>$relics,'resource_reward'=>$resources($input['resources']??null),'gems_drop'=>['chance'=>$chance($input['gems_chance']??null,'Edelsteinchance'),'amount'=>$integer($input['gems_amount']??null,0,1000000,'Edelsteinmenge')],'charms'=>$c];
     }
 
     public static function roll(float $probability): bool
@@ -301,6 +318,30 @@ final class RewardCatalog
     {
         foreach($fragments as $code=>$count)if(TreasureData::get((int)$code)&&(int)$count>0)
             \Conquer\Game\Treasure\TreasureService::addFragments($playerId,(int)$code,(int)$count);
+    }
+
+    /** Freeze whole-relic rewards separately from fragments for returns and reports. */
+    public static function rollRelics(array $drops): array
+    {
+        $relics=[];
+        foreach($drops as $drop){
+            if(!self::isRelicDropEligible($drop)||!self::roll((float)($drop['probability']??0)))continue;
+            $code=(int)$drop['treasure_code'];$count=max(0,(int)($drop['count']??0));
+            if($count>0)$relics[$code]=($relics[$code]??0)+$count;
+        }
+        return $relics;
+    }
+
+    public static function grantRelics(int $playerId,array $relics): void
+    {
+        foreach($relics as $code=>$count)if(self::isRelicDropEligible(['treasure_code'=>$code])&&(int)$count>0)
+            \Conquer\Game\Treasure\TreasureService::addRelics($playerId,(int)$code,(int)$count);
+    }
+
+    private static function isRelicDropEligible(array $row): bool
+    {
+        $definition=TreasureData::get((int)($row['treasure_code']??0));
+        return $definition!==null&&empty($definition['legacy_only']);
     }
 
     private static function isFragmentDropEligible(array $row): bool

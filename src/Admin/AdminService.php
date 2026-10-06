@@ -20,7 +20,7 @@ final class AdminService
         unset($input['csrf_token'],$input['operation_id']);ksort($input);
         $hash=hash('sha256',json_encode($input,JSON_THROW_ON_ERROR));
         $locks=['conquer-admin-op-'.$op];
-        if(in_array($action,['reward-save','reward-reset'],true))$locks[]='conquer-admin-rewards';
+        if(in_array($action,['reward-save','reward-reset','reward-batch-save'],true))$locks[]='conquer-admin-rewards';
         $playerId=WorldSettings::integer($input['player_id']??0,0,2147483647,'Spieler-ID');
         if($playerId>0)$locks[]='conquer-player-'.$playerId;
         $acquired=[];
@@ -43,6 +43,7 @@ final class AdminService
                     'world-territory-rules'=>self::territoryRules($input),
                     'gift'=>self::gift($db,$op,$input),
                     'reward-save','reward-reset'=>RewardEditor::save($db,$adminId,$action,$input),
+                    'reward-batch-save'=>RewardEditor::saveBatch($db,$adminId,$input),
                     'land-rules-save'=>self::landRules($adminId,$input),
                     'bug-report-update'=>self::bugReport($db,$adminId,$input),
                     'community-report-update','community-chat-ban','community-chat-unban'=>self::communityModeration($adminId,$action,$input),
@@ -56,6 +57,10 @@ final class AdminService
                 $db->execute('UPDATE admin_operations SET result_json=? WHERE operation_id=?',[json_encode($receiptResult,JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR),$op]);
                 return $result;
             });
+        } catch (\Throwable $e) {
+            // A later batch row can fail after earlier rows populated the runtime cache.
+            if(in_array($action,['reward-save','reward-reset','reward-batch-save'],true))\Conquer\Game\Rewards\RewardCatalog::resetCache();
+            throw $e;
         } finally {foreach(array_reverse($acquired) as $lock)$db->query('SELECT RELEASE_LOCK(?)',[$lock]);}
     }
 
