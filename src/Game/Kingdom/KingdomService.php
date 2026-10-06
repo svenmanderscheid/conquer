@@ -35,6 +35,7 @@ final class KingdomService
             $cityId = (int) $cityState['city']['id'];
             HospitalService::processHealed($cityId);
             self::syncQuests($playerId, $cityId);
+            $questState = DailyQuestService::getState($playerId);
             // One database snapshot prevents a concurrent return from appearing in both army locations.
             $standings = Connection::getInstance()->transaction(static fn(): array => self::standings());
             $alliance = self::alliance($playerId, $standings);
@@ -61,10 +62,11 @@ final class KingdomService
                 'inventory'=>InventoryService::getInventory($playerId),
                 'inventory_catalog'=>KingdomInventory::catalog($playerId),
                 'inventory_shop'=>KingdomInventory::shop(),
-                'quests'=>DailyQuestService::getQuests($playerId),
+                'quests'=>$questState['quests'],
+                'quest_activity'=>$questState['quest_activity'],
                 'welcome_event'=>\Conquer\Game\Conquest\WelcomeEventService::state($playerId),
                 'alpha_entry'=>\Conquer\Game\World\WorldEntry::settings(WorldContext::id()),
-                'quest_resets_at'=>gmdate('Y-m-d 00:00:00', strtotime('tomorrow UTC')),
+                'quest_resets_at'=>$questState['quest_resets_at'],
                 'hospital'=>$hospital,
                 'treasures'=>TreasureService::state($playerId),
                 'march_skins'=>MarchSkinService::state($playerId),
@@ -484,23 +486,41 @@ final class KingdomService
         return ['message'=>'Deine Auftragsbelohnung wurde gutgeschrieben.','rewards'=>$rewards];
     }
 
+    /** Dedicated quest endpoints use the same durable progress as the main application. */
+    public static function questState(int $playerId): array
+    {
+        return self::locked($playerId, static function () use ($playerId): array {
+            $city = WorldContext::city($playerId);
+            self::syncQuests($playerId, (int) $city['id']);
+            return DailyQuestService::getState($playerId);
+        });
+    }
+
     /** Reconcile historical processors without hooks from their durable completion records. */
     private static function syncQuests(int $playerId, int $cityId): void
     {
-        DailyQuestService::ensureDailyQuests($playerId);
+        $date = DailyQuestService::ensureDailyQuests($playerId);
         $db = Connection::getInstance();
         $progress = [
-            'upgrade_building_1'=>(int) $db->query('SELECT COUNT(*) FROM building_queue WHERE city_id=? AND is_processed=1 AND finishes_at>=UTC_DATE() AND finishes_at<=UTC_TIMESTAMP()', [$cityId])->fetchColumn(),
-            'train_troops_100'=>(int) $db->query('SELECT COALESCE(SUM(count),0) FROM troop_queue WHERE city_id=? AND is_processed=1 AND finishes_at>=UTC_DATE() AND finishes_at<=UTC_TIMESTAMP()', [$cityId])->fetchColumn(),
-            'research_complete_1'=>(int) $db->query('SELECT COUNT(*) FROM research_queue WHERE player_id=? AND world_id=' . WorldContext::id() . ' AND is_processed=1 AND finishes_at>=UTC_DATE() AND finishes_at<=UTC_TIMESTAMP()', [$playerId])->fetchColumn(),
+            'upgrade_building_1'=>(int) $db->query('SELECT COUNT(*) FROM building_queue WHERE city_id=? AND is_processed=1 AND finishes_at>=? AND finishes_at<DATE_ADD(?,INTERVAL 1 DAY) AND finishes_at<=UTC_TIMESTAMP()', [$cityId,$date,$date])->fetchColumn(),
+            'train_troops_100'=>(int) $db->query('SELECT COALESCE(SUM(count),0) FROM troop_queue WHERE city_id=? AND is_processed=1 AND finishes_at>=? AND finishes_at<DATE_ADD(?,INTERVAL 1 DAY) AND finishes_at<=UTC_TIMESTAMP()', [$cityId,$date,$date])->fetchColumn(),
+            'research_complete_1'=>(int) $db->query('SELECT COUNT(*) FROM research_queue WHERE player_id=? AND world_id=' . WorldContext::id() . ' AND is_processed=1 AND finishes_at>=? AND finishes_at<DATE_ADD(?,INTERVAL 1 DAY) AND finishes_at<=UTC_TIMESTAMP()', [$playerId,$date,$date])->fetchColumn(),
         ];
+        $gathered = array_fill_keys(['food','lumber','stone','gold'], 0);
         $progress['collect_resources'] = 0;
-        foreach ($db->query("SELECT haul_json FROM marches WHERE player_id=? AND world_id=" . WorldContext::id() . " AND march_type=9 AND state='complete' AND return_time>=UTC_DATE() AND return_time<=UTC_TIMESTAMP()", [$playerId])->fetchAll() as $row) {
+        // Daily rewards are account-wide: switching worlds must not lose or duplicate gathered units.
+        foreach ($db->query("SELECT haul_json FROM marches WHERE player_id=? AND march_type=9 AND state='complete' AND return_time>=? AND return_time<DATE_ADD(?,INTERVAL 1 DAY) AND return_time<=UTC_TIMESTAMP()", [$playerId,$date,$date])->fetchAll() as $row) {
             $haul = json_decode((string) ($row['haul_json'] ?? '{}'), true, 32, JSON_THROW_ON_ERROR);
-            foreach (['food','lumber','wood','stone','gold'] as $resource) { $progress['collect_resources'] += max(0, (int) ($haul['loot'][$resource] ?? 0)); }
+            foreach (['food','lumber','wood','stone','gold'] as $resource) {
+                $amount = max(0, (int) ($haul['loot'][$resource] ?? 0));
+                $progress['collect_resources'] += $amount;
+                $gathered[$resource === 'wood' ? 'lumber' : $resource] += $amount;
+            }
         }
+        foreach ($gathered as $resource=>$amount) $progress['gather_'.$resource.'_25000'] = $amount;
+        $progress['alliance_help_5'] = (int) $db->query('SELECT COUNT(*) FROM community_help_log WHERE helper_id=? AND created_at>=? AND created_at<DATE_ADD(?,INTERVAL 1 DAY) AND created_at<=UTC_TIMESTAMP()', [$playerId,$date,$date])->fetchColumn();
         foreach ($progress as $code=>$count) {
-            $db->execute('UPDATE player_daily_quests SET progress=GREATEST(progress,LEAST(target,?)),completed=IF(progress>=target,1,completed) WHERE player_id=? AND quest_code=? AND quest_date=UTC_DATE()', [$count,$playerId,$code]);
+            $db->execute('UPDATE player_daily_quests SET progress=GREATEST(progress,LEAST(target,?)),completed=IF(progress>=target,1,completed) WHERE player_id=? AND quest_code=? AND quest_date=?', [$count,$playerId,$code,$date]);
         }
     }
 

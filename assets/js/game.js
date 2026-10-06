@@ -158,7 +158,7 @@
                 renderHud();
                 syncCityReadiness();
                 mailboxPanel.refresh();
-                const signature=JSON.stringify([state.buildings,state.troops,state.build_queue,state.troop_queue,state.research,state.research_queue,state.research_duration_factor,state.research_defs.map(n=>canAfford(n.levels.find(l=>l.level===Number(state.research[n.code]||0)+1)?.resources||{})),state.marches,state.public_marches,state.reports,state.monsters,state.charms,state.nodes,state.players,state.congress,state.shrines,state.land_progression,state.territory,state.world?.map_profile,state.map_center,kingdom?.profile,kingdom?.march_skins,kingdom?.name_frames,kingdom?.theme_bundles,kingdom?.skin_bundles,kingdom?.alliance,kingdom?.inventory,kingdom?.quests,kingdom?.welcome_event,kingdom?.hospital,kingdom?.treasures,[kingdom?.trading?.rotation,kingdom?.trading?.offers,kingdom?.trading?.vip],[kingdom?.chests?.free_silver_remaining,kingdom?.chests?.free_silver_available,kingdom?.chests?.free_gold_available],kingdom?.rankings,kingdom?.arena,expeditions?.expeditions,market]);
+                const signature=JSON.stringify([state.buildings,state.troops,state.build_queue,state.troop_queue,state.research,state.research_queue,state.research_duration_factor,state.research_defs.map(n=>canAfford(n.levels.find(l=>l.level===Number(state.research[n.code]||0)+1)?.resources||{})),state.marches,state.public_marches,state.reports,state.monsters,state.charms,state.nodes,state.players,state.congress,state.shrines,state.land_progression,state.territory,state.world?.map_profile,state.map_center,kingdom?.profile,kingdom?.march_skins,kingdom?.name_frames,kingdom?.theme_bundles,kingdom?.skin_bundles,kingdom?.alliance,kingdom?.inventory,kingdom?.quests,kingdom?.quest_activity,kingdom?.welcome_event,kingdom?.hospital,kingdom?.treasures,[kingdom?.trading?.rotation,kingdom?.trading?.offers,kingdom?.trading?.vip],[kingdom?.chests?.free_silver_remaining,kingdom?.chests?.free_silver_available,kingdom?.chests?.free_gold_available],kingdom?.rankings,kingdom?.arena,expeditions?.expeditions,market]);
                 const editing=current!=='world'&&($('#content').dataset.dirty==='true'||($('#content').contains(document.activeElement)&&document.activeElement.matches('input,textarea,select')));
                 if(renderPage&&!editing&&!$('#game-dialog').open&&signature!==lastSignature){render();lastSignature=signature;}
                 panels.updateHospital();
@@ -352,10 +352,10 @@
     function updateQuestBadge() {
         updateWelcomeBadge();
         const button=$('#navigation [data-id="quests"]');if(!button)return;
-        const ready=(kingdom?.quests||[]).filter(q=>q.completed&&!q.claimed).length;
+        const ready=(kingdom?.quests||[]).filter(q=>q.completed&&!q.claimed).length+(kingdom?.quest_activity?.milestones||[]).filter(q=>q.completed&&!q.claimed).length;
         const badge=button.querySelector('.dock-badge');
         badge.textContent=fmt(ready);badge.hidden=ready===0;
-        button.setAttribute('aria-label','Aufgaben öffnen'+(ready?`, ${fmt(ready)} ${ready===1?'Aufgabe':'Aufgaben'} abholbereit`:''));
+        button.setAttribute('aria-label',t(ready?'quests.open_ready':'quests.open',{count:fmt(ready)}));
     }
     function resourceDialog(resource){
         const building={food:'farm',lumber:'lumber_camp',stone:'quarry',gold:'gold_mine'}[resource];if(!building)return;
