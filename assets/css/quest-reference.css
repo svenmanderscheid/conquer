@@ -1,0 +1,37 @@
+/* Quest categories share the existing window, list and server-backed rewards. */
+body.mobile-game #panel-dialog[data-panel=quests] .quest-header-tabs {display:flex;flex-direction:column;flex:none;}
+body.mobile-game #panel-dialog[data-panel=quests] .quest-header-tabs>.subtabs {flex:none;}
+body.mobile-game #panel-dialog[data-panel=quests] .quest-category-tabs {
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;flex:none;margin:0 0 8px;
+}
+body.mobile-game #panel-dialog[data-panel=quests] .quest-category {
+  display:flex;align-items:center;justify-content:center;gap:7px;min-width:0;min-height:44px;
+  padding:7px 9px;border:1px solid var(--ui-line);border-radius:10px;background:var(--ui-card);
+  color:var(--ui-ink);font:700 17px/1.15 var(--ui-font);cursor:pointer;
+}
+body.mobile-game #panel-dialog[data-panel=quests] .quest-category>span {min-width:0;overflow-wrap:anywhere;}
+body.mobile-game #panel-dialog[data-panel=quests] .quest-category.active {
+  background:var(--ui-inset)!important;border-color:var(--ui-gold)!important;color:var(--ui-ink)!important;box-shadow:inset 0 2px 4px color-mix(in srgb,var(--ui-gold) 22%,transparent)!important;
+}
+body.mobile-game #panel-dialog[data-panel=quests] .quest-category:focus-visible {outline:3px solid var(--ui-primary);outline-offset:1px;}
+body.mobile-game #panel-dialog[data-panel=quests] .quest-category-count {
+  display:grid;place-items:center;flex:none;min-width:22px;min-height:22px;padding:2px 5px;box-sizing:border-box;
+  border-radius:12px;background:var(--ui-gold-soft);color:var(--ui-primary-dark);font:700 12px/1 var(--ui-font-number);
+}
+body.mobile-game #panel-dialog[data-panel=quests] .quest-list .quest-main-featured {
+  border-color:var(--ui-gold)!important;background:linear-gradient(110deg,var(--ui-gold-soft),var(--ui-card-light))!important;
+}
+body.mobile-game #panel-dialog[data-panel=quests] .quest-main-kicker {
+  display:block;margin:0 0 5px;color:var(--ui-primary-dark);font:700 13px/1.2 var(--ui-font);
+}
+@media (max-width:360px) {
+  body.mobile-game #panel-dialog[data-panel=quests] .quest-category {gap:4px;padding:6px 4px;font-size:15px;}
+  body.mobile-game #panel-dialog[data-panel=quests] .quest-category-tabs {gap:4px;}
+}
+@media (max-height:480px) and (orientation:landscape) {
+  body.mobile-game #panel-dialog[data-panel=quests] .quest-header-tabs {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;margin-bottom:6px;}
+  body.mobile-game #panel-dialog[data-panel=quests] .quest-header-tabs .quest-category-tabs,body.mobile-game #panel-dialog[data-panel=quests] .quest-header-tabs>.subtabs {margin:0;min-width:0;}
+  body.mobile-game #panel-dialog[data-panel=quests] .quest-header-tabs>.subtabs {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:0;}
+  body.mobile-game #panel-dialog[data-panel=quests] .quest-header-tabs>.subtabs>.subtab {min-width:0;min-height:44px;white-space:normal;padding:4px 3px;font-size:12px;}
+  body.mobile-game #panel-dialog[data-panel=quests] .quest-category {gap:3px;padding:4px 3px;font-size:14px;}
+}

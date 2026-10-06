@@ -6,6 +6,7 @@
     const status = document.getElementById('app-start-status');
     const retry = document.getElementById('app-start-retry');
     const percent = document.getElementById('app-start-percent');
+    const reduced = () => document.body.classList.contains('reduced-motion') || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     let progress = 0, pageReady = false, gameReady = screen.dataset.game !== 'true', finished = false;
     const text = key => window.ConquerLocale?.t(key) || status.textContent;
     function update(value) {
@@ -19,8 +20,16 @@
         finished = true;
         clearTimeout(timeout);
         update(100);
+        retry.hidden = true;
+        screen.setAttribute('aria-busy', 'false');
         status.textContent = text('startup.ready');
-        setTimeout(() => { screen.classList.add('is-complete'); setTimeout(() => screen.remove(), 350); }, 350);
+        screen.classList.add('is-complete');
+        const dismiss = () => {
+            screen.remove();
+            window.dispatchEvent(new Event('conquer:startup-complete'));
+        };
+        // This is only the visual fade, never a minimum loading time.
+        if (reduced()) dismiss(); else setTimeout(dismiss, 300);
     }
     function fail() {
         if (finished) return;
@@ -30,12 +39,22 @@
     const timeout = setTimeout(fail, 30000);
     retry.addEventListener('click', () => location.reload());
     window.ConquerStartup = { ready() { if (finished) return; gameReady = true; update(90); finish(); }, fail };
-    document.addEventListener('DOMContentLoaded', () => {
+    const documentReady = () => {
         update(20);
+        status.textContent = text('startup.artwork');
         const images = [...document.images].filter(img => img.loading !== 'lazy' && img.getAttribute('src'));
         let settled = 0;
         const done = () => { settled++; update(20 + Math.round(50 * settled / Math.max(1, images.length))); };
         images.forEach(img => { if (img.complete) done(); else { img.addEventListener('load', done, {once:true}); img.addEventListener('error', done, {once:true}); } });
-    }, {once:true});
-    window.addEventListener('load', () => { pageReady = true; update(80); finish(); }, {once:true});
+    };
+    const loaded = () => {
+        pageReady = true;
+        update(80);
+        if (!gameReady) status.textContent = text('startup.sync');
+        finish();
+    };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', documentReady, {once:true});
+    else documentReady();
+    if (document.readyState === 'complete') loaded();
+    else window.addEventListener('load', loaded, {once:true});
 })();

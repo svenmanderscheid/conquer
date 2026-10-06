@@ -122,3 +122,7 @@ preview/
 __pycache__/
 *.pyc
 logs/*.json
+
+# Local video reference analysis and commit verification.
+/output/video-reference/
+/output/commit-video-scope/

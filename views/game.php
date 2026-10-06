@@ -56,6 +56,9 @@ $base = htmlspecialchars(APP_BASE, ENT_QUOTES);
   <link rel="stylesheet" href="<?= $base ?>/assets/css/territory.css?v=<?= filemtime(ROOT_DIR.'/assets/css/territory.css') ?>">
   <link rel="stylesheet" href="<?= $base ?>/assets/css/social-hub.css?v=<?= filemtime(ROOT_DIR.'/assets/css/social-hub.css') ?>">
   <link rel="stylesheet" href="<?= $base ?>/assets/css/alliance-community.css?v=<?= filemtime(ROOT_DIR.'/assets/css/alliance-community.css') ?>">
+  <link rel="stylesheet" href="<?= $base ?>/assets/css/kingdom-entry.css?v=<?= filemtime(ROOT_DIR.'/assets/css/kingdom-entry.css') ?>">
+  <link rel="stylesheet" href="<?= $base ?>/assets/css/quest-reference.css?v=<?= filemtime(ROOT_DIR.'/assets/css/quest-reference.css') ?>">
+  <link rel="stylesheet" href="<?= $base ?>/assets/css/welcome-event.css?v=<?= filemtime(ROOT_DIR.'/assets/css/welcome-event.css') ?>">
   <link rel="stylesheet" href="<?= $base ?>/assets/css/village-theme.css?v=<?= filemtime(__DIR__ . '/../assets/css/village-theme.css') ?>">
 </head>
 <body class="mobile-game">
@@ -159,6 +162,7 @@ $base = htmlspecialchars(APP_BASE, ENT_QUOTES);
 <script src="<?= $base ?>/assets/js/community-panel.js?v=<?= filemtime(ROOT_DIR.'/assets/js/community-panel.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/defense-panel.js?v=features1" defer></script>
 <script src="<?= $base ?>/assets/js/lord-talents.js?v=<?= filemtime(ROOT_DIR.'/assets/js/lord-talents.js') ?>" defer></script>
+<script src="<?= $base ?>/assets/js/welcome-event.js?v=<?= filemtime(ROOT_DIR.'/assets/js/welcome-event.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/progression-panel.js?v=<?= filemtime(ROOT_DIR.'/assets/js/progression-panel.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/world-panel.js?v=<?= filemtime(ROOT_DIR . '/assets/js/world-panel.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/world-chat.js?v=<?= filemtime(__DIR__ . '/../assets/js/world-chat.js') ?>" defer></script>

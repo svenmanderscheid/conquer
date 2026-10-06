@@ -42,12 +42,14 @@ window.ConquerBeginnerGuide = function(ctx) {
         ['Land, Ereignisse und langfristiger Fortschritt','Erkunde offene Regionen, entwickle Land und beteilige dich an verfügbaren Weltereignissen. Höhere Burg- und Ausbildungsgebäudestufen, Forschung und Relikte eröffnen weitere Möglichkeiten. Es gibt mehrere Wege, dein Reich voranzubringen.','land','Landübersicht öffnen'],
         ['Bedienung, Speichern und Kontosicherheit','Alle Bereiche lassen sich antippen. Das X oder Escape schließt ein Fenster; über Dorf/Welt wechselst du das Spielfeld. Dein Spielstand liegt auf dem Server. Prüfe nach Verbindungsproblemen zuerst den aktuellen Auftrag. Sichere dein Konto über Passwort und Wiederherstellung. Nur der Lesestand dieses Guides wird auf diesem Gerät gespeichert.','account','Konto öffnen'],
     ];
-    let key='',saved={},section='start',chapter=0,group='all',welcomed=false;
+    let key='',saved={},section='start',chapter=0,group='all',welcomed=false,introStep=0,startupPending=false;
+    const introScenes=['welcome','city','quests','together'];
+    const introText=(key,params={})=>window.ConquerLocale.t('intro.'+key,params);
     const host=getHost;
     function load() {
         const state=getState(),next=`conquer:beginner-guide:v1:${base}:${state?.city?.player_id}`;
         if(key===next)return;
-        key=next;saved={};
+        key=next;saved={};welcomed=false;
         try { const value=JSON.parse(localStorage.getItem(key));if(value&&typeof value==='object'&&!Array.isArray(value))saved=value; } catch {}
         chapter=Number.isInteger(saved.chapter)?Math.max(0,Math.min(chapters.length-1,saved.chapter)):0;
         saved.read=Array.isArray(saved.read)?saved.read.filter(n=>Number.isInteger(n)&&n>=0&&n<chapters.length):[];
@@ -140,7 +142,7 @@ window.ConquerBeginnerGuide = function(ctx) {
         const c=chapters[chapter],read=saved.read.includes(chapter);
         const t=key=>esc(window.ConquerLocale.t('alpha.guide.'+(key==='intro'&&!getKingdom()?.alpha_entry?'general':key)));
         const menu=[['quests','quests','guide-nav'],['inventory','inventory','guide-nav'],['alliance','alliance','guide-nav'],['world','world-map','guide-nav'],['shop','market','shop-section','crystals']];
-        return `<section class="guide-alpha-entry"><h2>${t('title')}</h2><p>${t('intro')}</p><div class="guide-menu-map">${menu.map(([id,art,act,target=id])=>`<button type="button" data-action="${act}" data-id="${target}" class="guide-menu-link"><img src="${base}/assets/art/menu-icons-v2/${art}.png" alt=""><span><strong>${t(id+'.title')}</strong><small>${t(id+'.text')}</small></span></button>`).join('')}</div><p class="guide-tip">${t('next')}</p></section><div class="guide-reading"><span>${new Set(saved.read).size} von ${chapters.length} Kapiteln gelesen</span><span>Lesestand auf diesem Gerät</span></div>
+        return `<section class="guide-alpha-entry"><h2>${t('title')}</h2><p>${t('intro')}</p><p>${button(introText('replay'),'guide-intro-replay')}</p><div class="guide-menu-map">${menu.map(([id,art,act,target=id])=>`<button type="button" data-action="${act}" data-id="${target}" class="guide-menu-link"><img src="${base}/assets/art/menu-icons-v2/${art}.png" alt=""><span><strong>${t(id+'.title')}</strong><small>${t(id+'.text')}</small></span></button>`).join('')}</div><p class="guide-tip">${t('next')}</p></section><div class="guide-reading"><span>${new Set(saved.read).size} von ${chapters.length} Kapiteln gelesen</span><span>Lesestand auf diesem Gerät</span></div>
             <div class="guide-chapters" role="group" aria-label="Kapitel auswählen">${chapters.map((c,i)=>`<button type="button" class="guide-chapter" data-action="guide-chapter" data-id="${i}" aria-pressed="${i===chapter}" aria-label="Kapitel ${i+1}: ${esc(c.title)}${saved.read.includes(i)?', gelesen':''}">${i+1}${saved.read.includes(i)?' ✓':''}</button>`).join('')}</div>
             <article class="guide-lesson"><div class="guide-lesson-heading"><img src="${base}/assets/art/${c.art}.svg" alt=""><div><p class="guide-eyebrow">Kapitel ${chapter+1} von ${chapters.length}</p><h2 tabindex="-1" id="guide-heading">${c.title}</h2></div></div><p class="guide-intro">${c.intro}</p><ul>${c.points.map(p=>`<li>${p}</li>`).join('')}</ul><p class="guide-tip">${c.tip}</p>${button(...c.action,true)}</article>
             <div class="guide-lesson-footer">${chapter>0?button('Zurück','guide-chapter',chapter-1):'<span></span>'}${button(chapter===chapters.length-1?(read?'Zu meinen Zielen':'Gelesen · zu den Zielen'):(read?'Weiter':'Gelesen · weiter'),'guide-next','',true)}</div><p>${button('Zielhinweis wieder einblenden','show-goal-hint')}</p>`;
@@ -197,6 +199,11 @@ window.ConquerBeginnerGuide = function(ctx) {
     function onClick(act,b) {
         if(!act.startsWith('guide-'))return false;
         load();const id=b.dataset.id;
+        if(act==='guide-intro-replay'){navigate('city',{afterCommit:()=>showIntro(0)});return true;}
+        if(act==='guide-intro-next'||act==='guide-intro-back'){
+            if(document.querySelector('#game-dialog[open] .kingdom-intro'))showIntro(introStep+(act==='guide-intro-next'?1:-1));
+            return true;
+        }
         if(act==='guide-open'){section='start';navigate('help');}
         if(act==='guide-tab'&&Object.hasOwn(tabs,id)){section=id;if(!host().querySelector('.beginner-guide'))navigate('help');redraw(`[data-action="guide-tab"][data-id="${id}"]`);}
         if(act==='guide-filter'&&Object.hasOwn(groups,id)){group=id;redraw(`[data-action="guide-filter"][data-id="${id}"]`);}
@@ -213,11 +220,34 @@ window.ConquerBeginnerGuide = function(ctx) {
         if(act==='guide-community'){if(ctx.openCommunity)ctx.openCommunity(id);else navigate('community');}
         return true;
     }
+    function showIntro(step) {
+        introStep=Math.max(0,Math.min(introScenes.length-1,step));
+        const scene=introScenes[introStep],last=introStep===introScenes.length-1;
+        welcomed=true;saved.welcomed=true;save();
+        openDialog(`<h2>${esc(introText('title'))}</h2><div class="guide-welcome kingdom-intro">
+            <div class="kingdom-intro-portrait" aria-hidden="true"><img src="${base}/assets/art/characters/tier-colors-v1/infantry-t4-ui.webp" alt="" width="768" height="768"></div>
+            <section class="kingdom-intro-dialogue"><header><span>${esc(introText('adviser'))}</span><span class="kingdom-intro-count">${esc(introText('step',{current:introStep+1,total:introScenes.length}))}</span></header>
+            <div class="kingdom-intro-copy"><h3 tabindex="-1" id="kingdom-intro-heading">${esc(introText(scene+'.title'))}</h3><p>${esc(introText(scene+'.text'))}</p></div>
+            <footer class="kingdom-intro-actions">${button(introText('skip'),'close-dialog')}${introStep?button(introText('back'),'guide-intro-back'):''}${button(introText(last?'begin':'next'),last?'guide-open':'guide-intro-next','',true)}</footer></section></div>`,{focusHeading:true});
+        document.getElementById('kingdom-intro-heading')?.focus({preventScroll:true});
+    }
     function maybeWelcome(current) {
         load();const s=getState();
         if(welcomed||saved.welcomed||current!=='city'||Number(s.buildings.castle?.level)>1||Number(s.trained_total)>0||Object.keys(s.research||{}).length||document.querySelector('dialog[open]'))return;
-        welcomed=true;saved.welcomed=true;save();
-        openDialog(`<h2>Willkommen in deinem Königreich!</h2><div class="guide-welcome"><img src="${base}/assets/art/map/castle.svg" alt=""><p>Aus einem kleinen Dorf wird dein eigenes Reich. Lerne die Gebäude kennen, sichere deinen Nachschub und finde dein erstes Ziel.</p><p>Sechs kurze Kapitel begleiten deinen Start. Du kannst jederzeit unterbrechen und den Anfangsguide im Hauptmenü wieder öffnen.</p><div class="guide-actions">${button('Guide starten','guide-open','',true)}${button('Später entdecken','close-dialog')}</div></div>`,{focusHeading:true});
+        // A native modal belongs above every page layer. Wait for startup to
+        // disappear so its loading status remains visible until the real state is ready.
+        if(document.getElementById('app-start')){
+            if(!startupPending){
+                startupPending=true;
+                window.addEventListener('conquer:startup-complete',()=>{
+                    startupPending=false;
+                    const route=location.hash.slice(1).split('?')[0]||'city';
+                    maybeWelcome(route);
+                },{once:true});
+            }
+            return;
+        }
+        showIntro(0);
     }
     return {render,onClick,maybeWelcome,nextGoal,openNextGoal(){const goal=nextGoal();if(goal)onClick(goal.action[1],{dataset:{id:goal.action[2]}});}};
 };

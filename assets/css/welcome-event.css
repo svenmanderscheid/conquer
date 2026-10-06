@@ -1,0 +1,44 @@
+/* Layout only uses the shared Union of Kingdoms surface and semantic tokens. */
+.welcome-event{display:flex;flex-direction:column;min-height:0;gap:10px}
+.welcome-event-hero{display:flex;align-items:center;gap:18px;background:var(--ui-card);border:1px solid var(--ui-line);border-radius:18px;padding:14px 20px}
+.welcome-event-hero>img{width:100px;height:110px;object-fit:contain;flex-shrink:0}
+.welcome-event-hero h2{margin:2px 0;color:var(--ui-primary-dark);font-size:26px}
+.welcome-event-hero p,.welcome-event-rules p{margin:4px 0;color:var(--ui-muted)}
+.welcome-event-hero small{color:var(--ui-primary)}
+.welcome-event-tabs{display:flex;gap:8px}
+.welcome-event-tabs button{min-height:44px;flex:1;border:1px solid var(--ui-line);border-radius:12px;background:var(--ui-card);color:var(--ui-ink);font:inherit;padding:8px 12px}
+.welcome-event-tabs button[aria-pressed=true]{background:var(--ui-primary);color:var(--ui-card-light)}
+.welcome-event-count,.welcome-event-tabs b{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;border-radius:20px;background:var(--ui-gold-soft);color:var(--ui-ink);padding:0 5px;font-size:13px}
+.welcome-event-count[hidden]{display:none}
+.hud-edge-button>.welcome-event-count{position:absolute;top:0;right:0;z-index:2;pointer-events:none}
+.welcome-event-list{overflow-y:auto;min-height:70px;overscroll-behavior:contain;display:grid;gap:10px;padding:2px}
+.welcome-event-milestone{display:flex;align-items:center;gap:16px;border:1px solid var(--ui-line);border-radius:14px;background:var(--ui-card);padding:14px}
+.welcome-event-milestone.is-ready{border-color:var(--ui-gold);background:var(--ui-gold-soft)}
+.welcome-event-milestone.is-claimed{background:var(--ui-green-soft)}
+.welcome-milestone-copy{flex:1;min-width:0}
+.welcome-milestone-heading{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.welcome-milestone-heading h3{margin:0;font-size:19px}.welcome-milestone-heading>span{font-size:13px;color:var(--ui-muted)}
+.welcome-milestone-copy>p{margin:4px 0 8px;color:var(--ui-muted)}
+.welcome-event-progress{display:flex;gap:12px;align-items:center;margin:8px 0;font-size:13px}
+.welcome-event-progress progress{flex:1;min-width:0;height:9px;accent-color:var(--ui-green)}
+.welcome-event-progress strong{white-space:nowrap}
+.welcome-reward-list{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0 0;padding:0;list-style:none}
+.welcome-reward-list li{display:grid;grid-template-columns:42px minmax(0,1fr);gap:0 7px;align-items:center;max-width:200px;font-size:13px}
+.welcome-reward-art{grid-row:span 2;position:relative;width:42px;height:42px;display:flex;align-items:center;justify-content:center}
+.welcome-reward-art img{max-width:100%;max-height:100%;object-fit:contain}.welcome-reward-art small{position:absolute;bottom:0;left:0;right:0;text-align:center;color:var(--ui-card-light);background:var(--ui-primary-dark);border-radius:4px;font-size:10px}
+.welcome-milestone-action{width:116px;flex-shrink:0;text-align:center}.welcome-milestone-action .button{width:100%;min-height:44px}
+.welcome-event-teaser>img{width:62px;height:62px;object-fit:contain}.welcome-event-teaser strong{display:flex;gap:8px;align-items:center}
+.mobile-game .progression-content:has(.welcome-event){display:flex;flex-direction:column;min-height:0;height:100%}
+.mobile-game .progression-content:has(.welcome-event)>.button[data-action=progress-reload]{display:none}
+.mobile-game .progression-content .welcome-event{flex:1;overflow:hidden}
+body.mobile-game #panel-dialog[data-panel=events] .event-simple-tabs{display:flex;flex-shrink:0;overflow-x:auto;gap:6px;}
+body.mobile-game #panel-dialog[data-panel=events] .event-simple-tabs button{flex:1 0 105px;}
+body.mobile-game #panel-dialog[data-panel=events] .welcome-event-tabs{flex-shrink:0;}
+body.mobile-game #panel-dialog[data-panel=events] .welcome-event-tabs button[aria-pressed=true]{background:var(--ui-gold-soft)!important;border-color:var(--ui-gold)!important;box-shadow:inset 0 -3px var(--ui-gold)!important;}
+body.mobile-game #panel-dialog[data-panel=events] .welcome-milestone-action .button{min-height:44px;margin:0;padding:8px 12px;}
+body.mobile-game #panel-dialog[data-panel=events] .welcome-event-progress progress{height:9px;}
+body.mobile-game #panel-dialog[data-panel=events] .welcome-event-list{flex:1;}
+body.mobile-game #panel-dialog[data-panel=events] .welcome-reward-art small{color:var(--ui-card-light)!important;line-height:1.3;}
+.welcome-event button:focus-visible{outline:3px solid var(--ui-primary-light);outline-offset:2px}
+@media(max-width:600px){.welcome-event-hero{padding:10px;gap:10px}.welcome-event-hero>img{width:60px;height:75px}.welcome-event-hero h2{font-size:22px}.welcome-event-hero p{font-size:13px}.welcome-event-milestone{padding:10px;gap:8px;align-items:stretch;flex-direction:column}.welcome-milestone-action{width:100%;text-align:right}.welcome-milestone-action .button{width:auto;min-width:110px}.welcome-reward-list{gap:6px}.welcome-reward-list li{max-width:140px;font-size:12px}.welcome-event-teaser>img{width:44px;height:44px}.welcome-event-tabs button{padding:7px 5px}.welcome-event-rules{font-size:13px}}
+@media(max-height:540px){.welcome-event{gap:5px}.welcome-event-hero{display:none}.welcome-event-rules{font-size:12px}.welcome-event-rules p{margin:0}.welcome-event-teaser>img{width:38px;height:38px}.welcome-event-milestone{flex-direction:row}.welcome-milestone-action{width:100px}.welcome-event-list{min-height:60px}.welcome-event-tabs button{min-height:44px}.welcome-event-milestone{padding:8px}.welcome-reward-list li{max-width:155px}}

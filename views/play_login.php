@@ -26,6 +26,7 @@ if($mode==='register'){
 <link rel="stylesheet" href="<?= $base ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR.'/assets/css/fantasy-fonts.css') ?>">
 <link rel="stylesheet" href="<?= $base ?>/assets/css/localization.css?v=<?= filemtime(ROOT_DIR.'/assets/css/localization.css') ?>">
 <link rel="stylesheet" href="<?= $base ?>/assets/css/play-login.css?v=<?= filemtime(ROOT_DIR.'/assets/css/play-login.css') ?>">
+<link rel="stylesheet" href="<?= $base ?>/assets/css/kingdom-entry.css?v=<?= filemtime(ROOT_DIR.'/assets/css/kingdom-entry.css') ?>">
 <link rel="stylesheet" href="<?= $base ?>/assets/css/village-theme.css?v=<?= filemtime(ROOT_DIR.'/assets/css/village-theme.css') ?>">
 <?= \Conquer\Game\Locale::bootstrapScripts($landingCspNonce) ?>
 <script src="<?= $base ?>/assets/js/localization.js?v=<?= filemtime(ROOT_DIR.'/assets/js/localization.js') ?>" defer></script>

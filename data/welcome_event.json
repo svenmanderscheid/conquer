@@ -1,0 +1,316 @@
+{
+  "version": 1,
+  "milestones": [
+    {
+      "code": "login_1",
+      "metric": "visit_days",
+      "target": 1,
+      "rewards": [
+        {
+          "item_code": 10201003,
+          "quantity": 1
+        },
+        {
+          "item_code": 10201010,
+          "quantity": 1
+        },
+        {
+          "item_code": 10103001,
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "code": "login_2",
+      "metric": "visit_days",
+      "target": 2,
+      "rewards": [
+        {
+          "item_code": 10201018,
+          "quantity": 1
+        },
+        {
+          "item_code": 10201026,
+          "quantity": 1
+        },
+        {
+          "item_code": 10103002,
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "code": "login_3",
+      "metric": "visit_days",
+      "target": 3,
+      "rewards": [
+        {
+          "item_code": 10201003,
+          "quantity": 2
+        },
+        {
+          "item_code": 10201010,
+          "quantity": 2
+        },
+        {
+          "item_code": 10103011,
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "code": "login_4",
+      "metric": "visit_days",
+      "target": 4,
+      "rewards": [
+        {
+          "item_code": 10201018,
+          "quantity": 2
+        },
+        {
+          "item_code": 10201026,
+          "quantity": 2
+        },
+        {
+          "item_code": 10103021,
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "code": "login_5",
+      "metric": "visit_days",
+      "target": 5,
+      "rewards": [
+        {
+          "item_code": 10201003,
+          "quantity": 3
+        },
+        {
+          "item_code": 10201010,
+          "quantity": 3
+        },
+        {
+          "item_code": 10103031,
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "code": "login_6",
+      "metric": "visit_days",
+      "target": 6,
+      "rewards": [
+        {
+          "item_code": 10201018,
+          "quantity": 3
+        },
+        {
+          "item_code": 10201026,
+          "quantity": 3
+        },
+        {
+          "item_code": 10103002,
+          "quantity": 4
+        }
+      ]
+    },
+    {
+      "code": "login_7",
+      "metric": "visit_days",
+      "target": 7,
+      "rewards": [
+        {
+          "item_code": 10201003,
+          "quantity": 5
+        },
+        {
+          "item_code": 10201010,
+          "quantity": 5
+        },
+        {
+          "item_code": 10201018,
+          "quantity": 5
+        },
+        {
+          "item_code": 10201026,
+          "quantity": 5
+        },
+        {
+          "item_code": 10103003,
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "code": "castle_3",
+      "metric": "castle",
+      "target": 3,
+      "navigation": {
+        "section": "city",
+        "building": "castle"
+      },
+      "rewards": [
+        {
+          "item_code": 10201003,
+          "quantity": 2
+        },
+        {
+          "item_code": 10201010,
+          "quantity": 2
+        },
+        {
+          "item_code": 10201018,
+          "quantity": 2
+        },
+        {
+          "item_code": 10201026,
+          "quantity": 2
+        },
+        {
+          "item_code": 10103002,
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "code": "castle_5",
+      "metric": "castle",
+      "target": 5,
+      "navigation": {
+        "section": "city",
+        "building": "castle"
+      },
+      "rewards": [
+        {
+          "item_code": 10201003,
+          "quantity": 5
+        },
+        {
+          "item_code": 10201010,
+          "quantity": 5
+        },
+        {
+          "item_code": 10201018,
+          "quantity": 5
+        },
+        {
+          "item_code": 10201026,
+          "quantity": 5
+        },
+        {
+          "item_code": 10103011,
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "code": "trained_500",
+      "metric": "trained",
+      "target": 500,
+      "navigation": {
+        "section": "army"
+      },
+      "rewards": [
+        {
+          "item_code": 10201003,
+          "quantity": 3
+        },
+        {
+          "item_code": 10201026,
+          "quantity": 3
+        },
+        {
+          "item_code": 10103031,
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "code": "trained_2000",
+      "metric": "trained",
+      "target": 2000,
+      "navigation": {
+        "section": "army"
+      },
+      "rewards": [
+        {
+          "item_code": 10201003,
+          "quantity": 4
+        },
+        {
+          "item_code": 10201010,
+          "quantity": 4
+        },
+        {
+          "item_code": 10201018,
+          "quantity": 4
+        },
+        {
+          "item_code": 10201026,
+          "quantity": 4
+        },
+        {
+          "item_code": 10103031,
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "code": "research_3",
+      "metric": "research",
+      "target": 3,
+      "navigation": {
+        "section": "research"
+      },
+      "rewards": [
+        {
+          "item_code": 10201010,
+          "quantity": 2
+        },
+        {
+          "item_code": 10201018,
+          "quantity": 2
+        },
+        {
+          "item_code": 10201026,
+          "quantity": 2
+        },
+        {
+          "item_code": 10103021,
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "code": "research_10",
+      "metric": "research",
+      "target": 10,
+      "navigation": {
+        "section": "research"
+      },
+      "rewards": [
+        {
+          "item_code": 10201003,
+          "quantity": 5
+        },
+        {
+          "item_code": 10201010,
+          "quantity": 5
+        },
+        {
+          "item_code": 10201018,
+          "quantity": 5
+        },
+        {
+          "item_code": 10201026,
+          "quantity": 5
+        },
+        {
+          "item_code": 10103021,
+          "quantity": 2
+        }
+      ]
+    }
+  ]
+}

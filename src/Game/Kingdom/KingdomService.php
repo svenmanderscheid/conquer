@@ -62,6 +62,7 @@ final class KingdomService
                 'inventory_catalog'=>KingdomInventory::catalog($playerId),
                 'inventory_shop'=>KingdomInventory::shop(),
                 'quests'=>DailyQuestService::getQuests($playerId),
+                'welcome_event'=>\Conquer\Game\Conquest\WelcomeEventService::state($playerId),
                 'alpha_entry'=>\Conquer\Game\World\WorldEntry::settings(WorldContext::id()),
                 'quest_resets_at'=>gmdate('Y-m-d 00:00:00', strtotime('tomorrow UTC')),
                 'hospital'=>$hospital,
@@ -114,6 +115,7 @@ final class KingdomService
                     'crystal.buy'=>KingdomInventory::buy($playerId, $body, true),
                     'vip.daily'=>\Conquer\Game\Vip\VipService::claimDaily($playerId),
                     'quest.claim'=>self::claimQuest($playerId, $body),
+                    'welcome.claim'=>\Conquer\Game\Conquest\WelcomeEventService::claim($playerId, $body['milestone_code'] ?? null),
                     'hospital.heal'=>HospitalService::perform($playerId,(int)$cityState['city']['id'],$body),
                     'treasure.equip','treasure.unequip'=>self::equip($playerId, $cityState, $body),
                     'treasure.preset_save','treasure.preset_apply'=>self::treasurePreset($playerId, $body),
@@ -126,7 +128,7 @@ final class KingdomService
                 };
             };
             $teleport=($body['action']??'')==='inventory.use' && (InventoryService::getItemDef((int)($body['item_code']??0))['category']??'')==='teleport';
-            $replayable=($body['action']??'')==='hospital.heal'
+            $replayable=in_array($body['action']??'',['hospital.heal','welcome.claim'],true)
                 || (in_array($body['action']??'',['inventory.use','chest.free'],true) && array_key_exists('operation_key',$body));
             // Read the receipt before checking stock or rolling rewards. A retry must
             // return the original loot even when the last owned chest was consumed.

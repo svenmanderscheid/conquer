@@ -38,7 +38,7 @@ window.ConquerRewards = (() => {
     function create(ctx){
         const {getState,getKingdom,openDialog,esc,fmt}=ctx,dialog=document.querySelector('#game-dialog');
         let pending=null,scope='',entry=null,closingHistory=false;
-        const tracked=payload=>['inventory.use','chest.free'].includes(payload?.action)&&(!payload.queue_type||payload.use_all===true);
+        const tracked=payload=>payload?.action==='welcome.claim'||['inventory.use','chest.free'].includes(payload?.action)&&(!payload.queue_type||payload.use_all===true);
         function restore(){
             const key=`conquer-item-receipt:${getState().city.world_id}:${getState().city.id}`;
             if(scope===key)return;
@@ -59,7 +59,7 @@ window.ConquerRewards = (() => {
         }
         function success(response,payload){
             save(null);
-            const result=response?.result||response||{},drops=Array.isArray(result.drops)?result.drops:[];
+            const result=response?.result||response||{},drops=Array.isArray(result.drops)?result.drops:payload.action==='welcome.claim'?(result.rewards||[]).flatMap(r=>r.item_code?[{...r,type:'item'}]:Number(r.gems)>0?[{type:'resource',resource:'gems',quantity:Number(r.gems)}]:Object.entries(r.resources||{}).map(([resource,quantity])=>({type:'resource',resource,quantity}))):[];
             if(!drops.length){dialog.close();return;}
             const rewards=drops.map(drop=>resolve(drop,getKingdom(),ctx.base)).filter(r=>r.quantity>0);
             const chest=payload.action==='chest.free'||(getKingdom()?.inventory_catalog||[]).some(i=>Number(i.item_code)===Number(payload.item_code)&&i.category==='chest');

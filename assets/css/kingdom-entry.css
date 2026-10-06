@@ -1,0 +1,92 @@
+/* Startup and adviser presentation share the final village-theme tokens. */
+.app-start .app-start-art { overflow:hidden; }
+.app-start .app-start-art img { animation:kingdom-start-drift 12s ease-in-out both; }
+@keyframes kingdom-start-drift { from { transform:scale(1.015); } to { transform:scale(1.065); } }
+.app-start .app-start-card .app-start-tip {
+    margin:12px 0 0;font-size:15px;line-height:1.35;color:var(--ui-muted);
+}
+body.mobile-game #game-dialog:has(.guide-welcome.kingdom-intro) {
+    inset:auto 0 max(24px,env(safe-area-inset-bottom))!important;margin:0 auto!important;
+    width:min(1060px,calc(100% - 32px - env(safe-area-inset-left) - env(safe-area-inset-right)))!important;
+    max-width:1060px!important;height:auto!important;
+    max-height:calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
+    padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;
+    overflow:visible!important;transform:none!important;
+}
+body.mobile-game #game-dialog:has(.guide-welcome.kingdom-intro)::backdrop {
+    background:color-mix(in srgb,var(--ui-primary-dark) 70%,transparent)!important;
+}
+body.mobile-game #game-dialog:has(.guide-welcome.kingdom-intro) #dialog-content {
+    padding:0!important;background:transparent!important;overflow:visible!important;
+}
+/* The dialog retains its accessible title; the visible speaker header is below. */
+body.mobile-game #game-dialog:has(.guide-welcome.kingdom-intro) > .popup-heading {
+    position:absolute!important;width:1px!important;height:1px!important;min-height:0!important;
+    padding:0!important;border:0!important;margin:-1px!important;overflow:hidden!important;
+    clip-path:inset(50%);white-space:nowrap;
+}
+body.mobile-game #game-dialog:has(.guide-welcome.kingdom-intro) > :is(.dialog-close,.dialog-report-button),
+body.mobile-game #game-dialog:has(.guide-welcome.kingdom-intro) .mobile-page-back { display:none!important; }
+body.mobile-game #game-dialog .guide-welcome.kingdom-intro {
+    display:grid;grid-template-columns:minmax(150px,.65fr) minmax(0,1.6fr);align-items:end;
+    gap:0;max-width:none;width:100%;margin:0;color:var(--ui-ink);font:18px/1.45 var(--ui-font);
+}
+.kingdom-intro .kingdom-intro-portrait { min-width:0;pointer-events:none; }
+.kingdom-intro .kingdom-intro-portrait img {
+    display:block;width:100%;height:auto;max-height:360px;object-fit:contain;object-position:bottom;
+    filter:drop-shadow(0 8px 8px color-mix(in srgb,var(--ui-primary-dark) 45%,transparent));
+}
+.kingdom-intro .kingdom-intro-dialogue {
+    min-width:0;display:flex;flex-direction:column;max-height:calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    border:3px solid var(--ui-window-frame-edge);border-radius:18px;background:var(--ui-paper);
+    box-shadow:var(--ui-shadow);overflow:hidden;
+}
+.kingdom-intro .kingdom-intro-dialogue > header {
+    display:flex;justify-content:space-between;align-items:center;gap:12px;flex-shrink:0;
+    padding:12px 20px;background:var(--ui-primary);color:var(--ui-card-light);font-size:18px;
+}
+.kingdom-intro .kingdom-intro-count { white-space:nowrap;font:14px/1.3 var(--ui-font-number); }
+.kingdom-intro .kingdom-intro-copy {
+    min-height:0;overflow:auto;overscroll-behavior:contain;padding:22px 24px 10px;scrollbar-width:none;
+}
+.kingdom-intro .kingdom-intro-copy h3 { margin:0 0 12px;font-size:clamp(23px,3vw,32px);line-height:1.15;color:var(--ui-ink); }
+.kingdom-intro .kingdom-intro-copy p { margin:0 0 10px; }
+.kingdom-intro .kingdom-intro-actions {
+    display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;flex-shrink:0;
+    padding:10px 20px 18px;
+}
+.kingdom-intro .kingdom-intro-actions > button { min-height:44px;min-width:72px;font-size:17px; }
+.kingdom-intro .kingdom-intro-actions > button:first-child { margin-right:auto; }
+@media (max-width:600px) and (min-height:481px) {
+    body.mobile-game #game-dialog:has(.guide-welcome.kingdom-intro) {
+        inset:auto 0 max(10px,env(safe-area-inset-bottom))!important;
+        width:calc(100% - 20px - env(safe-area-inset-left) - env(safe-area-inset-right))!important;
+    }
+    body.mobile-game #game-dialog .guide-welcome.kingdom-intro { grid-template-columns:1fr;font-size:17px; }
+    .kingdom-intro .kingdom-intro-portrait { width:140px;margin:0 0 -12px 8px;position:relative;z-index:1; }
+    .kingdom-intro .kingdom-intro-portrait img { max-height:24dvh; }
+    .kingdom-intro .kingdom-intro-dialogue { max-height:calc(76dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); }
+    .kingdom-intro .kingdom-intro-dialogue > header { padding:12px 16px; }
+    .kingdom-intro .kingdom-intro-copy { padding:18px 16px 8px; }
+    .kingdom-intro .kingdom-intro-actions { padding:8px 12px 12px;gap:6px; }
+    .kingdom-intro .kingdom-intro-actions > button { padding:8px 10px;font-size:16px; }
+}
+@media (max-height:480px) {
+    body.mobile-game #game-dialog:has(.guide-welcome.kingdom-intro) {
+        inset:auto 0 max(8px,env(safe-area-inset-bottom))!important;
+        width:calc(100% - 20px - env(safe-area-inset-left) - env(safe-area-inset-right))!important;
+    }
+    body.mobile-game #game-dialog .guide-welcome.kingdom-intro { grid-template-columns:minmax(96px,.4fr) minmax(0,1.6fr);font-size:16px; }
+    .kingdom-intro .kingdom-intro-portrait img { max-height:70dvh; }
+    .kingdom-intro .kingdom-intro-dialogue { max-height:calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); }
+    .kingdom-intro .kingdom-intro-dialogue > header { padding:8px 14px;font-size:16px; }
+    .kingdom-intro .kingdom-intro-copy { padding:12px 14px 4px; }
+    .kingdom-intro .kingdom-intro-copy h3 { font-size:23px;margin-bottom:8px; }
+    .kingdom-intro .kingdom-intro-actions { padding:6px 10px 10px; }
+}
+@media (prefers-reduced-motion:reduce) {
+    .app-start,.app-start-track i { transition:none!important; }
+    .app-start .app-start-art img { animation:none;transform:none; }
+}
+body.reduced-motion .app-start,body.reduced-motion .app-start-track i { transition:none!important; }
+body.reduced-motion .app-start .app-start-art img { animation:none;transform:none; }

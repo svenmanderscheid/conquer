@@ -97,10 +97,20 @@ const output=path.resolve(__dirname,'../artifacts/beginner-guide');fs.mkdirSync(
   await page.reload();await page.locator('.guide-welcome').waitFor();
   for(const [width,height] of [[1280,800],[390,844],[320,568],[568,320],[844,390]]){
    await page.setViewportSize({width,height});
-   await page.locator('[data-action="guide-open"]').scrollIntoViewIfNeeded();
-   const r=await page.locator('[data-action="guide-open"]').boundingBox();
-   assert(r&&r.y>=0&&r.y+r.height<=height,'Newcomer action reachable');
+   assert.equal(await page.locator('#app-start').count(),0,'Adviser opens after startup dismissal');
+   await page.waitForFunction(()=>document.querySelector('.kingdom-intro-portrait img')?.naturalWidth>0);
    await page.screenshot({path:path.join(output,`welcome-${width}x${height}.png`)});
+   for(let step=0;step<4;step++){
+    for(const button of await page.locator('.kingdom-intro-actions button').all()){
+     const r=await button.boundingBox();
+     assert(r&&r.x>=0&&r.x+r.width<=width+1&&r.y>=0&&r.y+r.height<=height+1&&r.height>=44,'Intro actions stay reachable and touch sized');
+    }
+    const body=await page.locator('.kingdom-intro-dialogue').boundingBox();
+    assert(body&&body.x>=0&&body.x+body.width<=width+1,'Dialogue fits viewport');
+    if(step<3)await page.locator('[data-action="guide-intro-next"]').click();
+   }
+   await page.screenshot({path:path.join(output,`intro-final-${width}x${height}.png`)});
+   for(let step=0;step<3;step++)await page.locator('[data-action="guide-intro-back"]').click();
   }
   await page.locator('.guide-welcome [data-action="close-dialog"]').click();
   await page.reload();await page.locator('.painted-village').waitFor();await page.waitForTimeout(700);
@@ -111,9 +121,33 @@ const output=path.resolve(__dirname,'../artifacts/beginner-guide');fs.mkdirSync(
   assert.equal(await page.locator('#game-dialog').evaluate(e=>e.open),false,'Reading the guide does not trigger another welcome');
   // Start from the welcome button, with storage unavailable; navigation must still work.
   await page.addInitScript(()=>{Storage.prototype.getItem=()=>{throw new Error('Storage unavailable');};Storage.prototype.setItem=()=>{throw new Error('Storage unavailable');};});
-  await page.reload();await page.locator('[data-action="guide-open"]').click();await page.locator('.beginner-guide').waitFor();
+  await page.reload();
+  for(let step=0;step<3;step++)await page.locator('[data-action="guide-intro-next"]').click();
+  await page.locator('[data-action="guide-open"]').click();await page.locator('.beginner-guide').waitFor();
+  await page.locator('[data-action="guide-intro-replay"]').click();await page.locator('.kingdom-intro').waitFor();
+  assert.equal(new URL(page.url()).hash,'#city','Replay first returns to the actual city');
+  await page.goBack();await page.waitForFunction(()=>!document.querySelector('#game-dialog').open);
+  let releaseStartup;
+  const startupGate=new Promise(resolve=>{releaseStartup=resolve;}),startupRoute=async route=>{await startupGate;await route.fallback();};
+  await page.route(base+'/api/game/state*',startupRoute);
+  await page.reload({waitUntil:'domcontentloaded'});await page.locator('#app-start').waitFor();
+  for(const [width,height] of [[1280,800],[390,844],[320,568],[568,320],[844,390]]){
+   await page.setViewportSize({width,height});
+   const card=await page.locator('.app-start-card').boundingBox();
+   assert(card&&card.x>=0&&card.x+card.width<=width+1&&card.y>=0&&card.y+card.height<=height+1,'Loading status fits viewport');
+   assert(Number(await page.locator('#app-start-progress').getAttribute('aria-valuenow'))<100,'Loading cannot complete without authenticated state');
+   await page.screenshot({path:path.join(output,`loading-${width}x${height}.png`)});
+  }
+  await page.emulateMedia({reducedMotion:'reduce'});
+  assert.equal(await page.locator('.app-start-art img').evaluate(el=>getComputedStyle(el).animationName),'none','OS reduced motion disables loading-art drift');
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  await page.evaluate(()=>document.body.classList.add('reduced-motion'));
+  assert.equal(await page.locator('.app-start-art img').evaluate(el=>getComputedStyle(el).animationName),'none','Game reduced motion disables loading-art drift');
+  await page.evaluate(()=>document.body.classList.remove('reduced-motion'));
+  releaseStartup();await page.unroute(base+'/api/game/state*',startupRoute);
+  await page.waitForFunction(()=>!document.getElementById('app-start'));
   assert.deepEqual(writes,[],'Reading, goal checks and destination previews never perform game actions');
   assert.deepEqual(errors,[],'No browser errors');
-  console.log('PASS: all 16 buildings, 6 chapters, real goal snapshots, local resume, newcomer dismissal, polling, destinations, Escape/Back and 20 responsive views. '+output);
+  console.log('PASS: all 16 buildings, 6 chapters, real goal snapshots, local resume, four-step adviser, replay/dismissal, true loading state, polling, destinations and Escape/Back across five viewport sizes. '+output);
  } finally {await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});
