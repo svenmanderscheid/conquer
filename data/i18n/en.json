@@ -10121,5 +10121,9 @@
   "quests.daily.gather_gold_25000.title": "Gold for the treasury",
   "quests.daily.gather_gold_25000.description": "Bring home 25,000 gold from gathering marches today.",
   "quests.daily.alliance_help_5.title": "Helping hands",
-  "quests.daily.alliance_help_5.description": "Help alliance members with five building or research requests today."
+  "quests.daily.alliance_help_5.description": "Help alliance members with five building or research requests today.",
+  "items.10207011.name": "Common Relic Fragment",
+  "items.10207011.description": "Grants one fragment of a random common relic. Fragments automatically increase its level.",
+  "items.10207013.name": "Epic Relic Fragment",
+  "items.10207013.description": "Grants one fragment of a random epic relic. Fragments automatically increase its level."
 }

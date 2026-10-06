@@ -10121,5 +10121,9 @@
   "quests.daily.gather_gold_25000.title": "Gold für die Schatzkammer",
   "quests.daily.gather_gold_25000.description": "Bringe heute 25.000 Gold mit Sammelzügen nach Hause.",
   "quests.daily.alliance_help_5.title": "Helfende Hände",
-  "quests.daily.alliance_help_5.description": "Hilf heute Allianzmitgliedern bei fünf Bau- oder Forschungsanfragen."
+  "quests.daily.alliance_help_5.description": "Hilf heute Allianzmitgliedern bei fünf Bau- oder Forschungsanfragen.",
+  "items.10207011.name": "Gewöhnliches Reliktfragment",
+  "items.10207011.description": "Gewährt ein Fragment eines zufälligen gewöhnlichen Relikts. Fragmente erhöhen automatisch dessen Stufe.",
+  "items.10207013.name": "Episches Reliktfragment",
+  "items.10207013.description": "Gewährt ein Fragment eines zufälligen epischen Relikts. Fragmente erhöhen automatisch dessen Stufe."
 }

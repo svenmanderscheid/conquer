@@ -2776,6 +2776,38 @@
       ]
     },
     {
+      "code": 10207011,
+      "name": "Common Relic Fragment",
+      "description": "Grants one fragment of a random common relic. Fragments automatically increase its level.",
+      "category": "fragment_pack",
+      "subcategory": "fragments",
+      "fragment_grade": "normal",
+      "fragment_amount": 1,
+      "rarity": "normal",
+      "icon": "fragment-normal.svg",
+      "name_de": "Gewöhnliches Reliktfragment",
+      "description_de": "Gewährt ein Fragment eines zufälligen gewöhnlichen Relikts. Fragmente erhöhen automatisch dessen Stufe.",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": []
+    },
+    {
+      "code": 10207013,
+      "name": "Epic Relic Fragment",
+      "description": "Grants one fragment of a random epic relic. Fragments automatically increase its level.",
+      "category": "fragment_pack",
+      "subcategory": "fragments",
+      "fragment_grade": "epic",
+      "fragment_amount": 1,
+      "rarity": "epic",
+      "icon": "fragment-epic.svg",
+      "name_de": "Episches Reliktfragment",
+      "description_de": "Gewährt ein Fragment eines zufälligen epischen Relikts. Fragmente erhöhen automatisch dessen Stufe.",
+      "icon_framed": false,
+      "is_usable": true,
+      "loot_sources": []
+    },
+    {
       "code": 10207021,
       "name": "Smaragd-Drachenei",
       "category": "fragment_pack",
