@@ -416,5 +416,9 @@
     "quests.daily.gather_gold_25000.title": "Gold fir d’Schatzkammer",
     "quests.daily.gather_gold_25000.description": "Bréng haut 25.000 Gold mat Sammelmärsch heem.",
     "quests.daily.alliance_help_5.title": "Hëllefend Hänn",
-    "quests.daily.alliance_help_5.description": "Hëllef haut Allianzmemberen bei fënnef Bau- oder Fuerschungsufroen."
+    "quests.daily.alliance_help_5.description": "Hëllef haut Allianzmemberen bei fënnef Bau- oder Fuerschungsufroen.",
+    "items.10207011.name": "Gewéinlecht Reliktfragment",
+    "items.10207011.description": "Gëtt ee Fragment vun engem zoufällege gewéinleche Relikt. Fragmenter erhéijen automatesch säin Niveau.",
+    "items.10207013.name": "Epescht Reliktfragment",
+    "items.10207013.description": "Gëtt ee Fragment vun engem zoufällegen epesche Relikt. Fragmenter erhéijen automatesch säin Niveau."
 }

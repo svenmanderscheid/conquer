@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "quests": [
     {
       "code": "attack_monster_1",
@@ -11,8 +11,13 @@
       "target": 1,
       "activity_points": 10,
       "rewards": [
-        { "item_code": 10103002, "quantity": 2 },
-        { "gems": 10 }
+        {
+          "item_code": 10103002,
+          "quantity": 2
+        },
+        {
+          "gems": 10
+        }
       ]
     },
     {
@@ -25,8 +30,13 @@
       "target": 3,
       "activity_points": 10,
       "rewards": [
-        { "item_code": 10103003, "quantity": 1 },
-        { "gems": 20 }
+        {
+          "item_code": 10103003,
+          "quantity": 1
+        },
+        {
+          "gems": 20
+        }
       ]
     },
     {
@@ -39,11 +49,25 @@
       "target": 1,
       "activity_points": 10,
       "rewards": [
-        { "item_code": 10103011, "quantity": 1 },
-        { "gems": 15 },
-        { "item_code": 10201010, "quantity": 1 },
-        { "item_code": 10201018, "quantity": 1 },
-        { "item_code": 10201026, "quantity": 1 }
+        {
+          "item_code": 10103011,
+          "quantity": 1
+        },
+        {
+          "gems": 15
+        },
+        {
+          "item_code": 10201010,
+          "quantity": 1
+        },
+        {
+          "item_code": 10201018,
+          "quantity": 1
+        },
+        {
+          "item_code": 10201026,
+          "quantity": 1
+        }
       ]
     },
     {
@@ -56,10 +80,21 @@
       "target": 100,
       "activity_points": 10,
       "rewards": [
-        { "item_code": 10103031, "quantity": 1 },
-        { "gems": 15 },
-        { "item_code": 10201003, "quantity": 2 },
-        { "item_code": 10201026, "quantity": 1 }
+        {
+          "item_code": 10103031,
+          "quantity": 1
+        },
+        {
+          "gems": 15
+        },
+        {
+          "item_code": 10201003,
+          "quantity": 2
+        },
+        {
+          "item_code": 10201026,
+          "quantity": 1
+        }
       ]
     },
     {
@@ -72,11 +107,25 @@
       "target": 1,
       "activity_points": 10,
       "rewards": [
-        { "item_code": 10103021, "quantity": 1 },
-        { "gems": 20 },
-        { "item_code": 10201010, "quantity": 1 },
-        { "item_code": 10201018, "quantity": 1 },
-        { "item_code": 10201026, "quantity": 1 }
+        {
+          "item_code": 10103021,
+          "quantity": 1
+        },
+        {
+          "gems": 20
+        },
+        {
+          "item_code": 10201010,
+          "quantity": 1
+        },
+        {
+          "item_code": 10201018,
+          "quantity": 1
+        },
+        {
+          "item_code": 10201026,
+          "quantity": 1
+        }
       ]
     },
     {
@@ -89,8 +138,13 @@
       "target": 50000,
       "activity_points": 10,
       "rewards": [
-        { "item_code": 10102001, "quantity": 1 },
-        { "gems": 10 }
+        {
+          "item_code": 10102001,
+          "quantity": 1
+        },
+        {
+          "gems": 10
+        }
       ]
     },
     {
@@ -104,8 +158,13 @@
       "activity_points": 10,
       "auto_complete_on_login": true,
       "rewards": [
-        { "item_code": 10103001, "quantity": 1 },
-        { "gems": 5 }
+        {
+          "item_code": 10103001,
+          "quantity": 1
+        },
+        {
+          "gems": 5
+        }
       ]
     },
     {
@@ -118,7 +177,9 @@
       "target": 1,
       "activity_points": 10,
       "rewards": [
-        { "gems": 50 }
+        {
+          "gems": 50
+        }
       ]
     },
     {
@@ -128,7 +189,12 @@
       "type": "gather_food",
       "target": 25000,
       "activity_points": 10,
-      "rewards": [{ "item_code": 10201003, "quantity": 1 }]
+      "rewards": [
+        {
+          "item_code": 10201003,
+          "quantity": 1
+        }
+      ]
     },
     {
       "code": "gather_lumber_25000",
@@ -137,7 +203,12 @@
       "type": "gather_lumber",
       "target": 25000,
       "activity_points": 10,
-      "rewards": [{ "item_code": 10201010, "quantity": 1 }]
+      "rewards": [
+        {
+          "item_code": 10201010,
+          "quantity": 1
+        }
+      ]
     },
     {
       "code": "gather_stone_25000",
@@ -146,7 +217,12 @@
       "type": "gather_stone",
       "target": 25000,
       "activity_points": 10,
-      "rewards": [{ "item_code": 10201018, "quantity": 1 }]
+      "rewards": [
+        {
+          "item_code": 10201018,
+          "quantity": 1
+        }
+      ]
     },
     {
       "code": "gather_gold_25000",
@@ -155,7 +231,12 @@
       "type": "gather_gold",
       "target": 25000,
       "activity_points": 10,
-      "rewards": [{ "item_code": 10201026, "quantity": 1 }]
+      "rewards": [
+        {
+          "item_code": 10201026,
+          "quantity": 1
+        }
+      ]
     },
     {
       "code": "alliance_help_5",
@@ -164,7 +245,12 @@
       "type": "alliance_help",
       "target": 5,
       "activity_points": 10,
-      "rewards": [{ "item_code": 10103001, "quantity": 2 }]
+      "rewards": [
+        {
+          "item_code": 10103001,
+          "quantity": 2
+        }
+      ]
     }
   ],
   "activity": {
@@ -174,42 +260,136 @@
         "code": "daily_activity_20",
         "target": 20,
         "rewards": [
-          { "item_code": 10201003, "quantity": 1 },
-          { "item_code": 10201010, "quantity": 1 },
-          { "item_code": 10201018, "quantity": 1 },
-          { "item_code": 10201026, "quantity": 1 }
+          {
+            "item_code": 10201003,
+            "quantity": 2
+          },
+          {
+            "item_code": 10201010,
+            "quantity": 2
+          },
+          {
+            "item_code": 10201018,
+            "quantity": 2
+          },
+          {
+            "item_code": 10201026,
+            "quantity": 2
+          }
         ]
       },
       {
         "code": "daily_activity_40",
         "target": 40,
-        "rewards": [{ "item_code": 10103002, "quantity": 2 }]
+        "rewards": [
+          {
+            "item_code": 10201003,
+            "quantity": 4
+          },
+          {
+            "item_code": 10201010,
+            "quantity": 4
+          },
+          {
+            "item_code": 10201018,
+            "quantity": 4
+          },
+          {
+            "item_code": 10201026,
+            "quantity": 4
+          }
+        ]
       },
       {
         "code": "daily_activity_60",
         "target": 60,
         "rewards": [
-          { "item_code": 10201003, "quantity": 2 },
-          { "item_code": 10201010, "quantity": 2 },
-          { "item_code": 10201018, "quantity": 2 },
-          { "item_code": 10201026, "quantity": 2 }
+          {
+            "item_code": 10201003,
+            "quantity": 6
+          },
+          {
+            "item_code": 10201010,
+            "quantity": 6
+          },
+          {
+            "item_code": 10201018,
+            "quantity": 6
+          },
+          {
+            "item_code": 10201026,
+            "quantity": 6
+          }
         ]
       },
       {
         "code": "daily_activity_80",
         "target": 80,
-        "rewards": [{ "item_code": 10103011, "quantity": 1 }, { "item_code": 10103021, "quantity": 1 }]
+        "rewards": [
+          {
+            "item_code": 10201003,
+            "quantity": 8
+          },
+          {
+            "item_code": 10201010,
+            "quantity": 8
+          },
+          {
+            "item_code": 10201018,
+            "quantity": 8
+          },
+          {
+            "item_code": 10201026,
+            "quantity": 8
+          },
+          {
+            "item_code": 10105001,
+            "quantity": 1
+          },
+          {
+            "gems": 50
+          },
+          {
+            "item_code": 10207011,
+            "quantity": 5
+          }
+        ]
       },
       {
         "code": "daily_activity_100",
         "target": 100,
         "rewards": [
-          { "item_code": 10201003, "quantity": 2 },
-          { "item_code": 10201010, "quantity": 2 },
-          { "item_code": 10201018, "quantity": 2 },
-          { "item_code": 10201026, "quantity": 2 },
-          { "item_code": 10103003, "quantity": 1 },
-          { "gems": 20 }
+          {
+            "item_code": 10201003,
+            "quantity": 10
+          },
+          {
+            "item_code": 10201010,
+            "quantity": 10
+          },
+          {
+            "item_code": 10201018,
+            "quantity": 10
+          },
+          {
+            "item_code": 10201026,
+            "quantity": 10
+          },
+          {
+            "item_code": 10105001,
+            "quantity": 3
+          },
+          {
+            "item_code": 10106001,
+            "quantity": 1
+          },
+          {
+            "gems": 100
+          },
+          {
+            "item_code": 10207013,
+            "quantity": 5
+          }
         ]
       }
     ]

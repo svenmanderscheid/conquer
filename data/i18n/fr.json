@@ -9547,5 +9547,9 @@
     "quests.daily.gather_gold_25000.title": "De l’or pour le royaume",
     "quests.daily.gather_gold_25000.description": "Rapportez 25 000 d’or de marches de collecte aujourd’hui.",
     "quests.daily.alliance_help_5.title": "Un coup de main",
-    "quests.daily.alliance_help_5.description": "Aidez des membres de l’alliance avec cinq demandes de construction ou de recherche aujourd’hui."
+    "quests.daily.alliance_help_5.description": "Aidez des membres de l’alliance avec cinq demandes de construction ou de recherche aujourd’hui.",
+    "items.10207011.name": "Fragment de relique commune",
+    "items.10207011.description": "Octroie un fragment d’une relique commune aléatoire. Les fragments augmentent automatiquement son niveau.",
+    "items.10207013.name": "Fragment de relique épique",
+    "items.10207013.description": "Octroie un fragment d’une relique épique aléatoire. Les fragments augmentent automatiquement son niveau."
 }
