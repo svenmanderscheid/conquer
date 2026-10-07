@@ -54,8 +54,8 @@ window.ConquerItemArt = (() => {
         'boost:march_size':[10202019,10202020,10300004],
         'boost:vs_monster_attack':[10202021,10202022],
         'boost:march_speed':[10202023,10202024],
-        'fragments:normal':[10207001], 'fragments:rare':[10207002],
-        'fragments:epic':[10207003], 'fragments:legendary':[10207004,10300002]
+        'fragments:normal':[10207001,10207011], 'fragments:rare':[10207002],
+        'fragments:epic':[10207003,10207013], 'fragments:legendary':[10207004,10300002]
     };
     const familyCodes = new Map(), familyArt = {};
     for (const [family,codes] of Object.entries(families)) {
