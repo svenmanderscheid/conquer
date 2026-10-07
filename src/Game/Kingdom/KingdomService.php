@@ -40,7 +40,7 @@ final class KingdomService
             $standings = Connection::getInstance()->transaction(static fn(): array => self::standings());
             $alliance = self::alliance($playerId, $standings);
             $db = Connection::getInstance();
-            $settings = $db->query('SELECT reduced_motion,compact_numbers,confirm_actions,report_build_complete,report_research_complete,report_train_complete FROM kingdom_profiles WHERE player_id=?', [$playerId])->fetch();
+            $settings = $db->query('SELECT reduced_motion,compact_numbers,confirm_actions,report_build_complete,report_research_complete,report_train_complete,report_heal_complete FROM kingdom_profiles WHERE player_id=?', [$playerId])->fetch();
             $hospital = HospitalService::getStatus($cityId);
             foreach ($hospital['wounded'] as &$w) { $w['name'] = TroopData::get($w['troop_code'])['name'] ?? 'Truppen'; }
             unset($w);
@@ -356,7 +356,7 @@ final class KingdomService
         }
         $assignments = ['reduced_motion=?','compact_numbers=?','confirm_actions=?'];
         // Older clients may omit the new preferences; preserve the saved choices.
-        foreach (['report_build_complete','report_research_complete','report_train_complete'] as $key) {
+        foreach (['report_build_complete','report_research_complete','report_train_complete','report_heal_complete'] as $key) {
             if (!array_key_exists($key, $body)) continue;
             self::require(is_bool($body[$key]), 'Einstellungen müssen wahr oder falsch sein.');
             $assignments[] = $key . '=?';

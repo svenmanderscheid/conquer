@@ -7,6 +7,8 @@
   "settings.reports.research_hint": "Receive a report when research finishes.",
   "settings.reports.train": "Troop training",
   "settings.reports.train_hint": "Receive a report when troops finish training or promotion.",
+  "settings.reports.heal": "Healing reports",
+  "settings.reports.heal_hint": "Receive a report when wounded troops finish healing.",
   "landing.seo.title": "Union of Kingdoms – Fantasy Browser Strategy Game",
   "landing.seo.description": "Build a fantasy kingdom, research upgrades and lead your army in PvP and alliance monster rallies. Play in your browser. Join the closed alpha waiting list.",
   "landing.seo.intro": "Union of Kingdoms is a fantasy browser strategy game. Grow your city, research upgrades and build your army. Challenge rival players and face mighty monsters with your alliance.",

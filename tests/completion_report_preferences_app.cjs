@@ -2,7 +2,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),net=require('node:net');
 const {spawn}=require('node:child_process'),{chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const root=path.resolve(__dirname,'..'),out=path.join(root,'output/playwright/completion-reports');
-const keys=['report_build_complete','report_research_complete','report_train_complete'];
+const keys=['report_build_complete','report_research_complete','report_train_complete','report_heal_complete'];
 (async()=>{
  fs.mkdirSync(out,{recursive:true});
  const port=await new Promise(resolve=>{const server=net.createServer();server.listen(0,'127.0.0.1',()=>{const port=server.address().port;server.close(()=>resolve(port));});});
@@ -23,6 +23,7 @@ const keys=['report_build_complete','report_research_complete','report_train_com
    await page.goto(base+'/city#settings');await page.locator('.completion-report-settings').waitFor();
    assert.equal(await page.locator('.completion-report-settings legend').innerText(),title);
    assert.equal(await page.evaluate(()=>ConquerLocale.locale),locale);
+   assert.equal(await page.locator('[name=report_heal_complete]').locator('..').locator('strong').innerText(),{en:'Healing reports',de:'Heilungsberichte',fr:'Rapports de soins'}[locale]);
    for(const [width,height] of [[1280,800],[390,844],[320,568],[844,390],[568,320]]) {
     await page.setViewportSize({width,height});
     for(const key of keys) {
@@ -38,6 +39,7 @@ const keys=['report_build_complete','report_research_complete','report_train_com
    await page.setViewportSize({width:390,height:844});
    for (const key of keys)await page.locator(`[name=${key}]`).check();
    await page.locator('[name=report_build_complete]').uncheck();await page.locator('[name=report_train_complete]').uncheck();
+   await page.locator('[name=report_heal_complete]').uncheck();
    const responsePromise=page.waitForResponse(r=>r.url().endsWith('/api/kingdom/action')&&r.request().postDataJSON()?.action==='settings.save');
    await page.locator('form[data-form=settings] button').tap();
    const response=await responsePromise;assert.equal(response.status(),200);

@@ -63,7 +63,7 @@ final class NotificationService
     {
         try {
             $db       = Connection::getInstance();
-            if (in_array($type, [self::TYPE_BUILD_COMPLETE, self::TYPE_RESEARCH_COMPLETE, self::TYPE_TRAIN_COMPLETE], true)) {
+            if (in_array($type, [self::TYPE_BUILD_COMPLETE, self::TYPE_RESEARCH_COMPLETE, self::TYPE_TRAIN_COMPLETE, self::TYPE_HEAL_COMPLETE], true)) {
                 $enabled = $db->query('SELECT report_' . $type . ' FROM kingdom_profiles WHERE player_id=?', [$playerId])->fetchColumn();
                 // Snapshot the choice at completion so re-enabling cannot backfill muted reports.
                 $data['report_enabled'] = $enabled === false || (bool) $enabled;
