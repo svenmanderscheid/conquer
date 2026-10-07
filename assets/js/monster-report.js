@@ -9,7 +9,7 @@ window.ConquerMonsterReport = (() => {
     const types = {infantry:['Infanterie','knight'],cavalry:['Kavallerie','rider'],ranged:['Bogenschützen','archer']};
     const troopArt = (type,tier) => {
         const level=Number(tier),prefix=type===types.infantry?'guardian':type===types.ranged?'fire-archer':type===types.cavalry?'shadow-rider':null;
-        return prefix&&level>=1&&level<=10?`characters/fantasy-troops-v2/${prefix}-t${level}-ui.webp`:type[1]+'.png';
+        return prefix&&level>=1&&level<=10?`characters/fantasy-troops-v3/${prefix}-t${level}-ui.webp`:type[1]+'.png';
     };
     const isMonster = r => Boolean(r?.details && !r.details.battle_kind && (r.target_type == null || Number(r.target_type)===3) && (r.details.monster_name != null || r.details.monster_snapshot != null));
     const sum = (rows,key) => rows.reduce((total,row)=>total+(Number(row[key])||0),0);

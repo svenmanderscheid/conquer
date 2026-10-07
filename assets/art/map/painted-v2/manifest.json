@@ -1,0 +1,1450 @@
+{
+  "date": "2026-10-05",
+  "generator": "Built-in image_gen; deterministic crop/registration/pose-layer packing only",
+  "assets": [
+    {
+      "id": "alliance-center",
+      "sourceSha256": "0b91bef1e0d91bf4e510874d73e9d340fde79b9d4414b2d1fa904f4cd1fd23f0",
+      "sourceFile": "alliance-center-still.png",
+      "prompt": "Edit reference 1 into ONE coherent Union of Kingdoms painted alliance headquarters portrait. Preserve its identity: ivory fortress, purple roofs and purple banners, central gold winged crest with turquoise gem, large center hall and two round side towers. Simplify overly dense spires to five broad roof masses. Match reference 2 EXACTLY in chunky rounded hand-painted cartoon building forms, thick dark espresso outlines and two broad light values; broad quiet surfaces and no shiny metal, no realistic textures, no tiny ornament clutter. Strong readable silhouette for mobile map, warm ivory walls, muted gold details. Fully visible isolated transparent cutout, centered square, no text. Reference 1 is the edit target, reference 2 only style.",
+      "stillOnly": true,
+      "outputs": [
+        {
+          "file": "alliance-center.webp",
+          "bytes": 50090,
+          "sha256": "b9226abb9304f7c87790569f3c5c18c46eb8054f6d8d5402394260d4bb11267d"
+        }
+      ]
+    },
+    {
+      "id": "shrine-forest",
+      "sourceSha256": "4e43348607864efc6f9ece85ae478d3f68fd19e6224cde242936098ac61c6bd0",
+      "sourceFile": "shrine-forest-sheet.png",
+      "prompt": "Generate ONE four-pose animation sprite sheet for the SAME named landmark. First reference is the exact identity to preserve, second reference defines approved Union of Kingdoms painted style. A regular 2x2 grid, four equal square cells, genuine transparent background, no grid lines or text. Each cell contains one complete full landmark, exactly same scale and pixel-aligned stationary structure across all four cells. Give 8% transparent padding per cell. Chunky rounded shapes, dark espresso thick outlines, two broad light values, no low-poly mesh rendering, no photorealism, no glossy material. ONLY the specified defining magical part changes pose; pedestal, stones and structure remain identical. No generic halo or floating particles. FOREST SHRINE: retain ring of rounded grey standing stones with leaf emblems, circular sage grass/stone platform, two twisting warm-brown living trunks meeting above a hovering green diamond, three broad sage tree canopies and two red flowers. Four poses show canopies/trunk upper twigs swaying LEFT, CENTER, RIGHT, CENTER gently. Root bases and standing stones fixed. Green diamond also rotates slightly but stays in same location. This is a living-tree shrine, no building or castle.",
+      "frameSize": 512,
+      "poseOrder": [
+        0,
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "frameDurationMs": 450,
+      "registration": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          1.0,
+          21.0,
+          -1.0
+        ],
+        [
+          1.0,
+          0.0,
+          22.0
+        ],
+        [
+          0.997712,
+          22.062,
+          23.112
+        ]
+      ],
+      "motionRegions": [
+        [
+          0.05,
+          0,
+          0.94,
+          0.46
+        ]
+      ],
+      "changedPixelFractions": [
+        0.22260665893554688,
+        0.2343597412109375,
+        0.22302627563476562
+      ],
+      "stationaryPixelsUnchanged": true,
+      "outputs": [
+        {
+          "file": "shrine-forest.png",
+          "bytes": 265984,
+          "sha256": "c9b4afa21ef7f1054a7a6f5485b960137228312441c2f516f9c83a7590b1297d"
+        },
+        {
+          "file": "shrine-forest.webp",
+          "bytes": 144736,
+          "sha256": "0be3396b6e8a8034a3a2df36bf605bef5c77942d3d64f80a49d088553966d818"
+        }
+      ]
+    },
+    {
+      "id": "shrine-ice",
+      "sourceSha256": "f57772db5aab88ce5d9d361708f8d6a2a3cf25095f8ddd654d99f659a713e6f4",
+      "sourceFile": "shrine-ice-sheet.png",
+      "prompt": "Generate ONE four-pose animation sprite sheet for the SAME named landmark. First reference is the exact identity to preserve, second reference defines approved Union of Kingdoms painted style. A regular 2x2 grid, four equal square cells, genuine transparent background, no grid lines or text. Each cell contains one complete full landmark, exactly same scale and pixel-aligned stationary structure across all four cells. Give 8% transparent padding per cell. Chunky rounded shapes, dark espresso thick outlines, two broad light values, no low-poly mesh rendering, no photorealism, no glossy material. ONLY the specified defining magical part changes pose; pedestal, stones and structure remain identical. No generic halo or floating particles. ICE SHRINE: retain warm-white snowy rounded stone arch with pale turquoise inner band above circular ice altar, a LARGE hovering turquoise diamond ice crystal in center and smaller crystals at base, three low carved snow monoliths. Four poses show central crystal turning about its vertical axis, visibly different broad/narrow facets: 0,30,60,90 degrees. Crystal pointed top/bottom stay at same positions. Arch, platform and small crystals remain fixed. Snowy white and turquoise palette. No buildings or castle.",
+      "frameSize": 512,
+      "poseOrder": [
+        0,
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "frameDurationMs": 450,
+      "registration": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0.997854,
+          4.049,
+          1.056
+        ],
+        [
+          1.0,
+          0.0,
+          23.0
+        ],
+        [
+          0.997854,
+          4.049,
+          24.006
+        ]
+      ],
+      "motionRegions": [
+        [
+          0.35,
+          0.26,
+          0.65,
+          0.64
+        ]
+      ],
+      "changedPixelFractions": [
+        0.0811767578125,
+        0.082489013671875,
+        0.080810546875
+      ],
+      "stationaryPixelsUnchanged": true,
+      "outputs": [
+        {
+          "file": "shrine-ice.png",
+          "bytes": 277283,
+          "sha256": "54d35cd8ca1d7b92977a4d07a39f33a84559da7733c6366f06dda46e72e96463"
+        },
+        {
+          "file": "shrine-ice.webp",
+          "bytes": 100940,
+          "sha256": "21df3947dae20ed39853c3d725ab9cf98956891786048724cbf96b8fdec24e73"
+        }
+      ]
+    },
+    {
+      "id": "shrine-lava",
+      "sourceSha256": "c55e0405eeaee298c8c3ef592fe807dbdf58a97e027b7494e5826780a7708e03",
+      "sourceFile": "shrine-lava-sheet.png",
+      "prompt": "Generate ONE four-pose animation sprite sheet of the SAME Union of Kingdoms landmark. First reference is exact identity, second reference is exact approved chunky painted style. Regular 2x2 grid, four equal square transparent cells, no labels/grid/text. Complete landmark with 8% transparent padding in every cell. Same stationary platform and stones, identical position, scale, perspective in every cell; only specified central ornament moves. Large soft rounded forms, thick dark espresso outlines, two-tone cel shading, no low-poly rendering or photorealism, no glossy reflections. LAVA FIRE SHRINE: circular dark brown/grey basalt-stone platform, five chunky rounded standing stones with orange flame glyphs, low terracotta/copper central brazier bowl and a single large orange/yellow flame. Only flame moves: pose1 leans left, pose2 upright, pose3 leans right, pose4 upright small. Bowl and stones remain pixel aligned. Warm orange and muted charcoal palette. No glow ring, no particles, no extra scenery.",
+      "frameSize": 512,
+      "poseOrder": [
+        0,
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "frameDurationMs": 450,
+      "registration": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          21.0
+        ],
+        [
+          1.0,
+          0.0,
+          21.0
+        ]
+      ],
+      "motionRegions": [
+        [
+          0.29,
+          0.05,
+          0.76,
+          0.56
+        ]
+      ],
+      "changedPixelFractions": [
+        0.14430999755859375,
+        0.15280914306640625,
+        0.1373138427734375
+      ],
+      "stationaryPixelsUnchanged": true,
+      "outputs": [
+        {
+          "file": "shrine-lava.png",
+          "bytes": 191018,
+          "sha256": "bcaf2464accee53b3ddb6c6a6a2eb34ebb4da19aaf960cad6bc5bc5dc3638b00"
+        },
+        {
+          "file": "shrine-lava.webp",
+          "bytes": 71276,
+          "sha256": "babe6ab365af83f1c9f175cd8c8dc0a05885535aef79701afa06503db353d802"
+        }
+      ]
+    },
+    {
+      "id": "shrine-sand",
+      "sourceSha256": "d5d09f9e325c8399b08f66daaa749ab3eee76b7bb7e356f82293aaff99754a35",
+      "sourceFile": "shrine-sand-sheet.png",
+      "prompt": "Generate ONE four-pose animation sprite sheet of the SAME Union of Kingdoms landmark. First reference is exact identity, second reference is exact approved chunky painted style. Regular 2x2 grid, four equal square transparent cells, no labels/grid/text. Complete landmark with 8% transparent padding in every cell. Same stationary platform and stones, identical position, scale, perspective in every cell; only specified central ornament moves. Large soft rounded forms, thick dark espresso outlines, two-tone cel shading, no low-poly rendering or photorealism, no glossy reflections. SAND SUN SHRINE: golden sandstone ring platform, two substantial rounded sandstone columns with simple brown zigzag symbols supporting a solid flat lintel, broad low round empty altar disk in center, two small sun-marked stones at foot, a golden sun wheel on top of lintel. Only sun-wheel ornament rotates: four poses 0,20,40,60 degrees about fixed central disk. Columns/lintel/altar remain identical and pixel-aligned. Ochre/sand/brown palette, broad quiet surfaces. No glow ring, particles or added castle.",
+      "frameSize": 512,
+      "poseOrder": [
+        0,
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "frameDurationMs": 450,
+      "registration": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "motionRegions": [
+        [
+          0.3,
+          0,
+          0.68,
+          0.35
+        ]
+      ],
+      "changedPixelFractions": [
+        0.092803955078125,
+        0.09061813354492188,
+        0.09055709838867188
+      ],
+      "stationaryPixelsUnchanged": true,
+      "outputs": [
+        {
+          "file": "shrine-sand.png",
+          "bytes": 239655,
+          "sha256": "3fbb8cd2ef6ac2b5419e7715182c723b2fd1d70e57e73d0f580fdd6b25b2a80d"
+        },
+        {
+          "file": "shrine-sand.webp",
+          "bytes": 89624,
+          "sha256": "2a5eceba54eec08faaaab064a823134d2b676e8fc70567f5ca81b3cde52d371a"
+        }
+      ]
+    },
+    {
+      "id": "castle-ironkeep",
+      "sourceSha256": "403a9ed4f308c739f2f378eb65ea31eac9b21e26eed7e97e921ecfc5b7c87ce4",
+      "sourceFile": "castle-ironkeep-sheet.png",
+      "prompt": "Create ONE four-pose sprite sheet remastering the exact castle identity in reference 1 into the approved painted style of reference 2. It is the SAME premium castle in every pose, not four different variants. Regular 2x2 grid, four equal square transparent cells, exact same scale/position/perspective with 8% breathing room; no text/grid/background. Thick dark espresso contours, large rounded chunky buildings, warm quiet two-tone cel shading, simplified material surfaces, no low-poly mesh or realistic reflections. Retain all identity-defining palette and motifs. Stationary walls, windows, doors, towers, foundations, stairs and statues must be identical in every pose. ONLY the defining named moving part changes. Make four poses visibly distinct at normal map scale without any generic glow, circular aura or random particles. IRONKEEP: slate grey iron-and-stone stronghold, four crenellated round defensive towers, red-brown pitched central roof, blue-grey banners with muted gold trim, central portcullis gate, two squat gold lion guardians, small rooftop windmill behind roof. The windmill is the defining moving part: its wooden four-blade rotor turns 0,22.5,45,67.5 degrees in the four poses, about one FIXED axle. Keep the red windmill hut still. Exactly one rotor, no duplicated blades. Preserve this practical fortified-workshop fantasy.",
+      "frameSize": 512,
+      "poseOrder": [
+        0,
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "frameDurationMs": 450,
+      "registration": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "motionRegions": [
+        [
+          0.31,
+          0,
+          0.68,
+          0.35
+        ]
+      ],
+      "changedPixelFractions": [
+        0.08850479125976562,
+        0.08705520629882812,
+        0.08709716796875
+      ],
+      "stationaryPixelsUnchanged": true,
+      "outputs": [
+        {
+          "file": "castle-ironkeep.png",
+          "bytes": 289766,
+          "sha256": "f423cd7f2ff3f36e968f385205b5f09072ed13265b36aa8ced6aa9dac96b23e2"
+        },
+        {
+          "file": "castle-ironkeep.webp",
+          "bytes": 98276,
+          "sha256": "556d1bd3eb79bb3cc5f2d0a32d062e69e5f230239f7c6720ce3069f6d2355af8"
+        }
+      ]
+    },
+    {
+      "id": "castle-rosehall",
+      "sourceSha256": "0922bb5e6c0c88dcb6b34f72d59cf7fbb6b7083fc21ab5966232bf6f19b00366",
+      "sourceFile": "castle-rosehall-sheet.png",
+      "prompt": "Create ONE four-pose sprite sheet remastering the exact castle identity in reference 1 into the approved painted style of reference 2. It is the SAME premium castle in every pose, not four different variants. Regular 2x2 grid, four equal square transparent cells, exact same scale/position/perspective with 8% breathing room; no text/grid/background. Thick dark espresso contours, large rounded chunky buildings, warm quiet two-tone cel shading, simplified material surfaces, no low-poly mesh or realistic reflections. Retain all identity-defining palette and motifs. Stationary walls, windows, doors, towers, foundations, stairs and statues must be identical in every pose. ONLY the defining named moving part changes. Make four poses visibly distinct at normal map scale without any generic glow, circular aura or random particles. ROSEHALL: pale ivory/cream garden palace, raspberry-pink central roof, rose-pink slender rounded turrets with gold finials, rose garlands on front arch, rose banners, two squat ivory lion guardians, small rose garden. Defining motion is the single royal pink flag at rear center: pose1 curves left, pose2 straight, pose3 billows right, pose4 gentle folded right. Flag cloth only moves; flagpole and all towers remain exactly fixed. Simplify into rounded chibi storybook castle, keep its romantic rose-palace identity.",
+      "frameSize": 512,
+      "poseOrder": [
+        0,
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "frameDurationMs": 450,
+      "registration": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          1.002257,
+          3.914,
+          -1.117
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.002257,
+          3.914,
+          -1.117
+        ]
+      ],
+      "motionRegions": [
+        [
+          0.54,
+          0,
+          0.88,
+          0.22
+        ]
+      ],
+      "changedPixelFractions": [
+        0.031597137451171875,
+        0.04021453857421875,
+        0.031734466552734375
+      ],
+      "stationaryPixelsUnchanged": true,
+      "outputs": [
+        {
+          "file": "castle-rosehall.png",
+          "bytes": 330555,
+          "sha256": "4d0904e1eabb48e39afc41dcca884f360bee991eaebe6d13467e5e37c7945ea8"
+        },
+        {
+          "file": "castle-rosehall.webp",
+          "bytes": 88006,
+          "sha256": "d12fbfbbc37e1897e1dc78d20b19f0fee7de671ba6e204cdbd10a44b3341f0c5"
+        }
+      ]
+    },
+    {
+      "id": "castle-sandspire",
+      "sourceSha256": "d24416a33aa898761ea434ea960ba6abc284542de92d23c9ed62e7a639e6c6a1",
+      "sourceFile": "castle-sandspire-sheet.png",
+      "prompt": "Create ONE four-pose sprite sheet remastering the exact premium castle identity in reference 1 into the approved painted style of reference 2. The SAME castle in each pose. Regular 2x2 grid, four equal square transparent cells, no labels/text/grid. Exact same scale, camera, position and fixed masonry, with 8% transparent padding each cell. Thick dark espresso outlines, chunky rounded chibi castle shapes, simple two-tone cel shading, quiet surfaces; no polygon-mesh look, no tiny realistic details. Keep original identity, palette and motifs. Defining named part alone moves; castle walls/windows/foundation/stairs/statues absolutely unchanged. Motion visible at small mobile map size, calm, without generic aura or random particles. SANDSPIRE: ochre sandstone desert palace, jade-teal central dome and four small teal domed minarets with gold points, wide arched entrance, gold trim, teal banners, two squat sandy-gold lion guardians. Above rear center is a LARGE GOLD SUN WHEEL. Only sun wheel rotates 0,20,40,60 degrees in four poses, its central disk remains fixed. Preserve desert sun-palace identity, broad simple shapes.",
+      "frameSize": 512,
+      "poseOrder": [
+        0,
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "frameDurationMs": 450,
+      "registration": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          1.00237,
+          14.912,
+          -1.199
+        ],
+        [
+          0.997642,
+          1.12,
+          25.137
+        ],
+        [
+          1.0,
+          16.0,
+          24.0
+        ]
+      ],
+      "motionRegions": [
+        [
+          0.42,
+          0,
+          0.73,
+          0.34
+        ]
+      ],
+      "changedPixelFractions": [
+        0.06840133666992188,
+        0.06740570068359375,
+        0.0689544677734375
+      ],
+      "stationaryPixelsUnchanged": true,
+      "outputs": [
+        {
+          "file": "castle-sandspire.png",
+          "bytes": 299359,
+          "sha256": "013c17ec7c0c0f9c68c3f781e6dc7cd3e0b45400dbc57d1c4e2dadd7733c25e6"
+        },
+        {
+          "file": "castle-sandspire.webp",
+          "bytes": 131380,
+          "sha256": "359babcbca6cc1affd0d57f1035ed3ed0d613268db989b160ab605edb617f0c4"
+        }
+      ]
+    },
+    {
+      "id": "castle-tidewatch",
+      "sourceSha256": "eb06886c33aa3be7f7582fa8e1088df9429152a0db34ff0f9c84dcd20ec42520",
+      "sourceFile": "castle-tidewatch-sheet.png",
+      "prompt": "Create ONE four-pose sprite sheet remastering the exact premium castle identity in reference 1 into the approved painted style of reference 2. The SAME castle in each pose. Regular 2x2 grid, four equal square transparent cells, no labels/text/grid. Exact same scale, camera, position and fixed masonry, with 8% transparent padding each cell. Thick dark espresso outlines, chunky rounded chibi castle shapes, simple two-tone cel shading, quiet surfaces; no polygon-mesh look, no tiny realistic details. Keep original identity, palette and motifs. Defining named part alone moves; castle walls/windows/foundation/stairs/statues absolutely unchanged. Motion visible at small mobile map size, calm, without generic aura or random particles. TIDEWATCH: ivory maritime fortress with dark navy pitched roof, teal domed corner towers and teal/gold banners, arched navy entrance, low curling sculptural wave forms around base, SMALL SHIP WHEEL above gate. Tall ivory LIGHTHOUSE tower rises behind LEFT side. Only the lighthouse lantern at top turns: four poses show its simple golden/cream beam-facing panel rotating through distinct sides, not an enormous searchlight. Lighthouse shaft, navy cap roof and entire castle remain fixed. Preserve seaside lighthouse-fortress identity.",
+      "frameSize": 512,
+      "poseOrder": [
+        0,
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "frameDurationMs": 450,
+      "registration": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          1.0,
+          42.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          11.0
+        ],
+        [
+          1.0,
+          42.0,
+          11.0
+        ]
+      ],
+      "motionRegions": [
+        [
+          0.43,
+          0.19,
+          0.66,
+          0.3
+        ]
+      ],
+      "changedPixelFractions": [
+        0.027393341064453125,
+        0.02704620361328125,
+        0.027423858642578125
+      ],
+      "stationaryPixelsUnchanged": true,
+      "outputs": [
+        {
+          "file": "castle-tidewatch.png",
+          "bytes": 258711,
+          "sha256": "93ae77d4b5d0a3508b291a6cdc4ad0ea0b29b0cb59d4b12cc4abeff1f64b2283"
+        },
+        {
+          "file": "castle-tidewatch.webp",
+          "bytes": 67964,
+          "sha256": "1e03fc328a7ec887dfabbce93b8e76d653d38f5aea9199dc2539d92211451b38"
+        }
+      ]
+    },
+    {
+      "id": "castle-winterhold",
+      "sourceSha256": "bcdaa3b64611629da50205aeeeadc7d7067bda0e1883a47d4a175e8bc39c624d",
+      "sourceFile": "castle-winterhold-sheet.png",
+      "prompt": "Create ONE four-pose sprite sheet remastering the exact premium castle identity in reference 1 into approved Union of Kingdoms painted style shown in reference 2. Same castle in all four poses, regular 2x2 equal square transparent cells, no text/grid. Exactly fixed camera, framing, scale, walls, windows, stairs and foundation. Eight percent transparent padding in every cell. Chunky soft rounded forms, warm dark brown bold outlines, simplified two-tone cel shading, no faceted mesh rendering, no glossy photo-realistic metal. Keep original silhouette, palette and distinctive motifs. Only stated signature part moves, visibly but calmly; no generic glows or random particles. WINTERHOLD: frosty ivory fortress, deep midnight-teal pitched central roof lightly edged with snow/icicles, round towers with navy cone roofs, pale blue banners, two ivory lion guardians, three ice-crystal finials. The CENTRAL tallest turquoise ice crystal above roof turns 0,25,50,75 degrees between poses; broad/narrow crystal facets visibly alternate. The two smaller side crystals and all building masonry remain stationary. Keep cold wintry fortress identity.",
+      "frameSize": 512,
+      "poseOrder": [
+        0,
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "frameDurationMs": 450,
+      "registration": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.002439,
+          -1.134,
+          -1.188
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "motionRegions": [
+        [
+          0.48,
+          0,
+          0.67,
+          0.26
+        ]
+      ],
+      "changedPixelFractions": [
+        0.0276031494140625,
+        0.02740478515625,
+        0.028102874755859375
+      ],
+      "stationaryPixelsUnchanged": true,
+      "outputs": [
+        {
+          "file": "castle-winterhold.png",
+          "bytes": 293998,
+          "sha256": "c95c016b1893b3aefea4bef2b908f01165f72cb8ef7f2ac981a117650446fedc"
+        },
+        {
+          "file": "castle-winterhold.webp",
+          "bytes": 78022,
+          "sha256": "70968006e936d71d2350185ca391d16bf9c8833bda3946eadf4b60d64e525f28"
+        }
+      ]
+    },
+    {
+      "id": "castle-jadecourt",
+      "sourceSha256": "b1ece0538b4e3033072b1d8d96d1d5c474bb639a9e6edae7f0aaad80cdaf092c",
+      "sourceFile": "castle-jadecourt-sheet.png",
+      "prompt": "Create ONE four-pose sprite sheet remastering the exact premium castle identity in reference 1 into approved Union of Kingdoms painted style shown in reference 2. Same castle in all four poses, regular 2x2 equal square transparent cells, no text/grid. Exactly fixed camera, framing, scale, walls, windows, stairs and foundation. Eight percent transparent padding in every cell. Chunky soft rounded forms, warm dark brown bold outlines, simplified two-tone cel shading, no faceted mesh rendering, no glossy photo-realistic metal. Keep original silhouette, palette and distinctive motifs. Only stated signature part moves, visibly but calmly; no generic glows or random particles. JADECOURT: ivory jade-temple palace, three-tier central pagoda with broad emerald curved eaves, two round jade-roofed side towers, muted gold ribs and green banners, two golden temple-lion statues. Under top pagoda eaves one LARGE golden hanging bell defines motion. Bell rocks LEFT, CENTER, RIGHT, CENTER through four poses, clear visible gap around it. Bell support, upper roof and building all fixed. Preserve original gold curled dragon-shaped roof end ornaments; reduce tiny detail to chunky painted forms.",
+      "frameSize": 512,
+      "poseOrder": [
+        0,
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "frameDurationMs": 450,
+      "registration": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "motionRegions": [
+        [
+          0.4,
+          0.23,
+          0.58,
+          0.38
+        ]
+      ],
+      "changedPixelFractions": [
+        0.02780914306640625,
+        0.0283050537109375,
+        0.027790069580078125
+      ],
+      "stationaryPixelsUnchanged": true,
+      "outputs": [
+        {
+          "file": "castle-jadecourt.png",
+          "bytes": 287003,
+          "sha256": "60885bb16d7ccf41dc7b98461643d8d29ca53e58540f498c4aaa8b8c398f8a2a"
+        },
+        {
+          "file": "castle-jadecourt.webp",
+          "bytes": 76100,
+          "sha256": "f03263c1834a244c3e7d72cc3463f88fa6aabe32ca78ba0897c64799bc954e6b"
+        }
+      ]
+    },
+    {
+      "id": "castle-emberforge",
+      "sourceSha256": "166910d7c2cae5c6a87fdce4625bfb46e7cf7b40942d84e7146d4cc56552e413",
+      "sourceFile": "castle-emberforge-sheet.png",
+      "prompt": "Create ONE four-pose sprite sheet remastering the exact premium castle identity in reference 1 into approved Union of Kingdoms painted style of reference 2. Same castle in every cell. Regular 2x2 grid, four equal square transparent cells, 8% clear transparent padding, no text or grid. Lock camera, scale, framing, all fixed architectural geometry identical. Large chunky rounded buildings, thick espresso contours, quiet flat two-tone shading; no low-poly mesh look, glossy metal or tiny realistic texture. Keep original palette, silhouette, banners and identity. Only stated signature part moves clearly and calmly, no generic glows/particles. EMBERFORGE: sturdy red-brown brick forge fortress, dark charcoal crenellations, copper corner columns, TWO tall square brick chimneys, orange/gold banners, round-arched dark gate. Large grey forging hammer on copper pivot above gate is the only moving part. Four poses show hammer resting DOWN on anvil, HALF-UP, FULL-UP, HALF-DOWN, connected to same hinge. Anvil remains fixed. Chimneys, crenellations, walls and gate exactly unchanged. Preserve forge/copper fantasy, no lava replacement.",
+      "frameSize": 512,
+      "poseOrder": [
+        0,
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "frameDurationMs": 450,
+      "registration": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0.997579,
+          22.09,
+          -1.845
+        ],
+        [
+          1.0,
+          0.0,
+          -3.0
+        ],
+        [
+          0.997579,
+          22.09,
+          -1.845
+        ]
+      ],
+      "motionRegions": [
+        [
+          0.35,
+          0,
+          0.65,
+          0.45
+        ]
+      ],
+      "changedPixelFractions": [
+        0.1074981689453125,
+        0.12232208251953125,
+        0.10732650756835938
+      ],
+      "stationaryPixelsUnchanged": true,
+      "outputs": [
+        {
+          "file": "castle-emberforge.png",
+          "bytes": 276707,
+          "sha256": "a09c0040dcbb5ed22a9505a14f3efa381b60775afcb55c1359c16e0273065602"
+        },
+        {
+          "file": "castle-emberforge.webp",
+          "bytes": 99454,
+          "sha256": "7cbf534860e3d060fb7cdf74f6aa4ef257a9f755183186ce23806c6c9260e9cb"
+        }
+      ]
+    },
+    {
+      "id": "castle-ravenloft",
+      "sourceSha256": "a11f1b437ed396e4d2dc6a4d614cd58d324bb532639b8453e60332481868e3a9",
+      "sourceFile": "castle-ravenloft-sheet.png",
+      "prompt": "Create ONE four-pose sprite sheet remastering the exact premium castle identity in reference 1 into approved Union of Kingdoms painted style of reference 2. Same castle in every cell. Regular 2x2 grid, four equal square transparent cells, 8% clear transparent padding, no text or grid. Lock camera, scale, framing, all fixed architectural geometry identical. Large chunky rounded buildings, thick espresso contours, quiet flat two-tone shading; no low-poly mesh look, glossy metal or tiny realistic texture. Keep original palette, silhouette, banners and identity. Only stated signature part moves clearly and calmly, no generic glows/particles. RAVENLOFT: gothic but chunky ivory-and-charcoal castle, rounded tall towers with deep violet pointed roofs, violet/gold banners, bat-wing shaped purple ornamental crest above entrance, two squat winged lion guardian statues. At highest central roof is a single BLACK RAVEN WEATHER VANE on fixed axle with arrow. Only weather vane rotates: distinct front-left, side-left, front-right, side-right silhouettes in four poses. Raven stays a single sculpted bird with exactly one head, two wings tucked in and one tail, no extra live birds. All roofs and masonry fixed.",
+      "frameSize": 512,
+      "poseOrder": [
+        0,
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "frameDurationMs": 450,
+      "registration": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0.99511,
+          10.254,
+          2.43
+        ],
+        [
+          1.0,
+          1.0,
+          15.0
+        ],
+        [
+          0.997549,
+          10.127,
+          15.184
+        ]
+      ],
+      "motionRegions": [
+        [
+          0.37,
+          0,
+          0.71,
+          0.26
+        ]
+      ],
+      "changedPixelFractions": [
+        0.042697906494140625,
+        0.0413970947265625,
+        0.0420074462890625
+      ],
+      "stationaryPixelsUnchanged": true,
+      "outputs": [
+        {
+          "file": "castle-ravenloft.png",
+          "bytes": 271270,
+          "sha256": "5c768b4b4a98025de2ddb407c9c3f1329abe1890d98d9869a88e1ce2f05b2889"
+        },
+        {
+          "file": "castle-ravenloft.webp",
+          "bytes": 90042,
+          "sha256": "324d9b32d5bd631478a5f3e047791cc4a3ae53da4508408296a15c69ae762324"
+        }
+      ]
+    },
+    {
+      "id": "castle-clockwork",
+      "sourceSha256": "4cc2fc98e3c180c80a0fb39d9eae6249ce26b8b472ef15e5fdb3fdd9ba776db3",
+      "sourceFile": "castle-clockwork-sheet.png",
+      "prompt": "Use case: style-transfer. Production transparent fantasy strategy game sprite sheet for Union of Kingdoms. Make one square 2 by 2 sprite sheet with exactly FOUR equal cells, one complete castle per cell. Input image 1 is the edit target: preserve its unique castle identity, palette, silhouette, architecture and theme. Input image 2 is style reference only: chunky rounded hand-painted storybook forms, warm dark brown outlines, smooth simplified surfaces, clear chibi silhouettes. Convert the target's angular low-poly 3D appearance to this approved painted game style. Isometric three-quarter view. No floor tile, no labels, no text, no grid lines, no card, no background: truly transparent alpha. Each complete building fits comfortably inside its cell with generous transparent padding, no overlap/cutoff. Lock camera, framing, scale, walls, doors, foundation and every fixed part identically in all four cells. Only the stated signature motif subtly moves from pose1 through pose4 for a loop; no whole-building wobble, rotation or zoom. Read order top-left, top-right, bottom-left, bottom-right. No generic halos/particles, no random new symbols, no photorealism, no glossy metal. Clockwork citadel: cream timber and warm brick, dark emerald green roofs, brass trim, large readable clock face above the door and one large exterior brass cog to its right, winding brass pipes. Preserve structure. Signature animation: that exterior cog rotates gently in 4 successive small steps; clock face and building stay fixed.",
+      "frameSize": 512,
+      "poseOrder": [
+        0,
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "frameDurationMs": 450,
+      "registration": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          1.002336,
+          20.916,
+          -1.194
+        ],
+        [
+          0.997674,
+          0.133,
+          30.121
+        ],
+        [
+          1.002336,
+          20.916,
+          27.874
+        ]
+      ],
+      "motionRegions": [
+        [
+          0.55,
+          0.35,
+          0.79,
+          0.6
+        ]
+      ],
+      "changedPixelFractions": [
+        0.06267547607421875,
+        0.063751220703125,
+        0.06373977661132812
+      ],
+      "stationaryPixelsUnchanged": true,
+      "outputs": [
+        {
+          "file": "castle-clockwork.png",
+          "bytes": 311732,
+          "sha256": "f89c0b357b93fec94db79816ba1b37cab4a60fc1b68117f1114ff27f9a7eb076"
+        },
+        {
+          "file": "castle-clockwork.webp",
+          "bytes": 91646,
+          "sha256": "04a97729c13c8922fbf14c1ab4e91e0c805882639ab68be4be52c48149da405c"
+        }
+      ]
+    },
+    {
+      "id": "castle-sapphire",
+      "sourceSha256": "032848bbf0e73aaad0a06f1cb4e60018e0f31953d7cfbdface5a9d543ad65699",
+      "sourceFile": "castle-sapphire-sheet.png",
+      "prompt": "Use case: style-transfer. Production transparent fantasy strategy game sprite sheet for Union of Kingdoms. Make one square 2 by 2 sprite sheet with exactly FOUR equal cells, one complete castle per cell. Input image 1 is the edit target: preserve its unique castle identity, palette, silhouette, architecture and theme. Input image 2 is style reference only: chunky rounded hand-painted storybook forms, warm dark brown outlines, smooth simplified surfaces, clear chibi silhouettes. Convert the target's angular low-poly 3D appearance to this approved painted game style. Isometric three-quarter view. No floor tile, no labels, no text, no grid lines, no card, no background: truly transparent alpha. Each complete building fits comfortably inside its cell with generous transparent padding, no overlap/cutoff. Lock camera, framing, scale, walls, doors, foundation and every fixed part identically in all four cells. Only the stated signature motif subtly moves from pose1 through pose4 for a loop; no whole-building wobble, rotation or zoom. Read order top-left, top-right, bottom-left, bottom-right. No generic halos/particles, no random new symbols, no photorealism, no glossy metal. Sapphire palace: ivory stone and rich sapphire-blue rounded domes, elegant golden ribs/trims, blue banners, matching small guardian statues at gate, one separate floating sapphire above central dome. Signature animation: ONLY the single floating sapphire moves around a small elliptical orbit above dome in four successive positions. Architecture and golden dome ribs fixed.",
+      "frameSize": 512,
+      "poseOrder": [
+        0,
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "frameDurationMs": 450,
+      "registration": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "motionRegions": [
+        [
+          0.33,
+          0.01,
+          0.78,
+          0.33
+        ]
+      ],
+      "changedPixelFractions": [
+        0.0613861083984375,
+        0.06409072875976562,
+        0.0687103271484375
+      ],
+      "stationaryPixelsUnchanged": true,
+      "outputs": [
+        {
+          "file": "castle-sapphire.png",
+          "bytes": 292510,
+          "sha256": "4fdeae2cba750abe1025bf4a0ef152b367a4cb7a4c16150c830f89760a63cceb"
+        },
+        {
+          "file": "castle-sapphire.webp",
+          "bytes": 115500,
+          "sha256": "6dc53ef310b70e6a6336d4ea588f2f58d63887635c0efb545ef4c4fba0ac0fbf"
+        }
+      ]
+    },
+    {
+      "id": "castle-phoenix",
+      "sourceSha256": "f8bbefb077a360d05c8f7409c9af92ce208156daacf60daa8adcc6e1e5db01da",
+      "sourceFile": "castle-phoenix-sheet.png",
+      "prompt": "Use case: style-transfer. Production transparent fantasy strategy game sprite sheet for Union of Kingdoms. Make one square 2 by 2 sprite sheet with exactly FOUR equal cells, one complete castle per cell. Input image 1 is the edit target: preserve its unique castle identity, palette, silhouette, architecture and theme. Input image 2 is style reference only: chunky rounded hand-painted storybook forms, warm dark brown outlines, smooth simplified surfaces, clear chibi silhouettes. Convert the target's angular low-poly 3D appearance to this approved painted game style. Isometric three-quarter view. No floor tile, no labels, no text, no grid lines, no card, no background: truly transparent alpha. Each complete building fits comfortably inside its cell with generous transparent padding, no overlap/cutoff. Lock camera, framing, scale, walls, doors, foundation and every fixed part identically in all four cells. Only the stated signature motif subtly moves from pose1 through pose4 for a loop; no whole-building wobble, rotation or zoom. Read order top-left, top-right, bottom-left, bottom-right. No generic halos/particles, no random new symbols, no photorealism, no glossy metal. Phoenix throne: charcoal-black foundation and roofs, rich red walls, gold edging, gold-red flame motifs and an anatomically clear golden phoenix perched above the main roof with exactly one head, two wings, two feet, one feathered tail. Signature animation: phoenix flaps its two feathered wings gently through four poses with body fixed. Keep bird attached atop roof; no extra wings or detached appendages.",
+      "frameSize": 512,
+      "poseOrder": [
+        0,
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "frameDurationMs": 450,
+      "registration": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0.98961,
+          39.478,
+          1.216
+        ],
+        [
+          0.987047,
+          3.075,
+          21.256
+        ],
+        [
+          0.98961,
+          39.478,
+          17.049
+        ]
+      ],
+      "motionRegions": [
+        [
+          0.22,
+          0,
+          0.99,
+          0.49
+        ]
+      ],
+      "changedPixelFractions": [
+        0.23124313354492188,
+        0.21813201904296875,
+        0.20855331420898438
+      ],
+      "stationaryPixelsUnchanged": true,
+      "outputs": [
+        {
+          "file": "castle-phoenix.png",
+          "bytes": 304997,
+          "sha256": "324c8a652756ceab0f427543779a35a1c33589fe7f3699f728b9eb4a76c297ec"
+        },
+        {
+          "file": "castle-phoenix.webp",
+          "bytes": 197030,
+          "sha256": "949396d647e5bb3936520a225c2a5c7cd42ec1986f4bd13306bba9074670ed49"
+        }
+      ]
+    },
+    {
+      "id": "castle-astral",
+      "sourceSha256": "dc1407c1523588faafd9dc14f7f9bde48c9157adcf0d34282189794bdee17a6c",
+      "sourceFile": "castle-astral-sheet.png",
+      "prompt": "Use case: style-transfer. Production transparent fantasy strategy game sprite sheet for Union of Kingdoms. Make one square 2 by 2 sprite sheet with exactly FOUR equal cells, one complete castle per cell. Input image 1 is the edit target: preserve its unique castle identity, palette, silhouette, architecture and theme. Input image 2 is style reference only: chunky rounded hand-painted storybook forms, warm dark brown outlines, smooth simplified surfaces, clear chibi silhouettes. Convert the target's angular low-poly 3D appearance to this approved painted game style. Isometric three-quarter view. No floor tile, no labels, no text, no grid lines, no card, no background: truly transparent alpha. Each complete building fits comfortably inside its cell with generous transparent padding, no overlap/cutoff. Lock camera, framing, scale, walls, doors, foundation and every fixed part identically in all four cells. Only the stated signature motif subtly moves from pose1 through pose4 for a loop; no whole-building wobble, rotation or zoom. Read order top-left, top-right, bottom-left, bottom-right. No generic halos/particles, no random new symbols, no photorealism, no glossy metal. Astral observatory: cream and gold round tower, midnight navy blue dome and small conical turrets, cyan light slits, arched golden armillary supports above observatory, central golden sun and small celestial spheres. Signature animation: small celestial spheres change position on coherent orbital rings in four small steps; central sun, rings and building remain fixed.",
+      "frameSize": 512,
+      "poseOrder": [
+        0,
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "frameDurationMs": 450,
+      "registration": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          1.004902,
+          24.819,
+          -2.451
+        ],
+        [
+          1.0,
+          1.0,
+          15.0
+        ],
+        [
+          1.002445,
+          24.91,
+          11.809
+        ]
+      ],
+      "motionRegions": [
+        [
+          0.34,
+          0.09,
+          0.78,
+          0.36
+        ]
+      ],
+      "changedPixelFractions": [
+        0.1012115478515625,
+        0.10099411010742188,
+        0.10430526733398438
+      ],
+      "stationaryPixelsUnchanged": true,
+      "outputs": [
+        {
+          "file": "castle-astral.png",
+          "bytes": 324035,
+          "sha256": "2751175c3ffa5c563228b8068224734484dc2fdb9663cf94fa19feebedc72c34"
+        },
+        {
+          "file": "castle-astral.webp",
+          "bytes": 168424,
+          "sha256": "d30359e1df5f85ffd9fbb7de3e9752a3033fe31de33483a6d5d27914174c8420"
+        }
+      ]
+    },
+    {
+      "id": "castle-eclipse",
+      "sourceSha256": "4757851b696287705c7a8dae9987d29b30313eaadd40e243c81b2361b9d31875",
+      "sourceFile": "castle-eclipse-sheet.png",
+      "prompt": "Use case: style-transfer. Production transparent fantasy strategy game sprite sheet for Union of Kingdoms. Make one square 2 by 2 sprite sheet with exactly FOUR equal cells, one complete castle per cell. Input image 1 is the edit target: preserve its unique castle identity, palette, silhouette, architecture and theme. Input image 2 is style reference only: chunky rounded hand-painted storybook forms, warm dark brown outlines, smooth simplified surfaces, clear chibi silhouettes. Convert the target's angular low-poly 3D appearance to this approved painted game style. Isometric three-quarter view. No floor tile, no labels, no text, no grid lines, no card, no background: truly transparent alpha. Each complete building fits comfortably inside its cell with generous transparent padding, no overlap/cutoff. Lock camera, framing, scale, walls, doors, foundation and every fixed part identically in all four cells. Only the stated signature motif subtly moves from pose1 through pose4 for a loop; no whole-building wobble, rotation or zoom. Read order top-left, top-right, bottom-left, bottom-right. No generic halos/particles, no random new symbols, no photorealism, no glossy metal. Eclipse citadel: obsidian-black round walls and pointed dark violet roofs, violet banners and gold trim, tall purple side spires, one large black sun disk with restrained violet corona above roof. Signature animation: violet corona changes softly in four phases around fixed black sun disk. Entire castle and sun geometry fixed. Do not turn sun into a portal or add extra floating fragments.",
+      "frameSize": 512,
+      "poseOrder": [
+        0,
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "frameDurationMs": 450,
+      "registration": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "motionRegions": [
+        [
+          0.33,
+          0.01,
+          0.82,
+          0.41
+        ]
+      ],
+      "changedPixelFractions": [
+        0.12424850463867188,
+        0.13358688354492188,
+        0.12207794189453125
+      ],
+      "stationaryPixelsUnchanged": true,
+      "outputs": [
+        {
+          "file": "castle-eclipse.png",
+          "bytes": 284625,
+          "sha256": "264b7eed8a978d2999086593930041a2879351182f9a33debbe00008498e6c07"
+        },
+        {
+          "file": "castle-eclipse.webp",
+          "bytes": 153650,
+          "sha256": "53feec1eafcc5852efc0d8aeebadc3c6eb125d97f4bb5f16e733b0e2eefc7bc4"
+        }
+      ]
+    },
+    {
+      "id": "castle-dragon",
+      "sourceSha256": "c3cbb736f8589de70d3ce157d843f3cd5517db8aaa01f599c1ffc087f8fd4ac2",
+      "sourceFile": "castle-dragon-sheet.png",
+      "prompt": "Use case: style-transfer. Production transparent fantasy strategy game sprite sheet for Union of Kingdoms. Make one square 2 by 2 sprite sheet with exactly FOUR equal cells, one complete castle per cell. Input image 1 is the edit target: preserve its unique castle identity, palette, silhouette, architecture and theme. Input image 2 is style reference only: chunky rounded hand-painted storybook forms, warm dark brown outlines, smooth simplified surfaces, clear chibi silhouettes. Convert the target's angular low-poly 3D appearance to this approved painted game style. Isometric three-quarter view. No floor tile, no labels, no text, no grid lines, no card, no background: truly transparent alpha. Each complete building fits comfortably inside its cell with generous transparent padding, no overlap/cutoff. Lock camera, framing, scale, walls, doors, foundation and every fixed part identically in all four cells. Only the stated signature motif subtly moves from pose1 through pose4 for a loop; no whole-building wobble, rotation or zoom. Read order top-left, top-right, bottom-left, bottom-right. No generic halos/particles, no random new symbols, no photorealism, no glossy metal. Dragonsteel citadel: ivory stone, warm gold dragon-head architectural crest over entrance, gold-scaled round roofs, orange banners, sapphire-blue gems and a small matched pair of golden dragon wing ornaments attached to central high roof. Signature animation: orange banners wave gently in four successive poses; all stonework, roof scales, wing ornaments, dragon crest and sapphire gems stay fixed. Gold remains warm softly painted, not photorealistic metal.",
+      "frameSize": 512,
+      "poseOrder": [
+        0,
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "frameDurationMs": 450,
+      "registration": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0.995643,
+          14.17,
+          3.153
+        ],
+        [
+          0.997817,
+          1.114,
+          20.039
+        ],
+        [
+          1.026966,
+          1.652,
+          5.137
+        ]
+      ],
+      "motionRegions": [
+        [
+          0.05,
+          0.43,
+          0.2,
+          0.62
+        ],
+        [
+          0.23,
+          0.51,
+          0.35,
+          0.74
+        ],
+        [
+          0.5,
+          0.55,
+          0.64,
+          0.83
+        ],
+        [
+          0.76,
+          0.51,
+          0.99,
+          0.84
+        ]
+      ],
+      "changedPixelFractions": [
+        0.166168212890625,
+        0.16556930541992188,
+        0.16610336303710938
+      ],
+      "stationaryPixelsUnchanged": true,
+      "outputs": [
+        {
+          "file": "castle-dragon.png",
+          "bytes": 380212,
+          "sha256": "b5753b215d597bcb872c83d79bae2b06a0b4863910412da9f8b0b0ade13b1342"
+        },
+        {
+          "file": "castle-dragon.webp",
+          "bytes": 286000,
+          "sha256": "0fc0096c3a47920464cb2e9d9e7ffe142b0cba37c3ad54adad819a72df27347b"
+        }
+      ]
+    },
+    {
+      "id": "castle-leviathan",
+      "sourceSha256": "29b4db01dc8de1b2f034a60ca9577bf00e53f1189e594f4198bda3501befd1fa",
+      "sourceFile": "castle-leviathan-sheet.png",
+      "prompt": "Use case: style-transfer. Production transparent fantasy strategy game sprite sheet for Union of Kingdoms. Make one square 2 by 2 sprite sheet with exactly FOUR equal cells, one complete castle per cell. Input image 1 is the edit target: preserve its unique castle identity, palette, silhouette, architecture and theme. Input image 2 is style reference only: chunky rounded hand-painted storybook forms, warm dark brown outlines, smooth simplified surfaces, clear chibi silhouettes. Convert the target's angular low-poly 3D appearance to this approved painted game style. Isometric three-quarter view. No floor tile, no labels, no text, no grid lines, no card, no background: truly transparent alpha. Each complete building fits comfortably inside its cell with generous transparent padding, no overlap/cutoff. Lock camera, framing, scale, walls, doors, foundation and every fixed part identically in all four cells. Only the stated signature motif subtly moves from pose1 through pose4 for a loop; no whole-building wobble, rotation or zoom. Read order top-left, top-right, bottom-left, bottom-right. No generic halos/particles, no random new symbols, no photorealism, no glossy metal. Leviathan sea palace: cream sandstone and turquoise teal dome/towers, pink coral branches, gold edging, water channels along foundation. One long turquoise sea serpent arches behind the dome from a single connected tail/body to exactly one friendly head. Signature animation: only its head/neck tip subtly sways in four poses while continuous arched body attachment remains anatomically coherent and castle stays fixed.",
+      "frameSize": 512,
+      "poseOrder": [
+        0,
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "frameDurationMs": 450,
+      "framingInset": 24,
+      "registration": [
+        [
+          0.90625,
+          24,
+          24
+        ],
+        [
+          0.896021,
+          28.981,
+          29.135
+        ],
+        [
+          0.894003,
+          29.07,
+          30.148
+        ],
+        [
+          0.896021,
+          28.981,
+          29.135
+        ]
+      ],
+      "motionRegions": [
+        [
+          0.3,
+          0,
+          1,
+          0.46
+        ]
+      ],
+      "changedPixelFractions": [
+        0.142303466796875,
+        0.13115692138671875,
+        0.13650131225585938
+      ],
+      "stationaryPixelsUnchanged": true,
+      "outputs": [
+        {
+          "file": "castle-leviathan.png",
+          "bytes": 282095,
+          "sha256": "b2037167e0667eeb8975d86be4d6f844176338a007a0ef88198acfa03ae31a62"
+        },
+        {
+          "file": "castle-leviathan.webp",
+          "bytes": 158478,
+          "sha256": "da956aab7dd703509b3bda1dc0a058371e2ac136b5f35a48ff7a1b4705890ef1"
+        }
+      ]
+    },
+    {
+      "id": "castle-yggdrasil",
+      "sourceSha256": "888ed6a2ee8a7394944ce76737a6051f0d4f42ebb9ee94f8501e840b38f52463",
+      "sourceFile": "castle-yggdrasil-sheet.png",
+      "prompt": "Use case: style-transfer. Production transparent fantasy strategy game sprite sheet for Union of Kingdoms. Make one square 2 by 2 sprite sheet with exactly FOUR equal cells, one complete castle per cell. Input image 1 is the edit target: preserve its unique castle identity, palette, silhouette, architecture and theme. Input image 2 is style reference only: chunky rounded hand-painted storybook forms, warm dark brown outlines, smooth simplified surfaces, clear chibi silhouettes. Convert the target's angular low-poly 3D appearance to this approved painted game style. Isometric three-quarter view. No floor tile, no labels, no text, no grid lines, no card, no background: truly transparent alpha. Each complete building fits comfortably inside its cell with generous transparent padding, no overlap/cutoff. Lock camera, framing, scale, walls, doors, foundation and every fixed part identically in all four cells. Only the stated signature motif subtly moves from pose1 through pose4 for a loop; no whole-building wobble, rotation or zoom. Read order top-left, top-right, bottom-left, bottom-right. No generic halos/particles, no random new symbols, no photorealism, no glossy metal. Yggdrasil world tree sanctuary: living thick brown tree trunk growing as core of round gold-trimmed wooden hall; rich green leafy canopy above, two green round turret roofs, curving roots at foundation, small warm golden rune ornaments. Signature animation: a few outer leaf clusters gently sway through four poses; trunk, roots, hall, door and camera fixed. No new halo, fireflies or floating generic particles.",
+      "frameSize": 512,
+      "poseOrder": [
+        0,
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "frameDurationMs": 450,
+      "framingInset": 24,
+      "registration": [
+        [
+          0.90625,
+          24,
+          24
+        ],
+        [
+          0.908629,
+          54.677,
+          19.19
+        ],
+        [
+          0.903884,
+          25.119,
+          32.4
+        ],
+        [
+          0.899188,
+          48.921,
+          31.085
+        ]
+      ],
+      "motionRegions": [
+        [
+          0.07,
+          0,
+          1,
+          0.42
+        ]
+      ],
+      "changedPixelFractions": [
+        0.18994903564453125,
+        0.1794281005859375,
+        0.17087173461914062
+      ],
+      "stationaryPixelsUnchanged": true,
+      "outputs": [
+        {
+          "file": "castle-yggdrasil.png",
+          "bytes": 257243,
+          "sha256": "48a2b6c689299b205eb253d1e1a6ef65747d5555161c554d09a5e8cfd0e02ea9"
+        },
+        {
+          "file": "castle-yggdrasil.webp",
+          "bytes": 168062,
+          "sha256": "9750cf4589ad105cf1d628fc22ba13d0b81c900c28319141561cec7859ae8671"
+        }
+      ]
+    },
+    {
+      "id": "castle-tempest",
+      "sourceSha256": "fca6a49535151e79ba0e5b199f9708ef414c0dc20cb8eb84d929a5500bdeb152",
+      "sourceFile": "castle-tempest-sheet.png",
+      "prompt": "Use case: style-transfer. Production transparent fantasy strategy game sprite sheet for Union of Kingdoms. Make one square 2 by 2 sprite sheet with exactly FOUR equal cells, one complete castle per cell. Input image 1 is the edit target: preserve its unique castle identity, palette, silhouette, architecture and theme. Input image 2 is style reference only: chunky rounded hand-painted storybook forms, warm dark brown outlines, smooth simplified surfaces, clear chibi silhouettes. Convert the target's angular low-poly 3D appearance to this approved painted game style. Isometric three-quarter view. No floor tile, no labels, no text, no grid lines, no card, no background: truly transparent alpha. Each complete building fits comfortably inside its cell with generous transparent padding, no overlap/cutoff. Lock camera, framing, scale, walls, doors, foundation and every fixed part identically in all four cells. Only the stated signature motif subtly moves from pose1 through pose4 for a loop; no whole-building wobble, rotation or zoom. Read order top-left, top-right, bottom-left, bottom-right. No generic halos/particles, no random new symbols, no photorealism, no glossy metal. Tempest storm fortress: ivory walls with deep storm-blue roofs, gold trim and upper crown, pale turquoise energy ornaments, soft pale clouds supporting floating foundation. Signature animation: defining small clouds drift subtly around the sides with a restrained cyan lightning arc changing through four poses. Walls, foundation, crown, roofs and fixed ornament supports remain identical. No generic glow ring.",
+      "frameSize": 512,
+      "poseOrder": [
+        0,
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "frameDurationMs": 450,
+      "framingInset": 24,
+      "registration": [
+        [
+          0.90625,
+          24,
+          24
+        ],
+        [
+          0.898158,
+          46.883,
+          28.062
+        ],
+        [
+          0.922878,
+          15.736,
+          23.958
+        ],
+        [
+          0.951241,
+          21.615,
+          9.976
+        ]
+      ],
+      "motionRegions": [
+        [
+          0.15,
+          0,
+          0.91,
+          0.47
+        ]
+      ],
+      "changedPixelFractions": [
+        0.16315460205078125,
+        0.1704254150390625,
+        0.19678878784179688
+      ],
+      "stationaryPixelsUnchanged": true,
+      "outputs": [
+        {
+          "file": "castle-tempest.png",
+          "bytes": 287255,
+          "sha256": "3144041f38a39a7916174d582048c1c21bab65cc10a70693ce24327978a626d4"
+        },
+        {
+          "file": "castle-tempest.webp",
+          "bytes": 227622,
+          "sha256": "ff4033c36767c4c1f261298a1f44fa95de9a3abd567a59fa0fc4416deaf755fb"
+        }
+      ]
+    },
+    {
+      "id": "congress",
+      "sourceSha256": "9f480bc1691be5f8a3208435aa1801d2fb079c7a9f0c7537c02aa032f90224aa",
+      "sourceFile": "congress-sheet.png",
+      "prompt": "Create a single FOUR-POSE animation sprite sheet of the SAME Union of Kingdoms Congress building from reference 1. Reference 1 defines identity, reference 2 defines approved chunky painted style. Exact 2x2 regular grid, equal square transparent cells, no labels, no margins between cells beyond transparent sprite padding. Every cell contains the complete SAME frontal three-quarter ivory council hall on a rounded floating dark rock island, large central teal-blue dome, four small blue domes, gold trim, broad ceremonial steps, crown and turquoise crystal finial. Simplify into thick dark espresso outlines, chunky soft shapes, flat two-tone cel shading. No low-poly rendering, no glossy realism. REGISTER ALL FOUR POSES: exact same building geometry, position, scale and island outline. ONLY central finial crystal turns gently: frame1 straight front facet, frame2 slight left facet, frame3 side facet, frame4 slight right facet. Windows/walls/stairs absolutely unchanged. No glow rings or particles, no detached new objects, no text. Genuine transparent background; avoid opaque rectangle. Four complete isolated full-building cutouts.",
+      "frameSize": 512,
+      "poseOrder": [
+        0,
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "frameDurationMs": 450,
+      "framingInset": 0,
+      "registration": [
+        [
+          1.0,
+          0,
+          0
+        ],
+        [
+          0.997972,
+          5.018,
+          1.002
+        ],
+        [
+          0.997972,
+          1.026,
+          2.998
+        ],
+        [
+          0.997972,
+          5.018,
+          2.998
+        ]
+      ],
+      "motionRegions": [
+        [
+          0.39,
+          0,
+          0.63,
+          0.21
+        ]
+      ],
+      "changedPixelFractions": [
+        0.02904510498046875,
+        0.02928924560546875,
+        0.030078887939453125
+      ],
+      "stationaryPixelsUnchanged": true,
+      "outputs": [
+        {
+          "file": "congress.png",
+          "bytes": 351863,
+          "sha256": "9e5034499bdac341b72571cdf9fd22a14d21a258328b61699f16d5ecce83a898"
+        },
+        {
+          "file": "congress.webp",
+          "bytes": 89366,
+          "sha256": "0c01956d1c600dd93867e7c50ba2a1df25edcf3ff0a77a480117cad12c0e2fb0"
+        }
+      ]
+    }
+  ]
+}

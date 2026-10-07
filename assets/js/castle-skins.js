@@ -30,8 +30,9 @@ window.ConquerCastleSkins = (()=>{
     const allIds=Object.freeze(allEntries.map(entry=>entry.id));
     const ids=Object.freeze(entries.map(entry=>entry.id));
     const get=skin=>allEntries.find(entry=>entry.id===skin)||entries[0];
-    const image=(base,skin='default')=>`${base}/assets/art/map/castle-${get(skin).id}.png?v=storybook2`;
-    const motionImage=(base,skin='default')=>get(skin).id==='default'?image(base,skin):`${base}/assets/art/map/castle-${get(skin).id}.webp?v=elemental1`;
+    const skinPath=skin=>`${skin.legacy?'painted-v2/':''}castle-${skin.id}`;
+    const image=(base,skin='default')=>get(skin).id==='default'?`${base}/assets/art/village-layered-v2/runtime/castle_rounded.webp`:`${base}/assets/art/map/${skinPath(get(skin))}.png?v=painted20261005`;
+    const motionImage=(base,skin='default')=>get(skin).id==='default'?image(base,skin):`${base}/assets/art/map/${skinPath(get(skin))}.webp?v=painted20261005`;
     const syncMotion=(root=document)=>{
         const reduced=document.body?.classList.contains('reduced-motion');
         root.querySelectorAll('img[data-castle-motion]').forEach(img=>{

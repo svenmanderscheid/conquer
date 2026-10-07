@@ -736,7 +736,7 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
             <div class="troop-chip">
                 <div class="troop-chip-icon troop-tier-frame" data-troop-tier="<?= $tier ?>">
                     <?php if ($troopPortraitPrefix && $tier >= 1 && $tier <= 10): ?>
-                        <img src="<?= htmlspecialchars(APP_BASE, ENT_QUOTES) ?>/assets/art/characters/fantasy-troops-v2/<?= $troopPortraitPrefix ?>-t<?= $tier ?>-ui.webp" alt="">
+                        <img src="<?= htmlspecialchars(APP_BASE, ENT_QUOTES) ?>/assets/art/characters/fantasy-troops-v3/<?= $troopPortraitPrefix ?>-t<?= $tier ?>-ui.webp" alt="">
                     <?php else: ?>
                         <?= $troopEmoji($tier) ?>
                     <?php endif ?>

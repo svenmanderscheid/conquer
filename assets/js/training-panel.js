@@ -19,10 +19,10 @@ window.ConquerTraining=function(ctx){
     const clock=end=>window.ConquerTrainingHud.formatTime(Math.max(0,(ctx.date(end)-now())/1000));
     const unlockRequirements=(t,state=getState())=>{
         const requirements=[];
-        if(Number(state?.buildings?.[building]?.level||0)<Number(t.unlock_building||1))requirements.push({code:building,name:schools[building].name,current:Number(state?.buildings?.[building]?.level||0),required:Number(t.unlock_building||1),action:'building',image:'buildings/'+building+'-city-v2.png'});
+        if(Number(state?.buildings?.[building]?.level||0)<Number(t.unlock_building||1))requirements.push({code:building,name:schools[building].name,current:Number(state?.buildings?.[building]?.level||0),required:Number(t.unlock_building||1),action:'building',image:'buildings/painted-v3/'+building+'.webp'});
         if(t.unlock_research){
-            requirements.push({code:'academy',name:'Akademie',current:Number(state?.buildings?.academy?.level||0),required:Number(t.unlock_academy),action:'building',image:'buildings/academy-city-v2.png'});
-            requirements.push({code:t.unlock_research,name:unitName(t)+' erforschen',current:Number(state?.research?.[t.unlock_research]||0),required:1,action:'research-dialog',image:'research/characters-v9/'+t.unlock_research+'.png'});
+            requirements.push({code:'academy',name:'Akademie',current:Number(state?.buildings?.academy?.level||0),required:Number(t.unlock_academy),action:'building',image:'buildings/painted-v3/academy.webp'});
+            requirements.push({code:t.unlock_research,name:unitName(t)+' erforschen',current:Number(state?.research?.[t.unlock_research]||0),required:1,action:'research-dialog',image:'research/characters-v10/'+t.unlock_research+'.png'});
         }
         return requirements.map(r=>({...r,met:r.current>=r.required}));
     };
@@ -43,11 +43,11 @@ window.ConquerTraining=function(ctx){
         const statMax=key=>Math.max(1,...getState().troop_defs.map(unit=>Number(unit[key])||0));
         const previewStats=[['power','Stärke'],['attack','Angriff'],['defense','Verteidigung'],['march_speed','Tempo']].map(([key,label])=>[key,label,statMax(key)]);
         const troopArt=school.type===1?'guardian':school.type===2?'fire-archer':'shadow-rider';
-        const portraitArt=`characters/fantasy-troops-v2/${troopArt}-t${tier}-ui.webp`;
+        const portraitArt=`characters/fantasy-troops-v3/${troopArt}-t${tier}-ui.webp`;
         const pageTitle=document.getElementById('page-title');if(pageTitle)pageTitle.textContent=window.ConquerLocale.t(({barrack:'english.37030144df0d515a',archery_range:'english.f9f458d58a965190',stable:'english.941825e78208a113'})[building]);
         host.innerHTML=`${ctx.armyHeader()}<section class="training-school" data-view="${key}" data-mode="${mode}" aria-label="${school.name}">
           <div class="training-workspace">
-            <nav class="training-tier-picker" aria-label="Truppenstufe wählen"><div class="training-tier-heading"><strong>Truppenstufe</strong><span>T1–T5</span></div><div class="training-tiers">${getState().troop_defs.filter(x=>Number(x.type)===school.type).map(x=>`<button type="button" id="training-tier-${x.tier}" class="training-tier troop-tier-frame ${x.unlocked?'':'is-locked'}" data-tier="${x.tier}" data-troop-tier="${Number(x.tier)}" data-action="training-tier" data-id="${x.tier}" aria-pressed="${Number(x.tier)===tier}" aria-label="T${x.tier} ${esc(unitName(x))}${x.unlocked?'':', gesperrt'}"><img src="${base}/assets/art/characters/fantasy-troops-v2/${troopArt}-t${x.tier}-thumb.webp" alt=""><strong>T${Number(x.tier)}</strong><small>${x.unlocked?fmt(getState().troops[x.code]||0):'🔒'}</small></button>`).join('')}</div></nav>
+            <nav class="training-tier-picker" aria-label="Truppenstufe wählen"><div class="training-tier-heading"><strong>Truppenstufe</strong><span>T1–T5</span></div><div class="training-tiers">${getState().troop_defs.filter(x=>Number(x.type)===school.type).map(x=>`<button type="button" id="training-tier-${x.tier}" class="training-tier troop-tier-frame ${x.unlocked?'':'is-locked'}" data-tier="${x.tier}" data-troop-tier="${Number(x.tier)}" data-action="training-tier" data-id="${x.tier}" aria-pressed="${Number(x.tier)===tier}" aria-label="T${x.tier} ${esc(unitName(x))}${x.unlocked?'':', gesperrt'}"><img src="${base}/assets/art/characters/fantasy-troops-v3/${troopArt}-t${x.tier}-thumb.webp" alt=""><strong>T${Number(x.tier)}</strong><small>${x.unlocked?fmt(getState().troops[x.code]||0):'🔒'}</small></button>`).join('')}</div></nav>
             <div class="training-controls">
             <div class="training-detail-scroll">
               <div class="training-stats" ${mode==='stats'?'':'hidden'}>${[['power','Stärke'],['attack','Angriff'],['defense','Verteidigung'],['hp','Lebenspunkte'],['march_speed','Marschtempo'],['carry','Traglast']].map(([key,label])=>{const max=statMax(key);const bonus=Math.max(0,Number(t.stat_bonuses?.[key]||0));return `<div class="training-stat"><span>${label}</span><strong>${statFormat(t[key])}${bonus?` <em>+${fmt(bonus)}</em>`:''}</strong><progress max="${max}" value="${t[key]}" aria-label="${label}: ${t[key]}${bonus?`, Bonus plus ${bonus}`:''}"></progress></div>`}).join('')}<button type="button" class="training-stat-note" data-action="training-stat-help">ⓘ Grundwerte + aktive Boni</button></div>

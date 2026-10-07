@@ -1,0 +1,262 @@
+{
+  "date": "2026-10-05",
+  "generator": "Built-in image_gen; deterministic crop/registration/pose-layer packing only",
+  "assets": [
+    {
+      "id": "shrine-forest",
+      "sourceSha256": "4e43348607864efc6f9ece85ae478d3f68fd19e6224cde242936098ac61c6bd0",
+      "sourceFile": "shrine-forest-sheet.png",
+      "prompt": "Generate ONE four-pose animation sprite sheet for the SAME named landmark. First reference is the exact identity to preserve, second reference defines approved Union of Kingdoms painted style. A regular 2x2 grid, four equal square cells, genuine transparent background, no grid lines or text. Each cell contains one complete full landmark, exactly same scale and pixel-aligned stationary structure across all four cells. Give 8% transparent padding per cell. Chunky rounded shapes, dark espresso thick outlines, two broad light values, no low-poly mesh rendering, no photorealism, no glossy material. ONLY the specified defining magical part changes pose; pedestal, stones and structure remain identical. No generic halo or floating particles. FOREST SHRINE: retain ring of rounded grey standing stones with leaf emblems, circular sage grass/stone platform, two twisting warm-brown living trunks meeting above a hovering green diamond, three broad sage tree canopies and two red flowers. Four poses show canopies/trunk upper twigs swaying LEFT, CENTER, RIGHT, CENTER gently. Root bases and standing stones fixed. Green diamond also rotates slightly but stays in same location. This is a living-tree shrine, no building or castle.",
+      "frameSize": 512,
+      "poseOrder": [
+        0,
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "frameDurationMs": 450,
+      "registration": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          1.0,
+          21.0,
+          -1.0
+        ],
+        [
+          1.0,
+          0.0,
+          22.0
+        ],
+        [
+          0.997712,
+          22.062,
+          23.112
+        ]
+      ],
+      "motionRegions": [
+        [
+          0.05,
+          0,
+          0.94,
+          0.46
+        ]
+      ],
+      "changedPixelFractions": [
+        0.22260665893554688,
+        0.2343597412109375,
+        0.22302627563476562
+      ],
+      "stationaryPixelsUnchanged": true,
+      "outputs": [
+        {
+          "file": "shrine-forest.png",
+          "bytes": 265984,
+          "sha256": "c9b4afa21ef7f1054a7a6f5485b960137228312441c2f516f9c83a7590b1297d"
+        },
+        {
+          "file": "shrine-forest.webp",
+          "bytes": 144736,
+          "sha256": "0be3396b6e8a8034a3a2df36bf605bef5c77942d3d64f80a49d088553966d818"
+        }
+      ]
+    },
+    {
+      "id": "shrine-ice",
+      "sourceSha256": "f57772db5aab88ce5d9d361708f8d6a2a3cf25095f8ddd654d99f659a713e6f4",
+      "sourceFile": "shrine-ice-sheet.png",
+      "prompt": "Generate ONE four-pose animation sprite sheet for the SAME named landmark. First reference is the exact identity to preserve, second reference defines approved Union of Kingdoms painted style. A regular 2x2 grid, four equal square cells, genuine transparent background, no grid lines or text. Each cell contains one complete full landmark, exactly same scale and pixel-aligned stationary structure across all four cells. Give 8% transparent padding per cell. Chunky rounded shapes, dark espresso thick outlines, two broad light values, no low-poly mesh rendering, no photorealism, no glossy material. ONLY the specified defining magical part changes pose; pedestal, stones and structure remain identical. No generic halo or floating particles. ICE SHRINE: retain warm-white snowy rounded stone arch with pale turquoise inner band above circular ice altar, a LARGE hovering turquoise diamond ice crystal in center and smaller crystals at base, three low carved snow monoliths. Four poses show central crystal turning about its vertical axis, visibly different broad/narrow facets: 0,30,60,90 degrees. Crystal pointed top/bottom stay at same positions. Arch, platform and small crystals remain fixed. Snowy white and turquoise palette. No buildings or castle.",
+      "frameSize": 512,
+      "poseOrder": [
+        0,
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "frameDurationMs": 450,
+      "registration": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0.997854,
+          4.049,
+          1.056
+        ],
+        [
+          1.0,
+          0.0,
+          23.0
+        ],
+        [
+          0.997854,
+          4.049,
+          24.006
+        ]
+      ],
+      "motionRegions": [
+        [
+          0.35,
+          0.26,
+          0.65,
+          0.64
+        ]
+      ],
+      "changedPixelFractions": [
+        0.0811767578125,
+        0.082489013671875,
+        0.080810546875
+      ],
+      "stationaryPixelsUnchanged": true,
+      "outputs": [
+        {
+          "file": "shrine-ice.png",
+          "bytes": 277283,
+          "sha256": "54d35cd8ca1d7b92977a4d07a39f33a84559da7733c6366f06dda46e72e96463"
+        },
+        {
+          "file": "shrine-ice.webp",
+          "bytes": 100940,
+          "sha256": "21df3947dae20ed39853c3d725ab9cf98956891786048724cbf96b8fdec24e73"
+        }
+      ]
+    },
+    {
+      "id": "shrine-lava",
+      "sourceSha256": "c55e0405eeaee298c8c3ef592fe807dbdf58a97e027b7494e5826780a7708e03",
+      "sourceFile": "shrine-lava-sheet.png",
+      "prompt": "Generate ONE four-pose animation sprite sheet of the SAME Union of Kingdoms landmark. First reference is exact identity, second reference is exact approved chunky painted style. Regular 2x2 grid, four equal square transparent cells, no labels/grid/text. Complete landmark with 8% transparent padding in every cell. Same stationary platform and stones, identical position, scale, perspective in every cell; only specified central ornament moves. Large soft rounded forms, thick dark espresso outlines, two-tone cel shading, no low-poly rendering or photorealism, no glossy reflections. LAVA FIRE SHRINE: circular dark brown/grey basalt-stone platform, five chunky rounded standing stones with orange flame glyphs, low terracotta/copper central brazier bowl and a single large orange/yellow flame. Only flame moves: pose1 leans left, pose2 upright, pose3 leans right, pose4 upright small. Bowl and stones remain pixel aligned. Warm orange and muted charcoal palette. No glow ring, no particles, no extra scenery.",
+      "frameSize": 512,
+      "poseOrder": [
+        0,
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "frameDurationMs": 450,
+      "registration": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          21.0
+        ],
+        [
+          1.0,
+          0.0,
+          21.0
+        ]
+      ],
+      "motionRegions": [
+        [
+          0.29,
+          0.05,
+          0.76,
+          0.56
+        ]
+      ],
+      "changedPixelFractions": [
+        0.14430999755859375,
+        0.15280914306640625,
+        0.1373138427734375
+      ],
+      "stationaryPixelsUnchanged": true,
+      "outputs": [
+        {
+          "file": "shrine-lava.png",
+          "bytes": 191018,
+          "sha256": "bcaf2464accee53b3ddb6c6a6a2eb34ebb4da19aaf960cad6bc5bc5dc3638b00"
+        },
+        {
+          "file": "shrine-lava.webp",
+          "bytes": 71276,
+          "sha256": "babe6ab365af83f1c9f175cd8c8dc0a05885535aef79701afa06503db353d802"
+        }
+      ]
+    },
+    {
+      "id": "shrine-sand",
+      "sourceSha256": "d5d09f9e325c8399b08f66daaa749ab3eee76b7bb7e356f82293aaff99754a35",
+      "sourceFile": "shrine-sand-sheet.png",
+      "prompt": "Generate ONE four-pose animation sprite sheet of the SAME Union of Kingdoms landmark. First reference is exact identity, second reference is exact approved chunky painted style. Regular 2x2 grid, four equal square transparent cells, no labels/grid/text. Complete landmark with 8% transparent padding in every cell. Same stationary platform and stones, identical position, scale, perspective in every cell; only specified central ornament moves. Large soft rounded forms, thick dark espresso outlines, two-tone cel shading, no low-poly rendering or photorealism, no glossy reflections. SAND SUN SHRINE: golden sandstone ring platform, two substantial rounded sandstone columns with simple brown zigzag symbols supporting a solid flat lintel, broad low round empty altar disk in center, two small sun-marked stones at foot, a golden sun wheel on top of lintel. Only sun-wheel ornament rotates: four poses 0,20,40,60 degrees about fixed central disk. Columns/lintel/altar remain identical and pixel-aligned. Ochre/sand/brown palette, broad quiet surfaces. No glow ring, particles or added castle.",
+      "frameSize": 512,
+      "poseOrder": [
+        0,
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "frameDurationMs": 450,
+      "registration": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "motionRegions": [
+        [
+          0.3,
+          0,
+          0.68,
+          0.35
+        ]
+      ],
+      "changedPixelFractions": [
+        0.092803955078125,
+        0.09061813354492188,
+        0.09055709838867188
+      ],
+      "stationaryPixelsUnchanged": true,
+      "outputs": [
+        {
+          "file": "shrine-sand.png",
+          "bytes": 239655,
+          "sha256": "3fbb8cd2ef6ac2b5419e7715182c723b2fd1d70e57e73d0f580fdd6b25b2a80d"
+        },
+        {
+          "file": "shrine-sand.webp",
+          "bytes": 89624,
+          "sha256": "2a5eceba54eec08faaaab064a823134d2b676e8fc70567f5ca81b3cde52d371a"
+        }
+      ]
+    }
+  ]
+}

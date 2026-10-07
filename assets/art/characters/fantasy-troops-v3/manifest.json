@@ -1,0 +1,1748 @@
+{
+  "schema": 1,
+  "date": "2026-10-05",
+  "game": "Union of Kingdoms",
+  "purpose": "Correct troop anatomy and weapon mechanics while preserving role colors and tier equipment progression. T4 Crossbowmen and T5 Snipers carry actual crossbows.",
+  "raw_sources": "Local retained source directory, configurable with --source-dir in tools/build-character-art-repairs-v3.py. Not needed at runtime.",
+  "default_source_directory": "output/image-fixes-2026-10-05/characters/masters",
+  "builder": "tools/build-character-art-repairs-v3.py",
+  "derivative_method": "Crop generated alpha bounds >8; common uniform scaling into original v2 canvas and optical bounds; WebP quality90 UI/86thumb; no repainting or recoloring. Guardian files copied byte-for-byte from v2.",
+  "sources": [
+    {
+      "id": "fire-archer",
+      "source_master_filename": "fire-archer.png",
+      "source_master_sha256": "5a769d63ab72623f44afff1b43fb042ffd9ed2b50ee9f2297f60ea8d67776bef",
+      "original": {
+        "path": "assets/art/characters/fantasy-troops-v2/fire-archer-ui.webp",
+        "sha256": "a9f7a30caec8de1c602043558a98b33565c907c7bfba676979c90455213df2c7",
+        "bytes": 65968,
+        "dimensions": [
+          496,
+          768
+        ],
+        "frames": 1
+      },
+      "operation": "taut V bowstring meeting drawn arrow nock",
+      "generation_stages": [
+        {
+          "tool": "built-in image_gen.imagegen",
+          "prompt": "Precise equipment correction on this exact transparent Union of Kingdoms fire-archer sprite. Keep the original tier identity, face, white hair, pointed ears, red role hood and dress, natural skin, boots, bow shape and decoration, metal colors, armor complexity, fiery arrow and pose unchanged. Correct ONLY the bowstring: the archer is drawing the arrow with her right draw-hand to the LEFT of the bow. Draw a single taut continuous bowstring as a clear V from the upper bow tip to the arrow NOCK precisely at that LEFT draw-hand, then from that same nock/draw-hand to the lower bow tip. Both strands must visibly connect to that one nock point. The bow is held by her extended other hand at the RIGHT grip. The string must NOT connect to the right grip, be straight from tip to tip, have extra strands, or miss the drawn arrow. Remove the old incorrect string. Preserve original role/tier palette, do not upgrade equipment or add jewels. True transparent alpha, full body inside the image with margins, same painterly chibi game style, no text, no background or checkerboard.",
+          "source": "assets/art/characters/fantasy-troops-v2/fire-archer-ui.webp",
+          "generated_image_sha256": "5a769d63ab72623f44afff1b43fb042ffd9ed2b50ee9f2297f60ea8d67776bef"
+        }
+      ]
+    },
+    {
+      "id": "fire-archer-t1",
+      "source_master_filename": "fire-archer-t1.png",
+      "source_master_sha256": "df4a911ab71afb97deeb1f8bdd130f4a0746bede6b189f6f462b0ac544c4fab2",
+      "original": {
+        "path": "assets/art/characters/fantasy-troops-v2/fire-archer-t1-ui.webp",
+        "sha256": "6d590ee58b197be457a3b49ddc0786c38409b444fd5b35971f317c49aabc2c04",
+        "bytes": 55814,
+        "dimensions": [
+          496,
+          768
+        ],
+        "frames": 1
+      },
+      "operation": "taut V bowstring meeting drawn arrow nock",
+      "generation_stages": [
+        {
+          "tool": "built-in image_gen.imagegen",
+          "prompt": "Precise equipment correction on this exact transparent Union of Kingdoms fire-archer sprite. Keep the original tier identity, face, white hair, pointed ears, red role hood and dress, natural skin, boots, bow shape and decoration, metal colors, armor complexity, fiery arrow and pose unchanged. Correct ONLY the bowstring: the archer is drawing the arrow with her right draw-hand to the LEFT of the bow. Draw a single taut continuous bowstring as a clear V from the upper bow tip to the arrow NOCK precisely at that LEFT draw-hand, then from that same nock/draw-hand to the lower bow tip. Both strands must visibly connect to that one nock point. The bow is held by her extended other hand at the RIGHT grip. The string must NOT connect to the right grip, be straight from tip to tip, have extra strands, or miss the drawn arrow. Remove the old incorrect string. Preserve original role/tier palette, do not upgrade equipment or add jewels. True transparent alpha, full body inside the image with margins, same painterly chibi game style, no text, no background or checkerboard.",
+          "source": "assets/art/characters/fantasy-troops-v2/fire-archer-t1-ui.webp",
+          "generated_image_sha256": "df4a911ab71afb97deeb1f8bdd130f4a0746bede6b189f6f462b0ac544c4fab2"
+        }
+      ]
+    },
+    {
+      "id": "fire-archer-t10",
+      "source_master_filename": "fire-archer-t10.png",
+      "source_master_sha256": "687c0d258f6511aec3a870a4e17dae64cac70582f7c8439048fe9a8ce21cc7b1",
+      "original": {
+        "path": "assets/art/characters/fantasy-troops-v2/fire-archer-t10-ui.webp",
+        "sha256": "85fcaac009b1cf103c5833c248231e4a637fe3d750f7c1280c3a00b738a27732",
+        "bytes": 73044,
+        "dimensions": [
+          497,
+          768
+        ],
+        "frames": 1
+      },
+      "operation": "taut V bowstring meeting drawn arrow nock",
+      "generation_stages": [
+        {
+          "tool": "built-in image_gen.imagegen",
+          "prompt": "Precise equipment correction on this exact transparent Union of Kingdoms fire-archer sprite. Keep the original tier identity, face, white hair, pointed ears, red role hood and dress, natural skin, boots, bow shape and decoration, metal colors, armor complexity, fiery arrow and pose unchanged. Correct ONLY the bowstring: the archer is drawing the arrow with her right draw-hand to the LEFT of the bow. Draw a single taut continuous bowstring as a clear V from the upper bow tip to the arrow NOCK precisely at that LEFT draw-hand, then from that same nock/draw-hand to the lower bow tip. Both strands must visibly connect to that one nock point. The bow is held by her extended other hand at the RIGHT grip. The string must NOT connect to the right grip, be straight from tip to tip, have extra strands, or miss the drawn arrow. Remove the old incorrect string. Preserve original role/tier palette, do not upgrade equipment or add jewels. True transparent alpha, full body inside the image with margins, same painterly chibi game style, no text, no background or checkerboard.",
+          "source": "assets/art/characters/fantasy-troops-v2/fire-archer-t10-ui.webp",
+          "generated_image_sha256": "687c0d258f6511aec3a870a4e17dae64cac70582f7c8439048fe9a8ce21cc7b1"
+        }
+      ]
+    },
+    {
+      "id": "fire-archer-t2",
+      "source_master_filename": "fire-archer-t2.png",
+      "source_master_sha256": "9582efc9b42393297c70b94a8f025a7729acd10c2792014ad226c36ad9905624",
+      "original": {
+        "path": "assets/art/characters/fantasy-troops-v2/fire-archer-t2-ui.webp",
+        "sha256": "57aac5106bde0260816101ca491075d09b85cfa22e90b4995a6058f24becee57",
+        "bytes": 60464,
+        "dimensions": [
+          497,
+          768
+        ],
+        "frames": 1
+      },
+      "operation": "taut V bowstring meeting drawn arrow nock",
+      "generation_stages": [
+        {
+          "tool": "built-in image_gen.imagegen",
+          "prompt": "Precise equipment correction on this exact transparent Union of Kingdoms fire-archer sprite. Keep the original tier identity, face, white hair, pointed ears, red role hood and dress, natural skin, boots, bow shape and decoration, metal colors, armor complexity, fiery arrow and pose unchanged. Correct ONLY the bowstring: the archer is drawing the arrow with her right draw-hand to the LEFT of the bow. Draw a single taut continuous bowstring as a clear V from the upper bow tip to the arrow NOCK precisely at that LEFT draw-hand, then from that same nock/draw-hand to the lower bow tip. Both strands must visibly connect to that one nock point. The bow is held by her extended other hand at the RIGHT grip. The string must NOT connect to the right grip, be straight from tip to tip, have extra strands, or miss the drawn arrow. Remove the old incorrect string. Preserve original role/tier palette, do not upgrade equipment or add jewels. True transparent alpha, full body inside the image with margins, same painterly chibi game style, no text, no background or checkerboard.",
+          "source": "assets/art/characters/fantasy-troops-v2/fire-archer-t2-ui.webp",
+          "generated_image_sha256": "9582efc9b42393297c70b94a8f025a7729acd10c2792014ad226c36ad9905624"
+        }
+      ]
+    },
+    {
+      "id": "fire-archer-t3",
+      "source_master_filename": "fire-archer-t3.png",
+      "source_master_sha256": "f6cf11b4c925ad98aa829d3b4affff1e6e24a728e25050e75d5a9935d239ccb7",
+      "original": {
+        "path": "assets/art/characters/fantasy-troops-v2/fire-archer-t3-ui.webp",
+        "sha256": "2865aef93a15b5d40c80483fdef1009b907b7326905da8782f4ebafa76de6128",
+        "bytes": 63562,
+        "dimensions": [
+          496,
+          768
+        ],
+        "frames": 1
+      },
+      "operation": "taut V bowstring meeting drawn arrow nock",
+      "generation_stages": [
+        {
+          "tool": "built-in image_gen.imagegen",
+          "prompt": "Precise equipment correction on this exact transparent Union of Kingdoms fire-archer sprite. Keep the original tier identity, face, white hair, pointed ears, red role hood and dress, natural skin, boots, bow shape and decoration, metal colors, armor complexity, fiery arrow and pose unchanged. Correct ONLY the bowstring: the archer is drawing the arrow with her right draw-hand to the LEFT of the bow. Draw a single taut continuous bowstring as a clear V from the upper bow tip to the arrow NOCK precisely at that LEFT draw-hand, then from that same nock/draw-hand to the lower bow tip. Both strands must visibly connect to that one nock point. The bow is held by her extended other hand at the RIGHT grip. The string must NOT connect to the right grip, be straight from tip to tip, have extra strands, or miss the drawn arrow. Remove the old incorrect string. Preserve original role/tier palette, do not upgrade equipment or add jewels. True transparent alpha, full body inside the image with margins, same painterly chibi game style, no text, no background or checkerboard.",
+          "source": "assets/art/characters/fantasy-troops-v2/fire-archer-t3-ui.webp",
+          "generated_image_sha256": "f6cf11b4c925ad98aa829d3b4affff1e6e24a728e25050e75d5a9935d239ccb7"
+        }
+      ]
+    },
+    {
+      "id": "fire-archer-t4",
+      "source_master_filename": "fire-archer-t4.png",
+      "source_master_sha256": "15c57c577e0f170e797fe0bf1751b8fbc895d48ed7bb27d274a67b5b83ed9d2d",
+      "original": {
+        "path": "assets/art/characters/fantasy-troops-v2/fire-archer-t4-ui.webp",
+        "sha256": "35a894bb8722560927291f9e190c16e33a461b1cc747def3e02f4b92806faa28",
+        "bytes": 71724,
+        "dimensions": [
+          497,
+          768
+        ],
+        "frames": 1
+      },
+      "operation": "actual crossbow weapon class",
+      "generation_stages": [
+        {
+          "tool": "built-in image_gen.imagegen",
+          "prompt": "Precise equipment correction on this exact transparent Union of Kingdoms fire-archer sprite. Keep the original tier identity, face, white hair, pointed ears, red role hood and dress, natural skin, boots, bow shape and decoration, metal colors, armor complexity, fiery arrow and pose unchanged. Correct ONLY the bowstring: the archer is drawing the arrow with her right draw-hand to the LEFT of the bow. Draw a single taut continuous bowstring as a clear V from the upper bow tip to the arrow NOCK precisely at that LEFT draw-hand, then from that same nock/draw-hand to the lower bow tip. Both strands must visibly connect to that one nock point. The bow is held by her extended other hand at the RIGHT grip. The string must NOT connect to the right grip, be straight from tip to tip, have extra strands, or miss the drawn arrow. Remove the old incorrect string. Preserve original role/tier palette, do not upgrade equipment or add jewels. True transparent alpha, full body inside the image with margins, same painterly chibi game style, no text, no background or checkerboard.",
+          "source": "assets/art/characters/fantasy-troops-v2/fire-archer-t4-ui.webp",
+          "generated_image_sha256": "651c02bb9adcfce04320baca2a369da47c1d20f0fb4fe2739c87206403958cb9"
+        },
+        {
+          "tool": "built-in image_gen.imagegen",
+          "prompt": "Use case: precise-object-edit. Correct a weapon-class semantic error on this exact transparent Union of Kingdoms troop sprite. Keep this same white-haired pointy-eared female chibi character, face, red hood, red cloak/dress, exact armor complexity, clothing ornaments, jewelry colors and full-body posture. REPLACE THE LONG VERTICAL BOW entirely with a mechanically recognizable CROSSBOW held horizontally at chest height pointing screen RIGHT. No tall bow remains above or beside her. The crossbow must have a substantial short wooden STOCK and a horizontal bolt rail extending right, a trigger grip near her chest held by the rear hand, a front supporting hand beneath the forward stock, and a single pair of short symmetric curved steel bow-limbs mounted TRANSVERSELY across the front of that stock. Correct perspective of transverse lath, string tension from both limb tips to the rear bolt nock on the rail near the trigger. One straight fiery bolt lying on the top rail points right, fire only at its head beyond the weapon front. No extra arrows, floating string or long archer bow. Adapt the two arms only enough to hold this actual crossbow believably, keep clear separation of both hands. Elegant fantasy crescent decorations may decorate the crossbow stock/lath but must not resemble a long vertical bow. Preserve natural skin and original exact role/tier palette, dark brown cartoon outlines and soft hand-painted chibi game style. Transparent alpha, one complete full-body figure, both boots visible, generous margins, no text, checkerboard or background. Tier4 CROSSBOWMEN: retain silver steel armor, warm gold trim, blue diamond gems and blue underskirt accents, with matching silver/gold crossbow fittings and BLUE gemstones. No purple recolor.",
+          "source": "previous corrected bow portrait for same tier",
+          "generated_image_sha256": "15c57c577e0f170e797fe0bf1751b8fbc895d48ed7bb27d274a67b5b83ed9d2d"
+        }
+      ]
+    },
+    {
+      "id": "fire-archer-t5",
+      "source_master_filename": "fire-archer-t5.png",
+      "source_master_sha256": "e37f90f5433238433597e52d2bc5ef2b4799c1ab2118d894a3f99c8916b209f0",
+      "original": {
+        "path": "assets/art/characters/fantasy-troops-v2/fire-archer-t5-ui.webp",
+        "sha256": "8b0242b843773a6f89c45772db80030eea277e52ee915ce23df837c33a23dc08",
+        "bytes": 79424,
+        "dimensions": [
+          496,
+          768
+        ],
+        "frames": 1
+      },
+      "operation": "actual crossbow weapon class",
+      "generation_stages": [
+        {
+          "tool": "built-in image_gen.imagegen",
+          "prompt": "Use case: precise-object-edit. Edit this transparent Union of Kingdoms fire-archer sprite to correct bow mechanics, preserving the character, pose, proportions, red hood, long white hair, purple tier-five jewels, ornate crescent bow, flaming arrow and full-body square composition. The archer's left visible arm extends right to hold the bow grip. The right visible drawing hand is back near her chest at the LEFT end of the arrow. DRAW ONE CLEAR taut bowstring as two thin continuous segments: upper bow-tip to arrow NOCK at the drawing hand near the chest, then that SAME nock to lower bow-tip. The string forms a pulled sideways V whose left vertex is the arrow's rear end in the drawing fingers. Remove the incorrect straight string that currently runs down by the bow grip. There must not be a second undrawn string. The arrow rests across the grip, horizontal toward the right, with a single flame arrowhead beyond the bow. Fingers grip the nock/string believably. No loose disconnected strings. Preserve all other details, bold dark outlines, chibi storybook art, purple equipment accents, both feet, transparent alpha background and generous margins. No text, frame, extra limbs, added arrows, ground or backdrop.",
+          "source": "assets/art/characters/fantasy-troops-v2/fire-archer-t5-ui.webp",
+          "generated_image_sha256": "de6b42ea9b575102744eeac485cd5a0b4a451d5760c69d44eb20f125e6de9758"
+        },
+        {
+          "tool": "built-in image_gen.imagegen",
+          "prompt": "Use case: precise-object-edit. Correct a weapon-class semantic error on this exact transparent Union of Kingdoms troop sprite. Keep this same white-haired pointy-eared female chibi character, face, red hood, red cloak/dress, exact armor complexity, clothing ornaments, jewelry colors and full-body posture. REPLACE THE LONG VERTICAL BOW entirely with a mechanically recognizable CROSSBOW held horizontally at chest height pointing screen RIGHT. No tall bow remains above or beside her. The crossbow must have a substantial short wooden STOCK and a horizontal bolt rail extending right, a trigger grip near her chest held by the rear hand, a front supporting hand beneath the forward stock, and a single pair of short symmetric curved steel bow-limbs mounted TRANSVERSELY across the front of that stock. Correct perspective of transverse lath, string tension from both limb tips to the rear bolt nock on the rail near the trigger. One straight fiery bolt lying on the top rail points right, fire only at its head beyond the weapon front. No extra arrows, floating string or long archer bow. Adapt the two arms only enough to hold this actual crossbow believably, keep clear separation of both hands. Elegant fantasy crescent decorations may decorate the crossbow stock/lath but must not resemble a long vertical bow. Preserve natural skin and original exact role/tier palette, dark brown cartoon outlines and soft hand-painted chibi game style. Transparent alpha, one complete full-body figure, both boots visible, generous margins, no text, checkerboard or background. Tier5 SNIPERS: retain red cloth, ivory/gold crescent trim and purple diamond gems, with matching ornate dark wood/ivory/gold crossbow and PURPLE gemstones. No silver/blue armor upgrade; preserve original dress.",
+          "source": "previous corrected bow portrait for same tier",
+          "generated_image_sha256": "cf54bdb9f716c1e318fc9938422334f613543a576e0c4fece62f946d308b7373"
+        },
+        {
+          "tool": "built-in image_gen.imagegen",
+          "prompt": "Precise tiny cleanup on this crossbowwoman. REMOVE ONLY the unwanted straight glowing PURPLE DIAGONAL LINE that runs across her white hair from the crescent brooch on her hood down to her left shoulder/chest. That line is a leftover bowstring from a deleted longbow and has no purpose. Restore normal white hair/hood paint underneath that one line, preserving hair boundaries and ornaments. DO NOT remove the actual gold crossbow strings connecting the two short front limb tips to the crossbow's rear nock/rail. Keep the entire correctly held horizontal crossbow, wooden stock, trigger, hands, bolt, flame, purple gems, ivory crescent ornaments, red hood and clothing, face, full body, boots and all other details exactly the same. No other changes. True transparent background, no checkerboard, no text, no glow streak across hair.",
+          "source": "previous crossbow portrait, remove leftover hair-crossing bowstring",
+          "generated_image_sha256": "e37f90f5433238433597e52d2bc5ef2b4799c1ab2118d894a3f99c8916b209f0"
+        }
+      ]
+    },
+    {
+      "id": "fire-archer-t6",
+      "source_master_filename": "fire-archer-t6.png",
+      "source_master_sha256": "305ef76648bb70239bae7197b29d5a77fc0ff05217020e56811942028493ea99",
+      "original": {
+        "path": "assets/art/characters/fantasy-troops-v2/fire-archer-t6-ui.webp",
+        "sha256": "f1a4595e4099c43b329f6077c362baabe259e7fa7420ddf6f6a93834400e99f4",
+        "bytes": 78162,
+        "dimensions": [
+          497,
+          768
+        ],
+        "frames": 1
+      },
+      "operation": "taut V bowstring meeting drawn arrow nock",
+      "generation_stages": [
+        {
+          "tool": "built-in image_gen.imagegen",
+          "prompt": "Precise equipment correction on this exact transparent Union of Kingdoms fire-archer sprite. Keep the original tier identity, face, white hair, pointed ears, red role hood and dress, natural skin, boots, bow shape and decoration, metal colors, armor complexity, fiery arrow and pose unchanged. Correct ONLY the bowstring: the archer is drawing the arrow with her right draw-hand to the LEFT of the bow. Draw a single taut continuous bowstring as a clear V from the upper bow tip to the arrow NOCK precisely at that LEFT draw-hand, then from that same nock/draw-hand to the lower bow tip. Both strands must visibly connect to that one nock point. The bow is held by her extended other hand at the RIGHT grip. The string must NOT connect to the right grip, be straight from tip to tip, have extra strands, or miss the drawn arrow. Remove the old incorrect string. Preserve original role/tier palette, do not upgrade equipment or add jewels. True transparent alpha, full body inside the image with margins, same painterly chibi game style, no text, no background or checkerboard.",
+          "source": "assets/art/characters/fantasy-troops-v2/fire-archer-t6-ui.webp",
+          "generated_image_sha256": "305ef76648bb70239bae7197b29d5a77fc0ff05217020e56811942028493ea99"
+        }
+      ]
+    },
+    {
+      "id": "fire-archer-t7",
+      "source_master_filename": "fire-archer-t7.png",
+      "source_master_sha256": "70467f0bff91850b1bfd5094d6f0396c9cf3b622425fce20b1cd0e3f6be715ac",
+      "original": {
+        "path": "assets/art/characters/fantasy-troops-v2/fire-archer-t7-ui.webp",
+        "sha256": "23743a1cb8c729b04ccfe5bb9cf53585745dcbb8ed2b3e2a898eb04cdf9e24b6",
+        "bytes": 73884,
+        "dimensions": [
+          496,
+          768
+        ],
+        "frames": 1
+      },
+      "operation": "taut V bowstring meeting drawn arrow nock",
+      "generation_stages": [
+        {
+          "tool": "built-in image_gen.imagegen",
+          "prompt": "Precise equipment correction on this exact transparent Union of Kingdoms fire-archer sprite. Keep the original tier identity, face, white hair, pointed ears, red role hood and dress, natural skin, boots, bow shape and decoration, metal colors, armor complexity, fiery arrow and pose unchanged. Correct ONLY the bowstring: the archer is drawing the arrow with her right draw-hand to the LEFT of the bow. Draw a single taut continuous bowstring as a clear V from the upper bow tip to the arrow NOCK precisely at that LEFT draw-hand, then from that same nock/draw-hand to the lower bow tip. Both strands must visibly connect to that one nock point. The bow is held by her extended other hand at the RIGHT grip. The string must NOT connect to the right grip, be straight from tip to tip, have extra strands, or miss the drawn arrow. Remove the old incorrect string. Preserve original role/tier palette, do not upgrade equipment or add jewels. True transparent alpha, full body inside the image with margins, same painterly chibi game style, no text, no background or checkerboard.",
+          "source": "assets/art/characters/fantasy-troops-v2/fire-archer-t7-ui.webp",
+          "generated_image_sha256": "70467f0bff91850b1bfd5094d6f0396c9cf3b622425fce20b1cd0e3f6be715ac"
+        }
+      ]
+    },
+    {
+      "id": "fire-archer-t8",
+      "source_master_filename": "fire-archer-t8.png",
+      "source_master_sha256": "7e4674b81761dbfef7bd5ddb8bd2549c6cb0b2340a71563f745e7251d179fd1a",
+      "original": {
+        "path": "assets/art/characters/fantasy-troops-v2/fire-archer-t8-ui.webp",
+        "sha256": "622d1e6ea104b49de2a4f4e5165849db436ecff1f401b7fac5bc86523ad282af",
+        "bytes": 79318,
+        "dimensions": [
+          497,
+          768
+        ],
+        "frames": 1
+      },
+      "operation": "taut V bowstring meeting drawn arrow nock",
+      "generation_stages": [
+        {
+          "tool": "built-in image_gen.imagegen",
+          "prompt": "Precise equipment correction on this exact transparent Union of Kingdoms fire-archer sprite. Keep the original tier identity, face, white hair, pointed ears, red role hood and dress, natural skin, boots, bow shape and decoration, metal colors, armor complexity, fiery arrow and pose unchanged. Correct ONLY the bowstring: the archer is drawing the arrow with her right draw-hand to the LEFT of the bow. Draw a single taut continuous bowstring as a clear V from the upper bow tip to the arrow NOCK precisely at that LEFT draw-hand, then from that same nock/draw-hand to the lower bow tip. Both strands must visibly connect to that one nock point. The bow is held by her extended other hand at the RIGHT grip. The string must NOT connect to the right grip, be straight from tip to tip, have extra strands, or miss the drawn arrow. Remove the old incorrect string. Preserve original role/tier palette, do not upgrade equipment or add jewels. True transparent alpha, full body inside the image with margins, same painterly chibi game style, no text, no background or checkerboard.",
+          "source": "assets/art/characters/fantasy-troops-v2/fire-archer-t8-ui.webp",
+          "generated_image_sha256": "7e4674b81761dbfef7bd5ddb8bd2549c6cb0b2340a71563f745e7251d179fd1a"
+        }
+      ]
+    },
+    {
+      "id": "fire-archer-t9",
+      "source_master_filename": "fire-archer-t9.png",
+      "source_master_sha256": "1bafcdb170c45b227367fbee105c59aaa3662b0cf5b15be83743c4d190600155",
+      "original": {
+        "path": "assets/art/characters/fantasy-troops-v2/fire-archer-t9-ui.webp",
+        "sha256": "ab7ac39657a15b465e1e9736bc2f98d471b159f2e65f40bd33883af8730aef22",
+        "bytes": 75324,
+        "dimensions": [
+          497,
+          768
+        ],
+        "frames": 1
+      },
+      "operation": "taut V bowstring meeting drawn arrow nock",
+      "generation_stages": [
+        {
+          "tool": "built-in image_gen.imagegen",
+          "prompt": "Precise equipment correction on this exact transparent Union of Kingdoms fire-archer sprite. Keep the original tier identity, face, white hair, pointed ears, red role hood and dress, natural skin, boots, bow shape and decoration, metal colors, armor complexity, fiery arrow and pose unchanged. Correct ONLY the bowstring: the archer is drawing the arrow with her right draw-hand to the LEFT of the bow. Draw a single taut continuous bowstring as a clear V from the upper bow tip to the arrow NOCK precisely at that LEFT draw-hand, then from that same nock/draw-hand to the lower bow tip. Both strands must visibly connect to that one nock point. The bow is held by her extended other hand at the RIGHT grip. The string must NOT connect to the right grip, be straight from tip to tip, have extra strands, or miss the drawn arrow. Remove the old incorrect string. Preserve original role/tier palette, do not upgrade equipment or add jewels. True transparent alpha, full body inside the image with margins, same painterly chibi game style, no text, no background or checkerboard.",
+          "source": "assets/art/characters/fantasy-troops-v2/fire-archer-t9-ui.webp",
+          "generated_image_sha256": "1bafcdb170c45b227367fbee105c59aaa3662b0cf5b15be83743c4d190600155"
+        }
+      ]
+    },
+    {
+      "id": "shadow-rider",
+      "source_master_filename": "shadow-rider.png",
+      "source_master_sha256": "6e437479ef1f66e9f6355c457ca91113a56cd61bcf12b1d42e2c51300ffbcdb1",
+      "original": {
+        "path": "assets/art/characters/fantasy-troops-v2/shadow-rider-ui.webp",
+        "sha256": "3a038184024db36e2ad842459b921351d7c7e5180953c062e70c4db9565ec9d5",
+        "bytes": 90126,
+        "dimensions": [
+          756,
+          768
+        ],
+        "frames": 1
+      },
+      "operation": "paired mount antlers; no rider antlers",
+      "generation_stages": [
+        {
+          "tool": "built-in image_gen.imagegen",
+          "prompt": "Edit this exact transparent Union of Kingdoms cavalry sprite. Make ONLY the antler anatomical correction: both purple antler stems must visibly attach to the SAME small dark-purple mount's forehead, side by side above its eyes/ears, entirely LEFT of the rider face. Remove the incorrectly placed antler behind the right of the rider hood/quiver; leave that area empty transparent. Rider has no antlers or horns. Preserve precisely this tier's existing armor complexity, worn or polished materials, metal color, purple role cloth, white hair, skin, quiver, cape, crescent polearm, saddle, four mount legs and boot. Do not upgrade or downgrade equipment, do not recolor, add gems, add patterns or change pose. Keep strong dark-brown cartoon outlines and the original hand-painted chibi style. One complete standalone sprite with true transparent alpha, ample margins, no checkerboard, no background, no text.",
+          "source": "assets/art/characters/fantasy-troops-v2/shadow-rider-ui.webp",
+          "generated_image_sha256": "6e437479ef1f66e9f6355c457ca91113a56cd61bcf12b1d42e2c51300ffbcdb1"
+        }
+      ]
+    },
+    {
+      "id": "shadow-rider-t1",
+      "source_master_filename": "shadow-rider-t1.png",
+      "source_master_sha256": "c06dbf8e10179c246be6be43cdb81ca55188a9e0f7b548febf44929c4d364130",
+      "original": {
+        "path": "assets/art/characters/fantasy-troops-v2/shadow-rider-t1-ui.webp",
+        "sha256": "c274dbf84503f7be05e878c651dd288db3e3f11e7a5a8573fe77912553136b22",
+        "bytes": 74024,
+        "dimensions": [
+          756,
+          768
+        ],
+        "frames": 1
+      },
+      "operation": "paired mount antlers; no rider antlers",
+      "generation_stages": [
+        {
+          "tool": "built-in image_gen.imagegen",
+          "prompt": "Edit this exact transparent Union of Kingdoms cavalry sprite. Make ONLY the antler anatomical correction: both purple antler stems must visibly attach to the SAME small dark-purple mount's forehead, side by side above its eyes/ears, entirely LEFT of the rider face. Remove the incorrectly placed antler behind the right of the rider hood/quiver; leave that area empty transparent. Rider has no antlers or horns. Preserve precisely this tier's existing armor complexity, worn or polished materials, metal color, purple role cloth, white hair, skin, quiver, cape, crescent polearm, saddle, four mount legs and boot. Do not upgrade or downgrade equipment, do not recolor, add gems, add patterns or change pose. Keep strong dark-brown cartoon outlines and the original hand-painted chibi style. One complete standalone sprite with true transparent alpha, ample margins, no checkerboard, no background, no text.",
+          "source": "assets/art/characters/fantasy-troops-v2/shadow-rider-t1-ui.webp",
+          "generated_image_sha256": "c06dbf8e10179c246be6be43cdb81ca55188a9e0f7b548febf44929c4d364130"
+        }
+      ]
+    },
+    {
+      "id": "shadow-rider-t10",
+      "source_master_filename": "shadow-rider-t10.png",
+      "source_master_sha256": "fec01817ea87a29247a1cf3c70a01e35e9801e0d76385b0bd65f83aa820aa74f",
+      "original": {
+        "path": "assets/art/characters/fantasy-troops-v2/shadow-rider-t10-ui.webp",
+        "sha256": "201fda2c713a5023a09a8f5508d058210b517378d951191dc3996cd1db9c282d",
+        "bytes": 109726,
+        "dimensions": [
+          756,
+          768
+        ],
+        "frames": 1
+      },
+      "operation": "paired mount antlers; no rider antlers",
+      "generation_stages": [
+        {
+          "tool": "built-in image_gen.imagegen",
+          "prompt": "Edit this exact transparent Union of Kingdoms cavalry sprite. Make ONLY the antler anatomical correction: both purple antler stems must visibly attach to the SAME small dark-purple mount's forehead, side by side above its eyes/ears, entirely LEFT of the rider face. Remove the incorrectly placed antler behind the right of the rider hood/quiver; leave that area empty transparent. Rider has no antlers or horns. Preserve precisely this tier's existing armor complexity, worn or polished materials, metal color, purple role cloth, white hair, skin, quiver, cape, crescent polearm, saddle, four mount legs and boot. Do not upgrade or downgrade equipment, do not recolor, add gems, add patterns or change pose. Keep strong dark-brown cartoon outlines and the original hand-painted chibi style. One complete standalone sprite with true transparent alpha, ample margins, no checkerboard, no background, no text.",
+          "source": "assets/art/characters/fantasy-troops-v2/shadow-rider-t10-ui.webp",
+          "generated_image_sha256": "fec01817ea87a29247a1cf3c70a01e35e9801e0d76385b0bd65f83aa820aa74f"
+        }
+      ]
+    },
+    {
+      "id": "shadow-rider-t2",
+      "source_master_filename": "shadow-rider-t2.png",
+      "source_master_sha256": "130ac1a8166fcf37e1faac1a4b0b46301574bb6ad2c232d8fb2fb37bf19b5f50",
+      "original": {
+        "path": "assets/art/characters/fantasy-troops-v2/shadow-rider-t2-ui.webp",
+        "sha256": "e0132ca264ba9c068fba159bbea9f6ec316374e31fc201e6419d6ae7741a7fa0",
+        "bytes": 78048,
+        "dimensions": [
+          756,
+          768
+        ],
+        "frames": 1
+      },
+      "operation": "paired mount antlers; no rider antlers",
+      "generation_stages": [
+        {
+          "tool": "built-in image_gen.imagegen",
+          "prompt": "Edit this exact transparent Union of Kingdoms cavalry sprite. Make ONLY the antler anatomical correction: both purple antler stems must visibly attach to the SAME small dark-purple mount's forehead, side by side above its eyes/ears, entirely LEFT of the rider face. Remove the incorrectly placed antler behind the right of the rider hood/quiver; leave that area empty transparent. Rider has no antlers or horns. Preserve precisely this tier's existing armor complexity, worn or polished materials, metal color, purple role cloth, white hair, skin, quiver, cape, crescent polearm, saddle, four mount legs and boot. Do not upgrade or downgrade equipment, do not recolor, add gems, add patterns or change pose. Keep strong dark-brown cartoon outlines and the original hand-painted chibi style. One complete standalone sprite with true transparent alpha, ample margins, no checkerboard, no background, no text.",
+          "source": "assets/art/characters/fantasy-troops-v2/shadow-rider-t2-ui.webp",
+          "generated_image_sha256": "130ac1a8166fcf37e1faac1a4b0b46301574bb6ad2c232d8fb2fb37bf19b5f50"
+        }
+      ]
+    },
+    {
+      "id": "shadow-rider-t3",
+      "source_master_filename": "shadow-rider-t3.png",
+      "source_master_sha256": "87afb2c3e99fc77f0b15d2b30494caa2535a8958dc13c308767c5a670bdc6449",
+      "original": {
+        "path": "assets/art/characters/fantasy-troops-v2/shadow-rider-t3-ui.webp",
+        "sha256": "82c2a9b006bc60a8cd7a16a968786c187441949bc598fa08eb1da1dc120fe7ad",
+        "bytes": 84438,
+        "dimensions": [
+          756,
+          768
+        ],
+        "frames": 1
+      },
+      "operation": "paired mount antlers; no rider antlers",
+      "generation_stages": [
+        {
+          "tool": "built-in image_gen.imagegen",
+          "prompt": "Edit this exact transparent Union of Kingdoms cavalry sprite. Make ONLY the antler anatomical correction: both purple antler stems must visibly attach to the SAME small dark-purple mount's forehead, side by side above its eyes/ears, entirely LEFT of the rider face. Remove the incorrectly placed antler behind the right of the rider hood/quiver; leave that area empty transparent. Rider has no antlers or horns. Preserve precisely this tier's existing armor complexity, worn or polished materials, metal color, purple role cloth, white hair, skin, quiver, cape, crescent polearm, saddle, four mount legs and boot. Do not upgrade or downgrade equipment, do not recolor, add gems, add patterns or change pose. Keep strong dark-brown cartoon outlines and the original hand-painted chibi style. One complete standalone sprite with true transparent alpha, ample margins, no checkerboard, no background, no text.",
+          "source": "assets/art/characters/fantasy-troops-v2/shadow-rider-t3-ui.webp",
+          "generated_image_sha256": "87afb2c3e99fc77f0b15d2b30494caa2535a8958dc13c308767c5a670bdc6449"
+        }
+      ]
+    },
+    {
+      "id": "shadow-rider-t4",
+      "source_master_filename": "shadow-rider-t4.png",
+      "source_master_sha256": "faf7de067d0a1f2a487ffa9dfa7c4008f954cd526cd6ab25b7dca589b2f9a722",
+      "original": {
+        "path": "assets/art/characters/fantasy-troops-v2/shadow-rider-t4-ui.webp",
+        "sha256": "1002e9c62a3183db141b164332d6720d49d24bd579abae79faef64de06fc3edc",
+        "bytes": 100438,
+        "dimensions": [
+          756,
+          768
+        ],
+        "frames": 1
+      },
+      "operation": "paired mount antlers; no rider antlers",
+      "generation_stages": [
+        {
+          "tool": "built-in image_gen.imagegen",
+          "prompt": "Edit this exact transparent Union of Kingdoms cavalry sprite. Make ONLY the antler anatomical correction: both purple antler stems must visibly attach to the SAME small dark-purple mount's forehead, side by side above its eyes/ears, entirely LEFT of the rider face. Remove the incorrectly placed antler behind the right of the rider hood/quiver; leave that area empty transparent. Rider has no antlers or horns. Preserve precisely this tier's existing armor complexity, worn or polished materials, metal color, purple role cloth, white hair, skin, quiver, cape, crescent polearm, saddle, four mount legs and boot. Do not upgrade or downgrade equipment, do not recolor, add gems, add patterns or change pose. Keep strong dark-brown cartoon outlines and the original hand-painted chibi style. One complete standalone sprite with true transparent alpha, ample margins, no checkerboard, no background, no text.",
+          "source": "assets/art/characters/fantasy-troops-v2/shadow-rider-t4-ui.webp",
+          "generated_image_sha256": "faf7de067d0a1f2a487ffa9dfa7c4008f954cd526cd6ab25b7dca589b2f9a722"
+        }
+      ]
+    },
+    {
+      "id": "shadow-rider-t5",
+      "source_master_filename": "shadow-rider-t5.png",
+      "source_master_sha256": "f87ed3fb500e2a936a36522d8dcc37fc10a2131c9719d0d48f77066af18e4d80",
+      "original": {
+        "path": "assets/art/characters/fantasy-troops-v2/shadow-rider-t5-ui.webp",
+        "sha256": "91fd61382b905cc67f37b51a156f96e24050f9c382cb7177fbcabac570bc0bea",
+        "bytes": 107746,
+        "dimensions": [
+          756,
+          768
+        ],
+        "frames": 1
+      },
+      "operation": "paired mount antlers; no rider antlers",
+      "generation_stages": [
+        {
+          "tool": "built-in image_gen.imagegen",
+          "prompt": "Use case: precise-object-edit. Edit target: the attached transparent chibi cavalry illustration from Union of Kingdoms. Correct ONLY the impossible antler anatomy. This is one small dark-purple fantasy deer mount carrying one hooded white-haired elf rider. BOTH purple antlers must visibly arise as a natural paired set from the SAME mount's skull, above its eyes and ears, entirely in the area left of the rider's face. Remove the entire misplaced antler that currently emerges above and behind the RIGHT side of the rider hood/quiver. Keep that region clean: only cape/hood/quiver, with transparent negative space above. Rebuild the paired antlers above the mount's forehead with two clearly readable attachment points; a narrower coherent antler silhouette is fine. Rider has NO horns, antlers or branches. Preserve the same character identity, dark brown outlines, cute chibi proportions, purple tier-5 palette, opaque solid painted subject, crescent polearm held in the hands, white hair, hood, scarf, saddle, armor, cape, four mount legs, and square full-body composition. Preserve clean real alpha transparency; no black background, checkerboard, text, ground, extra creatures, extra limbs, horn on rider, disconnected antlers or new props. Return one corrected standalone sprite, not a comparison.",
+          "source": "assets/art/characters/fantasy-troops-v2/shadow-rider-t5-ui.webp",
+          "generated_image_sha256": "f87ed3fb500e2a936a36522d8dcc37fc10a2131c9719d0d48f77066af18e4d80"
+        }
+      ]
+    },
+    {
+      "id": "shadow-rider-t6",
+      "source_master_filename": "shadow-rider-t6.png",
+      "source_master_sha256": "73da79377bdd69e27fa028b88f7927ac6fbc055f8d8ca2a1ea5621aee98a4582",
+      "original": {
+        "path": "assets/art/characters/fantasy-troops-v2/shadow-rider-t6-ui.webp",
+        "sha256": "66cd348b190892197ed7ec2ec9f78a4072002abd931005158e0668139874e064",
+        "bytes": 90964,
+        "dimensions": [
+          756,
+          768
+        ],
+        "frames": 1
+      },
+      "operation": "paired mount antlers; no rider antlers",
+      "generation_stages": [
+        {
+          "tool": "built-in image_gen.imagegen",
+          "prompt": "Edit this exact transparent Union of Kingdoms cavalry sprite. Make ONLY the antler anatomical correction: both purple antler stems must visibly attach to the SAME small dark-purple mount's forehead, side by side above its eyes/ears, entirely LEFT of the rider face. Remove the incorrectly placed antler behind the right of the rider hood/quiver; leave that area empty transparent. Rider has no antlers or horns. Preserve precisely this tier's existing armor complexity, worn or polished materials, metal color, purple role cloth, white hair, skin, quiver, cape, crescent polearm, saddle, four mount legs and boot. Do not upgrade or downgrade equipment, do not recolor, add gems, add patterns or change pose. Keep strong dark-brown cartoon outlines and the original hand-painted chibi style. One complete standalone sprite with true transparent alpha, ample margins, no checkerboard, no background, no text.",
+          "source": "assets/art/characters/fantasy-troops-v2/shadow-rider-t6-ui.webp",
+          "generated_image_sha256": "73da79377bdd69e27fa028b88f7927ac6fbc055f8d8ca2a1ea5621aee98a4582"
+        }
+      ]
+    },
+    {
+      "id": "shadow-rider-t7",
+      "source_master_filename": "shadow-rider-t7.png",
+      "source_master_sha256": "5030b0fdfbf7b662f6b0dd60b5ec7e03516355f53e4ff5fc28232815e1240388",
+      "original": {
+        "path": "assets/art/characters/fantasy-troops-v2/shadow-rider-t7-ui.webp",
+        "sha256": "4d7116d840ab6914cd76619b79061ada25b08db78df818de6d3e0d071aa831d7",
+        "bytes": 105292,
+        "dimensions": [
+          756,
+          768
+        ],
+        "frames": 1
+      },
+      "operation": "paired mount antlers; no rider antlers",
+      "generation_stages": [
+        {
+          "tool": "built-in image_gen.imagegen",
+          "prompt": "Edit this exact transparent Union of Kingdoms cavalry sprite. Make ONLY the antler anatomical correction: both purple antler stems must visibly attach to the SAME small dark-purple mount's forehead, side by side above its eyes/ears, entirely LEFT of the rider face. Remove the incorrectly placed antler behind the right of the rider hood/quiver; leave that area empty transparent. Rider has no antlers or horns. Preserve precisely this tier's existing armor complexity, worn or polished materials, metal color, purple role cloth, white hair, skin, quiver, cape, crescent polearm, saddle, four mount legs and boot. Do not upgrade or downgrade equipment, do not recolor, add gems, add patterns or change pose. Keep strong dark-brown cartoon outlines and the original hand-painted chibi style. One complete standalone sprite with true transparent alpha, ample margins, no checkerboard, no background, no text.",
+          "source": "assets/art/characters/fantasy-troops-v2/shadow-rider-t7-ui.webp",
+          "generated_image_sha256": "5030b0fdfbf7b662f6b0dd60b5ec7e03516355f53e4ff5fc28232815e1240388"
+        }
+      ]
+    },
+    {
+      "id": "shadow-rider-t8",
+      "source_master_filename": "shadow-rider-t8.png",
+      "source_master_sha256": "d62b117063496e112815bce9a0f4f787af83ce76da27ecbd37bc348a2e507702",
+      "original": {
+        "path": "assets/art/characters/fantasy-troops-v2/shadow-rider-t8-ui.webp",
+        "sha256": "f709fc676427338fee768620b31c2f6db2c0ae9a4eb67a1dc21fbddc1d4272b6",
+        "bytes": 98892,
+        "dimensions": [
+          756,
+          768
+        ],
+        "frames": 1
+      },
+      "operation": "paired mount antlers; no rider antlers",
+      "generation_stages": [
+        {
+          "tool": "built-in image_gen.imagegen",
+          "prompt": "Edit this exact transparent Union of Kingdoms cavalry sprite. Make ONLY the antler anatomical correction: both purple antler stems must visibly attach to the SAME small dark-purple mount's forehead, side by side above its eyes/ears, entirely LEFT of the rider face. Remove the incorrectly placed antler behind the right of the rider hood/quiver; leave that area empty transparent. Rider has no antlers or horns. Preserve precisely this tier's existing armor complexity, worn or polished materials, metal color, purple role cloth, white hair, skin, quiver, cape, crescent polearm, saddle, four mount legs and boot. Do not upgrade or downgrade equipment, do not recolor, add gems, add patterns or change pose. Keep strong dark-brown cartoon outlines and the original hand-painted chibi style. One complete standalone sprite with true transparent alpha, ample margins, no checkerboard, no background, no text.",
+          "source": "assets/art/characters/fantasy-troops-v2/shadow-rider-t8-ui.webp",
+          "generated_image_sha256": "d62b117063496e112815bce9a0f4f787af83ce76da27ecbd37bc348a2e507702"
+        }
+      ]
+    },
+    {
+      "id": "shadow-rider-t9",
+      "source_master_filename": "shadow-rider-t9.png",
+      "source_master_sha256": "926237e40dd920a597d8bbf1f58b21e1569d3fac93fb1ad400d7af3804bb0692",
+      "original": {
+        "path": "assets/art/characters/fantasy-troops-v2/shadow-rider-t9-ui.webp",
+        "sha256": "8c8d673243ed0ed7c0cc60a4e56debf4c174ac4414e0f98ebcf50a9349af2b9f",
+        "bytes": 107054,
+        "dimensions": [
+          756,
+          768
+        ],
+        "frames": 1
+      },
+      "operation": "paired mount antlers; no rider antlers",
+      "generation_stages": [
+        {
+          "tool": "built-in image_gen.imagegen",
+          "prompt": "Edit this exact transparent Union of Kingdoms cavalry sprite. Make ONLY the antler anatomical correction: both purple antler stems must visibly attach to the SAME small dark-purple mount's forehead, side by side above its eyes/ears, entirely LEFT of the rider face. Remove the incorrectly placed antler behind the right of the rider hood/quiver; leave that area empty transparent. Rider has no antlers or horns. Preserve precisely this tier's existing armor complexity, worn or polished materials, metal color, purple role cloth, white hair, skin, quiver, cape, crescent polearm, saddle, four mount legs and boot. Do not upgrade or downgrade equipment, do not recolor, add gems, add patterns or change pose. Keep strong dark-brown cartoon outlines and the original hand-painted chibi style. One complete standalone sprite with true transparent alpha, ample margins, no checkerboard, no background, no text.",
+          "source": "assets/art/characters/fantasy-troops-v2/shadow-rider-t9-ui.webp",
+          "generated_image_sha256": "926237e40dd920a597d8bbf1f58b21e1569d3fac93fb1ad400d7af3804bb0692"
+        }
+      ]
+    }
+  ],
+  "delivery": [
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-t1-thumb.webp",
+      "dimensions": [
+        116,
+        180
+      ],
+      "bytes": 9210,
+      "sha256": "5dd0e1e92e164c0e399734ae42764c0d360f41b222419a5eaea1976ee7b2f73d",
+      "original_sha256": "711b9f9a123495faf29cbb8d93030f00a971784345a3215113a1899ed43520ea",
+      "transparent_fraction": 0.6258,
+      "bounds": [
+        12,
+        10,
+        104,
+        161
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-t1-ui.webp",
+      "dimensions": [
+        496,
+        768
+      ],
+      "bytes": 73804,
+      "sha256": "361eb7f1310a9b108ee17e69e1d640974bda325942394b92ac0e09889acb128f",
+      "original_sha256": "6d590ee58b197be457a3b49ddc0786c38409b444fd5b35971f317c49aabc2c04",
+      "transparent_fraction": 0.6684,
+      "bounds": [
+        51,
+        46,
+        445,
+        691
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-t10-thumb.webp",
+      "dimensions": [
+        116,
+        180
+      ],
+      "bytes": 10624,
+      "sha256": "d25ef2b8e875a0cf2f17104e1654e7ee1587b4422f40dcedbbeb43398e561528",
+      "original_sha256": "2200f9d0e5aa62ae09cc6af17f8533d4661ee0cccf0c13ab3f1954ba2789637b",
+      "transparent_fraction": 0.6093,
+      "bounds": [
+        11,
+        10,
+        104,
+        163
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-t10-ui.webp",
+      "dimensions": [
+        497,
+        768
+      ],
+      "bytes": 92424,
+      "sha256": "de13757a7484926bdf1341bcdf88180ee912eb65aa5dd509cf1c9ab6a64e5507",
+      "original_sha256": "85fcaac009b1cf103c5833c248231e4a637fe3d750f7c1280c3a00b738a27732",
+      "transparent_fraction": 0.6553,
+      "bounds": [
+        50,
+        46,
+        446,
+        699
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-t2-thumb.webp",
+      "dimensions": [
+        116,
+        180
+      ],
+      "bytes": 9530,
+      "sha256": "b364f6646df17c1a9c134527ba090246642da738fe197cd75dcebc1f2eacdc2a",
+      "original_sha256": "b655bcd84d09d9f6994d5ca98c20d91d6c15b08c31d334ba8e1779a150c012d7",
+      "transparent_fraction": 0.6281,
+      "bounds": [
+        12,
+        10,
+        104,
+        161
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-t2-ui.webp",
+      "dimensions": [
+        497,
+        768
+      ],
+      "bytes": 76930,
+      "sha256": "86869d9aefdebc65143a406442916c9ccc955cdb13852f7714de91866ddd8db3",
+      "original_sha256": "57aac5106bde0260816101ca491075d09b85cfa22e90b4995a6058f24becee57",
+      "transparent_fraction": 0.6761,
+      "bounds": [
+        53,
+        47,
+        443,
+        689
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-t3-thumb.webp",
+      "dimensions": [
+        116,
+        180
+      ],
+      "bytes": 9772,
+      "sha256": "6cb403744fa115c7784db31296973fdbb560140b898145aabb681eeac1c4851a",
+      "original_sha256": "1378ba624904df4ca70011cabc3d693d66b0a421d810497ee6c503c0234ab7d8",
+      "transparent_fraction": 0.6196,
+      "bounds": [
+        12,
+        10,
+        104,
+        162
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-t3-ui.webp",
+      "dimensions": [
+        496,
+        768
+      ],
+      "bytes": 82670,
+      "sha256": "bd7185c87834de8b66691336f3feac1d8af83d189599577672f6994fd652c1c2",
+      "original_sha256": "2865aef93a15b5d40c80483fdef1009b907b7326905da8782f4ebafa76de6128",
+      "transparent_fraction": 0.6642,
+      "bounds": [
+        52,
+        47,
+        444,
+        694
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-t4-thumb.webp",
+      "dimensions": [
+        116,
+        180
+      ],
+      "bytes": 9356,
+      "sha256": "a84b7f3e4e464a40d782207f532533f23d3a99bf7feeec7adea03964d8e0f8ee",
+      "original_sha256": "8261b6b215b759c735d786b35fa0a2feef6f3909d75501027bd084af028be722",
+      "transparent_fraction": 0.5932,
+      "bounds": [
+        8,
+        20,
+        108,
+        152
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-t4-ui.webp",
+      "dimensions": [
+        497,
+        768
+      ],
+      "bytes": 82846,
+      "sha256": "69d9c3596f02679beac9ac908d13081c816dc0a84fbdfe994d97458cfcbac13b",
+      "original_sha256": "35a894bb8722560927291f9e190c16e33a461b1cc747def3e02f4b92806faa28",
+      "transparent_fraction": 0.6265,
+      "bounds": [
+        35,
+        88,
+        462,
+        654
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-t5-thumb.webp",
+      "dimensions": [
+        116,
+        180
+      ],
+      "bytes": 8846,
+      "sha256": "32cf53e80d6b1455372e2269f66fc2212ab1f1eb73a2c7d31cd5396338d0f2fb",
+      "original_sha256": "3d74788375e66eb97a30a4ea96d3ca825edfb6150d17680447a992a402611906",
+      "transparent_fraction": 0.6519,
+      "bounds": [
+        8,
+        29,
+        108,
+        144
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-t5-ui.webp",
+      "dimensions": [
+        496,
+        768
+      ],
+      "bytes": 80944,
+      "sha256": "c65e1a26a02f69f4b93e14d37d93421c59137357f735b764d4d22b9a804999fc",
+      "original_sha256": "8b0242b843773a6f89c45772db80030eea277e52ee915ce23df837c33a23dc08",
+      "transparent_fraction": 0.6719,
+      "bounds": [
+        31,
+        119,
+        465,
+        620
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-t6-thumb.webp",
+      "dimensions": [
+        116,
+        180
+      ],
+      "bytes": 10934,
+      "sha256": "eefa809e077383b2a9544b8def0f747b8f6aba57c04a3bc408262b48ee9276c4",
+      "original_sha256": "463708835d55e4108afb5ff805d9f9a3bd684efc2433bd8fdf42896cf660376f",
+      "transparent_fraction": 0.559,
+      "bounds": [
+        9,
+        8,
+        106,
+        164
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-t6-ui.webp",
+      "dimensions": [
+        497,
+        768
+      ],
+      "bytes": 97982,
+      "sha256": "dbafd15f1056a4e5a153d4ab11f941aa7455110b5742cb068cb8fc6cf7d967fa",
+      "original_sha256": "f1a4595e4099c43b329f6077c362baabe259e7fa7420ddf6f6a93834400e99f4",
+      "transparent_fraction": 0.6071,
+      "bounds": [
+        42,
+        39,
+        454,
+        703
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-t7-thumb.webp",
+      "dimensions": [
+        116,
+        180
+      ],
+      "bytes": 10302,
+      "sha256": "c6176588eafcabf0c943fa826a15199fddf8445c1f7550fa5f6e1635bac46da9",
+      "original_sha256": "cdbe297af8e011ce48579acad19c734c3aa162015cba9d1bb932221ddee4902e",
+      "transparent_fraction": 0.6157,
+      "bounds": [
+        12,
+        10,
+        103,
+        164
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-t7-ui.webp",
+      "dimensions": [
+        496,
+        768
+      ],
+      "bytes": 89876,
+      "sha256": "29f29bdcd43e345e41b1eb235d88f8ed20fa39b1fd14e3eaad5d0e4d1aabf600",
+      "original_sha256": "23743a1cb8c729b04ccfe5bb9cf53585745dcbb8ed2b3e2a898eb04cdf9e24b6",
+      "transparent_fraction": 0.6565,
+      "bounds": [
+        52,
+        44,
+        443,
+        702
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-t8-thumb.webp",
+      "dimensions": [
+        116,
+        180
+      ],
+      "bytes": 11522,
+      "sha256": "34e3b06737eee028825c4d9d355c3a47a029352419c5c04e7ec351e619556f1f",
+      "original_sha256": "212fe8a7262a8903aba90117d3e6b133a2cf1853ca2a822d214260382cf9475e",
+      "transparent_fraction": 0.5803,
+      "bounds": [
+        12,
+        8,
+        104,
+        166
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-t8-ui.webp",
+      "dimensions": [
+        497,
+        768
+      ],
+      "bytes": 99862,
+      "sha256": "5ff28ad5a755418efe8bea92fc0b0b1152bdc01f8ba6bac6d123ce4a19585352",
+      "original_sha256": "622d1e6ea104b49de2a4f4e5165849db436ecff1f401b7fac5bc86523ad282af",
+      "transparent_fraction": 0.6281,
+      "bounds": [
+        52,
+        36,
+        445,
+        709
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-t9-thumb.webp",
+      "dimensions": [
+        117,
+        180
+      ],
+      "bytes": 10786,
+      "sha256": "de971c83503c12e55fb8260304d7200495bb43397e5a681f1b58f95b6e8df233",
+      "original_sha256": "401e616fe0fc00c5d0138866ee08dcb709076c6d51b4f78cd8c4b236f68b6a5b",
+      "transparent_fraction": 0.5927,
+      "bounds": [
+        11,
+        10,
+        105,
+        167
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-t9-ui.webp",
+      "dimensions": [
+        497,
+        768
+      ],
+      "bytes": 96006,
+      "sha256": "3f6b2926e1cd5622ba9ec52047ea4d669cb282a3df174965ec432d2064578fc2",
+      "original_sha256": "ab7ac39657a15b465e1e9736bc2f98d471b159f2e65f40bd33883af8730aef22",
+      "transparent_fraction": 0.6314,
+      "bounds": [
+        46,
+        44,
+        450,
+        716
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-thumb.webp",
+      "dimensions": [
+        116,
+        180
+      ],
+      "bytes": 9548,
+      "sha256": "da54a0349951859995deaca8e383e18ce0899bb4e5364aa4f70df61aec7b5e8a",
+      "original_sha256": "516f2f7b09d113085b7c823d21762d631df1ea27e71cfdd0dc87d62d5bab1768",
+      "transparent_fraction": 0.6317,
+      "bounds": [
+        12,
+        10,
+        104,
+        161
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-ui.webp",
+      "dimensions": [
+        496,
+        768
+      ],
+      "bytes": 74990,
+      "sha256": "411efde92cccf7af4e7f60fb4817b1b5feba1e16237533d5f41ceb9d7c901797",
+      "original_sha256": "a9f7a30caec8de1c602043558a98b33565c907c7bfba676979c90455213df2c7",
+      "transparent_fraction": 0.6763,
+      "bounds": [
+        52,
+        47,
+        444,
+        689
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/guardian-t1-thumb.webp",
+      "dimensions": [
+        180,
+        156
+      ],
+      "bytes": 9490,
+      "sha256": "37f63c544c89084bc059ea7e2677faaedb0a3d58b25b5a105948e44ecb9ca70f",
+      "original_sha256": "37f63c544c89084bc059ea7e2677faaedb0a3d58b25b5a105948e44ecb9ca70f",
+      "transparent_fraction": 0.5089,
+      "bounds": [
+        15,
+        8,
+        166,
+        143
+      ],
+      "change": "unchanged approved guardian copy"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/guardian-t1-ui.webp",
+      "dimensions": [
+        768,
+        664
+      ],
+      "bytes": 74086,
+      "sha256": "9bad8afea02a60b74158b99b65c857a69812a21a4436e0246d839b8cb8e7f721",
+      "original_sha256": "9bad8afea02a60b74158b99b65c857a69812a21a4436e0246d839b8cb8e7f721",
+      "transparent_fraction": 0.5136,
+      "bounds": [
+        67,
+        37,
+        712,
+        612
+      ],
+      "change": "unchanged approved guardian copy"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/guardian-t10-thumb.webp",
+      "dimensions": [
+        180,
+        156
+      ],
+      "bytes": 11786,
+      "sha256": "91a44558de110530d9b274e5f636f2e8f0ed78137c304e9655a38632d24f5ad4",
+      "original_sha256": "91a44558de110530d9b274e5f636f2e8f0ed78137c304e9655a38632d24f5ad4",
+      "transparent_fraction": 0.4721,
+      "bounds": [
+        11,
+        8,
+        169,
+        143
+      ],
+      "change": "unchanged approved guardian copy"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/guardian-t10-ui.webp",
+      "dimensions": [
+        768,
+        664
+      ],
+      "bytes": 101172,
+      "sha256": "2de0316d0efcb0593a04d328365dacc4d5cbcfac63249c72aa5db3eb5e9c7efc",
+      "original_sha256": "2de0316d0efcb0593a04d328365dacc4d5cbcfac63249c72aa5db3eb5e9c7efc",
+      "transparent_fraction": 0.4765,
+      "bounds": [
+        51,
+        36,
+        723,
+        611
+      ],
+      "change": "unchanged approved guardian copy"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/guardian-t2-thumb.webp",
+      "dimensions": [
+        180,
+        156
+      ],
+      "bytes": 10164,
+      "sha256": "71ff6dfd3d309dae9fbc67ca4edf7711f90ff3fa8da8cbb76f85828e8d74b053",
+      "original_sha256": "71ff6dfd3d309dae9fbc67ca4edf7711f90ff3fa8da8cbb76f85828e8d74b053",
+      "transparent_fraction": 0.5047,
+      "bounds": [
+        15,
+        8,
+        166,
+        142
+      ],
+      "change": "unchanged approved guardian copy"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/guardian-t2-ui.webp",
+      "dimensions": [
+        768,
+        664
+      ],
+      "bytes": 78072,
+      "sha256": "60baaa95690b6461eb8ad6e48700d924e653e63fef65fa4a9929b1257e8976f3",
+      "original_sha256": "60baaa95690b6461eb8ad6e48700d924e653e63fef65fa4a9929b1257e8976f3",
+      "transparent_fraction": 0.5093,
+      "bounds": [
+        67,
+        37,
+        711,
+        606
+      ],
+      "change": "unchanged approved guardian copy"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/guardian-t3-thumb.webp",
+      "dimensions": [
+        180,
+        156
+      ],
+      "bytes": 10618,
+      "sha256": "330198dfc9f32baa54058fa8ed22491718aa00012fcb9bd97c5681b7e68d9ecf",
+      "original_sha256": "330198dfc9f32baa54058fa8ed22491718aa00012fcb9bd97c5681b7e68d9ecf",
+      "transparent_fraction": 0.4994,
+      "bounds": [
+        14,
+        8,
+        166,
+        143
+      ],
+      "change": "unchanged approved guardian copy"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/guardian-t3-ui.webp",
+      "dimensions": [
+        768,
+        664
+      ],
+      "bytes": 83658,
+      "sha256": "ffd8379ac1cc07ebf58422dff24bc0ebec38a5702bc0f69b0a8eef1be281a25c",
+      "original_sha256": "ffd8379ac1cc07ebf58422dff24bc0ebec38a5702bc0f69b0a8eef1be281a25c",
+      "transparent_fraction": 0.5035,
+      "bounds": [
+        64,
+        37,
+        712,
+        610
+      ],
+      "change": "unchanged approved guardian copy"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/guardian-t4-thumb.webp",
+      "dimensions": [
+        180,
+        156
+      ],
+      "bytes": 10986,
+      "sha256": "55298d08167bfc4214ac91b1dbdf36682d1d351e561beb0898ebe827e9a22963",
+      "original_sha256": "55298d08167bfc4214ac91b1dbdf36682d1d351e561beb0898ebe827e9a22963",
+      "transparent_fraction": 0.4745,
+      "bounds": [
+        11,
+        8,
+        169,
+        146
+      ],
+      "change": "unchanged approved guardian copy"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/guardian-t4-ui.webp",
+      "dimensions": [
+        768,
+        664
+      ],
+      "bytes": 87464,
+      "sha256": "e25a82055ad23272438880b0c816f859a3340b7197945fedb56bc59db4038de5",
+      "original_sha256": "e25a82055ad23272438880b0c816f859a3340b7197945fedb56bc59db4038de5",
+      "transparent_fraction": 0.4795,
+      "bounds": [
+        50,
+        37,
+        723,
+        622
+      ],
+      "change": "unchanged approved guardian copy"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/guardian-t5-thumb.webp",
+      "dimensions": [
+        180,
+        156
+      ],
+      "bytes": 10790,
+      "sha256": "fb5212ff2f0968d7fb12b4c02aa333009d439f37b94df156052d396b949a7e07",
+      "original_sha256": "fb5212ff2f0968d7fb12b4c02aa333009d439f37b94df156052d396b949a7e07",
+      "transparent_fraction": 0.4751,
+      "bounds": [
+        15,
+        8,
+        170,
+        142
+      ],
+      "change": "unchanged approved guardian copy"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/guardian-t5-ui.webp",
+      "dimensions": [
+        768,
+        664
+      ],
+      "bytes": 83732,
+      "sha256": "d3fcdb22b9d1d53e61f00b923463527e1352696c44b324369afa88026c94f3c3",
+      "original_sha256": "d3fcdb22b9d1d53e61f00b923463527e1352696c44b324369afa88026c94f3c3",
+      "transparent_fraction": 0.4789,
+      "bounds": [
+        68,
+        37,
+        725,
+        607
+      ],
+      "change": "unchanged approved guardian copy"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/guardian-t6-thumb.webp",
+      "dimensions": [
+        180,
+        156
+      ],
+      "bytes": 10844,
+      "sha256": "a4c0d996c1e31b223e845219380a5354efedd027d88fb929564b904e41f7bf67",
+      "original_sha256": "a4c0d996c1e31b223e845219380a5354efedd027d88fb929564b904e41f7bf67",
+      "transparent_fraction": 0.4947,
+      "bounds": [
+        10,
+        8,
+        167,
+        144
+      ],
+      "change": "unchanged approved guardian copy"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/guardian-t6-ui.webp",
+      "dimensions": [
+        768,
+        665
+      ],
+      "bytes": 88884,
+      "sha256": "1be0199fbdbe421224bd56fd209338a54d4ea3bb35f2cc3b3bce9ee3da98c642",
+      "original_sha256": "1be0199fbdbe421224bd56fd209338a54d4ea3bb35f2cc3b3bce9ee3da98c642",
+      "transparent_fraction": 0.4998,
+      "bounds": [
+        47,
+        37,
+        713,
+        614
+      ],
+      "change": "unchanged approved guardian copy"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/guardian-t7-thumb.webp",
+      "dimensions": [
+        180,
+        156
+      ],
+      "bytes": 11050,
+      "sha256": "1b65b3e5ab0a473f7eace7ba11153cac84579d92f2434ceb834e4019efb54b30",
+      "original_sha256": "1b65b3e5ab0a473f7eace7ba11153cac84579d92f2434ceb834e4019efb54b30",
+      "transparent_fraction": 0.4865,
+      "bounds": [
+        13,
+        8,
+        168,
+        144
+      ],
+      "change": "unchanged approved guardian copy"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/guardian-t7-ui.webp",
+      "dimensions": [
+        768,
+        664
+      ],
+      "bytes": 93304,
+      "sha256": "79bed1eb7fff142621136ef84733413ef01c2d9ec9c19d12ad07e3c6a8aa3234",
+      "original_sha256": "79bed1eb7fff142621136ef84733413ef01c2d9ec9c19d12ad07e3c6a8aa3234",
+      "transparent_fraction": 0.4908,
+      "bounds": [
+        58,
+        38,
+        720,
+        617
+      ],
+      "change": "unchanged approved guardian copy"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/guardian-t8-thumb.webp",
+      "dimensions": [
+        180,
+        156
+      ],
+      "bytes": 11374,
+      "sha256": "929366471c655da4b5669cdf13b348b390b81b6e51cea28c59742fe23319a24b",
+      "original_sha256": "929366471c655da4b5669cdf13b348b390b81b6e51cea28c59742fe23319a24b",
+      "transparent_fraction": 0.4936,
+      "bounds": [
+        12,
+        8,
+        167,
+        143
+      ],
+      "change": "unchanged approved guardian copy"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/guardian-t8-ui.webp",
+      "dimensions": [
+        768,
+        664
+      ],
+      "bytes": 97988,
+      "sha256": "d70c35efe9614aa9ca4d55bdeb1157aa69a037a4bbdcf30672ca77b66ae735de",
+      "original_sha256": "d70c35efe9614aa9ca4d55bdeb1157aa69a037a4bbdcf30672ca77b66ae735de",
+      "transparent_fraction": 0.4981,
+      "bounds": [
+        54,
+        38,
+        713,
+        609
+      ],
+      "change": "unchanged approved guardian copy"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/guardian-t9-thumb.webp",
+      "dimensions": [
+        180,
+        156
+      ],
+      "bytes": 11874,
+      "sha256": "3a7c4311c47e6548a5eaa3053d57651c5e0bc44644c3c3a8e60163087e09de26",
+      "original_sha256": "3a7c4311c47e6548a5eaa3053d57651c5e0bc44644c3c3a8e60163087e09de26",
+      "transparent_fraction": 0.484,
+      "bounds": [
+        11,
+        8,
+        168,
+        143
+      ],
+      "change": "unchanged approved guardian copy"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/guardian-t9-ui.webp",
+      "dimensions": [
+        768,
+        664
+      ],
+      "bytes": 103614,
+      "sha256": "103ba709aed78869d954a35bea4ad3d5a02e2dc9be8d082af969846ca7fdfc5e",
+      "original_sha256": "103ba709aed78869d954a35bea4ad3d5a02e2dc9be8d082af969846ca7fdfc5e",
+      "transparent_fraction": 0.4882,
+      "bounds": [
+        51,
+        35,
+        718,
+        611
+      ],
+      "change": "unchanged approved guardian copy"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/guardian-thumb.webp",
+      "dimensions": [
+        180,
+        156
+      ],
+      "bytes": 10630,
+      "sha256": "d8692f2a6c3b4ba83e8d27943d4539f5b6a234ed674396ac166f5a684a0ab64a",
+      "original_sha256": "d8692f2a6c3b4ba83e8d27943d4539f5b6a234ed674396ac166f5a684a0ab64a",
+      "transparent_fraction": 0.4973,
+      "bounds": [
+        15,
+        8,
+        166,
+        142
+      ],
+      "change": "unchanged approved guardian copy"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/guardian-ui.webp",
+      "dimensions": [
+        768,
+        664
+      ],
+      "bytes": 78030,
+      "sha256": "21a70869338ed26ff00988bb540f4149b7dff3087b98dd1ef28bfe9703fe41e1",
+      "original_sha256": "21a70869338ed26ff00988bb540f4149b7dff3087b98dd1ef28bfe9703fe41e1",
+      "transparent_fraction": 0.5034,
+      "bounds": [
+        67,
+        38,
+        710,
+        606
+      ],
+      "change": "unchanged approved guardian copy"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/shadow-rider-t1-thumb.webp",
+      "dimensions": [
+        177,
+        180
+      ],
+      "bytes": 11756,
+      "sha256": "fbacdf171645055d16f2d0ce931d6dce3ae044820cd5507ff02ee993cd0d67f9",
+      "original_sha256": "c8de43a066c327ede0d49fc1587ff843c60f538214c32819e357775ecdd019ab",
+      "transparent_fraction": 0.6489,
+      "bounds": [
+        11,
+        11,
+        166,
+        167
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/shadow-rider-t1-ui.webp",
+      "dimensions": [
+        756,
+        768
+      ],
+      "bytes": 97454,
+      "sha256": "09388d90a1a303b924c747926b66e43e45e0037398951c25f99dad79486f6f23",
+      "original_sha256": "c274dbf84503f7be05e878c651dd288db3e3f11e7a5a8573fe77912553136b22",
+      "transparent_fraction": 0.6842,
+      "bounds": [
+        47,
+        48,
+        708,
+        713
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/shadow-rider-t10-thumb.webp",
+      "dimensions": [
+        177,
+        180
+      ],
+      "bytes": 13642,
+      "sha256": "f542023ed290dac9a63fd46e7b0b52158d03adbbf96419f631e8cb0e39745d89",
+      "original_sha256": "2cc1094e224a7dbecb2540751a48952f0a4ec74a1efec9d825b22dcc11bcc071",
+      "transparent_fraction": 0.6331,
+      "bounds": [
+        10,
+        11,
+        167,
+        167
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/shadow-rider-t10-ui.webp",
+      "dimensions": [
+        756,
+        768
+      ],
+      "bytes": 125380,
+      "sha256": "8781d9badcde451792ac869734144dfca5c680ac0da19f742a00fe46c5cadc1f",
+      "original_sha256": "201fda2c713a5023a09a8f5508d058210b517378d951191dc3996cd1db9c282d",
+      "transparent_fraction": 0.6658,
+      "bounds": [
+        44,
+        49,
+        712,
+        715
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/shadow-rider-t2-thumb.webp",
+      "dimensions": [
+        177,
+        180
+      ],
+      "bytes": 12722,
+      "sha256": "c5e23cad39d130f96ec686a0f68e2618eb862c24c1becf2dcb0ec379cf124caf",
+      "original_sha256": "7a57863765665bf57f61c459fa26a61454eb4b2330e9a1b146b7a655dfff0a7f",
+      "transparent_fraction": 0.6402,
+      "bounds": [
+        11,
+        10,
+        166,
+        167
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/shadow-rider-t2-ui.webp",
+      "dimensions": [
+        756,
+        768
+      ],
+      "bytes": 104620,
+      "sha256": "d6a08dd6077b23f13def3a775e90a98c821f01b693bae8214cf6743717cc6ccb",
+      "original_sha256": "e0132ca264ba9c068fba159bbea9f6ec316374e31fc201e6419d6ae7741a7fa0",
+      "transparent_fraction": 0.6781,
+      "bounds": [
+        49,
+        46,
+        706,
+        713
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/shadow-rider-t3-thumb.webp",
+      "dimensions": [
+        177,
+        180
+      ],
+      "bytes": 13038,
+      "sha256": "2ac875c767e089969b1de315262e72a65652efb16488ce9d2706a7db09a11916",
+      "original_sha256": "b683eee6e9b77d958df770989510ff4125ed2cc1092662688b93b431373a6abe",
+      "transparent_fraction": 0.6366,
+      "bounds": [
+        10,
+        10,
+        167,
+        167
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/shadow-rider-t3-ui.webp",
+      "dimensions": [
+        756,
+        768
+      ],
+      "bytes": 108718,
+      "sha256": "f637c2398ce631009930238ffba94d6811b83e88d7da3bfc78c575b1ec99b7fa",
+      "original_sha256": "82c2a9b006bc60a8cd7a16a968786c187441949bc598fa08eb1da1dc120fe7ad",
+      "transparent_fraction": 0.6716,
+      "bounds": [
+        43,
+        45,
+        712,
+        715
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/shadow-rider-t4-thumb.webp",
+      "dimensions": [
+        177,
+        180
+      ],
+      "bytes": 13678,
+      "sha256": "626deff616a7ab71ba4fc839e407a277849a9a94b71347f0f4b277437ecac4ef",
+      "original_sha256": "04177dd78db0de3129c8804bf35f74b035b6dc909c82d9ea10e257ae1944735b",
+      "transparent_fraction": 0.6286,
+      "bounds": [
+        10,
+        10,
+        167,
+        167
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/shadow-rider-t4-ui.webp",
+      "dimensions": [
+        756,
+        768
+      ],
+      "bytes": 120678,
+      "sha256": "e787e994b8a3096e9f42ecda86ae971a6eab47af861ed15e4933cb2243f9b50f",
+      "original_sha256": "1002e9c62a3183db141b164332d6720d49d24bd579abae79faef64de06fc3edc",
+      "transparent_fraction": 0.6624,
+      "bounds": [
+        43,
+        46,
+        712,
+        714
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/shadow-rider-t5-thumb.webp",
+      "dimensions": [
+        177,
+        180
+      ],
+      "bytes": 14222,
+      "sha256": "883781a3246f38fa1b9c92beabce67c6ee0de1cee988035a79c6254ecbeb2a1d",
+      "original_sha256": "62648d712c726f091c0191c16f81d3bd37647f0a270a1ec3b7a3ac3549da701d",
+      "transparent_fraction": 0.6135,
+      "bounds": [
+        8,
+        9,
+        168,
+        168
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/shadow-rider-t5-ui.webp",
+      "dimensions": [
+        756,
+        768
+      ],
+      "bytes": 125574,
+      "sha256": "a11dbad422d05efb31631e19f1ca2b06a183018dda03881f23f6f7aa9c7ee7a7",
+      "original_sha256": "91fd61382b905cc67f37b51a156f96e24050f9c382cb7177fbcabac570bc0bea",
+      "transparent_fraction": 0.6457,
+      "bounds": [
+        36,
+        39,
+        719,
+        718
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/shadow-rider-t6-thumb.webp",
+      "dimensions": [
+        177,
+        180
+      ],
+      "bytes": 13046,
+      "sha256": "e8acb739b940b015c31740c8f1def78d2e09c96e8f130630f334bb0df39d8f6a",
+      "original_sha256": "dc870be174abc078cb184c216c5a573210595fc70710ed0c4cf716a38df92d09",
+      "transparent_fraction": 0.6396,
+      "bounds": [
+        11,
+        10,
+        166,
+        167
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/shadow-rider-t6-ui.webp",
+      "dimensions": [
+        756,
+        768
+      ],
+      "bytes": 112494,
+      "sha256": "24e03941158f7cf40df664acdb01b59c9a88810de2a45b45d612c16b1b26f70b",
+      "original_sha256": "66cd348b190892197ed7ec2ec9f78a4072002abd931005158e0668139874e064",
+      "transparent_fraction": 0.6724,
+      "bounds": [
+        47,
+        45,
+        709,
+        715
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/shadow-rider-t7-thumb.webp",
+      "dimensions": [
+        177,
+        180
+      ],
+      "bytes": 13596,
+      "sha256": "bfcf51e4b0d87fa3a8fc6f881d305c12665f7ab55b41ede5cf9936ccb8c055ab",
+      "original_sha256": "b24b7fcc32110be9750f9cd8d04b6664ca4aaff39fb53653e35ba54792d98403",
+      "transparent_fraction": 0.6381,
+      "bounds": [
+        10,
+        10,
+        166,
+        167
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/shadow-rider-t7-ui.webp",
+      "dimensions": [
+        756,
+        768
+      ],
+      "bytes": 122158,
+      "sha256": "d9f7aa827b63b97c6539e118bfc315c981eaea9022f0c2a7a90f9a45c57db5e1",
+      "original_sha256": "4d7116d840ab6914cd76619b79061ada25b08db78df818de6d3e0d071aa831d7",
+      "transparent_fraction": 0.6689,
+      "bounds": [
+        45,
+        44,
+        711,
+        715
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/shadow-rider-t8-thumb.webp",
+      "dimensions": [
+        177,
+        180
+      ],
+      "bytes": 13510,
+      "sha256": "60ccbe890978b637ed2da42e1ea05ac0b0fec6c83d393abaa369c7682826ff31",
+      "original_sha256": "c560c2fceee644bc9e455d2906e3007c74aad268ec811deb2eed7e4889a10350",
+      "transparent_fraction": 0.6435,
+      "bounds": [
+        11,
+        11,
+        166,
+        167
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/shadow-rider-t8-ui.webp",
+      "dimensions": [
+        756,
+        768
+      ],
+      "bytes": 119312,
+      "sha256": "eb562d327aca772073fe2ce9025d6a431c170d595296ba25b9beb151459dbf5f",
+      "original_sha256": "f709fc676427338fee768620b31c2f6db2c0ae9a4eb67a1dc21fbddc1d4272b6",
+      "transparent_fraction": 0.6758,
+      "bounds": [
+        48,
+        48,
+        708,
+        713
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/shadow-rider-t9-thumb.webp",
+      "dimensions": [
+        177,
+        180
+      ],
+      "bytes": 13932,
+      "sha256": "9594c34937f7cf7faf82d8e3d21c4c550536dc1120d36e553720ea3c129c685d",
+      "original_sha256": "b7ae7e9d20c8c572b4e4f2aa631ff7c46164ff50db8dc04297f1faf507da048f",
+      "transparent_fraction": 0.6395,
+      "bounds": [
+        11,
+        11,
+        166,
+        166
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/shadow-rider-t9-ui.webp",
+      "dimensions": [
+        756,
+        768
+      ],
+      "bytes": 131716,
+      "sha256": "6cd732254fa53dc73f5d199e5aed1b69c338634a33ca28110f8c0bdceb9c38e4",
+      "original_sha256": "8c8d673243ed0ed7c0cc60a4e56debf4c174ac4414e0f98ebcf50a9349af2b9f",
+      "transparent_fraction": 0.6703,
+      "bounds": [
+        45,
+        48,
+        710,
+        711
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/shadow-rider-thumb.webp",
+      "dimensions": [
+        177,
+        180
+      ],
+      "bytes": 12402,
+      "sha256": "771ce8537d6ff4efe5444e7d4841c13fd375d6e858d59efdfea5edb5a77fac28",
+      "original_sha256": "6113cf28a00666ab4ab63026f89b4c14617aadb3837f8195aaea58dacaeab4f4",
+      "transparent_fraction": 0.6449,
+      "bounds": [
+        11,
+        10,
+        166,
+        166
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/shadow-rider-ui.webp",
+      "dimensions": [
+        756,
+        768
+      ],
+      "bytes": 98482,
+      "sha256": "8cf577a0d475af5c0bc6b146542f7d6a8f403037da8534758a44c6d09992a46e",
+      "original_sha256": "3a038184024db36e2ad842459b921351d7c7e5180953c062e70c4db9565ec9d5",
+      "transparent_fraction": 0.6824,
+      "bounds": [
+        49,
+        48,
+        707,
+        710
+      ],
+      "change": "individually corrected imagegen artwork; resize+WebP encode only"
+    }
+  ]
+}

@@ -56,7 +56,7 @@ $structuredData = [
 <meta property="og:url" content="<?= htmlspecialchars($canonical, ENT_QUOTES) ?>"><meta property="og:image" content="<?= htmlspecialchars($socialImage, ENT_QUOTES) ?>">
 <meta property="og:image:width" content="1122"><meta property="og:image:height" content="1402"><meta property="og:image:alt" content="The illustrated fantasy world of Union of Kingdoms">
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="<?= htmlspecialchars($seoTitle, ENT_QUOTES) ?>"><meta name="twitter:description" content="<?= htmlspecialchars($seoDescription, ENT_QUOTES) ?>"><meta name="twitter:image" content="<?= htmlspecialchars($socialImage, ENT_QUOTES) ?>">
-<link rel="preload" as="image" href="<?= $base ?>/assets/art/loading/branded/royal-sunrise-logo-v1.webp" type="image/webp" fetchpriority="high">
+<link rel="preload" as="image" href="<?= $base ?>/assets/art/loading/branded/royal-sunrise-logo-v2.webp" type="image/webp" fetchpriority="high">
 <link rel="stylesheet" href="<?= $base ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR . '/assets/css/fantasy-fonts.css') ?>">
 <link rel="stylesheet" href="<?= $base ?>/assets/css/landing.css?v=<?= filemtime(ROOT_DIR . '/assets/css/landing.css') ?>">
 <link rel="stylesheet" href="<?= $base ?>/assets/css/localization.css?v=<?= filemtime(ROOT_DIR . '/assets/css/localization.css') ?>">
@@ -82,9 +82,9 @@ $structuredData = [
 <main id="main-content" class="lp-main">
   <section class="lp-hero" aria-labelledby="hero-title">
     <div class="lp-hero-picture" data-hero-gallery aria-hidden="true">
-      <img class="lp-hero-slide is-active" src="<?= $base ?>/assets/art/loading/branded/royal-sunrise-logo-v1.webp" width="1672" height="936" alt="" fetchpriority="high">
-      <img class="lp-hero-slide" src="<?= $base ?>/assets/art/loading/branded/heroes-monsters-logo-v1.webp" width="1672" height="936" alt="" loading="lazy">
-      <img class="lp-hero-slide" src="<?= $base ?>/assets/art/loading/branded/moonlit-kingdom-logo-v1.webp" width="1672" height="936" alt="" loading="lazy">
+      <img class="lp-hero-slide is-active" src="<?= $base ?>/assets/art/loading/branded/royal-sunrise-logo-v2.webp" width="1672" height="936" alt="" fetchpriority="high">
+      <img class="lp-hero-slide" src="<?= $base ?>/assets/art/loading/branded/heroes-monsters-logo-v2.webp" width="1672" height="936" alt="" loading="lazy">
+      <img class="lp-hero-slide" src="<?= $base ?>/assets/art/loading/branded/moonlit-kingdom-logo-v2.webp" width="1672" height="936" alt="" loading="lazy">
     </div>
     <div class="lp-hero-content">
       <p class="lp-kicker"><span>In your browser</span><i aria-hidden="true">·</i><span>no download</span></p>
@@ -102,7 +102,7 @@ $structuredData = [
   <?php require ROOT_DIR . '/views/partials/landing-game-guide.php'; ?>
 
   <section id="zugang" class="lp-access" aria-labelledby="access-title" tabindex="-1">
-    <div class="lp-access-character lp-access-character-left" aria-hidden="true"><img src="<?= $base ?>/assets/art/characters/fantasy-troops-v2/guardian-t10-ui.webp" alt=""></div>
+    <div class="lp-access-character lp-access-character-left" aria-hidden="true"><img src="<?= $base ?>/assets/art/characters/fantasy-troops-v3/guardian-ui.webp" alt=""></div>
     <div class="lp-auth-card" data-auth-card data-access-mode="waitlist">
       <div class="lp-auth-heading">
         <p class="lp-auth-badge">Closed alpha</p>
@@ -140,7 +140,7 @@ $structuredData = [
         <div class="lp-auth-footer lp-key-link"><a href="https://play.unionofkingdoms.com/?mode=register"><?= $wt('redeem') ?></a></div>
       </div>
     </div>
-    <div class="lp-access-character lp-access-character-right" aria-hidden="true"><img src="<?= $base ?>/assets/art/characters/fantasy-troops-v2/fire-archer-t10-ui.webp" alt=""></div>
+    <div class="lp-access-character lp-access-character-right" aria-hidden="true"><img src="<?= $base ?>/assets/art/characters/fantasy-troops-v3/fire-archer-ui.webp" alt=""></div>
   </section>
 </main>
 

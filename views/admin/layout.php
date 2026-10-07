@@ -38,7 +38,7 @@ $newBugCount=(int)$db->query("SELECT COUNT(*) FROM bug_reports WHERE world_id=? 
     <?php foreach([
         'Start'=>['dashboard'=>['','Übersicht','hud/city.svg'],'analytics'=>['/analytics','Statistiken','hud/reports.svg']],
         'Spielinhalte'=>['rewards'=>['/rewards','Beute & Drops','items/chest-gold.svg'],'items'=>['/items','Gegenstände','hud/inventory.svg'],'world_create'=>['/world-create','Welt erstellen','hud/city.svg'],'world'=>['/world','Welten & Spawns','hud/world.svg'],'lands'=>['/lands','Länder & Entwicklung','hud/world.svg']],
-        'Gemeinschaft'=>array_merge(['alpha_keys'=>['/alpha-keys','Alpha-Keys','items/scroll.svg']],$canEdit?['alpha_waitlist'=>['/alpha-waitlist','Alpha-E-Mails','hud/reports.svg']]:[],['players'=>['/players','Spieler & Geschenke','knight.png'],'alliances'=>['/alliances','Allianzen','hud/alliance.svg'],'chat'=>['/chat','Chatprotokoll','hud/reports.svg'],'bug_reports'=>['/bug-reports','Bugmeldungen'.($newBugCount?' · '.$newBugCount:''),'menu-icons/bug-report.png']]),
+        'Gemeinschaft'=>array_merge(['alpha_keys'=>['/alpha-keys','Alpha-Keys','items/scroll.svg']],$canEdit?['alpha_waitlist'=>['/alpha-waitlist','Alpha-E-Mails','hud/reports.svg']]:[],['players'=>['/players','Spieler & Geschenke','knight.png'],'alliances'=>['/alliances','Allianzen','hud/alliance.svg'],'chat'=>['/chat','Chatprotokoll','hud/reports.svg'],'bug_reports'=>['/bug-reports','Bugmeldungen'.($newBugCount?' · '.$newBugCount:''),'menu-icons-v2/bug-report.png']]),
         'Oberfläche'=>['layout_editor'=>['/layout','Layout-Editor','hud/city.svg']],
         'Verlauf'=>['audit'=>['/audit','Änderungsprotokoll','hud/quest.svg']]
     ] as $group=>$links): ?><div class="nav-caption"><?= ah($group) ?></div>
