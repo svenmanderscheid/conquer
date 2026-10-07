@@ -27,7 +27,7 @@ final class RallyCapacity
             'next_total'=>$next===null?null:self::total(self::base($next),$bonus)];
     }
 
-    /** A city identifies both the owner and the world whose research applies. */
+    /** A city identifies the owner and world whose research, talents and VIP apply. */
     public static function forCity(int $playerId,int $cityId): array
     {
         $city=Connection::getInstance()->query("SELECT c.world_id,COALESCE(b.level,1) AS hall_level FROM cities c LEFT JOIN city_buildings b ON b.city_id=c.id AND b.building_code='hall_of_alliance' WHERE c.id=? AND c.player_id=?",[$cityId,$playerId])->fetch();

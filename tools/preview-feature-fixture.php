@@ -86,7 +86,7 @@ try{
   foreach([10102021,10102031,10202010,10202011] as $code)$db->execute('INSERT INTO player_inventory(player_id,item_code,quantity) VALUES(1,?,5) ON DUPLICATE KEY UPDATE quantity=5',[$code]);
   foreach(['construction_speed'=>10102021,'research_speed'=>10102031] as $type=>$code)$db->execute("INSERT INTO player_charms_active(player_id,stat_category,grade,charm_code,bonus_pct,expires_at) VALUES(1,?,'normal',?,25,DATE_ADD(UTC_TIMESTAMP(),INTERVAL 8 HOUR))",[$type,$code]);
   $db->execute("INSERT INTO active_buffs(player_id,buff_type,multiplier,expires_at) VALUES(1,'research_boost',1.25,DATE_ADD(UTC_TIMESTAMP(),INTERVAL 8 HOUR))");
-  \Conquer\Game\Vip\VipService::setPoints(1,200000,1);
+  \Conquer\Game\Vip\VipService::setPoints(1,150000,1);
   \Conquer\Game\World\WorldContext::bind(1);
   foreach([10102001] as $code){
    \Conquer\Game\Inventory\InventoryService::addItems(1,$code,1);

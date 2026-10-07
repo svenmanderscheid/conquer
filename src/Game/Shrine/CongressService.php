@@ -212,7 +212,7 @@ final class CongressService
 
     private static function casualties(array $troops,float $rate,array $buffs=[],array $enemyTroops=[]): array
     {
-        $out=['survivors'=>[],'wounded'=>[],'dead'=>[]];foreach($troops as $code=>$count){$factor=\Conquer\Game\Player\TalentEffects::lossFactor($buffs,ResearchEffects::troopType((int)$code),$enemyTroops);$lost=min($count,(int)round($count*$rate*$factor));$wounded=(int)floor($lost*.3);$out['survivors'][$code]=$count-$lost;$out['wounded'][$code]=$wounded;$out['dead'][$code]=$lost-$wounded;}return $out;
+        $out=['survivors'=>[],'wounded'=>[],'dead'=>[]];foreach($troops as $code=>$count){$factor=\Conquer\Game\Player\TalentEffects::lossFactor($buffs,ResearchEffects::troopType((int)$code),$enemyTroops);$lost=min($count,(int)round($count*$rate*$factor));$wounded=\Conquer\Game\March\PvpRules::woundedCount($lost,$buffs);$out['survivors'][$code]=$count-$lost;$out['wounded'][$code]=$wounded;$out['dead'][$code]=$lost-$wounded;}return $out;
     }
 
     private static function returnMarch(Connection $db,array $march,array $troops,string $reason): void

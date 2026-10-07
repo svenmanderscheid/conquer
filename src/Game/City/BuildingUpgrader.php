@@ -13,7 +13,7 @@ use Conquer\Db\Connection;
  * Validation order:
  *   1. Building code must be valid
  *   2. Building must not already be at max level (30)
- *   3. No other upgrade in progress (1 slot; 2 at VIP 4+)
+ *   3. No other upgrade in progress (1 slot; 2 at VIP 5+)
  *   4. Non-castle buildings cannot exceed castle level
  *   5. Resources must be sufficient (after applying production tick)
  *
@@ -66,7 +66,7 @@ final class BuildingUpgrader
         $db = Connection::getInstance();
 
         // 3. Queue slot available?
-        $maxSlots = $vipLevel >= 4 ? 2 : 1;
+        $maxSlots = \Conquer\Game\Vip\VipService::buildingSlots($vipLevel);
         $activeCount = (int) $db->query(
             'SELECT COUNT(*) FROM building_queue WHERE city_id = ? AND is_processed = 0',
             [$cityId],
@@ -74,7 +74,7 @@ final class BuildingUpgrader
 
         if ($activeCount + BuildingPlotService::busy($cityId) >= $maxSlots) {
             $msg = $maxSlots === 1
-                ? 'A building is already being upgraded. Reach VIP 4 to unlock a second slot.'
+                ? \Conquer\Game\Locale::t('vip.build_slot_required')
                 : 'Both building queue slots are occupied.';
             throw new \RuntimeException($msg);
         }

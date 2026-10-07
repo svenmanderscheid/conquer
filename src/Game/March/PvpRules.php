@@ -29,11 +29,17 @@ final class PvpRules
         foreach ($troops as $code=>$count) {
             $factor=\Conquer\Game\Player\TalentEffects::lossFactor($buffs,ResearchEffects::troopType((int)$code),$enemyTroops);
             $lost = min((int)$count, (int)ceil($count * max(0, $rate)*$factor-1e-8));
-            $wounded = (int)floor($lost * .3);
+            $wounded = self::woundedCount($lost, $buffs);
             $result['survivors'][$code] = $count - $lost;
             $result['wounded'][$code] = $wounded;
             $result['dead'][$code] = $lost - $wounded;
         }
         return $result;
+    }
+
+    /** VIP reduces the death share by percentage points, preserving total casualties. */
+    public static function woundedCount(int $lost, array $buffs): int
+    {
+        return (int)floor(max(0,$lost) * min(1.0,.3+max(0.0,(float)($buffs['mortality_reduction']??0)))+1e-8);
     }
 }

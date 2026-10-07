@@ -493,7 +493,7 @@
         const b = state.buildings[code], q = state.build_queue.find(q=>q.building_code===code),resource={farm:'food',lumber_camp:'lumber',quarry:'stone',gold_mine:'gold'}[code];
         const previousHall=code==='hall_of_alliance'&&$('#game-dialog').open&&$('#game-dialog').dataset.building===code?{scroll:$('#game-dialog .levelup-scroll')?.scrollTop||0,expanded:!!$('#game-dialog .hall-capacity-levels')?.open,focused:document.activeElement?.matches('.hall-capacity-levels>summary')}:null;
         const requirements = Object.entries(b.requirements).filter(([k,v]) => state.buildings[k].level < v);
-        const slotsFull = state.build_queue.length >= (state.vip.building_slots ?? (state.vip.level >= 4 ? 2 : 1));
+        const slotsFull = state.build_queue.length >= (state.vip.building_slots ?? 1);
         const locked = (b.item_requirements||[]).some(item=>!item.met) || requirements.length || slotsFull || !canAfford(b.cost) || b.level >= 30;
         const stats=code==='hall_of_alliance'?allianceHallCapacity(b):[b.progression?levelupStat(b.progression.label,fmt(b.progression.current),b.level<30?fmt(b.progression.next):null):'',b.production?levelupStat('Produktionslager',fmt(state.storage_caps?.[resource])):'',b.production?levelupStat('Produktion je Stunde',fmt(b.production)):'' ].join('');
         const itemRows=window.ConquerRequirements.missingFirst(b.item_requirements||[]).map(item=>`<div class="levelup-item-row ${item.met?'is-ready':'is-missing'}"><span class="levelup-check" aria-hidden="true">${item.met?'✓':'!'}</span><strong>${esc(item.name)}</strong><span class="levelup-resource-values"><b>${fmt(item.owned)}</b><i>/</i>${fmt(item.count)}</span>${window.ConquerRequirements.quantityFeedback(item.name,item.owned,item.count)}</div>`).join('');

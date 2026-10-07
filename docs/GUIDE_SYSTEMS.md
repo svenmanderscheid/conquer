@@ -47,4 +47,4 @@ Separater Testbefund: `tests/world_footprint.cjs` scheitert in seiner unverände
 
 ## Noch offen aus dem Vergleich
 
-Allianz-Münzen/Shop, funktionaler Wachturm, mehrere unabhängig ausbaubare Gebäude/Außenbauplätze und regionale Landentwicklung sind eigenständige weitere Schritte. Ebenso offen bleiben eine wirksame Hospital-Kapazitätsregel, die vollständige Einführung bis zur Allianzinteraktion sowie Entscheidungen über VIP-Meilensteine, Truhenskalierung und Lord-Levelbelohnungen. Die drei regulären Marschplätze und der zweite Bauplatz ab VIP 4 bleiben vorerst bestehen.
+Allianz-Münzen/Shop, funktionaler Wachturm, mehrere unabhängig ausbaubare Gebäude/Außenbauplätze und regionale Landentwicklung sind eigenständige weitere Schritte. Ebenso offen bleiben eine wirksame Hospital-Kapazitätsregel, die vollständige Einführung bis zur Allianzinteraktion sowie Entscheidungen über VIP-Meilensteine, Truhenskalierung und Lord-Levelbelohnungen. Die drei regulären Marschplätze erhalten ab VIP 6 einen zusätzlichen Platz und ab VIP 18 einen zweiten. Der zweite Bauplatz wird ab VIP 5 freigeschaltet; die vollständige aktuelle Tabelle steht in VIP_SYSTEM.md.

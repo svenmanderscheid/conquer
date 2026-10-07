@@ -5472,7 +5472,7 @@ body.mobile-game :is(#panel-dialog,#game-dialog,.map-overlay-panel) :is(
   .subtab.active,.inventory-tab.active,.inventory-category-tabs .active,.trading-tabs .active,
   .treasury-tabs .active,.treasury-main-tabs .active,.community-tabs .active,.dungeon-tabs .active,
   .rt-branch.is-selected,.army-tier-tabs .selected,.profile-nav.active,.vip-tabs [aria-pressed=true],
-  .skin-category-tabs [aria-pressed=true],.event-simple-tabs [aria-pressed=true]
+  .vip-level-picker [aria-pressed=true],.skin-category-tabs [aria-pressed=true],.event-simple-tabs [aria-pressed=true]
 ) {
   background:var(--ui-paper) var(--ui-selected-surface)!important;color:var(--ui-head-ink)!important;
   border-color:var(--ui-primary-dark)!important;box-shadow:inset 0 2px var(--ui-primary-highlight),0 3px 0 var(--ui-primary-edge)!important;

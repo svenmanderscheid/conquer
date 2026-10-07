@@ -85,7 +85,7 @@ window.ConquerBeginnerGuide = function(ctx) {
         const ready={ready:true,reason:'Jetzt möglich'},waiting={ready:false,reason:'Ein passender Auftrag läuft bereits.'};
         const affordable=cost=>cost&&Object.entries(cost).every(([resource,amount])=>Number(s.city?.[resource]||0)>=Number(amount));
         if(['castle','production'].includes(goal.id)){
-            const queued=s.build_queue||[],slots=Number(s.vip?.building_slots??(Number(s.vip?.level)>=4?2:1));
+            const queued=s.build_queue||[],slots=Number(s.vip?.building_slots??1);
             if(queued.length+(s.plot_queue||[]).length>=slots)return waiting;
             const candidate=(code,visited=new Set())=>{
                 const b=s.buildings[code];if(!b||visited.has(code)||queued.some(q=>q.building_code===code))return null;

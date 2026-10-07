@@ -12,6 +12,8 @@ const root=path.resolve(__dirname,'..'),output=path.join(root,'artifacts','vip-w
   await new Promise((resolve,reject)=>{const timer=setTimeout(()=>{clearInterval(poll);reject(Error(log||'Fixture timeout'));},60000),poll=setInterval(()=>{if(log.includes('Synthetic preview ready')){clearTimeout(timer);clearInterval(poll);resolve();}else if(fixture.exitCode!==null){clearTimeout(timer);clearInterval(poll);reject(Error(log));}},100);});
   browser=await chromium.launch({headless:true,executablePath:process.env.BROWSER_EXECUTABLE_PATH||'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'});
   fs.mkdirSync(output,{recursive:true});
+  // Optional focused run omits the independent registration-page checks.
+  if(!process.env.VIP_WORLD_ONLY){
   const registrationContext=await browser.newContext({viewport:{width:390,height:844},hasTouch:true}),registration=await registrationContext.newPage();
   await registration.goto(base+'/?mode=register');assert.equal(await registration.locator('[name=world_id]').inputValue(),'1');
   await registration.goto(base+'/?mode=register&world_id=2');assert.equal(await registration.locator('[name=world_id]').inputValue(),'2');
@@ -28,6 +30,7 @@ const root=path.resolve(__dirname,'..'),output=path.join(root,'artifacts','vip-w
    }
   }
   await registrationContext.close();
+  }
   const page=await browser.newPage({viewport:{width:390,height:844},hasTouch:true}),errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto(base+'/?zugang=login');await page.locator('[name=identifier], [name=username]').first().fill('PreviewPlayer');await page.locator('[name=password]').fill('PreviewFixture!2026');
   await Promise.all([page.waitForURL('**/city'),page.locator('form[action$="/auth/local"] button[type=submit]').click()]);
@@ -36,7 +39,7 @@ const root=path.resolve(__dirname,'..'),output=path.join(root,'artifacts','vip-w
   const state=async()=> (await (await page.request.get(base+'/api/kingdom/state')).json()).data;
   const worlds=async()=>{await close();await page.locator('#hud-menu').tap();await page.locator('#game-dialog [data-action=dialog-tab][data-id=worlds]').tap();await page.locator('.world-selector').waitFor();};
   await ready();await close();
-  let snapshot=await state();assert.equal(snapshot.vip.world_id,1);assert.equal(snapshot.vip.points,1000);assert.equal(snapshot.vip.level,3);
+  let snapshot=await state();assert.equal(snapshot.vip.world_id,1);assert.equal(snapshot.vip.points,1000);assert.equal(snapshot.vip.level,4);
   await page.locator('#hud-vip-button').tap();await page.locator('.vip-note').waitFor();
   assert.equal(await page.locator('.vip-note').innerText(),JSON.parse(fs.readFileSync(path.join(root,'data/i18n/en.json'),'utf8'))['vip.world_scope']);
   let responsePromise=page.waitForResponse(r=>r.url().endsWith('/api/kingdom/action')&&r.request().postDataJSON()?.action==='vip.daily');
@@ -50,10 +53,10 @@ const root=path.resolve(__dirname,'..'),output=path.join(root,'artifacts','vip-w
   snapshot=await state();assert.equal(snapshot.vip.points,2010);assert.equal(snapshot.inventory.find(i=>i.item_code===10206002).quantity,1);
   await worlds();assert(await page.locator('[data-action=worlds-select][data-world="3"]').isDisabled());
   await Promise.all([page.waitForURL('**/city#city'),page.locator('[data-action=worlds-select][data-world="2"]').tap()]);await ready();
-  snapshot=await state();assert.equal(snapshot.vip.world_id,2);assert.equal(snapshot.vip.points,200);assert.equal(snapshot.vip.daily_claimed,false);assert(!snapshot.inventory.some(i=>i.item_code===10206002));
+  snapshot=await state();assert.equal(snapshot.vip.world_id,2);assert.equal(snapshot.vip.points,0);assert.equal(snapshot.vip.daily_claimed,false);assert(!snapshot.inventory.some(i=>i.item_code===10206002));
   await close();await page.locator('#hud-vip-button').tap();await page.locator('.vip-note').waitFor();assert.equal(await page.locator('#hud-vip-button [data-vip-level]').textContent(),'1');
   responsePromise=page.waitForResponse(r=>r.url().endsWith('/api/kingdom/action')&&r.request().postDataJSON()?.action==='vip.daily');
-  await page.locator('[data-action=vip-daily]').tap();assert.equal((await responsePromise).status(),200);await page.locator('.vip-claimed').waitFor();assert.equal((await state()).vip.points,210);
+  await page.locator('[data-action=vip-daily]').tap();assert.equal((await responsePromise).status(),200);await page.locator('.vip-claimed').waitFor();assert.equal((await state()).vip.points,10);
   const oldWorld=await page.request.post(base+'/api/kingdom/action',{headers,data:{action:'inventory.use',item_code:10206002,quantity:1,expected_world_id:1,operation_key:'browser-old-world-vip'}});assert.equal(oldWorld.status(),409);
   const denied=await page.request.post(base+'/api/worlds/action',{headers:{...headers,'X-World-ID':'2'},data:{action:'join',world_id:3,expected_world_id:2,request_id:'browser-no-extra-village'}});assert.equal(denied.status(),409);
   fs.mkdirSync(output,{recursive:true});

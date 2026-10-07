@@ -55,6 +55,7 @@ final class FeatureDatabase
             foreach(['0119_world_map_profiles.sql','0120_territory_conquest.sql','0121_community_social.sql','0122_alliance_community.sql','0123_community_news.sql','0126_extra_event_button.sql','0127_alpha_entry_and_missions.sql','0128_completion_report_preferences.sql','0129_world_vip.sql','0130_hunter_constellations.sql','0131_melusina_dungeon.sql','0132_dungeon_entrances.sql','0133_welcome_events.sql','0134_action_points_overflow.sql'] as $migration){
                 \Conquer\Db\MigrationSql::apply(\Conquer\Db\Connection::getInstance()->getPdo(),(string)file_get_contents(ROOT_DIR.'/migrations/'.$migration));
             }
+            \Conquer\Db\MigrationSql::apply(\Conquer\Db\Connection::getInstance()->getPdo(),(string)file_get_contents(ROOT_DIR.'/migrations/0135_vip_benefits.sql'));
             // The cloned source may already contain 0107. Replay its additive
             // columns independently in this disposable schema, not in the user DB.
             foreach(["report_type ENUM('bug','idea') NOT NULL DEFAULT 'bug' AFTER world_id",'screenshot MEDIUMBLOB NULL AFTER client_context',"screenshot_mime VARCHAR(32) NOT NULL DEFAULT '' AFTER screenshot"] as $column){

@@ -77,7 +77,7 @@ window.ConquerOverlay = function (ctx) {
         $('hud-hunter-fill').style.width=`${hunterMax?100:Math.min(100,hunterXp/hunterNext*100)}%`;
         hunter.setAttribute('aria-label',profile?(hunterMax?`Hunter-Stufe ${level}, Höchststufe erreicht. Hunter-Talente öffnen`:`Hunter-Stufe ${level}, ${fmt(hunterXp)} von ${fmt(hunterNext)} Jagd-XP. Hunter-Talente öffnen`):'Hunter-Fortschritt wird geladen');
         const second=$('hud-build-second'),slots=Number(kingdom?.vip?.building_slots||state.vip?.building_slots||1),unlocked=slots>1;
-        if(second){second.dataset.action=unlocked?'buildings':'vip-open';second.classList.toggle('is-locked',!unlocked);second.setAttribute('aria-label',unlocked?'Zweite Bauschleife öffnen':'Zweite Bauschleife wird mit VIP 4 freigeschaltet');}
+        if(second){second.dataset.action=unlocked?'buildings':'vip-open';second.classList.toggle('is-locked',!unlocked);second.setAttribute('aria-label',unlocked?'Zweite Bauschleife öffnen':window.ConquerLocale.t('vip.build_slot_locked'));}
         $('hud-march-status').textContent = `${state.marches?.length || 0} / ${(state.army_limits?.march_slots || 3)+(state.army_limits?.gather_march_slots || 0)+(state.army_limits?.hunt_march_slots || 0)}`;
         $('hud-marches')?.classList.toggle('has-activity',!!state.marches?.length);
         rallyAlert();
@@ -108,7 +108,7 @@ window.ConquerOverlay = function (ctx) {
         const timed = Number.isFinite(end);
         const status = row ? (timed && end <= now() ? 'finishing' : 'active') : locked ? 'locked' : loading ? 'loading' : 'idle';
         const stateText = {active:'Läuft',finishing:'Abschluss',locked:'Gesperrt',loading:'Lädt …',idle:'Bereit'}[status];
-        const time = row ? (status === 'finishing' ? 'Wird bestätigt' : timed ? clock(row.finishes_at) : 'Zeit offen') : locked ? 'Ab VIP 4' : loading ? 'Bitte warten' : 'Auftrag starten';
+        const time = row ? (status === 'finishing' ? 'Wird bestätigt' : timed ? clock(row.finishes_at) : 'Zeit offen') : locked ? window.ConquerLocale.t('vip.build_slot_from') : loading ? 'Bitte warten' : 'Auftrag starten';
         const progress = timed && Number.isFinite(start) && end > start ? Math.max(0,Math.min(1,(now()-start)/(end-start))) : null;
         button.dataset.jobState = status;
         button.classList.toggle('has-activity', Boolean(row));

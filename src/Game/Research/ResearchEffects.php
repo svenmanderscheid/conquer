@@ -59,7 +59,7 @@ final class ResearchEffects
         return [
             'cost' => array_map(static fn($amount)=>$amount*$factor,$cost),
             'speed_multiplier' => max(.05, (1 + (float)($buffs['training_speed'] ?? 0) + (float)($buffs[$type.'_training_speed'] ?? 0)) * $boost),
-            'max_count' => self::wholeCount((float)($buffs['base_'.$type.'_training_amount']??$buffs['base_training_amount']??500) * (1 + max(0.0, (float)($buffs[$type.'_training_amount'] ?? 0)))),
+            'max_count' => self::wholeCount((float)($buffs['base_'.$type.'_training_amount']??$buffs['base_training_amount']??500) * (1 + max(0.0, (float)($buffs[$type.'_training_amount'] ?? 0) + (float)($buffs['training_amount'] ?? 0)))),
         ];
     }
 

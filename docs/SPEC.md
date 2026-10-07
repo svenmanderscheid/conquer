@@ -421,7 +421,7 @@ Golden pillars are excluded from Union of Kingdoms (decision: 30 September 2026)
 
 ### 4.3 Upgrade rules
 
-- **One build slot at a time** by default. A second slot is unlocked via **VIP 4+** (the "Additional Building Queue" benefit).
+- **One build slot at a time** by default. A second slot is unlocked via **VIP 5+** (the "Additional Building Queue" benefit).
 - Resources are consumed at the moment construction starts.
 - Cancelling a build returns 50% of resources [DEFAULT].
 - An upgrade can be instant-completed using GEMS or Speedup items.
@@ -2310,7 +2310,7 @@ The Treasure Goblin is a **newly designed monster** (not in the LoK source data)
 
 **F2P value analysis:**
 
-A diligent F2P player kills ~3-5 Goblins per day (Lv 3 average): **3-15 hours of Build SP per day**. Over 12 months (~365 days) = **~1,100 to 5,500 hours of Build SP**. Cumulative Castle L1→L30 build time at Speed 1.0 is about 155 days before construction bonuses and speedups; the final Castle upgrade alone is 30 days. With two build queues (VIP 4), event rewards and the 12-month real time available, F2P Castle L30 + T5 remains feasible. ✓
+A diligent F2P player kills ~3-5 Goblins per day (Lv 3 average): **3-15 hours of Build SP per day**. Over 12 months (~365 days) = **~1,100 to 5,500 hours of Build SP**. Cumulative Castle L1→L30 build time at Speed 1.0 is about 155 days before construction bonuses and speedups; the final Castle upgrade alone is 30 days. With two build queues (VIP 5), event rewards and the 12-month real time available, F2P Castle L30 + T5 remains feasible. ✓
 
 ### 14.14 Charm drops by Monster
 
@@ -2679,18 +2679,20 @@ Bonuses are unlocked progressively. Many benefits start showing at low levels an
 | Research Speed | VIP 3 (+3%) | +100% |
 | Construction Speed | VIP 3 (+3%) | +100% |
 | Action Point Regeneration | VIP 4 (+3%) | +70% |
-| Additional Building Queue | VIP 4 | UNLOCK |
+| Additional Building Queue | VIP 5 | UNLOCK |
 | Troop Limit | VIP 6 (+5%) | +30% |
 | Marching Troop Capacity | VIP 6 (5,000) | +45,000 |
 | Troop Dispatch Queue | VIP 6 | +1 (extra march slot) |
 | Mortality Reduction | VIP 7 (5%) | 30% |
-| Action Point items | VIP 8 | UNLOCK (use AP items from inventory) |
+| Maximum Action Points | VIP 8 (+10) | +80 |
 | Troops Training Speed | VIP 9 (+5%) | +25% |
 | Troops Training Cost | VIP 9 (-5%) | -25% |
 | Troops Training Amount | VIP 9 (+5%) | +25% |
-| Troop Dispatch Queue (2nd) | VIP 17 | +1 (5 march slots total) |
+| Troop Dispatch Queue (2nd) | VIP 18 | +1 (5 march slots total) |
 | Maximum Troop Size for Rally | VIP 16 (+5%) | +20% |
 | Mastery Points | per level (1 → 19) | for Mastery system [Phase 3+] |
+
+The full approved per-level table and current gameplay contracts are recorded in [VIP_SYSTEM.md](VIP_SYSTEM.md) (7 October 2026). New profiles start at zero points; existing point totals are preserved and levels follow the revised thresholds.
 
 ### 17.5 VIP integration into buff stack
 

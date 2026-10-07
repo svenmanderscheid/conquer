@@ -44,8 +44,9 @@ final class ActionPoints
             if(!$row)throw new \RuntimeException('Player not found.');
             $saved=$db->query('SELECT rate,fraction FROM player_ap_regeneration WHERE player_id=?',[$playerId])->fetch()?:['rate'=>1,'fraction'=>0];
             $bonuses=MasteryService::bonuses($playerId);
-            $rate=1+max(0,(float)($bonuses['talent_ap_regen']??0));
-            $maximum=self::MAX_AP+max(0,(int)($bonuses['talent_max_ap']??0));
+            $vip=\Conquer\Game\Vip\VipService::status($playerId)['bonuses'];
+            $rate=1+max(0,(float)($bonuses['talent_ap_regen']??0))+$vip['action_point_regeneration']/100;
+            $maximum=self::MAX_AP+max(0,(int)($bonuses['talent_max_ap']??0))+$vip['action_points'];
             $elapsed=max(0,time()-strtotime($row['last_ap_regen'].' UTC'));
             $stored=max(0,(int)$row['action_points']);
             // Full or overfilled balances keep their value without banking regeneration.

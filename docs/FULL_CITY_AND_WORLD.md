@@ -206,7 +206,7 @@ Geprüft wurden Syntax, vollständiger Szenenaufbau, Gesamtansicht und Nahansich
 
 ### Mobile Sammlungen, Ränge und Bauschleifen – 12. September 2026
 
-VIP und Hunter-Stufe stehen als kompakte Rangschilder direkt beim Profil. Die frühere Bezeichnung Lord-Stufe heißt in allen sichtbaren Profil- und Talentansichten Hunter-Stufe. Unter den Aktionspunkten zeigt die linke Stadtleiste zwei getrennte Bauschleifen. Bauen II liest die echte VIP-Freischaltung; vor VIP 4 führt der gesperrte Platz zur VIP-Ansicht, danach zeigt er den zweiten laufenden Bauauftrag oder „Bereit“.
+VIP und Hunter-Stufe stehen als kompakte Rangschilder direkt beim Profil. Die frühere Bezeichnung Lord-Stufe heißt in allen sichtbaren Profil- und Talentansichten Hunter-Stufe. Unter den Aktionspunkten zeigt die linke Stadtleiste zwei getrennte Bauschleifen. Bauen II liest die echte VIP-Freischaltung; vor VIP 5 führt der gesperrte Platz zur VIP-Ansicht, danach zeigt er den zweiten laufenden Bauauftrag oder „Bereit“.
 
 Inventar und Reliktsammlung verwenden keine Seiten mehr. Die vorhandenen Kategorien und Reliktansichten bleiben erhalten, während die kleineren Karten in einer durchgehenden, vertikal scrollbaren Sammlung stehen. Vorhandene Gegenstände und Relikte erscheinen zuerst und sind innerhalb dieser Gruppe nach Stufe absteigend geordnet. Noch nicht vorhandene Inhalte folgen gedimmt und entsättigt, bleiben aber für ihre Detailinformationen auswählbar.
 

@@ -40,15 +40,15 @@ try{
     $migration=(string)file_get_contents(ROOT_DIR.'/migrations/0129_world_vip.sql');
     MigrationSql::apply($db->getPdo(),$migration);
     wv(VipService::status(1,2)['points']===200000&&VipService::status(1,2)['daily_claimed'],'legacy progress and daily claim are preserved once');
-    wv(VipService::status(1,1)['points']===200&&VipService::status(1,1)['level']===1&&!VipService::status(1,1)['daily_claimed'],'other legacy village starts its own VIP 1');
+    wv(VipService::status(1,1)['points']===200&&VipService::status(1,1)['level']===2&&!VipService::status(1,1)['daily_claimed'],'other legacy village preserves its original 200 points');
     wv(InventoryService::quantity(1,10106001,2)===3&&InventoryService::quantity(1,10106001,1)===0,'legacy VIP packs follow the oldest village only');
     wv(InventoryService::quantity(1,10103003,1)===2&&InventoryService::quantity(1,10103003,2)===2,'other inventory retains its previous scope');
     wv((int)$db->query("SELECT scope_world_id FROM trading_shop_purchases WHERE player_id=1 AND shop_mode='vip'")->fetchColumn()===2,'legacy VIP stock belongs to the preserved world');
     wv(VipService::status(1,3)['points']===0,'an unjoined world has no VIP progress');
     wvReject(fn()=>VipService::addPoints(1,100,3),'points cannot create a village in an unjoined world');
     wvReject(fn()=>InventoryService::addItems(1,10106001,1,3),'VIP items cannot be granted in an unjoined world');
-    wv(MasteryService::snapshot(1,2)['points_from_vip']===9&&MasteryService::snapshot(1,1)['points_from_vip']===0,'VIP Hunter allowance stays in its world');
-    wv(abs(BuffEngine::getBuffs(1,2)['research_speed']-.25)<1e-9&&abs(BuffEngine::getBuffs(1,1)['research_speed'])<1e-9,'background bonus calculations use the explicit world');
+    wv(MasteryService::snapshot(1,2)['points_from_vip']===10&&MasteryService::snapshot(1,1)['points_from_vip']===1,'VIP Hunter allowance stays in its world');
+    wv(abs(BuffEngine::getBuffs(1,2)['research_speed']-.30)<1e-9&&abs(BuffEngine::getBuffs(1,1)['research_speed'])<1e-9,'background bonus calculations use the explicit world');
     $city=WorldContext::city(1,1);$db->execute('UPDATE cities SET food=0,last_resource_update=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 1 HOUR) WHERE id=20');
     ResourceTick::persist($city,['farm'=>['level'=>1]]);
     $rate=\Conquer\Game\City\BuildingData::getHourlyRate('farm',1,VipService::bonuses(1));
@@ -80,14 +80,14 @@ try{
     wv(VipService::status(1,1)['points']===1210&&VipService::status(1,2)['points']===200000&&InventoryService::quantity(1,10106001,2)===7,'migration replay neither overwrites progress nor duplicates packs');
     $db->execute("INSERT INTO sessions(id,player_id,token,csrf_token,ip_address,user_agent,expires_at,active_world_id)VALUES(1,1,?,'world-vip-test','127.0.0.1','fixture',DATE_ADD(UTC_TIMESTAMP(),INTERVAL 1 HOUR),2)",[str_repeat('a',64)]);
     $_COOKIE[Session::COOKIE_NAME]=str_repeat('a',64);$session=Session::current();
-    wv((int)$session['vip_level']===10,'session VIP follows the active world');
+    wv((int)$session['vip_level']===11,'session VIP follows the active world');
     wv(count(array_filter(WorldService::state(1)['worlds'],fn($w)=>$w['can_join']))===0,'accounts with villages see no new-world join action');
     WorldService::action($session,['action'=>'select','world_id'=>1,'expected_world_id'=>2,'request_id'=>'legacy-select-00001']);
-    wv(Session::current()['vip_level']===3,'world selection refreshes cached VIP');
+    wv(Session::current()['vip_level']===4,'world selection refreshes cached VIP');
     wvReject(fn()=>WorldService::action($session,['action'=>'join','world_id'=>3,'expected_world_id'=>1,'request_id'=>'deny-extra-village-001']),'server denies a second village');
     wvReject(fn()=>OAuth::createDefaultCity($db,1,'LegacyVIP',3),'direct registration city creation cannot bypass the rule');
     OAuth::createDefaultCity($db,2,'SeparateAccount',3);OAuth::createDefaultCity($db,2,'SeparateAccount',3);
-    wv((int)$db->query('SELECT COUNT(*) FROM cities WHERE player_id=2')->fetchColumn()===1&&VipService::status(2,3)['points']===200,'a separate account receives one village and fresh VIP, ignoring archived global totals');
+    wv((int)$db->query('SELECT COUNT(*) FROM cities WHERE player_id=2')->fetchColumn()===1&&VipService::status(2,3)['points']===0,'a separate account receives one village and fresh VIP, ignoring archived global totals');
     // Contention across two world targets is serialized by the player row lock.
     $jobs=[];
     foreach([1,3] as $world){$process=proc_open([PHP_BINARY,__FILE__,'create',$fixture->sessionPath(),(string)$world],[0=>['pipe','r'],1=>['pipe','w'],2=>['pipe','w']],$pipes,null,null,['bypass_shell'=>true]);fclose($pipes[0]);$jobs[]=[$process,$pipes];}
@@ -102,15 +102,15 @@ try{
         if($body!==null)curl_setopt_array($ch,[CURLOPT_POST=>true,CURLOPT_POSTFIELDS=>json_encode($body)]);
         $raw=curl_exec($ch);$status=(int)curl_getinfo($ch,CURLINFO_HTTP_CODE);curl_close($ch);return [$status,json_decode((string)$raw,true)];
     };
-    [$status,$json]=$http('/me');wv($status===200&&$json['data']['vip_level']===3,'own API profile shows selected-world VIP');
-    [$status,$json]=$http('/profile');wv($status===200&&$json['data']['vip_level']===3,'public API profile shows selected-world VIP');
+    [$status,$json]=$http('/me');wv($status===200&&$json['data']['vip_level']===4,'own API profile shows selected-world VIP');
+    [$status,$json]=$http('/profile');wv($status===200&&$json['data']['vip_level']===4,'public API profile shows selected-world VIP');
     $body=['action'=>'join','world_id'=>3,'expected_world_id'=>1,'request_id'=>'api-extra-village-001'];
     wv($http('/world',$body,false)[0]===403&&$http('/world',$body,true,false)[0]===401,'world creation requires CSRF and authentication');
     [$status,$json]=$http('/world',$body);wv($status===409&&str_contains($json['error']['message'],'new account'),'authenticated API explains the one-village rule');
     $admin=\Conquer\Auth\AdminAuth::createAdmin('VipWorldAdmin','Vip-world-admin-2026!','superadmin');
     $input=['world_id'=>2,'player_id'=>1,'reason'=>'VIP world scope test','operation_id'=>bin2hex(random_bytes(16)),'gems'=>90000,'vip_points'=>501,'vip_level'=>999];
     $correction=\Conquer\Admin\AdminService::execute($admin,'set-account-values',$input);
-    wv($correction['after']['vip_level']===2&&VipService::status(1,2)['points']===501&&VipService::status(1,1)['points']===1210,'admin correction affects only the selected world and derives its level');
+    wv($correction['after']['vip_level']===3&&VipService::status(1,2)['points']===501&&VipService::status(1,1)['points']===1210,'admin correction affects only the selected world and derives its level');
     $gift=['world_id'=>2,'player_id'=>1,'reason'=>'VIP world gift test','operation_id'=>bin2hex(random_bytes(16)),'title'=>'World VIP gift','message'=>'Fixture only','item_code'=>10206002,'quantity'=>1];
     \Conquer\Admin\AdminService::execute($admin,'gift',$gift);
     wv(InventoryService::quantity(1,10206002,2)===1&&InventoryService::quantity(1,10206002,1)===2,'admin VIP gift follows its selected world even while another world is active');

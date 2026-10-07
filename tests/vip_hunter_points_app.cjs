@@ -69,7 +69,29 @@ async function fixture() {
                 const label=await page.evaluate(()=>ConquerLocale.t('vip.hunter_points'));
                 const row=page.locator('.vip-bonuses > div').filter({has:page.locator('dt',{hasText:label})});
                 assert.equal(await row.count(),1);assert.match(await row.locator('dd').textContent(),/^\+9/);assert(!(await row.locator('dd').textContent()).includes('%'),'Hunter allowance is a flat count');
+                assert.equal(await page.locator('.vip-bonuses > div').count(),15,'all numeric VIP abilities are visible');
+                assert.match(await page.locator('[data-vip-perk=construction_speed] dd').textContent(),/^\+25 %/,'speed bonuses use a positive sign');
+                assert.match(await page.locator('[data-vip-perk=troop_training_cost] dd').textContent(),/^−5 %/,'training discounts use a negative sign');
+                const vipMetrics=await page.locator('.vip-panel').evaluate(el=>({overflow:el.scrollWidth>el.clientWidth+1,pageOverflow:document.documentElement.scrollWidth>innerWidth+1,scrollbar:getComputedStyle(document.querySelector('#dialog-content')).scrollbarWidth}));
+                assert.deepEqual(vipMetrics,{overflow:false,pageOverflow:false,scrollbar:'none'},locale+' '+width+' VIP layout');
                 await page.screenshot({path:path.join(output,locale+'-'+width+'-vip.png')});
+                await page.locator('[data-action=vip-levels]').tap();
+                assert.equal(await page.locator('[data-action=vip-level]').count(),20,'VIP 1 to 20, without a VIP 0 button');
+                for(const level of [1,5,6,16,18,20]){
+                    await page.locator(`[data-action=vip-level][data-id="${level}"]`).tap();
+                    assert.equal((await page.locator('.vip-level-title h3').textContent()).replace(/\s/g,''),'VIP'+level);
+                    assert.equal(await page.locator('.vip-slots strong').textContent(),level>=5?'2':'1');
+                    const hit=await page.locator(`[data-action=vip-level][data-id="${level}"]`).boundingBox();assert(hit.height>=44,'VIP level touch target');
+                }
+                assert.match(await page.locator('[data-vip-perk=marching_troop_capacity] dd').textContent(),/^\+45/);
+                assert.equal(await page.locator('[data-vip-perk=troop_dispatch_queue] dd').textContent(),'+2');
+                assert.equal(await page.locator('[data-vip-perk=action_points] dd').textContent(),'+80');
+                const selectedBorder=await page.locator('[data-action=vip-level][data-id="20"]').evaluate(el=>getComputedStyle(el).borderColor);
+                const idleBorder=await page.locator('[data-action=vip-level][data-id="1"]').evaluate(el=>getComputedStyle(el).borderColor);
+                assert.notEqual(selectedBorder,idleBorder,'selected VIP level has a visible border state');
+                await page.locator('.vip-level-title').scrollIntoViewIfNeeded();
+                await page.screenshot({path:path.join(output,locale+'-'+width+'-vip20.png')});
+                await page.locator('[data-action=vip-overview]').tap();
                 report.push({locale,width,height,...metrics});
             }
         }
