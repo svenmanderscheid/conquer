@@ -21,3 +21,13 @@ The existing broad shrine test still contains an obsolete search-close selector;
 Raster corrections used the built-in image generation tool. Exact prompts and source/output hashes are in the manifests beside the new troop, march and world assets and in `assets/marketing/image-repairs-20261005.json`. Menu/research exports reuse approved source artwork. Raw accepted masters remain in the local review folders. Preparation tools validate reproducible outputs.
 
 New asset paths and explicit icon versions avoid stale browser caches. The release is isolated from concurrent gameplay edits. The live package applies only recorded image-path and cache substitutions to separately captured server sources, with previous files archived outside the public web root; it does not replace divergent live gameplay code wholesale.
+
+## Deployment regression, 7 October 2026
+
+A fresh live request and independent browser checks found the public troop preview serving `fantasy-troops-v2` again. All corrected v3 files were still available with the approved hashes. The live HTML response was `private, no-store` with a dynamic CDN response, so the problem was an older template on the server, not the player's browser cache. The server's separate Git history did not include the image corrections; the landing template had been replaced after the successful 5 October verification.
+
+Deployment must preserve image fixes as part of the server's tracked release state, including the new asset directories. When applying a targeted release to a divergent live checkout, capture its current files and apply only reviewed substitutions; verify expected before and after hashes and retain a private backup. Do not replace the current server code with an older whole-project snapshot.
+
+Run `tests/landing_artwork.cjs` after website releases, with `UOK_ARTWORK_URL=https://unionofkingdoms.com/` for the live check. It verifies the default T5 portraits and interactive T1–T5 previews against approved v3 paths and image contents at desktop, phone and landscape sizes. A GitHub push alone does not establish that the live site serves the same release.
+
+The targeted restoration changed 43 live files and recorded all 384 approved runtime paths in server commit `a484e8a`. The three language catalogues changed only the archer equipment description. All before/after hashes and a private file backup were retained; no database or configuration changes were included. The live regression test then passed every viewport with and without JavaScript, including SHA-256 checks of all fifteen displayed troop portraits. Evidence is in `output/image-regression-2026-10-07/` and `artifacts/landing-artwork/`.
