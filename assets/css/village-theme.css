@@ -1259,7 +1259,7 @@ body.mobile-game #atlas-search-panel .map-overlay-close { width:40px; height:40p
   #atlas-search-panel .atlas-object-search-submit { grid-column:2; grid-row:3; min-height:44px; font-size:17px; }
   #atlas-search-panel .atlas-search-feedback { grid-column:1 / -1; }
 }
-/* Horizontal, non-modal object search approved for the world map. */
+/* Non-modal object search: swipeable categories, level row, then search action. */
 body.mobile-game.world-mode .map-overlay-shell .map-overlay-search-toggle {
   left:max(12px,var(--edge-gap))!important;
   right:auto!important;
@@ -1356,7 +1356,7 @@ body.mobile-game.world-mode.world-search-open .hud-right-tools { visibility:hidd
 #atlas-search-panel .map-search-collapse svg { width:26px; height:26px; fill:none; stroke:currentColor; stroke-width:3; stroke-linecap:round; stroke-linejoin:round; }
 #atlas-search-panel .atlas-object-search {
   display:grid;
-  grid-template-columns:minmax(0,1fr) auto;
+  grid-template-columns:minmax(0,1fr);
   gap:8px 10px;
   align-items:end;
   margin:0;
@@ -1396,18 +1396,18 @@ body.mobile-game.world-mode.world-search-open .hud-right-tools { visibility:hidd
   color:var(--ui-head-ink);
   box-shadow:0 3px var(--ui-gold);
 }
-#atlas-search-panel .atlas-search-controls { min-width:0; padding:5px 7px 7px; }
+#atlas-search-panel .atlas-search-controls { grid-column:1; grid-row:auto; min-width:0; padding:8px 10px 10px; }
 #atlas-search-panel .atlas-search-level-heading { margin-bottom:2px; font-size:12px; }
 #atlas-search-panel .atlas-search-level-row { gap:6px; }
-#atlas-search-panel #atlas-object-level { min-width:54px; }
+#atlas-search-panel #atlas-object-level { min-width:0; }
 #atlas-search-panel .atlas-search-level-value { order:0; flex-basis:44px; font-family:var(--ui-font-number); }
-#atlas-search-panel .atlas-search-hint,#atlas-search-panel .atlas-search-feedback { grid-column:1 / -1; font-size:11px; line-height:1.25; }
+#atlas-search-panel .atlas-search-hint,#atlas-search-panel .atlas-search-feedback { grid-column:1; grid-row:auto; font-size:11px; line-height:1.25; }
 #atlas-search-panel .atlas-object-search .atlas-object-search-submit {
-  grid-column:2;
-  grid-row:2;
-  width:auto;
-  min-width:168px;
-  min-height:58px;
+  grid-column:1;
+  grid-row:auto;
+  width:100%;
+  min-width:0;
+  min-height:48px;
   padding-inline:12px;
   font-size:18px;
   white-space:nowrap;
@@ -1418,18 +1418,16 @@ body.mobile-game.world-mode.world-search-open .hud-right-tools { visibility:hidd
   #atlas-search-panel .atlas-object-search .atlas-search-category { flex-basis:78px; height:80px; font-size:11px; }
   #atlas-search-panel .atlas-search-category img { width:51px; height:49px; }
   #atlas-search-panel .atlas-search-level-bounds { display:none; }
-  #atlas-search-panel .atlas-object-search .atlas-object-search-submit { min-width:138px; padding-inline:8px; font-size:15px; }
+  #atlas-search-panel .atlas-object-search .atlas-object-search-submit { padding-inline:8px; font-size:18px; }
   #atlas-search-panel .atlas-search-hint { display:none; }
 }
 @media(max-width:360px) {
   #atlas-search-panel .atlas-object-search .atlas-search-category { flex-basis:72px; }
   #atlas-search-panel .atlas-search-controls { padding-inline:4px; }
   #atlas-search-panel .atlas-search-level-row { gap:3px; }
-  #atlas-search-panel .atlas-search-level-row button { flex-basis:40px; width:40px; padding:8px; }
-  #atlas-search-panel #atlas-object-level { min-width:30px; }
+  #atlas-search-panel .atlas-search-level-row button { padding:8px; }
   #atlas-search-panel .atlas-search-level-value { flex-basis:40px; }
-  #atlas-search-panel .atlas-object-search .atlas-object-search-submit { min-width:116px; padding-inline:5px; font-size:13px; }
-  #atlas-search-panel .atlas-object-search-submit svg { display:none; }
+  #atlas-search-panel .atlas-object-search .atlas-object-search-submit { padding-inline:8px; }
 }
 @media(max-height:500px) and (orientation:landscape) {
   body.mobile-game.world-mode.world-search-open :is(#world-search-topbar-guard,.topbar) { visibility:hidden!important; pointer-events:none!important; }
@@ -1441,13 +1439,15 @@ body.mobile-game.world-mode.world-search-open .hud-right-tools { visibility:hidd
   }
   body.mobile-game.world-mode.world-search-open .map-overlay-shell .map-overlay-search-toggle {
     right:auto!important;
-    left:calc(50% - min(340px,calc(50% - 55px)) + 12px)!important;
+    left:max(4px,var(--edge-gap))!important;
   }
   body.mobile-game .map-overlay-shell #atlas-search-panel {
-    bottom:calc(var(--hud-dock-bottom,4px) + var(--hud-dock-height,60px) + 49px + env(safe-area-inset-bottom,0px))!important;
+    bottom:calc(var(--hud-dock-bottom,4px) + var(--hud-dock-height,60px) + 8px + env(safe-area-inset-bottom,0px))!important;
+    max-height:calc(100dvh - var(--hud-dock-bottom,4px) - var(--hud-dock-height,60px) - 16px - env(safe-area-inset-bottom,0px))!important;
     width:min(680px,calc(100% - 110px));
     padding:5px 8px 7px;
   }
+  body.mobile-game .map-overlay-shell #atlas-search-panel::after { display:none; }
   body.mobile-game.world-mode.world-search-open .map-overlay-shell .map-overlay-search-toggle { bottom:calc(var(--hud-dock-bottom,4px) + var(--hud-dock-height,60px) + 2px + env(safe-area-inset-bottom,0px))!important; }
   #atlas-search-panel .map-overlay-heading { min-height:27px; margin-bottom:2px; padding-bottom:1px; }
   #atlas-search-panel .map-overlay-heading h2 { font-size:17px!important; }
@@ -1457,8 +1457,8 @@ body.mobile-game.world-mode.world-search-open .hud-right-tools { visibility:hidd
   #atlas-search-panel .atlas-search-category img { width:43px; height:38px; }
   #atlas-search-panel .atlas-search-controls { padding:2px 5px 4px; }
   #atlas-search-panel .atlas-search-level-heading { display:none; }
-  #atlas-search-panel .atlas-search-level-row button { height:40px; min-height:40px; }
-  #atlas-search-panel #atlas-object-level { height:40px; }
+  #atlas-search-panel .atlas-search-level-row button { height:44px; min-height:44px; }
+  #atlas-search-panel #atlas-object-level { height:44px; }
   #atlas-search-panel .atlas-search-level-value { height:38px; }
   #atlas-search-panel .atlas-object-search .atlas-object-search-submit { min-height:44px; font-size:14px; }
   #atlas-search-panel .atlas-search-hint { display:none; }
@@ -5437,6 +5437,7 @@ body.mobile-game :is(#panel-dialog,#game-dialog,.map-overlay-panel) :is(
   .button.primary,.button.gold,.button:where(:not(.secondary):not(.danger):not(.small)),
   .treasury-button.gold,.treasury-button.blue,.vip-button:where(:not(.secondary):not(.vip-tabs button)),
   .march-dispatch,.march-submit,.inventory-use-button,.levelup-primary,.training-submit,.training-speedup-open,
+  .atlas-object-search-submit,.atlas-object-search-submit>span,
   [data-action="inventory-use-all"],.trading-buy
 ),body.welcome .welcome-form .button,body.play-login-page .play-submit {
   font-family:var(--ui-font-heading)!important;font-weight:400!important;font-synthesis:none;
