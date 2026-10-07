@@ -22,7 +22,7 @@ const target = 'https://game.example.test/play/?from=mobile&test=1#city';
     fs.mkdirSync(artifactDir, { recursive:true });
     fs.writeFileSync(configPath, JSON.stringify({ server:{ url:target, errorPath:'index.html' } }));
     const bundle = buildWeb({ configPath, outputDir });
-    assert.deepEqual(bundle.files, ['index.html', 'assets/fonts/OFL-Almendra.txt', 'assets/fonts/OFL-Lora.txt']);
+    assert.deepEqual(bundle.files, ['index.html', 'assets/fonts/OFL-Bree-Serif.txt', 'assets/fonts/OFL-Nunito.txt']);
     assert(bundle.files.every(file => !/\.(php|sql|env|pem|key)$/i.test(file)), 'Only public fallback assets are bundled');
     const bytes = bundle.files.reduce((sum, file) => sum + fs.statSync(path.join(outputDir, file)).size, 0);
     assert(bytes < 2 * 1024 * 1024, 'The connection screen stays below 2 MiB');
@@ -66,11 +66,25 @@ const target = 'https://game.example.test/play/?from=mobile&test=1#city';
     assert.equal(await page.evaluate(() => ConquerPWA.register()), null, 'The connection screen never registers a service worker');
     assert.equal(await page.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).length), 0);
 
+    const fontSession = await context.newCDPSession(page);
+    await fontSession.send('DOM.enable');
+    await fontSession.send('CSS.enable');
+    const fontChecks = [];
     for (const language of ['en', 'de', 'fr']) {
       await page.locator('[data-locale-select]').selectOption(language);
       assert.equal(await page.locator('html').getAttribute('lang'), language);
       const catalog = JSON.parse(fs.readFileSync(path.join(projectRoot, 'data/i18n', language + '.json'), 'utf8'));
       assert.equal(await page.locator('h2').textContent(), catalog['mobile.connection.title']);
+      await page.evaluate(() => document.fonts.ready);
+      const fontDocument = await fontSession.send('DOM.getDocument');
+      for (const [selector, family] of [['h1','Bree Serif'],['h2','Bree Serif'],['.mobile-shell-retry','Bree Serif'],['.mobile-shell-content>p','Nunito']]) {
+        const { nodeId } = await fontSession.send('DOM.querySelector', { nodeId:fontDocument.root.nodeId, selector });
+        const { fonts } = await fontSession.send('CSS.getPlatformFontsForNode', { nodeId });
+        assert(fonts.some(font => font.isCustomFont && font.familyName.includes(family)), language + ' ' + selector + ' renders ' + family);
+        assert(fonts.every(font => font.isCustomFont), language + ' ' + selector + ' has no system-font fallback');
+        fontChecks.push({ language, selector, fonts });
+      }
+
       for (const [width, height] of [[1280,800], [390,844], [320,568], [844,390], [568,320]]) {
         await page.setViewportSize({ width, height });
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, language + ' has no horizontal overflow at ' + width);
@@ -109,6 +123,7 @@ const target = 'https://game.example.test/play/?from=mobile&test=1#city';
     await page.locator('.mobile-shell-retry').click();
     await page.waitForURL(target);
     assert.equal(retries, 1);
+    fs.writeFileSync(path.join(artifactDir, 'font-checks.json'), JSON.stringify(fontChecks, null, 2));
     console.log('Mobile shell: 15 locale/viewport checks passed; ' + bundle.files.length + ' public files, ' + bytes + ' bytes.');
   } finally {
     if (browser) await browser.close();

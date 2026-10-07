@@ -59,15 +59,15 @@ function itemRenderingChecks() {
     for (const test of cases) {
         kingdom.inventory = [test.item];
         panels.onClick('inventory-category', {dataset: {id: test.item.category}});
-        assert(host.innerHTML.includes('loot-tile rarity-' + test.rarity), JSON.stringify(test));
-        assert(host.innerHTML.includes('loot-value">' + test.stamp + '</span>'), JSON.stringify(test));
-        assert(host.innerHTML.includes('loot-count">37</span>'), 'Owned quantity must stay visible.');
+        assert(host.innerHTML.includes('loot-tile item-icon rarity-' + test.rarity), JSON.stringify(test));
+        assert(host.innerHTML.includes('loot-value"><span>' + test.stamp + '</span>'), JSON.stringify(test));
+        assert(host.innerHTML.includes('loot-count" title="37">×37</span>'), 'Owned quantity must stay visible.');
         assert(host.innerHTML.includes('data-action="inventory-item" data-id="' + test.item.item_code + '"'), 'Item selection must retain the real item code.');
     }
     kingdom.inventory=[{item_code:17,quantity:0,category:'resource_pack',resource:'food',amount:1000,name_de:'Katalogpaket',description_de:'Eine echte Katalogbeschreibung.',icon:'speedup.svg',icon_framed:true,rarity:'mythic'}];
     kingdom.inventory_catalog=kingdom.inventory;
     panels.onClick('inventory-category',{dataset:{id:'resource_pack'}});
-    panels.onClick('inventory-scope',{dataset:{id:'all'}});
+    panels.showInventoryItem(17);
     assert(host.innerHTML.includes('Katalogpaket'),'Metadata name must win over legacy name');
     assert(host.innerHTML.includes('is-framed is-unowned'),'Framed zero-owned cards need distinct presentation');
     assert(host.innerHTML.includes('rarity-mythic'),'Explicit rarity must win over amount thresholds');
@@ -86,9 +86,9 @@ function itemRenderingChecks() {
       {item_code:907,category:'resource_pack',resource:'food',amount:1000,quantity:1},
       {item_code:908,category:'resource_pack',resource:'food',amount:5000,quantity:1},
     ];kingdom.inventory=kingdom.inventory_catalog;
-    panels.onClick('inventory-category',{dataset:{id:'speedup'}});assert.deepEqual(shown(),[903,904,902,901],'Speedups group by troop activity and duration rather than item code');assert(host.innerHTML.includes('<span>4 Gegenstände</span>'),'Counter must describe the current category');
+    panels.onClick('inventory-category',{dataset:{id:'speedup'}});assert.deepEqual(shown(),[903,904,902,901],'Speedups group by troop activity and duration rather than item code');assert(host.innerHTML.includes('4 Gegenstände'),'Counter must describe the current category');
     panels.onClick('inventory-category',{dataset:{id:'resource_pack'}});assert.deepEqual(shown(),[907,908,905,906],'Resources group by material and ascending quantity');
-    panels.onClick('inventory-scope',{dataset:{id:'owned'}});assert.deepEqual(shown(),[907,908,905,906],'Ownership view uses the same semantic ordering');
+    assert(!host.innerHTML.includes('inventory-scope'),'Owned inventory needs no catalogue toggle');assert.deepEqual(shown(),[907,908,905,906],'Owned items retain semantic ordering');
     return cases.length+10;
 }
 
@@ -173,7 +173,7 @@ async function itemUseChecks() {
         FormData: class { constructor(form) { this.values = form.values; } get(key) { return this.values[key]; } },
     };
     vm.runInNewContext(source, sandbox, {filename:'mvp-panels.js'});
-    const panels = sandbox.window.ConquerPanels({getKingdom:()=>({inventory:[{item_code:10101001,quantity:2},{item_code:10103001,quantity:3}]}),toast:()=>{},action: (endpoint, payload) => calls.push({endpoint, payload})});
+    const panels = sandbox.window.ConquerPanels({base:'',esc:String,getKingdom:()=>({inventory:[{item_code:10101001,quantity:2},{item_code:10103001,quantity:3}]}),toast:()=>{},action: (endpoint, payload) => calls.push({endpoint, payload})});
     for (const [id, queue] of [[10101001, ''], [10103001, 'building:12']]) {
         await panels.onSubmit({dataset:{form:'item-use',id:String(id)},values:{queue},reportValidity:()=>true});
     }
@@ -184,7 +184,7 @@ async function itemUseChecks() {
     await panels.onSubmit({dataset:{form:'item-use',id:'999'},values:{queue:''}});
     assert.equal(calls.length,2,'Missing catalogue item cannot dispatch a use action');
     let finish,pendingCalls=0;
-    const guarded=sandbox.window.ConquerPanels({getKingdom:()=>({inventory:[{item_code:10101001,quantity:2}]}),toast:()=>{},action:()=>{pendingCalls++;return new Promise(resolve=>{finish=resolve;});}});
+    const guarded=sandbox.window.ConquerPanels({base:'',esc:String,getKingdom:()=>({inventory:[{item_code:10101001,quantity:2}]}),toast:()=>{},action:()=>{pendingCalls++;return new Promise(resolve=>{finish=resolve;});}});
     const form={dataset:{form:'item-use',id:'10101001'},values:{queue:''},reportValidity:()=>true},first=guarded.onSubmit(form);
     await guarded.onSubmit(form);assert.equal(pendingCalls,1,'A second click while use is pending must not dispatch');finish();await first;
     return calls.length+2;
@@ -385,14 +385,14 @@ async function main() {
             assert.equal(await page.locator('#game-dialog').evaluate(dialog => dialog.open), false);
             await page.evaluate(() => { K.inventory = K.inventory.filter(item => item.item_code!==99900001); });
             await page.locator('[data-action="inventory-category"][data-id="resource_pack"]').click();
-            await page.locator('[data-action="inventory-scope"][data-id="all"]').click();
-            await page.locator('[data-action="inventory-item"][data-id="1"]').click();
+            await page.evaluate(() => panels.showInventoryItem(1));
+            assert.equal(await page.locator('.loot-card.is-unowned').count(),1,'A source link previews only its target');
             assert.equal(await page.locator('.inventory-dialog button[type="submit"],.inventory-dialog [data-action="teleport-select"]').isDisabled(),true,'Unowned catalogue item must not be usable');
             assert.equal(await page.locator('.inventory-dialog .inventory-owned').innerText(),'0 vorhanden');
             await check('inventory-full-catalogue', true);
             assert.equal(await page.locator('#game-dialog').evaluate(dialog => dialog.open), false);
-            await page.locator('[data-action="inventory-scope"][data-id="owned"]').click();
-            assert.equal(await page.locator('[data-action="inventory-item"][data-id="1"]').count(),0,'Ownership filter must hide zero quantities');
+            await page.locator('[data-action="inventory-category"][data-id="resource_pack"]').click();
+            assert.equal(await page.locator('[data-action="inventory-item"][data-id="1"]').count(),0,'Changing category dismisses the unowned preview');
             await setPanel('quests');
             for (const tab of ['active', 'ready', 'claimed']) {
                 await select('quests', tab);
@@ -423,7 +423,7 @@ async function main() {
         const realItems=JSON.parse(fs.readFileSync(path.join(root,'data/items.json'),'utf8')).items.map(i=>({...i,item_code:i.code,quantity:0}));
         for(const [width,height] of viewports){
             await page.setViewportSize({width,height});
-            await page.evaluate(catalogue=>{K.inventory=[];K.inventory_catalog=catalogue;K.queues=[];current='inventory';draw();panels.onClick('inventory-scope',{dataset:{id:'all'}});},realItems);
+            await page.evaluate(catalogue=>{K.inventory=catalogue.map(item=>({...item,quantity:1}));K.inventory_catalog=catalogue;K.queues=[];current='inventory';draw();},realItems);
             const seen=new Set();
             for(const category of ['resource_pack','speedup','boost','other']){
                 await page.locator(`[data-action="inventory-category"][data-id="${category}"]`).click();
@@ -433,14 +433,14 @@ async function main() {
                     const ids=await page.locator('[data-action="inventory-item"]').evaluateAll(nodes=>nodes.map(n=>Number(n.dataset.id)));
                     ids.forEach(id=>seen.add(id));
                     const longest=realItems.filter(i=>ids.includes(i.code)).sort((a,b)=>(b.description_de||'').length-(a.description_de||'').length)[0];
-                    if(longest){await page.locator(`[data-action="inventory-item"][data-id="${longest.code}"]`).click();}
-                    assert.equal(await page.locator('.inventory-dialog button[type="submit"],.inventory-dialog [data-action="teleport-select"]').isDisabled(),true,'Full catalogue zero-owned items must remain unusable');
+                    if(longest){await page.evaluate(code=>{K.inventory=K.inventory.filter(item=>item.item_code!==code);panels.showInventoryItem(code);},longest.code);assert.equal(await page.locator('.loot-card.is-unowned').count(),1,'Only the linked unowned item is added to owned inventory');}
+                    assert.equal(await page.locator('.inventory-dialog button[type="submit"],.inventory-dialog [data-action="teleport-select"]').isDisabled(),true,'A linked zero-owned item must remain unusable');
                     await check('real-catalogue-'+category+'-'+(++n),n===1);let effectPage=1;while(await page.locator('[aria-label="Weitere Effektinformation"]').count()&&!await page.locator('[aria-label="Weitere Effektinformation"]').isDisabled()){await page.locator('[aria-label="Weitere Effektinformation"]').click();await check('real-effect-'+category+'-'+n+'-'+(++effectPage));}
                     assert.equal(await page.locator('#game-dialog').evaluate(dialog => dialog.open), false);
                     const next=page.locator('.inventory-pager button').last();if(!await next.count()||!await next.isVisible()||await next.isDisabled())break;await next.click();
                 }
             }
-            assert.equal(seen.size,realItems.length,'Every actual catalogue definition must be reachable on every viewport');
+            assert.equal(seen.size,realItems.length,'Every owned catalogue definition must be reachable on every viewport');
         }
         // Empty states matter for new accounts and fully claimed daily objectives.
         for (const [width, height] of viewports) {

@@ -22,7 +22,13 @@ const legacyFiles = [
   'assets/fonts/OFL-Lora.txt',
   'shell.css', 'bootstrap.js', 'service-worker.js'
 ];
-const licenseFiles = ['assets/fonts/OFL-Almendra.txt', 'assets/fonts/OFL-Lora.txt'];
+const fontFiles = [
+  'assets/fonts/bree-serif-v18-400-latin-ext.woff2',
+  'assets/fonts/bree-serif-v18-400-latin.woff2',
+  'assets/fonts/nunito-v32-latin-ext.woff2',
+  'assets/fonts/nunito-v32-latin.woff2'
+];
+const licenseFiles = ['assets/fonts/OFL-Bree-Serif.txt', 'assets/fonts/OFL-Nunito.txt'];
 const localeKeys = [
   'locale.label',
   'mobile.connection.title',
@@ -69,7 +75,7 @@ function buildWeb({ configPath = path.join(mobileRoot, 'capacitor.config.json'),
   const dataUrl = (file, type) => 'data:' + type + ';base64,' + fs.readFileSync(path.join(projectRoot, file)).toString('base64');
   const fonts = read('assets/css/fantasy-fonts.css').replace(/url\(["']?\.\.\/fonts\/([^"')]+)["']?\)/g, (_, name) => {
     const file = 'assets/fonts/' + name;
-    if (!legacyFiles.includes(file) || !file.endsWith('.woff2')) throw new Error('Unrecognised bundled font: ' + name);
+    if (!fontFiles.includes(file)) throw new Error('Unrecognised bundled font: ' + name);
     return 'url("' + dataUrl(file, 'font/woff2') + '")';
   });
   // The talent-header illustration never appears in this connection screen.

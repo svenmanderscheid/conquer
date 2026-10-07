@@ -8,7 +8,7 @@ function worldPreviewVersion(string $path): string { return (string) filemtime(_
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#5c4270">
+  <meta name="theme-color" content="#8538bc">
   <title>Luxemburg als Spielwelt · Union of Kingdoms</title>
   <link rel="icon" href="../art/items/compass.svg" type="image/svg+xml">
   <link rel="stylesheet" href="../css/fantasy-fonts.css?v=<?= worldPreviewVersion('../css/fantasy-fonts.css') ?>">

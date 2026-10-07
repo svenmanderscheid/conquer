@@ -64,9 +64,57 @@ assert(ratio(hex('#8f99a6'),hex('#213e57'))<4.5,'Regression oracle rejects its d
    await page.locator('#game-dialog[open][data-building="'+code+'"]').waitFor();await page.evaluate(()=>document.fonts.ready);
   }
   async function contrast(selector){return page.locator(selector).evaluateAll(elements=>{
-   const canvas=document.createElement('canvas');canvas.width=canvas.height=1;const ctx=canvas.getContext('2d',{willReadFrequently:true});const parse=value=>{ctx.clearRect(0,0,1,1);ctx.fillStyle=value;ctx.fillRect(0,0,1,1);const [r,g,b,a]=ctx.getImageData(0,0,1,1).data;return[r,g,b,a/255];},blend=(top,bottom,alpha=top[3])=>top.slice(0,3).map((v,i)=>v*alpha+bottom[i]*(1-alpha)),lum=c=>{const f=v=>(v/=255)<=.04045?v/12.92:((v+.055)/1.055)**2.4;return.2126*f(c[0])+.7152*f(c[1])+.0722*f(c[2]);};
-   return elements.filter(el=>{const r=el.getBoundingClientRect(),s=getComputedStyle(el);return r.width&&r.height&&s.visibility!=='hidden'&&s.display!=='none'&&el.textContent.trim();}).map(el=>{let bg=[255,255,255],chain=[],node=el;while(node){chain.unshift(node);node=node.parentElement;}const gradients=[];for(const item of chain){const style=getComputedStyle(item),image=style.backgroundImage;const c=parse(style.backgroundColor);if(c[3]>=.999)gradients.length=0;if(image!=='none')gradients.push({element:item.id||item.className||item.tagName,image});bg=blend(c,bg,c[3]);}const style=getComputedStyle(el),fg=parse(style.color);let opacity=1;for(let node=el;node;node=node.parentElement)opacity*=Number(getComputedStyle(node).opacity)||1;const painted=blend(fg,bg,fg[3]*opacity),l1=lum(painted),l2=lum(bg);return{text:el.textContent.trim().replace(/\s+/g,' '),ratio:(Math.max(l1,l2)+.05)/(Math.min(l1,l2)+.05),color:style.color,background:bg.map(Math.round),opacity,gradients};});
+   const canvas=document.createElement('canvas');canvas.width=canvas.height=1;
+   const ctx=canvas.getContext('2d',{willReadFrequently:true}),colours=new Map();
+   const parse=value=>{
+    if(!CSS.supports('color',value))throw new Error('Unsupported contrast colour: '+value);
+    if(!colours.has(value)){ctx.clearRect(0,0,1,1);ctx.fillStyle=value;ctx.fillRect(0,0,1,1);const [r,g,b,a]=ctx.getImageData(0,0,1,1).data;colours.set(value,[r,g,b,a/255]);}
+    return colours.get(value);
+   };
+   const over=(top,bottom)=>{const alpha=top[3]+bottom[3]*(1-top[3]);return alpha?[...top.slice(0,3).map((v,i)=>(v*top[3]+bottom[i]*bottom[3]*(1-top[3]))/alpha),alpha]:[0,0,0,0];};
+   const lum=c=>{const f=v=>(v/=255)<=.04045?v/12.92:((v+.055)/1.055)**2.4;return.2126*f(c[0])+.7152*f(c[1])+.0722*f(c[2]);};
+   const unique=values=>[...new Map(values.map(value=>[value.flat().map(n=>n.toFixed(4)).join(','),value])).values()];
+   const layers=value=>{const result=[];let depth=0,start=0;for(let i=0;i<value.length;i++){if(value[i]==='(')depth++;else if(value[i]===')')depth--;else if(value[i]===','&&depth===0){result.push(value.slice(start,i).trim());start=i+1;}}result.push(value.slice(start).trim());return result;};
+   return elements.filter(el=>{const r=el.getBoundingClientRect(),s=getComputedStyle(el);return r.width&&r.height&&s.visibility!=='hidden'&&s.display!=='none'&&el.textContent.trim();}).map(el=>{
+    const style=getComputedStyle(el),gradients=[],unmeasured=[];let pairs=[[parse(style.color),[0,0,0,0]]],opacity=1;
+    for(let node=el;node;node=node.parentElement){
+     const css=getComputedStyle(node),nodeOpacity=Number(css.opacity);opacity*=nodeOpacity;
+     if(pairs.some(pair=>pair.some(colour=>colour[3]<.999))){
+      let surfaces=[parse(css.backgroundColor)];
+      // CSS lists the uppermost image first. Build each possible stop surface
+      // from the bottom up, compositing translucent stops over lower layers.
+      for(const layer of layers(css.backgroundImage).reverse()){
+       if(layer==='none')continue;
+       const stops=/^(?:repeating-)?(?:linear|radial)-gradient\(/.test(layer)?layer.match(/(?:rgba?|color|oklab|oklch|lab|lch)\([^)]+\)/g):null;
+       if(!stops||stops.length<2){unmeasured.push({element:node.id||node.className||node.tagName,image:layer});continue;}
+       gradients.push({element:node.id||node.className||node.tagName,image:layer,stops});
+       surfaces=unique(stops.flatMap(stop=>surfaces.map(surface=>over(parse(stop),surface))));
+      }
+      if(css.backgroundBlendMode.split(',').some(mode=>mode.trim()!=='normal'))unmeasured.push({element:node.id||node.tagName,blendMode:css.backgroundBlendMode});
+      pairs=unique(pairs.flatMap(pair=>surfaces.map(surface=>pair.map(colour=>over(colour,surface)))));
+     }
+     // Opacity applies to the composed text/background group, not only ink.
+     pairs=pairs.map(pair=>pair.map(colour=>[...colour.slice(0,3),colour[3]*nodeOpacity]));
+    }
+    const measured=pairs.map(pair=>pair.map(colour=>over(colour,[255,255,255,1]))).map(([foreground,background])=>{const a=lum(foreground),b=lum(background);return{ratio:(Math.max(a,b)+.05)/(Math.min(a,b)+.05),foreground,background};}).sort((a,b)=>a.ratio-b.ratio);
+    const worst=measured[0];
+    return{text:el.textContent.trim().replace(/\s+/g,' '),ratio:worst.ratio,color:style.color,background:worst.background.slice(0,3).map(Math.round),opacity,gradients,unmeasured,surfaces:measured.length};
+   });
   });}
+  // Prove that gradients are evaluated rather than waived: the light stop,
+  // a translucent upper layer and group opacity must each reveal low contrast.
+  await page.evaluate(()=>{
+   const oracle=document.createElement('div');oracle.id='building-contrast-oracle';oracle.style.cssText='position:fixed;inset:0;z-index:999999;background:white';
+   oracle.innerHTML='<div data-case="green" style="color:#203b18;background:linear-gradient(#b6e084,#82c34a,#72b641)">Green action</div><div data-case="stop" style="color:white;background:linear-gradient(black,#999)">Light stop</div><div data-case="layers" style="color:white;background:linear-gradient(#ffffff80,#ffffff80),linear-gradient(black,black)">Layered action</div><div data-case="opacity" style="color:white;background:linear-gradient(black,black);opacity:.5">Faded group</div>';
+   document.body.append(oracle);
+  });
+  const oracles=await contrast('#building-contrast-oracle>div');
+  assert(oracles[0].ratio>=4.5&&oracles[0].gradients.length===1,'Green gradient measures every stop');
+  assert(oracles[1].ratio<4.5&&oracles[1].surfaces===2,'Light gradient stop fails contrast');
+  assert(oracles[2].ratio<4.5&&oracles[2].gradients.length===2,'Translucent upper gradient composites over the lower gradient');
+  assert(oracles[3].ratio<4.5,'Group opacity composites both text and background');
+  for(const oracle of oracles)assert.deepEqual(oracle.unmeasured,[],'Oracle background fully measured');
+  await page.locator('#building-contrast-oracle').evaluate(el=>el.remove());
   async function inspect(size){
    await page.setViewportSize({width:size[0],height:size[1]});mode='blocked';await open();
    const dialog=page.locator('#game-dialog'),overview=dialog.locator('.levelup-overview'),upgrade=dialog.locator('[data-action="upgrade"]');
@@ -81,7 +129,7 @@ assert(ratio(hex('#8f99a6'),hex('#213e57'))<4.5,'Regression oracle rejects its d
    const reachable=await upgrade.evaluate(el=>{const r=el.getBoundingClientRect();return{left:r.left,right:r.right,top:r.top,bottom:r.bottom,height:r.height,innerWidth,innerHeight};});assert(reachable.left>=0&&reachable.right<=reachable.innerWidth+1&&reachable.top>=0&&reachable.bottom<=reachable.innerHeight+1,'Disabled upgrade remains scroll-reachable at '+size.join('x')+': '+JSON.stringify(reachable));
    const close=await dialog.locator('.dialog-close:visible,.mobile-page-back:visible').first().evaluate(el=>{const r=el.getBoundingClientRect();return{left:r.left,right:r.right,top:r.top,bottom:r.bottom,height:r.height};});assert(close.left>=0&&close.right<=size[0]+1&&close.top>=0&&close.bottom<=size[1]+1&&close.height>0,'Close/scroll control remains visible at '+size.join('x'));
    const samples=await contrast('.levelup-levels span,.levelup-levels strong,.levelup-stat>span:first-child,.levelup-stat strong,.levelup-stat b,.levelup-resource-row strong,.levelup-resource-values,.requirements-overview strong,.requirement-status,.requirement-levels b,.requirement-card-footer strong,#game-dialog [data-action="upgrade"]');
-   assert(samples.length>=12,'All requested dialog text samples exist');for(const sample of samples){assert.deepEqual(sample.gradients,[],`${size.join('x')} text background chain has an unmeasured gradient: ${sample.text}`);assert(sample.ratio>=4.5,`${size.join('x')} contrast ${sample.ratio.toFixed(2)}: ${sample.text} (${sample.color} on ${sample.background})`);}
+   assert(samples.length>=12,'All requested dialog text samples exist');for(const sample of samples){assert.deepEqual(sample.unmeasured,[],`${size.join('x')} text background chain has an unmeasured gradient: ${sample.text}`);assert(sample.ratio>=4.5,`${size.join('x')} contrast ${sample.ratio.toFixed(2)}: ${sample.text} (${sample.color} on ${sample.background})`);}
    const scroll=dialog.locator('.levelup-scroll');assert.equal(await scroll.count(),1,'Upgrade content shares one scroll area');
    assert(await overview.evaluate(el=>el.querySelector('.levelup-stats').getBoundingClientRect().bottom<=el.getBoundingClientRect().bottom+1),'Improvement values stay inside the overview surface');
    await scroll.evaluate(el=>el.scrollTop=el.scrollHeight);assert(await upgrade.isVisible(),'Upgrade stays visible while requirements scroll');
@@ -105,7 +153,7 @@ assert(ratio(hex('#8f99a6'),hex('#213e57'))<4.5,'Regression oracle rejects its d
    await cards.first().scrollIntoViewIfNeeded();
    assert(await cards.evaluateAll(elements=>elements.every(el=>el.scrollWidth<=el.clientWidth+1)),'Requirement copy fits each card');
    const samples=await contrast('.requirement-status,.requirement-levels b,.requirement-card-footer strong,.requirements-overview strong');
-   for(const sample of samples)assert(sample.ratio>=4.5,'Prerequisite contrast: '+sample.text);
+   for(const sample of samples){assert.deepEqual(sample.unmeasured,[],'Prerequisite background is measured: '+sample.text);assert(sample.ratio>=4.5,'Prerequisite contrast: '+sample.text);}
    await page.screenshot({path:path.join(output,'building-prerequisites-'+size.join('x')+'.png')});
    await cards.first().click();assert.equal(await page.locator('#game-dialog').getAttribute('data-building'),'castle','Requirement opens its actual upgrade menu');
   }
@@ -124,7 +172,7 @@ assert(ratio(hex('#8f99a6'),hex('#213e57'))<4.5,'Regression oracle rejects its d
   mode='active';await page.goto(app.base+'/city?visual_check='+(++viewSequence)+'#city',{waitUntil:'domcontentloaded'});await page.locator('#hud-build').click();await page.locator('#game-dialog[open][data-building="hall_of_alliance"]').waitFor();assert.equal((await page.locator('#game-dialog .popup-heading h2').textContent()).trim(),'Ausbau läuft');report.push({activeBuilding:'hall_of_alliance'});await page.locator("#game-dialog .dialog-close:visible, #game-dialog .mobile-page-back:visible").first().click();await page.locator('#app-start').waitFor({state:'detached'});
   mode='affordable';await page.locator('#app-start').waitFor({state:'detached'});
   const buildingCodes=await page.evaluate(async()=>Object.keys((await(await fetch('api/game/state')).json()).data.buildings));
-  for(const code of buildingCodes){await open(code);const samples=await contrast('.levelup-levels span,.levelup-levels strong,.levelup-stat>span:first-child,.levelup-stat strong,.levelup-stat b,.levelup-resource-row strong,.levelup-resource-values,#game-dialog .levelup-footer button');for(const sample of samples){assert.deepEqual(sample.gradients,[],`${code} text background chain has an unmeasured gradient: ${sample.text}`);assert(sample.ratio>=4.5,`${code} contrast ${sample.ratio.toFixed(2)}: ${sample.text}`);}}
+  for(const code of buildingCodes){await open(code);const samples=await contrast('.levelup-levels span,.levelup-levels strong,.levelup-stat>span:first-child,.levelup-stat strong,.levelup-stat b,.levelup-resource-row strong,.levelup-resource-values,#game-dialog .levelup-footer button');for(const sample of samples){assert.deepEqual(sample.unmeasured,[],`${code} text background chain has an unmeasured gradient: ${sample.text}`);assert(sample.ratio>=4.5,`${code} contrast ${sample.ratio.toFixed(2)}: ${sample.text}`);}}
   report.push({buildingDialogs:buildingCodes});
   mode='complete';await open();assert(await page.locator('#game-dialog [data-action="upgrade"]').isDisabled(),'Maximum-level buildings cannot upgrade');assert.equal(await page.locator('#game-dialog .levelup-stat b').count(),0,'Maximum-level building shows no next progression value');assert((await page.locator('#game-dialog .levelup-levels').innerText()).includes('Maximum'));report.push({scenario:'complete'});
   assert.deepEqual(errors,[],'No browser errors');assert.deepEqual(badAssets,[],'No missing assets');assert.deepEqual(writes,[],'Fixture UI inspection performs no API writes');

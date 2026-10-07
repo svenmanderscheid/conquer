@@ -11,6 +11,7 @@ const out=path.resolve(process.env.REWARD_OUTPUT||'artifacts/reward-dialog-revie
  try{
   const page=await browser.newPage({viewport:{width:1280,height:800},hasTouch:true}),errors=[];page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(20000);
   await page.addInitScript(()=>{if(location.pathname==='/city'&&!location.hash)history.replaceState(null,'','#world');});
+  await require('./fixtures/inventory_access.cjs')(page);
   await page.goto(base);await page.goto(new URL('?zugang=login', page.url()).href);await page.locator("[name=identifier], [name=username]").fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');await Promise.all([page.waitForURL(u=>u.pathname==='/city'),page.locator("form[action$=\"/auth/local\"] button[type=\"submit\"]").click()]);
   await page.locator('#navigation [data-id="inventory"]').click();await page.locator('[data-action="inventory-category"][data-id="other"]').click();
   const state=await page.evaluate(async()=>(await(await fetch('/api/kingdom/state')).json()).data),chest=state.inventory.find(i=>i.category==='chest'&&i.quantity>0);assert(chest,'Fresh fixture must include a welcome chest');
@@ -37,8 +38,8 @@ const out=path.resolve(process.env.REWARD_OUTPUT||'artifacts/reward-dialog-revie
    await page.screenshot({path:path.join(out,`${width}x${height}-rewards.png`)});
   }
   await page.goBack();await page.waitForFunction(()=>!document.querySelector('#game-dialog').open);assert.equal(new URL(page.url()).hash,'#inventory','Back keeps inventory open');
-  await page.setViewportSize({width:390,height:844});await page.locator('[data-action="inventory-category"][data-id="other"]').click();await page.locator('.inventory-scope-bar [data-action="inventory-scope"][data-id="all"]').click();
-  const material=after.inventory_catalog.find(i=>i.usage_context==='building');assert(material);await page.locator(`[data-action="inventory-item"][data-id="${material.item_code}"]`).click();
+  await page.setViewportSize({width:390,height:844});await page.locator('[data-action="inventory-category"][data-id="other"]').click();
+  const material=after.inventory_catalog.find(i=>i.usage_context==='building');assert(material);await require('./fixtures/inventory_access.cjs').showItem(page,material.item_code);
   const materialDetails=page.locator('#inventory-details .inventory-dialog');await materialDetails.waitFor();
   assert.match(await materialDetails.innerText(),/automatisch/i);assert(await materialDetails.locator('button[type="submit"]').isDisabled());
   assert.equal(await page.locator('#game-dialog').evaluate(dialog=>dialog.open),false,'Material guidance stays inside the inventory');

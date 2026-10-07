@@ -17,6 +17,7 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/world-targ
   browser=await chromium.launch({headless:true,channel:'chrome'});
   const page=await browser.newPage({viewport:{width:1280,height:800},hasTouch:true}),errors=[],writes=[];
   page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(20000);
+  await require('./fixtures/inventory_access.cjs')(page);
   await page.goto(base);const csrf=await page.locator('[name=csrf]').first().inputValue();
   await page.request.post(base+'/auth/local',{form:{csrf,mode:'login',identifier:'PreviewPlayer',password:'PreviewFixture!2026'}});
 
@@ -27,7 +28,7 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/world-targ
   if(!process.env.DUNGEON_ONLY){
   await page.goto(base+'/city#inventory');await page.reload();await page.locator('.inventory-shell').waitFor();await instrument();
   page.on('request',r=>{if(r.method()==='POST'&&r.url().includes('/api/'))writes.push(r.url());});
-  async function openChestSource(){await page.locator('[data-action=inventory-scope][data-id=all]').click();await page.locator('[data-action=inventory-category][data-id=other]').click();await page.locator('[data-action=inventory-item][data-id="10105001"]').click();await page.locator('.inventory-inspector [data-action=item-sources]').click();await page.locator('.item-source-card').first().waitFor();}
+  async function openChestSource(){await page.locator('[data-action=inventory-category][data-id=other]').click();await require('./fixtures/inventory_access.cjs').showItem(page,10105001);await page.locator('.inventory-inspector [data-action=item-sources]').click();await page.locator('.item-source-card').first().waitFor();}
   await openChestSource();
   await page.locator('.item-source-card').filter({has:page.getByRole('button',{name:'Show on map'})}).first().getByRole('button').click();
   await page.waitForFunction(()=>location.hash==='#world');await page.waitForTimeout(150);

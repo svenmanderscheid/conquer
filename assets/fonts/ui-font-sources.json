@@ -1,0 +1,75 @@
+{
+  "purpose": "Local UI fonts approved for Union of Kingdoms: Bree Serif for headings/main actions; Nunito for text/numbers; Conquer UI aliases Nunito.",
+  "cssSource": "https://fonts.googleapis.com/css2?family=Bree+Serif&family=Nunito:wght@400..800&display=swap",
+  "families": [
+    {
+      "name": "Bree Serif",
+      "weights": [
+        400
+      ],
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "upstream": "https://github.com/google/fonts/tree/main/ofl/breeserif",
+      "license": "OFL-Bree-Serif.txt"
+    },
+    {
+      "name": "Nunito",
+      "weights": [
+        400,
+        600,
+        700,
+        800
+      ],
+      "cssWeightRange": [
+        400,
+        800
+      ],
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "upstream": "https://github.com/google/fonts/tree/main/ofl/nunito",
+      "license": "OFL-Nunito.txt"
+    }
+  ],
+  "files": [
+    {
+      "file": "bree-serif-v18-400-latin-ext.woff2",
+      "url": "https://fonts.gstatic.com/s/breeserif/v18/4UaHrEJCrhhnVA3DgluA96Tp56N1.woff2",
+      "bytes": 6548,
+      "sha256": "a5e11496ab839fb59550296c5b07ae8218982b968637e16efdbbfd2c255ba655"
+    },
+    {
+      "file": "bree-serif-v18-400-latin.woff2",
+      "url": "https://fonts.gstatic.com/s/breeserif/v18/4UaHrEJCrhhnVA3DgluA96rp5w.woff2",
+      "bytes": 10348,
+      "sha256": "ca092b4130ee50797d9ba9790e5504ff66649cd7a144f2efe54147e313299e48"
+    },
+    {
+      "file": "nunito-v32-latin-ext.woff2",
+      "url": "https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofIO-aBXso.woff2",
+      "bytes": 35588,
+      "sha256": "2c8d792869818ecb253a46bc3c63c7013df7aac2f69291c3c85e5cdc94160960"
+    },
+    {
+      "file": "nunito-v32-latin.woff2",
+      "url": "https://fonts.gstatic.com/s/nunito/v32/XRXV3I6Li01BKofINeaB.woff2",
+      "bytes": 39128,
+      "sha256": "ba344451eab25b217a165363b1982048a5e5830a0daf36577973955a04cac793"
+    },
+    {
+      "file": "OFL-Bree-Serif.txt",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/breeserif/OFL.txt",
+      "bytes": 4411,
+      "sha256": "fbe0442a6b1ce162c95e241df76cab5ef2daf6a5ac84ae1a7a6749f32c051098"
+    },
+    {
+      "file": "OFL-Nunito.txt",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/nunito/OFL.txt",
+      "bytes": 4385,
+      "sha256": "580df76c95a1ec5ab878ceb25bb3d85c6a076804e9c970c8c6972aea775fdf65"
+    }
+  ]
+}

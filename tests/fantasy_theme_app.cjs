@@ -7,7 +7,7 @@ const { spawn } = require('child_process');
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const textContrast = require('./fixtures/menu_text_contrast.cjs');
 const root = path.resolve(__dirname, '..');
-const output = path.join(root, 'artifacts', 'fantasy-theme');
+const output = path.resolve(process.env.FANTASY_THEME_OUTPUT || path.join(root, 'artifacts', 'fantasy-theme'));
 fs.mkdirSync(output, { recursive: true });
 
 async function startFixture() {
@@ -74,7 +74,7 @@ async function actualFonts(page, selector) {
         assert(geometry.overflow <= 2 && geometry.visible && geometry.height >= 44, 'Authentication remains touch-accessible: ' + route + ' ' + width);
         if (await page.locator('.locale-install .button').count()) {
           const color = await page.locator('.locale-install .button').evaluate(element => getComputedStyle(element).backgroundColor);
-          if (color !== 'rgb(92, 66, 112)') appearanceFailures.push(`auth ${route || 'welcome'} ${width}x${height}: installation accent ${color}`);
+          if (color !== 'rgb(133, 56, 188)') appearanceFailures.push(`auth ${route || 'welcome'} ${width}x${height}: installation accent ${color}`);
         }
         report.push({ auth: route || 'welcome', width, height, ...geometry });
         await page.screenshot({ path: path.join(output, `${route ? 'recovery' : 'welcome'}-${width}x${height}.png`), fullPage: true });
@@ -92,7 +92,7 @@ async function actualFonts(page, selector) {
     await page.evaluate(async () => { await new Promise(requestAnimationFrame); await document.fonts.ready; });
     const glyphs = await actualFonts(page, '#resources .resource strong');
     report.push({ fonts: glyphs, resourceFont: await page.locator('#resources .resource strong').first().evaluate(element => getComputedStyle(element).font) });
-    assert(glyphs.some(font => font.familyName.includes('Lora') && font.isCustomFont), 'Actual resource digits render in self-hosted Lora');
+    assert(glyphs.some(font => font.familyName.includes('Nunito') && font.isCustomFont), 'Actual resource digits render in self-hosted Nunito');
 
     async function closeDialogs() {
       for (let i = 0; i < 4 && await page.locator('dialog[open]').count(); i++) await page.keyboard.press('Escape');
@@ -108,12 +108,25 @@ async function actualFonts(page, selector) {
       await page.locator('#panel-dialog[open]').waitFor();
       await page.waitForLoadState('networkidle');
       const ready = {
-        mastery: '.talent-node', defense: '.defense-body', land: '.land-shell',
+        mastery: '.talent-star-select', market: '.shop-merchant-card', research: '.rt-node-art img', defense: '.defense-body', land: '.land-shell',
         dungeons: '.dungeon-shell[aria-busy="false"]', community: '.social-hub .social-welcome',
         events: '.progression-content', account: '.progression-content', worlds: '.world-selector',
       }[id];
       if (ready) await page.locator('#content ' + ready).first().waitFor();
       await page.evaluate(() => document.fonts.ready);
+      if (id === 'research') {
+        await page.waitForFunction(() => {
+          const visible = [...document.querySelectorAll('.rt-node-art')].filter(art => {
+            const r = art.getBoundingClientRect();
+            return art.checkVisibility() && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth;
+          });
+          return visible.length > 0 && visible.every(art => [...art.querySelectorAll('img')].every(image => image.complete && image.naturalWidth > 0));
+        });
+        report.push({ researchArtwork: await page.locator('.rt-node-art img').evaluateAll(images => images.slice(0, 9).map(image => ({
+          src: image.getAttribute('src'), loaded: image.complete && image.naturalWidth > 0,
+          width: image.getBoundingClientRect().width, height: image.getBoundingClientRect().height,
+        }))) });
+      }
     }
     async function inspect(tag, save = false) {
       const data = await page.evaluate(() => {
@@ -124,9 +137,11 @@ async function actualFonts(page, selector) {
         const rect = dialog.getBoundingClientRect(), button = close.getBoundingClientRect();
         return {
           primary: getComputedStyle(heading).backgroundColor,
-          expectedPrimary: matchMedia('(max-width:700px), (max-width:1100px) and (max-height:520px) and (orientation:landscape)').matches ? 'rgb(68, 48, 82)' : 'rgb(92, 66, 112)',
+          headerBackground: getComputedStyle(heading).backgroundImage,
+          expectedPrimary: 'rgb(133, 56, 188)',
           surface: getComputedStyle(dialog).backgroundColor,
           font: getComputedStyle(title).fontFamily,
+          titleWeight: getComputedStyle(title).fontWeight,
           overflow: dialog.scrollWidth - dialog.clientWidth,
           outside: rect.left < -2 || rect.right > innerWidth + 2 || rect.top < -2 || rect.bottom > innerHeight + 2,
           closeVisible: button.top >= 0 && button.left >= 0 && button.bottom <= innerHeight + 2 && button.right <= innerWidth + 2,
@@ -138,8 +153,8 @@ async function actualFonts(page, selector) {
       report.push({ contrast: tag, ...contrast });
       appearanceFailures.push(...contrast.failures.map(sample => `${tag}: ${sample.selector} "${sample.text}" contrast ${sample.ratio} < ${sample.minimum}`));
       if (data.primary !== data.expectedPrimary) appearanceFailures.push(tag + ': violet header ' + data.primary);
-      if (data.surface !== 'rgb(233, 223, 207)') appearanceFailures.push(tag + ': beige surface ' + data.surface);
-      if (!data.font.includes('Conquer UI')) appearanceFailures.push(tag + ': fantasy typography ' + data.font);
+      if (data.surface !== 'rgb(255, 250, 240)') appearanceFailures.push(tag + ': apricot-light surface ' + data.surface);
+      if (!data.font.includes('Bree Serif') || data.titleWeight !== '400') appearanceFailures.push(tag + ': Bree Serif regular title ' + data.font + ' / ' + data.titleWeight);
       if (data.outside || !data.closeVisible) appearanceFailures.push(tag + ': unreachable window/close action');
       if (data.overflow > 2) appearanceFailures.push(tag + ': horizontal window overflow ' + data.overflow);
       if (save) await page.screenshot({ path: path.join(output, tag + '.png') });
@@ -162,15 +177,51 @@ async function actualFonts(page, selector) {
           });
         }
         await inspect(`${id}-${width}x${height}`, true);
+        if (id === 'profile') {
+          const actions = await page.locator('.lok-profile-nav .profile-nav').evaluateAll(buttons => buttons.map(button => {
+            const box = button.getBoundingClientRect(), label = button.lastElementChild;
+            const range = document.createRange(); range.selectNodeContents(label);
+            const text = range.getBoundingClientRect();
+            const center = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
+            return { label: label.textContent, height: box.height, minHeight: getComputedStyle(button).minHeight,
+              uncovered: !!center && (center === button || button.contains(center)),
+              inside: box.left >= 0 && box.right <= innerWidth + 1 && box.top >= 0 && box.bottom <= innerHeight + 1,
+              textFits: text.left >= box.left && text.right <= box.right + 1 && text.top >= box.top && text.bottom <= box.bottom + 1 };
+          }));
+          report.push({ profileActions: `${width}x${height}`, actions });
+          assert.equal(actions.length, 5, 'All five profile destinations remain available');
+          assert(actions.every(action => action.height >= 44 && action.inside && action.textFits && action.uncovered), 'Profile actions are readable and touch-accessible: ' + JSON.stringify(actions));
+          const caption = await page.locator('.lok-profile-hero figcaption small').evaluate(label => {
+            const stage = label.closest('.lok-profile-stage').getBoundingClientRect();
+            const range = document.createRange(); range.selectNodeContents(label);
+            const text = range.getBoundingClientRect();
+            return { label: label.textContent, inside: text.left >= stage.left && text.right <= stage.right + 1 && text.top >= stage.top && text.bottom <= stage.bottom + 1 };
+          });
+          report.push({ profileCaption: `${width}x${height}`, ...caption });
+          assert(caption.inside, 'Profile castle level remains readable inside its portrait stage: ' + width + 'x' + height);
+        }
+        if (id === 'army' && width === 1280) {
+          const bodyFonts = await actualFonts(page, '.training-unit-heading p');
+          // The synthetic barracks starts with an active queue; inspect its visible primary action.
+          const actionFonts = await actualFonts(page, '.training-speedup-open');
+          const actionWeight = await page.locator('.training-speedup-open').evaluate(element => getComputedStyle(element).fontWeight);
+          report.push({ typography: 'training body and main action', bodyFonts, actionFonts, actionWeight });
+          assert(bodyFonts.some(font => font.familyName.includes('Nunito') && font.isCustomFont), 'Actual training body text renders in self-hosted Nunito');
+          assert(actionFonts.some(font => font.familyName.includes('Bree Serif') && font.isCustomFont), 'Actual main training action renders in self-hosted Bree Serif');
+          assert.equal(actionWeight, '400', 'Bree Serif main action uses its real regular face without synthetic bold');
+        }
       }
+      console.log(`Checked ${broad.length} menus at ${width}x${height}`);
     }
     const titleFonts = await actualFonts(page, '#page-title');
-    assert(titleFonts.some(font => font.familyName.includes('Almendra') && font.isCustomFont), 'Actual menu title renders in self-hosted Almendra');
+    assert(titleFonts.some(font => font.familyName.includes('Bree Serif') && font.isCustomFont), 'Actual menu title renders in self-hosted Bree Serif');
     report.push({ titleFonts });
     await closeDialogs();
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.locator('#navigation [data-action="tab"][data-id="world"]').click();
     await page.locator('.atlas-shell').waitFor();
+    await page.waitForFunction(() => !document.querySelector('#scene-transition')?.classList.contains('is-active'));
+    await page.waitForLoadState('networkidle');
     await page.screenshot({ path: path.join(output, 'world-desktop.png') });
 
     const admin = await context.newPage();
@@ -193,7 +244,7 @@ async function actualFonts(page, selector) {
     assert.deepEqual(badApis, [], 'All menu reads succeed');
     assert.deepEqual(appearanceFailures, [], 'Every menu keeps the approved appearance and reachable controls');
     fs.writeFileSync(path.join(output, 'report.json'), JSON.stringify(report, null, 2));
-    console.log('PASS fantasy theme: ' + (broad.length * sizes.length) + ' menu/viewport combinations, actual Almendra/Lora glyphs, tappable relics, world, welcome and backoffice. ' + output);
+    console.log('PASS fantasy theme: ' + (broad.length * sizes.length) + ' menu/viewport combinations, actual Bree Serif/Nunito glyphs, tappable relics, world, welcome and backoffice. ' + output);
   } catch (error) {
     fs.writeFileSync(path.join(output, 'report.json'), JSON.stringify({ report, errors, badAssets, badApis, appearanceFailures, failure: String(error) }, null, 2));
     if (browser) for (const context of browser.contexts()) for (const [index, page] of context.pages().entries()) await page.screenshot({ path: path.join(output, `failure-${index}.png`) }).catch(() => {});

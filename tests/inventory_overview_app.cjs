@@ -89,7 +89,7 @@ const output=path.resolve(__dirname,'../artifacts/inventory-overview');fs.mkdirS
   }
   for(const [width,height] of [[1280,800],[390,844],[320,568],[568,320],[844,390]]){
    await page.setViewportSize({width,height});await page.waitForTimeout(350);
-   await page.locator('[data-action="inventory-scope"][data-id="all"]').tap();
+   assert.equal(await page.locator('[data-action="inventory-scope"]').count(),0);
    const board=page.locator('.inventory-scroll-board');await board.evaluate(b=>b.scrollTop=b.scrollHeight);
    const original=await board.evaluate(b=>b.scrollTop);
    await trigger.tap();assert.equal(await dialog.evaluate(d=>d.open),true);

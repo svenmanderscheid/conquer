@@ -1,13 +1,24 @@
 /* Conquer's shared village UI. Authoritative appearance layer; layout stays in each feature.
    Reference: docs/UI_STYLE_GUIDE.md and assets/art/village2.png.
-   Palette A separates violet application chrome from semantic game colours. */
+   Approved Apricotlight / Bree Serif + Nunito, 7 October 2026; see docs/BRANDING_KIT.md.
+   Violet application chrome remains separate from semantic game colours. */
 :root {
   color-scheme:light;
-  --ui-paper:#e9dfcf; --ui-card:#fbf6ec; --ui-card-light:#fffcf6;
-  --ui-inset:#dfcda9; --ui-disabled:#ddd2c0;
-  --ui-ink:#443549; --ui-muted:#5f5261;
-  --ui-line:#c7b692; --ui-frame:#756080;
-  --ui-primary:#5c4270; --ui-primary-light:#80658f; --ui-primary-dark:#443052;
+  --ui-paper:#fffaf0; --ui-card:#fffdf8; --ui-card-light:#fffdf8;
+  --ui-inset:#fff0e2; --ui-disabled:#eee7d9;
+  --ui-ink:#432d4b; --ui-muted:#635368;
+  --ui-line:#dfbda0; --ui-frame:#bca37c;
+  --ui-primary:#8538bc; --ui-primary-light:#a24dd0; --ui-primary-dark:#532375;
+  --ui-primary-base:#702ba1; --ui-primary-edge:#421760; --ui-primary-highlight:#da93f4;
+  --ui-surface:radial-gradient(ellipse at 0% 32%,#ffdbbb9e,transparent 52%),radial-gradient(ellipse at 100% 66%,#f2d9e959,transparent 46%),linear-gradient(#fffdf6,#fff7ec);
+  --ui-surface-inset:radial-gradient(ellipse at 0% 5%,#ffe0c6,transparent 72%),linear-gradient(135deg,#fff5e8,#f5edee);
+  --ui-surface-footer:linear-gradient(var(--ui-paper),#ffe8d2);
+  --ui-head-surface:linear-gradient(var(--ui-primary-light),var(--ui-primary) 23%,var(--ui-primary-base) 84%,var(--ui-primary-dark));
+  --ui-action-green-light:#b6e084; --ui-action-green:#82c34a; --ui-action-green-base:#72b641;
+  --ui-action-green-ink:#203b18; --ui-action-green-edge:#4c7a2d; --ui-action-green-highlight:#d9f3aa;
+  --ui-action-green-surface:linear-gradient(var(--ui-action-green-light),var(--ui-action-green) 18%,var(--ui-action-green-base));
+  --ui-action-gold-surface:linear-gradient(#ffe293,#ffc24c 24%,#edae33);
+  --ui-action-gold-ink:#4e2d36; --ui-action-gold-edge:#a56b22;
   --ui-window-head:#cdb9dc; --ui-window-head-light:#e9ddf1; --ui-window-head-shadow:#a98bbc;
   --ui-window-frame:#f8edce; --ui-window-frame-edge:#c9a55a;
   --ui-blue:#2a72c9; --ui-blue-light:#438fe4; --ui-blue-dark:#24559c;
@@ -16,9 +27,10 @@
   --ui-red:#b43c34; --ui-red-dark:#85342b; --ui-red-soft:#fae5d8; --ui-purple:#8c4ac4;
   --ui-crystal:#ad65df; --ui-crystal-light:#e4b5ff; --ui-crystal-dark:#693496; --ui-crystal-soft:#f2e4fb;
   --ui-radius:12px; --ui-radius-window:16px;
-  --ui-font:'Conquer UI','Almendra',Georgia,serif;
-  --ui-font-number:'Lora',Georgia,serif;
-  --ui-shadow:0 3px 0 #80658f42,0 12px 30px #715d7930;
+  --ui-font:'Nunito','Conquer UI','Segoe UI',sans-serif;
+  --ui-font-number:var(--ui-font);
+  --ui-font-heading:'Bree Serif','Nunito','Conquer UI',Georgia,serif;
+  --ui-shadow:inset 0 0 0 2px var(--ui-card-light),0 5px 0 #d9c2a0,0 8px 0 #aa8c63,0 13px 24px #5b326825;
 }
 
 /* Currency identity follows the approved amethyst mine; action/rarity colours stay separate. */
@@ -150,7 +162,7 @@ body.mobile-game :is(#panel-dialog,#game-dialog,.map-overlay-panel) {
   --popup-surface:var(--ui-paper); --popup-inset:var(--ui-inset); --popup-deep:var(--ui-inset);
   --popup-ink:var(--ui-ink); --popup-muted:var(--ui-muted); --popup-line:var(--ui-line);
   --popup-paper:var(--ui-card); --ink:var(--ui-ink); --muted:var(--ui-muted); --line:var(--ui-line);
-  background:var(--ui-paper)!important; color:var(--ui-ink)!important;
+  background:var(--ui-surface) var(--ui-paper)!important; color:var(--ui-ink)!important;
   border:3px solid var(--ui-frame)!important; border-radius:var(--ui-radius-window)!important;
   box-shadow:var(--ui-shadow)!important; font-family:var(--ui-font)!important;
   scrollbar-color:var(--ui-line) var(--ui-paper);
@@ -158,7 +170,7 @@ body.mobile-game :is(#panel-dialog,#game-dialog,.map-overlay-panel) {
 body.mobile-game :is(#panel-dialog,#game-dialog)::backdrop { background:#44354973!important; backdrop-filter:none!important; }
 body.mobile-game:has(#panel-dialog[open]) #game-dialog::backdrop { background:#4435494f!important; }
 body.mobile-game :is(#panel-dialog #content,#game-dialog #dialog-content) {
-  background:var(--ui-paper)!important; color:var(--ui-ink)!important;
+  background:var(--ui-surface) var(--ui-paper)!important; color:var(--ui-ink)!important;
   scrollbar-color:var(--ui-line) var(--ui-paper);
 }
 /* Copy inherits its surface, including coloured buttons and notices. */
@@ -169,7 +181,7 @@ body.mobile-game :is(#panel-dialog,#game-dialog,.map-overlay-panel) :is(.muted,.
   color:var(--ui-muted)!important;
 }
 body.mobile-game :is(#panel-dialog,#game-dialog,.map-overlay-panel) :is(h1,h2,h3,h4) {
-  font-family:var(--ui-font)!important; letter-spacing:0!important; text-transform:none!important;
+  font-family:var(--ui-font-heading)!important; font-weight:400!important; letter-spacing:0!important; text-transform:none!important;
 }
 /* One violet roof over every window. */
 body.mobile-game :is(#panel-dialog .page-heading,#game-dialog .popup-heading,#game-dialog .march-command-heading,.map-overlay-heading) {
@@ -179,7 +191,7 @@ body.mobile-game :is(#panel-dialog .page-heading,#game-dialog .popup-heading,#ga
 body.mobile-game :is(.page-heading,.popup-heading,.march-command-heading,.map-overlay-heading)::before,
 body.mobile-game :is(.page-heading,.popup-heading,.march-command-heading,.map-overlay-heading)::after { display:none!important; }
 body.mobile-game :is(#panel-dialog #page-title,#game-dialog .popup-heading h2,#game-dialog .march-command-heading h2,.map-overlay-heading h2) {
-  color:var(--ui-card)!important; font-family:var(--ui-font)!important; letter-spacing:0!important;
+  color:var(--ui-card)!important; font-family:var(--ui-font-heading)!important; font-weight:400!important; letter-spacing:0!important;
   text-transform:none!important; text-shadow:0 1px var(--ui-primary-dark)!important;
 }
 body.mobile-game :is(.panel-close,#inventory-overview-button,#game-dialog>.dialog-close,.map-overlay-close,.atlas-close,.march-close) {
@@ -207,7 +219,7 @@ body.mobile-game :is(#panel-dialog,#game-dialog) :is(
   .trading-shell,.trading-scroll,.treasury-shell,.treasury-reference,.treasury-library,.treasury-chest-page,
   .inventory-shell.inventory-paged,.inventory-board,.rt-academy.rt-continuous,.rt-board,
   .community-shell,.march-layout,.hero-expedition,.boss-panel,.lok-profile,.vip-panel
-) { background:var(--ui-paper)!important; color:var(--ui-ink)!important; box-shadow:none!important; }
+) { background:var(--ui-surface) var(--ui-paper)!important; color:var(--ui-ink)!important; box-shadow:none!important; }
 body.mobile-game :is(#panel-dialog,#game-dialog) :is(
   .trading-summary,.trading-footer,.treasury-library-heading,.treasury-loadout,.treasury-item-stats,
   .treasury-active-bonuses,.treasury-bonus-row,.treasury-detail-heading,.treasury-chest-rewards,
@@ -252,8 +264,8 @@ body.mobile-game :is(#panel-dialog,#game-dialog,.map-overlay-panel) :is(
 body.mobile-game :is(#panel-dialog,#game-dialog) :is(.trading-buy,.treasury-chest-card .treasury-button) {
   background:var(--ui-gold)!important; color:var(--ui-ink)!important; border-color:#aa792d!important;
 }
-body.mobile-game :is(#panel-dialog,#game-dialog) :is(.trading-buy.pays-gems,.hospital-crystals) { background:var(--ui-orange)!important; border-color:#b85a25!important; color:var(--ui-primary-dark)!important; }
-body.mobile-game :is(#panel-dialog,#game-dialog) .shop-merchant-action.pays-gems { background:var(--ui-orange)!important; border-color:#b85a25!important; color:var(--ui-primary-dark)!important; }
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.trading-buy.pays-gems,.hospital-crystals) { background:var(--ui-orange)!important; border-color:#b85a25!important; color:var(--ui-action-gold-ink)!important; }
+body.mobile-game :is(#panel-dialog,#game-dialog) .shop-merchant-action.pays-gems { background:var(--ui-orange)!important; border-color:#b85a25!important; color:var(--ui-action-gold-ink)!important; }
 body.mobile-game :is(#panel-dialog,#game-dialog) .trading-price { background:#fbf6ecaa!important; border-radius:8px!important; }
 body.mobile-game :is(#panel-dialog,#game-dialog) :is(.danger,.button.danger,.is-attack .march-attack) {
   background:var(--ui-red)!important; color:var(--ui-card-light)!important; border-color:#85342b!important;
@@ -704,7 +716,7 @@ body.mobile-game #panel-dialog[data-panel=quests] .quest-list:focus-visible { ou
 }
 /* HUD and world overlays use the same parchment without obscuring the playfield. */
 body.mobile-game :is(.hud-profile .player-button,.hud-edge-status,#lord-talent-button,.hud-objective,#resources .resource) {
-  background:#e9dfcfed!important; color:var(--ui-ink)!important; border-color:var(--ui-line)!important;
+  background:color-mix(in srgb,var(--ui-paper) 93%,transparent)!important; color:var(--ui-ink)!important; border-color:var(--ui-line)!important;
   border-radius:9px!important; text-shadow:none!important;
 }
 body.mobile-game :is(#player-hud-name,#player-hud-name small,.hud-objective strong,.hud-objective small,#resources .resource strong,#lord-hud-level) { color:var(--ui-ink)!important; text-shadow:none!important; }
@@ -713,7 +725,7 @@ body.mobile-game :is(.hud-edge-label,.game-dock button>.dock-label,.hud-menu>spa
 body.mobile-game .hud-profile {
   position:relative; display:grid; grid-template-columns:86px minmax(0,1fr) minmax(0,1fr);
   grid-template-rows:52px 48px; gap:8px; width:530px; max-width:530px; padding:10px;
-  border:2px solid var(--ui-primary-light); border-radius:20px; background:#e9dfcfed;
+  border:2px solid var(--ui-primary-light); border-radius:20px; background:color-mix(in srgb,var(--ui-paper) 93%,transparent);
   box-shadow:0 4px 0 var(--ui-primary-dark),0 10px 24px #2d21304d; pointer-events:none;
 }
 body.mobile-game #account-button {
@@ -873,7 +885,7 @@ body.mobile-game #game-dialog .building-quick-card>strong { font-size:16px; }
 body.mobile-game #game-dialog .building-quick-card { flex-direction:row; text-align:left; }
 body.mobile-game #game-dialog .building-quick-card>small { display:block; flex-shrink:0; }
 body.mobile-game #game-dialog .building-requirement-icon { background:var(--ui-card); }
-body.mobile-game #game-dialog .building-quick-card>small { color:var(--ui-muted)!important; font-family:Lora,serif; font-size:12px; }
+body.mobile-game #game-dialog .building-quick-card>small { color:var(--ui-muted)!important; font-family:var(--ui-font-number); font-size:12px; }
 @media(max-width:420px) {
   body.mobile-game #game-dialog .building-quick-card { min-height:62px; padding:6px 9px; }
   body.mobile-game #game-dialog .building-quick-card>img { flex-basis:50px; width:50px; height:50px; }
@@ -1160,7 +1172,7 @@ body.mobile-game dialog>#toast {
   transform:translate(-50%,-10px);
 }
 body.mobile-game dialog>#toast.visible { transform:translate(-50%,0); }
-body.mobile-game .world-chat { background:#e9dfcff5!important; color:var(--ui-ink)!important; border-color:var(--ui-line)!important; box-shadow:0 -2px 12px #4435491a!important; }
+body.mobile-game .world-chat { background:color-mix(in srgb,var(--ui-paper) 96%,transparent)!important; color:var(--ui-ink)!important; border-color:var(--ui-line)!important; box-shadow:0 -2px 12px #4435491a!important; }
 body.mobile-game .world-chat-heading { background:var(--ui-inset)!important; border-color:var(--ui-line)!important; }
 body.mobile-game .world-chat .world-chat-empty { color:var(--ui-muted); }
 body.mobile-game .world-chat-heading button[aria-pressed=true] { color:var(--ui-ink)!important; box-shadow:inset 0 -3px var(--ui-gold)!important; }
@@ -1579,7 +1591,7 @@ body.mobile-game .map-overlay-coordinate-toggle>button:focus-visible { outline:3
   body.mobile-game .map-overlay-shell .map-overlay-coordinate-toggle { width:158px; min-width:158px; }
   body.mobile-game .map-overlay-coordinate-toggle .atlas-coordinates { min-width:72px; font-size:10px; }
 }
-body.mobile-game .map-overlay-shell .atlas-biome-label { background:#e9dfcfdc!important; color:var(--ui-ink)!important; text-shadow:none!important; border:1px solid var(--ui-line); border-radius:9px; padding:5px 12px; }
+body.mobile-game .map-overlay-shell .atlas-biome-label { background:color-mix(in srgb,var(--ui-paper) 86%,transparent)!important; color:var(--ui-ink)!important; text-shadow:none!important; border:1px solid var(--ui-line); border-radius:9px; padding:5px 12px; }
 
 /* Backoffice uses the same materials with its existing, denser administrative layout. */
 body.admin-village { --bg:var(--ui-paper); --panel:var(--ui-card); --line:var(--ui-line); --text:var(--ui-ink); --muted:var(--ui-muted); --accent:var(--ui-primary); --green:var(--ui-green-dark); background:var(--ui-paper); color:var(--ui-ink); font-family:var(--ui-font); }
@@ -3517,7 +3529,7 @@ body.mobile-game #panel-dialog[data-panel="army"]:not([data-hospital="true"]) #c
 /* Shared dark-violet window chrome (variant A). Role and rarity colours stay semantic. */
 body.mobile-game :is(#panel-dialog,#game-dialog,.map-overlay-panel) {
   border-color:var(--ui-window-frame-edge)!important;
-  box-shadow:inset 0 0 0 2px var(--ui-window-frame),0 3px 0 var(--ui-window-frame-edge),0 7px 0 color-mix(in srgb,var(--ui-window-head-shadow) 76%,var(--ui-frame)),0 20px 40px #715d7930!important;
+  box-shadow:var(--ui-shadow)!important;
 }
 body.mobile-game :is(
   #panel-dialog .page-heading,
@@ -3525,10 +3537,10 @@ body.mobile-game :is(
   #game-dialog .march-command-heading,
   .map-overlay-heading
 ) {
-  background:var(--ui-primary) linear-gradient(180deg,var(--ui-primary-light),var(--ui-primary) 38%,var(--ui-primary-dark))!important;
+  background:var(--ui-primary) var(--ui-head-surface)!important;
   color:var(--ui-card-light)!important;
-  border-bottom-color:var(--ui-window-head-shadow)!important;
-  box-shadow:inset 0 3px #ffffff99,0 3px 0 color-mix(in srgb,var(--ui-window-head-shadow) 75%,var(--ui-frame))!important;
+  border-bottom-color:var(--ui-primary-edge)!important;
+  box-shadow:inset 0 3px var(--ui-primary-highlight),inset 0 -3px var(--ui-primary-edge)!important;
 }
 body.mobile-game :is(
   #panel-dialog #page-title,
@@ -3542,10 +3554,10 @@ body.mobile-game :is(
 /* Training and talent windows carry older, more specific header skins. */
 body.mobile-game #panel-dialog[data-panel] .page-heading,
 body.mobile-game #panel-dialog[data-panel="army"]:not([data-hospital="true"]) .page-heading {
-  background:var(--ui-primary) linear-gradient(180deg,var(--ui-primary-light),var(--ui-primary) 38%,var(--ui-primary-dark))!important;
+  background:var(--ui-primary) var(--ui-head-surface)!important;
   color:var(--ui-card-light)!important;
-  border-bottom-color:var(--ui-window-head-shadow)!important;
-  box-shadow:inset 0 3px #ffffff99,0 3px 0 color-mix(in srgb,var(--ui-window-head-shadow) 75%,var(--ui-frame))!important;
+  border-bottom-color:var(--ui-primary-edge)!important;
+  box-shadow:inset 0 3px var(--ui-primary-highlight),inset 0 -3px var(--ui-primary-edge)!important;
 }
 body.mobile-game #panel-dialog[data-panel] #page-title { color:var(--ui-card-light)!important; text-shadow:none!important; }
 /* Compact skin collections: one continuous vertical list instead of pages. */
@@ -3637,8 +3649,8 @@ body.mobile-game #game-dialog.march-dialog:has(.is-monster-rally) .march-command
     flex:0 0 auto!important;min-height:56px!important;height:auto!important;
     padding:calc(6px + env(safe-area-inset-top)) 52px 6px 60px!important;
     margin:0!important;gap:8px!important;border-radius:0!important;
-    background:var(--ui-primary-dark)!important;color:var(--ui-card-light)!important;
-    border-bottom:2px solid var(--ui-gold)!important;box-shadow:none!important;
+    background:var(--ui-primary) var(--ui-head-surface)!important;color:var(--ui-card-light)!important;
+    border-bottom:2px solid var(--ui-gold)!important;box-shadow:inset 0 3px var(--ui-primary-highlight),inset 0 -3px var(--ui-primary-edge)!important;
   }
   body.mobile-game #panel-dialog[data-panel] #page-title,
   body.mobile-game #game-dialog.mobile-detail-page :is(.popup-heading,.march-command-heading) h2 {
@@ -5077,7 +5089,7 @@ body.mobile-game #hud-gems>.hud-gems-compact { display:none; }
     width:min(760px,calc(100dvw / var(--ui-desktop-scale) - 32px));
     height:min(760px,calc(84dvh / var(--ui-desktop-scale)));
   }
-  body.mobile-game #panel-dialog[data-panel],body.mobile-game #game-dialog {
+  body.mobile-game #panel-dialog[data-panel],body.mobile-game #game-dialog,body.mobile-game #game-dialog.march-dialog {
     max-width:calc(100dvw / var(--ui-desktop-scale) - 32px)!important;
     max-height:calc(100dvh / var(--ui-desktop-scale) - 40px)!important;
   }
@@ -5363,3 +5375,95 @@ body.mobile-game #panel-dialog[data-panel=quests] .quest-row>.quest-action { gri
 
 /* Shared resource motifs also replace inline emoji in costs and treasury values. */
 .resource-inline-icon{display:inline-block;width:1.4em;height:1.4em;object-fit:contain;vertical-align:middle;flex:none}
+
+/* Approved menu identity, 7 October 2026. These shared overrides retire legacy
+   per-feature fonts/materials; role colours and the independent admin stay intact. */
+:is(body.mobile-game,body.welcome,body.play-login-page,body.report-page) :where(div,section,article,header,footer,nav,button,input,select,textarea,p,span,small,strong,b,em,label,dt,dd,li,summary,th,td,a) {
+  font-family:var(--ui-font)!important;
+}
+:is(body.mobile-game,body.welcome,body.play-login-page,body.report-page) :is(h1,h2,h3,h4),
+body.mobile-game :is(#panel-dialog,#game-dialog,.map-overlay-panel) :is(h1,h2,h3,h4),
+body.mobile-game #panel-dialog[data-panel] #page-title,
+body.mobile-game #game-dialog :is(.popup-heading,.march-command-heading) h2,
+body.mobile-game #game-dialog .levelup-art>span:last-child,
+body.welcome .welcome-form :is(h1,h2,.brand) {
+  font-family:var(--ui-font-heading)!important;font-weight:400!important;font-synthesis:none;
+}
+:is(body.mobile-game,body.welcome,body.play-login-page,body.report-page) :is(h1,h2,h3,h4) :where(span,strong,b,em) {
+  font-family:inherit!important;font-weight:inherit!important;
+}
+:is(body.mobile-game,body.welcome) :is(input[type=number],time,[data-timer],.num) { font-variant-numeric:tabular-nums; }
+body.welcome .welcome-form { background:var(--ui-surface) var(--ui-paper); }
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.inventory-board,.inventory-scroll-board,.inventory-views,.rt-academy-header,.rt-search) {
+  background:var(--ui-surface-inset) var(--ui-inset)!important;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.inventory-inspector,.inventory-inspector-description,.training-cost-grid,.bonus-panel) {
+  background:var(--ui-card)!important;border-color:var(--ui-line)!important;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) :is(.levelup-footer,.march-footer,.training-actions,.inventory-inspector-controls,.trading-footer) {
+  background:var(--ui-paper) var(--ui-surface-footer);border-color:var(--ui-line);
+}
+/* All main actions share the heading face. Textual times/amounts stay in Nunito. */
+body.mobile-game :is(#panel-dialog,#game-dialog,.map-overlay-panel) :is(
+  .button.primary,.button.gold,.button:where(:not(.secondary):not(.danger):not(.small)),
+  .treasury-button.gold,.treasury-button.blue,.vip-button:where(:not(.secondary):not(.vip-tabs button)),
+  .march-dispatch,.march-submit,.inventory-use-button,.levelup-primary,.training-submit,.training-speedup-open,
+  [data-action="inventory-use-all"],.trading-buy
+),body.welcome .welcome-form .button,body.play-login-page .play-submit {
+  font-family:var(--ui-font-heading)!important;font-weight:400!important;font-synthesis:none;
+}
+body.mobile-game #panel-dialog[data-panel="army"] .training-school .training-submit>span {
+  font-family:var(--ui-font-heading)!important;font-weight:400!important;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog,.map-overlay-panel) :is(
+  .button:where(:not(.secondary):not(.danger):not(.small)),.button.primary,.button.gold,
+  .treasury-button.gold,.treasury-button.blue,.vip-button:where(:not(.secondary):not(.vip-tabs button)),
+  .profile-contact.mail,.march-dispatch,.march-submit,.inventory-use-button,.levelup-primary
+):not(:disabled):not([aria-disabled="true"]):not(.danger):not(.march-attack):not(.trading-buy):not(.pays-gems):not(.hospital-crystals):not([data-action="inventory-use-all"]),
+body.mobile-game #panel-dialog[data-panel="army"]:not([data-hospital="true"]) .training-school :is(.training-submit,.training-speedup-open):not(:disabled),
+body.mobile-game #game-dialog .levelup-footer .levelup-primary:not(:disabled),
+body.mobile-game .world-chat .world-chat-compose button[type=submit]:not(:disabled),
+body.mobile-game .march-formation-dialog #march-formation-confirm:not(:disabled),
+body.mobile-game .march-time-dialog .march-time-ok:not(:disabled),
+body.mobile-game #game-dialog.march-dialog .march-time-button:not(:disabled),
+body.mobile-game #atlas-search-panel .atlas-object-search .atlas-object-search-submit:not(:disabled),
+body.welcome .welcome-form .button:not(:disabled),body.play-login-page .play-submit:not(:disabled) {
+  background:var(--ui-action-green) var(--ui-action-green-surface)!important;
+  color:var(--ui-action-green-ink)!important;border-color:var(--ui-action-green-edge)!important;
+  box-shadow:inset 0 3px var(--ui-action-green-highlight),0 4px 0 var(--ui-action-green-edge),0 6px 10px #52644921!important;
+  text-shadow:none!important;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog) :is([data-action="inventory-use-all"],.trading-buy:not(.pays-gems),.treasury-chest-card .treasury-button):not(:disabled),
+body.mobile-game :is(.panel-close,#inventory-overview-button,#game-dialog>.dialog-close,.map-overlay-close,.atlas-close,.march-close,.mobile-page-back) {
+  background:var(--ui-gold-soft) var(--ui-action-gold-surface)!important;color:var(--ui-action-gold-ink)!important;
+  border-color:var(--ui-action-gold-edge)!important;box-shadow:inset 0 2px var(--ui-card-light),0 3px 0 var(--ui-action-gold-edge)!important;
+}
+body.mobile-game :is(#panel-dialog,#game-dialog,.map-overlay-panel) :is(
+  .subtab.active,.inventory-tab.active,.inventory-category-tabs .active,.trading-tabs .active,
+  .treasury-tabs .active,.treasury-main-tabs .active,.community-tabs .active,.dungeon-tabs .active,
+  .rt-branch.is-selected,.army-tier-tabs .selected,.profile-nav.active,.vip-tabs [aria-pressed=true],
+  .skin-category-tabs [aria-pressed=true],.event-simple-tabs [aria-pressed=true]
+) {
+  background:var(--ui-primary) var(--ui-head-surface)!important;color:var(--ui-card-light)!important;
+  border-color:var(--ui-primary-dark)!important;box-shadow:inset 0 2px var(--ui-primary-highlight),0 3px 0 var(--ui-primary-edge)!important;
+}
+/* Neutral training surfaces match the shared windows; tier frames keep their colours. */
+body.mobile-game #panel-dialog[data-panel="army"]:not([data-hospital="true"]) :is(.training-showcase,.training-tier-picker,.training-controls,.training-portrait) {
+  background:var(--ui-surface) var(--ui-paper);border-color:var(--ui-line);
+  box-shadow:inset 0 2px var(--ui-card-light),0 3px 0 var(--ui-line),0 6px 10px #5b32681a;
+}
+body.mobile-game #panel-dialog[data-panel="army"]:not([data-hospital="true"]) .training-school .training-schools button {
+  background:var(--ui-card)!important;color:var(--ui-ink)!important;border-color:var(--ui-line)!important;
+  box-shadow:inset 0 2px var(--ui-card-light),0 3px 0 var(--ui-line)!important;
+}
+body.mobile-game #panel-dialog[data-panel="army"]:not([data-hospital="true"]) .training-school :is(.training-schools button,.training-view-tabs button)[aria-pressed="true"] {
+  background:var(--ui-primary) var(--ui-head-surface)!important;color:var(--ui-card-light)!important;
+  border-color:var(--ui-primary-dark)!important;box-shadow:inset 0 2px var(--ui-primary-highlight),0 3px 0 var(--ui-primary-edge)!important;
+}
+body.mobile-game #panel-dialog .training-school .training-schools button[aria-pressed="true"] :is(strong,small) { color:inherit!important; }
+body.play-login-page .play-card { background:var(--ui-surface) var(--ui-paper);box-shadow:var(--ui-shadow); }
+body.play-login-page .play-card-head { background:var(--ui-primary) var(--ui-head-surface);box-shadow:inset 0 3px var(--ui-primary-highlight); }
+body.report-page { --c-panel3:var(--ui-inset);background:var(--ui-surface) var(--ui-paper);color:var(--ui-ink);font-family:var(--ui-font); }
+body.report-page .topbar { background:var(--ui-primary) var(--ui-head-surface);color:var(--ui-card-light); }
+body.report-page .topbar :is(.topbar-id,.topbar-date) { color:inherit; }
+body.report-page .topbar-back { background:var(--ui-action-gold-surface);color:var(--ui-action-gold-ink);border-color:var(--ui-action-gold-edge);min-height:44px; }

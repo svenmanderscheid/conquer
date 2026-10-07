@@ -20,6 +20,7 @@ const out=path.resolve(__dirname,'../artifacts/inventory-reference');fs.mkdirSyn
   const page=await browser.newPage({viewport:{width:1280,height:800},hasTouch:true}),errors=[];
   page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(15000);page.setDefaultNavigationTimeout(45000);
   await page.context().addCookies([{name:'conquer_locale',value:'de',url:base}]);
+  await require('./fixtures/inventory_access.cjs')(page);
   await page.goto(base+'/?zugang=login',{waitUntil:'domcontentloaded'});
   await page.locator("[name=identifier], [name=username]").fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');
   await Promise.all([page.waitForURL('**/city'),page.locator("form[action$=\"/auth/local\"] button[type=\"submit\"]").click()]);
@@ -30,18 +31,25 @@ const out=path.resolve(__dirname,'../artifacts/inventory-reference');fs.mkdirSyn
   assert(!state.inventory_catalog.some(item=>retired.has(Number(item.code??item.item_code))));
   assert(!state.inventory.some(item=>retired.has(Number(item.item_code))));
   await page.locator('#navigation [data-id="inventory"]').click();
-  await page.locator('[data-action="inventory-scope"][data-id="all"]').click();
+  assert.equal(await page.locator('[data-action="inventory-scope"],.inventory-scope-bar').count(),0,'Inventory shows owned items without a catalogue filter');
   assert.deepEqual(await page.locator('.inventory-category-tabs button').evaluateAll(bs=>bs.map(b=>b.dataset.id)),['resource_pack','speedup','boost','other']);
   for(const [width,height] of [[1280,800],[390,844],[320,568],[568,320],[844,390]]){
    await page.setViewportSize({width,height});await page.waitForTimeout(450);
    for(const category of ['resource_pack','speedup','boost','other']){
     await page.locator(`[data-action="inventory-category"][data-id="${category}"]`).click();
     assert.equal(await page.locator('#panel-dialog').getAttribute('data-panel'),'inventory','Item categories stay in the backpack');
-    const board=page.locator('.inventory-scroll-board');await board.waitFor();
+    const board=page.locator('.inventory-scroll-board');
+    if(!await board.count()){
+     assert.equal(await page.locator('.inventory-empty').count(),1,'An unowned category shows the honest empty state');
+     assert.equal(await page.locator('[data-action="inventory-scope"],[data-action="inventory-item"]').count(),0,'An empty category never opens the catalogue');
+     const bounds=await page.locator('#panel-dialog').boundingBox();assert(bounds.x>=0&&bounds.x+bounds.width<=width+1&&bounds.y>=0&&bounds.y+bounds.height<=height+1,'Empty inventory stays inside the viewport');
+     await page.screenshot({path:path.join(out,`${width}x${height}-${category}.png`)});continue;
+    }
+    await board.waitFor();
     await page.locator('.inventory-page-grid').evaluate(async el=>{await Promise.all([...el.querySelectorAll('img')].map(async i=>{i.loading='eager';await i.decode()}))});
     const metrics=await page.evaluate(()=>{
      const grid=document.querySelector('.inventory-page-grid'),board=document.querySelector('.inventory-scroll-board'),panel=document.querySelector('#panel-dialog'),r=panel.getBoundingClientRect();
-     const bad=[...document.querySelectorAll('.inventory-category-tabs button,.inventory-scope-bar button,.panel-close')].filter(b=>{const x=b.getBoundingClientRect(),scrollTab=b.closest('.inventory-category-tabs'),mustBeVisible=!scrollTab||b.getAttribute('aria-pressed')==='true';return (mustBeVisible&&(x.left<0||x.right>innerWidth||x.top<0||x.bottom>innerHeight))||b.scrollWidth>b.clientWidth+2}).map(b=>b.textContent);
+     const bad=[...document.querySelectorAll('.inventory-category-tabs button,.panel-close')].filter(b=>{const x=b.getBoundingClientRect(),scrollTab=b.closest('.inventory-category-tabs'),mustBeVisible=!scrollTab||b.getAttribute('aria-pressed')==='true';return (mustBeVisible&&(x.left<0||x.right>innerWidth||x.top<0||x.bottom>innerHeight))||b.scrollWidth>b.clientWidth+2}).map(b=>b.textContent);
      const clipped=[...grid.querySelectorAll('.loot-count,.loot-value')].filter(el=>el.scrollWidth>el.clientWidth+1).map(el=>el.textContent);
      const stockProblems=[...grid.querySelectorAll('.item-icon')].filter(tile=>{const stock=tile.querySelector('.loot-count'),value=tile.querySelector('.loot-value'),s=stock.getBoundingClientRect(),v=value.getBoundingClientRect();return !stock.textContent.startsWith('×')||parseFloat(getComputedStyle(stock).fontSize)<11||s.top>=tile.getBoundingClientRect().y+tile.clientHeight/2||(value.textContent&&s.bottom>=v.top);}).map(tile=>tile.textContent);
      return {shell:document.querySelector('.inventory-shell').className,grid:grid.outerHTML.slice(0,250),columns:getComputedStyle(grid).gridTemplateColumns.split(' ').length,overflow:board.scrollWidth>board.clientWidth+2||panel.scrollWidth>panel.clientWidth+2,outside:r.left<0||r.right>innerWidth+1||r.top<0||r.bottom>innerHeight+1,bad,clipped,stockProblems};
@@ -81,10 +89,10 @@ const out=path.resolve(__dirname,'../artifacts/inventory-reference');fs.mkdirSyn
   await page.setViewportSize({width:390,height:844});
   await page.locator('[data-action="inventory-category"][data-id="resource_pack"]').click();
   const zero=state.inventory_catalog.find(i=>i.category==='resource_pack'&&!Number(i.quantity));
-  assert(zero);await page.locator(`[data-action="inventory-item"][data-id="${zero.item_code}"]`).click();
+  assert(zero);assert.equal(await page.locator(`[data-action="inventory-item"][data-id="${zero.item_code}"]`).count(),0);await require('./fixtures/inventory_access.cjs').showItem(page,zero.item_code);assert.equal(await page.locator('.loot-card.is-unowned').count(),1,'Only the linked unowned item is previewed');
   assert.equal(await page.locator('#inventory-details button[type="submit"]').isDisabled(),true);
   assert.equal(await page.locator('#inventory-details [data-action="inventory-use-all"]').isDisabled(),true);
-  await page.locator('[data-action="inventory-scope"][data-id="owned"]').click();
+  await page.locator('[data-action="inventory-category"][data-id="resource_pack"]').click();
   assert.equal(await page.locator(`[data-action="inventory-item"][data-id="${zero.item_code}"]`).count(),0);
   const owned=state.inventory.find(i=>i.category==='resource_pack'&&i.quantity>0);
   assert(owned,'Fixture must contain a resource pack for the real consumption check');

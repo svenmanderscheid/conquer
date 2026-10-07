@@ -17,13 +17,15 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/item-sourc
   browser=await chromium.launch({headless:true,channel:'chrome'});
   const page=await browser.newPage({viewport:{width:1280,height:800},hasTouch:true}),errors=[],writes=[];
   page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(20000);
+  await require('./fixtures/inventory_access.cjs')(page);
   await page.goto(base);const csrf=await page.locator('[name=csrf]').first().inputValue();
   await page.request.post(base+'/auth/local',{form:{csrf,mode:'login',identifier:'PreviewPlayer',password:'PreviewFixture!2026'}});
   await page.goto(base+'/city#inventory');await page.locator('.inventory-shell').waitFor();
   // Opening rally details may calculate a read-only battle preview via POST.
   page.on('request',r=>{if(r.method()==='POST'&&r.url().includes('/api/')&&new URL(r.url()).pathname!=='/api/march/preview')writes.push(r.url());});
-  await page.locator('[data-action=inventory-scope][data-id=all]').click();
-  await page.locator('[data-action=inventory-item].is-unowned').first().click();
+
+  const unowned=await page.evaluate(async()=>{const kingdom=(await(await fetch('/api/kingdom/state')).json()).data;return kingdom.inventory_catalog.find(item=>!Number(item.quantity)).item_code;});
+  await require('./fixtures/inventory_access.cjs').showItem(page,unowned);
   const sources=page.locator('.inventory-inspector [data-action=item-sources]');
   assert.equal(await sources.isEnabled(),true,'unowned item still offers source lookup');
   await sources.click();await page.locator('.item-source-card,.item-sources .notice').first().waitFor();
@@ -45,9 +47,9 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/item-sourc
   for(const [width,height]of[[1280,800],[390,844],[568,320]]){
    await page.setViewportSize({width,height});
    await page.evaluate(()=>{location.hash='inventory';});await page.locator('.inventory-shell').waitFor();
-   await page.locator('[data-action=inventory-scope][data-id=all]').click();
+
    await page.locator('[data-action=inventory-category][data-id=other]').click();
-   await page.locator('[data-action=inventory-item][data-id="10105001"]').click();
+   await require('./fixtures/inventory_access.cjs').showItem(page,10105001);
    await sources.click();await page.locator('.item-source-card').first().waitFor();
    const map=page.locator('.item-source-card').filter({has:page.locator('button', {hasText:'Show on map'})}).first();
    assert(await map.count(),'a reachable monster source is available in preview');
@@ -74,8 +76,8 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/item-sourc
   assert(badgeDefinition.gems_drop?.amount>0,'Rally also exposes its crystal drop');
   for(const [width,height]of[[1280,800],[390,844],[320,568],[844,390],[568,320]]){
    await page.setViewportSize({width,height});await page.evaluate(()=>{location.hash='inventory';});await page.locator('.inventory-shell').waitFor();
-   await page.locator('[data-action=inventory-scope][data-id=all]').click();await page.locator('[data-action=inventory-category][data-id=other]').click();
-   await page.locator('[data-action=inventory-item][data-id="119000002"]').click();
+   await page.locator('[data-action=inventory-category][data-id=other]').click();
+   await require('./fixtures/inventory_access.cjs').showItem(page,119000002);
    const lookupResponse=page.waitForResponse(response=>response.url().includes('/api/item-sources?')&&response.url().includes('item_code=119000002'));
    await sources.click();const lookup=(await(await lookupResponse).json()).data;await page.locator('.item-source-card').first().waitFor();
    assert.equal(await page.locator('.item-sources-selected').innerText(),lookup.item.name);
@@ -87,13 +89,21 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/item-sourc
    const attack=page.locator(`[data-action="expedition"][data-kind="monsters"][data-id="${badgeTarget.id}"]:visible`).first();await attack.click();await page.locator('.march-command.is-monster-rally').waitFor();
    const targetTab=page.locator('[data-action="march-view"][data-id="target"]');if(await targetTab.isVisible())await targetTab.click();
    const rewards=page.locator('.march-rewards>div>span');assert.equal(await rewards.count(),9,'All eight items and crystals remain visible in the loot list');
-   const badge=rewards.filter({has:page.locator('img[alt="'+lookup.item.name+'"]')}),crystals=rewards.filter({has:page.locator('img[src$="/items/gems.svg"]')});
+   const gemArt=await page.evaluate(()=>ConquerItemArt.resourceUrl('','gems'));
+   const badge=rewards.filter({has:page.locator('img[alt="'+lookup.item.name+'"]')}),crystals=rewards.filter({has:page.locator('img[src="'+gemArt+'"]')});
    assert.equal(await badge.count(),1,'Badge appears once');assert.equal(await badge.locator('strong').innerText(),'2');
    assert.equal(await crystals.count(),1,'Crystal reward is not truncated');assert.equal(Number((await crystals.locator('strong').innerText()).replace(/\D/g,'')),badgeDefinition.gems_drop.amount);
    for(const reward of [badge,crystals]){await reward.scrollIntoViewIfNeeded();assert(await reward.evaluate(el=>{const r=el.getBoundingClientRect();return r.top>=0&&r.bottom<=innerHeight+1&&el.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2));}),'Reward is reachable by scrolling');}
-   const layout=await page.locator('#game-dialog').evaluate(dialog=>{const r=dialog.getBoundingClientRect(),target=dialog.querySelector('.march-target'),send=dialog.querySelector('#march-confirm'),button=send.getBoundingClientRect();return{inside:r.left>=0&&r.top>=0&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1,overflow:dialog.scrollWidth>dialog.clientWidth+2||target.scrollWidth>target.clientWidth+2,sendReachable:button.height>=44&&button.top>=0&&button.bottom<=innerHeight+1&&send.contains(document.elementFromPoint(button.x+button.width/2,button.y+button.height/2))};});
-   assert.deepEqual(layout,{inside:true,overflow:false,sendReachable:true},'Complete loot list '+width+'x'+height);
    await page.locator('.march-rewards img').evaluateAll(async images=>{await Promise.all(images.map(image=>image.decode()));});
+   const layout=await page.locator('#game-dialog').evaluate(dialog=>{const r=dialog.getBoundingClientRect(),target=dialog.querySelector('.march-target'),send=dialog.querySelector('#march-confirm'),button=send.getBoundingClientRect();return{inside:r.left>=0&&r.top>=0&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1,overflow:dialog.scrollWidth>dialog.clientWidth+2||target.scrollWidth>target.clientWidth+2,sendReachable:button.height>=44&&button.top>=0&&button.bottom<=innerHeight+1&&send.contains(document.elementFromPoint(button.x+button.width/2,button.y+button.height/2))};});
+   if(!layout.inside||layout.overflow||!layout.sendReachable){
+    await page.screenshot({path:path.join(out,'badge-loot-failure-'+width+'x'+height+'.png')});
+    console.log('LOOT_LAYOUT',JSON.stringify(await page.locator('#game-dialog').evaluate(dialog=>{
+     const style=getComputedStyle(dialog);
+     return{dialog:dialog.getBoundingClientRect().toJSON(),send:dialog.querySelector('#march-confirm').getBoundingClientRect().toJSON(),style:{width:style.width,minWidth:style.minWidth,maxWidth:style.maxWidth,height:style.height,minHeight:style.minHeight,maxHeight:style.maxHeight,zoom:style.zoom,inline:dialog.getAttribute('style')},scrollY,view:[innerWidth,innerHeight]};
+    })));
+   }
+   assert.deepEqual(layout,{inside:true,overflow:false,sendReachable:true},'Complete loot list '+width+'x'+height);
    await page.screenshot({path:path.join(out,'badge-loot-'+width+'x'+height+'.png')});
    await page.keyboard.press('Escape');await page.waitForFunction(()=>!document.querySelector('#game-dialog').open);
   }
@@ -121,5 +131,5 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/item-sourc
   assert.deepEqual(writes,[],'finding and following sources performs no gameplay writes');
   assert.deepEqual(errors,[],'no browser errors');
   console.log('ITEM SOURCE APP CHECKS PASSED');
- }finally{if(browser)await browser.close();if(child){child.stdin.end('\n');await new Promise(resolve=>child.on('exit',resolve));}}
+ }finally{if(browser)await browser.close();if(child&&child.exitCode===null&&child.signalCode===null){const exited=new Promise(resolve=>child.once('exit',resolve));child.stdin.end('\n');await exited;}}
 })().catch(e=>{console.error(e);process.exitCode=1;});

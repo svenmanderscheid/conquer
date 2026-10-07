@@ -151,7 +151,7 @@ body.mobile-game .training-school { flex:1; min-height:0; display:flex; flex-dir
 .training-speedup-list { display:grid; gap:10px; }.training-speedup-list button { display:flex; justify-content:space-between; gap:12px; }
 @media(min-width:651px) and (min-height:501px) {
  body.mobile-game .training-school { gap:9px; }
- .training-workspace { grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); grid-template-rows:156px minmax(0,1fr); gap:10px 18px; padding:0 1px 5px; }
+ .training-workspace { grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); grid-template-rows:130px minmax(0,1fr); gap:10px 18px; padding:0 1px 5px; }
  .training-showcase { padding:12px; }
  .training-unit-heading h3 { font-size:23px; }
  .training-portrait { min-height:0; margin:9px 3px 7px; }
@@ -159,18 +159,19 @@ body.mobile-game .training-school { flex:1; min-height:0; display:flex; flex-dir
  .training-stage-toolbar { min-height:34px; }
  .training-tier-picker { padding:7px 9px 9px; }
  .training-tier-heading strong { font-size:16px; }
- .training-school .training-tier { min-height:86px; }
- .training-tier img { height:46px; }
- .training-controls { justify-content:flex-start; overflow:hidden; gap:6px; padding:9px 12px 13px; }
+ .training-school .training-tier { min-height:72px; }
+ .training-tier img { height:40px; }
+ .training-controls { justify-content:flex-start; overflow:hidden; gap:6px; padding:8px 12px; }
  .training-detail-scroll,.training-order { flex:1; min-height:0; }
  .training-order { display:flex; flex-direction:column; gap:5px; }
  .training-compose { flex:none; gap:4px; }
- .training-cost-grid { gap:0; padding:6px 9px 5px; }
- .training-cost-heading { padding-bottom:4px; }
- .training-school .training-cost { min-height:27px; padding:1px 3px; }
+ .training-cost-grid { grid-template-columns:repeat(2,minmax(0,1fr));gap:0 12px; padding:6px 9px 5px; }
+ .training-cost-heading { grid-column:1/-1;padding-bottom:4px; }
+ .training-school .training-cost { min-height:44px; padding:1px 3px; }
  .training-cost img { width:23px; height:23px; }
  .training-quantity { grid-template-columns:42px minmax(70px,1fr) 42px 74px; gap:7px; }
- .training-school .training-quantity>button,.training-school .training-count-label,.training-school #train-count { height:40px; }
+ .training-school .training-quantity>button,.training-school .training-count-label,.training-school #train-count { height:44px; }
+ .training-school .training-max { min-height:44px; }
  .training-school #training-range { height:25px; }
  .training-submit-row,.training-running-actions { margin-top:auto; padding:2px 0 3px; }
  .training-school .training-submit,.training-school .training-stats-shortcut,.training-school .training-speedup-open,.training-school .training-speedup-quick { min-height:44px; }

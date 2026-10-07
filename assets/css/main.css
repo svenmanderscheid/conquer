@@ -9,23 +9,24 @@
    CSS Custom Properties — Cozy Design Tokens
    -------------------------------------------------------------------------- */
 :root {
-    --ui-primary: #5c4270;
-    --ui-primary-light: #80658f;
-    --ui-primary-dark: #443052;
-    --ui-paper: #e9dfcf;
-    --ui-card: #fbf6ec;
-    --ui-card-light: #fffcf6;
-    --ui-inset: #dfcda9;
-    --ui-disabled: #ddd2c0;
-    --ui-ink: #443549;
-    --ui-muted: #5f5261;
-    --ui-line: #c7b692;
-    --ui-frame: #756080;
+    --ui-primary: #8538bc;
+    --ui-primary-light: #a24dd0;
+    --ui-primary-dark: #532375;
+    --ui-paper: #fffaf0;
+    --ui-card: #fffdf8;
+    --ui-card-light: #fffdf8;
+    --ui-inset: #fff0e2;
+    --ui-disabled: #eee7d9;
+    --ui-ink: #432d4b;
+    --ui-muted: #635368;
+    --ui-line: #dfbda0;
+    --ui-frame: #bca37c;
     --ui-green: #586d50;
     --ui-green-dark: #3f523a;
     --ui-gold: #c5a361;
-    --ui-font: 'Conquer UI','Almendra',Georgia,serif;
-    --ui-font-number: 'Lora',Georgia,serif;
+    --ui-font: 'Nunito','Conquer UI','Segoe UI',sans-serif;
+    --ui-font-number: var(--ui-font);
+    --ui-font-heading: 'Bree Serif','Nunito','Conquer UI',Georgia,serif;
     /* Backgrounds */
     --c-bg:        var(--ui-paper);
     --c-panel:     var(--ui-card);

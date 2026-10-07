@@ -1,14 +1,13 @@
 'use strict';
 // Never put authenticated documents, API responses, admin screens, or auth requests in CacheStorage.
-const BUILD='union-of-kingdoms-public-v9';
+const BUILD='union-of-kingdoms-public-v10';
 const ROOT=new URL(self.registration.scope),PREFIX=ROOT.pathname,CACHE=BUILD+':'+PREFIX;
 const OFFLINE=new URL('offline.html',ROOT).href;
 const PRELOAD=['offline.html','favicon.ico','apple-touch-icon.png','assets/icons/conquer-32.png','assets/icons/conquer-maskable-512.png','assets/icons/conquer-192.png','assets/icons/conquer-512.png'];
 const STATIC=new Set([
     ...PRELOAD,'assets/js/localization.js','assets/css/localization.css','assets/css/fantasy-fonts.css',
-    'assets/fonts/almendra-400-latin.woff2','assets/fonts/almendra-400-latin-ext.woff2',
-    'assets/fonts/almendra-700-latin.woff2','assets/fonts/almendra-700-latin-ext.woff2',
-    'assets/fonts/lora-latin.woff2','assets/fonts/lora-latin-ext.woff2',
+    'assets/fonts/bree-serif-v18-400-latin.woff2','assets/fonts/bree-serif-v18-400-latin-ext.woff2',
+    'assets/fonts/nunito-v32-latin.woff2','assets/fonts/nunito-v32-latin-ext.woff2',
     'assets/css/game.css','assets/css/game-theme.css','assets/css/admin-backoffice.css',
     'assets/css/community-panel.css','assets/css/progression-panel.css','assets/css/defense-panel.css',
     'assets/js/game.js','assets/js/community-panel.js','assets/js/progression-panel.js','assets/js/defense-panel.js',

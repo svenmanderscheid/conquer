@@ -8,7 +8,7 @@ $base = htmlspecialchars(APP_BASE, ENT_QUOTES);
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#5c4270">
+  <meta name="theme-color" content="#8538bc">
   <link rel="stylesheet" href="<?= $base ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR.'/assets/css/fantasy-fonts.css') ?>">
   <title>Union of Kingdoms · Gemeinsam gegen die Dunkelheit</title><?php require ROOT_DIR.'/views/partials/brand-head.php'; ?>
   <link rel="stylesheet" href="<?= $base ?>/assets/css/world-map.css?v=<?= filemtime(__DIR__ . '/../assets/css/world-map.css') ?>">

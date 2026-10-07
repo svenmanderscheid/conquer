@@ -131,7 +131,7 @@ window.ConquerPanels = function(ctx) {
     const inventoryMainCategories=['resource_pack','speedup','boost','other'];
     const inventoryCategoryArt={all:'chest-silver.svg',resource_pack:'pouch.svg',speedup:'speedup.svg',boost:'production.svg',chest:'chest-gold.svg',other:'energy.svg'};
     const inventoryQueueSelections={},inventoryQuantities={};
-    let inventoryScope='owned',inventoryUsePending=false;
+    let inventoryLinkedItem=null,inventoryUsePending=false;
     const inventorySelections={};
     const boostLabels={resource_production:'Produktionsbonus',gathering_speed:'Sammelbonus',construction_speed:'Baubonus',research_speed:'Forschungsbonus',training_speed:'Ausbildungsbonus',anti_spy:'Spähschutz'};
     const speedupLabels={generic:'Universell',building:'Bauen',research:'Forschung',training:'Ausbildung',healing:'Heilung'};
@@ -198,16 +198,20 @@ window.ConquerPanels = function(ctx) {
         const oldQueue=host().querySelector('#inventory-queue');
         if(oldQueue)inventoryQueueSelections[oldQueue.closest('form').dataset.id]=oldQueue.value;
         const focused=document.activeElement?.closest?.('[data-action="inventory-item"]');
-        const owned=(inventoryScope==='all'?(K().inventory_catalog||K().inventory):K().inventory).filter(i=>inventoryScope==='all'||Number(i.quantity)>0),selected=Object.hasOwn(inventoryCategories,tabsState.inventory)?tabsState.inventory:'resource_pack';
+        const selected=Object.hasOwn(inventoryCategories,tabsState.inventory)?tabsState.inventory:'resource_pack';
+        const owned=(K().inventory||[]).filter(i=>Number(i.quantity)>0);
+        // A source link may preview one specific unowned item without opening the catalogue.
+        const linked=inventorySelections[selected]===inventoryLinkedItem&&(K().inventory_catalog||[]).find(i=>Number(i.item_code)===inventoryLinkedItem);
+        if(linked&&!owned.some(i=>Number(i.item_code)===inventoryLinkedItem))owned.push(linked);
         tabsState.inventory=selected;
         const items=owned.filter(i=>selected==='all'||inventoryGroup(i)===selected||(selected==='other'&&i.category==='chest')).sort((a,b)=>(Number(b.quantity)>0)-(Number(a.quantity)>0)||Number(b.level||b.tier||0)-Number(a.level||a.tier||0)||inventorySort(a,b));
         const detailItem=items.find(i=>Number(i.item_code)===inventorySelections[selected])||items[0];
         if(detailItem)inventorySelections[selected]=Number(detailItem.item_code);
         let contents;
         if(items.length){
-            contents=`<div class="inventory-browser"><div class="inventory-board inventory-scroll-board" tabindex="0" aria-label="${esc(inventoryCategories[selected])}, nach unten scrollen"><div class="inventory-page-grid inventory-all-grid" ${inventoryGridAttributes(true)}>${items.map(i=>`<button class="loot-card ${Number(i.quantity)>0?'is-owned':'is-unowned'}" data-action="inventory-item" data-id="${Number(i.item_code)}" title="${esc(itemName(i))}" aria-label="${esc(itemName(i))}, ${fmt(i.quantity)} vorhanden, Details anzeigen" aria-controls="inventory-details" aria-pressed="${Number(i.item_code)===Number(detailItem.item_code)}">${lootTile(i)}</button>`).join('')}</div></div>${inventoryInspector(itemDetails(detailItem))}</div>`;
-        }else contents=inventoryEmpty(selected,'Noch keine Gegenstände','Neue Vorräte findest du in Aufgaben und Truhen.',button('Alle Items ansehen','inventory-scope','all','gold small'));
-        host().innerHTML=`<div class="inventory-shell inventory-paged inventory-backpack"><nav class="inventory-category-tabs" aria-label="Inventarkategorie">${inventoryMainCategories.map(key=>`<button data-action="inventory-category" data-id="${key}" class="${key===selected?'active':''}" aria-pressed="${key===selected}" title="${esc(inventoryCategories[key])}"><span>${key==='speedup'?'Beschleu&shy;niger':esc(inventoryCategories[key])}</span></button>`).join('')}</nav><div class="inventory-scope-bar" aria-label="Inventaransicht"><button data-action="inventory-scope" data-id="owned" class="${inventoryScope==='owned'?'active':''}" aria-pressed="${inventoryScope==='owned'}">Im Besitz</button><button data-action="inventory-scope" data-id="all" class="${inventoryScope==='all'?'active':''}" aria-pressed="${inventoryScope==='all'}">Alle Items</button><span>${items.length} Gegenstände</span></div><div id="inventory-body" class="inventory-body">${contents}</div></div>`;
+            contents=`<div class="inventory-browser"><div class="inventory-board inventory-scroll-board" tabindex="0" aria-label="${esc(window.ConquerLocale.t('copy.e5ca6e2ef4470214',{p0:window.ConquerLocale.text(inventoryCategories[selected])+', '+window.ConquerLocale.t('template.items',{count:fmt(items.length)})}))}"><div class="inventory-page-grid inventory-all-grid" ${inventoryGridAttributes(true)}>${items.map(i=>`<button class="loot-card ${Number(i.quantity)>0?'is-owned':'is-unowned'}" data-action="inventory-item" data-id="${Number(i.item_code)}" title="${esc(itemName(i))}" aria-label="${esc(itemName(i))}, ${fmt(i.quantity)} vorhanden, Details anzeigen" aria-controls="inventory-details" aria-pressed="${Number(i.item_code)===Number(detailItem.item_code)}">${lootTile(i)}</button>`).join('')}</div></div>${inventoryInspector(itemDetails(detailItem))}</div>`;
+        }else contents=inventoryEmpty(selected,'Noch keine Gegenstände','Neue Vorräte findest du in Aufgaben und Truhen.');
+        host().innerHTML=`<div class="inventory-shell inventory-paged inventory-backpack"><nav class="inventory-category-tabs" aria-label="Inventarkategorie">${inventoryMainCategories.map(key=>`<button data-action="inventory-category" data-id="${key}" class="${key===selected?'active':''}" aria-pressed="${key===selected}" title="${esc(inventoryCategories[key])}"><span>${key==='speedup'?'Beschleu&shy;niger':esc(inventoryCategories[key])}</span></button>`).join('')}</nav><div id="inventory-body" class="inventory-body">${contents}</div></div>`;
         const board=host().querySelector('.inventory-scroll-board,.inventory-scroll-list');
         if(board)board.scrollTop=scrollTop;
         const details=host().querySelector('.inventory-inspector');
@@ -248,6 +252,7 @@ window.ConquerPanels = function(ctx) {
         return `<div class="inventory-dialog"><div class="inventory-dialog-heading">${lootTile(i)}<div><span class="inventory-kicker"><span data-i18n="${categoryKey}">${esc(window.ConquerLocale.t(categoryKey))}</span> · <span data-i18n="${rarityKey}">${esc(window.ConquerLocale.t(rarityKey))}</span></span><h2>${esc(itemName(i))}</h2><span class="inventory-owned">${fmt(i.quantity)} vorhanden</span></div></div><div class="inventory-effect"><p>${esc(itemDescription(i))}</p></div>${itemControls(i,'inventory')}<button type="button" class="button secondary item-source-link" data-action="item-sources" data-item-code="${Number(i.item_code)}">${esc(window.ConquerLocale?.t('sources.find')||'Find sources')}</button></div>`;
     }
     function selectInventoryItem(id){
+        if(Number(id)!==inventoryLinkedItem)inventoryLinkedItem=null;
         inventorySelections[tabsState.inventory]=Number(id);
         renderInventory();
         const details=host().querySelector('.inventory-inspector');
@@ -257,7 +262,7 @@ window.ConquerPanels = function(ctx) {
         const item=(K().inventory_catalog||K().inventory||[]).find(i=>Number(i.item_code)===Number(code));
         if(!item)return false;
         const category=inventoryGroup(item);
-        inventoryScope='all';tabsState.inventory=inventoryMainCategories.includes(category)?category:'other';
+        inventoryLinkedItem=Number(code);tabsState.inventory=inventoryMainCategories.includes(category)?category:'other';
         inventorySelections[tabsState.inventory]=Number(code);renderInventory(true);
         host().querySelector('.inventory-inspector')?.scrollIntoView({block:'nearest'});
         return true;
@@ -363,8 +368,7 @@ window.ConquerPanels = function(ctx) {
         if(act.startsWith('hospital-')&&getHospital().onClick(act,b))return true;
         if(act==='panel-tab'){tabsState[b.dataset.group]=id;ctx.render();return true;}
         if(act==='panel-page'){panelPages[id]=Math.max(0,Number(b.dataset.page)||0);ctx.render();$('.panel-page-status')?.focus({preventScroll:true});return true;}
-        if(act==='inventory-scope'){if(['owned','all'].includes(id)){inventoryScope=id;delete host().dataset.dirty;renderInventory(true);host().querySelector(`[data-action="inventory-scope"][data-id="${id}"]`)?.focus({preventScroll:true});}return true;}
-        if(act==='inventory-category'){if(Object.hasOwn(inventoryCategories,id)){tabsState.inventory=id;delete host().dataset.dirty;renderInventory(true);host().querySelector(`[data-action="inventory-category"][data-id="${id}"]`)?.focus({preventScroll:true});}return true;}
+        if(act==='inventory-category'){if(Object.hasOwn(inventoryCategories,id)){inventoryLinkedItem=null;tabsState.inventory=id;delete host().dataset.dirty;renderInventory(true);host().querySelector(`[data-action="inventory-category"][data-id="${id}"]`)?.focus({preventScroll:true});}return true;}
         if(act==='inventory-item'){selectInventoryItem(id);return true;}
         if(act==='teleport-select'){const item=(K().inventory||[]).find(entry=>Number(entry.item_code)===Number(id));if(item)ctx.beginTeleport?.(item);return true;}
         if(act==='inventory-use-all'){const form=b.closest('form');if(form?.reportValidity())onSubmit(form,true).catch(error=>toast(error.message));return true;}

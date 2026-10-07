@@ -570,7 +570,7 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
 <link rel="stylesheet" href="<?= htmlspecialchars(APP_BASE, ENT_QUOTES) ?>/assets/css/village-theme.css?v=<?= filemtime(__DIR__ . "/../assets/css/village-theme.css") ?>">
 <?php require ROOT_DIR.'/views/partials/localization-head.php'; ?>
 </head>
-<body data-i18n-scope>
+<body class="report-page" data-i18n-scope>
 <?php if (!$isEmbed): $hudCurrentView = 'reports'; require __DIR__ . '/partials/hud.php'; endif ?>
 <div id="game">
 <?php if (!$isEmbed): ?>
