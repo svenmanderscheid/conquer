@@ -79,7 +79,8 @@ export function ground(c,project,s,bounds){
 export function decorations(bounds,occupied){
  const result=[],span=3.1;
  for(let gy=Math.floor(bounds.top/span)-1;gy<=Math.ceil(bounds.bottom/span)+1;gy++)for(let gx=Math.floor(bounds.left/span)-1;gx<=Math.ceil(bounds.right/span)+1;gx++){
-  const seed=hash(gx,gy);if(seed%100>48)continue;
+  // Keep a stable subset of the existing groves, with about a third fewer trees.
+  const seed=hash(gx,gy);if(seed%100>32)continue;
   for(let n=0;n<(seed%7===0?3:1);n++){
    const size=(100+(seed>>>10)%36)/71,x=gx*span+(35+(seed>>>8)%125+n*44)/71,y=gy*span+(40+(seed>>>17)%110+n%2*28)/71;
    if(x<0||y<0||x>(bounds.worldWidth||256)-1||y>(bounds.worldHeight||256)-1||occupied(x,y,size*.6)||occupied(x,y-size*.65,size*.6))continue;

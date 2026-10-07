@@ -7,7 +7,7 @@ window.ConquerWorld = (() => {
   let painted=null,paintedLoading=false;
   function loadPainted(){
     if(paintedLoading)return;paintedLoading=true;
-    import(`${context.base}/assets/js/world-painted.js?v=8`).then(async module=>{
+    import(`${context.base}/assets/js/world-painted.js?v=9`).then(async module=>{
       await module.init(context.base,invalidateArtwork,()=>!sceneVisible||motionReduced()||cameraGesture());
       painted=module;invalidateArtwork();
     }).catch(error=>{console.warn('Painted world fallback',error);loadScenery();});
@@ -846,7 +846,7 @@ window.ConquerWorld = (() => {
     // them. This keeps the illustrated world alive without filling every tile.
     for(let gy=Math.floor(top/clusterSpan)-1;gy<=Math.ceil(bottom/clusterSpan)+1;gy++)for(let gx=Math.floor(left/clusterSpan)-1;gx<=Math.ceil(right/clusterSpan)+1;gx++){
       const v=hash(gx,gy,13),wx=gx*clusterSpan+1+hash(gx,gy,14)*(clusterSpan-2),wy=gy*clusterSpan+1+hash(gx,gy,15)*(clusterSpan-2),weights=window.ConquerLandscape.biomeAt(wx,wy).weights;
-      const treeDensity=.84+weights.forest*.2;
+      const treeDensity=(.84+weights.forest*.2)*2/3;
       if(v<.68*treeDensity){
         const count=6+Math.floor(hash(gx,gy,16)*5)+(weights.forest>.55?2:0);
         for(let k=0;k<count;k++){
