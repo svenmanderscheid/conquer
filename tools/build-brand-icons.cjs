@@ -6,8 +6,8 @@ const sharp = require('sharp');
 const root = path.resolve(__dirname, '..');
 const iconDir = path.join(root, 'assets', 'icons');
 const source = fs.readFileSync(path.join(iconDir, 'union-of-kingdoms-painted-master.png'));
-// Apricotlicht brand violet; preserve the approved painted motif when exporting.
-const background = '#8538bc';
+// Clean-white brand surface; preserve the approved painted motif when exporting.
+const background = '#ffffff';
 async function png(size, opaque = false) {
   let image = sharp(source).resize(size, size);
   if (opaque) image = image.flatten({ background });

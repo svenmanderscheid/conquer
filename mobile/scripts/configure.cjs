@@ -13,7 +13,7 @@ function createConfig(gameUrl) {
     appId: 'com.unionofkingdoms.app',
     appName: 'Union of Kingdoms',
     webDir: 'www',
-    backgroundColor: '#fffaf0',
+    backgroundColor: '#ffffff',
     loggingBehavior: 'debug',
     // Remote PHP pages preserve the current same-origin login for device tests.
     // This setting is deliberately not a production distribution architecture.

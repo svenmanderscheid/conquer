@@ -30,7 +30,7 @@ function bindHitBounds(button,target,img){
 function updateHitBounds(img,binding){
  const {button}=binding,src=binding.enabled?img.getAttribute('src'):null;
  if(src===binding.src)return;binding.src=src;
- button.style.removeProperty('--sprite-hit-clip');delete button.dataset.spriteHitBounds;
+ button.style.removeProperty('--sprite-hit-clip');button.style.removeProperty('--sprite-bottom-inset');delete button.dataset.spriteHitBounds;
  if(!src)return;
  button.dataset.spriteHitBounds='pending';
  if(!hitBoundsCache.has(src))hitBoundsCache.set(src,load(src).then(alphaBounds).catch(()=>null));
@@ -43,6 +43,7 @@ function updateHitBounds(img,binding){
   const inset=[(y+bounds.top*ratio)/height,(width-x-bounds.right*ratio)/width,(height-y-bounds.bottom*ratio)/height,(x+bounds.left*ratio)/width];
   // Keep this on the button: draw() copies img inline geometry to the canvas.
   button.style.setProperty('--sprite-hit-clip',`inset(${inset.map(n=>`${Math.max(0,n)*100}%`).join(' ')})`);
+  button.style.setProperty('--sprite-bottom-inset',String(Math.max(0,inset[2])));
   button.dataset.spriteHitBounds='ready';
  });
 }
@@ -100,16 +101,19 @@ function itemFor(target){
  load(source(target)).then(image=>{item.image=image;matchDragonSize(item);invalidate();}).catch(error=>{item.failed=true;console.warn(error);});return item;
 }
 // One visual hierarchy; authoritative footprints and coordinates remain separate.
-const mapSize=(item,target)=>item.id==='castle'?3.65:files[item.id]?1.75:item.id==='magdar'?2.6:item.id.includes('dragon')?item.w/70*(target.data.definition?.type==='rally'?.9:.65):item.id==='orc'?1.4:1.35;
+const mapSize=(item,target)=>(item.id==='castle'?3.65:files[item.id]?1.75:item.id==='magdar'?2.6:item.id.includes('dragon')?item.w/70*(target.data.definition?.type==='rally'?.9:.65):item.id==='orc'?1.4:1.35)*(target.kind==='monsters'&&target.data.definition?.type!=='rally'?1.2:1);
+const minimumSize=(item,target)=>target.kind==='nodes'?36:target.kind==='monsters'&&target.data.definition?.type!=='rally'?38:0;
+const displaySize=(item,target,tile)=>Math.max(minimumSize(item,target),mapSize(item,target)*tile);
 export function bind(button,target){
  const id=key(target),img=button.querySelector('img');
- if(!id){if(button.dataset.painted){delete button.dataset.painted;img.style.cssText='';button.querySelector('.atlas-painted-motion')?.remove();}bindHitBounds(button,target,img);return;}
+ if(!id){if(button.dataset.painted){delete button.dataset.painted;button.style.removeProperty('--painted-display-size');button.style.removeProperty('--painted-padding');img.style.cssText='';button.querySelector('.atlas-painted-motion')?.remove();}bindHitBounds(button,target,img);return;}
  button.dataset.painted=id;const item=itemFor(target),size=mapSize(item,target);
  button.style.setProperty('--painted-size',String(size));button.style.setProperty('--painted-padding',String(item.groundPadding));
+ button.style.setProperty('--painted-display-size',`max(${minimumSize(item,target)}px, calc(var(--tile-size,44px) * ${size}))`);
  // Preserve img geometry for the target-menu placement calculations.
- img.style.width=img.style.height=`calc(var(--tile-size,44px) * ${size})`;
- img.style.marginLeft=`calc(var(--tile-size,44px) * ${-size/2})`;
- img.style.bottom=`calc(var(--tile-size,44px) * ${-size*item.groundPadding})`;
+ img.style.width=img.style.height='var(--painted-display-size)';
+ img.style.marginLeft='calc(var(--painted-display-size) * -.5)';
+ img.style.bottom='calc(var(--painted-display-size) * var(--painted-padding) * -1)';
  bindHitBounds(button,target,img);
 }
 function ellipse(g,x,y,rx,ry,color){g.save();g.translate(x,y);g.scale(rx,ry);const fade=g.createRadialGradient(0,0,0,0,0,1);fade.addColorStop(0,color);fade.addColorStop(.45,color);fade.addColorStop(1,'transparent');g.fillStyle=fade;g.fillRect(-1,-1,2,2);g.restore();}
@@ -125,7 +129,7 @@ export function draw(button,target,time,reduced){
  }
  const {canvas,img,ctx:g}=binding;
  // Small encounters need small backing stores, rather than 192px for every sprite.
- const resolution=Math.min(192,Math.max(80,Math.ceil(mapSize(item,target)*(button.mapTileSize||44))));
+ const resolution=Math.min(192,Math.max(80,Math.ceil(displaySize(item,target,button.mapTileSize||44))));
  if(canvas.width!==resolution){canvas.width=canvas.height=resolution;canvas.paintStamp=null;}
  if(img.style.opacity!=='0')img.style.opacity='0';
  const geometry=img.style.cssText;
@@ -144,11 +148,11 @@ export function draw(button,target,time,reduced){
 }
 export function shadow(c,x,y,s,target,tiles){
  const id=key(target);if(!id)return false;
- const item=itemFor(target),size=mapSize(item,target);
- const foot=y+tiles*s/2;ellipse(c,x+2,foot-2,size*s*.3,size*s*.08,'rgba(59,73,37,.22)');return true;
+ const item=itemFor(target),size=displaySize(item,target,s);
+ const foot=y+tiles*s/2;ellipse(c,x+2,foot-2,size*.3,size*.08,'rgba(59,73,37,.22)');return true;
 }
 export function visible(target,x,y,tile,tiles,width,height){
  const item=itemFor(target);if(!item)return false;
- const size=mapSize(item,target)*tile,bottom=y+tiles*tile/2+size*item.groundPadding;
+ const size=displaySize(item,target,tile),bottom=y+tiles*tile/2+size*item.groundPadding;
  return x+size/2>=0&&x-size/2<=width&&bottom>=0&&bottom-size<=height;
 }

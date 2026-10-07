@@ -15,7 +15,7 @@ echo json_encode([
     'id'=>$root,'name'=>'Union of Kingdoms','short_name'=>'Union of Kingdoms',
     'description'=>'Build your kingdom and embark on adventures together.',
     'lang'=>'en','start_url'=>$root.'?source=pwa','scope'=>$root,
-    'display'=>'standalone','orientation'=>'any','background_color'=>'#fffaf0','theme_color'=>'#8538bc',
+    'display'=>'standalone','orientation'=>'any','background_color'=>'#ffffff','theme_color'=>'#ffffff',
     'categories'=>['games','entertainment'],
     'icons'=>[
         ['src'=>$root.'assets/icons/conquer-192.png?v='.$iconVersion,'sizes'=>'192x192','type'=>'image/png','purpose'=>'any'],

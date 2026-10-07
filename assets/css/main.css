@@ -1,6 +1,6 @@
 /* ==========================================================================
-   Conquer — Cozy-Stardew Game Theme
-   Warm parchment fantasy aesthetic — Stardew Valley / Cult of the Lamb inspired
+   Union of Kingdoms — clean white fantasy theme
+   Shared white surfaces, soft gray depth, Bree Serif and Nunito
    ========================================================================== */
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -9,18 +9,24 @@
    CSS Custom Properties — Cozy Design Tokens
    -------------------------------------------------------------------------- */
 :root {
-    --ui-primary: #8538bc;
-    --ui-primary-light: #a24dd0;
-    --ui-primary-dark: #532375;
-    --ui-paper: #fffaf0;
-    --ui-card: #fffdf8;
-    --ui-card-light: #fffdf8;
-    --ui-inset: #fff0e2;
-    --ui-disabled: #eee7d9;
-    --ui-ink: #432d4b;
-    --ui-muted: #635368;
-    --ui-line: #dfbda0;
-    --ui-frame: #bca37c;
+    --ui-primary: #637080;
+    --ui-primary-light: #e5eaf0;
+    --ui-primary-dark: #293441;
+    --ui-primary-base: #f0f3f6;
+    --ui-primary-edge: #aab4c0;
+    --ui-primary-highlight: #fff;
+    --ui-head-surface: linear-gradient(#fff,#fff 23%,#f0f3f6);
+    --ui-head-ink: #293441;
+    --ui-selected-surface: linear-gradient(#f0f3f6,#e5eaf0);
+    --ui-paper: #fff;
+    --ui-card: #fff;
+    --ui-card-light: #fff;
+    --ui-inset: #f0f3f6;
+    --ui-disabled: #e5eaf0;
+    --ui-ink: #293441;
+    --ui-muted: #536173;
+    --ui-line: #d7dde4;
+    --ui-frame: #c5cdd5;
     --ui-green: #586d50;
     --ui-green-dark: #3f523a;
     --ui-gold: #c5a361;
@@ -31,7 +37,7 @@
     --c-bg:        var(--ui-paper);
     --c-panel:     var(--ui-card);
     --c-panel2:    var(--ui-inset);
-    --c-panel3:    var(--ui-primary);
+    --c-panel3:    var(--ui-primary-light);
 
     /* Borders */
     --c-border:    var(--ui-line);
@@ -42,7 +48,7 @@
     --c-gold-l:    #d4a070;
     --c-gold-xl:   #e8c090;
     --c-wood-dark: var(--ui-frame);
-    --c-stone:     #d4cfc4;
+    --c-stone:     var(--ui-primary-light);
 
     /* Text */
     --c-text:      var(--ui-ink);
@@ -61,8 +67,8 @@
     --c-info:      #5f9ea0;
 
     /* Shadows */
-    --c-shadow:    rgba(139, 90, 43, 0.18);
-    --c-shadow-h:  rgba(139, 90, 43, 0.32);
+    --c-shadow:    rgba(41, 52, 65, 0.14);
+    --c-shadow-h:  rgba(41, 52, 65, 0.24);
 }
 
 html, body {
@@ -72,7 +78,7 @@ html, body {
 }
 
 /* --------------------------------------------------------------------------
-   Game Buttons — wooden token style
+   Game Buttons — raised neutral surfaces
    -------------------------------------------------------------------------- */
 .btn-game {
     display: inline-flex;
@@ -87,16 +93,16 @@ html, body {
     letter-spacing: 0.05em;
     cursor: pointer;
     border: none;
-    background: var(--ui-primary);
-    color: var(--ui-card-light);
+    background: var(--ui-head-surface);
+    color: var(--ui-head-ink);
     border-bottom: 3px solid var(--ui-frame);
-    box-shadow: 0 2px 6px var(--c-shadow), inset 0 1px 0 rgba(255,220,160,0.3);
+    box-shadow: 0 2px 6px var(--c-shadow), inset 0 1px 0 #fff;
     transition: filter 0.15s, transform 0.1s;
     text-decoration: none;
     font-family: inherit;
     line-height: 1.3;
 }
-.btn-game:hover  { filter: brightness(1.1); color: var(--ui-card-light); }
+.btn-game:hover  { filter: brightness(1.03); }
 .btn-game:active { transform: translateY(1px); border-bottom-width: 2px; }
 
 .btn-game-blue {
@@ -129,17 +135,17 @@ html, body {
 }
 
 /* --------------------------------------------------------------------------
-   Game Panels / Cards — parchment style
+   Game Panels / Cards — white surfaces
    -------------------------------------------------------------------------- */
 .game-panel {
     background: var(--c-panel);
     border: 1px solid var(--c-border);
     border-radius: 10px;
-    box-shadow: 0 3px 12px var(--c-shadow), 0 1px 3px rgba(139,90,43,0.08);
+    box-shadow: 0 3px 12px var(--c-shadow), 0 1px 3px rgba(41,52,65,0.08);
 }
 
 .game-panel-header {
-    background: linear-gradient(180deg, var(--c-panel3) 0%, var(--c-panel2) 100%);
+    background: var(--ui-head-surface);
     border-bottom: 1px solid var(--c-border);
     border-radius: 10px 10px 0 0;
     padding: 10px 16px;
@@ -147,7 +153,7 @@ html, body {
     font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: var(--ui-card-light);
+    color: var(--ui-head-ink);
 }
 
 .game-panel-body { padding: 14px 16px; }
@@ -175,7 +181,7 @@ html, body {
 .game-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(74, 53, 32, 0.6);
+    background: rgba(41, 52, 65, 0.48);
     z-index: 4000;
     display: flex;
     align-items: center;
@@ -224,7 +230,7 @@ html, body {
    Navigation
    -------------------------------------------------------------------------- */
 .cnav-top {
-    background: linear-gradient(180deg, var(--c-panel3) 0%, var(--c-panel2) 100%);
+    background: var(--ui-head-surface);
     border-bottom: 2px solid var(--c-border);
     box-shadow: 0 2px 8px var(--c-shadow);
 }
@@ -261,7 +267,7 @@ html, body {
     letter-spacing: 0.04em;
     text-transform: uppercase;
 }
-.badge-wood   { background: #e8d0a8; color: var(--c-wood-dark); border: 1px solid var(--c-border); }
+.badge-wood   { background: var(--ui-inset); color: var(--ui-ink); border: 1px solid var(--c-border); }
 .badge-green  { background: #d0ecc8; color: #3a6a28;  border: 1px solid rgba(127,176,105,0.4); }
 .badge-red    { background: #f0d0c8; color: #7a2a20;  border: 1px solid rgba(192,96,77,0.4); }
 .badge-blue   { background: #c8e4e8; color: #2a5a60;  border: 1px solid rgba(95,158,160,0.4); }

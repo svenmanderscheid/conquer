@@ -9,6 +9,7 @@ const { buildWeb } = require('../mobile/scripts/build-web.cjs');
 
 test('prototype preserves the game origin and subdirectory without broad navigation permissions', () => {
   const config = createConfig('https://test.example/conquer');
+  assert.equal(config.backgroundColor, '#ffffff', 'The native launch surface follows clean-white branding');
   assert.equal(config.server.url, 'https://test.example/conquer/');
   assert.equal(config.server.cleartext, false);
   assert.equal(config.android.allowMixedContent, false);

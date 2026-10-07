@@ -74,7 +74,7 @@ async function actualFonts(page, selector) {
         assert(geometry.overflow <= 2 && geometry.visible && geometry.height >= 44, 'Authentication remains touch-accessible: ' + route + ' ' + width);
         if (await page.locator('.locale-install .button').count()) {
           const color = await page.locator('.locale-install .button').evaluate(element => getComputedStyle(element).backgroundColor);
-          if (color !== 'rgb(133, 56, 188)') appearanceFailures.push(`auth ${route || 'welcome'} ${width}x${height}: installation accent ${color}`);
+          if (color !== 'rgb(255, 255, 255)') appearanceFailures.push(`auth ${route || 'welcome'} ${width}x${height}: white installation surface ${color}`);
         }
         report.push({ auth: route || 'welcome', width, height, ...geometry });
         await page.screenshot({ path: path.join(output, `${route ? 'recovery' : 'welcome'}-${width}x${height}.png`), fullPage: true });
@@ -138,7 +138,7 @@ async function actualFonts(page, selector) {
         return {
           primary: getComputedStyle(heading).backgroundColor,
           headerBackground: getComputedStyle(heading).backgroundImage,
-          expectedPrimary: 'rgb(133, 56, 188)',
+          expectedPrimary: 'rgb(255, 255, 255)',
           surface: getComputedStyle(dialog).backgroundColor,
           font: getComputedStyle(title).fontFamily,
           titleWeight: getComputedStyle(title).fontWeight,
@@ -152,8 +152,8 @@ async function actualFonts(page, selector) {
       const contrast = await textContrast(page, '#panel-dialog[open]');
       report.push({ contrast: tag, ...contrast });
       appearanceFailures.push(...contrast.failures.map(sample => `${tag}: ${sample.selector} "${sample.text}" contrast ${sample.ratio} < ${sample.minimum}`));
-      if (data.primary !== data.expectedPrimary) appearanceFailures.push(tag + ': violet header ' + data.primary);
-      if (data.surface !== 'rgb(255, 250, 240)') appearanceFailures.push(tag + ': apricot-light surface ' + data.surface);
+      if (data.primary !== data.expectedPrimary) appearanceFailures.push(tag + ': white header ' + data.primary);
+      if (data.surface !== 'rgb(255, 255, 255)') appearanceFailures.push(tag + ': white surface ' + data.surface);
       if (!data.font.includes('Bree Serif') || data.titleWeight !== '400') appearanceFailures.push(tag + ': Bree Serif regular title ' + data.font + ' / ' + data.titleWeight);
       if (data.outside || !data.closeVisible) appearanceFailures.push(tag + ': unreachable window/close action');
       if (data.overflow > 2) appearanceFailures.push(tag + ': horizontal window overflow ' + data.overflow);

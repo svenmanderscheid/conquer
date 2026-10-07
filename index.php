@@ -776,7 +776,7 @@ $authError = match ($_GET['auth_error'] ?? '') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#8538bc">
+    <meta name="theme-color" content="#ffffff">
     <title>Union of Kingdoms — Coming Soon</title>
     <?php require ROOT_DIR.'/views/partials/brand-head.php'; ?>
     <link rel="stylesheet" href="<?= htmlspecialchars(APP_BASE, ENT_QUOTES) ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR.'/assets/css/fantasy-fonts.css') ?>">

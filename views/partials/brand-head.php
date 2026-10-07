@@ -13,3 +13,4 @@ $brandManifestVersion = filemtime(ROOT_DIR . '/manifest.php') . '-' . $brandVers
 <link rel="icon" href="<?= $brandBase ?>/assets/icons/conquer-32.png?v=<?= $brandVersion ?>" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="<?= $brandBase ?>/apple-touch-icon.png?v=<?= $brandVersion ?>" sizes="180x180">
 <link rel="manifest" href="<?= $brandBase ?>/manifest.php?v=<?= $brandManifestVersion ?>">
+<script src="<?= $brandBase ?>/assets/js/ui-press.js?v=<?= filemtime(ROOT_DIR.'/assets/js/ui-press.js') ?>" defer></script>

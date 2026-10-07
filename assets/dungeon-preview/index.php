@@ -8,7 +8,7 @@ function atlasVersion(string $path): string { return (string) filemtime(__DIR__ 
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#8538bc">
+  <meta name="theme-color" content="#ffffff">
   <title>Luxemburg · Union of Kingdoms Dungeonatlas</title>
   <link rel="icon" href="../art/items/compass.svg" type="image/svg+xml">
   <link rel="stylesheet" href="../css/fantasy-fonts.css?v=<?= atlasVersion('../css/fantasy-fonts.css') ?>">

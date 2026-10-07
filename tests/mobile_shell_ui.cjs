@@ -58,6 +58,16 @@ const target = 'https://game.example.test/play/?from=mobile&test=1#city';
     assert.equal(await page.locator('.mobile-shell-retry').textContent(), 'Try again');
     assert.equal(await page.locator('.mobile-shell-retry').getAttribute('href'), target);
     assert.equal(await page.title(), 'Union of Kingdoms');
+    assert.equal(await page.locator('meta[name=theme-color]').getAttribute('content'), '#ffffff');
+    assert.deepEqual(await page.evaluate(() => {
+      const style = selector => getComputedStyle(document.querySelector(selector));
+      return {
+        page:style('body').backgroundColor,
+        headerText:style('.mobile-shell-header').color,
+        retryText:style('.mobile-shell-retry').color,
+        card:style('.mobile-shell-window').backgroundColor
+      };
+    }), { page:'rgb(255, 255, 255)', headerText:'rgb(41, 52, 65)', retryText:'rgb(32, 59, 24)', card:'rgb(255, 255, 255)' }, 'White surfaces preserve dark header and green-action text');
     assert.equal(await page.locator('link[rel=stylesheet],script[src]').count(), 0, 'No external CSS or JavaScript dependencies');
     const styles = await page.locator('style').evaluateAll(nodes => nodes.map(node => node.dataset.source));
     assert.equal(styles.at(-1), 'assets/css/village-theme.css', 'Embedded shared theme is loaded last');
