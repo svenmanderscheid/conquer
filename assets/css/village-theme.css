@@ -1,28 +1,30 @@
 /* Conquer's shared village UI. Authoritative appearance layer; layout stays in each feature.
    Reference: docs/UI_STYLE_GUIDE.md and assets/art/village2.png.
-   Approved Clean White / Bree Serif + Nunito, 7 October 2026; see docs/BRANDING_KIT.md.
+   Approved Warm Cream & Royal Gold / Bree Serif + Nunito, 7 October 2026; see docs/BRANDING_KIT.md.
    Neutral application chrome remains separate from semantic game colours. */
 :root {
   color-scheme:light;
-  --ui-paper:#fff; --ui-card:#fff; --ui-card-light:#fff;
-  --ui-inset:#f0f3f6; --ui-disabled:#e5eaf0;
-  --ui-ink:#293441; --ui-muted:#536173;
-  --ui-line:#d7dde4; --ui-frame:#c5cdd5;
-  --ui-primary:#637080; --ui-primary-light:#e5eaf0; --ui-primary-dark:#293441;
-  --ui-primary-base:#f0f3f6; --ui-primary-edge:#aab4c0; --ui-primary-highlight:#fff;
-  --ui-surface:linear-gradient(#fff,#f7f9fc);
-  --ui-surface-inset:linear-gradient(#f7f9fc,#f0f3f6);
-  --ui-surface-footer:linear-gradient(#fff,#f4f6f8);
-  --ui-head-surface:linear-gradient(#fff,#fff 23%,#f0f3f6);
+  --ui-paper:#fff7e7; --ui-card:#fffcf3; --ui-card-light:#fffcf3;
+  --ui-inset:#f0e5cf; --ui-disabled:#e3d3b5;
+  --ui-ink:#3a3529; --ui-muted:#68604f;
+  --ui-line:#d9c7a4; --ui-frame:#c9b48e;
+  --ui-primary:#756a55; --ui-primary-light:#e3d3b5; --ui-primary-dark:#3a3529;
+  --ui-primary-base:#f0e5cf; --ui-primary-edge:#b39b76; --ui-primary-highlight:#fffcf3;
+  --ui-accent-gold:#d6a64d; --ui-accent-gold-soft:#fff5de;
+  --ui-accent-gold-ink:#704600; --ui-accent-gold-edge:#8b611b;
+  --ui-surface:linear-gradient(#fffcf3,#faf2e1);
+  --ui-surface-inset:linear-gradient(#faf2e1,#f0e5cf);
+  --ui-surface-footer:linear-gradient(#fffcf3,#f8edda);
+  --ui-head-surface:linear-gradient(#fffcf3,#fffcf3 23%,#faf2e1);
   --ui-head-ink:var(--ui-ink);
-  --ui-selected-surface:linear-gradient(#f0f3f6,#e5eaf0);
+  --ui-selected-surface:linear-gradient(var(--ui-card),var(--ui-accent-gold-soft));
   --ui-action-green-light:#b6e084; --ui-action-green:#82c34a; --ui-action-green-base:#72b641;
   --ui-action-green-ink:#203b18; --ui-action-green-edge:#4c7a2d; --ui-action-green-highlight:#d9f3aa;
   --ui-action-green-surface:linear-gradient(var(--ui-action-green-light),var(--ui-action-green) 18%,var(--ui-action-green-base));
   --ui-action-gold-surface:linear-gradient(#ffe293,#ffc24c 24%,#edae33);
   --ui-action-gold-ink:#4e2d36; --ui-action-gold-edge:#a56b22;
-  --ui-window-head:#f0f3f6; --ui-window-head-light:#fff; --ui-window-head-shadow:#aab4c0;
-  --ui-window-frame:#fff; --ui-window-frame-edge:#c5cdd5;
+  --ui-window-head:#faf2e1; --ui-window-head-light:#fffcf3; --ui-window-head-shadow:#b39b76;
+  --ui-window-frame:#fff7e7; --ui-window-frame-edge:#c9b48e;
   --ui-blue:#2a72c9; --ui-blue-light:#438fe4; --ui-blue-dark:#24559c;
   --ui-green:#586d50; --ui-green-dark:#3f523a; --ui-green-soft:#e3eadc;
   --ui-gold:#c5a361; --ui-gold-soft:#f1e2bd; --ui-orange:#ed8a31;
@@ -32,7 +34,7 @@
   --ui-font:'Nunito','Conquer UI','Segoe UI',sans-serif;
   --ui-font-number:var(--ui-font);
   --ui-font-heading:'Bree Serif','Nunito','Conquer UI',Georgia,serif;
-  --ui-shadow:inset 0 0 0 2px var(--ui-card-light),0 5px 0 var(--ui-line),0 8px 0 var(--ui-primary-edge),0 13px 24px #29344125;
+  --ui-shadow:inset 0 0 0 2px var(--ui-card-light),0 5px 0 var(--ui-line),0 8px 0 var(--ui-primary-edge),0 13px 24px #3a352925;
 }
 
 /* Currency identity follows the approved amethyst mine; action/rarity colours stay separate. */
@@ -188,7 +190,7 @@ body.mobile-game :is(#panel-dialog,#game-dialog,.map-overlay-panel) :is(h1,h2,h3
 /* One neutral roof over every window. */
 body.mobile-game :is(#panel-dialog .page-heading,#game-dialog .popup-heading,#game-dialog .march-command-heading,.map-overlay-heading) {
   background:var(--ui-paper) var(--ui-head-surface)!important; color:var(--ui-head-ink)!important;
-  border-bottom:3px solid var(--ui-primary-dark)!important; box-shadow:inset 0 3px #ffffff24!important;
+  border-bottom:3px solid var(--ui-accent-gold)!important; box-shadow:inset 0 3px #ffffff24!important;
 }
 body.mobile-game :is(.page-heading,.popup-heading,.march-command-heading,.map-overlay-heading)::before,
 body.mobile-game :is(.page-heading,.popup-heading,.march-command-heading,.map-overlay-heading)::after { display:none!important; }
@@ -278,7 +280,7 @@ body.mobile-game :is(#panel-dialog,#game-dialog,.map-overlay-panel) :is(input:no
 }
 body.mobile-game :is(#panel-dialog,#game-dialog,.map-overlay-panel) ::placeholder { color:var(--ui-muted)!important; opacity:1; }
 body.mobile-game :is(#panel-dialog,#game-dialog,.map-overlay-panel) :is(button,input,select,textarea,a,summary):focus-visible {
-  outline:3px solid var(--ui-primary)!important; outline-offset:2px;
+  outline:3px solid var(--ui-accent-gold-edge)!important; outline-offset:2px;
 }
 body.mobile-game #panel-dialog .alliance-action {
   background:var(--ui-gold-soft)!important;color:var(--ui-ink)!important;
@@ -300,7 +302,7 @@ body.mobile-game :is(#panel-dialog,#game-dialog) :is(.progress-track>span,.rt-le
   background:var(--ui-green)!important; box-shadow:inset 0 2px #b2d68a!important;
 }
 body.mobile-game :is(#panel-dialog,#game-dialog) :is(.unit-locked,.treasury-slot.is-locked) {
-  background:var(--ui-disabled)!important; border-color:#b4a17e!important; color:var(--ui-muted)!important;
+  background:var(--ui-disabled)!important; border-color:#b4a17e!important; color:var(--ui-ink)!important;
 }
 body.mobile-game :is(#panel-dialog,#game-dialog) :is(.requirement-met,.notice.success,.treasury-slot.is-equipped,.achievement.unlocked,.community-message.mine) {
   background:var(--ui-green-soft)!important; border-color:#72974f!important; color:var(--ui-green-dark)!important;
@@ -2015,7 +2017,7 @@ body.mobile-game .march-formation-dialog footer button { margin:0; min-width:0; 
 body.mobile-game .march-formation-dialog #march-formation-confirm { background:var(--ui-green); border-color:var(--ui-green-dark); color:var(--ui-card-light); }
 body.mobile-game .march-formation-dialog #march-formation-error { color:var(--ui-red-dark); }
 body.mobile-game .march-formation-dialog :is(button,input):focus-visible { outline:3px solid var(--ui-primary); outline-offset:2px; }
-body.mobile-game .march-formation-dialog button:disabled { cursor:default; opacity:1; background:var(--ui-disabled)!important; color:var(--ui-muted)!important; border-color:var(--ui-line)!important; }
+body.mobile-game .march-formation-dialog button:disabled { cursor:default; opacity:1; background:var(--ui-disabled)!important; color:var(--ui-ink)!important; border-color:var(--ui-line)!important; }
 @media(max-height:500px) {
  body.mobile-game .march-formation-dialog-body { gap:7px; padding:10px 14px; }
  body.mobile-game .march-formation-dialog header { padding:3px 12px; }
@@ -3843,7 +3845,7 @@ body.mobile-game .world-chat-conversation-badge { display:grid;place-items:cente
 body.mobile-game .world-chat-window :is(button,input,select,textarea):focus-visible { outline:3px solid var(--ui-primary);outline-offset:2px; }
 body.mobile-game .world-chat-window-heading button:focus-visible { outline-color:var(--ui-primary); }
 body.mobile-game .world-chat-window :is(button,input,select,textarea):disabled { background:var(--ui-disabled);color:var(--ui-muted);cursor:default; }
-body.mobile-game .world-chat .world-chat-compose button[type=submit]:disabled { background:var(--ui-disabled)!important;color:var(--ui-muted)!important;border-color:var(--ui-line)!important; }
+body.mobile-game .world-chat .world-chat-compose button[type=submit]:disabled { background:var(--ui-disabled)!important;color:var(--ui-ink)!important;border-color:var(--ui-line)!important; }
 body.mobile-game .world-chat :is(.world-chat-tools,.world-chat-latest,.world-chat-badge,.world-chat-conversation-badge)[hidden] { display:none; }
 @media(max-width:700px), (max-width:1100px) and (max-height:520px) and (orientation:landscape) {
   body.mobile-game .world-chat-window-heading { gap:6px;padding-inline:7px;padding-top:calc(6px + env(safe-area-inset-top,0px)); }
@@ -5174,7 +5176,7 @@ body.mobile-game #game-dialog .requirement-card .requirement-card-footer {
 }
 .requirement-card-footer>strong { color:var(--ui-red-dark);font-weight:700; }
 .requirement-met .requirement-card-footer>strong { color:var(--ui-green-dark); }
-body.mobile-game #game-dialog .requirement-card .requirement-card-footer>span { color:var(--ui-primary)!important; }
+body.mobile-game #game-dialog .requirement-card .requirement-card-footer>span { color:var(--ui-muted)!important; }
 .requirement-card-footer i { font-style:normal;font-size:17px;line-height:1; }
 .requirement-meter { display:block;min-width:0;height:7px;border-radius:8px;background:var(--ui-disabled);overflow:hidden; }
 .requirement-meter>span { display:block;height:100%;border-radius:inherit;background:var(--ui-green); }
@@ -5281,7 +5283,7 @@ body.mobile-game :is(#panel-dialog,#game-dialog) .loot-tile.item-icon .loot-coun
   font-variant-numeric:tabular-nums;white-space:nowrap;
 }
 body.mobile-game :is(#panel-dialog,#game-dialog) .loot-tile.item-icon.is-unowned .loot-count {
-  background:var(--ui-disabled)!important;border-color:var(--ui-line);color:var(--ui-muted)!important;box-shadow:none;
+  background:var(--ui-disabled)!important;border-color:var(--ui-line);color:var(--ui-ink)!important;box-shadow:none;
 }
 body.mobile-game :is(#panel-dialog,#game-dialog) .inventory-dialog .inventory-owned {
   display:inline-block;margin-top:5px;padding:5px 9px;border:1px solid var(--ui-gold);border-radius:8px;
@@ -5474,8 +5476,8 @@ body.mobile-game :is(#panel-dialog,#game-dialog,.map-overlay-panel) :is(
   .rt-branch.is-selected,.army-tier-tabs .selected,.profile-nav.active,.vip-tabs [aria-pressed=true],
   .vip-level-picker [aria-pressed=true],.skin-category-tabs [aria-pressed=true],.event-simple-tabs [aria-pressed=true]
 ) {
-  background:var(--ui-paper) var(--ui-selected-surface)!important;color:var(--ui-head-ink)!important;
-  border-color:var(--ui-primary-dark)!important;box-shadow:inset 0 2px var(--ui-primary-highlight),0 3px 0 var(--ui-primary-edge)!important;
+  background:var(--ui-accent-gold-soft) var(--ui-selected-surface)!important;color:var(--ui-accent-gold-ink)!important;
+  border-color:var(--ui-accent-gold-edge)!important;box-shadow:inset 0 2px var(--ui-primary-highlight),0 3px 0 var(--ui-accent-gold-edge)!important;
 }
 /* Neutral training surfaces match the shared windows; tier frames keep their colours. */
 body.mobile-game #panel-dialog[data-panel="army"]:not([data-hospital="true"]) :is(.training-showcase,.training-tier-picker,.training-controls,.training-portrait) {
@@ -5487,8 +5489,8 @@ body.mobile-game #panel-dialog[data-panel="army"]:not([data-hospital="true"]) .t
   box-shadow:inset 0 2px var(--ui-card-light),0 3px 0 var(--ui-line)!important;
 }
 body.mobile-game #panel-dialog[data-panel="army"]:not([data-hospital="true"]) .training-school :is(.training-schools button,.training-view-tabs button)[aria-pressed="true"] {
-  background:var(--ui-paper) var(--ui-selected-surface)!important;color:var(--ui-head-ink)!important;
-  border-color:var(--ui-primary-dark)!important;box-shadow:inset 0 2px var(--ui-primary-highlight),0 3px 0 var(--ui-primary-edge)!important;
+  background:var(--ui-accent-gold-soft) var(--ui-selected-surface)!important;color:var(--ui-accent-gold-ink)!important;
+  border-color:var(--ui-accent-gold-edge)!important;box-shadow:inset 0 2px var(--ui-primary-highlight),0 3px 0 var(--ui-accent-gold-edge)!important;
 }
 body.mobile-game #panel-dialog .training-school .training-schools button[aria-pressed="true"] :is(strong,small) { color:inherit!important; }
 body.play-login-page .play-card { background:var(--ui-surface) var(--ui-paper);box-shadow:var(--ui-shadow); }
@@ -5498,7 +5500,7 @@ body.report-page .topbar { background:var(--ui-paper) var(--ui-head-surface);col
 body.report-page .topbar :is(.topbar-id,.topbar-date) { color:inherit; }
 body.report-page .topbar-back { background:var(--ui-action-gold-surface);color:var(--ui-action-gold-ink);border-color:var(--ui-action-gold-edge);min-height:44px; }
 
-/* Clean White keeps chrome quiet; gameplay, rarity and currency colours remain semantic. */
+/* Warm Cream keeps chrome quiet; gameplay, rarity and currency colours remain semantic. */
 :is(body.mobile-game,body.welcome,body.play-login-page,body.report-page) :is(
   .page-heading,.popup-heading,.march-command-heading,.map-overlay-heading,.play-card-head
 ) :is(h1,h2,h3,#page-title) {
@@ -5535,8 +5537,8 @@ body.report-page .topbar-back {
   border-color:var(--ui-frame)!important;box-shadow:inset 0 2px var(--ui-card),0 3px var(--ui-primary-edge)!important;
 }
 body.mobile-game :is(#panel-dialog,#game-dialog) :is(.subtab.active,.inventory-category-tabs .active,.profile-nav.active,.rt-branch.is-selected,.training-view-tabs [aria-pressed=true],.training-schools [aria-pressed=true]) {
-  background:var(--ui-inset) var(--ui-selected-surface)!important;color:var(--ui-ink)!important;
-  border-color:var(--ui-primary)!important;box-shadow:inset 0 0 0 1px var(--ui-primary),0 2px var(--ui-primary-edge)!important;
+  background:var(--ui-accent-gold-soft) var(--ui-selected-surface)!important;color:var(--ui-accent-gold-ink)!important;
+  border-color:var(--ui-accent-gold-edge)!important;box-shadow:inset 0 0 0 1px var(--ui-accent-gold-edge),0 2px var(--ui-accent-gold-edge)!important;
 }
 .guide-button.guide-primary:hover { background:var(--ui-selected-surface);color:var(--ui-ink); }
 body.mobile-game .hud-hunter-track>i { background:var(--ui-primary); }
@@ -5573,6 +5575,29 @@ body.mobile-game #panel-dialog[data-panel="army"]:not([data-hospital="true"]) #c
 body.mobile-game #panel-dialog[data-panel="army"] :is(.training-role-icon,.training-rank):not([data-troop-tier]) {
   background:var(--ui-head-surface);border-color:var(--ui-frame);box-shadow:inset 0 2px var(--ui-card),0 3px var(--ui-primary-edge);
 }
+/* Gold marks navigation and selection, independently of rewards and rarity. */
+body.mobile-game #resources { border-bottom:2px solid var(--ui-accent-gold)!important; }
+body.mobile-game #navigation .game-dock-item { border-top-color:var(--ui-accent-gold)!important; }
+body.mobile-game #navigation .game-dock-item.current {
+  border-color:var(--ui-accent-gold-edge)!important;color:var(--ui-accent-gold-ink)!important;
+  background:var(--ui-selected-surface)!important;
+}
+body.mobile-game #navigation .game-dock-item.current .dock-label {
+  background:var(--ui-accent-gold-soft)!important;color:var(--ui-accent-gold-ink)!important;
+}
+body.mobile-game .world-chat-tabs>button[aria-pressed=true] {
+  border-color:var(--ui-accent-gold-edge);color:var(--ui-accent-gold-ink);
+  box-shadow:inset 0 -3px var(--ui-accent-gold),0 2px 4px #3a352920;
+}
+/* Keep the existing plaque at the building, only for the current selection.
+   Construction/training status remains visible even when its name is hidden. */
+body.mobile-game .painted-village-building:not([aria-pressed="true"]) :is(.painted-building-name,.painted-building-level),
+body.mobile-game .painted-village-building:not([aria-pressed="true"]):not(.is-building):not(.is-training)>.painted-building-label { display:none; }
+body.mobile-game .painted-village-building:not([aria-pressed="true"]):is(.is-building,.is-training)>.painted-building-label {
+  padding:0;border:0;background:transparent;box-shadow:none!important;
+}
+body.mobile-game .painted-village-building:not([aria-pressed="true"])>.painted-building-label>.painted-build-status { margin:0; }
+.painted-village-building:focus-visible:not([aria-pressed="true"])>:is(.painted-building-sprite,.painted-motion) { filter:brightness(1.18); }
 /* Individual translate preserves each control's existing layout transform. Native clicks
    remain native; ui-press.js only tracks the visual press/cancel state. */
 :is(body.mobile-game,body.welcome,body.play-login-page,body.report-page) .ui-press-ready {

@@ -21,7 +21,7 @@ if($mode==='register'){
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#fff7e7">
 <title>Union of Kingdoms – Sign in to play</title><?php require ROOT_DIR.'/views/partials/brand-head.php'; ?>
 
 <link rel="stylesheet" href="<?= $base ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR.'/assets/css/fantasy-fonts.css') ?>">

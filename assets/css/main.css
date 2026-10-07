@@ -1,6 +1,6 @@
 /* ==========================================================================
-   Union of Kingdoms — clean white fantasy theme
-   Shared white surfaces, soft gray depth, Bree Serif and Nunito
+   Union of Kingdoms — warm cream and royal gold fantasy theme
+   Shared cream surfaces, warm depth, Bree Serif and Nunito
    ========================================================================== */
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -9,24 +9,36 @@
    CSS Custom Properties — Cozy Design Tokens
    -------------------------------------------------------------------------- */
 :root {
-    --ui-primary: #637080;
-    --ui-primary-light: #e5eaf0;
-    --ui-primary-dark: #293441;
-    --ui-primary-base: #f0f3f6;
-    --ui-primary-edge: #aab4c0;
-    --ui-primary-highlight: #fff;
-    --ui-head-surface: linear-gradient(#fff,#fff 23%,#f0f3f6);
-    --ui-head-ink: #293441;
-    --ui-selected-surface: linear-gradient(#f0f3f6,#e5eaf0);
-    --ui-paper: #fff;
-    --ui-card: #fff;
-    --ui-card-light: #fff;
-    --ui-inset: #f0f3f6;
-    --ui-disabled: #e5eaf0;
-    --ui-ink: #293441;
-    --ui-muted: #536173;
-    --ui-line: #d7dde4;
-    --ui-frame: #c5cdd5;
+    --ui-primary: #756a55;
+    --ui-primary-light: #e3d3b5;
+    --ui-primary-dark: #3a3529;
+    --ui-primary-base: #f0e5cf;
+    --ui-primary-edge: #b39b76;
+    --ui-primary-highlight: #fffcf3;
+    --ui-surface: linear-gradient(#fffcf3,#faf2e1);
+    --ui-surface-inset: linear-gradient(#faf2e1,#f0e5cf);
+    --ui-surface-footer: linear-gradient(#fffcf3,#f8edda);
+    --ui-head-surface: linear-gradient(#fffcf3,#fffcf3 23%,#faf2e1);
+    --ui-head-ink: #3a3529;
+    --ui-selected-surface: linear-gradient(var(--ui-card),var(--ui-accent-gold-soft));
+    --ui-window-head: #faf2e1;
+    --ui-window-head-light: #fffcf3;
+    --ui-window-head-shadow: #b39b76;
+    --ui-window-frame: #fff7e7;
+    --ui-window-frame-edge: #c9b48e;
+    --ui-paper: #fff7e7;
+    --ui-card: #fffcf3;
+    --ui-card-light: #fffcf3;
+    --ui-inset: #f0e5cf;
+    --ui-disabled: #e3d3b5;
+    --ui-ink: #3a3529;
+    --ui-muted: #68604f;
+    --ui-line: #d9c7a4;
+    --ui-frame: #c9b48e;
+    --ui-accent-gold: #d6a64d;
+    --ui-accent-gold-soft: #fff5de;
+    --ui-accent-gold-ink: #704600;
+    --ui-accent-gold-edge: #8b611b;
     --ui-green: #586d50;
     --ui-green-dark: #3f523a;
     --ui-gold: #c5a361;
@@ -67,8 +79,8 @@
     --c-info:      #5f9ea0;
 
     /* Shadows */
-    --c-shadow:    rgba(41, 52, 65, 0.14);
-    --c-shadow-h:  rgba(41, 52, 65, 0.24);
+    --c-shadow:    rgba(58, 53, 41, 0.14);
+    --c-shadow-h:  rgba(58, 53, 41, 0.24);
 }
 
 html, body {
@@ -96,7 +108,7 @@ html, body {
     background: var(--ui-head-surface);
     color: var(--ui-head-ink);
     border-bottom: 3px solid var(--ui-frame);
-    box-shadow: 0 2px 6px var(--c-shadow), inset 0 1px 0 #fff;
+    box-shadow: 0 2px 6px var(--c-shadow), inset 0 1px 0 var(--ui-primary-highlight);
     transition: filter 0.15s, transform 0.1s;
     text-decoration: none;
     font-family: inherit;
@@ -135,13 +147,13 @@ html, body {
 }
 
 /* --------------------------------------------------------------------------
-   Game Panels / Cards — white surfaces
+   Game Panels / Cards — cream surfaces
    -------------------------------------------------------------------------- */
 .game-panel {
     background: var(--c-panel);
     border: 1px solid var(--c-border);
     border-radius: 10px;
-    box-shadow: 0 3px 12px var(--c-shadow), 0 1px 3px rgba(41,52,65,0.08);
+    box-shadow: 0 3px 12px var(--c-shadow), 0 1px 3px rgba(58,53,41,0.08);
 }
 
 .game-panel-header {
@@ -181,7 +193,7 @@ html, body {
 .game-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(41, 52, 65, 0.48);
+    background: rgba(58, 53, 41, 0.48);
     z-index: 4000;
     display: flex;
     align-items: center;

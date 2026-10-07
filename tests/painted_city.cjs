@@ -1,22 +1,36 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
+const http=require('node:http');
 const pw=require(process.env.PLAYWRIGHT_MODULE||'playwright');
+const textContrast=require('./fixtures/menu_text_contrast.cjs');
 const root=path.resolve(__dirname,'..');
 (async()=>{
+ const server=http.createServer((request,response)=>{
+  const url=new URL(request.url,'http://localhost');
+  if(url.pathname==='/'){response.setHeader('Content-Type','text/html');response.end('<style>html,body{margin:0}#host{position:absolute;inset:0}</style><body class="mobile-game"><main id="host"></main></body>');return;}
+  const file=path.resolve(root,'.'+url.pathname);
+  if(!file.startsWith(path.join(root,'assets')+path.sep)||!fs.existsSync(file)||!fs.statSync(file).isFile()){response.writeHead(404).end();return;}
+  response.setHeader('Content-Type',({'.png':'image/png','.webp':'image/webp','.svg':'image/svg+xml','.woff2':'font/woff2'})[path.extname(file)]||'application/octet-stream');response.end(fs.readFileSync(file));
+ });
+ await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+ const base='http://127.0.0.1:'+server.address().port;
  const browser=await pw.chromium.launch({headless:true,channel:process.env.PLAYWRIGHT_CHANNEL||'msedge'});
  try{
   const page=await browser.newPage();
-  await page.setContent('<style>html,body{margin:0}#host{position:absolute;inset:0}</style><main id="host"></main>');
+  await page.goto(base);
   await page.addStyleTag({path:path.join(root,'assets/css/village-theme.css')});
   await page.addScriptTag({path:path.join(root,'assets/js/city-painted.js')});
-  await page.evaluate(async()=>{
+  await page.evaluate(async base=>{
    window.ConquerCastleSkins={ids:['forest','fire'],get:id=>({id:['forest','fire'].includes(id)?id:'default'}),image:(base,id)=>base+'/assets/art/map/castle-'+id+'.png',motionImage:(base,id)=>id==='fire'?base+'/assets/art/map/castle-missing.webp':base+'/assets/art/map/castle-'+id+'.webp'};
-   window.fixture={host:document.querySelector('#host'),base:'http://localhost/conquer',state:{city:{city_skin:'default'},buildings:{castle:{level:14}},troop_defs:[],troop_queue:[]},labels:{castle:'Burg'},countdown:()=>'<time>1:47:54</time>'};
+   window.fixture={host:document.querySelector('#host'),base,state:{city:{city_skin:'default'},buildings:{castle:{level:14}},troop_defs:[],troop_queue:[]},labels:{castle:'Burg'},countdown:()=>'<time>1:47:54</time>'};
    ConquerPaintedCity.render(fixture);
    await new Promise(requestAnimationFrame);
-  });
+  },base);
   assert.equal(await page.locator('.painted-building-sprite').count(),15,'Separate approved-style sprites');
+  assert.equal(await page.locator('.painted-village-building[aria-pressed="false"]').count(),16,'Buildings start with no selection');
+  assert.equal(await page.locator('.painted-building-name:visible,.painted-building-level:visible').count(),0,'Names and levels appear only after selection');
+  assert.equal(await page.locator('.painted-village-building[title]').count(),0,'No hover tooltip bypasses the selection-only labels');
   assert.match(await page.locator('.painted-village-scene>img').getAttribute('src'),/village-layered-v2\/runtime\/terrain-extended\.webp$/);
   const castle=page.locator('[data-id="castle"] .painted-building-sprite');
   await page.evaluate(()=>{fixture.citySkin='fire';ConquerPaintedCity.render(fixture);});
@@ -40,7 +54,11 @@ const root=path.resolve(__dirname,'..');
   const trainingStatus=page.locator('[data-id="archery_range"] .painted-build-status');
   assert.equal(await trainingStatus.isVisible(),true,'Running training is visible above its painted building');
   assert.match(await trainingStatus.innerText(),/Ausbildung\s+25 Truppen\s+Restzeit\s+1:47:54/,'Training badge separates troop count and remaining time');
-  assert.equal(await trainingStatus.evaluate(element=>getComputedStyle(element).backgroundColor),'rgb(92, 66, 112)','Training badge uses the high-contrast village purple');
+  await trainingStatus.scrollIntoViewIfNeeded();
+  const trainingContrast=await textContrast(page,'[data-id="archery_range"] .painted-build-status');
+  assert(trainingContrast.checked>0,'Running training has measured visible text');
+  assert.deepEqual(trainingContrast.failures,[],'Training badge remains readable in the shared palette');
+  assert.equal(await page.locator('[data-id="archery_range"] .painted-building-name').isVisible(),false,'Unselected running jobs do not reveal the building name');
   assert.equal(await page.locator('[data-id="archery_range"] .painted-scaffold').isVisible(),false,'Training does not show a construction scaffold');
   await page.evaluate(()=>{fixture.state.build_queue=[{id:8,building_code:'academy',level_to:2,finishes_at:'2030-01-01 12:00:00'}];ConquerPaintedCity.render(fixture);});
   const buildStatus=page.locator('[data-id="academy"] .painted-build-status');
@@ -81,18 +99,39 @@ const root=path.resolve(__dirname,'..');
    assert.equal(await page.locator('.painted-village-scroll').evaluate(s=>s.scrollLeft),before+70,'Mouse drag pans horizontally');
    assert.equal(await page.locator('.painted-village-scroll').evaluate(s=>s.scrollTop),50,'Mouse drag pans vertically');
    assert.equal(await page.evaluate(()=>buildingClicks),0,'Dragging does not activate a building');
+   assert.equal(await page.locator('.painted-building-name:visible').count(),0,'Dragging never reveals a building name');
    assert.equal(await page.locator('.painted-village-building').count(),16);
    assert.equal(await page.locator('[data-id="castle"]').getAttribute('aria-label'),'Burg · Stufe 14');
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'No document overflow');
    for(const button of await page.locator('.painted-village-building').all()){
     await button.click();
-    assert(await page.locator('.painted-building-banner').isVisible(),'Selection banner opens: '+await button.getAttribute('data-id')+' '+size.width);
-    assert.equal(await page.locator('.painted-building-banner strong').textContent(),await button.getAttribute('data-name'));
+    assert.equal(await button.getAttribute('aria-pressed'),'true','Native click selects the existing building');
+    assert.equal(await page.locator('.painted-building-name:visible').count(),1,'Exactly one selected name is visible');
+    assert(await button.locator('.painted-building-name').isVisible(),'The existing name plaque is attached to the selected building');
+    assert(await button.locator('.painted-building-level').isVisible(),'Selected building level remains visible');
+    assert(await page.locator('.painted-building-actions').isVisible(),'Existing action row opens: '+await button.getAttribute('data-id')+' '+size.width);
+    assert.equal(await page.locator('.painted-building-banner').count(),0,'No duplicate name/level card is created');
+    assert.equal(await button.locator('.painted-building-name').textContent(),await button.getAttribute('data-name'));
+    assert(await button.evaluate(node=>{const plaque=node.querySelector('.painted-building-label').getBoundingClientRect(),actions=document.querySelector('.painted-building-actions').getBoundingClientRect();return actions.bottom<=plaque.top||actions.top>=plaque.bottom||actions.right<=plaque.left||actions.left>=plaque.right;}),'Action row does not cover the name/level plaque');
     await page.locator('.painted-selection-close').click();
+    assert.equal(await page.locator('.painted-building-name:visible').count(),0,'Closing selection hides names again');
    }
    assert.equal(await page.evaluate(()=>buildingClicks),0,'Selection does not open upgrade dialog immediately');
+   const selected=page.locator('.painted-village-building[data-id="academy"]');
+   await selected.focus();assert.equal(await selected.locator('.painted-building-name').isVisible(),false,'Keyboard focus alone does not select');
+   await selected.press('Enter');assert.equal(await selected.getAttribute('aria-pressed'),'true','Enter selects a building');
+   await page.evaluate(()=>ConquerPaintedCity.render(fixture));
+   assert.equal(await selected.getAttribute('aria-pressed'),'true','A normal state refresh preserves the selection');
+   assert(await selected.locator('.painted-building-name').isVisible(),'The selected plaque survives a state refresh');
+   await selected.press('Escape');assert.equal(await page.locator('.painted-building-name:visible').count(),0,'Escape clears the label');
+   await selected.press('Space');assert.equal(await selected.getAttribute('aria-pressed'),'true','Space selects a building');
+   await page.locator('.painted-village-scene>img').dispatchEvent('click');
+   assert.equal(await page.locator('.painted-building-name:visible').count(),0,'A free-terrain click clears selection');
+   await selected.click();await page.locator('.painted-building-actions [data-action="building"]').click();
+   assert.equal(await page.evaluate(()=>buildingClicks),1,'Existing upgrade/info action is dispatched once');
+   assert.equal(await page.locator('.painted-building-name:visible').count(),0,'Opening the existing action clears selection');
    assert(await page.evaluate(()=>{const s=document.querySelector('.painted-village-scroll');s.scrollLeft=120;const before=s.scrollLeft;ConquerPaintedCity.render(fixture);return s.scrollLeft===before;}),'Refresh preserves pan position');
   }
   console.log('Painted village: 16 building targets checked in four viewport sizes; refresh preserves position.');
- }finally{await browser.close();}
+ }finally{await browser.close();await new Promise(resolve=>server.close(resolve));}
 })().catch(error=>{console.error(error);process.exitCode=1;});

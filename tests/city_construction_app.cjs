@@ -75,7 +75,7 @@ async function detailMotionSamples(art){
    assert(first.motion.length>0,'Work details animate');assert.notDeepEqual(first.motion,second.motion,'The construction pose changes visibly during its work cycle');
    assert.equal(await building.locator('.painted-scaffold').getAttribute('aria-hidden'),'true','Work decoration is excluded from accessibility navigation');
    assert.equal(await building.locator('.painted-scaffold').evaluate(node=>getComputedStyle(node).pointerEvents),'none','Decoration cannot intercept touch');
-   await building.tap();await page.locator('.painted-building-banner').waitFor();assert.match(await page.locator('.painted-building-banner').innerText(),/Farm/i,'Tap selects the working building');
+   await building.tap();await page.locator('.painted-building-menu:not([hidden]) .painted-building-actions').waitFor();assert.match(await building.locator('.painted-building-name').innerText(),/Farm/i,'Tap selects the working building');
    await page.locator('.painted-building-actions [data-action="building"]').tap();await page.locator('#game-dialog[open]').waitFor();
    const paused=await page.evaluate(animationState);assert(paused.motion.every(node=>node.playState==='paused'),'Construction pauses behind its upgrade dialog');
    await page.screenshot({path:path.join(output,`${phase}-${width}x${height}-dialog.png`)});await closeDialogs();
@@ -145,7 +145,7 @@ async function detailMotionSamples(art){
     for(const [width,height] of [[390,844],[844,390]]){
      await page.setViewportSize({width,height});await reveal(target);await page.screenshot({path:path.join(output,`after-${width}x${height}-${code}.png`)});
      if(width===390)await target.locator('.painted-scaffold').screenshot({path:path.join(output,`after-detail-${code}.png`)});
-     await target.tap();await page.locator('.painted-building-banner').waitFor();assert.equal(await target.getAttribute('aria-pressed'),'true',`Working building selects by touch: ${code} ${width}x${height}`);
+     await target.tap();await page.locator('.painted-building-menu:not([hidden]) .painted-building-actions').waitFor();assert.equal(await target.getAttribute('aria-pressed'),'true',`Working building selects by touch: ${code} ${width}x${height}`);
      await page.locator('.painted-building-actions [data-action="building"]').tap();await page.locator('#game-dialog[open]').waitFor();
      const paused=await page.evaluate(animationState,code);assert(paused.motion.length>0&&paused.motion.every(node=>node.playState==='paused'),`All work pauses behind the building dialog: ${code} ${width}x${height}`);await closeDialogs();
      if(await page.locator('.painted-selection-close').isVisible())await page.locator('.painted-selection-close').tap();

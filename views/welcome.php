@@ -48,7 +48,7 @@ $structuredData = [
 <title><?= htmlspecialchars($seoTitle, ENT_QUOTES) ?></title><?php require ROOT_DIR.'/views/partials/brand-head.php'; ?>
 <meta name="description" content="<?= htmlspecialchars($seoDescription, ENT_QUOTES) ?>">
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#fff7e7">
 <link rel="canonical" href="<?= htmlspecialchars($canonical, ENT_QUOTES) ?>">
 
 

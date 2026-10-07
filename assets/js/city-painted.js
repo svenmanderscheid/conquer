@@ -200,7 +200,7 @@ window.ConquerPaintedCity=(()=>{
  function render({host,base,state,kingdom,labels,countdown,citySkin}){
   if(!host.querySelector('.painted-village')){
    const art=`${base}/assets/art/village-layered-v2/runtime`;
-   host.innerHTML=`<div class="painted-village"><div class="painted-village-scroll" tabindex="0" aria-label="Dorfansicht – mit der Maus ziehen oder wischen"><div class="painted-village-ground"><div class="painted-village-scene"><img src="${art}/terrain-extended.webp" alt="Dorfuntergrund ohne Gebäude" draggable="false">${places.map(([code,x,y,w,h])=>`<button type="button" class="painted-village-building" data-action="building" data-id="${code}" style="left:${x}%;top:${y}%;width:${w}%;height:${h}%">${code==='wall'?'':`<img class="painted-building-sprite" src="${art}/${spriteName(code)}.webp" alt="" draggable="false">`}<span class="painted-scaffold" aria-hidden="true"></span><span class="painted-building-label"><strong class="painted-building-name"></strong><small class="painted-building-level"></small><small class="painted-build-status"></small></span></button>`).join('')}</div></div></div><button class="city-building-tool" data-action="buildings" aria-label="Gebäudeübersicht öffnen">♜ <small>Gebäude</small></button></div>`;
+   host.innerHTML=`<div class="painted-village"><div class="painted-village-scroll" tabindex="0" aria-label="Dorfansicht – mit der Maus ziehen oder wischen"><div class="painted-village-ground"><div class="painted-village-scene"><img src="${art}/terrain-extended.webp" alt="Dorfuntergrund ohne Gebäude" draggable="false">${places.map(([code,x,y,w,h])=>`<button type="button" class="painted-village-building" data-action="building" data-id="${code}" aria-pressed="false" style="left:${x}%;top:${y}%;width:${w}%;height:${h}%">${code==='wall'?'':`<img class="painted-building-sprite" src="${art}/${spriteName(code)}.webp" alt="" draggable="false">`}<span class="painted-scaffold" aria-hidden="true"></span><span class="painted-building-label"><strong class="painted-building-name"></strong><small class="painted-building-level"></small><small class="painted-build-status"></small></span></button>`).join('')}</div></div></div><button class="city-building-tool" data-action="buildings" aria-label="Gebäudeübersicht öffnen">♜ <small>Gebäude</small></button></div>`;
    const terrain=host.querySelector('.painted-village-scene>img');
    const frame=terrainFrame;
    terrain.style.cssText=`left:${-frame.x/frame.width*100}%;top:${-frame.y/frame.height*100}%;width:${1448/frame.width*100}%;height:${1086/frame.height*100}%`;
@@ -214,15 +214,13 @@ window.ConquerPaintedCity=(()=>{
    const scroll=host.querySelector('.painted-village-scroll');requestAnimationFrame(()=>{scroll.scrollLeft=(scroll.scrollWidth-scroll.clientWidth)/2;});
    const menu=document.createElement('div');
    menu.className='painted-building-menu';menu.hidden=true;
-   menu.innerHTML='<div class="painted-building-banner"><strong></strong><small></small></div><div class="painted-building-actions"><button type="button" data-action="building"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 4.5 19 9l-3 3-1.7-1.7-7.6 7.6-2.6-2.6 7.6-7.6L10 6l3-3 1.5 1.5Z"/><path d="M4 20h7"/></svg><small>Ausbauen / Info</small></button><button type="button" data-action="training-building"><svg data-building-icon viewBox="0 0 24 24" aria-hidden="true"></svg><small>Öffnen</small></button><button type="button" class="painted-selection-close" aria-label="Gebäudeauswahl schließen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>';
+   menu.innerHTML='<div class="painted-building-actions"><button type="button" data-action="building"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 4.5 19 9l-3 3-1.7-1.7-7.6 7.6-2.6-2.6 7.6-7.6L10 6l3-3 1.5 1.5Z"/><path d="M4 20h7"/></svg><small>Ausbauen / Info</small></button><button type="button" data-action="training-building"><svg data-building-icon viewBox="0 0 24 24" aria-hidden="true"></svg><small>Öffnen</small></button><button type="button" class="painted-selection-close" aria-label="Gebäudeauswahl schließen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>';
    host.querySelector('.painted-village').append(menu);
    const clear=()=>{menu.hidden=true;scroll.querySelectorAll('[aria-pressed="true"]').forEach(b=>b.setAttribute('aria-pressed','false'));};
    scroll.addEventListener('click',e=>{
     const b=e.target.closest('.painted-village-building');
     if(!b){clear();return;}
     e.stopPropagation();clear();b.setAttribute('aria-pressed','true');
-    menu.querySelector('strong').textContent=b.dataset.name;
-    menu.querySelector('.painted-building-banner small').textContent=b.dataset.status;
     menu.querySelector('[data-building-icon]').innerHTML=buildingMenuIcons[b.dataset.id]??buildingMenuIcons.castle;
     menu.querySelector('[data-action="training-building"]').setAttribute('aria-label',b.dataset.name+' öffnen');
     menu.querySelectorAll('[data-action]').forEach(a=>a.dataset.id=b.dataset.id);
@@ -237,10 +235,13 @@ window.ConquerPaintedCity=(()=>{
      const bounds=overlay.getBoundingClientRect(),style=getComputedStyle(overlay);
      if(bounds.width&&bounds.height&&style.visibility!=='hidden'&&style.display!=='none'&&bounds.right>actionBounds.left&&bounds.left<actionBounds.right&&bounds.top>p.top+safeTop)safeBottom=Math.min(safeBottom,bounds.top-8);
     }
-    const latestTop=safeBottom-p.top-actionBounds.height-40;
-    const menuTop=Math.max(safeTop,Math.min(p.height-r.height-86,r.top-p.top,latestTop));
-    menu.style.setProperty('--selected-actions-top',Math.max(40,Math.min(r.bottom-p.top-menuTop-30,safeBottom-p.top-menuTop-actionBounds.height))+'px');
-    menu.style.top=menuTop+'px';
+    // Keep the only name/level plaque uncovered. Retain the same action row,
+    // placing it below the plaque where possible, or above in short views.
+    const label=b.querySelector('.painted-building-label').getBoundingClientRect();
+    const below=label.bottom+10,above=label.top-actionBounds.height-10;
+    const actionTop=below+actionBounds.height<=safeBottom?below:Math.max(p.top+safeTop,Math.min(above,safeBottom-actionBounds.height));
+    menu.style.setProperty('--selected-actions-top',(actionTop-p.top-safeTop)+'px');
+    menu.style.top=safeTop+'px';
     // Keep the building commands between visible side tools on narrow screens.
     const row=actions.getBoundingClientRect(),half=row.width/2;
     let minCenter=p.left+half+8,maxCenter=p.right-half-8;
@@ -309,12 +310,11 @@ window.ConquerPaintedCity=(()=>{
      :`<span class="painted-building-heading"><b>Ausbau</b><strong>Stufe ${Number(queue.level_to)||level+1}</strong></span><span class="painted-building-time"><small>Restzeit</small>${countdown(queue.finishes_at)}</span>`;
    }
    b.dataset.name=labels[code]||code;b.dataset.level=level;
-   b.setAttribute('aria-label',text);b.title=text;
+   // The name is available to assistive technology without an unselected hover tooltip.
+   b.setAttribute('aria-label',text);
    b.querySelector('.painted-building-name').textContent=b.dataset.name;
    b.querySelector('.painted-building-level').textContent=window.ConquerLocale?.t('template.level',{level})||`Level ${level}`;
   }
-  const selected=host.querySelector('.painted-village-building[aria-pressed="true"]');
-  if(selected)host.querySelector('.painted-building-banner small').textContent=selected.dataset.status;
   updateReadiness({host,base,state,kingdom,labels});
  }
  return {render,readiness,updateReadiness};
