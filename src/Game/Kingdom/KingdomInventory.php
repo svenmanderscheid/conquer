@@ -122,10 +122,7 @@ final class KingdomInventory
             return self::boost($playerId, $cityId, $def);
         }
         if ($category === 'ap_refill') {
-            $ap = ActionPoints::get($playerId);
             $amount = (int)$def['ap_amount'];
-            KingdomService::require($amount > 0 && $ap['current'] < $ap['max'], 'Deine Aktionspunkte sind bereits vollständig gefüllt.');
-            $quantity = min($quantity, (int)ceil(($ap['max'] - $ap['current']) / $amount));
             $def['ap_amount'] = $amount * $quantity;
             return self::ap($playerId, $def) + ['quantity'=>$quantity];
         }
@@ -322,11 +319,9 @@ final class KingdomInventory
 
     private static function ap(int $playerId, array $def): array
     {
-        $current = ActionPoints::get($playerId);
-        KingdomService::require($current['current']<$current['max'], 'Deine Aktionspunkte sind bereits vollständig gefüllt.');
-        $amount = min((int) $def['ap_amount'], $current['max']-$current['current']);
-        Connection::getInstance()->execute('UPDATE players SET action_points=LEAST(action_points+?,?) WHERE id=?', [$amount,$current['max'],$playerId]);
-        return ['message'=>"$amount Aktionspunkte wurden wiederhergestellt.",'amount'=>$amount];
+        $amount = (int) $def['ap_amount'];
+        ActionPoints::credit($playerId, $amount);
+        return ['message'=>\Conquer\Game\Locale::t('ap.refill_credited',['amount'=>$amount]),'amount'=>$amount];
     }
 
     private static function vip(int $playerId, array $def): array

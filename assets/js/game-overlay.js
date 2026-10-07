@@ -52,7 +52,8 @@ window.ConquerOverlay = function (ctx) {
         const compactEnergy = energy.querySelector('.hud-energy-compact');
         if (compactEnergy) compactEnergy.textContent = profile ? compactNumber(ap) : '…';
         energy.setAttribute('aria-label', profile ? `${fmt(ap)} von ${fmt(apMax)} Aktionspunkten. Profil öffnen` : 'Aktionspunkte werden geladen');
-        energyTrack.setAttribute('aria-valuemax',String(apMax));energyTrack.setAttribute('aria-valuenow',String(ap));
+        energyTrack.setAttribute('aria-valuemax',String(apMax));energyTrack.setAttribute('aria-valuenow',String(Math.min(ap,apMax)));
+        energyTrack.setAttribute('aria-valuetext',`${fmt(ap)} / ${fmt(apMax)}`);
         $('hud-energy-fill').style.width=`${Math.min(100,ap/apMax*100)}%`;
         const gems=$('hud-gems'),compactGems=gems.querySelector('.hud-gems-compact');
         gems.querySelector('strong').textContent = profile ? fmt(profile.gems) : '…';

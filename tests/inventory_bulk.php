@@ -75,9 +75,12 @@ try {
 
     $def=findBulk('ap_refill');$code=(int)$def['code'];InventoryService::addItems(1,$code,300);
     $result=useBulk($code,'bulk_ap_once');
-    checkBulk($result['quantity']===(int)ceil(200/$def['ap_amount']) && stockBulk($code)===300-$result['quantity'], 'AP preserves items beyond the full bar');
-    checkBulk((int)$db->query('SELECT action_points FROM players WHERE id=1')->fetchColumn()===200, 'AP is filled');
-    rejectBulk(fn()=>useBulk($code,'bulk_ap_full'), 'full AP does not consume more');
+    checkBulk($result['quantity']===300 && $result['amount']===$def['ap_amount']*300 && stockBulk($code)===0, 'AP credits the full selected stack beyond the regeneration cap');
+    checkBulk((int)$db->query('SELECT action_points FROM players WHERE id=1')->fetchColumn()===$result['amount'], 'overflow AP survives the returned state refresh');
+    InventoryService::addItems(1,$code,2);
+    checkBulk(useBulk($code,'bulk_ap_once')===$result && stockBulk($code)===2, 'AP receipt replay preserves newly acquired stock');
+    $more=useBulk($code,'bulk_ap_full');
+    checkBulk($more['quantity']===2 && stockBulk($code)===0 && (int)$db->query('SELECT action_points FROM players WHERE id=1')->fetchColumn()===$result['amount']+$more['amount'], 'already overfilled AP accepts the next full stack');
 
     $cache=new ReflectionProperty(ChestService::class,'dropTableCache');
     $cache->setValue(null,['chests'=>[

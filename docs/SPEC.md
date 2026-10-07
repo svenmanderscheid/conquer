@@ -1986,6 +1986,7 @@ To attack a monster, a player spends **Action Points** (also called Stamina). AP
 - **Max AP** = 100 [DEFAULT — base, increases with VIP and treasures]
 - **AP regen rate** = 1 AP per 5 minutes [DEFAULT — modified by `AP Regeneration` from VIP, charms, treasures]
 - AP cap can exceed 100 with VIP / treasure bonuses.
+- **Current refill rule (7 October 2026):** the maximum limits automatic regeneration only. Refill items (single, selected quantity, or Use All) and refunds credit their full value, even above the maximum, such as 300/210. Regeneration pauses at or above the maximum, without banking elapsed time, and resumes after spending below it.
 
 ### 14.2 AP cost per monster type
 

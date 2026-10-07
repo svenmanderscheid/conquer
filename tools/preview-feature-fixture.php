@@ -235,6 +235,11 @@ try{
   \Conquer\Game\Treasure\TreasureService::upgradeEffect(1,60100002,0);
   \Conquer\Game\Treasure\TreasureService::equipTreasure(1,60100002,2,7,1);
  }
+ if(in_array('--action-points',$argv,true)){
+  $db->execute('UPDATE players SET action_points=200,last_ap_regen=UTC_TIMESTAMP() WHERE id=1');
+  $db->execute("INSERT INTO player_lord_talents(player_id,world_id,talent_code,rank) VALUES(1,1,'monster_9',1) ON DUPLICATE KEY UPDATE rank=1");
+  foreach([10204001=>4,10104001=>6]as$code=>$quantity)\Conquer\Game\Inventory\InventoryService::addItems(1,$code,$quantity);
+ }
  if(in_array('--quest-activity',$argv,true)){
   // Completed objectives belong exclusively to this disposable preview player.
   \Conquer\Game\Quest\DailyQuestService::ensureDailyQuests(1);

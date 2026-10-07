@@ -8,7 +8,7 @@ use Conquer\Db\Connection;
 /**
  * Action Point system.
  *
- * - Max AP:          200
+ * - Regeneration cap: 200 (plus talents); refills may exceed it
  * - Regen rate:      1 AP every 5 minutes (12 AP/hour)
  * - Monster cost:    10 AP  (normal monsters)
  * - Dämmerhorn cost: 25 AP
@@ -33,7 +33,7 @@ final class ActionPoints
      * Returns current AP for a player, applying any pending regeneration first.
      * Persists updated values to DB if AP changed.
      *
-     * @return array{current: int, max: int, regen_per_hour: int}
+     * @return array{current: int, max: int, regen_per_hour: float}
      * @throws \RuntimeException if the player is not found
      */
     public static function get(int $playerId): array
@@ -47,10 +47,11 @@ final class ActionPoints
             $rate=1+max(0,(float)($bonuses['talent_ap_regen']??0));
             $maximum=self::MAX_AP+max(0,(int)($bonuses['talent_max_ap']??0));
             $elapsed=max(0,time()-strtotime($row['last_ap_regen'].' UTC'));
-            $stored=min($maximum,max(0,(int)$row['action_points']));
-            $credit=$elapsed/300*(float)$saved['rate']+(float)$saved['fraction'];
-            $current=min($maximum,$stored+(int)floor($credit+1e-9));
-            $fraction=$current===$maximum?0:max(0,$credit-floor($credit+1e-9));
+            $stored=max(0,(int)$row['action_points']);
+            // Full or overfilled balances keep their value without banking regeneration.
+            $credit=$stored<$maximum?$elapsed/300*(float)$saved['rate']+(float)$saved['fraction']:0;
+            $current=$stored<$maximum?min($maximum,$stored+(int)floor($credit+1e-9)):$stored;
+            $fraction=$current>=$maximum?0:max(0,$credit-floor($credit+1e-9));
             $db->execute('UPDATE players SET action_points=?,last_ap_regen=UTC_TIMESTAMP() WHERE id=?',[$current,$playerId]);
             $db->execute('INSERT INTO player_ap_regeneration(player_id,rate,fraction) VALUES(?,?,?) ON DUPLICATE KEY UPDATE rate=VALUES(rate),fraction=VALUES(fraction)',[$playerId,$rate,$fraction]);
             return ['current'=>$current,'max'=>$maximum,'regen_per_hour'=>self::REGEN_PER_HOUR*$rate];
@@ -120,10 +121,27 @@ final class ActionPoints
         return $baseCost<=0?0:max(1,(int)ceil($baseCost*max(.05,1+(float)($bonuses['talent_monster_ap_cost']??0))-1e-8));
     }
 
+    /**
+     * Credit the full refill/refund under the same lock as pending regeneration.
+     * @return array{current: int, max: int, regen_per_hour: float}
+     */
+    public static function credit(int $playerId,int $amount): array
+    {
+        if($amount<=0)throw new \InvalidArgumentException('AP credit must be positive.');
+        $db=Connection::getInstance();
+        $credit=static function(Connection $db)use($playerId,$amount):array {
+            $state=self::get($playerId);
+            $state['current']+=$amount;
+            $db->execute('UPDATE players SET action_points=action_points+? WHERE id=?',[$amount,$playerId]);
+            if($state['current']>=$state['max'])$db->execute('UPDATE player_ap_regeneration SET fraction=0 WHERE player_id=?',[$playerId]);
+            return $state;
+        };
+        return $db->getPdo()->inTransaction()?$credit($db):$db->transaction($credit);
+    }
+
     public static function refund(int $playerId,int $paid): void
     {
         if($paid<=0)return;
-        $state=self::get($playerId);
-        Connection::getInstance()->execute('UPDATE players SET action_points=LEAST(?,action_points+?) WHERE id=?',[$state['max'],$paid,$playerId]);
+        self::credit($playerId,$paid);
     }
 }
