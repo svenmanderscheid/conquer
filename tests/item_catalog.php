@@ -35,10 +35,22 @@ try{
     }
     $drops=json_decode(file_get_contents(ROOT_DIR.'/data/chest_drops.json'),true)['chests'];$obtainable=[];
     foreach($drops as$c)foreach($c['drop_table']as$drop)if(isset($drop['item_code'])){$obtainable[]=$drop['item_code'];itemCheck(in_array($drop['item_code'],$allCodes,true)&&$drop['weight']>0,'valid chest entry');}
-    foreach($defs as$d)if(!in_array($d['category'],['chest','material'],true))itemCheck(in_array($d['code'],$obtainable,true),'new item is obtainable '.$d['code']);
+    $questRules=\Conquer\Game\Dungeon\MelusinaProgress::rules();
+    $questCodes=array_column(array_values(array_filter($defs,static fn($d)=>$d['category']==='dungeon_quest')),'code');
+    itemCheck($questCodes===[$questRules['fragment_item_code'],$questRules['key_item_code']],'quest items match the authoritative fragment and key acquisition rules');
+    foreach($questCodes as$code){
+        itemCheck(!in_array($code,$obtainable,true),'quest progression cannot be bypassed through ordinary chest drops '.$code);
+        itemCheck(InventoryService::quantity(1,$code,1)===2&&InventoryService::quantity(1,$code,2)===0,'quest inventory is isolated to its earned world '.$code);
+    }
+    $dailyQuests=json_decode(file_get_contents(ROOT_DIR.'/data/daily_quests.json'),true,512,JSON_THROW_ON_ERROR);
+    foreach(array_merge($dailyQuests['quests'],$dailyQuests['activity']['milestones']) as$quest)foreach($quest['rewards'] as$reward)if(isset($reward['item_code'])){
+        itemCheck(in_array($reward['item_code'],$allCodes,true)&&($reward['quantity']??0)>0,'valid daily quest or activity item reward');
+        $obtainable[]=$reward['item_code'];
+    }
+    foreach($defs as$d)if(!in_array($d['category'],['chest','material','dungeon_quest'],true))itemCheck(in_array($d['code'],$obtainable,true),'new item is obtainable '.$d['code']);
     foreach($defs as$d){
         $code=(int)$d['code'];$cat=$d['category'];$before=(int)$db->query('SELECT quantity FROM player_inventory WHERE player_id=1 AND item_code=?',[$code])->fetchColumn();
-        if($cat==='material'){itemReject(fn()=>itemUse($code),'material cannot be directly consumed '.$code);itemCheck((int)$db->query('SELECT quantity FROM player_inventory WHERE player_id=1 AND item_code=?',[$code])->fetchColumn()===$before,'material keeps its inventory balance '.$code);continue;}
+        if(in_array($cat,['material','dungeon_quest'],true)){itemReject(fn()=>itemUse($code),$cat.' cannot be directly consumed '.$code);itemCheck((int)$db->query('SELECT quantity FROM player_inventory WHERE player_id=1 AND item_code=?',[$code])->fetchColumn()===$before,$cat.' keeps its inventory balance '.$code);continue;}
         if($cat==='resource_pack'){
             $resource=$d['resource'];$table=$resource==='gems'?'players':'cities';$old=(int)$db->query("SELECT $resource FROM $table WHERE id=1")->fetchColumn();itemUse($code);$after=(int)$db->query("SELECT $resource FROM $table WHERE id=1")->fetchColumn();itemCheck($after-$old===$d['amount'],'real resource credit '.$code);
         }elseif($cat==='speedup'){

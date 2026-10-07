@@ -1,5 +1,17 @@
 # English campaign and public website — 24 September 2026
 
+## Open Alpha launch — 5 October 2026
+
+The owner chose Open Alpha without invitation keys. All ten campaign PNGs now say **Play the Open Alpha**, retain **www.unionofkingdoms.com**, the approved artwork and **A new Era begins**. Post 10 also says **No key needed. Create your kingdom.** Current edit prompts are in `outputs/social-2026-09/OPEN-ALPHA-EDIT-PROMPTS.json`; earlier prompt files record historical revisions.
+
+Instagram captions, Facebook captions with clickable links, profile copy, image descriptions, the gallery and game overview are updated. Troop claims follow the active five-tier catalogue and matching research requirements. The complete verified package is `outputs/union-of-kingdoms-open-alpha-social-kit-en.zip`; the previous general package name contains the same update. Social-network posts were not published.
+
+The public website and game registration were updated on the live host after preserving `views`, `src` and `data` outside the public document root in `open-alpha-backup-20261005/`. Website PHP files matched the local baseline before replacement. Live authentication files were patched in place; only nine new keys were added to each live language catalogue, preserving newer existing translations. Unrelated talent, hospital and combat work was excluded from this deployment.
+
+Live browser verification confirmed direct registration links, the Open Alpha notice, no invitation-key field, all ten new WebP images loading and no horizontal overflow. No real player account was created or changed for verification. Recorded screenshots are in `output/open-alpha-2026-10-05/`.
+
+Local checks passed: Open Alpha and closed-alpha registration suites, key consumption, public/game entry routing, localization, login layout across three languages and five sizes, landing layout across three selectable languages and five sizes including no-JavaScript entry, and campaign gallery across three widths. The actual new-player app at `/city` passed its existing controlled-fixture test on desktop, narrow portrait and landscape. Caption lint reports READY for all ten posts. Browser checks do not establish physical-device verification.
+
 ## Website refresh — 25 September 2026
 
 The public page now includes a three-image campaign gallery (city, army and monsters), with links to the matching game sections. The original artwork stays uncropped, is loaded lazily as WebP and is labelled as promotional illustration. The city image reuses the social preview. The troop section offers touch-friendly T1–T10 buttons for all three current troop types; without JavaScript, the existing T10 portraits remain visible.

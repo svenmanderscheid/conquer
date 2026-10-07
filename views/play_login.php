@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 $base = htmlspecialchars(APP_BASE, ENT_QUOTES);
+$openAlpha = \Conquer\Auth\AlphaAccess::isOpen();
 $mode = (($_POST['mode'] ?? $_GET['mode'] ?? 'login') === 'register') ? 'register' : 'login';
 $loginError = $loginError ?? '';
 $username = htmlspecialchars(is_string($_POST['username'] ?? null) ? $_POST['username'] : '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
@@ -27,7 +28,7 @@ if($mode==='register'){
 <link rel="stylesheet" href="<?= $base ?>/assets/css/localization.css?v=<?= filemtime(ROOT_DIR.'/assets/css/localization.css') ?>">
 <link rel="stylesheet" href="<?= $base ?>/assets/css/play-login.css?v=<?= filemtime(ROOT_DIR.'/assets/css/play-login.css') ?>">
 <link rel="stylesheet" href="<?= $base ?>/assets/css/kingdom-entry.css?v=<?= filemtime(ROOT_DIR.'/assets/css/kingdom-entry.css') ?>">
-<link rel="stylesheet" href="<?= $base ?>/assets/css/village-theme.css?v=<?= filemtime(ROOT_DIR.'/assets/css/village-theme.css') ?>">
+  <link rel="stylesheet" href="<?= $base ?>/assets/css/village-theme.css?v=<?= filemtime(ROOT_DIR.'/assets/css/village-theme.css') ?>">
 <?= \Conquer\Game\Locale::bootstrapScripts($landingCspNonce) ?>
 <script src="<?= $base ?>/assets/js/localization.js?v=<?= filemtime(ROOT_DIR.'/assets/js/localization.js') ?>" defer></script>
 </head>
@@ -38,7 +39,7 @@ if($mode==='register'){
     <div class="play-card">
       <header class="play-card-head">
         <img class="play-logo" src="<?= $base ?>/assets/art/logo-union-of-kingdoms-en-v3.webp" width="190" height="127" alt="Union of Kingdoms">
-        <p data-i18n="login.alpha">Playable alpha</p>
+        <p data-i18n="<?= $openAlpha ? 'landing.open_alpha' : 'login.alpha' ?>"><?= $openAlpha ? 'Open Alpha' : 'Playable alpha' ?></p>
         <h1 id="play-login-title" data-i18n="<?= $mode === 'register' ? 'login.register' : 'login.login' ?>"><?= $mode === 'register' ? 'New kingdom' : 'Sign in' ?></h1>
       </header>
       <div class="play-card-body">
@@ -50,12 +51,13 @@ if($mode==='register'){
         <form method="post" action="<?= $base ?>/auth/local">
           <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['login_csrf'], ENT_QUOTES) ?>">
           <input type="hidden" name="mode" value="<?= $mode ?>">
-          <?php if ($mode === 'register'): ?>
+          <?php if ($mode === 'register' && !$openAlpha): ?>
           <label><span data-i18n="login.alpha_key">Alpha key</span>
             <input name="alpha_key" required inputmode="text" autocomplete="one-time-code" maxlength="35" spellcheck="false" value="<?= htmlspecialchars(is_string($_POST['alpha_key'] ?? null) ? $_POST['alpha_key'] : '', ENT_QUOTES) ?>">
           </label>
           <?php endif ?>
           <?php if ($mode === 'register'): ?>
+          <?php if ($openAlpha): ?><p class="play-world-rule" data-i18n="landing.open_access">No key needed. Create your account and start playing in your browser.</p><?php endif ?>
           <label><span data-i18n="waitlist.email">Email address</span><input type="email" name="email" required maxlength="254" autocomplete="email" autocapitalize="none" spellcheck="false" value="<?= $email ?>"></label>
           <label><span data-i18n="login.username_short">Player name</span><input name="username" required minlength="3" maxlength="25" pattern="[A-Za-z0-9_]+" autocomplete="username" autocapitalize="none" spellcheck="false" value="<?= $username ?>"></label>
           <label><span data-i18n="registration.world">World</span><select name="world_id" required>
@@ -71,6 +73,7 @@ if($mode==='register'){
           </label>
           <button class="play-submit" type="submit" data-i18n="<?= $mode === 'register' ? 'login.create' : 'login.continue' ?>"><?= $mode === 'register' ? 'Create kingdom →' : 'Continue playing →' ?></button>
         </form>
+        <?php if ($openAlpha): ?><p class="play-world-rule" data-i18n="landing.open_notice">The game is in active development. Features and balance may change, and alpha progress may be reset.</p><?php endif ?>
         <div class="play-links"><a href="<?= $base ?>/auth/recover" data-i18n="login.forgot">Forgot your password?</a></div>
       </div>
     </div>

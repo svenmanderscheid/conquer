@@ -283,6 +283,16 @@ final class MarchTick
                     self::finalizeMarch($db,$marchId,$troops,[],'defender_wins');
                     return ['resolved'=>true,'monster_killed'=>false,'outcome'=>'defender_wins','already_settled'=>true];
                 }
+                $arrivedAt=strtotime($march['arrival_time'].' UTC');
+                $questItems=empty($monster['expires_at'])||strtotime($monster['expires_at'].' UTC')>$arrivedAt
+                    ?\Conquer\Game\Dungeon\MelusinaProgress::drop($playerId,(int)$march['world_id'],'monster',$monsterId,$targetX,$targetY,$arrivedAt):[];
+                foreach($questItems as $code=>$count){
+                    $result['items'][$code]=($result['items'][$code]??0)+$count;
+                    $item=InventoryService::getItemDef((int)$code);
+                    $result['report']['item_rewards'][]=['code'=>(int)$code,'count'=>$count,'name'=>$item['name']??'Well-key fragment'];
+                }
+                $result['report']['items']=$result['items'];
+                if($questItems)$db->execute("UPDATE monster_kill_receipts SET reward_snapshot_json=JSON_SET(reward_snapshot_json,'$.items',JSON_EXTRACT(?,'$')) WHERE id=? AND world_id=?",[json_encode($result['items'],JSON_THROW_ON_ERROR),(int)$settlement['receipt_id'],(int)$march['world_id']]);
                 $result['report']['regional_supply']=\Conquer\Game\Territory\TerritoryEconomy::regionalKill(WorldContext::id(),$playerId,$targetX,$targetY,'monster-march:'.$marchId,\Conquer\Game\Territory\TerritoryEconomy::regionalBaseResources($monsterDef),strtotime($march['arrival_time'].' UTC'));
                 \Conquer\Game\Hospital\HospitalService::addWounded($cityId,$result['attacker_losses'],true);
                 $result['report']['lord_xp']=\Conquer\Game\Player\LordLevel::addXp($playerId,$xp,WorldContext::id(),'monster-march:'.$marchId);

@@ -17,7 +17,7 @@ try {
     foreach (['unionofkingdoms.com', 'www.unionofkingdoms.com'] as $host) {
         $headers = ['Host: ' . $host];
         $home = HttpApp::request($base, '/', 'GET', $headers);
-        entryAssert($home['status'] === 200 && str_contains($home['body'], 'id="waitlist-form"') && !str_contains($home['body'], 'name="password"'), "$host serves only the waitlist, without a hidden credential form");
+        entryAssert($home['status'] === 200 && str_contains($home['body'], 'Play the Open Alpha') && !str_contains($home['body'], 'id="waitlist-form"') && !str_contains($home['body'], 'name="password"'), "$host offers direct Open Alpha registration without a credential or waitlist form");
         entryAssert(str_contains($home['body'], 'href="https://play.unionofkingdoms.com/"'), 'website links to game login');
         entryAssert(str_contains($home['body'], '<link rel="canonical" href="https://unionofkingdoms.com/">'), 'public hosts share one canonical URL');
         entryAssert(str_contains($home['body'], '<title>Union of Kingdoms – Fantasy Browser Strategy Game</title>') && !str_contains($home['body'], 'ten tiers each'), 'search metadata describes the current browser strategy alpha');
@@ -42,7 +42,7 @@ try {
         $sitemap = HttpApp::request($base, '/sitemap.xml', 'GET', ['Host: ' . $host]);
         entryAssert(!str_contains($sitemap['body'], '<url>'), 'game login is not advertised in a sitemap');
         $r = HttpApp::request($base, '/?mode=register', 'GET', ['Host: ' . $host]);
-        entryAssert(str_contains($r['body'], 'name="alpha_key"') && str_contains($r['body'], 'name="email"'), 'game registration retains alpha-key and email fields');
+        entryAssert(!str_contains($r['body'], 'name="alpha_key"') && str_contains($r['body'], 'No key needed') && str_contains($r['body'], 'name="email"'), 'game registration needs no key and retains the email field');
         $r = HttpApp::request($base, '/auth/local', 'POST', ['Host: ' . $host, 'Content-Type: application/x-www-form-urlencoded'], 'mode=login&identifier=Nobody&password=secret');
         entryAssert($r['status'] === 200 && str_contains($r['body'], 'class="play-error"') && !str_contains($r['body'], 'id="waitlist-form"'), 'missing CSRF returns the game error screen');
     }

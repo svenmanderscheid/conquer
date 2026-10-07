@@ -23,6 +23,8 @@
 @media(max-width:539px){.atlas-teleport-guide{top:max(78px,calc(env(safe-area-inset-top) + 70px));gap:7px;padding:6px 8px}.atlas-teleport-guide img{width:34px;height:34px}.atlas-teleport-guide strong{font-size:14px}.atlas-teleport-guide small{font-size:11px}.atlas-teleport-guide button{min-height:38px;padding-inline:9px}}
 @media(max-width:539px) and (min-height:540px){.atlas-teleport-guide{top:max(148px,calc(env(safe-area-inset-top) + 140px))}}
 /* Allianzgebäude: warme Flächen, violette Dächer und ruhige Goldakzente. */
+.map-overlay-shell .atlas-marker.atlas-marker--dungeons>img{width:calc(var(--tile-size,44px)*3);height:calc(var(--tile-size,44px)*3);left:50%;margin-left:calc(var(--tile-size,44px)*-1.5);bottom:0;object-fit:contain;filter:drop-shadow(0 5px 4px var(--ui-primary-dark))}
+.atlas-marker--dungeons .atlas-marker-name{max-width:180px;opacity:1;background:var(--ui-paper);color:var(--ui-ink);border:1px solid var(--ui-gold);border-radius:8px;font:700 12px/1.2 var(--ui-font);white-space:normal;text-align:center}
 .atlas-marker--alliance_center img{width:calc(var(--tile-size,44px)*4.8);height:calc(var(--tile-size,44px)*4.8);filter:drop-shadow(0 8px 5px #2d201f66)}
 .atlas-marker--outpost img{width:calc(var(--tile-size,44px)*3.25);height:calc(var(--tile-size,44px)*3.25);filter:drop-shadow(0 7px 4px #2d201f66)}
 .atlas-marker--alliance_center .atlas-marker-level,.atlas-marker--outpost .atlas-marker-level{background:#4d3157;color:#f8e7bb;border-color:#caa85f}

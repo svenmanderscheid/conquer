@@ -1,0 +1,10 @@
+{
+  "dungeon_code": "melusina_well",
+  "canton_id": "03",
+  "fragment_item_code": 10309001,
+  "key_item_code": 10309002,
+  "fragments_required": 3,
+  "drop_chance": 0.35,
+  "pity_limit": 5,
+  "source_limit": 3
+}

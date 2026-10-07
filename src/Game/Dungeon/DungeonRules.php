@@ -25,7 +25,7 @@ final class DungeonRules
         if ($catalog !== null) return self::withRewards($catalog);
         $path = dirname(__DIR__, 3) . '/data/dungeons.json';
         $decoded = json_decode((string) file_get_contents($path), true, 64, JSON_THROW_ON_ERROR);
-        if (!isset($decoded['dungeons'], $decoded['difficulties']) || count($decoded['dungeons']) !== 6) {
+        if (!isset($decoded['dungeons'], $decoded['difficulties']) || count($decoded['dungeons']) < 6) {
             throw new RuntimeException('Der Dungeon-Katalog ist unvollständig.');
         }
         $catalog = $decoded;
@@ -52,10 +52,17 @@ final class DungeonRules
         $at = ($at ?? new DateTimeImmutable('now', new DateTimeZone('UTC')))->setTimezone(new DateTimeZone('UTC'));
         $monday = $at->modify('monday this week')->setTime(0, 0);
         $week = intdiv($monday->getTimestamp(), 604800);
-        $all = self::catalog()['dungeons'];
+        $all = array_values(array_filter(self::catalog()['dungeons'], static fn(array $d): bool => ($d['availability'] ?? 'weekly') === 'weekly'));
+        if (count($all) < 3) throw new RuntimeException('Der wöchentliche Dungeon-Katalog ist unvollständig.');
         $available = [];
         for ($i=0; $i<3; $i++) $available[] = $all[($week * 3 + $i) % count($all)];
         return ['week_start'=>$monday->format(DATE_ATOM),'week_end'=>$monday->modify('+7 days')->format(DATE_ATOM),'available'=>$available];
+    }
+
+    /** Permanent regional adventures never alter the existing weekly rotation. */
+    public static function permanentDungeons(): array
+    {
+        return array_values(array_filter(self::catalog()['dungeons'], static fn(array $d): bool => ($d['availability'] ?? 'weekly') === 'permanent'));
     }
 
     public static function preview(?DateTimeImmutable $at = null): array

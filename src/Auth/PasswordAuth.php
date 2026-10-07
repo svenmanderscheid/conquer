@@ -38,7 +38,7 @@ final class PasswordAuth
                 $alphaKey = $_POST['alpha_key'] ?? null;
                 $worldId=isset($_POST['world_id'])?\Conquer\Game\World\WorldContext::integer($_POST['world_id']):null;
                 $id = $db->transaction(static function (Connection $db) use ($name,$email,$password,$alphaKey,$worldId): int {
-                    $alphaKeyId = AlphaAccess::consume($db, $alphaKey);
+                    $alphaKeyId = AlphaAccess::isOpen() ? null : AlphaAccess::consume($db, $alphaKey);
                     $db->execute('INSERT INTO players (username,email,password_hash,alpha_access_key_id,last_login,beginner_shield_until) VALUES (?,?,?,?,UTC_TIMESTAMP(),DATE_ADD(UTC_TIMESTAMP(),INTERVAL 7 DAY))',
                         [$name,$email,password_hash($password,PASSWORD_DEFAULT),$alphaKeyId]);
                     $id = $db->lastInsertId();

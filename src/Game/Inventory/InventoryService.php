@@ -141,10 +141,10 @@ final class InventoryService
         return $affected > 0;
     }
 
-    /** Only VIP consumables are world-bound; the remaining inventory keeps scope 0. */
+    /** VIP consumables and dungeon quest items are bound to their world. */
     private static function scope(int $itemCode, ?int $worldId = null): int
     {
-        return (self::getItemDef($itemCode)['category']??'')==='vip_point' ? ($worldId??WorldContext::id()) : 0;
+        return in_array(self::getItemDef($itemCode)['category']??'', ['vip_point','dungeon_quest'], true) ? ($worldId??WorldContext::id()) : 0;
     }
 
     public static function quantity(int $playerId, int $itemCode, ?int $worldId = null, bool $lock = false): int

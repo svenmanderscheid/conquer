@@ -29,7 +29,7 @@ try{
  file_put_contents($dir.'/router.php',$router);
  $db->execute('INSERT INTO admin_users(username,password_hash,role) VALUES(?,?,?)',['PreviewAdmin',password_hash('PreviewFixture!2026',PASSWORD_DEFAULT),'superadmin']);
  $db->execute('INSERT INTO players(id,username,email,password_hash) VALUES(1,?,?,?)',['PreviewPlayer','preview@tests.invalid',password_hash('PreviewFixture!2026',PASSWORD_DEFAULT)]);
- if(in_array('--territory',$argv,true)){
+ if(in_array('--territory',$argv,true)||in_array('--melusina',$argv,true)){
   \Conquer\Game\World\WorldMapProfile::configureEmptyWorld(1);
   \Conquer\Game\World\WorldService::initializeWorld(1);
  }
@@ -139,7 +139,7 @@ try{
   }
  }
  if(in_array('--army-receipts',$argv,true))$db->execute('DELETE FROM marches WHERE player_id=1');
- if(in_array('--dungeons',$argv,true)){
+ if(in_array('--dungeons',$argv,true)||in_array('--melusina',$argv,true)){
   \Conquer\Db\MigrationSql::apply($db->getPdo(),file_get_contents(ROOT_DIR.'/migrations/0082_create_dungeons.sql'));
   \Conquer\Game\Player\LordLevel::addXp(1,\Conquer\Game\Player\LordLevel::totalForLevel(20),1,'dungeon-preview');
   $db->execute("INSERT INTO player_lord_talents(player_id,world_id,talent_code,rank) VALUES(1,1,'attack_0',5)");
@@ -153,6 +153,7 @@ try{
   }
  }
 
+ if(in_array('--melusina',$argv,true))require ROOT_DIR.'/tests/fixtures/melusina_preview.php';
  if(in_array('--talents',$argv,true))\Conquer\Game\Player\LordLevel::addXp(1,\Conquer\Game\Player\LordLevel::totalForLevel(60),1,'preview-level');
  if(in_array('--effects',$argv,true)){
   $db->execute("INSERT INTO player_charms_active(player_id,world_id,stat_category,grade,charm_code,source_map_charm_id,bonus_pct,activated_at,expires_at) VALUES(1,1,'construction','epic',10700002,999,5,DATE_SUB(UTC_TIMESTAMP(),INTERVAL 45 MINUTE),DATE_ADD(UTC_TIMESTAMP(),INTERVAL 75 MINUTE)),(1,1,'gold_production','normal',10600001,NULL,20,DATE_SUB(UTC_TIMESTAMP(),INTERVAL 3 HOUR),DATE_ADD(UTC_TIMESTAMP(),INTERVAL 5 HOUR))");
@@ -233,6 +234,14 @@ try{
   \Conquer\Game\Treasure\TreasureService::addFragments(1,60100002,30);
   \Conquer\Game\Treasure\TreasureService::upgradeEffect(1,60100002,0);
   \Conquer\Game\Treasure\TreasureService::equipTreasure(1,60100002,2,7,1);
+ }
+ if(in_array('--quest-activity',$argv,true)){
+  // Completed objectives belong exclusively to this disposable preview player.
+  \Conquer\Game\Quest\DailyQuestService::ensureDailyQuests(1);
+  $questDefinitions=json_decode((string)file_get_contents(ROOT_DIR.'/data/daily_quests.json'),true,512,JSON_THROW_ON_ERROR);
+  foreach($questDefinitions['quests'] as $questDefinition){
+   $db->execute('UPDATE player_daily_quests SET progress=target,completed=1 WHERE player_id=1 AND quest_code=? AND quest_date=UTC_DATE()',[$questDefinition['code']]);
+  }
  }
  if(in_array('--alpha-entry',$argv,true)){
   $db->execute('DELETE FROM city_troops WHERE city_id=1');

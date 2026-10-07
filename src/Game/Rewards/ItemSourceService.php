@@ -4,6 +4,7 @@ namespace Conquer\Game\Rewards;
 
 use Conquer\Db\Connection;
 use Conquer\Game\Dungeon\DungeonRules;
+use Conquer\Game\Dungeon\MelusinaProgress;
 use Conquer\Game\Expedition\EncounterCatalog;
 use Conquer\Game\Inventory\InventoryService;
 use Conquer\Game\Locale;
@@ -61,6 +62,15 @@ final class ItemSourceService
         $troops=(int)$db->query('SELECT COALESCE(SUM(count),0) FROM city_troops WHERE city_id=?',[$city['id']])->fetchColumn();
         $inventory=array_column(InventoryService::getInventory($playerId),'quantity','item_code');
         $sources=[];$monsterSources=[];$codes=[];$talents=\Conquer\Game\Player\MasteryService::bonuses($playerId,$world);
+        $regionalAvailable=MelusinaProgress::available($world);
+        if(isset($query['item_code'])&&in_array($query['item_code'],[10309001,10309002],true)){
+            // Discovery must not allocate an entrance or initialize quest progress.
+            $accepted=$regionalAvailable&&(bool)$db->query('SELECT accepted_at FROM melusina_progress WHERE player_id=? AND world_id=?',[$playerId,$world])->fetchColumn();
+            if($regionalAvailable)$sources[]=['id'=>'melusina:'.$query['item_code'],'type'=>'dungeon','name'=>Locale::t('melusina.entrance_name'),
+                'rewards'=>[],'notes'=>[self::note($query['item_code']===10309001?'melusina.sources_fragment':'melusina.sources_key')],
+                'status'=>'available','reason'=>self::note($accepted?'melusina.sources_open':'melusina.sources_accept'),
+                'destination'=>['tab'=>'dungeons','dungeon_code'=>'melusina_well']];
+        }
         foreach(array_unique(array_merge(array_column(RewardCatalog::json('monsters')['monsters'],'code'),array_column(RewardCatalog::json('world_spawn')['monsters'],'code')))as$code){
             $code=(int)$code;if(!MonsterData::isActive($code))continue;$d=MonsterData::get($code);$level=max(1,(int)$d['level']);
             $relicDrops=array_map(static fn(array $drop):array=>['relic_code'=>$drop['treasure_code']]+$drop,$d['relic_drops']??[]);
@@ -87,7 +97,7 @@ final class ItemSourceService
                 if(count($rows)<200)break;
             }
         }
-        $sources=array_values($monsterSources);
+        $sources=array_merge($sources,array_values($monsterSources));
         $chests=$db->query('SELECT * FROM player_chests WHERE player_id=?',[$playerId])->fetch()?:[];
         foreach(RewardCatalog::sources('chest')as$type=>$source){
             $cfg=RewardCatalog::effective('chest',(string)$type,$world);$total=array_sum(array_column($cfg['drop_table'],'weight'));$rewards=[];
@@ -109,9 +119,11 @@ final class ItemSourceService
             $sources[]=['id'=>'chest:'.$type,'type'=>'chest','name'=>Locale::t('sources.chest.'.$type),'rewards'=>$rewards,'notes'=>$notes,'status'=>$available?'available':'unavailable','reason'=>self::note($reason),'destination'=>['tab'=>$inventoryChest!==null&&!$free||$type==='platinum'?'inventory':'treasures','item_code'=>$inventoryChest??$chestItem,'section'=>'chests']];
         }
         $rotation=array_column(DungeonRules::weeklyRotation()['available'],'dungeon_code');
-        $specialized=(bool)$db->query("SELECT 1 FROM player_lord_talents WHERE player_id=? AND world_id=? AND rank>0 AND (talent_code LIKE 'attack\\_%' OR talent_code LIKE 'defense\\_%' OR talent_code LIKE 'gather\\_%' OR talent_code LIKE 'hunter\\_%') LIMIT 1",[$playerId,$world])->fetchColumn();
+        $specialized=(bool)$db->query("SELECT 1 FROM player_lord_talents WHERE player_id=? AND world_id=? AND rank>0 AND talent_code REGEXP '^(attack|defense|gather|hunter|infantry|archer|cavalry|monster|combat|gathering)_' LIMIT 1",[$playerId,$world])->fetchColumn();
         $activeDungeon=(bool)$db->query("SELECT 1 FROM dungeon_members m JOIN dungeon_runs r ON r.id=m.run_id WHERE m.player_id=? AND r.world_id=? AND r.status IN ('recruiting','running','decision') LIMIT 1",[$playerId,$world])->fetchColumn();
         foreach(RewardCatalog::sources('dungeon')as$key=>$source){
+            $permanent=($source['definition']['availability']??'weekly')==='permanent';
+            if($permanent&&!$regionalAvailable)continue;
             $cfg=RewardCatalog::effective('dungeon',(string)$key,$world);$rewards=[];
             $fragment=self::matchReward($query,['treasure_code'=>$cfg['treasure_code']],1,(int)$cfg['fragments']);if($fragment)$rewards[]=$fragment;
             $custom=RewardCatalog::override('dungeon',(string)$key,$world)!==null;
@@ -120,9 +132,11 @@ final class ItemSourceService
                 $chance=$custom?($total>0?(float)$cfg['item_chance']*(int)$entry['weight']/$total:0):($i===$playerId%max(1,count($entries))?(float)$cfg['item_chance']:0);
                 $match=self::matchReward($query,$entry,$chance,(int)$cfg['item_quantity']);if($match)$rewards[]=$match;
             }
-            if(!$rewards)continue;$inRotation=in_array($key,$rotation,true);$available=$inRotation&&$specialized&&$troops>=10&&!$activeDungeon;
+            if(!$rewards)continue;$inRotation=$permanent||in_array($key,$rotation,true);$available=$inRotation&&$specialized&&$troops>=10&&!$activeDungeon;
             $reason=!$inRotation?'sources.not_rotation':($activeDungeon?'sources.dungeon_busy':(!$specialized?'sources.talent':($troops<10?'sources.ten_troops':'sources.dungeon_available')));
-            $sources[]=['id'=>'dungeon:'.$key,'type'=>'dungeon','name'=>Locale::text($source['name']),'rewards'=>$rewards,'notes'=>[self::note('sources.dungeon_rules'),self::note('sources.dungeon_base'),self::note('sources.duration',['minutes'=>(int)ceil($source['definition']['base_duration']/60)])],'status'=>$available?'available':'unavailable','reason'=>self::note($reason),'destination'=>['tab'=>'dungeons','dungeon_code'=>$key]];
+            $notes=[self::note('sources.dungeon_rules'),self::note('sources.dungeon_base'),self::note('sources.duration',['minutes'=>(int)ceil($source['definition']['base_duration']/60)])];
+            if($permanent)$notes[]=self::note('melusina.key_rule');
+            $sources[]=['id'=>'dungeon:'.$key,'type'=>'dungeon','name'=>Locale::text($source['name']),'rewards'=>$rewards,'notes'=>$notes,'status'=>$available?'available':'unavailable','reason'=>self::note($reason),'destination'=>['tab'=>'dungeons','dungeon_code'=>$key]];
         }
         $chapter=max(1,(int)$db->query('SELECT chapter FROM world_chapters WHERE world_id=?',[$world])->fetchColumn());
         foreach(RewardCatalog::sources('expedition')as$key=>$source){

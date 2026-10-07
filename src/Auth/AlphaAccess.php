@@ -8,6 +8,12 @@ use Conquer\Db\Connection;
 /** Closed-alpha invite keys. Plain-text keys are shown once and never stored. */
 final class AlphaAccess
 {
+    /** The Open Alpha accepts password registrations without an invitation. */
+    public static function isOpen(): bool
+    {
+        return (\Conquer\Bootstrap::getConfig()['open_alpha'] ?? true) === true;
+    }
+
     public static function normalize(mixed $value): string
     {
         if (!is_string($value)) {

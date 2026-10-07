@@ -231,6 +231,7 @@ window.ConquerPanels = function(ctx) {
     function itemControls(i,prefix='item'){
         const queues=(K().queues||[]).filter(q=>i.subcategory==='generic'||q.type===i.subcategory);
         const supported=i.is_usable!==false,owned=Number(i.quantity)>0;
+        if(i.category==='dungeon_quest')return `<p class="notice blue">${esc(itemDescription(i))}</p><button type="button" class="button wide" data-action="dialog-tab" data-id="dungeons">${esc(window.ConquerLocale.t('melusina.open'))}</button>`;
         const bulk=['resource_pack','speedup','chest','ap_refill','vip_point','boost','resource_box','fragment_pack'].includes(i.category);
         const unavailable=(i.category==='speedup'&&!queues.length)||(i.category==='teleport'&&i.teleport_mode==='alliance'&&!K().alliance)||!owned;
         const allHint=i.category==='speedup'?'Beschleuniger werden nur bis zum Abschluss des gewählten Auftrags verbraucht.':i.category==='ap_refill'?'Es werden nur so viele Gegenstände verbraucht, bis deine Aktionspunkte voll sind.':'';

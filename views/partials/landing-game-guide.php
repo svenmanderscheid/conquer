@@ -15,16 +15,15 @@
       '07-alliance' => ['Stronger together.', 'Three allies planning their next adventure over a map', '#game-goal', 'Find your shared goal'],
       '08-monsters' => ['Face greater threats together', 'Grumwald in his current storybook design, with a guardian and fire archer', '#bosses', 'Meet the rally monsters'],
       '09-conquest' => ['Build strength. Challenge rivals.', 'Rival kingdoms and armies facing each other across a valley', '#progression', 'Explore your journey'],
-      '10-alpha' => ['Be part of the beginning.', 'A guardian and archer welcoming players through the city gates', '#zugang', 'Register for closed alpha'],
+      '10-alpha' => ['Be part of the beginning.', 'A guardian and archer welcoming players through the city gates', '#zugang', $openAlpha ? \Conquer\Game\Locale::t('landing.open_cta') : 'Register for closed alpha'],
     ] as $art => [$title, $description, $target, $link]): ?>
     <figure class="lp-campaign-card">
-      <?php $artVersion = 'v5'; ?>
-      <a href="<?= $target ?>"><img src="<?= $base ?>/assets/marketing/<?= $art === '01-build' ? 'kingdom-social-en-v5' : 'campaign-' . $art . '-' . $artVersion ?>.webp" width="1122" height="1402" loading="lazy" decoding="async" alt="<?= $description ?>"></a>
+      <a href="<?= $target ?>"><img src="<?= $base ?>/assets/marketing/<?= $art === '01-build' ? ($openAlpha ? 'kingdom-social-en-open-alpha-v1' : 'kingdom-social-en-v5') : 'campaign-' . $art . ($openAlpha ? '-open-alpha-v2' : '-v5') ?>.webp" width="1122" height="1402" loading="lazy" decoding="async" alt="<?= $description ?>"></a>
       <figcaption><h3><?= $title ?></h3><a href="<?= $target ?>"><?= $link ?> <span aria-hidden="true">→</span></a></figcaption>
     </figure>
     <?php endforeach ?>
   </div>
-  <p class="lp-guide-note">Promotional illustrations · Register for closed alpha. These images are artwork, not gameplay screenshots.</p>
+  <p class="lp-guide-note"><?= $openAlpha ? \Conquer\Game\Locale::html('landing.open_art_note') : \Conquer\Game\Locale::html('copy.63fa7d65009d2717') ?></p>
 </section>
 <section id="game-goal" class="lp-guide-section" aria-labelledby="goal-title">
   <div class="lp-guide-heading"><p class="lp-section-kicker lp-brand-slogan">A new Era begins</p><h2 id="goal-title">A kingdom built for the long run.</h2>
@@ -92,7 +91,7 @@
     <article class="lp-guide-card"><p class="lp-guide-label">Later platform step</p><h3>One game across devices</h3><p>The browser is the current entry point. iOS and Android apps are planned after gameplay, navigation and server interfaces are stable. No App Store, Google Play or full-release date is announced.</p></article>
   </div>
   <details class="lp-guide-faq"><summary>Is this a seasonal game with regular restarts?</summary><p>The intended model is lasting kingdom development, PvP competition and continuing alliance PvE. Routine seasonal restarts are not the design goal. Alpha testing may still require resets.</p></details>
-  <details class="lp-guide-faq"><summary>Can I play now?</summary><p>Access is currently limited to the closed alpha. Join the waiting list below to register your interest. Signing up does not guarantee immediate access; new game accounts require an alpha key.</p></details>
+  <details class="lp-guide-faq"><summary>Can I play now?</summary><p><?= $openAlpha ? \Conquer\Game\Locale::html('landing.open_faq') : \Conquer\Game\Locale::html('copy.939bef382ac7fb8a') ?></p></details>
   <details class="lp-guide-faq"><summary>Is the Star Crown story the endgame?</summary><p>The Star Crown is an earlier story concept, not a confirmed playable campaign or a fixed seasonal ending. The confirmed direction is ongoing development, kingdom conquest and stronger cooperative monster challenges.</p></details>
-  <a class="lp-button lp-guide-cta" href="#zugang">Register for closed alpha <span aria-hidden="true">→</span></a>
+  <a class="lp-button lp-guide-cta" href="<?= $openAlpha ? $registerUrl : '#zugang' ?>"><?= $openAlpha ? \Conquer\Game\Locale::html('landing.open_cta') : \Conquer\Game\Locale::html('copy.4b0368646e5780e9') ?> <span aria-hidden="true">→</span></a>
 </section>

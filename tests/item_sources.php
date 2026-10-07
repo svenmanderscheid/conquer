@@ -65,6 +65,26 @@ try{
     $dungeonItems=S::search(1,['item_code'=>$selected]);
     sourceCheck((bool)array_filter($dungeonItems['sources'],static fn($s)=>$s['id']==='dungeon:'.$dungeon['dungeon_code']),'default dungeon item follows account-specific reward selection');
     if(count($itemCodes)>1&&$itemCodes[0]!==$selected){$other=S::search(1,['item_code'=>$itemCodes[0]]);sourceCheck(!array_filter($other['sources'],static fn($s)=>$s['id']==='dungeon:'.$dungeon['dungeon_code']),'finder does not promise another account\'s deterministic dungeon item');}
+    sourceCheck(!array_filter(S::search(1,['treasure_code'=>60400102])['sources'],static fn($s)=>$s['id']==='dungeon:melusina_well'),'legacy maps do not advertise unreachable Melusina rewards');
+    sourceCheck(!array_filter(S::search(1,['item_code'=>10309001])['sources'],static fn($s)=>str_starts_with($s['id'],'melusina:')),'legacy maps do not advertise quest fragment sources');
+    $db->execute("INSERT INTO worlds(id,name,slug,status,map_size)VALUES(3,'Luxembourg sources','item-sources-luxembourg','running',256)");
+    \Conquer\Game\World\WorldMapProfile::configureEmptyWorld(3);
+    $db->execute("INSERT INTO cities(id,player_id,world_id,name,coord_x,coord_y,castle_level)VALUES(3,1,3,'Regional city',418,846,1)");
+    $db->execute('INSERT INTO city_troops(city_id,troop_code,count)VALUES(3,50100101,20)');
+    $db->execute("INSERT INTO player_lord_talents(player_id,world_id,talent_code,rank)VALUES(1,3,'infantry_0',1)");
+    WorldContext::bind(3,1);
+    $regional=array_values(array_filter(S::search(1,['treasure_code'=>60400102])['sources'],static fn($s)=>$s['id']==='dungeon:melusina_well'));
+    sourceCheck(count($regional)===1&&$regional[0]['status']==='available'&&$regional[0]['reason']['key']!=='sources.not_rotation','permanent Melusina rewards remain available outside the weekly rotation with current specializations');
+    sourceCheck(in_array('melusina.key_rule',array_column($regional[0]['notes'],'key'),true),'permanent reward source explains its party key requirement');
+    foreach([10309001,10309002]as$code){
+        $questSources=array_values(array_filter(S::search(1,['item_code'=>$code])['sources'],static fn($s)=>$s['id']==='melusina:'.$code));
+        sourceCheck(count($questSources)===1&&$questSources[0]['destination']['dungeon_code']==='melusina_well'&&$questSources[0]['reason']['key']==='melusina.sources_accept','quest acquisition source routes to acceptance without auto-accepting '.$code);
+    }
+    sourceCheck((int)$db->query('SELECT COUNT(*) FROM melusina_progress')->fetchColumn()===0&&(int)$db->query('SELECT COUNT(*) FROM world_dungeon_entrances')->fetchColumn()===0,'source discovery neither initializes quest progress nor allocates entrance land');
+    $db->execute("UPDATE worlds SET status='paused' WHERE id=3");
+    $pausedQuest=S::search(1,['item_code'=>10309002]);
+    sourceCheck(!array_filter($pausedQuest['sources'],static fn($s)=>$s['status']==='available'),'paused regional world cannot advertise available quest crafting');
+    WorldContext::bind(1,1);
     $db->execute("UPDATE worlds SET status='paused' WHERE id=1");
     sourceCheck(!array_filter(S::search(1,['treasure_code'=>60100001])['sources'],static fn($s)=>$s['status']==='available'),'paused worlds cannot advertise currently available rewards');
     $token=str_repeat('a',64);$db->execute("INSERT INTO sessions(player_id,token,csrf_token,ip_address,user_agent,expires_at,active_world_id)VALUES(1,?,?,'127.0.0.1','sources',DATE_ADD(UTC_TIMESTAMP(),INTERVAL 1 HOUR),1)",[$token,str_repeat('b',64)]);

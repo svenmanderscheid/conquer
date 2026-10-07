@@ -97,7 +97,7 @@ final class RewardCatalog
         } elseif ($type === 'dungeon') {
             foreach (self::json('dungeons')['dungeons'] as $d) {
                 $key = $d['dungeon_code'];
-                $out[$key] = ['key'=>$key,'name'=>$d['name'],'subtitle'=>$d['theme'],'image'=>'dungeons/'.$key.'.webp','definition'=>$d];
+                $out[$key] = ['key'=>$key,'name'=>$d['name'],'subtitle'=>$d['theme'],'image'=>'dungeons/'.($d['art_code']??$key).'.webp','definition'=>$d];
             }
         } elseif ($type === 'chest') {
             foreach (self::json('chest_drops')['chests'] as $key=>$d) $out[$key] = ['key'=>$key,'name'=>['silver'=>'Silbertruhe','gold'=>'Goldtruhe','platinum'=>'Platintruhe'][$key] ?? $key,'subtitle'=>'Schatzkammer · gewichtete Ziehungen','image'=>'items/chest-'.$key.'.svg','definition'=>$d];

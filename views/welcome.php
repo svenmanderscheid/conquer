@@ -1,6 +1,9 @@
 <?php
 declare(strict_types=1);
 $base = htmlspecialchars(APP_BASE, ENT_QUOTES);
+$openAlpha = \Conquer\Auth\AlphaAccess::isOpen();
+$openText = static fn(string $key): string => \Conquer\Game\Locale::html('landing.open_' . $key);
+$registerUrl = 'https://play.unionofkingdoms.com/?mode=register';
 $config = \Conquer\Bootstrap::getConfig();
 $configuredRoot = rtrim((string) ($config['base_url'] ?? ''), '/');
 $requestHost = strtolower((string) parse_url('http://' . ($_SERVER['HTTP_HOST'] ?? ''), PHP_URL_HOST));
@@ -13,9 +16,9 @@ if (!filter_var($configuredRoot, FILTER_VALIDATE_URL)) {
 }
 $publicRoot = $configuredRoot;
 $canonical = $publicRoot . '/';
-$socialImage = $publicRoot . '/assets/marketing/kingdom-social-en-v5.webp';
+$socialImage = $publicRoot . '/assets/marketing/' . ($openAlpha ? 'kingdom-social-en-open-alpha-v1.webp' : 'kingdom-social-en-v5.webp');
 $seoTitle = \Conquer\Game\Locale::t('landing.seo.title', [], 'en');
-$seoDescription = \Conquer\Game\Locale::t('landing.seo.description', [], 'en');
+$seoDescription = \Conquer\Game\Locale::t($openAlpha ? 'landing.open_description' : 'landing.seo.description', [], 'en');
 $waitlistError = $waitlistError ?? '';
 $waitlistSuccess = $waitlistSuccess ?? false;
 $waitlistValue = static fn(string $name): string => htmlspecialchars(is_string($_POST[$name] ?? null) ? mb_substr($_POST[$name], 0, 254) : '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
@@ -29,7 +32,7 @@ $structuredData = [
     ], [
         '@type' => ['VideoGame', 'WebApplication'], '@id' => $canonical . '#game',
         'name' => 'Union of Kingdoms', 'url' => $canonical,
-        'description' => 'A browser strategy game about city development, research, armies, PvP and cooperative alliance PvE. Currently in closed alpha.',
+        'description' => 'A browser strategy game about city development, research, armies, PvP and cooperative alliance PvE. Currently in ' . ($openAlpha ? 'Open Alpha.' : 'closed alpha.'),
         'image' => $socialImage, 'inLanguage' => 'en', 'genre' => ['Strategy', 'City building', 'Fantasy'],
         'gamePlatform' => 'Webbrowser', 'applicationCategory' => 'GameApplication',
         'operatingSystem' => 'Web Browser', 'isAccessibleForFree' => true,
@@ -90,7 +93,11 @@ $structuredData = [
       <p class="lp-kicker"><span>In your browser</span><i aria-hidden="true">·</i><span>no download</span></p>
       <h1 id="hero-title"><span>Your kingdom.</span><br><em>Our next adventure.</em></h1>
       <p class="lp-lead"><?= \Conquer\Game\Locale::html('landing.seo.intro', [], 'en') ?></p>
+      <?php if ($openAlpha): ?>
+      <a class="lp-button lp-hero-start" href="<?= $registerUrl ?>"><span><?= $openText('cta') ?></span> <span aria-hidden="true">→</span></a>
+      <?php else: ?>
       <a class="lp-button lp-hero-start" href="<?= $base ?>/?zugang=waitlist#zugang" data-auth-target="waitlist"><span>Register for closed alpha</span> <span aria-hidden="true">→</span></a>
+      <?php endif ?>
     </div>
     <div class="lp-hero-controls" role="group" aria-label="Choose featured artwork">
       <button class="is-active" type="button" data-hero-slide="0" aria-label="Kingdom at sunrise" aria-pressed="true"></button>
@@ -103,6 +110,20 @@ $structuredData = [
 
   <section id="zugang" class="lp-access" aria-labelledby="access-title" tabindex="-1">
     <div class="lp-access-character lp-access-character-left" aria-hidden="true"><img src="<?= $base ?>/assets/art/characters/fantasy-troops-v3/guardian-ui.webp" alt=""></div>
+    <?php if ($openAlpha): ?>
+    <div class="lp-auth-card">
+      <div class="lp-auth-heading">
+        <p class="lp-auth-badge"><?= \Conquer\Game\Locale::html('landing.open_alpha') ?></p>
+        <h2 id="access-title"><?= $openText('title') ?></h2>
+      </div>
+      <div class="lp-auth-body">
+        <p class="lp-waitlist-intro"><?= $openText('access') ?></p>
+        <a class="lp-button lp-submit" href="<?= $registerUrl ?>"><?= $openText('cta') ?> <span aria-hidden="true">→</span></a>
+        <p class="lp-alpha-note"><?= $openText('notice') ?></p>
+        <div class="lp-auth-footer"><a href="https://play.unionofkingdoms.com/" data-i18n="login.login"><?= \Conquer\Game\Locale::html('login.login') ?></a></div>
+      </div>
+    </div>
+    <?php else: ?>
     <div class="lp-auth-card" data-auth-card data-access-mode="waitlist">
       <div class="lp-auth-heading">
         <p class="lp-auth-badge">Closed alpha</p>
@@ -140,6 +161,7 @@ $structuredData = [
         <div class="lp-auth-footer lp-key-link"><a href="https://play.unionofkingdoms.com/?mode=register"><?= $wt('redeem') ?></a></div>
       </div>
     </div>
+    <?php endif ?>
     <div class="lp-access-character lp-access-character-right" aria-hidden="true"><img src="<?= $base ?>/assets/art/characters/fantasy-troops-v3/fire-archer-ui.webp" alt=""></div>
   </section>
 </main>

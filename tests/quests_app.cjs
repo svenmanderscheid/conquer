@@ -27,7 +27,7 @@ async function startFixture(){const server=net.createServer();await new Promise(
   const dailyReady=ready.filter(q=>!q.permanent),mainReady=ready.filter(q=>q.permanent);
   assert.equal(ready.filter(q=>!q.permanent).length,1,'Fresh fixture starts with one daily login reward');
   assert.equal(ready.filter(q=>q.permanent).length,3,'Completed starter building missions are ready too');
-  assert.equal(await badge.innerText(),String(ready.length));assert.match(await button.getAttribute('aria-label'),/\b4\b/);
+  assert.equal(await badge.innerText(),String(ready.length));assert.match(await button.getAttribute('aria-label'),/4 Belohnungen abholbereit/);
   for(const [width,height] of [[1280,800],[820,720],[390,844],[320,568],[568,320],[844,390]]){
    await page.setViewportSize({width,height});
    await page.waitForTimeout(250);
@@ -58,8 +58,8 @@ async function startFixture(){const server=net.createServer();await new Promise(
    assert.deepEqual(categoryLayout,{horizontal:false,buttons:true,rawKeys:false});
    await page.screenshot({path:path.join(output,`${width}x${height}-main-quests.png`)});
    await page.locator('[data-action=quest-category][data-id=daily]').click();
-   assert.equal(await page.locator('.quest-activity-chest').count(),(kingdom.quest_activity?.milestones||[]).length,'Available daily activity chest previews remain in Daily');
-   assert((await page.locator('.quest-page-summary').innerText()).includes(`0 / ${daily.length}`),'Daily status excludes starter missions');
+   assert.equal(await page.locator('.quest-activity-chest').count(),5,'Five daily activity chest previews remain available');
+   assert.match(await page.locator('.quest-page-summary').innerText(),/0 \/ 13/,'Daily status excludes starter missions');
    assert.equal(await page.locator('.quest-row').first().getAttribute('data-quest-code'),dailyReady[0].quest_code);
    assert.equal(await page.locator('.quest-row.ready').count(),dailyReady.length);
    assert.equal(await page.locator('.quest-row').count(),daily.filter(q=>!q.claimed).length);
@@ -142,7 +142,7 @@ async function startFixture(){const server=net.createServer();await new Promise(
   await page.locator('#hud-menu').click();
   await page.waitForFunction(()=>document.querySelector('#navigation .dock-badge')?.textContent==='2');
   assert.equal(await badge.isVisible(),true);
-  assert.match(await button.getAttribute('aria-label'),/\b2\b/);
+  assert.match(await button.getAttribute('aria-label'),/2 Belohnungen abholbereit/);
   await page.locator("#game-dialog .dialog-close:visible, #game-dialog .mobile-page-back:visible").first().click();
   await page.unroute(base+'/api/kingdom/state');
   await page.waitForFunction(()=>document.querySelector('#navigation .dock-badge')?.hidden);

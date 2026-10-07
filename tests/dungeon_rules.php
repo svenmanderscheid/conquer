@@ -11,12 +11,14 @@ $member=static fn(string$role,int$count=1000):array=>['role'=>$role,'specialty_p
 $party=[$member('attack'),$member('defense'),$member('gather'),$member('hunter')];
 
 $catalog=DungeonRules::catalog();
-$check(count($catalog['dungeons'])===6&&count($catalog['difficulties'])===2,'catalog shape');
-$check(count(array_filter($catalog['dungeons'],static fn(array$d):bool=>(float)($d['enemy_factor']??0)===3.5))===6,'all new dungeon definitions use the cooperative enemy factor');
+$check(count($catalog['dungeons'])===7&&count($catalog['difficulties'])===2,'catalog includes six weekly dungeons and Melusina');
+$check(count(array_filter($catalog['dungeons'],static fn(array$d):bool=>(float)($d['enemy_factor']??0)===3.5))===7,'all new dungeon definitions use the cooperative enemy factor');
+$check(array_column(DungeonRules::permanentDungeons(),'dungeon_code')===['melusina_well'],'Melusina has a permanent regional definition');
 $rotation=DungeonRules::weeklyRotation(new DateTimeImmutable('2026-09-12T18:00:00+02:00'));
 $check($rotation['week_start']==='2026-09-07T00:00:00+00:00'&&count($rotation['available'])===3,'UTC Monday rotation');
 $preview=DungeonRules::preview(new DateTimeImmutable('2026-09-12T18:00:00+02:00'));
 $check($preview['week_start']==='2026-09-14T00:00:00+00:00'&&$preview['available']!==$rotation['available'],'next week preview');
+$check(count(array_unique(array_merge(array_column($rotation['available'],'dungeon_code'),array_column($preview['available'],'dungeon_code'))))===6&&!in_array('melusina_well',array_column($rotation['available'],'dungeon_code'),true),'six weekly dungeons keep their original alternating rotation');
 $check(DungeonRules::validateParty($party),'valid mixed party');
 foreach ([[$member('attack')]] as $bad){try{DungeonRules::validateParty($bad);$check(false,'invalid party accepted');}catch(InvalidArgumentException){$ok++;}}
 $check(DungeonRules::validateParty([$member('attack'),$member('attack')]),'duplicate roles are valid');
@@ -70,7 +72,7 @@ foreach($catalog['dungeons']as$def){$guidance=DungeonRules::guidance($def);$name
     $profileRun=DungeonRules::simulate($def,$recommended,'hard','balanced',42,'explore');$neutralRun=DungeonRules::simulate($neutral,$recommended,'hard','balanced',42,'explore');
     $check($profileRun['success']&&$profileRun['hp_remaining']>$neutralRun['hp_remaining'],'recommended formation benefits from its dungeon profile for '.$def['dungeon_code']);
 }
-$check(count(array_unique($names))===6&&count(array_unique($mixes))===6,'all six dungeons have distinct named formations');
+$check(count(array_unique($names))===7&&count(array_unique($mixes))===7,'all seven dungeons have distinct named formations');
 $legacy=$catalog['dungeons'][0];unset($legacy['army_profile']);$legacyBefore=$legacy;$legacyGuidance=DungeonRules::guidance($legacy);$check($legacy===$legacyBefore&&!empty($legacyGuidance['requirements']['hard']['explore'])&&array_sum(array_column($legacyGuidance['mix'],'percent'))===100,'legacy definition receives neutral advisory guidance without mutation');$withTypes=$profileParty($catalog['dungeons'][0]['army_profile']['mix'],300);$withoutTypes=array_map(static function(array$m):array{unset($m['type_stats']);return$m;},$withTypes);$check(DungeonRules::simulate($legacy,$withTypes,'normal','balanced',42,'skip')===DungeonRules::simulate($legacy,$withoutTypes,'normal','balanced',42,'skip'),'saved definitions without profiles retain legacy aggregate combat math');
 echo "ALL DUNGEON RULE CHECKS PASSED ($ok assertions).\n";
 echo 'BALANCE typical wins per 4 seeds: '.json_encode($balance,JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR)."\n";

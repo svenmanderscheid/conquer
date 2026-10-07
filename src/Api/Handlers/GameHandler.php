@@ -158,6 +158,7 @@ final class GameHandler
         Response::ok($state + [
             'world'=>$world+['map_profile'=>$mapProfile,'width'=>$mapProfile['width'],'height'=>$mapProfile['height']],
             'territory'=>TerritoryService::compactState($pid,$worldId),
+            'dungeon_entrances'=>array_values(array_filter([\Conquer\Game\Dungeon\DungeonEntrance::forWorld($worldId)])),
             'beginner_journey'=>\Conquer\Game\Tutorial\BeginnerJourney::state($pid,$worldId),
             'return_summary'=>$returnSince === null ? null : \Conquer\Game\City\ReturnSummary::since($city, $returnSince),
             'active_effects'=>\Conquer\Game\Buff\ActiveEffectService::forPlayer($pid,$worldId),

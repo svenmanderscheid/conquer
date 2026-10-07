@@ -40,6 +40,10 @@ final class WorldPlacement
             [$l,$t,$r,$b]=LuxembourgGeography::boundsForSize($landmark['x'],$landmark['y'],$landmark['footprint']);
             if(!($right<$l||$left>$r||$bottom<$t||$top>$b))return false;
         }
+        if($profile['key']==='luxembourg')foreach(\Conquer\Game\Dungeon\DungeonEntrance::registered($worldId, true) as $entrance){
+            [$l,$t,$r,$b]=LuxembourgGeography::boundsForSize((int)$entrance['coord_x'],(int)$entrance['coord_y'],(int)$entrance['footprint']);
+            if(!($right<$l||$left>$r||$bottom<$t||$top>$b))return false;
+        }
         // Landmarks are preplaced in locked zones; interactions still require access.
         if(!in_array($kind,['shrine','congress'],true)&&class_exists(\Conquer\Game\World\LandAccessPolicy::class)){
             foreach([[$left,$top],[$right,$top],[$left,$bottom],[$right,$bottom]] as [$cx,$cy])

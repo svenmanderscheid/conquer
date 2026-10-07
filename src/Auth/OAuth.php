@@ -329,8 +329,10 @@ final class OAuth
             }
         }
 
-        // Closed alpha: a social login may resume/link an invited account,
-        // but it must never create a new player around the invite gate.
+        // Account creation uses the registration form, including world selection.
+        if (AlphaAccess::isOpen()) {
+            throw new \DomainException(\Conquer\Game\Locale::t('login.create_before_link'));
+        }
         throw new \DomainException('Erstelle dein Alpha-Konto zuerst mit deinem persönlichen Key. Danach kannst du diesen Anmeldedienst verknüpfen.');
     }
 

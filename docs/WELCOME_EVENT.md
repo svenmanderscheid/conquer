@@ -1,6 +1,6 @@
 # Kingdom Foundations welcome event
 
-The existing Events screen contains a permanent welcome campaign inspired by the reference game's newcomer support and growth tracks. It awards supplies for seven distinct UTC visit dates and six completed growth milestones. This does not change the committed eight daily quests, starter missions, Conquest, invasions, or scheduled event shortcuts. The separate development working-tree extension for thirteen daily quests and activity chests is not included in this change.
+The existing Events screen contains a permanent welcome campaign inspired by the reference game's newcomer support and growth tracks. It awards supplies for seven distinct UTC visit dates and six completed growth milestones. This does not change daily quests, activity chests, starter missions, Conquest, invasions, or scheduled event shortcuts.
 
 ## Player rules
 
@@ -57,8 +57,6 @@ Apply the migration through the established deployment process before enabling t
 
 `tests/welcome_event.php` checks nonretroactive visits, repeated dates, skipped dates, the seven-day cap, completed growth, isolation between players/worlds, invalid claims, session and CSRF guards, operation receipts, altered payloads, ignored client rewards, rollback after a late grant failure, concurrent direct claims, closed-world rejection and pre-migration compatibility.
 
-Integration results in the shared development working tree: 149 welcome-event checks and 106 existing starter-reward checks passed in disposable databases. That tree also included a separate daily-activity extension whose 144 checks passed; the extension and its tests are not part of this commit. These working-tree results do not replace validation of the isolated commit.
+Backend results: 149 welcome-event checks, 106 existing starter-reward checks and 144 existing daily-quest/activity checks pass in disposable databases.
 
-`tests/welcome_event_app.cjs` passed against the actual main app in that shared working tree at 1280×800, 390×844, 320×568, 568×320 and 844×390. It checks both reward tracks, scrolling, touch targets, real login and growth claims, exact reward previews and HUD counts. A committed claim whose reply is lost is restored after a page reload and retried with the same operation key, without duplicate rewards. No page errors occurred. Screenshots under ignored `output/video-reference/qa/welcome/` were visually inspected. Physical mobile-device verification remains open.
-
-The exact scoped release tree was then exported and verified independently on top of commit 02c93e97. All 149 welcome-event and 106 starter-reward checks passed in disposable databases. The welcome-event browser suite passed five screen sizes and persisted lost-response recovery; the quest suite passed six screen sizes and real claims; the intro suite passed five screen sizes, replay, navigation and true loading state. Startup lifecycle and beginner destination selection checks passed. No player data was changed.
+`tests/welcome_event_app.cjs` passed against the actual main app at 1280×800, 390×844, 320×568, 568×320 and 844×390. It checks both reward tracks, scrolling, touch targets, real login and growth claims, exact reward previews and HUD counts. A committed claim whose reply is lost is restored after a page reload and retried with the same operation key, without duplicate rewards. No page errors occurred. Screenshots under ignored `output/video-reference/qa/welcome/` were visually inspected. Physical mobile-device verification remains open.

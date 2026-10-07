@@ -295,8 +295,8 @@
             window.ConquerWorld.focus(Number(x),Number(y));
             const updated=await refresh();
             if(!isCurrent()||!updated)return;
-            const rows=state[kind]||[],found=rows.some(row=>Number(row.id)===Number(id)&&Number(row.coord_x??row.x)===Number(x)&&Number(row.coord_y??row.y)===Number(y));
-            if(found){window.ConquerWorld.locate(Number(x),Number(y),[kind],Number(id));}
+            const rows=state[kind]||(kind==='dungeons'?state.dungeon_entrances:[])||[],found=rows.some(row=>String(row.id)===String(id)&&Number(row.coord_x??row.x)===Number(x)&&Number(row.coord_y??row.y)===Number(y));
+            if(found){window.ConquerWorld.locate(Number(x),Number(y),[kind],id);}
             else onMissing?.();
         }});
     }
@@ -672,7 +672,10 @@
     const communityPanel=window.ConquerCommunity({...featureContext,openSharedReport,openSharedLocation,openStructureLocation:async location=>{navigate('world',{focusTitle:false});window.ConquerWorld.focus(location.x,location.y);await refresh();if(!window.ConquerWorld.locate(location.x,location.y,[location.kind],location.id))toast('Das Allianzgebäude ist an dieser Position nicht mehr vorhanden.');},beginStructurePlacement:structureType=>{const center=structureType==='center';teleportSelection={kind:'alliance-structure',structure_type:center?'center':'outpost',footprint:center?5:3,label:center?'Allianzzentrum':'Außenposten',art:center?'painted-v2/alliance-center.webp':'alliance-outpost'};navigate('world',{focusTitle:false});toast(`${teleportSelection.label} auf einen freien Platz ziehen.`);},openMailbox:()=>{navigate('reports');mailboxPanel.select('private');}});
     const socialHub=window.ConquerSocialHub({...featureContext,openPublicProfile:id=>panels.onClick('public-profile',{dataset:{id:String(id)}}),openPrivate:(id,name)=>{navigate(playfield);worldChat?.openPrivate(id,name);},openChat:channel=>{navigate(playfield);worldChat?.openChannel(channel);},chatChanged:()=>worldChat?.refresh(),openMailbox:()=>{navigate('reports');mailboxPanel.select('private');}});
     const allianceCommunity=window.ConquerAllianceCommunity(featureContext);
-    const dungeonPanel=window.ConquerDungeons({...featureContext,unitName});
+    const dungeonPanel=window.ConquerDungeons({...featureContext,unitName,
+        onMelusinaSource:(source,worldId)=>openWorldTarget({x:source.x,y:source.y,kind:source.type==='monster'?'monsters':'nodes',id:source.id},worldId,()=>toast(t('melusina.source_changed'))),
+        onMelusinaEntrance:(entrance,worldId)=>openWorldTarget({x:entrance.x,y:entrance.y,kind:'dungeons',id:entrance.id||'melusina_well'},worldId)
+    });
     worldChat=window.ConquerWorldChat({...featureContext,openSharedReport,openSharedLocation,openPublicProfile:id=>panels.onClick('public-profile',{dataset:{id:String(id)}}),onOpen:()=>mobilePages?.opened('chat'),onClose:()=>mobilePages?.closed('chat')});
     const defensePanel=window.ConquerDefense(featureContext);
     const progressionPanel=window.ConquerProgression(featureContext);

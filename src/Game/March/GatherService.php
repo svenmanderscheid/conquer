@@ -181,6 +181,10 @@ final class GatherService
                     $items=\Conquer\Game\Rewards\RewardCatalog::rollItems($rewards['drops']);
                     $fragments=\Conquer\Game\Rewards\RewardCatalog::rollFragments($rewards['fragment_drops']);
                     $relics=\Conquer\Game\Rewards\RewardCatalog::rollRelics($rewards['relic_drops']);
+                    if (!$recall) {
+                        $questItems=\Conquer\Game\Dungeon\MelusinaProgress::drop((int)$march['player_id'],(int)$march['world_id'],'gather',(int)$obj['id'],(int)$obj['coord_x'],(int)$obj['coord_y'],$end);
+                        foreach($questItems as $code=>$count)$items[$code]=($items[$code]??0)+$count;
+                    }
                 }
                 \Conquer\Game\World\LandProgressService::recordGather((int)$march['world_id'],(int)$march['id'],(int)$obj['coord_x'],(int)$obj['coord_y'],FieldObjectService::RESOURCE_BY_TYPE[(int)$obj['object_type']],$amount,(int)$march['player_id']);
             }

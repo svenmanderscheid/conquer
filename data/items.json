@@ -3357,6 +3357,34 @@
       "loot_sources": []
     },
     {
+      "code": 10309001,
+      "name": "Well-key fragment",
+      "name_de": "Brunnenschlüsselfragment",
+      "category": "dungeon_quest",
+      "subcategory": "melusina_fragment",
+      "rarity": "rare",
+      "description": "Combine three fragments to restore the sealed well key. Earned after accepting Melusina’s quest by defeating solo monsters or fully gathering resource nodes in Luxembourg canton.",
+      "description_de": "Setze drei Fragmente zum Brunnenschlüssel zusammen. Nach Annahme von Melusinas Auftrag durch Siege über Solo-Monster oder vollständig abgebaute Rohstoffstellen im Kanton Luxembourg erhältlich.",
+      "is_usable": false,
+      "icon": "fragment-rare.svg",
+      "icon_framed": false,
+      "loot_sources": ["melusina_quest"]
+    },
+    {
+      "code": 10309002,
+      "name": "Sealed well key",
+      "name_de": "Schlüssel zum versiegelten Brunnen",
+      "category": "dungeon_quest",
+      "subcategory": "melusina_key",
+      "rarity": "epic",
+      "description": "Opens Melusina’s dungeon for your whole party. Reserved at departure, consumed only on success, and returned after defeat or cancellation.",
+      "description_de": "Öffnet Melusinas Dungeon für die gesamte Gruppe. Beim Start reserviert, nur bei Erfolg verbraucht und bei Niederlage oder Abbruch zurückgegeben.",
+      "is_usable": false,
+      "icon": "compass.svg",
+      "icon_framed": false,
+      "loot_sources": ["melusina_quest"]
+    },
+    {
       "code": 10300005,
       "name": "Alliance Coin",
       "name_de": "Allianzmünze",

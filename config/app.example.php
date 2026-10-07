@@ -28,6 +28,8 @@ return [
     'max_players_per_world' => 5000,
     'beginner_shield_days' => 7,
     'alpha_no_payments' => true,
+    // Open Alpha is the default. Set false to require invitation keys again.
+    'open_alpha' => true,
     'inactive_hide_days' => 30,
 
     // Local-only convenience. Keep false outside a private development database.

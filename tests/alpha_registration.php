@@ -11,7 +11,7 @@ function alphaAssert(bool $ok,string $label):void{if(!$ok)throw new RuntimeExcep
 $fixture=new \ConquerTests\FeatureDatabase();$jars=[];$mail=tempnam(sys_get_temp_dir(),'alpha-mail-');
 try {
     $db=Connection::getInstance();$db->execute("UPDATE worlds SET status='running' WHERE id=1");
-    $base=$fixture->serve(HttpApp::source([], $mail),['-d','disable_functions=mail','-d','display_errors=0']);
+    $base=$fixture->serve(HttpApp::source(['open_alpha'=>false], $mail),['-d','disable_functions=mail','-d','display_errors=0']);
     for($i=0;$i<3;$i++)$jars[]=tempnam(sys_get_temp_dir(),'alpha-cookie-');
     $key=AlphaAccess::generate($db,'Isolated HTTP alpha',1);$name='AlphaIsolated';$password='Alpha-password-2026!';
     $csrf=static function(int $i)use($base,$jars):string{$r=HttpApp::request($base,'/','GET',[],null,$jars[$i]);preg_match('/name="csrf" value="([a-f0-9]+)"/',$r['body'],$m);return $m[1]??'';};

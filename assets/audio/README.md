@@ -1,5 +1,35 @@
 # Dorfmusik und Spieleffekte
 
+## Musikentwurf „Kingdom Reverie“ (5. Oktober 2026)
+
+`kingdom-reverie-v1.wav` ist ein neuer, noch nicht im Spiel aktivierter
+Kompositionsentwurf: 64 BPM, 4/4, 32 Takte / 120 Sekunden. Eine eigene Melodie
+mit weichen synthetisierten Klaviertönen, gezupfter Begleitung, ruhigen Bässen
+und leisen Flächen bewegt sich zwischen D-Moll und F-Dur. Keine Schlagzeugspur.
+Die bisher aktive Daylight-Fassung bleibt für die Hörabnahme ausgewählt.
+
+Als Ausgangspunkt dient die gewünschte Referenz **„Speedy“ von Mersy BeatZ**
+([Spotify](https://open.spotify.com/track/0K7LUqThcpXj10UYsNSihe)). Zugänglich
+waren öffentliche Spotify-/Apple-Hörproben. Ihre Signalanalyse deutet auf etwa
+64 BPM beziehungsweise 128 BPM in doppelter Zählweise; die Position innerhalb
+des Songs ist nicht ausgewiesen. Ein Abgleich mit den ausdrücklich gewünschten
+ersten Sekunden ist deshalb noch offen. Instrumentierung, Tonart und neue
+Notenfolge sind eigene Gestaltungsentscheidungen, keine Transkription der
+Referenz. Der Generator verwendet keine fremden Aufnahmen oder Samples.
+
+Erzeugung: `python tools/generate-kingdom-reverie.py` mit NumPy. Die vorbereitete
+Spieldatei ist Mono, 24.000 Hz, 16-Bit PCM, 5,76 MB; Spitzenpegel rund 37,2 %,
+RMS 6,4 %. Ausklänge und Hall werden über die Schleifengrenze gelegt, ohne
+Schluss-Pause. Unter `artifacts/audio-reverie/` entstehen zusätzlich die
+32-sekündige Stereo-Hörprobe `Kingdom-Reverie-preview.wav`, der vollständige
+Stereo-Master, die bearbeitbare MIDI-Komposition und eine Übergangshörprobe
+(Schleifengrenze bei Sekunde 8). Nur die kurze Hörprobe blendet am Ende aus.
+`waveform-check.json` protokolliert Pegel, Dateigröße und die Schleifengrenze.
+Die native Chrome-Dekodierung und Web-Audio-Schleife wurden bei 44.100 und
+48.000 Hz geprüft: keine übersteuerten Samples und keine Stille an der Grenze;
+Ende und Anfang entsprechen den dekodierten Samples. Das ist eine technische
+Prüfung, keine Hörabnahme oder Prüfung auf einem echten Mobilgerät.
+
 ## Aktionssounds (5. Oktober 2026)
 
 Die gemeinsame Audio-Engine bietet 21 kurze Hörproben unter **Menü → Optionen
