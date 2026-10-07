@@ -1,0 +1,597 @@
+{
+  "schema": 1,
+  "date": "2026-10-07",
+  "game": "Union of Kingdoms",
+  "purpose": "All Archer portraits carry bows, including tiers four and five.",
+  "userCorrection": "The user explicitly clarified that Archers should use bows. This supersedes the earlier crossbow interpretation for T4/T5. Reuse the previously inspected, corrected bowstring masters; preserve all role and tier colors.",
+  "processing": {
+    "tool": "sharp",
+    "version": "0.35.4",
+    "noNewImageGeneration": true,
+    "alphaThreshold": 8,
+    "framing": "Original v2 canvas and optical bounds reproduced from output/image-fixes-2026-10-05/characters/build_derivatives.py, with Lanczos3 scaling, centered horizontal placement and original optical height.",
+    "webpQuality": {
+      "ui": 90,
+      "thumb": 86
+    },
+    "webpEffort": 6,
+    "unchangedCopies": 18,
+    "reexported": 4
+  },
+  "sources": [
+    {
+      "tier": 4,
+      "tool": "built-in image_gen.imagegen",
+      "generationDate": "2026-10-05",
+      "generatedImage": "exec-9d1ca213-054d-4d2d-9b7d-f366154da1ff.png",
+      "generationRecord": "output/image-fixes-2026-10-05/characters/generation-jobs.json",
+      "prompt": "Precise equipment correction on this exact transparent Union of Kingdoms fire-archer sprite. Keep the original tier identity, face, white hair, pointed ears, red role hood and dress, natural skin, boots, bow shape and decoration, metal colors, armor complexity, fiery arrow and pose unchanged. Correct ONLY the bowstring: the archer is drawing the arrow with her right draw-hand to the LEFT of the bow. Draw a single taut continuous bowstring as a clear V from the upper bow tip to the arrow NOCK precisely at that LEFT draw-hand, then from that same nock/draw-hand to the lower bow tip. Both strands must visibly connect to that one nock point. The bow is held by her extended other hand at the RIGHT grip. The string must NOT connect to the right grip, be straight from tip to tip, have extra strands, or miss the drawn arrow. Remove the old incorrect string. Preserve original role/tier palette, do not upgrade equipment or add jewels. True transparent alpha, full body inside the image with margins, same painterly chibi game style, no text, no background or checkerboard.",
+      "originalInput": "assets/art/characters/fantasy-troops-v2/fire-archer-t4-ui.webp",
+      "originalInputSha256": "35a894bb8722560927291f9e190c16e33a461b1cc747def3e02f4b92806faa28",
+      "retainedMaster": "output/archer-bow-2026-10-07/masters/fire-archer-bow-t4.png",
+      "masterSha256": "651c02bb9adcfce04320baca2a369da47c1d20f0fb4fe2739c87206403958cb9",
+      "width": 1008,
+      "height": 1560,
+      "bounds": [
+        145,
+        95,
+        956,
+        1424
+      ],
+      "transparentFraction": 0.6384119352869353
+    },
+    {
+      "tier": 5,
+      "tool": "built-in image_gen.imagegen",
+      "generationDate": "2026-10-05",
+      "generatedImage": "exec-1e5187f0-074f-43c6-b062-c14e2d3ec9eb.png",
+      "generationRecord": "output/image-fixes-2026-10-05/characters/root-archer-prompt.json",
+      "prompt": "Use case: precise-object-edit. Edit this transparent Union of Kingdoms fire-archer sprite to correct bow mechanics, preserving the character, pose, proportions, red hood, long white hair, purple tier-five jewels, ornate crescent bow, flaming arrow and full-body square composition. The archer's left visible arm extends right to hold the bow grip. The right visible drawing hand is back near her chest at the LEFT end of the arrow. DRAW ONE CLEAR taut bowstring as two thin continuous segments: upper bow-tip to arrow NOCK at the drawing hand near the chest, then that SAME nock to lower bow-tip. The string forms a pulled sideways V whose left vertex is the arrow's rear end in the drawing fingers. Remove the incorrect straight string that currently runs down by the bow grip. There must not be a second undrawn string. The arrow rests across the grip, horizontal toward the right, with a single flame arrowhead beyond the bow. Fingers grip the nock/string believably. No loose disconnected strings. Preserve all other details, bold dark outlines, chibi storybook art, purple equipment accents, both feet, transparent alpha background and generous margins. No text, frame, extra limbs, added arrows, ground or backdrop.",
+      "originalInput": "assets/art/characters/fantasy-troops-v2/fire-archer-t5-ui.webp",
+      "originalInputSha256": "8b0242b843773a6f89c45772db80030eea277e52ee915ce23df837c33a23dc08",
+      "retainedMaster": "output/archer-bow-2026-10-07/masters/fire-archer-bow-t5.png",
+      "masterSha256": "de6b42ea9b575102744eeac485cd5a0b4a451d5760c69d44eb20f125e6de9758",
+      "width": 1008,
+      "height": 1561,
+      "bounds": [
+        91,
+        90,
+        978,
+        1431
+      ],
+      "transparentFraction": 0.5951885238400293
+    }
+  ],
+  "files": [
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-bow-ui.webp",
+      "tier": null,
+      "kind": "ui",
+      "action": "Byte-identical copy of existing approved bow portrait",
+      "bytes": 74990,
+      "sha256": "411efde92cccf7af4e7f60fb4817b1b5feba1e16237533d5f41ceb9d7c901797",
+      "previousPortrait": "assets/art/characters/fantasy-troops-v3/fire-archer-ui.webp",
+      "previousPortraitSha256": "411efde92cccf7af4e7f60fb4817b1b5feba1e16237533d5f41ceb9d7c901797",
+      "width": 496,
+      "height": 768,
+      "bounds": [
+        52,
+        47,
+        444,
+        689
+      ],
+      "transparentFraction": 0.676301033266129
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-bow-thumb.webp",
+      "tier": null,
+      "kind": "thumb",
+      "action": "Byte-identical copy of existing approved bow portrait",
+      "bytes": 9548,
+      "sha256": "da54a0349951859995deaca8e383e18ce0899bb4e5364aa4f70df61aec7b5e8a",
+      "previousPortrait": "assets/art/characters/fantasy-troops-v3/fire-archer-thumb.webp",
+      "previousPortraitSha256": "da54a0349951859995deaca8e383e18ce0899bb4e5364aa4f70df61aec7b5e8a",
+      "width": 116,
+      "height": 180,
+      "bounds": [
+        12,
+        10,
+        104,
+        161
+      ],
+      "transparentFraction": 0.6316570881226053
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-bow-t1-ui.webp",
+      "tier": 1,
+      "kind": "ui",
+      "action": "Byte-identical copy of existing approved bow portrait",
+      "bytes": 73804,
+      "sha256": "361eb7f1310a9b108ee17e69e1d640974bda325942394b92ac0e09889acb128f",
+      "previousPortrait": "assets/art/characters/fantasy-troops-v3/fire-archer-t1-ui.webp",
+      "previousPortraitSha256": "361eb7f1310a9b108ee17e69e1d640974bda325942394b92ac0e09889acb128f",
+      "width": 496,
+      "height": 768,
+      "bounds": [
+        51,
+        46,
+        445,
+        691
+      ],
+      "transparentFraction": 0.6684124033938172
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-bow-t1-thumb.webp",
+      "tier": 1,
+      "kind": "thumb",
+      "action": "Byte-identical copy of existing approved bow portrait",
+      "bytes": 9210,
+      "sha256": "5dd0e1e92e164c0e399734ae42764c0d360f41b222419a5eaea1976ee7b2f73d",
+      "previousPortrait": "assets/art/characters/fantasy-troops-v3/fire-archer-t1-thumb.webp",
+      "previousPortraitSha256": "5dd0e1e92e164c0e399734ae42764c0d360f41b222419a5eaea1976ee7b2f73d",
+      "width": 116,
+      "height": 180,
+      "bounds": [
+        12,
+        10,
+        104,
+        161
+      ],
+      "transparentFraction": 0.6258141762452107
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-bow-t2-ui.webp",
+      "tier": 2,
+      "kind": "ui",
+      "action": "Byte-identical copy of existing approved bow portrait",
+      "bytes": 76930,
+      "sha256": "86869d9aefdebc65143a406442916c9ccc955cdb13852f7714de91866ddd8db3",
+      "previousPortrait": "assets/art/characters/fantasy-troops-v3/fire-archer-t2-ui.webp",
+      "previousPortraitSha256": "86869d9aefdebc65143a406442916c9ccc955cdb13852f7714de91866ddd8db3",
+      "width": 497,
+      "height": 768,
+      "bounds": [
+        53,
+        47,
+        443,
+        689
+      ],
+      "transparentFraction": 0.6760510982562039
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-bow-t2-thumb.webp",
+      "tier": 2,
+      "kind": "thumb",
+      "action": "Byte-identical copy of existing approved bow portrait",
+      "bytes": 9530,
+      "sha256": "b364f6646df17c1a9c134527ba090246642da738fe197cd75dcebc1f2eacdc2a",
+      "previousPortrait": "assets/art/characters/fantasy-troops-v3/fire-archer-t2-thumb.webp",
+      "previousPortraitSha256": "b364f6646df17c1a9c134527ba090246642da738fe197cd75dcebc1f2eacdc2a",
+      "width": 116,
+      "height": 180,
+      "bounds": [
+        12,
+        10,
+        104,
+        161
+      ],
+      "transparentFraction": 0.6280651340996168
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-bow-t3-ui.webp",
+      "tier": 3,
+      "kind": "ui",
+      "action": "Byte-identical copy of existing approved bow portrait",
+      "bytes": 82670,
+      "sha256": "bd7185c87834de8b66691336f3feac1d8af83d189599577672f6994fd652c1c2",
+      "previousPortrait": "assets/art/characters/fantasy-troops-v3/fire-archer-t3-ui.webp",
+      "previousPortraitSha256": "bd7185c87834de8b66691336f3feac1d8af83d189599577672f6994fd652c1c2",
+      "width": 496,
+      "height": 768,
+      "bounds": [
+        52,
+        47,
+        444,
+        694
+      ],
+      "transparentFraction": 0.6642488869287635
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-bow-t3-thumb.webp",
+      "tier": 3,
+      "kind": "thumb",
+      "action": "Byte-identical copy of existing approved bow portrait",
+      "bytes": 9772,
+      "sha256": "6cb403744fa115c7784db31296973fdbb560140b898145aabb681eeac1c4851a",
+      "previousPortrait": "assets/art/characters/fantasy-troops-v3/fire-archer-t3-thumb.webp",
+      "previousPortraitSha256": "6cb403744fa115c7784db31296973fdbb560140b898145aabb681eeac1c4851a",
+      "width": 116,
+      "height": 180,
+      "bounds": [
+        12,
+        10,
+        104,
+        162
+      ],
+      "transparentFraction": 0.619588122605364
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-bow-t4-ui.webp",
+      "tier": 4,
+      "kind": "ui",
+      "action": "Reuse corrected bow master; crop/resize/transparent composition/WebP encoding only",
+      "bytes": 90680,
+      "sha256": "768e8eb61bb5db833a808c5f618fc2234edd8125df20c04a345c2cfaee12126d",
+      "previousPortrait": "assets/art/characters/fantasy-troops-v3/fire-archer-t4-ui.webp",
+      "previousPortraitSha256": "69d9c3596f02679beac9ac908d13081c816dc0a84fbdfe994d97458cfcbac13b",
+      "width": 497,
+      "height": 768,
+      "bounds": [
+        51,
+        47,
+        446,
+        695
+      ],
+      "transparentFraction": 0.6427235286720322,
+      "fit": {
+        "reference": "assets/art/characters/fantasy-troops-v2/fire-archer-t4-ui.webp",
+        "referenceSha256": "35a894bb8722560927291f9e190c16e33a461b1cc747def3e02f4b92806faa28",
+        "referenceBounds": [
+          75,
+          47,
+          462,
+          695
+        ],
+        "sourceCrop": [
+          145,
+          95,
+          956,
+          1424
+        ],
+        "resized": [
+          395,
+          648
+        ],
+        "placement": [
+          51,
+          47
+        ],
+        "canvas": [
+          497,
+          768
+        ]
+      }
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-bow-t4-thumb.webp",
+      "tier": 4,
+      "kind": "thumb",
+      "action": "Reuse corrected bow master; crop/resize/transparent composition/WebP encoding only",
+      "bytes": 10486,
+      "sha256": "fcdbd568b81d79b93c9d1e71f75a34f2934cbf3165d819b9cc0afc5593f50219",
+      "previousPortrait": "assets/art/characters/fantasy-troops-v3/fire-archer-t4-thumb.webp",
+      "previousPortraitSha256": "a84b7f3e4e464a40d782207f532533f23d3a99bf7feeec7adea03964d8e0f8ee",
+      "width": 116,
+      "height": 180,
+      "bounds": [
+        11,
+        10,
+        104,
+        162
+      ],
+      "transparentFraction": 0.5944444444444444,
+      "fit": {
+        "reference": "assets/art/characters/fantasy-troops-v2/fire-archer-t4-thumb.webp",
+        "referenceSha256": "8261b6b215b759c735d786b35fa0a2feef6f3909d75501027bd084af028be722",
+        "referenceBounds": [
+          17,
+          10,
+          108,
+          162
+        ],
+        "sourceCrop": [
+          145,
+          95,
+          956,
+          1424
+        ],
+        "resized": [
+          93,
+          152
+        ],
+        "placement": [
+          11,
+          10
+        ],
+        "canvas": [
+          116,
+          180
+        ]
+      }
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-bow-t5-ui.webp",
+      "tier": 5,
+      "kind": "ui",
+      "action": "Reuse corrected bow master; crop/resize/transparent composition/WebP encoding only",
+      "bytes": 98672,
+      "sha256": "c435c4a8a78723b00c52f8a9aa0f413cdfa99810fab3b386cd27414bfbfcb077",
+      "previousPortrait": "assets/art/characters/fantasy-troops-v3/fire-archer-t5-ui.webp",
+      "previousPortraitSha256": "c65e1a26a02f69f4b93e14d37d93421c59137357f735b764d4d22b9a804999fc",
+      "width": 496,
+      "height": 768,
+      "bounds": [
+        33,
+        45,
+        463,
+        695
+      ],
+      "transparentFraction": 0.605032972110215,
+      "fit": {
+        "reference": "assets/art/characters/fantasy-troops-v2/fire-archer-t5-ui.webp",
+        "referenceSha256": "8b0242b843773a6f89c45772db80030eea277e52ee915ce23df837c33a23dc08",
+        "referenceBounds": [
+          65,
+          45,
+          465,
+          695
+        ],
+        "sourceCrop": [
+          91,
+          90,
+          978,
+          1431
+        ],
+        "resized": [
+          430,
+          650
+        ],
+        "placement": [
+          33,
+          45
+        ],
+        "canvas": [
+          496,
+          768
+        ]
+      }
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-bow-t5-thumb.webp",
+      "tier": 5,
+      "kind": "thumb",
+      "action": "Reuse corrected bow master; crop/resize/transparent composition/WebP encoding only",
+      "bytes": 11002,
+      "sha256": "c26dff5858d33427d06f0ffb74913aded5c3d76ef7eb87e59b1b5d34d571edb0",
+      "previousPortrait": "assets/art/characters/fantasy-troops-v3/fire-archer-t5-thumb.webp",
+      "previousPortraitSha256": "32cf53e80d6b1455372e2269f66fc2212ab1f1eb73a2c7d31cd5396338d0f2fb",
+      "width": 116,
+      "height": 180,
+      "bounds": [
+        8,
+        11,
+        108,
+        162
+      ],
+      "transparentFraction": 0.5699712643678161,
+      "fit": {
+        "reference": "assets/art/characters/fantasy-troops-v2/fire-archer-t5-thumb.webp",
+        "referenceSha256": "3d74788375e66eb97a30a4ea96d3ca825edfb6150d17680447a992a402611906",
+        "referenceBounds": [
+          14,
+          10,
+          108,
+          163
+        ],
+        "sourceCrop": [
+          91,
+          90,
+          978,
+          1431
+        ],
+        "resized": [
+          100,
+          151
+        ],
+        "placement": [
+          8,
+          11
+        ],
+        "canvas": [
+          116,
+          180
+        ]
+      }
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-bow-t6-ui.webp",
+      "tier": 6,
+      "kind": "ui",
+      "action": "Byte-identical copy of existing approved bow portrait",
+      "bytes": 97982,
+      "sha256": "dbafd15f1056a4e5a153d4ab11f941aa7455110b5742cb068cb8fc6cf7d967fa",
+      "previousPortrait": "assets/art/characters/fantasy-troops-v3/fire-archer-t6-ui.webp",
+      "previousPortraitSha256": "dbafd15f1056a4e5a153d4ab11f941aa7455110b5742cb068cb8fc6cf7d967fa",
+      "width": 497,
+      "height": 768,
+      "bounds": [
+        42,
+        39,
+        454,
+        703
+      ],
+      "transparentFraction": 0.6070695003353455
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-bow-t6-thumb.webp",
+      "tier": 6,
+      "kind": "thumb",
+      "action": "Byte-identical copy of existing approved bow portrait",
+      "bytes": 10934,
+      "sha256": "eefa809e077383b2a9544b8def0f747b8f6aba57c04a3bc408262b48ee9276c4",
+      "previousPortrait": "assets/art/characters/fantasy-troops-v3/fire-archer-t6-thumb.webp",
+      "previousPortraitSha256": "eefa809e077383b2a9544b8def0f747b8f6aba57c04a3bc408262b48ee9276c4",
+      "width": 116,
+      "height": 180,
+      "bounds": [
+        9,
+        8,
+        106,
+        164
+      ],
+      "transparentFraction": 0.558955938697318
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-bow-t7-ui.webp",
+      "tier": 7,
+      "kind": "ui",
+      "action": "Byte-identical copy of existing approved bow portrait",
+      "bytes": 89876,
+      "sha256": "29f29bdcd43e345e41b1eb235d88f8ed20fa39b1fd14e3eaad5d0e4d1aabf600",
+      "previousPortrait": "assets/art/characters/fantasy-troops-v3/fire-archer-t7-ui.webp",
+      "previousPortraitSha256": "29f29bdcd43e345e41b1eb235d88f8ed20fa39b1fd14e3eaad5d0e4d1aabf600",
+      "width": 496,
+      "height": 768,
+      "bounds": [
+        52,
+        44,
+        443,
+        702
+      ],
+      "transparentFraction": 0.6564862651209677
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-bow-t7-thumb.webp",
+      "tier": 7,
+      "kind": "thumb",
+      "action": "Byte-identical copy of existing approved bow portrait",
+      "bytes": 10302,
+      "sha256": "c6176588eafcabf0c943fa826a15199fddf8445c1f7550fa5f6e1635bac46da9",
+      "previousPortrait": "assets/art/characters/fantasy-troops-v3/fire-archer-t7-thumb.webp",
+      "previousPortraitSha256": "c6176588eafcabf0c943fa826a15199fddf8445c1f7550fa5f6e1635bac46da9",
+      "width": 116,
+      "height": 180,
+      "bounds": [
+        12,
+        10,
+        103,
+        164
+      ],
+      "transparentFraction": 0.6157088122605364
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-bow-t8-ui.webp",
+      "tier": 8,
+      "kind": "ui",
+      "action": "Byte-identical copy of existing approved bow portrait",
+      "bytes": 99862,
+      "sha256": "5ff28ad5a755418efe8bea92fc0b0b1152bdc01f8ba6bac6d123ce4a19585352",
+      "previousPortrait": "assets/art/characters/fantasy-troops-v3/fire-archer-t8-ui.webp",
+      "previousPortraitSha256": "5ff28ad5a755418efe8bea92fc0b0b1152bdc01f8ba6bac6d123ce4a19585352",
+      "width": 497,
+      "height": 768,
+      "bounds": [
+        52,
+        36,
+        445,
+        709
+      ],
+      "transparentFraction": 0.6281281438631791
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-bow-t8-thumb.webp",
+      "tier": 8,
+      "kind": "thumb",
+      "action": "Byte-identical copy of existing approved bow portrait",
+      "bytes": 11522,
+      "sha256": "34e3b06737eee028825c4d9d355c3a47a029352419c5c04e7ec351e619556f1f",
+      "previousPortrait": "assets/art/characters/fantasy-troops-v3/fire-archer-t8-thumb.webp",
+      "previousPortraitSha256": "34e3b06737eee028825c4d9d355c3a47a029352419c5c04e7ec351e619556f1f",
+      "width": 116,
+      "height": 180,
+      "bounds": [
+        12,
+        8,
+        104,
+        166
+      ],
+      "transparentFraction": 0.580316091954023
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-bow-t9-ui.webp",
+      "tier": 9,
+      "kind": "ui",
+      "action": "Byte-identical copy of existing approved bow portrait",
+      "bytes": 96006,
+      "sha256": "3f6b2926e1cd5622ba9ec52047ea4d669cb282a3df174965ec432d2064578fc2",
+      "previousPortrait": "assets/art/characters/fantasy-troops-v3/fire-archer-t9-ui.webp",
+      "previousPortraitSha256": "3f6b2926e1cd5622ba9ec52047ea4d669cb282a3df174965ec432d2064578fc2",
+      "width": 497,
+      "height": 768,
+      "bounds": [
+        46,
+        44,
+        450,
+        716
+      ],
+      "transparentFraction": 0.6313899019114688
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-bow-t9-thumb.webp",
+      "tier": 9,
+      "kind": "thumb",
+      "action": "Byte-identical copy of existing approved bow portrait",
+      "bytes": 10786,
+      "sha256": "de971c83503c12e55fb8260304d7200495bb43397e5a681f1b58f95b6e8df233",
+      "previousPortrait": "assets/art/characters/fantasy-troops-v3/fire-archer-t9-thumb.webp",
+      "previousPortraitSha256": "de971c83503c12e55fb8260304d7200495bb43397e5a681f1b58f95b6e8df233",
+      "width": 117,
+      "height": 180,
+      "bounds": [
+        11,
+        10,
+        105,
+        167
+      ],
+      "transparentFraction": 0.592687559354226
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-bow-t10-ui.webp",
+      "tier": 10,
+      "kind": "ui",
+      "action": "Byte-identical copy of existing approved bow portrait",
+      "bytes": 92424,
+      "sha256": "de13757a7484926bdf1341bcdf88180ee912eb65aa5dd509cf1c9ab6a64e5507",
+      "previousPortrait": "assets/art/characters/fantasy-troops-v3/fire-archer-t10-ui.webp",
+      "previousPortraitSha256": "de13757a7484926bdf1341bcdf88180ee912eb65aa5dd509cf1c9ab6a64e5507",
+      "width": 497,
+      "height": 768,
+      "bounds": [
+        50,
+        46,
+        446,
+        699
+      ],
+      "transparentFraction": 0.6552623029845741
+    },
+    {
+      "path": "assets/art/characters/fantasy-troops-v3/fire-archer-bow-t10-thumb.webp",
+      "tier": 10,
+      "kind": "thumb",
+      "action": "Byte-identical copy of existing approved bow portrait",
+      "bytes": 10624,
+      "sha256": "d25ef2b8e875a0cf2f17104e1654e7ee1587b4422f40dcedbbeb43398e561528",
+      "previousPortrait": "assets/art/characters/fantasy-troops-v3/fire-archer-t10-thumb.webp",
+      "previousPortraitSha256": "d25ef2b8e875a0cf2f17104e1654e7ee1587b4422f40dcedbbeb43398e561528",
+      "width": 116,
+      "height": 180,
+      "bounds": [
+        11,
+        10,
+        104,
+        163
+      ],
+      "transparentFraction": 0.6093390804597701
+    }
+  ]
+}

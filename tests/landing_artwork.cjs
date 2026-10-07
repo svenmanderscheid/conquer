@@ -14,7 +14,7 @@ const root = path.resolve(__dirname, '..');
 const output = path.join(root, 'artifacts/landing-artwork');
 const php = process.env.PHP_BINARY || 'php';
 const viewports = [[1280, 800], [390, 844], [844, 390]];
-const roles = ['guardian', 'fire-archer', 'shadow-rider'];
+const roles = ['guardian', 'fire-archer-bow', 'shadow-rider'];
 const names = ['Infantry guardian', 'Fire archer', 'Cavalry shadow rider'];
 const artDirectory = 'assets/art/characters/fantasy-troops-v3/';
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');

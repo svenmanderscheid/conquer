@@ -1009,7 +1009,7 @@ window.ConquerWorld = (() => {
       if(!publicRoute&&view.marchHud&&!actor.querySelector('.atlas-march-hit')){actor.setAttribute('role','group');const hit=document.createElement('button');hit.className='atlas-march-hit';hit.dataset.followMarch=key;hit.type='button';hit.setAttribute('aria-label',`Marsch ${key} mit der Kamera verfolgen`);actor.append(hit);}
       let troops=march.troops||march.troops_json||{};if(typeof troops==='string'){try{troops=JSON.parse(troops);}catch{troops={};}}
       const types=new Map();let total=0;for(const [code,count]of Object.entries(troops)){const n=number(count);if(n<=0)continue;total+=n;const type=number(state.troop_defs?.find(t=>number(t.code)===number(code))?.type);if(type>=1&&type<=3)types.set(type,(types.get(type)||0)+n);}
-      const labels={1:'Infanterie',2:'Bogenschützen',3:'Kavallerie'},arts={1:'guardian',2:'fire-archer',3:'shadow-rider'},composition=[...types].sort((a,b)=>a[0]-b[0]),signature=JSON.stringify(composition);
+      const labels={1:'Infanterie',2:'Bogenschützen',3:'Kavallerie'},arts={1:'guardian',2:'fire-archer-bow',3:'shadow-rider'},composition=[...types].sort((a,b)=>a[0]-b[0]),signature=JSON.stringify(composition);
       if(actor.dataset.composition!==signature){actor.dataset.composition=signature;actor.querySelector('.atlas-party-units').innerHTML=composition.map(([type,count])=>`<span class="atlas-party-type atlas-party-type--${type}" data-type="${type}" data-count="${count}"><img src="${troopAsset(arts[type])}" alt=""><img src="${troopAsset(arts[type])}" alt=""></span>`).join('')||`<span class="atlas-party-unknown">${icon('flag')}</span>`;}
       // march_skin is the immutable server snapshot taken at dispatch. Never derive an active
       // march from the player's currently equipped skin: changing equipment affects only new marches.
@@ -1097,7 +1097,7 @@ window.ConquerWorld = (() => {
     const biome=window.ConquerLandscape.biomeAt(...t.destination).id;
     const effects=window.ConquerMarchEffects,art=effects?.create?.(t.skinId,{biome})||effects?.[t.skinId]?.({biome})||null;
     const attackers=(t.attackArts?.length?t.attackArts:[troopAsset('guardian')]).map((src,index)=>`<img src="${escape(src)}" alt="" style="--fighter:${index}">`).join('');
-    const defender=t.combatKind==='monsters'&&t.combatArt?`<img class="atlas-impact-monster" src="${escape(t.combatArt)}" alt="">`:`<img src="${troopAsset('guardian')}" alt=""><img src="${troopAsset('fire-archer')}" alt="" style="--fighter:1">`;
+    const defender=t.combatKind==='monsters'&&t.combatArt?`<img class="atlas-impact-monster" src="${escape(t.combatArt)}" alt="">`:`<img src="${troopAsset('guardian')}" alt=""><img src="${troopAsset('fire-archer-bow')}" alt="" style="--fighter:1">`;
     const skinParticles=Array.from({length:8},(_,index)=>`<i style="--combat-particle:${index}"></i>`).join('');
     node.innerHTML=`<span class="atlas-impact-combatants"><span class="atlas-impact-ground"></span><span class="atlas-impact-side is-attacker">${attackers}</span><span class="atlas-impact-clash"><b></b><b></b></span><span class="atlas-impact-skin-motif">${skinParticles}</span><span class="atlas-impact-side is-defender">${defender}</span></span>`;
     if(art){node.append(art.canvas);node.dataset.marchSkin=t.skinId;art.paint(0);}

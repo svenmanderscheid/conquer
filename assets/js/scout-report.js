@@ -17,7 +17,7 @@ window.ConquerScoutReport = function(ctx) {
         if(!entries.length)return note(empty);
         const cards=entries.map(t=>{
             const def=getState()?.troop_defs?.find(u=>Number(u.code)===Number(t.code)),tier=Number(t.tier??def?.tier),type=t.type??def?.type;
-            const prefix=({1:'guardian',2:'fire-archer',3:'shadow-rider',infantry:'guardian',ranged:'fire-archer',cavalry:'shadow-rider'})[type];
+            const prefix=({1:'guardian',2:'fire-archer-bow',3:'shadow-rider',infantry:'guardian',ranged:'fire-archer-bow',cavalry:'shadow-rider'})[type];
             const art=prefix&&tier>=1&&tier<=10?`characters/fantasy-troops-v3/${prefix}-t${tier}-ui.webp`:'hud/expeditions.svg';
             const name=t.name||(def?unitName(def):'Truppe #'+t.code);
             return `<article class="sr-troop"><div class="sr-portrait troop-tier-frame" data-troop-tier="${Number(tier)||0}">${image(art)}<span class="sr-tier">${tier?'T'+tier:'?'}</span><b>${number(t.count??t.sent)}</b></div><strong>${esc(name)}</strong></article>`;

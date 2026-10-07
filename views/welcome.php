@@ -162,7 +162,7 @@ $structuredData = [
       </div>
     </div>
     <?php endif ?>
-    <div class="lp-access-character lp-access-character-right" aria-hidden="true"><img src="<?= $base ?>/assets/art/characters/fantasy-troops-v3/fire-archer-ui.webp" alt=""></div>
+    <div class="lp-access-character lp-access-character-right" aria-hidden="true"><img src="<?= $base ?>/assets/art/characters/fantasy-troops-v3/fire-archer-bow-ui.webp" alt=""></div>
   </section>
 </main>
 

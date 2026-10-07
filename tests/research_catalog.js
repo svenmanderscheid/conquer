@@ -148,6 +148,8 @@ check('every technology has a real subject-specific illustration and counter ico
         for(const image of images)assert(fs.existsSync(path.join(root,image)),'Missing asset '+image);
         assert(!/\/art\/(knight|archer|rider)\.png/.test(html),'Generic player portrait for '+node.code);
     }
+    for(const code of ['ranged_hp','archer_def_against_cavalry','troops_hp','crossbow_man','sniper'])assert(renderedArt(code).includes('/characters-bow-v1/'+code+'.png'),'Corrected bow artwork for '+code);
+    for(const code of ['infantry_hp_against_archer','cavalry_hp_against_infantry','longbow_man'])assert(renderedArt(code).includes('/characters-v10/'+code+'.png'),'Unrelated artwork retains its existing URL: '+code);
     assert(renderedArt('infantry_hp').includes('data-art="infantry-hp"'));
     assert(renderedArt('infantry_def').includes('data-art="infantry-def"'));
     assert(renderedArt('infantry_atk').includes('data-art="infantry-atk"'));

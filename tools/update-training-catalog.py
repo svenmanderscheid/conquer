@@ -9,7 +9,7 @@ academy_levels = [1, 10, 16, 23, 30]
 resources = {10100001: 'food', 10100002: 'lumber', 10100003: 'stone', 10100004: 'gold'}
 names = {
     1: ['Schwertkämpfer', 'Krieger', 'Ritter', 'Wächter', 'Kreuzritter'],
-    2: ['Bogenschützen', 'Langbogenschützen', 'Waldläufer', 'Armbrustschützen', 'Scharfschützen'],
+    2: ['Bogenschützen', 'Langbogenschützen', 'Waldläufer', 'Veteranenbogenschützen', 'Scharfschützen'],
     3: ['Reiter', 'Berittene Krieger', 'Schwere Kavallerie', 'Eiserne Kavallerie', 'Dragoner'],
 }
 troops = []
@@ -18,7 +18,7 @@ for row in source:
     assert kind in names and 1 <= tier <= 5
     troop = {key: row[key] for key in ['name', 'type', 'hp', 'attack', 'defense', 'speed', 'carry', 'power', 'heal_time']}
     troop.update(code=50000001 + kind * 100000 + tier * 100, source_code=row['code'], tier=tier,
-                 name=row['name'].title(), name_de=names[kind][tier - 1], march_speed=row['speed'],
+                 name='Veteran Archers' if kind == 2 and tier == 4 else row['name'].title(), name_de=names[kind][tier - 1], march_speed=row['speed'],
                  time=training_times[tier - 1], source_time=row['time'],
                  unlock_building=1, unlock_castle=academy_levels[tier - 1], unlock_academy=academy_levels[tier - 1],
                  unlock_research=None if tier == 1 else row['name'].replace(' ', '_'))

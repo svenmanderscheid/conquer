@@ -731,7 +731,7 @@ $fmtF = fn(float $n): string => number_format($n, 0, '.', ',');
                 $injured = (int)($t['injured'] ?? $t['lost'] ?? 0);
                 $tier    = (int)($t['tier'] ?? 1);
                 $chipDef = TroopData::get((int)($t['code'] ?? 0));
-                $troopPortraitPrefix = [1 => 'guardian', 2 => 'fire-archer', 3 => 'shadow-rider'][(int)($chipDef['type'] ?? 0)] ?? null;
+                $troopPortraitPrefix = [1 => 'guardian', 2 => 'fire-archer-bow', 3 => 'shadow-rider'][(int)($chipDef['type'] ?? 0)] ?? null;
 
             ?>
             <div class="troop-chip">

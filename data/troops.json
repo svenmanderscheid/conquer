@@ -212,7 +212,7 @@
       "need_gold": 45
     },
     {
-      "name": "Crossbow Man",
+      "name": "Veteran Archers",
       "type": 2,
       "hp": 200,
       "attack": 119,
@@ -224,7 +224,7 @@
       "code": 50200401,
       "source_code": 50100204,
       "tier": 4,
-      "name_de": "Armbrustschützen",
+      "name_de": "Veteranenbogenschützen",
       "march_speed": 80,
       "time": 16,
       "source_time": 24,

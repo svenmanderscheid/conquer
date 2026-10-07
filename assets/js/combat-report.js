@@ -21,7 +21,7 @@ window.ConquerCombatReport = function ({base, esc, fmt, openDialog, toast, unitN
     };
     const avatar = army => `<img class="cr-avatar" src="${base}/assets/art/${['knight','archer','rider'].includes(army.avatar)?army.avatar:'knight'}.png" alt="">`;
     const troopArt = troop => {
-        const tier=Number(troop.tier),prefix={infantry:'guardian',ranged:'fire-archer',cavalry:'shadow-rider'}[troop.type];
+        const tier=Number(troop.tier),prefix={infantry:'guardian',ranged:'fire-archer-bow',cavalry:'shadow-rider'}[troop.type];
         if(prefix&&tier>=1&&tier<=10)return `characters/fantasy-troops-v3/${prefix}-t${tier}-ui.webp`;
         return (types[troop.type]?.[1]||'knight')+'.png';
     };

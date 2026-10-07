@@ -19,7 +19,7 @@
         research_speed:'Wissensdurst', construction_speed:'Flotte Baumeister', production_resource_protect:'Geschützte Vorräte', resource_protect:'Strategischer Vorratsschutz',
         troops_storage:'Traglast der Armee', march_size:'Größere Marschverbände', march_limit:'Zusätzlicher Marschplatz', hospital_capacity:'Größeres Hospital', healing_time_reduced:'Schnellere Heilung', rally_attack_amount:'Größere Sammelangriffe',
         resource_production:'Reichsweite Produktion', resource_capacity:'Reichsweite Lagerung', troop_speed_when_participating_a_rally:'Tempo im Sammelangriff',
-        warrior:'Krieger', longbow_man:'Langbogenschützen', horseman:'Reiter', knight:'Ritter', ranger:'Waldläufer', heavy_cavalry:'Schwere Kavallerie', guardian:'Wächter', crossbow_man:'Armbrustschützen', iron_cavalry:'Eiserne Kavallerie', crusader:'Kreuzritter', sniper:'Scharfschützen', dragoon:'Dragoner'
+        warrior:'Krieger', longbow_man:'Langbogenschützen', horseman:'Reiter', knight:'Ritter', ranger:'Waldläufer', heavy_cavalry:'Schwere Kavallerie', guardian:'Wächter', crossbow_man:'Veteranenbogenschützen', iron_cavalry:'Eiserne Kavallerie', crusader:'Kreuzritter', sniper:'Scharfschützen', dragoon:'Dragoner'
     };
     const paths = {
         book:'M3 4h7l2 2 2-2h7v15h-7l-2 2-2-2H3V4Zm9 2v15M6 8h3m-3 4h3m6-4h3m-3 4h3',
@@ -117,9 +117,11 @@
         const effect=/training_amount/.test(code)?'training_amount':/training_speed/.test(code)?'training_speed':/training_cost/.test(code)?'training_cost':/(?:^|_)hp(?:_|$)/.test(code)?'hp':/(?:^|_)def(?:_|$)/.test(code)?'def':/(?:^|_)atk(?:_|$)/.test(code)?'atk':/(?:^|_)spd(?:_|$)/.test(code)?'spd':/storage/.test(code)?'storage':null;
         return {key:effect?family+'-'+effect:'research',advanced};
     }
+    // Only illustrations containing the corrected archer use the new asset URLs.
+    const bowResearchArt = new Set(["ranged_hp","ranged_def","ranged_atk","ranged_spd","ranged_training_amount","ranged_training_speed","ranged_training_cost","advanced_ranged_hp","advanced_ranged_def","advanced_ranged_atk","advanced_ranged_spd","troops_storage","march_size","march_limit","troops_hp","troops_atk","troops_def","troops_spd","rally_attack_amount","ranged_storage","archer_hp_against_cavalry","archer_def_against_cavalry","archer_atk_against_cavalry","castle_defending_archers_hp","castle_defending_archers_def","castle_defending_archers_atk","archers_hp_when_composed_of_archer_only","archers_def_when_composed_of_archer_only","archers_atk_when_composed_of_archer_only","troop_speed_when_participating_a_rally","archers_hp_when_participating_a_rally","archers_def_when_participating_a_rally","archers_atk_when_participating_a_rally","crossbow_man","sniper"]);
     function nodeArt(node, base, esc) {
         const code=String(node.code||''),art=artFor(node),specific=code&&code!=='academy';
-        const src=specific?`${base}/assets/art/research/characters-v10/${encodeURIComponent(code)}.png`:`${base}/assets/art/research/${art.key}.svg`;
+        const src=specific?`${base}/assets/art/research/${bowResearchArt.has(code)?'characters-bow-v1':'characters-v10'}/${encodeURIComponent(code)}.png`:`${base}/assets/art/research/${art.key}.svg`;
         const resourceSrc=art.resource?(window.ConquerItemArt?.resourceUrl(base,art.resource==='crystal'?'gems':art.resource) || `${base}/assets/art/${art.resource==='crystal'?'items/gems.svg':'ui-resources/'+art.resource+'.png'}`):null;
         const picture=specific?`<img src="${esc(src)}" alt="" loading="lazy">`:resourceSrc?`<img class="rt-resource-art" src="${esc(resourceSrc)}" alt="" loading="lazy"><img class="rt-resource-effect" src="${esc(src)}" alt="" loading="lazy">`:`<img src="${esc(src)}" alt="" loading="lazy">`;
         return `<span class="rt-node-art rt-illustrated${art.resource?' rt-resource':''}${specific?' rt-specific-art':''}" data-art="${art.key}"${specific?` data-research-art="${esc(code)}"`:''}>${picture}${art.advanced?'<small class="rt-art-rank" aria-hidden="true">II</small>':''}</span>`;

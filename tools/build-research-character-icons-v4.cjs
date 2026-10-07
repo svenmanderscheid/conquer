@@ -8,7 +8,9 @@ const referenceDir = path.join(root, 'assets/art/research/references');
 const motifDir = path.join(root, 'assets/art/research/nodes-v3/motifs');
 // Use a new public directory whenever the approved artwork changes so an
 // installed PWA cannot keep serving older files under identical URLs.
-const outputDir = path.join(root, 'assets/art/research/characters-v10');
+// --archer-bows-only writes only the 35 affected icons to fresh cache-safe URLs.
+const bowOnly = process.argv.includes('--archer-bows-only');
+const outputDir = path.join(root, 'assets/art/research', bowOnly ? 'characters-bow-v1' : 'characters-v10');
 const troopDir = path.join(root, 'assets/art/characters/fantasy-troops-v3');
 const baseDir = path.join(outputDir, 'bases');
 const manifest = JSON.parse(fs.readFileSync(path.join(root, 'assets/art/research/nodes-v3/manifest.json'), 'utf8'));
@@ -103,7 +105,7 @@ function paintedSceneFor(code) {
 function portraitFrameSvg() {
     return Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="248" height="248"><defs><linearGradient id="paper" x2="0" y2="1"><stop stop-color="#fbf6ec"/><stop offset="1" stop-color="#dfcda9"/></linearGradient></defs><rect x="3" y="3" width="242" height="242" rx="27" fill="#c89839" stroke="#3d241d" stroke-width="5"/><rect x="11" y="11" width="226" height="226" rx="21" fill="url(#paper)" stroke="#ffdf77" stroke-width="5"/></svg>`);
 }
-const troopFiles={infantry:'guardian',ranged:'fire-archer',cavalry:'shadow-rider'};
+const troopFiles={infantry:'guardian',ranged:bowOnly?'fire-archer-bow':'fire-archer',cavalry:'shadow-rider'};
 async function troopCutout(family,width,height) {
     return sharp(path.join(troopDir,`${troopFiles[family]}-t4-ui.webp`)).trim({background:TRANSPARENT}).resize(width,height,{fit:'contain',background:TRANSPARENT}).png().toBuffer();
 }
@@ -151,7 +153,7 @@ async function transparentSheetExterior(buffer) {
 async function buildApprovedBases() {
     // Match the actual, corrected game characters instead of retaining the old
     // horned cavalry or the original HP hearts baked into the concept sheet.
-    for (const family of Object.keys(troopFiles)) {
+    for (const family of bowOnly ? ['ranged'] : Object.keys(troopFiles)) {
         const character=await troopCutout(family,220,220);
         await sharp(portraitFrameSvg()).composite([{input:character,left:14,top:14}]).png({compressionLevel:9}).toFile(path.join(baseDir,`${family}.png`));
     }
@@ -161,6 +163,15 @@ async function buildApprovedBases() {
         {input:await troopCutout('infantry',144,190),left:51,top:46}
     ];
     await sharp(portraitFrameSvg()).composite(army).png({compressionLevel:9}).toFile(path.join(baseDir,'scene-army.png'));
+    if (bowOnly) {
+        // These legacy research IDs remain stable; use the approved bow tier
+        // portraits instead of the crossbows painted into the old unlock sheet.
+        for (const [code,tier] of [['crossbow_man',4],['sniper',5]]) {
+            await sharp(path.join(troopDir,`fire-archer-bow-t${tier}-ui.webp`)).trim({background:TRANSPARENT})
+                .resize(214,214,{fit:'contain',background:TRANSPARENT}).png({compressionLevel:9}).toFile(path.join(baseDir,`${code}.png`));
+        }
+        return;
+    }
     const mask = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="248" height="248"><rect width="248" height="248" rx="28" fill="white"/></svg>`);
     const gold = await cropGrid(approvedSheet, 5, 1, 3, 0, 248, {r:255,g:255,b:255,alpha:1});
     await sharp(await transparentSheetExterior(gold)).composite([{input:mask,blend:'dest-in'}]).png({compressionLevel:9}).toFile(path.join(baseDir,'scene-gold.png'));
@@ -235,7 +246,10 @@ async function renderSpecial(code) {
 (async () => {
     await buildApprovedBases();
     const unlockSet = new Set(unlocks.flat());
-    for (const code of manifest.codes) {
+    const codes = bowOnly ? manifest.codes.filter(code =>
+        (familyOf(code)==='ranged' && !['longbow_man','ranger'].includes(code)) ||
+        (familyOf(code)==='general' && paintedSceneFor(code)==='army')) : manifest.codes;
+    for (const code of codes) {
         const family = familyOf(code), effect = effectOf(code);
         const buffer = unlockSet.has(code) ? await renderUnlock(code)
             : family !== 'general' && effect ? await renderApprovedStat(code, family, effect)
@@ -243,6 +257,8 @@ async function renderSpecial(code) {
                 : await renderSpecial(code);
         await sharp(buffer).png({compressionLevel: 9}).toFile(path.join(outputDir, `${code}.png`));
     }
-    fs.writeFileSync(path.join(outputDir, 'manifest.json'), JSON.stringify({version: 10, count: manifest.codes.length, codes: manifest.codes}, null, 2) + '\n');
-    console.log(`Wrote ${manifest.codes.length} approved effect-first research icons to ${path.relative(root, outputDir)}`);
+    const sourceFiles = bowOnly ? ['fire-archer-bow-t4-ui.webp','fire-archer-bow-t5-ui.webp','guardian-t4-ui.webp','shadow-rider-t4-ui.webp'] : [];
+    const sources = Object.fromEntries(sourceFiles.map(file => [file, require('node:crypto').createHash('sha256').update(fs.readFileSync(path.join(troopDir,file))).digest('hex')]));
+    fs.writeFileSync(path.join(outputDir, 'manifest.json'), JSON.stringify({version: bowOnly ? 'bow-v1' : 10, count: codes.length, codes, ...(bowOnly ? {sources} : {})}, null, 2) + '\n');
+    console.log(`Wrote ${codes.length} approved effect-first research icons to ${path.relative(root, outputDir)}`);
 })().catch(error => { console.error(error); process.exit(1); });
