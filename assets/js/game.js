@@ -594,6 +594,7 @@
     function menuDialog() {
         const groups=[['Königreich',['quests','army','research','treasures','mastery','market','defense']],['Gemeinsam',['land','dungeons','expeditions','community','events','rankings','arena','reports']],['Mein Spiel',['settings','worlds','account','help','bugreport']]];
         openDialog('<h2>Spielmenü</h2><div class="menu-groups">'+groups.map(([title,keys])=>'<section><h3>'+title+'</h3><div class="menu-grid">'+keys.map(key=>'<button class="menu-link '+(current===key?'selected':'')+'" data-action="'+(key==='bugreport'?'bug-report-open':'dialog-tab')+'" data-id="'+key+'" '+(current===key?'aria-current="page"':'')+'>'+svg(key)+'<span>'+navs[key]+'</span></button>').join('')+(title==='Mein Spiel'&&comfort.hasReturn()?'<button class="menu-link" data-action="show-return-summary">'+svg('reports')+'<span>'+esc(window.ConquerLocale.t('alpha.return_summary'))+'</span></button>':'')+'</div></section>').join('')+'</div>');
+        $('#dialog-content .menu-groups>section:last-child .menu-grid').insertAdjacentHTML('afterbegin',`<button class="menu-link" data-action="guide-intro-replay">${svg('help')}<span>${esc(t('intro.replay'))}</span></button>`);
         $('#dialog-content .menu-grid').insertAdjacentHTML('beforeend',`<button class="menu-link" data-action="vip-open"><span class="nav-emblem"><img class="nav-art" src="${base}/assets/art/ui-hud/vip.svg" alt=""></span><span>VIP</span></button>`);
         $('#game-dialog').classList.add('menu-dialog');
     }

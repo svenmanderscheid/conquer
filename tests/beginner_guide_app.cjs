@@ -20,6 +20,27 @@ const output=path.resolve(__dirname,'../artifacts/beginner-guide');fs.mkdirSync(
   assert(Number(snapshot.buildings.castle.level)>1);
   page.on('request',r=>{if(r.method()==='POST'&&r.url().includes('/api/'))writes.push(r.url());});
   assert.equal(await page.locator('.guide-welcome').count(),0,'Established player is not interrupted');
+  // Established players can replay directly from the menu without first finding a guide tab.
+  for(const [width,height] of [[1280,800],[390,844],[320,568],[568,320],[844,390]]){
+   await page.setViewportSize({width,height});
+   await page.locator('#hud-menu').click();
+   const menu=page.locator('#game-dialog[open]'),replay=menu.locator('.menu-link[data-action="guide-intro-replay"]');
+   assert.equal(await menu.locator('[data-action="dialog-tab"][data-id="help"]').innerText(),'Anfangsguide','Guide label matches the published menu path');
+   assert.equal(await replay.innerText(),'Einführung erneut ansehen','Introduction has a direct, translated menu entry');
+   await replay.scrollIntoViewIfNeeded();
+   const r=await replay.boundingBox();
+   assert(r&&r.x>=0&&r.x+r.width<=width+1&&r.y>=0&&r.y+r.height<=height+1&&r.width>=44&&r.height>=44,`Direct intro entry is reachable and touch sized at ${width}x${height}`);
+   await page.screenshot({path:path.join(output,`intro-menu-${width}x${height}.png`)});
+   await replay.click();
+   await page.locator('#game-dialog[open] .kingdom-intro').waitFor();
+   assert.equal(new URL(page.url()).hash,'#city','Direct replay opens above the actual city');
+   assert.equal(await page.locator('#kingdom-intro-heading').innerText(),'Dein Königreich erwartet dich','Direct replay starts with the first scene');
+   const skip=page.locator('#game-dialog[open] .kingdom-intro [data-action="close-dialog"]');
+   assert.equal(await skip.innerText(),'Überspringen');
+   await skip.click();
+   await page.waitForFunction(()=>!document.querySelector('#game-dialog').open);
+  }
+  await page.setViewportSize({width:1280,height:800});
   await page.locator('#hud-menu').click();await page.locator('[data-action="dialog-tab"][data-id="help"]').click();
   await page.locator('.beginner-guide').waitFor();
   await page.evaluate(()=>document.fonts.ready);
@@ -148,6 +169,6 @@ const output=path.resolve(__dirname,'../artifacts/beginner-guide');fs.mkdirSync(
   await page.waitForFunction(()=>!document.getElementById('app-start'));
   assert.deepEqual(writes,[],'Reading, goal checks and destination previews never perform game actions');
   assert.deepEqual(errors,[],'No browser errors');
-  console.log('PASS: all 16 buildings, 6 chapters, real goal snapshots, local resume, four-step adviser, replay/dismissal, true loading state, polling, destinations and Escape/Back across five viewport sizes. '+output);
+  console.log('PASS: all 16 buildings, 6 chapters, real goal snapshots, local resume, direct menu replay for established players, four-step adviser, replay/dismissal, true loading state, polling, destinations and Escape/Back across five viewport sizes. '+output);
  } finally {await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});
