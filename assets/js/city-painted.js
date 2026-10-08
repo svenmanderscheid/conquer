@@ -49,7 +49,7 @@ window.ConquerPaintedCity=(()=>{
  }
  function updateReadiness({host,base,state,kingdom,labels}){
   const scene=host.querySelector('.painted-village-scene');if(!scene)return;
-  syncHeadroom(scene.closest('.painted-village'));
+  syncView(scene.closest('.painted-village'));
   let layer=scene.querySelector('.painted-building-notices');
   if(!layer){layer=document.createElement('div');layer.className='painted-building-notices';scene.append(layer);}
   const notices=readiness({state,kingdom}),active=new Set(notices.map(notice=>notice.code));
@@ -75,6 +75,7 @@ window.ConquerPaintedCity=(()=>{
   const scene=village.querySelector('.painted-village-scene'),scroll=village.querySelector('.painted-village-scroll');
   const resources=document.getElementById('resources');
   if(!scene||!scroll)return;
+  village.style.setProperty('--painted-zoom-top',Math.max(8,(resources?.getBoundingClientRect().bottom??village.getBoundingClientRect().top)-village.getBoundingClientRect().top+8)+'px');
   // End scrolling at the painting's real lower edge; never expose a fallback
   // background or reserve more HUD space than the approved artwork contains.
   const ground=scene.parentElement;
@@ -85,7 +86,23 @@ window.ConquerPaintedCity=(()=>{
   const room=Math.max(0,Math.ceil(resources.getBoundingClientRect().bottom-village.getBoundingClientRect().top+12-scene.offsetHeight*.1+27));
   scroll.style.setProperty('--painted-headroom',room+'px');
  }
- window.addEventListener('resize',()=>requestAnimationFrame(()=>document.querySelectorAll('.painted-village').forEach(syncHeadroom)));
+ const zoomLevels=[1,.9,.8];
+ function syncView(village){
+  const scroll=village.querySelector('.painted-village-scroll'),scene=village.querySelector('.painted-village-scene');
+  if(!scroll?.clientWidth||!scroll.clientHeight||!scene)return;
+  const zoom=Number(village.dataset.zoom)||1;
+  const baseWidth=Math.max(scroll.clientWidth+240,1200,innerHeight*1.5);
+  // Reveal the existing outer woodland at smaller scales, without blank edges.
+  const artworkHeight=(1086-terrainFrame.y)/terrainFrame.width;
+  const resources=document.getElementById('resources');
+  const headroom=resources?Math.max(0,resources.getBoundingClientRect().bottom-village.getBoundingClientRect().top+39):0;
+  const heightFloor=resources?Math.min(scroll.clientHeight/artworkHeight,Math.max(0,scroll.clientHeight-headroom)/(artworkHeight-2/3*.1)):scroll.clientHeight/artworkHeight;
+  const widthFloor=scroll.clientWidth/(1+2*terrainFrame.x/terrainFrame.width);
+  const width=Math.ceil(Math.max(baseWidth*zoom,widthFloor,heightFloor))+1;
+  scene.parentElement.style.setProperty('--painted-scene-width',width+'px');
+  syncHeadroom(village);
+ }
+ window.addEventListener('resize',()=>requestAnimationFrame(()=>document.querySelectorAll('.painted-village').forEach(syncView)));
  function syncCastleSkin(button,base,skinId){
   const image=button?.querySelector('.painted-building-sprite');if(!image)return;
   const catalog=window.ConquerCastleSkins,requested=typeof skinId==='string'&&/^[a-z0-9-]{1,32}$/.test(skinId)?skinId:'default',id=requested||'default';
@@ -217,6 +234,27 @@ window.ConquerPaintedCity=(()=>{
    menu.innerHTML='<div class="painted-building-actions"><button type="button" data-action="building"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 4.5 19 9l-3 3-1.7-1.7-7.6 7.6-2.6-2.6 7.6-7.6L10 6l3-3 1.5 1.5Z"/><path d="M4 20h7"/></svg><small>Ausbauen / Info</small></button><button type="button" data-action="training-building"><svg data-building-icon viewBox="0 0 24 24" aria-hidden="true"></svg><small>Öffnen</small></button><button type="button" class="painted-selection-close" aria-label="Gebäudeauswahl schließen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>';
    host.querySelector('.painted-village').append(menu);
    const clear=()=>{menu.hidden=true;scroll.querySelectorAll('[aria-pressed="true"]').forEach(b=>b.setAttribute('aria-pressed','false'));};
+   const zoomControls=document.createElement('div');
+   zoomControls.className='painted-village-zoom';zoomControls.setAttribute('role','group');
+   zoomControls.setAttribute('aria-label','Village zoom');zoomControls.setAttribute('data-i18n-attrs','aria-label:city.zoom.controls');
+   zoomControls.innerHTML='<button type="button" data-city-zoom="out" aria-label="Zoom out of village" data-i18n-attrs="aria-label:city.zoom.out">−</button><span class="painted-village-zoom-value" data-i18n-ignore>100%</span><button type="button" data-city-zoom="in" aria-label="Zoom in on village" data-i18n-attrs="aria-label:city.zoom.in" disabled>+</button>';
+   host.querySelector('.painted-village').append(zoomControls);
+   let zoomIndex=0;
+   const setZoom=next=>{
+    next=Math.max(0,Math.min(zoomLevels.length-1,next));if(next===zoomIndex)return;
+    const scene=scroll.querySelector('.painted-village-scene'),oldWidth=scene.offsetWidth;
+    const centerX=(scroll.scrollLeft+scroll.clientWidth/2-scene.offsetLeft)/oldWidth;
+    const centerY=(scroll.scrollTop+scroll.clientHeight/2-scene.offsetTop)/oldWidth;
+    clear();zoomIndex=next;scroll.closest('.painted-village').dataset.zoom=zoomLevels[next];
+    syncView(scroll.closest('.painted-village'));
+    scroll.scrollLeft=scene.offsetLeft+centerX*scene.offsetWidth-scroll.clientWidth/2;
+    scroll.scrollTop=scene.offsetTop+centerY*scene.offsetWidth-scroll.clientHeight/2;
+    zoomControls.querySelector('[data-city-zoom="out"]').disabled=next===zoomLevels.length-1;
+    zoomControls.querySelector('[data-city-zoom="in"]').disabled=next===0;
+    zoomControls.querySelector('.painted-village-zoom-value').textContent=Math.round(zoomLevels[next]*100)+'%';
+   };
+   zoomControls.addEventListener('click',e=>{const button=e.target.closest('[data-city-zoom]');if(button&&!button.disabled)setZoom(zoomIndex+(button.dataset.cityZoom==='out'?1:-1));});
+   scroll.addEventListener('keydown',e=>{if(e.target!==scroll||!['+','=','-','−'].includes(e.key))return;e.preventDefault();setZoom(zoomIndex+(['-','−'].includes(e.key)?1:-1));});
    scroll.addEventListener('click',e=>{
     const b=e.target.closest('.painted-village-building');
     if(!b){clear();return;}

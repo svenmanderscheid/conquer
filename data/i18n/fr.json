@@ -1,4 +1,7 @@
 {
+  "city.zoom.controls": "Zoom du village",
+  "city.zoom.out": "Réduire la vue du village",
+  "city.zoom.in": "Agrandir la vue du village",
   "settings.reports.title": "Rapports de fin",
   "settings.reports.hint": "Choisissez les nouveaux rapports reçus dans votre courrier. Ce choix est enregistré pour votre compte dans tous les mondes. Les rapports existants et les indicateurs de fin sur les bâtiments restent disponibles.",
   "settings.reports.build": "Bâtiments",
