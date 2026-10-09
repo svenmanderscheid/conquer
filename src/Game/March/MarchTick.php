@@ -119,7 +119,8 @@ final class MarchTick
                         });
                     });
                 } elseif ($marchType === 8) {
-                    self::resolveScout($db, $log, $marchId, $playerId, $cityId, $targetX, $targetY, (int)$march['target_id']);
+                    if(in_array((int)$march['target_type'],[4,5],true))LandmarkScout::resolve($march);
+                    else self::resolveScout($db, $log, $marchId, $playerId, $cityId, $targetX, $targetY, (int)$march['target_id']);
                 } elseif (in_array($marchType,[11,12],true)) {
                     \Conquer\Game\WorldRules::combatLock(function()use($db,$march,$marchType,$intTroops):void{$db->transaction(function()use($db,$march,$marchType,$intTroops):void{if($db->execute("UPDATE marches SET state='resolving' WHERE id=? AND state='marching'",[(int)$march['id']])!==1)return;if($marchType===12)\Conquer\Game\Map\NeutralVillageService::scout($db,$march);else \Conquer\Game\Map\NeutralVillageService::attack($db,$march,$intTroops);});});
                 } elseif (in_array($marchType,[9,GatherService::FIELD_ATTACK],true)) {

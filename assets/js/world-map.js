@@ -135,7 +135,8 @@ window.ConquerWorld = (() => {
     return `${owner} · ${event.name||'Schreinereignis'} · ${state}${time?` · ${event.active?'bis':'ab'} ${time}`:''}`;
   }
   const isVillage = target => target.kind==='home'||target.kind==='players'||target.kind==='neutral_villages';
-  const isCompactTarget = target => isVillage(target)||target.kind==='territory'||target.kind==='dungeons'||target.kind==='monsters'||target.kind==='nodes'||target.kind==='charms'||target.kind==='alliance_center'||target.kind==='outpost';
+  const isLandmark = target => ['territory','shrine','congress'].includes(target.kind);
+  const isCompactTarget = target => isVillage(target)||isLandmark(target)||target.kind==='dungeons'||target.kind==='monsters'||target.kind==='nodes'||target.kind==='charms'||target.kind==='alliance_center'||target.kind==='outpost';
   const isRegionalBoss = target => target.kind==='monsters'&&target.data.definition?.type==='rally'&&target.data.definition?.art?.startsWith('monsters/');
   // Feet in each original illustration, after object-fit:contain in the 3.6 x
   // 3.8 tile portrait. Wide Sandmaul has much more vertical transparent margin.
@@ -365,6 +366,11 @@ window.ConquerWorld = (() => {
     if(button.dataset.atlasFilter){memory.filter=button.dataset.atlasFilter;view.el.querySelectorAll('[data-atlas-filter]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.atlasFilter===memory.filter)));updateMarkers();updateSidebar();paint();return;}
     if(button.dataset.atlasTarget){if(performance.now()<view.suppressUntil)return;select(button.dataset.atlasTarget,button.classList.contains('atlas-nearby-row'),true);return;}
     if(button.dataset.action&&button.closest('.atlas-target-actions,.atlas-detail')){
+      if(isLandmark(selectedTarget()||{})&&typeof context.onLandmarkAction==='function'&&['territory-target','shrine-open','congress-open','landmark-rally','landmark-scout'].includes(button.dataset.action)){
+        e.stopPropagation();const mounted=view,world=context.state.city.world_id,act=button.dataset.action,dataset={...button.dataset};clearSelection(false);
+        const launch=()=>{if(view===mounted&&mounted.el.isConnected&&sceneVisible&&context.state.city.world_id===world)context.onLandmarkAction(act,dataset);};
+        if(view.releasingMapHistory)view.pendingMapAction=()=>setTimeout(launch,0);else launch();return;
+      }
       const kind=button.dataset.kind;
       const open=button.dataset.action==='expedition'?(kind==='monsters'?context.onMonsterAttack:['nodes','node-attack','charms'].includes(kind)?context.onGather:null):null;
       if(typeof open==='function'&&!button.disabled){
@@ -408,7 +414,7 @@ window.ConquerWorld = (() => {
   window.addEventListener('popstate',()=>{
     if(!view?.el.isConnected)return;view.releasingMapHistory=false;
     if(view.pendingMapAction){const pending=view.pendingMapAction;view.pendingMapAction=null;pending();return;}
-    if((memory.panel==='navigation'&&!history.state?.conquerMapOverview)||(memory.panel==='search'&&!history.state?.conquerMapSearch)||(['actions','target'].includes(memory.panel)&&['nodes','monsters'].includes(selectedTarget()?.kind)&&!history.state?.conquerMapTarget))clearSelection(true,false);
+    if((memory.panel==='navigation'&&!history.state?.conquerMapOverview)||(memory.panel==='search'&&!history.state?.conquerMapSearch)||(['actions','target'].includes(memory.panel)&&['nodes','monsters','territory','shrine','congress'].includes(selectedTarget()?.kind)&&!history.state?.conquerMapTarget))clearSelection(true,false);
     else if(history.state?.conquerMapSearch&&memory.panel!=='search')openPanel('search',view.el.querySelector('[data-atlas="search"]'));
     else if(history.state?.conquerMapOverview&&memory.panel!=='navigation')openPanel('navigation',view.el.querySelector('[data-atlas="navigation"]'));
   });
@@ -426,14 +432,14 @@ window.ConquerWorld = (() => {
   }
   function select(key,center=false,directMonster=false){
     if(view.releasingMapHistory){view.pendingMapAction=()=>select(key,center,directMonster);return;}
-    const target=view.targetMap.get(key);if(!target)return;if(directMonster&&target.kind==='territory'&&context.onTerritory){clearSelection(false);context.onTerritory(target.id);return;}
+    const target=view.targetMap.get(key);if(!target)return;
     if(directMonster&&target.kind==='nodes'&&!target.data.gatherer_march_id&&typeof context.onGather==='function'){
       cancelSearch();stopFollowing();view.objectActionFraming=null;memory.selected=null;memory.cell=null;memory.panel=null;view.returnFocus=view.markerNodes.get(key);updateMarkers();updateSidebar();paint();context.onGather(target.id);return;
     }
     if(directMonster&&target.kind==='monsters'&&typeof context.onMonsterAttack==='function'){
       cancelSearch();stopFollowing();view.objectActionFraming=null;memory.selected=null;memory.cell=null;memory.panel=null;view.returnFocus=view.markerNodes.get(key);updateMarkers();updateSidebar();paint();context.onMonsterAttack(target.id);return;
     }
-    if(memory.panel==='actions'&&memory.selected===key){clearSelection(false);view.viewport.focus({preventScroll:true});return;}if(['nodes','monsters'].includes(target.kind))setMapHistory('target');else releaseSearchHistory();cancelSearch();stopFollowing();view.objectActionFraming=null;memory.selected=key;memory.cell=null;memory.panel='actions';view.returnFocus=view.markerNodes.get(key);if(center||isCompactTarget(target))moveTo(...targetCenter(target));updateMarkers();updateSidebar();paint();view.el.querySelector('.atlas-target-actions button')?.focus({preventScroll:true});
+    if(memory.panel==='actions'&&memory.selected===key){clearSelection(false);view.viewport.focus({preventScroll:true});return;}if(['nodes','monsters','territory','shrine','congress'].includes(target.kind))setMapHistory('target');else releaseSearchHistory();cancelSearch();stopFollowing();view.objectActionFraming=null;memory.selected=key;memory.cell=null;memory.panel='actions';view.returnFocus=view.markerNodes.get(key);if(center||isCompactTarget(target))moveTo(...targetCenter(target));updateMarkers();updateSidebar();paint();view.el.querySelector('.atlas-target-actions button')?.focus({preventScroll:true});
   }
   function notify(){clearTimeout(notifyTimer);notifyTimer=setTimeout(()=>{if(view?.el.isConnected)window.dispatchEvent(new Event('conquer-world-moved'));},380);}
   function moveTo(x,y){stopFollowing();memory.x=clamp(x,0,mapWidth()-1);memory.y=clamp(y,0,mapHeight()-1);paint();updateSidebar();notify();}
@@ -603,12 +609,17 @@ window.ConquerWorld = (() => {
     if(target.kind==='home')actions=button('Profil','profile','aria-label="Profil" data-action="dialog-tab" data-id="profile"')+button('Skin','skin','aria-label="Skin" data-action="city-skins"','is-skin')+button('Dorfübersicht','home','aria-label="Dorfübersicht" data-action="tab" data-id="city"','is-city');
     else if(target.kind==='players')actions=button('Profil','profile',`data-action="public-profile" data-id="${escape(target.id)}"`)+button('Solo-Attacke','sword',`data-action="village-attack" data-id="${escape(target.id)}"`,'is-attack')+button('Debuff','debuff',`data-action="village-debuff" data-id="${escape(target.id)}"`,'is-debuff')+button('Rally','flag',`data-action="village-rally" data-id="${escape(target.id)}"`,'is-rally')+button('Spähen','scout',`data-action="village-scout" data-id="${escape(target.id)}" data-x="${target.x}" data-y="${target.y}"`,'is-scout');
     else if(target.kind==='neutral_villages')actions=button('Angreifen','sword',`data-action="neutral-village-attack" data-id="${escape(target.id)}"`,'is-attack')+button('Spähen','scout',`data-action="neutral-village-scout" data-id="${escape(target.id)}" data-x="${target.x}" data-y="${target.y}"`,'is-scout');
+    else if(isLandmark(target)){
+      const attrs=`data-kind="${target.kind}" data-id="${escape(target.id)}"`;
+      const details=target.kind==='territory'?'territory-target':target.kind==='shrine'?'shrine-open':'congress-open';
+      actions=button(escape(translated('landmark.details','Details')),'list',`data-action="${details}" data-id="${escape(target.id)}"`)
+        +button(escape(translated('landmark.rally','Rally')),'flag',`data-action="landmark-rally" ${attrs} aria-haspopup="dialog"${target.data.can_attack?'':` title="${escape(translated('landmark.attack_info','Attack times and requirements'))}"`}`,target.data.can_attack?'is-rally':'is-rally is-locked')
+        +button(escape(translated('landmark.scout','Scout')),'scout',`data-action="landmark-scout" ${attrs}`,'is-scout');
+    }
     else if(target.kind==='charms')actions='';
     else if(target.kind==='dungeons')actions=button(escape(translated('melusina.open','Explore the well')),'home','data-action="dialog-tab" data-id="dungeons"');
     else if(!actions)actions=target.kind==='territory'?button('Gebiet öffnen','home',`data-action="territory-target" data-id="${escape(target.id)}"`):target.kind==='shrine'?button('Schrein','home',`data-action="shrine-open" data-id="${escape(target.id)}"`):target.kind==='congress'?button('Kongress','home','data-action="congress-open"'):button('Details','list','data-atlas="details"');
     if(target.kind==='alliance_center'&&target.data.can_garrison)actions+=button('Verteidigen','home',`data-action="alliance-center-garrison" data-id="${escape(target.id)}"`,'is-garrison');
-    if(target.kind==='shrine'&&target.data.can_attack)actions+=button('Angreifen','sword',`data-action="shrine-attack" data-id="${escape(target.id)}"`,'is-attack');
-    if(target.kind==='congress'&&target.data.can_attack)actions+=button('Angreifen','sword','data-action="congress-attack"','is-attack');
     if(target.kind==='monsters')actions+=button(target.data.definition?.type==='rally'?'Rally starten':'Angreifen','sword',`data-action="expedition" data-kind="monsters" data-id="${escape(target.id)}"`,'is-attack');
     if(target.kind==='charms')actions+=button('Einsammeln','debuff',`data-action="expedition" data-kind="charms" data-id="${escape(target.id)}"`,'is-gather');
     if(target.kind==='nodes'){const n=target.data;actions+=n.is_own_gathering?button('Zurückrufen','home',`data-action="gather-recall" data-id="${escape(n.gatherer_march_id)}"`):button(n.can_attack?'Angreifen':n.gatherer_march_id?'Allianz · besetzt':'Sammeln',n.can_attack?'sword':'resource',`data-action="expedition" data-kind="${n.can_attack?'node-attack':'nodes'}" data-id="${escape(target.id)}" ${n.gatherer_march_id&&!n.can_attack?'disabled':''}`,n.can_attack?'is-attack':'is-gather');}
@@ -620,7 +631,7 @@ window.ConquerWorld = (() => {
       return `<div class="atlas-encounter-header"><strong>${escape(target.name)}</strong><button data-atlas="clear" aria-label="Zielmenü schließen">${icon('close')}</button></div><div class="atlas-encounter-summary">${encounterImage(target)}<div><strong>Stufe ${target.level}</strong><small>X ${target.x} · Y ${target.y}</small><small>${footprint(target)} × ${footprint(target)} ${footprint(target)===1?'Feld':'Felder'}</small></div></div><div class="atlas-encounter-stock"><span>${node?'Vorrat':'Lebenspunkte'}</span><strong>${format(current)} / ${format(maximum)}</strong><progress aria-label="${node?'Verbleibender Vorrat':'Lebenspunkte'}" value="${Math.min(current,maximum)}" max="${maximum}"></progress></div><p class="atlas-encounter-status${node?' atlas-node-status':''}"${node?` data-occupation="${nodeOccupation(data)}"`:''}>${escape(status)}</p><div class="atlas-actions-buttons">${actions}</div>`;
     }
     if(isCompactTarget(target)){
-      const summary=target.kind==='charms'||target.kind==='dungeons'
+      const summary=target.kind==='charms'||target.kind==='dungeons'||isLandmark(target)
         ? `<small class="atlas-charm-summary">X ${target.x} · Y ${target.y}</small>`
         : `<small>Lv. ${target.level} · X ${target.x} · Y ${target.y}</small>`;
       const close=target.kind==='charms'?'':`<button data-atlas="clear" aria-label="Zielmenü schließen">${icon('close')}</button>`;
@@ -746,6 +757,7 @@ window.ConquerWorld = (() => {
   }
   function positionActions(){
     const menu=view.el.querySelector('.atlas-target-actions'),target=selectedTarget();if(menu.hidden||!target)return;
+    menu.classList.toggle('is-landmark',isLandmark(target));
     menu.classList.toggle('is-village',isCompactTarget(target));menu.classList.toggle('is-own-village',target.kind==='home');menu.classList.toggle('is-alliance-center',target.kind==='alliance_center');menu.classList.toggle('is-simple-target',['monsters','nodes','charms'].includes(target.kind));menu.classList.toggle('is-empty-cell',target.kind==='cell');menu.classList.toggle('is-monster',target.kind==='monsters');menu.classList.toggle('is-resource',target.kind==='nodes');menu.classList.toggle('is-charm',target.kind==='charms');
     if(target.kind==='charms')menu.dataset.grade=['normal','epic','legendary'].includes(target.data.grade)?target.data.grade:'normal';else delete menu.dataset.grade;
     const encounter=['monsters','nodes'].includes(target.kind);menu.classList.toggle('is-encounter',encounter);

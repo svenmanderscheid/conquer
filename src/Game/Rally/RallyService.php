@@ -46,6 +46,7 @@ final class RallyService
             $meta=json_decode($r['result_json']??'{}',true)?:[];$alliance=WorldRules::alliance($playerId);
             if($alliance===null||$alliance!==($meta['alliance_id']??null)||$alliance!==WorldRules::alliance((int)$r['leader_player_id']))throw new \RuntimeException('Nur Mitglieder der Rally-Allianz können teilnehmen.');
             if(($r['target_kind']??'city')==='territory')\Conquer\Game\Territory\TerritoryRally::validateJoin($r,$playerId);
+            elseif(($r['target_kind']??'city')==='shrine')ShrineRally::validate($r,$playerId);
             elseif(($r['target_kind']??'city')==='monster')MonsterRally::target((int)$r['world_id'],(int)$r['target_x'],(int)$r['target_y'],(int)$r['target_monster_id']);
             else WorldRules::assertCityAttackAllowed($playerId,(int)$r['target_x'],(int)$r['target_y'],(int)$r['target_player_id']);
             if($db->query('SELECT id FROM rally_participants WHERE rally_id=? AND player_id=?',[$rallyId,$playerId])->fetchColumn()!==false)throw new \RuntimeException('Du nimmst bereits an dieser Rally teil.');
@@ -107,7 +108,7 @@ final class RallyService
             WorldContext::run((int)$r['world_id'],function()use($db,$id,$r):void{
             if($r['status']==='gathering'&&strtotime($r['launch_at'].' UTC')<=time()){self::launchRow($r);return;}
             if($r['status']==='marching'&&strtotime($r['arrival_time'].' UTC')<=time()){
-                $result=($r['target_kind']??'city')==='monster'?MonsterRally::resolve($r,self::armies($r)):CityCombat::resolve(self::armies($r),(int)$r['target_city_id'],(int)$r['target_x'],(int)$r['target_y'],null,(int)$id);
+                $result=match($r['target_kind']??'city'){'monster'=>MonsterRally::resolve($r,self::armies($r)),'shrine'=>ShrineRally::resolve($r,self::armies($r)),default=>CityCombat::resolve(self::armies($r),(int)$r['target_city_id'],(int)$r['target_x'],(int)$r['target_y'],null,(int)$id)};
                 $meta=json_decode($r['result_json']??'{}',true)?:[];$result+=$meta;
                 $db->execute("UPDATE rallies SET status='returning',result_json=? WHERE id=?",[json_encode($result),$id]);$r['status']='returning';$r['result_json']=json_encode($result);
             }
@@ -128,7 +129,7 @@ final class RallyService
     {
         $db=Connection::getInstance();$rows=$db->query("SELECT r.*,c.coord_x AS leader_x,c.coord_y AS leader_y FROM rallies r JOIN cities c ON c.id=r.leader_city_id WHERE r.world_id=? AND r.status IN ('marching','returning') AND CAST(JSON_UNQUOTE(JSON_EXTRACT(r.result_json,'$.alliance_id')) AS UNSIGNED)=?",[WorldContext::id(),$allianceId])->fetchAll();$result=[];
         foreach($rows as $r){
-            $base=['rally_id'=>(int)$r['id'],'march_type'=>'rally','target_type'=>match($r['target_kind']??'city'){'monster'=>3,'territory'=>5,default=>2},'target_x'=>(int)$r['target_x'],'target_y'=>(int)$r['target_y'],'departure_time'=>$r['launch_at'],'arrival_time'=>$r['arrival_time'],'return_time'=>$r['return_time'],'state'=>$r['status'],'is_allied'=>true];
+            $base=['rally_id'=>(int)$r['id'],'march_type'=>'rally','target_type'=>match($r['target_kind']??'city'){'monster'=>3,'territory'=>5,'shrine'=>4,default=>2},'target_x'=>(int)$r['target_x'],'target_y'=>(int)$r['target_y'],'departure_time'=>$r['launch_at'],'arrival_time'=>$r['arrival_time'],'return_time'=>$r['return_time'],'state'=>$r['status'],'is_allied'=>true];
             if($r['status']==='marching'){$leader=(int)$r['leader_player_id'];$result[]=$base+['id'=>'alliance-rally:'.$r['id'],'player_id'=>$leader,'is_own'=>$leader===$viewerPlayerId,'origin_x'=>(int)$r['leader_x'],'origin_y'=>(int)$r['leader_y']];continue;}
             $meta=json_decode($r['result_json']??'{}',true)?:[];$armies=$meta['armies']??self::armies($r);
             foreach($armies as $army){if(!empty($army['is_ai']))continue;$city=$db->query('SELECT coord_x,coord_y FROM cities WHERE id=? AND world_id=?',[(int)$army['city_id'],(int)$r['world_id']])->fetch();if(!$city)continue;$owner=(int)$army['player_id'];$result[]=$base+['id'=>'alliance-rally:'.$r['id'].':'.$owner,'player_id'=>$owner,'is_own'=>$owner===$viewerPlayerId,'origin_x'=>(int)$city['coord_x'],'origin_y'=>(int)$city['coord_y']];}
@@ -144,13 +145,13 @@ final class RallyService
                 self::settleJoiners($r);
                 $joining=$db->query("SELECT rp.*,c.coord_x AS join_origin_x,c.coord_y AS join_origin_y FROM rally_participants rp JOIN cities c ON c.id=rp.city_id WHERE rp.rally_id=? AND rp.player_id=?",[$r['id'],$playerId])->fetch();
                 if(($joining['status']??null)==='joining'){$marches[]=['id'=>'rally-join:'.$r['id'].':'.$playerId,'rally_id'=>(int)$r['id'],'march_type'=>'rally_join','march_skin'=>$joining['march_skin']??null,'march_speed_bonus_pct'=>(int)($joining['march_speed_bonus_pct']??0),'state'=>'marching','target_type'=>2,'target_x'=>(int)$r['origin_x'],'target_y'=>(int)$r['origin_y'],'origin_x'=>(int)$joining['join_origin_x'],'origin_y'=>(int)$joining['join_origin_y'],'departure_time'=>$joining['joined_at'],'arrival_time'=>$joining['arrival_time'],'return_time'=>null,'troops_json'=>$joining['troops_json']];}
-                elseif(($joining['status']??null)==='pending'){$marches[]=['id'=>'rally:'.$r['id'],'rally_id'=>(int)$r['id'],'march_type'=>'rally','march_skin'=>$joining['march_skin']??null,'march_speed_bonus_pct'=>(int)($joining['march_speed_bonus_pct']??0),'state'=>'gathering','target_type'=>match($r['target_kind']??'city'){'monster'=>3,'territory'=>5,default=>2},'target_x'=>(int)$r['target_x'],'target_y'=>(int)$r['target_y'],'origin_x'=>(int)$r['origin_x'],'origin_y'=>(int)$r['origin_y'],'departure_time'=>$r['launch_at'],'arrival_time'=>$r['launch_at'],'return_time'=>null,'troops_json'=>$joining['troops_json']];}
+                elseif(($joining['status']??null)==='pending'){$marches[]=['id'=>'rally:'.$r['id'],'rally_id'=>(int)$r['id'],'march_type'=>'rally','march_skin'=>$joining['march_skin']??null,'march_speed_bonus_pct'=>(int)($joining['march_speed_bonus_pct']??0),'state'=>'gathering','target_type'=>match($r['target_kind']??'city'){'monster'=>3,'territory'=>5,'shrine'=>4,default=>2},'target_x'=>(int)$r['target_x'],'target_y'=>(int)$r['target_y'],'origin_x'=>(int)$r['origin_x'],'origin_y'=>(int)$r['origin_y'],'departure_time'=>$r['launch_at'],'arrival_time'=>$r['launch_at'],'return_time'=>null,'troops_json'=>$joining['troops_json']];}
                 continue;
             }
             $combined=[];$result=json_decode($r['result_json']??'{}',true)?:[];$armies=$r['status']==='returning'?($result['armies']??self::armies($r)):self::armies($r);$originX=(int)$r['origin_x'];$originY=(int)$r['origin_y'];
             if($r['status']==='returning'){$own=array_values(array_filter($armies,fn($army)=>(int)$army['player_id']===$playerId))[0]??null;if(!$own)continue;$armies=[$own];$home=WorldRules::origin($playerId,(int)$own['city_id'],(int)$r['world_id']);$originX=(int)$home['coord_x'];$originY=(int)$home['coord_y'];}
             foreach($armies as $army)foreach(($r['status']==='returning'?($army['survivors']??$army['troops']):$army['troops']) as $code=>$count)$combined[$code]=($combined[$code]??0)+(int)$count;
-            $marches[]=['id'=>'rally:'.$r['id'],'rally_id'=>(int)$r['id'],'march_type'=>'rally','march_skin'=>$r['march_skin']??null,'march_speed_bonus_pct'=>(int)($r['march_speed_bonus_pct']??0),'state'=>$r['status'],'target_x'=>(int)$r['target_x'],'target_y'=>(int)$r['target_y'],'origin_x'=>$originX,'origin_y'=>$originY,'departure_time'=>$r['launch_at'],'arrival_time'=>$r['arrival_time']??$r['launch_at'],'return_time'=>$r['return_time'],'troops_json'=>json_encode($combined)];}
+            $marches[]=['id'=>'rally:'.$r['id'],'rally_id'=>(int)$r['id'],'march_type'=>'rally','march_skin'=>$r['march_skin']??null,'march_speed_bonus_pct'=>(int)($r['march_speed_bonus_pct']??0),'state'=>$r['status'],'target_type'=>match($r['target_kind']??'city'){'monster'=>3,'territory'=>5,'shrine'=>4,default=>2},'target_id'=>($r['target_kind']??'city')==='shrine'?(json_decode($r['result_json']??'{}',true)['shrine_id']??0):($r['target_city_id']??$r['target_monster_id']??$r['target_territory_id']??0),'target_x'=>(int)$r['target_x'],'target_y'=>(int)$r['target_y'],'origin_x'=>$originX,'origin_y'=>$originY,'departure_time'=>$r['launch_at'],'arrival_time'=>$r['arrival_time']??$r['launch_at'],'return_time'=>$r['return_time'],'troops_json'=>json_encode($combined)];}
         return $marches;
     }
     public static function getParticipants(int $rallyId,bool $withSummaries=true): array
@@ -169,6 +170,11 @@ final class RallyService
     private static function launchRow(array $r): void
     {
         if(($r['target_kind']??'city')==='territory'){\Conquer\Game\Territory\TerritoryRally::launch($r);return;}
+        if(($r['target_kind']??'city')==='shrine'){
+            try{ShrineRally::validate($r,(int)$r['leader_player_id']);}
+            catch(\PDOException $e){throw $e;}
+            catch(\RuntimeException|\DomainException $e){self::cancelGathering($r,$e->getMessage());return;}
+        }
         if(($r['target_kind']??'city')==='monster'){
             try{MonsterRally::target((int)$r['world_id'],(int)$r['target_x'],(int)$r['target_y'],(int)$r['target_monster_id']);}
             catch(\PDOException $e){throw $e;}
@@ -183,6 +189,11 @@ final class RallyService
         }
         $seconds=MarchSpeed::duration(hypot($r['target_x']-$origin['coord_x'],$r['target_y']-$origin['coord_y']),$speed,(int)$r['world_id']);
         $returnSeconds=MarchSpeed::duration(hypot($r['target_x']-$origin['coord_x'],$r['target_y']-$origin['coord_y']),$returnSpeed,(int)$r['world_id']);
+        if(($r['target_kind']??'city')==='shrine'){
+            try{ShrineRally::validate($r,(int)$r['leader_player_id'],time()+$seconds);}
+            catch(\PDOException $e){throw $e;}
+            catch(\RuntimeException|\DomainException $e){self::cancelGathering($r,$e->getMessage());return;}
+        }
         $db->execute("UPDATE rallies SET status='marching',launch_at=UTC_TIMESTAMP(),arrival_time=DATE_ADD(UTC_TIMESTAMP(),INTERVAL ? SECOND),return_time=DATE_ADD(UTC_TIMESTAMP(),INTERVAL ? SECOND) WHERE id=?",[$seconds,$seconds+$returnSeconds,$r['id']]);$db->execute("UPDATE rally_participants SET status='marching' WHERE rally_id=? AND status='pending'",[$r['id']]);
     }
     public static function describe(array $row): array
@@ -192,7 +203,7 @@ final class RallyService
             $row['target_name']=($meta['monster']['name']??'Monster').' Lv. '.($meta['monster']['level']??1);
             $row['ap_cost_base']=max(0,(int)($meta['monster']['action_point_cost']??\Conquer\Game\Player\ActionPoints::costForMonster($meta['monster']['name']??'')));
         }
-        if(($row['target_kind']??'city')==='territory')$row['target_name']=$meta['target_name']??'Eroberungsziel';
+        if(in_array($row['target_kind']??'city',['territory','shrine'],true))$row['target_name']=$meta['target_name']??'Eroberungsziel';
         $row['capacity']=$meta['capacity']??null;$row['human_capacity_remaining']=isset($meta['capacity'])?max(0,(int)$meta['capacity']-array_sum(array_map(static fn($a)=>!empty($a['is_ai'])?0:array_sum($a['troops']),self::armies($row)))):null;
         return $row;
     }

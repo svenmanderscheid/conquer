@@ -204,6 +204,46 @@ final class CongressService
         ShrineService::checkSecured();
     }
 
+    /** Same shrine formula, with each rally member's buffs, casualties and garrison preserved. */
+    public static function fightRally(array $r,array $target,array $armies,int $alliance): array
+    {
+        $db=Connection::getInstance();$db->query('SELECT id FROM shrines WHERE id=? FOR UPDATE',[$target['id']])->fetch();
+        $shrine=ShrineService::getShrine((int)$target['id']);
+        $guards=$db->query('SELECT * FROM shrine_garrisons WHERE shrine_id=? ORDER BY id FOR UPDATE',[$target['id']])->fetchAll();
+        $enemy=[];$combined=[];foreach($guards as $g)foreach(json_decode($g['troops_json'],true)?:[] as $code=>$n)$enemy[$code]=($enemy[$code]??0)+(int)$n;
+        foreach($armies as $a)foreach($a['troops'] as $code=>$n)$combined[$code]=($combined[$code]??0)+(int)$n;
+        $attack=0.0;$absorption=0.0;
+        foreach($armies as &$a){
+            $raw=BuffEngine::getBuffs((int)$a['player_id'],(int)$r['world_id']);
+            $buffs=ResearchEffects::armyBuffs($raw,$a['troops']);
+            if($shrine['alliance_id']!==null)$buffs=\Conquer\Game\Player\TalentEffects::combat($buffs,'pvp',false,$enemy);
+            $a['buffs']=$raw;$a['combat_buffs']=$buffs;$attack+=self::power($a['troops'],$buffs,false);$absorption+=self::power($a['troops'],$buffs,true);
+        }unset($a);
+        $defense=self::power($shrine['garrison_troops'],[],true);
+        foreach($guards as $g){$army=json_decode($g['troops_json'],true)?:[];$defense+=self::power($army,\Conquer\Game\Player\TalentEffects::combat(ResearchEffects::armyBuffs(json_decode($g['buffs_json'],true)?:[],$army),'field_defense',false,$combined),true);}
+        $wins=$attack>=$defense;$attackRate=$wins?min(.5,$defense/max(1,$absorption)):min(.8,$defense/max(1,$absorption)*.6);$defenseRate=$wins?.5:min(.5,$attack/max(1,$defense));
+        foreach($guards as $g){$loss=self::casualties(json_decode($g['troops_json'],true)?:[],$defenseRate,json_decode($g['buffs_json'],true)?:[],$combined);HospitalService::addWounded((int)$g['city_id'],$loss['wounded']);if($wins)self::returnGarrison($db,$g,$shrine,$loss['survivors']);else $db->execute('UPDATE shrine_garrisons SET troops_json=? WHERE id=?',[json_encode($loss['survivors']),$g['id']]);}
+        $npc=$wins?[]:self::casualties($shrine['garrison_troops'],$defenseRate)['survivors'];
+        if($wins){
+            \Conquer\Game\Conquest\EventService::beforeCapture($shrine);
+            $db->execute('INSERT INTO shrine_captures(shrine_id,alliance_id,captured_at,contested_until,secured_at,garrison_troops_json) VALUES(?,?,UTC_TIMESTAMP(),DATE_ADD(UTC_TIMESTAMP(),INTERVAL ? SECOND),NULL,?) ON DUPLICATE KEY UPDATE alliance_id=VALUES(alliance_id),captured_at=VALUES(captured_at),contested_until=VALUES(contested_until),secured_at=NULL,garrison_troops_json=VALUES(garrison_troops_json)',[$shrine['id'],$alliance,ShrineService::CONTEST_DURATION_SECONDS,'{}']);
+        }else $db->execute('INSERT INTO shrine_captures(shrine_id,garrison_troops_json) VALUES(?,?) ON DUPLICATE KEY UPDATE garrison_troops_json=VALUES(garrison_troops_json)',[$shrine['id'],json_encode($npc)]);
+        $outcome=$wins?'attacker_wins':'defender_wins';
+        foreach($armies as &$a){
+            $loss=self::casualties($a['troops'],$attackRate,$a['combat_buffs'],$enemy);HospitalService::addWounded((int)$a['city_id'],$loss['wounded']);
+            $report=['battle_kind'=>$shrine['shrine_code']==='CONGRESS'?'congress':'shrine','target_name'=>$shrine['name'],'monster_name'=>$shrine['name'],'outcome'=>$outcome,'alliance_id'=>$alliance,'attacker_damage'=>(int)round($attack),'defender_strength'=>(int)round($defense),'loot'=>[],'dead'=>$loss['dead'],'troops'=>[],'hold_seconds'=>ShrineService::CONTEST_DURATION_SECONDS,'rally_id'=>(int)$r['id']];
+            foreach($a['troops'] as $code=>$n)$report['troops'][]=['code'=>(int)$code,'sent'=>$n,'survived'=>$loss['survivors'][$code]??0,'injured'=>$loss['wounded'][$code]??0,'dead'=>$loss['dead'][$code]??0];
+            $db->execute('INSERT INTO battle_reports(world_id,attacker_id,attacker_city_id,target_type,target_id,target_x,target_y,outcome,data_json,created_at) VALUES(?,?,?,?,?,?,?,?,?,UTC_TIMESTAMP())',[$r['world_id'],$a['player_id'],$a['city_id'],self::TARGET_TYPE,$shrine['id'],$shrine['coord_x'],$shrine['coord_y'],$outcome,json_encode($report)]);
+            if($wins){
+                $city=WorldRules::origin((int)$a['player_id'],(int)$a['city_id'],(int)$r['world_id']);
+                $travel=self::travelSeconds($city,$shrine,$a['troops'],$a['buffs'],['bonus_pct'=>$a['march_speed_bonus_pct']??0],false,true);
+                $db->execute('INSERT INTO shrine_garrisons(shrine_id,player_id,city_id,march_skin,march_speed_bonus_pct,troops_json,alliance_id,buffs_json,travel_seconds) VALUES(?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE troops_json=VALUES(troops_json),alliance_id=VALUES(alliance_id),march_skin=VALUES(march_skin),march_speed_bonus_pct=VALUES(march_speed_bonus_pct),buffs_json=VALUES(buffs_json),travel_seconds=VALUES(travel_seconds)',[$shrine['id'],$a['player_id'],$a['city_id'],$a['march_skin']??null,(int)($a['march_speed_bonus_pct']??0),json_encode($loss['survivors']),$alliance,json_encode($a['buffs']),$travel]);
+            }
+            $a['survivors']=$wins?[]:$loss['survivors'];$a['garrisoned']=$wins?$loss['survivors']:[];unset($a['buffs'],$a['combat_buffs']);
+        }unset($a);
+        ShrineService::checkSecured();return ['outcome'=>$outcome,'armies'=>$armies,'target_name'=>$shrine['name'],'garrisoned'=>$wins,'cancelled'=>false];
+    }
+
     /** Original shrine attack-vs-HP/defense formula; real research modifies each troop type. */
     private static function power(array $troops,array $buffs,bool $defense): float
     {

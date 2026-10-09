@@ -12,7 +12,7 @@ const out=path.resolve(__dirname,'../artifacts/territory-main');fs.mkdirSync(out
  const artExamples=[...['food','lumber','stone','gold','abbey','rune'].map(benefit=>territory.targets.find(t=>t.kind==='commune'&&t.benefit_type===benefit)),territory.targets.find(t=>t.kind==='canton'),territory.targets.find(t=>t.kind==='crown')];
  for(const viewport of (process.argv.includes('--admin-only')?[]:[{width:1280,height:800},{width:390,height:844},{width:320,height:568},{width:844,height:390},{width:568,height:320}])){
   await page.setViewportSize(viewport);await page.locator('#navigation [data-id="world"]').click();await page.waitForFunction(()=>document.querySelector('.atlas-shell.is-luxembourg'));
-  await page.evaluate(t=>ConquerWorld.focus(t.x,t.y),goal);await page.waitForSelector(`[data-atlas-target="territory:${goal.id}"]`);await page.locator(`[data-atlas-target="territory:${goal.id}"]`).click();await page.waitForSelector('.territory-target-summary');assert.match(await page.locator('.territory-target-summary').innerText(),new RegExp(goal.name));
+  await page.evaluate(t=>ConquerWorld.focus(t.x,t.y),goal);await page.waitForSelector(`[data-atlas-target="territory:${goal.id}"]`);await page.locator(`[data-atlas-target="territory:${goal.id}"]`).click();await page.locator('.atlas-target-actions [data-action="territory-target"]').click();await page.waitForSelector('.territory-target-summary');assert.match(await page.locator('.territory-target-summary').innerText(),new RegExp(goal.name));
   await page.waitForFunction(()=>{const img=document.querySelector('.territory-target-summary img');return img?.complete&&img.naturalWidth===512});
   if(viewport.width===1280){
    const artSources=new Set();
@@ -31,7 +31,7 @@ const out=path.resolve(__dirname,'../artifacts/territory-main');fs.mkdirSync(out
     const artSize=await marker.locator('img').boundingBox(),tileSize=await marker.boundingBox();
     assert(artSize.width>=tileSize.width*.85&&artSize.width<=tileSize.width,'Landmark picture fills its authoritative footprint');
     await page.screenshot({path:path.join(out,`art-${path.basename(src,'.webp')}.png`)});
-    await marker.click();await page.waitForSelector('.territory-target-summary');
+    await page.locator('.atlas-target-actions [data-action="territory-target"]').click();await page.waitForSelector('.territory-target-summary');
    }
    assert.equal(artSources.size,8);console.log('PASS all eight territory illustrations in actual map and dialogs');
   }

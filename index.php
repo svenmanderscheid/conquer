@@ -440,6 +440,7 @@ if (str_starts_with($path, '/api/')) {
     $router->get('/api/battle/report/:id',   [\Conquer\Api\Handlers\BattleHandler::class, 'report']);
     $router->post('/api/battle/report/:id/delete', [\Conquer\Api\Handlers\BattleHandler::class, 'delete']);
 
+    $router->post('/api/march/scout-landmark', [\Conquer\Api\Handlers\LandmarkHandler::class, 'scout']);
     // Map
     $router->get('/api/map/info',              [\Conquer\Api\Handlers\MapHandler::class, 'info']);
     $router->get('/api/map/tiles',             [\Conquer\Api\Handlers\MapHandler::class, 'tiles']);
@@ -516,6 +517,7 @@ if (str_starts_with($path, '/api/')) {
 
     // Conquest Event
     $router->get('/api/conquest/event',           fn() => \Conquer\Api\Handlers\ConquestHandler::current($session));
+    $router->post('/api/rally/start-shrine', [\Conquer\Api\Handlers\RallyHandler::class, 'startShrine']);
     $router->get('/api/conquest/leaderboard',     fn() => \Conquer\Api\Handlers\ConquestHandler::leaderboard($session));
 
     // Hospital

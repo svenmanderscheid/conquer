@@ -16,8 +16,8 @@ final class ApiOperation
     {
         return in_array($path, [
             '/api/march/dispatch','/api/march/dispatch-charm','/api/march/dispatch-player',
-            '/api/march/dispatch-scout','/api/march/dispatch-gather','/api/march/dispatch-field-attack',
-            '/api/march/reinforce','/api/rally/start','/api/rally/start-monster','/api/rally/join',
+            '/api/march/dispatch-scout','/api/march/scout-landmark','/api/march/dispatch-gather','/api/march/dispatch-field-attack',
+            '/api/march/reinforce','/api/rally/start','/api/rally/start-monster','/api/rally/start-shrine','/api/rally/join',
         ], true) || ($path === '/api/defense/action' && in_array($body['action'] ?? '', ['scout','reinforce','promotion.start','wall.repair'], true));
     }
 

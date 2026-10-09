@@ -567,7 +567,7 @@
         if(node.top<body.top||node.bottom>body.bottom)panelHost.scrollTop+=node.top-body.top-(panelHost.clientHeight-node.height)/2;
     }
     function renderWorld(host=playfieldHost) {
-        state.city.city_skin=kingdom?.profile?.city_skin||'default';state.city.name_frame=kingdom?.profile?.name_frame||window.ConquerNameFrames.normalizeState(kingdom?.name_frames,state.city.city_skin).equipped;window.ConquerWorld.render({host,state,alliance:kingdom?.alliance,base,esc,monsterArt,now,teleport:teleportSelection,searchMap:query=>api('map/search'+(query?'?'+new URLSearchParams(query):'')),onTerritory:id=>territoryPanel.open(id),onGather:(id,kind='nodes')=>expeditionDialog(id,kind),onMonsterAttack:id=>expeditionDialog(id,'monsters'),onAllianceGarrison:target=>marchPanel.open(target.id,'alliance-center-garrison',{target}),onMarchRecall:id=>String(id).startsWith('territory-garrison:')?territoryPanel.recall(String(id).split(':')[1]):action('march/recall',{march_id:id},'Die Truppen sind auf dem Heimweg.')});
+        state.city.city_skin=kingdom?.profile?.city_skin||'default';state.city.name_frame=kingdom?.profile?.name_frame||window.ConquerNameFrames.normalizeState(kingdom?.name_frames,state.city.city_skin).equipped;window.ConquerWorld.render({host,state,alliance:kingdom?.alliance,base,esc,monsterArt,now,teleport:teleportSelection,searchMap:query=>api('map/search'+(query?'?'+new URLSearchParams(query):'')),onTerritory:id=>territoryPanel.open(id),onLandmarkAction:(act,dataset)=>{const b={dataset};if(!landmarkActions.onClick(act,b))territoryPanel.onClick(act,b)||congressPanel.onClick(act,b);},onGather:(id,kind='nodes')=>expeditionDialog(id,kind),onMonsterAttack:id=>expeditionDialog(id,'monsters'),onAllianceGarrison:target=>marchPanel.open(target.id,'alliance-center-garrison',{target}),onMarchRecall:id=>String(id).startsWith('territory-garrison:')?territoryPanel.recall(String(id).split(':')[1]):action('march/recall',{march_id:id},'Die Truppen sind auf dem Heimweg.')});
     }
     async function locateMonsterReport(report) {
         const charm=report?.outcome==='attacker_wins'?report.details?.charm:null,x=Number(charm?.x??report?.target_x),y=Number(charm?.y??report?.target_y);
@@ -583,7 +583,7 @@
         const r=state.reports.find(r=>Number(r.id)===Number(id));if(!r)return;
         if(['city','rally','territory'].includes(r.details?.battle_kind)){combatReport.open(r);return;}
         if(window.ConquerMonsterReport.isMonster(r))return monsterReports.open(r);
-        if(['scout','neutral_village_scout'].includes(r.details?.type))return scoutReports.open(r);
+        if(['scout','neutral_village_scout','landmark_scout'].includes(r.details?.type))return scoutReports.open(r);
         const d=r.details||{},pvp=['city','rally','neutral_village'].includes(d.battle_kind),units=d.troops||[],size=innerHeight<540?1:innerHeight<700?2:3,pages=Math.max(1,Math.ceil(units.length/size));
         page=Math.max(0,Math.min(pages-1,Number(page)||0));
         const summary=`<section>${d.lord_xp>0?`<p class="notice">+${fmt(d.lord_xp)} Jagd-XP für deinen Hunter</p>`:''}<p class="muted">Gefecht bei ${r.target_x}, ${r.target_y}</p><div class="detail-row"><span>Gegner</span><strong>${esc(d.target_name||d.monster_name||'Monster')}</strong></div>${!pvp&&d.army_power!=null?`<div class="detail-row"><span>${d.type==='monster_rally'?'Rally-Macht':'Armeemacht'}</span><strong>${fmt(d.army_power)} / ${fmt(d.required_power)} benötigt</strong></div>`:`<div class="detail-row"><span>${pvp?'Angriffsstärke':d.type==='monster_rally'?'Schaden der Rally':'Schaden'}</span><strong>${fmt(d.attacker_damage)}</strong></div>`}<div class="detail-row"><span>${pvp?'Verteidigung':'Gegner-HP übrig'}</span><strong>${fmt(pvp?d.defender_strength:d.monster_hp_after)}</strong></div></section>`;
@@ -670,6 +670,7 @@
         monsterReports.open(report);return true;
     }});
     const territoryPanel=window.ConquerTerritory({...featureContext,unitName,marchPanel});
+    const landmarkActions=window.ConquerLandmarkActions({...featureContext,marchPanel,territoryPanel});
     const communityPanel=window.ConquerCommunity({...featureContext,openSharedReport,openSharedLocation,openStructureLocation:async location=>{navigate('world',{focusTitle:false});window.ConquerWorld.focus(location.x,location.y);await refresh();if(!window.ConquerWorld.locate(location.x,location.y,[location.kind],location.id))toast('Das Allianzgebäude ist an dieser Position nicht mehr vorhanden.');},beginStructurePlacement:structureType=>{const center=structureType==='center';teleportSelection={kind:'alliance-structure',structure_type:center?'center':'outpost',footprint:center?5:3,label:center?'Allianzzentrum':'Außenposten',art:center?'painted-v2/alliance-center.webp':'alliance-outpost'};navigate('world',{focusTitle:false});toast(`${teleportSelection.label} auf einen freien Platz ziehen.`);},openMailbox:()=>{navigate('reports');mailboxPanel.select('private');}});
     const socialHub=window.ConquerSocialHub({...featureContext,openPublicProfile:id=>panels.onClick('public-profile',{dataset:{id:String(id)}}),openPrivate:(id,name)=>{navigate(playfield);worldChat?.openPrivate(id,name);},openChat:channel=>{navigate(playfield);worldChat?.openChannel(channel);},chatChanged:()=>worldChat?.refresh(),openMailbox:()=>{navigate('reports');mailboxPanel.select('private');}});
     const allianceCommunity=window.ConquerAllianceCommunity(featureContext);
@@ -706,6 +707,7 @@
         if(act==='city-ready'){openCityNotice(id);return;}
         if(act==='close-dialog'){$('#game-dialog').close();return;}
         if(act==='bug-report-open'){const dialogTitle=$('#game-dialog').open?$('#dialog-content h2,h3')?.textContent.trim():'';bugReports.begin({path:location.pathname+'#'+current,label:dialogTitle?navs[current]+' – '+dialogTitle:navs[current]});return;}
+        if(landmarkActions.onClick(act,b))return;
         if(beginnerGuide.onClick(act,b))return;
         if(bugReports.onClick(act,b))return;
         if(overlay.onClick(act,b)||vipPanel.onClick(act,b))return;

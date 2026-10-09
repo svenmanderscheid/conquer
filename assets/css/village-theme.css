@@ -1496,6 +1496,23 @@ body.mobile-game .map-overlay-shell .atlas-target-actions .atlas-action-disc::af
 body.mobile-game .map-overlay-shell .atlas-target-actions .atlas-action-disc svg { width:26px;height:26px;stroke-width:1.9;filter:none; }
 body.mobile-game .map-overlay-shell .atlas-target-actions .atlas-action>span:last-child { position:relative;z-index:1;margin-top:-2px;padding:2px 6px;background:var(--ui-card);color:var(--ui-ink);border:1px solid var(--ui-line);border-radius:7px;box-shadow:inset 0 1px var(--ui-card-light),0 2px color-mix(in srgb,var(--ui-frame) 65%,transparent);text-shadow:none; }
 body.mobile-game .map-overlay-shell .atlas-target-actions .atlas-action:disabled { --action-face:var(--ui-disabled);--action-shade:var(--ui-line);cursor:not-allowed; }
+body.mobile-game .map-overlay-shell .atlas-target-actions .atlas-action.is-locked { --action-face:var(--ui-disabled);--action-shade:var(--ui-line); }
+body.mobile-game .map-overlay-shell .atlas-target-actions .atlas-action.is-locked .atlas-action-disc { color:var(--ui-ink); }
+body.mobile-game .map-overlay-shell .atlas-target-actions.is-landmark .atlas-village-banner { padding-right:48px;min-height:48px; }
+body.mobile-game .map-overlay-shell .atlas-target-actions.is-landmark .atlas-village-banner>button { width:44px;height:44px;min-height:44px;top:2px;right:2px; }
+body.mobile-game #game-dialog:not(.mobile-detail-page):has(.landmark-info) {
+  position:fixed;inset:0!important;margin:auto!important;transform:none!important;
+  width:min(460px,calc(100vw - 24px - env(safe-area-inset-left) - env(safe-area-inset-right)))!important;
+  height:fit-content!important;max-height:calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
+  min-height:0;border-radius:18px;background:var(--ui-paper);color:var(--ui-ink);
+}
+body.mobile-game #game-dialog:has(.landmark-info) #dialog-content { min-height:0;overflow-y:auto;padding:18px; }
+body.mobile-game #game-dialog .landmark-info { display:grid;gap:12px;min-width:0; }
+body.mobile-game #game-dialog .landmark-info :is(h3,p,dl) { margin:0;overflow-wrap:anywhere; }
+body.mobile-game #game-dialog .landmark-info dl { padding:12px;border:1px solid var(--ui-line);border-radius:12px;background:var(--ui-card); }
+body.mobile-game #game-dialog .landmark-info dt { color:var(--ui-muted); }
+body.mobile-game #game-dialog .landmark-info dd { margin:4px 0 0;font-family:var(--ui-font-number); }
+body.mobile-game #game-dialog .landmark-info .button { min-height:44px; }
 body.mobile-game .map-overlay-shell .atlas-target-actions .atlas-action:disabled .atlas-action-disc { color:var(--ui-muted); }
 /* The own castle keeps its identity below the artwork and uses a compact icon-only action dock. */
 body.mobile-game .map-overlay-shell .atlas-target-actions.is-village.is-own-village {

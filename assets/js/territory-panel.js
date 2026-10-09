@@ -120,6 +120,11 @@ window.ConquerTerritory=function(ctx){
   }
   function schedule(){clearTimeout(timer);if(active())timer=setTimeout(()=>{if(active()&&!working&&!formMode&&!document.hidden)load();else schedule();},15000);}
   async function open(id=null){if(!enabled()){toast('Die Kontinent-Eroberung ist in dieser Welt nicht aktiv.');return;}remember();targetId=id;formMode=null;detail=null;loading=true;error='';feedback='';if(Number(state?.world_id)!==world()){state=null;views.clear();}if(!active())openDialog('<section class="territory-shell"><h2>Allianzgebiete</h2><p role="status">Gebiete werden geladen …</p></section>');draw();await load();}
+  async function openRally(id){
+    await open(id);
+    if(!active()||targetId!==id||!detail?.can_attack||!leadership())return;
+    formMode={mode:'start',id};draw();host()?.querySelector('.territory-army')?.scrollIntoView({block:'start'});
+  }
   async function joinRally(id,button){
     if(working||!ctx.marchPanel)return;
     if(pending()){error='Bitte setze zuerst deinen unbestätigten Auftrag fort.';draw();return;}
@@ -182,5 +187,5 @@ window.ConquerTerritory=function(ctx){
   document.addEventListener('input',e=>{if(!active()||!host().contains(e.target))return;if(e.target.name==='territory-search'){search=e.target.value;draw(true);}else if(e.target.matches('[data-territory-troop]'))updateArmyTotal(e.target.closest('form'));});
   document.addEventListener('change',e=>{if(active()&&host().contains(e.target)&&e.target.name==='territory-scope'){scope=e.target.value;draw(true);}});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden&&active()&&!working&&!formMode)load();});
-  return {open,onClick,onSubmit,enabled,recall:id=>execute({action:'recall',garrison_id:Number(id)})};
+  return {open,openRally,onClick,onSubmit,enabled,recall:id=>execute({action:'recall',garrison_id:Number(id)})};
 };

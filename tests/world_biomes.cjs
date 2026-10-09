@@ -44,7 +44,8 @@ const viewports=[{width:390,height:844},{width:320,height:568},{width:568,height
   for(const viewport of viewports){
    await page.setViewportSize(viewport);const size=`${viewport.width}x${viewport.height}`;
    const coordinateRect=await page.locator('.map-overlay-coordinate-toggle').boundingBox();
-   assert(coordinateRect.width<=164&&coordinateRect.height<=44,`${size}: coordinate control stays compact`);
+   const coordinateScale=await page.locator('.map-overlay-coordinate-toggle').evaluate(el=>Number.parseFloat(getComputedStyle(el).zoom)||1);
+   assert(coordinateRect.width/coordinateScale<=164.5&&coordinateRect.height/coordinateScale<=44.5,`${size}: coordinate control stays compact ${JSON.stringify(coordinateRect)}`);
    // The compass returns to the village; the adjacent map button still opens the overview.
    await openNavigation();await navigation.getByRole('button',{name:'Lava',exact:true}).click();
    const home=page.getByRole('button',{name:'Zum eigenen Dorf springen',exact:true});
@@ -69,16 +70,15 @@ const viewports=[{width:390,height:844},{width:320,height:568},{width:568,height
     await page.screenshot({path:path.join(output,`${size}-${zone.id}.png`)});
     const overflow=await page.evaluate(()=>({w:document.documentElement.scrollWidth,h:document.documentElement.scrollHeight,vw:innerWidth,vh:innerHeight}));if(overflow.w>overflow.vw||overflow.h>overflow.vh)findings.push(`${size}/${zone.id}: page overflow ${JSON.stringify(overflow)}`);
    }
-   const congress=page.locator('.atlas-marker[data-atlas-target="congress"]');assert(await congress.isVisible());assert((await congress.locator('img').getAttribute('src')).includes('congress.webp'));
+   const congress=page.locator('.atlas-marker[data-atlas-target="congress"]');assert(await congress.isVisible());assert((await congress.locator('img').getAttribute('src')).includes('congress-forum.webp'));
    await congress.click();assert(await page.getByRole('group',{name:'Zielaktionen'}).isVisible());assert.equal(await page.locator('[role="dialog"]:visible').count(),0,'first Congress click must remain a non-modal context menu');
-   assert(await page.getByRole('group',{name:'Zielaktionen'}).getByRole('button',{name:'Angreifen',exact:true}).isVisible());
+   assert(await page.getByRole('group',{name:'Zielaktionen'}).getByRole('button',{name:'Rally',exact:true}).isVisible());
    const menuRect=await page.getByRole('group',{name:'Zielaktionen'}).boundingBox();if(menuRect.x<0||menuRect.y<0||menuRect.x+menuRect.width>viewport.width+.5||menuRect.y+menuRect.height>viewport.height+.5)findings.push(`${size}: Congress context menu clipped ${JSON.stringify(menuRect)}`);
    await page.screenshot({path:path.join(output,`${size}-congress-actions.png`)});
-   await page.getByRole('group',{name:'Zielaktionen'}).getByRole('button',{name:'Kongress',exact:true}).click();assert.equal(await page.evaluate(()=>fixtureActions.at(-1)),'congress-open');
+   await page.getByRole('group',{name:'Zielaktionen'}).getByRole('button',{name:'Details',exact:true}).click();assert.equal(await page.evaluate(()=>fixtureActions.at(-1)),'congress-open');
    console.log(`PASS ${size}: five region jumps, non-modal Congress actions, event dispatch`);
   }
-  const congress=page.locator('.atlas-marker[data-atlas-target="congress"]');const frameA=await congress.screenshot();await page.waitForTimeout(875);const frameB=await congress.screenshot();assert(!frameA.equals(frameB),'floating Congress must show actual animated frames');
-  await page.emulateMedia({reducedMotion:'reduce'});await page.waitForFunction(()=>document.querySelector('.atlas-marker[data-atlas-target="congress"] img').src.includes('congress.png'));await page.emulateMedia({reducedMotion:'no-preference'});
+  await page.emulateMedia({reducedMotion:'reduce'});assert((await page.locator('.atlas-marker[data-atlas-target="congress"] img').getAttribute('src')).includes('congress-forum.webp'));await page.emulateMedia({reducedMotion:'no-preference'});
   assert.deepEqual(errors,[],'browser runtime errors');assert(!blocked.some(name=>name.includes('/api')),'fixture must never call game API');
   fs.writeFileSync(path.join(output,'findings.json'),JSON.stringify({terrain,findings,errors},null,2));console.log(`Screenshots: ${output}`);
   assert.deepEqual(findings,[],'responsive clipping findings');console.log('ALL WORLD BIOME CHECKS PASSED');

@@ -255,6 +255,7 @@ try{
   \Conquer\Game\World\AlphaRealm::setup();
   \Conquer\Auth\OAuth::createDefaultCity($db,1,'PreviewPlayer');
  }
+ if(in_array('--landmark-actions',$argv,true))\Conquer\Game\World\WorldService::initializeWorld(1);
  $port=18942;foreach($argv as $arg)if(preg_match('/^--port=([0-9]{4,5})$/D',$arg,$match))$port=(int)$match[1];if($port<1024||$port>65535)throw new RuntimeException('Invalid preview port.');
  mkdir($dir.'/sessions',0700,true);
  $log=$dir.'/logs/server.log';$server=proc_open([PHP_BINARY,'-d','session.save_path='.$dir.'/sessions','-d','display_startup_errors=0','-S','127.0.0.1:'.$port,'-t',$dir,$dir.'/router.php'],[0=>['pipe','r'],1=>['file',$log,'a'],2=>['file',$log,'a']],$pipes,$dir);

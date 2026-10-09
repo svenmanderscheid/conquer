@@ -49,6 +49,15 @@ final class RallyHandler
         catch(\RuntimeException|\DomainException $e){Response::error(400,'RALLY_FAILED',$e->getMessage());}
         Response::ok(['rally_id'=>$id]);
     }
+    public static function startShrine(array $params): void
+    {
+        $s=self::session(true);$b=self::body();$pid=(int)$s['player_id'];
+        $id=self::integer($b,'target_id',1,PHP_INT_MAX);$minutes=self::integer($b+['rally_minutes'=>5],'rally_minutes',1,30);
+        if(!is_array($b['troops']??null))Response::error(400,'INVALID_INPUT','Choose a valid army.');
+        try{$city=WorldContext::city($pid);$rally=\Conquer\Game\Rally\ShrineRally::start($pid,(int)$city['id'],$id,$b['troops'],$minutes);}
+        catch(\RuntimeException|\DomainException $e){Response::error(422,'RALLY_FAILED',$e->getMessage());}
+        Response::ok(['rally_id'=>$rally]);
+    }
     public static function join(array $params): void
     {
         $s=self::session(true);$b=self::body();$id=self::integer($b,'rally_id',1,PHP_INT_MAX);if(!is_array($b['troops']??null))Response::error(400,'INVALID_INPUT','Wähle eine gültige Armee.');

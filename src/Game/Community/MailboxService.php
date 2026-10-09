@@ -28,6 +28,13 @@ final class MailboxService
     /** Give monster mail a useful list label without depending on the current map spawn. */
     private static function presentListEntry(array $row): array
     {
+        if(($row['source']??'')==='battle'){
+            $meta=self::decode($row['metadata_json']??null);
+            if(($meta['details']['type']??'')==='landmark_scout'){
+                $row['subject'].=' · '.($meta['details']['target_name']??'');
+                unset($row['metadata_json']);return $row;
+            }
+        }
         if(($row['source']??'')!=='battle'||($row['category']??'')!=='reports'){
             unset($row['metadata_json']);
             return $row;
@@ -88,7 +95,7 @@ final class MailboxService
                 $d=['target_name'=>'Deine Stadt','perspective'=>'defender'];
             }
             $d['outcome']=$r['outcome'];
-            self::insert($player,$world,'battle',$r,($r['defender_id']||in_array($d['battle_kind']??'',['city','rally'],true))?'war':'reports',$title,
+            self::insert($player,$world,'battle',$r,($r['defender_id']||($d['type']??'')==='landmark_scout'||in_array($d['battle_kind']??'',['city','rally','shrine','congress'],true))?'war':'reports',$title,
                 ($d['target_name']??$d['monster_name']??'Gefecht').' · ('.$r['target_x'].', '.$r['target_y'].')',
                 ['sender'=>'Kampfbericht','details'=>$d,'x'=>(int)$r['target_x'],'y'=>(int)$r['target_y'],'defender'=>$defender,'scout'=>$scout]);
         }
