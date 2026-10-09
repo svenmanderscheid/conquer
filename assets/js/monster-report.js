@@ -27,6 +27,12 @@ window.ConquerMonsterReport = (() => {
     function asset(base,file) {
         return /^[a-zA-Z0-9_/-]+\.(svg|png|webp)$/.test(file||'')&&!file.includes('..')?`${base}/assets/art/items/${file}`:'';
     }
+    function relicAsset(base,item) {
+        const fallback=asset(base,item.icon),treasure_code=Number(item.treasure_code??item.code);
+        return (treasure_code>0||fallback)&&window.ConquerRelicPresentation
+            ?window.ConquerRelicPresentation.image(base,{...item,treasure_code,icon:fallback?item.icon:''})
+            :fallback;
+    }
     function monsterArt(base,m,name) {
         const art=String(m?.art||'').replace(/\.png$/,'');
         const regional=`${art} ${name||''}`.match(/grumwald|frostgrimm|sandmaul|glutramm/i);
@@ -106,12 +112,12 @@ window.ConquerMonsterReport = (() => {
         const reward=(label,count,src)=>`<div class="mr-reward">${src?`<img src="${src}" alt="${esc(label)}">`:'<span class="mr-reward-symbol" aria-hidden="true">✦</span>'}<span><span class="mr-reward-name">${esc(label)}</span><strong>× ${number(count)}</strong></span></div>`;
         for(const [key,label] of Object.entries({food:'Nahrung',lumber:'Holz',stone:'Stein',gold:'Gold',gems:'Edelsteine'})){
             const amount=d.loot?.[key]??(key==='lumber'?d.loot?.wood:0);
-            if(Number(amount)>0)rewards.push(reward(label,amount,key==='gems'?asset(base,'gems.svg'):`${window.ConquerItemArt?.resourceUrl(base,key) || `${base}/assets/art/ui-resources/${key}.png`}`));
+            if(Number(amount)>0)rewards.push(reward(label,amount,window.ConquerItemArt?.resourceUrl(base,key)||(key==='gems'?asset(base,'gems.svg'):`${base}/assets/art/ui-resources/${key}.png`)));
         }
         for(const item of d.item_rewards||[])if(Number(item.count??item.quantity)>0){const resolved=window.ConquerRewards?.resolve(item,kingdom,base);rewards.push(reward(resolved?.name||item.name,item.count??item.quantity,resolved?.icon||asset(base,item.icon)));}
         for(const [type,entries] of [['fragment',d.fragment_rewards||[]],['relic',d.relic_rewards||[]]])for(const entry of entries)if(Number(entry.count)>0){const resolved=window.ConquerRewards?.resolve({...entry,type},kingdom,base),kind=resolved?.kind||window.ConquerLocale.t('reward.kind.'+type);rewards.push(reward(`${resolved?.name||entry.name} · ${kind}`,entry.count,resolved?.icon||asset(base,entry.icon)));}
         const loot=section('Erhaltene Beute',`<div class="cr-resources">${rewards.join('')||'<p class="cr-note">Keine Gegenstände oder Rohstoffe erhalten.</p>'}</div><p class="cr-note mr-delivery ${r.reward_delivery==='delivered'?'mr-delivered':''}" data-report-delivery role="status">${delivery(r)}</p>${d.charm?'<p class="cr-note">✦ Öffentlicher Charm am Kampfort · separat einsammeln.</p>':''}`,'mr-loot');
-        const equipment=!source?'<p class="cr-note">Die damaligen Relikte wurden nicht gespeichert.</p>':source.equipment?.length?`<div class="cr-equipment mr-equipment-list">${source.equipment.map(item=>`<div class="cr-item grade-${['normal','uncommon','rare','epic','legendary'].includes(item.grade)?item.grade:'normal'}">${asset(base,item.icon)?`<img src="${asset(base,item.icon)}" alt="" loading="lazy">`:'<span aria-hidden="true">✦</span>'}<strong>${esc(item.name_de||item.name)}</strong><small>Stufe ${number(item.level)}</small></div>`).join('')}</div>`:'<p class="cr-note">Keine Relikte ausgerüstet.</p>';
+        const equipment=!source?'<p class="cr-note">Die damaligen Relikte wurden nicht gespeichert.</p>':source.equipment?.length?`<div class="cr-equipment mr-equipment-list">${source.equipment.map(item=>`<div class="cr-item grade-${['normal','uncommon','rare','epic','legendary'].includes(item.grade)?item.grade:'normal'}">${relicAsset(base,item)?`<img src="${esc(relicAsset(base,item))}" alt="" loading="lazy">`:'<span aria-hidden="true">✦</span>'}<strong>${esc(item.name_de||item.name)}</strong><small>Stufe ${number(item.level)}</small></div>`).join('')}</div>`:'<p class="cr-note">Keine Relikte ausgerüstet.</p>';
         const talents=!source?'<p class="cr-note">Die damalige Hunter-Meisterschaft wurde nicht gespeichert.</p>':`<div class="mr-mastery-head"><span aria-hidden="true">✦</span><div><strong>Hunter-Meisterschaft</strong><small>Lord-Stufe ${number(source.hunter?.level)}</small></div></div>${source.hunter?.talents?.length?`<ul class="cr-talents mr-mastery-list">${source.hunter.talents.map(t=>`<li><span>${esc(t.name_key?ConquerLocale.t(t.name_key):t.name)}</span><b>${esc(window.ConquerLocale.t('talents.rank',{rank:number(t.rank),max:t.max_rank??5}))}</b></li>`).join('')}</ul>`:'<p class="cr-note">Keine Hunter-Talente vergeben.</p>'}`;
         const bonusRows=own?Object.entries(types).flatMap(([type,[label]])=>Object.entries({atk:'Angriff',def:'Verteidigung',hp:'Lebenspunkte'}).map(([key,stat])=>`<li><span><i aria-hidden="true">◈</i>${label} · ${stat}</span><b>${percent(own.bonuses?.[type]?.[key]??0)}</b></li>`)).join(''):'';
         const bonuses=own?`<ul class="mr-boost-list">${bonusRows}</ul><p class="cr-note">Wirksame Boni zum Kampfzeitpunkt, inklusive Monsterbonus. Das Monster kämpft mit seinen gespeicherten Grundwerten.</p>`:'<p class="cr-note">Die Kampfboni wurden damals nicht gespeichert. Aktuelle Boni werden diesem Bericht nicht nachträglich zugeordnet.</p>';

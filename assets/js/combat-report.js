@@ -25,6 +25,13 @@ window.ConquerCombatReport = function ({base, esc, fmt, openDialog, toast, unitN
         if(prefix&&tier>=1&&tier<=10)return `characters/fantasy-troops-v3/${prefix}-t${tier}-ui.webp`;
         return (types[troop.type]?.[1]||'knight')+'.png';
     };
+    const relicArt = item => {
+        const icon=/^[a-z0-9_/-]+\.(png|svg|webp)$/i.test(item.icon||'')&&!String(item.icon).includes('..')?item.icon:'';
+        const treasure_code=Number(item.treasure_code??item.code);
+        return (treasure_code>0||icon)&&window.ConquerRelicPresentation
+            ?window.ConquerRelicPresentation.image(base,{...item,treasure_code,icon})
+            :icon?`${base}/assets/art/items/${icon}`:'';
+    };
     const troopName = troop => unitName({...getState().troop_defs.find(t=>Number(t.code)===Number(troop.code)),...troop,type:{infantry:1,ranged:2,cavalry:3}[troop.type]||troop.type});
     const coord = army => Number.isFinite(army.x)&&Number.isFinite(army.y)?`X:${army.x} Y:${army.y}`:'Koordinaten nicht gespeichert';
     const identity = (army, role) => `<div class="cr-identity ${role}"><small class="cr-role">${roles[role]}${combat[role].armies.length>1?` · ${combat[role].armies.length} Armeen`:''}</small>${avatar(army)}<div><strong data-user-content>${esc(army.name)}</strong><small>${esc(coord(army))}</small></div></div>`;
@@ -62,7 +69,7 @@ window.ConquerCombatReport = function ({base, esc, fmt, openDialog, toast, unitN
             </tbody></table>`;
     }
     function equipment() {
-        return `<div class="cr-columns">${Object.keys(roles).map(role=>`<div class="cr-loadouts">${combat[role].armies.map(army=>`<div><h4 data-user-content>${esc(army.name)}</h4>${army.equipment===null?'<p class="cr-note">Nicht gespeichert.</p>':army.equipment.length?`<div class="cr-equipment">${army.equipment.map(item=>`<div class="cr-item grade-${['normal','uncommon','rare','epic','legendary'].includes(item.grade)?item.grade:'normal'}">${/^[a-z0-9_/-]+\.(png|svg|webp)$/i.test(item.icon)?`<img src="${base}/assets/art/items/${esc(item.icon)}" alt="" loading="lazy">`:'<span aria-hidden="true">✦</span>'}<strong>${esc(item.name)}</strong><small>St. ${number(item.level)}</small></div>`).join('')}</div>`:'<p class="cr-note">Keine Relikte ausgerüstet.</p>'}</div>`).join('')}</div>`).join('')}</div>`;
+        return `<div class="cr-columns">${Object.keys(roles).map(role=>`<div class="cr-loadouts">${combat[role].armies.map(army=>`<div><h4 data-user-content>${esc(army.name)}</h4>${army.equipment===null?'<p class="cr-note">Nicht gespeichert.</p>':army.equipment.length?`<div class="cr-equipment">${army.equipment.map(item=>`<div class="cr-item grade-${['normal','uncommon','rare','epic','legendary'].includes(item.grade)?item.grade:'normal'}">${relicArt(item)?`<img src="${esc(relicArt(item))}" alt="" loading="lazy">`:'<span aria-hidden="true">✦</span>'}<strong>${esc(item.name)}</strong><small>St. ${number(item.level)}</small></div>`).join('')}</div>`:'<p class="cr-note">Keine Relikte ausgerüstet.</p>'}</div>`).join('')}</div>`).join('')}</div>`;
     }
     function talents() {
         return `<div class="cr-columns">${Object.keys(roles).map(role=>`<div class="cr-loadouts">${combat[role].armies.map(army=>`<div><h4 data-user-content>${esc(army.name)}</h4><p class="cr-hunter">✦ Hunter · Stufe ${number(army.hunter_level)}</p>${army.talents===null?'<p class="cr-note">Nicht gespeichert.</p>':army.talents.length?`<ul class="cr-talents">${army.talents.map(t=>`<li><span>${esc(t.name_key?ConquerLocale.t(t.name_key):t.name)}</span><b>${number(t.rank)}/${number(t.max_rank??5)}</b></li>`).join('')}</ul>`:'<p class="cr-note">Keine Talente vergeben.</p>'}</div>`).join('')}</div>`).join('')}</div>`;
