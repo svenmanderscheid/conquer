@@ -104,6 +104,13 @@ check_blocked "/tests/" "Tests folder"
 check_blocked "/tests/verify_security.sh" "This script"
 echo ""
 
+echo "🚫 Should be BLOCKED (403/404) — Local artifacts and browser diagnostics:"
+check_blocked "/output/" "Local maintenance and release artifacts"
+check_blocked "/output/chest-relic-fix-release.zip" "Private release archive"
+check_blocked "/outputs/" "Local generated output"
+check_blocked "/.playwright-cli/" "Private browser diagnostics"
+echo ""
+
 echo "🚫 Should be BLOCKED (403/404) — Documentation:"
 check_blocked "/docs/" "Docs folder"
 check_blocked "/docs/SPEC.md" "Master specification"
@@ -129,7 +136,7 @@ echo ""
 
 if [ $FAIL -eq 0 ]; then
     echo -e "${GREEN}✓ ALL SECURITY CHECKS PASSED${NC}"
-    echo "Site is safe to keep running."
+    echo "Checked public/private paths passed; this does not replace a full security review."
     exit 0
 else
     echo -e "${RED}✗ $FAIL SECURITY CHECKS FAILED${NC}"

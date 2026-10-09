@@ -1,0 +1,2 @@
+# Local diagnostics, source snapshots and release artifacts are never public.
+Require all denied

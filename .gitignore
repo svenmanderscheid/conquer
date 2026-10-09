@@ -114,6 +114,9 @@ asset-workflow/
 # Local audit evidence, prototypes and exports are not release contents.
 artifacts/
 outputs/
+/output/*
+!/output/.htaccess
+/.playwright-cli/
 preview/
 .claude/
 /Routkaepp_Ekki_Sunny_Orange.pdf
@@ -122,7 +125,3 @@ preview/
 __pycache__/
 *.pyc
 logs/*.json
-
-# Local video reference analysis and commit verification.
-/output/video-reference/
-/output/commit-video-scope/

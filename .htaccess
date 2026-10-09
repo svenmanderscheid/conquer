@@ -38,7 +38,7 @@ LimitRequestBody 65536
 </If>
 
 # Relative rules protect both domain-root and /conquer installations.
-RewriteRule ^(?:src|config|migrations|cron|tests|docs|data|vendor|node_modules|mobile|logs|sessions|cache|tmp|tools|bin|artifacts|outputs|preview|asset-workflow|views|\.git|\.github|\.claude|\.codex[^/]*)(?:/|$) - [F,L,NC]
+RewriteRule ^(?:src|config|migrations|cron|tests|docs|data|vendor|node_modules|mobile|logs|sessions|cache|tmp|tools|bin|artifacts|output|outputs|preview|asset-workflow|views|\.git|\.github|\.claude|\.playwright-cli|\.codex[^/]*)(?:/|$) - [F,L,NC]
 
 # Local documents and exports at the project root are not public game assets.
 # Intentional downloadable assets belong below assets/.
@@ -81,8 +81,8 @@ RewriteRule ^(.*)$ index.php [QSA,L]
 # Block access to non-public folders even though they live in webroot
 # (Each of these folders also has its own deny-all .htaccess for redundancy)
 # ============================================================================
-RedirectMatch 403 ^/(src|config|migrations|cron|tests|docs|data|vendor|node_modules|logs|sessions|cache|tmp|outputs|preview|\.github|\.git)/.*$
-RedirectMatch 403 ^/(src|config|migrations|cron|tests|docs|data|vendor|node_modules|logs|sessions|cache|tmp|outputs|preview|\.github|\.git)$
+RedirectMatch 403 ^/(src|config|migrations|cron|tests|docs|data|vendor|node_modules|logs|sessions|cache|tmp|output|outputs|preview|\.playwright-cli|\.github|\.git)/.*$
+RedirectMatch 403 ^/(src|config|migrations|cron|tests|docs|data|vendor|node_modules|logs|sessions|cache|tmp|output|outputs|preview|\.playwright-cli|\.github|\.git)$
 
 # ============================================================================
 # Performance — caching for static assets

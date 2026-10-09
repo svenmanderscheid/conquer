@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 /** XAMPP Apache integration: disposable document root, no game bootstrap or DB.
+ * Covers request limits, private artifacts and maintenance-script HTTP guards.
  * Run: C:/xampp/php/php.exe tests/apache_request_limits.php
  * Optional CONQUER_APACHE_ROOT / CONQUER_PHP_ROOT override the XAMPP paths.
  */
@@ -24,8 +25,10 @@ function requestLimit(int $port, string $path, int $size, bool $chunked=false, s
     if($chunked)$headers[]='Transfer-Encoding: chunked';
     curl_setopt_array($ch,[CURLOPT_CUSTOMREQUEST=>$method,CURLOPT_POSTFIELDS=>str_repeat('x',$size),
         CURLOPT_HTTPHEADER=>$headers,CURLOPT_RETURNTRANSFER=>true,CURLOPT_HEADER=>true,
-        CURLOPT_TIMEOUT=>15,CURLOPT_HTTP_VERSION=>CURL_HTTP_VERSION_1_1]);
+        CURLOPT_TIMEOUT=>15,CURLOPT_HTTP_VERSION=>CURL_HTTP_VERSION_1_1,CURLOPT_PATH_AS_IS=>true,
+        CURLOPT_NOBODY=>$method==='HEAD']);
     $response=curl_exec($ch);$status=(int)curl_getinfo($ch,CURLINFO_HTTP_CODE);$error=curl_error($ch);curl_close($ch);
+    if($response===false)throw new RuntimeException("HTTP fixture request $method $path failed: $error");
     return [$status,(string)$response,$error];
 }
 function removeFixture(string $path, string $root): void {
@@ -40,10 +43,29 @@ try {
     mkdir($root.'/www/conquer',0700,true);
     $source=(string)file_get_contents(dirname(__DIR__).'/.htaccess');
     // Read the complete entity so Apache must enforce chunked limits as well.
-    $handler='<?php $raw=file_get_contents("php://input"); header("Content-Type: text/plain"); echo "fixture-bytes=".strlen((string)$raw);';
+    $handler='<?php $raw=file_get_contents("php://input"); header("Content-Type: text/plain"); $path=parse_url($_SERVER["REQUEST_URI"],PHP_URL_PATH); if(!preg_match("~^/(?:conquer/)?(?:index\\.php$|city$|api/)~",$path)){http_response_code(404);exit;} echo "fixture-bytes=".strlen((string)$raw);';
+    $privateDirs=['output','outputs','preview','.playwright-cli'];
+    $helpers=['apply-hunter-vip-dependency.php','check-hunter-schema.php'];
     foreach([$root.'/www',$root.'/www/conquer'] as $site){
         file_put_contents($site.'/.htaccess',$source);file_put_contents($site.'/index.php',$handler);
-        foreach(['outputs','preview','assets'] as $dir){mkdir($site.'/'.$dir);file_put_contents($site.'/'.$dir.'/probe.txt','fixture');}
+        foreach([...$privateDirs,'assets','output-public'] as $dir){
+            mkdir($site.'/'.$dir.'/nested',0700,true);
+            foreach(['probe.txt','nested/probe.zip','nested/probe.log'] as $file)file_put_contents($site.'/'.$dir.'/'.$file,'private-fixture-marker');
+            file_put_contents($site.'/'.$dir.'/probe.php','<?php echo "private-fixture-marker";');
+        }
+        // Copies can reach only this tripwire, never an application autoloader or DB.
+        mkdir($site.'/src');mkdir($site.'/cli-probes');
+        file_put_contents($site.'/src/Autoloader.php','<?php echo "fixture-cli-entry"; exit;');
+        foreach($helpers as $helper){
+            $original=dirname(__DIR__).'/output/'.$helper;
+            if(is_file($original))copy($original,$site.'/cli-probes/'.$helper);
+        }
+        // Exercise the directory-level fallback independently of the root name rule.
+        if(is_file(dirname(__DIR__).'/output/.htaccess')){
+            mkdir($site.'/directory-guard');
+            copy(dirname(__DIR__).'/output/.htaccess',$site.'/directory-guard/.htaccess');
+            file_put_contents($site.'/directory-guard/probe.txt','private-fixture-marker');
+        }
     }
     $socket=stream_socket_server('tcp://127.0.0.1:0',$errno,$error);
     if(!$socket)throw new RuntimeException($error);
@@ -82,10 +104,57 @@ try {
             [$status]=requestLimit($port,$base.'/api/kingdom/profile-image',70000,$chunked,'DELETE');
             checkHttp($status===413,"$mode non-upload method retains 64 KiB limit");
         }
-        foreach(['outputs','preview'] as $dir){
-            foreach(['','/probe.txt'] as $suffix){[$status]=requestLimit($port,$base.'/'.$dir.$suffix,0,false,'GET');checkHttp($status===403,"$base/$dir$suffix denied");}
+        foreach($privateDirs as $dir){
+            foreach(['GET','HEAD','POST'] as $method){
+                foreach(['/probe.php','','/probe.txt','/nested/probe.zip','/nested/probe.log'] as $suffix){
+                    [$status,$body]=requestLimit($port,$base.'/'.$dir.$suffix,0,false,$method);
+                    checkHttp($status===403&&!str_contains($body,'private-fixture-marker'),"$method $base/$dir$suffix denied before content or execution (got $status)");
+                }
+            }
         }
-        [$status]=requestLimit($port,$base.'/assets/probe.txt',0,false,'GET');checkHttp($status===200,"$base/assets public fixture accessible");
+        foreach(['/%6futput/probe.php','/%2eplaywright-cli/nested/probe.log','/OuTpUt/probe.txt','/output/probe.php/extra','/output/probe.php?next=/assets/probe.txt','/assets/../output/probe.php','//output//probe.php'] as $path){
+            [$status,$body]=requestLimit($port,$base.$path,0,false,'GET');
+            checkHttp($status===403&&!str_contains($body,'private-fixture-marker'),"private path variant $base$path denied");
+        }
+        foreach(['/output%2fprobe.php','/output%5cprobe.php','/output./probe.php','/output%20/probe.php'] as $path){
+            [$status,$body]=requestLimit($port,$base.$path,0,false,'GET');
+            checkHttp(in_array($status,[400,403,404],true)&&!str_contains($body,'private-fixture-marker'),"platform path alias $base$path rejected");
+        }
+        // NTFS can expose dot-directories through a generated 8.3 name.
+        $shortNameProcess=proc_open('cmd.exe /d /c for %I in (.playwright-cli) do @echo %~snxI',[0=>['pipe','r'],1=>['pipe','w'],2=>['pipe','w']],$pipes,$root.'/www'.$base,null,['bypass_shell'=>true]);
+        if(!is_resource($shortNameProcess))throw new RuntimeException('Cannot inspect Windows directory alias');
+        fclose($pipes[0]);$shortName=trim((string)stream_get_contents($pipes[1]));$shortError=stream_get_contents($pipes[2]);fclose($pipes[1]);fclose($pipes[2]);
+        $shortExit=proc_close($shortNameProcess);
+        checkHttp($shortExit===0&&$shortName!==''&&$shortError==='',"Windows directory alias resolved (exit $shortExit, name $shortName, error $shortError)");
+        if(strcasecmp($shortName,'.playwright-cli')!==0){
+            [$status,$body]=requestLimit($port,$base.'/'.rawurlencode($shortName).'/nested/probe.log',0,false,'GET');
+            checkHttp($status===403&&!str_contains($body,'private-fixture-marker'),"Windows short directory alias $base/$shortName denied (got $status)");
+        }
+        foreach(['/assets/probe.txt','/output-public/probe.txt'] as $path){
+            [$status,$body]=requestLimit($port,$base.$path,0,false,'GET');
+            checkHttp($status===200&&str_contains($body,'private-fixture-marker'),"$base$path public fixture accessible");
+        }
+        foreach(['/city','/api/game/state'] as $path){
+            [$status,$body]=requestLimit($port,$base.$path,0,false,'GET');
+            checkHttp($status===200&&str_contains($body,'fixture-bytes=0'),"$base$path still reaches front controller");
+        }
+        if(is_dir($root.'/www'.$base.'/directory-guard')){
+            [$status,$body]=requestLimit($port,$base.'/directory-guard/probe.txt',0,false,'GET');
+            checkHttp($status===403&&!str_contains($body,'private-fixture-marker'),'directory-level fallback denies independently');
+        }
+        foreach($helpers as $helper){
+            $copy=$root.'/www'.$base.'/cli-probes/'.$helper;
+            // These are local-only tools and may be absent from a clean release checkout.
+            if(!is_file($copy))continue;
+            foreach(['GET','POST','HEAD'] as $method){
+                [$status,$body]=requestLimit($port,$base.'/cli-probes/'.$helper,0,false,$method);
+                checkHttp($status===403&&!str_contains($body,'fixture-cli-entry'),"$method $helper rejects HTTP even outside the private directory");
+            }
+            $cli=proc_open([PHP_BINARY,$copy],[0=>['pipe','r'],1=>['pipe','w'],2=>['pipe','w']],$pipes,$root,null,['bypass_shell'=>true]);
+            if(!is_resource($cli))throw new RuntimeException('Cannot check CLI control');
+            fclose($pipes[0]);$out=stream_get_contents($pipes[1]);$err=stream_get_contents($pipes[2]);fclose($pipes[1]);fclose($pipes[2]);
+            checkHttp(proc_close($cli)===0&&$out==='fixture-cli-entry'&&$err==='',"$helper retains its CLI entry path without opening a database");
+        }
     }
     echo "ALL $checks APACHE REQUEST-LIMIT CHECKS PASSED\n";
 } catch(Throwable $e) {
