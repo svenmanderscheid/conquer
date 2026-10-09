@@ -1498,8 +1498,42 @@ body.mobile-game .map-overlay-shell .atlas-target-actions .atlas-action>span:las
 body.mobile-game .map-overlay-shell .atlas-target-actions .atlas-action:disabled { --action-face:var(--ui-disabled);--action-shade:var(--ui-line);cursor:not-allowed; }
 body.mobile-game .map-overlay-shell .atlas-target-actions .atlas-action.is-locked { --action-face:var(--ui-disabled);--action-shade:var(--ui-line); }
 body.mobile-game .map-overlay-shell .atlas-target-actions .atlas-action.is-locked .atlas-action-disc { color:var(--ui-ink); }
-body.mobile-game .map-overlay-shell .atlas-target-actions.is-landmark .atlas-village-banner { padding-right:48px;min-height:48px; }
-body.mobile-game .map-overlay-shell .atlas-target-actions.is-landmark .atlas-village-banner>button { width:44px;height:44px;min-height:44px;top:2px;right:2px; }
+/* Landmark names and actions share one measured card; the hit areas stay still. */
+body.mobile-game .map-overlay-shell .atlas-target-actions.is-village.is-landmark {
+  display:flex;flex-direction:column;gap:10px;width:min(300px,calc(100% - 16px));height:auto;padding:10px;
+  border:2px solid var(--ui-frame);border-radius:16px;background:var(--ui-paper);color:var(--ui-ink);
+  box-shadow:inset 0 1px var(--ui-card-light),0 3px var(--ui-primary-edge),0 6px 14px color-mix(in srgb,var(--ui-ink) 18%,transparent);
+  pointer-events:auto;
+}
+body.mobile-game .map-overlay-shell .atlas-target-actions.is-landmark .atlas-village-banner {
+  position:static;display:grid;grid-template-columns:minmax(0,1fr) 44px;column-gap:8px;row-gap:4px;align-items:center;
+  width:100%;min-height:44px;padding:0;translate:none;border:0;background:transparent;box-shadow:none;text-align:left;
+}
+body.mobile-game .map-overlay-shell .atlas-target-actions.is-landmark .atlas-village-banner strong {
+  grid-column:1;justify-self:start;max-width:100%;overflow:visible;white-space:normal;overflow-wrap:anywhere;
+  font:400 16px/1.25 var(--ui-font-heading);font-family:var(--ui-font-heading)!important;
+}
+body.mobile-game .map-overlay-shell .atlas-target-actions.is-landmark .atlas-village-banner small {
+  grid-column:1;justify-self:start;margin:0;font:11px/1.3 var(--ui-font-number);color:var(--ui-muted);
+}
+body.mobile-game .map-overlay-shell .atlas-target-actions.is-landmark .atlas-village-banner>button {
+  position:static;grid-column:2;grid-row:1 / span 2;width:44px;height:44px;min-height:44px;padding:10px;
+}
+body.mobile-game .map-overlay-shell .atlas-target-actions.is-landmark .atlas-actions-buttons {
+  position:static;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;height:auto;
+}
+body.mobile-game .map-overlay-shell .atlas-target-actions.is-landmark .atlas-action {
+  position:relative;inset:auto;width:auto;min-width:0;min-height:76px;margin:0;padding:0;translate:none;scale:none;
+  font-size:11px;line-height:15px;text-align:center;
+}
+body.mobile-game .map-overlay-shell .atlas-target-actions.is-landmark .atlas-action:is(:hover,:focus-visible,:active) { translate:none;transform:none;filter:none; }
+body.mobile-game .map-overlay-shell .atlas-target-actions.is-landmark .atlas-action:active .atlas-action-disc { transform:translateY(2px);box-shadow:inset 0 1px var(--ui-card-light),0 1px var(--ui-frame); }
+body.mobile-game .map-overlay-shell .atlas-target-actions.is-landmark .atlas-action>span:last-child { max-width:100%;white-space:normal;overflow-wrap:anywhere; }
+body.mobile-game .map-overlay-shell :is(.atlas-marker--territory,.atlas-marker--shrine,.atlas-marker--congress).is-selected>.atlas-marker-name { opacity:0; }
+@media(max-height:620px) {
+  body.mobile-game.world-mode:has(.atlas-target-actions.is-landmark:not([hidden])) #hud-mail,
+  .map-overlay-shell:has(.atlas-target-actions.is-landmark:not([hidden])) :is(.map-overlay-search-toggle,.map-overlay-coordinate-toggle) { visibility:hidden;pointer-events:none; }
+}
 body.mobile-game #game-dialog:not(.mobile-detail-page):has(.landmark-info) {
   position:fixed;inset:0!important;margin:auto!important;transform:none!important;
   width:min(460px,calc(100vw - 24px - env(safe-area-inset-left) - env(safe-area-inset-right)))!important;

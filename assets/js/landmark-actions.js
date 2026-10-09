@@ -12,8 +12,8 @@ window.ConquerLandmarkActions=function(ctx){
   };
   function info(target,reason){
     const name=['shrine','congress'].includes(target.kind)?window.ConquerLocale.text(target.name):target.name;
-    const window=target.next_window,event=target.event;
-    const timing=window?`${when(window.starts_at)} – ${when(window.ends_at)}`:event?`${when(event.starts_at||event.next_starts_at)} – ${when(event.ends_at)}`:tr('anytime');
+    const attackWindow=target.next_window,event=target.event;
+    const timing=attackWindow?`${when(attackWindow.starts_at)} – ${when(attackWindow.ends_at)}`:event?`${when(event.starts_at||event.next_starts_at)} – ${when(event.ends_at)}`:tr('anytime');
     openDialog(`<section class="landmark-info"><h2>${esc(tr('attack_info'))}</h2><h3 translate="no">${esc(name)}</h3><p role="status">${esc(reason)}</p><dl><dt>${esc(tr('window'))}</dt><dd>${esc(timing)}</dd></dl>${target.kind==='commune'&&!target.owner_alliance_id?`<p>${esc(tr('npc_first_attack'))}</p>`:''}<p class="muted">${esc(tr('arrival_rule'))}</p><button type="button" class="button secondary" data-action="close-dialog">${esc(tr('close'))}</button></section>`);
   }
   async function rally(kind,id){

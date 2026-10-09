@@ -594,7 +594,8 @@ window.ConquerWorld = (() => {
       node.style.left=`${x}px`;node.style.top=`${y}px`;
       if(node.mapTileSize!==tileSize){node.mapTileSize=tileSize;node.style.setProperty('--tile-size',`${tileSize}px`);}
       if(node.mapFootprint!==tiles){node.mapFootprint=tiles;node.style.setProperty('--footprint',String(tiles));}
-      node.style.zIndex=String((isVillage(target)?0:10000)+Math.round(y)+300);
+      // Nearby encounter art must not cover a landmark's permanent nameplate.
+      node.style.zIndex=String((isLandmark(target)?15000:isVillage(target)?0:10000)+Math.round(y)+300);
     }
     const target=selectedTarget(),focus=view.el.querySelector('.atlas-cell-focus');focus.hidden=!target;focus.classList.toggle('is-teleport-preview',!!(context.teleport&&target?.kind==='cell'));if(target){const [x,y]=projectTarget(target),size=scale()*footprint(target);focus.style.left=`${x}px`;focus.style.top=`${y}px`;focus.style.width=focus.style.height=`${size}px`;focus.dataset.x=String(target.x);focus.dataset.y=String(target.y);if(context.teleport&&target.kind==='cell'){const placement=teleportPlacement(target.x,target.y),preview=focus.querySelector('.atlas-teleport-city-preview'),state=focus.querySelector('.atlas-teleport-placement-state');focus.dataset.valid=String(placement.valid);preview.src=context.teleport.kind==='alliance-structure'?asset(context.teleport.art):window.ConquerCastleSkins.image(context.base,context.state.city.city_skin||'default');preview.alt=context.teleport.kind==='alliance-structure'?`${context.teleport.label} platzieren`:'Stadt platzieren';state.textContent=placement.valid?`X ${target.x} · Y ${target.y}`:placement.reason;}}
   }
@@ -729,15 +730,20 @@ window.ConquerWorld = (() => {
     const obstacles=[...document.querySelectorAll('.topbar,.world-chat,#navigation,#hud-menu,.hud-edge-tools button,.map-overlay-search-toggle,.map-overlay-coordinate-toggle')].filter(el=>{const css=getComputedStyle(el);return !el.hidden&&css.display!=='none'&&css.visibility!=='hidden'&&Number(css.opacity)>0;}).map(el=>{const r=el.getBoundingClientRect();return{left:r.left-viewport.left,right:r.right-viewport.left,top:r.top-viewport.top,bottom:r.bottom-viewport.top};});
     const topbar=document.querySelector('.topbar')?.getBoundingClientRect(),chat=document.querySelector('.world-chat')?.getBoundingClientRect();
     const safeTop=Math.max(8,(topbar?.bottom||0)-viewport.top+8),safeBottom=Math.min(view.height-8,chat&&chat.height>32?chat.top-viewport.top-8:view.height-8);
+    const landmark=isLandmark(target),objectSize=scale()*footprint(target),safeHeight=safeBottom-safeTop;
+    if(landmark){
+      const room=Math.max(safeHeight-height-gap,Math.min(safeHeight-gap*2,view.width-width-gap*3));
+      if(room>0&&objectSize>room+1&&memory.zoom>minZoom()+.001){zoomTo(memory.zoom*room/objectSize);return;}
+    }
     const framing=`card:${target.key}:${view.width}:${view.height}:${memory.zoom}`;
     if(view.objectActionFraming!==framing){
       view.objectActionFraming=framing;
       const [x,y]=projectTarget(target),art=view.markerNodes.get(target.key).querySelector('img').getBoundingClientRect();
       // Small screens place the card beside the target; tall phones can stack it.
-      const side=view.width<=620&&safeBottom-safeTop<height+art.height+gap*2;
+      const side=view.width<=620&&safeHeight<height+(landmark?objectSize:art.height)+gap*(landmark?1:2);
       const shortLandscape=view.width>420&&view.width<=620&&view.height<=360;
-      const desiredX=shortLandscape?48:side?Math.max(38,(view.width-width-gap)/2):view.width/2;
-      const desiredY=shortLandscape?safeBottom-4:side?(safeTop+safeBottom)/2+art.height*.2:Math.max(safeTop+art.height,(safeTop+safeBottom-height)/2);
+      const desiredX=landmark?(side?gap+objectSize/2:view.width/2):shortLandscape?48:side?Math.max(38,(view.width-width-gap)/2):view.width/2;
+      const desiredY=landmark?(side?(safeTop+safeBottom)/2:safeTop+objectSize/2+Math.max(0,(safeHeight-height-objectSize-gap)/2)):shortLandscape?safeBottom-4:side?(safeTop+safeBottom)/2+art.height*.2:Math.max(safeTop+art.height,(safeTop+safeBottom-height)/2);
       if(view.width<=620&&(Math.abs(x-desiredX)>1||Math.abs(y-desiredY)>1)){moveTo(memory.x+(x-desiredX)/scale(),memory.y+(y-desiredY)/scale());return;}
     }
     const marker=view.markerNodes.get(target.key),art=marker.querySelector('img').getBoundingClientRect(),tile=marker.getBoundingClientRect();
@@ -762,6 +768,7 @@ window.ConquerWorld = (() => {
     if(target.kind==='charms')menu.dataset.grade=['normal','epic','legendary'].includes(target.data.grade)?target.data.grade:'normal';else delete menu.dataset.grade;
     const encounter=['monsters','nodes'].includes(target.kind);menu.classList.toggle('is-encounter',encounter);
     if(encounter){menu.classList.remove('is-village');positionEncounterActions(menu,target);return;}
+    if(isLandmark(target)){positionEncounterActions(menu,target);return;}
     if(target.kind==='home'){positionOwnVillageActions(menu,target);return;}
     if(target.kind==='alliance_center'){positionAllianceCenterActions(menu,target);return;}
     if(target.kind==='charms'){positionObjectActions(menu,target);return;}
