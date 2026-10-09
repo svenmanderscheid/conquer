@@ -2874,7 +2874,7 @@ body.mobile-game #panel-dialog[data-panel="mastery"] .talent-tabs { background:v
 body.mobile-game #panel-dialog[data-panel="mastery"] .talent-tabs button:not(.is-active) { background:var(--ui-card)!important;color:var(--ui-ink)!important;border-color:var(--ui-line)!important; }
 body.mobile-game #panel-dialog[data-panel="mastery"] :is(.talent-footer,.talent-sheet-card>header,.talent-sheet .talent-rank-controls) { background:var(--ui-inset)!important;border-color:var(--ui-line)!important; }
 body.mobile-game #panel-dialog[data-panel="mastery"] .talent-sheet-card { background:var(--ui-card)!important;border-color:var(--ui-frame)!important; }
-body.mobile-game #panel-dialog[data-panel="mastery"] .lord-talents :is(.talent-progress h2,.talent-sheet h2,.talent-button) {
+body.mobile-game #panel-dialog[data-panel="mastery"] .lord-talents :is(.talent-progress h2,.talent-sheet h2,.talent-button:not(.talent-save)) {
   font-family:var(--ui-font)!important;
 }
 body.mobile-game #panel-dialog[data-panel="mastery"] .lord-talents :is(.talent-progress h2,.talent-sheet h2) {
@@ -5484,7 +5484,7 @@ body.mobile-game :is(#panel-dialog,#game-dialog,.map-overlay-panel) :is(
   .treasury-button.gold,.treasury-button.blue,.vip-button:where(:not(.secondary):not(.vip-tabs button)),
   .march-dispatch,.march-submit,.inventory-use-button,.levelup-primary,.training-submit,.training-speedup-open,
   .atlas-object-search-submit,.atlas-object-search-submit>span,
-  [data-action="inventory-use-all"],.trading-buy
+  [data-action="inventory-use-all"],.trading-buy,.talent-save
 ),body.welcome .welcome-form .button,body.play-login-page .play-submit {
   font-family:var(--ui-font-heading)!important;font-weight:400!important;font-synthesis:none;
 }
@@ -5498,6 +5498,7 @@ body.mobile-game :is(#panel-dialog,#game-dialog,.map-overlay-panel) :is(
 ):not(:disabled):not([aria-disabled="true"]):not(.danger):not(.march-attack):not(.trading-buy):not(.pays-gems):not(.hospital-crystals):not([data-action="inventory-use-all"]),
 body.mobile-game #panel-dialog[data-panel="army"]:not([data-hospital="true"]) .training-school :is(.training-submit,.training-speedup-open):not(:disabled),
 body.mobile-game #game-dialog .levelup-footer .levelup-primary:not(:disabled),
+body.mobile-game #panel-dialog[data-panel="mastery"] .talent-save:not(:disabled),
 body.mobile-game .world-chat .world-chat-compose button[type=submit]:not(:disabled),
 body.mobile-game .march-formation-dialog #march-formation-confirm:not(:disabled),
 body.mobile-game .march-time-dialog .march-time-ok:not(:disabled),
