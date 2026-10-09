@@ -10340,5 +10340,15 @@
   "troop.name.50300201": "Dusk Rider",
   "troop.name.50300301": "Night Lancer",
   "troop.name.50300401": "Shadow Knight",
-  "troop.name.50300501": "Eclipse Rider"
+  "troop.name.50300501": "Eclipse Rider",
+  "connection.saved": "Progress saved",
+  "connection.refreshing": "Updating your kingdom…",
+  "connection.offline": "You are offline. We will reconnect automatically.",
+  "connection.failed": "Connection interrupted. Retrying automatically.",
+  "connection.partial": "Some areas are unavailable. Retrying automatically.",
+  "connection.refresh": "Refresh game state",
+  "connection.wait_action": "Wait for your current action to be confirmed.",
+  "intro.next_goal": "Your next step",
+  "intro.open_step": "Open next step",
+  "intro.preview_only": "This opens the existing action screen. You review the cost and confirm the action yourself."
 }

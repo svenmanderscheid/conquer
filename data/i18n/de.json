@@ -10340,5 +10340,15 @@
   "troop.name.50300201": "Dämmerungsreiter",
   "troop.name.50300301": "Nachtlanzer",
   "troop.name.50300401": "Schattenritter",
-  "troop.name.50300501": "Finsternisreiter"
+  "troop.name.50300501": "Finsternisreiter",
+  "connection.saved": "Fortschritt gespeichert",
+  "connection.refreshing": "Dein Königreich wird aktualisiert …",
+  "connection.offline": "Du bist offline. Wir verbinden dich automatisch wieder.",
+  "connection.failed": "Verbindung unterbrochen. Neuer Versuch erfolgt automatisch.",
+  "connection.partial": "Ein Spielbereich ist nicht erreichbar. Wir versuchen es erneut.",
+  "connection.refresh": "Spielstand aktualisieren",
+  "connection.wait_action": "Warte, bis dein laufender Auftrag bestätigt wurde.",
+  "intro.next_goal": "Dein nächster Schritt",
+  "intro.open_step": "Nächsten Schritt öffnen",
+  "intro.preview_only": "Du öffnest die vorhandene Aktionsansicht. Kosten prüfen und die Aktion bestätigen kannst du dort selbst."
 }

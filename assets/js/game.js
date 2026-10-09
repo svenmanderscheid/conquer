@@ -7,6 +7,13 @@
     const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const i18n=window.ConquerLocale;
     const t=(key,parameters={})=>i18n?.t(key,parameters)??key;
+    function connectionStatus(kind) {
+        if(navigator.onLine===false)kind='offline';
+        const element=$('#save-state');
+        element.textContent=t('connection.'+kind);
+        element.dataset.connection=kind;
+        element.classList.toggle('error',['offline','failed','partial'].includes(kind));
+    }
     const fmt = n => i18n?.formatNumber(Math.floor(Number(n)||0))??String(Math.floor(Number(n)||0));
     const date = value => { if (!value) return Date.now(); const raw=String(value).replace(' ','T'); return Date.parse(/[zZ]|[+-]\d\d:\d\d$/.test(raw)?raw:raw+'Z'); };
     const duration = n => i18n?.formatDuration(n)??String(Math.max(0,Math.ceil(Number(n)||0)));
@@ -61,7 +68,7 @@
     };
     let state, kingdom, expeditions, market, allianceRallies=[], publicMarches=[], current = Object.hasOwn(navs, location.hash.slice(1)) ? location.hash.slice(1) : 'city', filter = 'monsters', busy = false, polling = null, offset = 0, toastTimer, lastSignature = '', dialogTrigger=null, teleportSelection=null;
     const loadErrors = {};
-    let apiRetryAt=0;
+    let apiRetryAt=0,appLifecycle=null;
     let rallyRequestSequence=0,rallyAppliedSequence=0,rallyDataScope='';
     let dialogVersion=0;
     const viewPositions=new Map();
@@ -137,6 +144,7 @@
         if (polling) return polling;
         polling = (async()=>{
             try {
+                if(!state||$('#save-state').classList.contains('error'))connectionStatus('refreshing');
                 const center=playfield==='world'?window.ConquerWorld.getCenter():null,returnSince=comfort.since();
                 const query=new URLSearchParams(center?{map_x:center.x,map_y:center.y,map_radius:center.radius||30}:{});
                 if(returnSince)query.set('return_since',returnSince);
@@ -152,14 +160,13 @@
                 if(results[4]?.status==='fulfilled'&&acceptRallies(results[4].value,rallyRequest)&&results[1]?.status==='fulfilled')sound?.observeRallies?.(allianceRallies,{playerId:state.player?.id||state.city?.player_id,worldId:state.city?.world_id,allianceId:kingdom?.alliance?.id||0,serverTime:now()/1000});
                 if(results[5]?.status==='fulfilled')publicMarches=results[5].value?.marches||[];
                 state.public_marches=publicMarches;
-                $('#save-state').textContent=Object.keys(loadErrors).length?'Ein Bereich ist derzeit nicht erreichbar':'Fortschritt gespeichert';
-                $('#save-state').classList.toggle('error',Object.keys(loadErrors).length>0);
+                connectionStatus(Object.keys(loadErrors).length?'partial':'saved');
                 document.body.classList.toggle('reduced-motion',Boolean(kingdom?.settings?.reduced_motion));
                 renderHud();
                 syncCityReadiness();
                 mailboxPanel.refresh();
                 const signature=JSON.stringify([state.buildings,state.troops,state.build_queue,state.troop_queue,state.research,state.research_queue,state.research_duration_factor,state.research_defs.map(n=>canAfford(n.levels.find(l=>l.level===Number(state.research[n.code]||0)+1)?.resources||{})),state.marches,state.public_marches,state.reports,state.monsters,state.charms,state.nodes,state.players,state.congress,state.shrines,state.land_progression,state.territory,state.world?.map_profile,state.map_center,kingdom?.profile,kingdom?.march_skins,kingdom?.name_frames,kingdom?.theme_bundles,kingdom?.skin_bundles,kingdom?.alliance,kingdom?.inventory,kingdom?.quests,kingdom?.quest_activity,kingdom?.welcome_event,kingdom?.hospital,kingdom?.treasures,[kingdom?.trading?.rotation,kingdom?.trading?.offers,kingdom?.trading?.vip],[kingdom?.chests?.free_silver_remaining,kingdom?.chests?.free_silver_available,kingdom?.chests?.free_gold_available],kingdom?.rankings,kingdom?.arena,expeditions?.expeditions,market]);
-                const editing=current!=='world'&&($('#content').dataset.dirty==='true'||($('#content').contains(document.activeElement)&&document.activeElement.matches('input,textarea,select')));
+                const editing=current!=='world'&&([playfieldHost,panelHost].some(host=>host.dataset.dirty==='true'||(host.contains(document.activeElement)&&document.activeElement.matches('input,textarea,select'))));
                 if(renderPage&&!editing&&!$('#game-dialog').open&&signature!==lastSignature){render();lastSignature=signature;}
                 panels.updateHospital();
                 trainingPanel.update();
@@ -175,7 +182,7 @@
             } catch(e) {
                 console.warn('Game refresh failed:',e);
                 if(!state)window.ConquerStartup?.fail();
-                $('#save-state').textContent='Verbindung unterbrochen';$('#save-state').classList.add('error');
+                connectionStatus('failed');
                 if(!state)$('#content').innerHTML=`<div class="empty"><span class="empty-icon">♜</span><h3>Dein Reich ist kurz außer Reichweite.</h3><p>${esc(e.message)}</p><button class="button" data-action="retry">Erneut versuchen</button></div>`;
                 return false;
             }
@@ -597,6 +604,7 @@
         $('#dialog-content .menu-groups>section:last-child .menu-grid').insertAdjacentHTML('afterbegin',`<button class="menu-link" data-action="guide-intro-replay">${svg('help')}<span>${esc(t('intro.replay'))}</span></button>`);
         $('#dialog-content .menu-grid').insertAdjacentHTML('beforeend',`<button class="menu-link" data-action="vip-open"><span class="nav-emblem"><img class="nav-art" src="${base}/assets/art/ui-hud/vip.svg" alt=""></span><span>VIP</span></button>`);
         $('#game-dialog').classList.add('menu-dialog');
+        $('#dialog-content .menu-grid')?.insertAdjacentHTML('beforeend',`<button type="button" class="menu-link" data-action="connection-refresh">${svg('world')}<span>${esc(t('connection.refresh'))}</span></button>`);
     }
     function shopDialog() {
         tradingPanel.selectTab('merchant');
@@ -683,7 +691,7 @@
     const progressionPanel=window.ConquerProgression(featureContext);
     const worldPanel=window.ConquerWorldPanel(featureContext);
     const landPanel=window.ConquerLand(featureContext);
-    const beginnerGuide=window.ConquerBeginnerGuide({...featureContext,getHost:()=>panelHost,labels,buildingImage,buildingDialog,buildingFunction,openCommunity:tab=>communityPanel.onClick('community-open',{dataset:{action:'community-open',id:tab}})});
+    const beginnerGuide=window.ConquerBeginnerGuide({...featureContext,getHost:()=>panelHost,labels,buildingImage,buildingDialog,buildingFunction,closeIntro:()=>$('#game-dialog').close(),openCommunity:tab=>communityPanel.onClick('community-open',{dataset:{action:'community-open',id:tab}})});
     const comfort=window.ConquerGameComfort({...featureContext,labels,nextGoal:()=>beginnerGuide.nextGoal(),openGoal:()=>beginnerGuide.openNextGoal()});
     document.addEventListener('click',event=>{if(event.target.closest('[data-action="show-goal-hint"]')){comfort.showGoal();toast('Der Zielhinweis ist wieder eingeblendet.');}});
     const bugReports=window.ConquerBugReports(featureContext);
@@ -703,6 +711,12 @@
         if(act==='teleport-confirm'&&teleportSelection){const selection=teleportSelection;(async()=>{const result=await action('kingdom/action',{action:'inventory.use',item_code:selection.item_code,target_x:Number(b.dataset.x),target_y:Number(b.dataset.y)});if(result){teleportSelection=null;renderWorld();}})();return;}
         if(act==='structure-confirm'&&teleportSelection?.kind==='alliance-structure'){const selection=teleportSelection,x=Number(b.dataset.x),y=Number(b.dataset.y);(async()=>{const result=await communityPanel.placeStructure(selection.structure_type,x,y);if(result){teleportSelection=null;renderWorld();window.ConquerWorld.locate(x,y,[selection.structure_type==='center'?'alliance_center':'outpost'],result.id);}})();return;}
         if(act==='alliance-center-garrison'){const target=state.alliance_structures?.find(entry=>Number(entry.id)===Number(b.dataset.id));if(target?.can_garrison)marchPanel.open(target.id,'alliance-center-garrison',{target});return;}
+        if(act==='connection-refresh'){
+            $('#game-dialog').close();
+            if(busy){toast(t('connection.wait_action'));return;}
+            if(navigator.onLine===false){connectionStatus('offline');toast(t('connection.offline'));return;}
+            connectionStatus('refreshing');return refresh();
+        }
         if(act==='retry') return refresh(); if(!state)return;
         if(act==='city-ready'){openCityNotice(id);return;}
         if(act==='close-dialog'){$('#game-dialog').close();return;}
@@ -777,8 +791,11 @@
     window.addEventListener('resize',()=>{panelNeedsResize=true;resizePanel();});
     panelHost.addEventListener('focusout',resizePanel);
     $('#game-dialog').addEventListener('close',resizePanel);
-    setInterval(()=>{if(document.hidden)return;updateExtraEvent();rallyPanel.updateTime();marchPanel.update();queueSpeedups.update();activeEffects.update();treasurePanel.updateTime();tradingPanel.updateTime();panels.updateHospitalTime();document.querySelectorAll('[data-end]').forEach(el=>{const text=duration((date(el.dataset.end)-now())/1000);if(el.textContent!==text)el.textContent=text;});},1000);
-    window.ConquerPolling({delay:()=>Math.max(apiRetryAt-Date.now(),current==='world'||state?.marches?.length||state?.build_queue?.length||state?.troop_queue?.length||state?.research_queue?.length?5000:15000),refresh:async()=>{
+    setInterval(()=>{if(document.hidden||appLifecycle?.isActive()===false)return;updateExtraEvent();rallyPanel.updateTime();marchPanel.update();queueSpeedups.update();activeEffects.update();treasurePanel.updateTime();tradingPanel.updateTime();panels.updateHospitalTime();document.querySelectorAll('[data-end]').forEach(el=>{const text=duration((date(el.dataset.end)-now())/1000);if(el.textContent!==text)el.textContent=text;});},1000);
+    appLifecycle=window.ConquerPolling({onAvailabilityChange:({active,online})=>{
+        if(!active){comfort.pause();return;}
+        connectionStatus(online?'refreshing':'offline');
+    },delay:()=>Math.max(apiRetryAt-Date.now(),current==='world'||state?.marches?.length||state?.build_queue?.length||state?.troop_queue?.length||state?.research_queue?.length?5000:15000),refresh:async()=>{
         if(busy) return;
         const dialog=$('#game-dialog');
         if(!dialog.open) { await refresh(); return; }

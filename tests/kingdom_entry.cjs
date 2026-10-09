@@ -37,13 +37,14 @@ function startup({game=true,reduced=false,readyState='loading'}={}) {
 }
 function intro({stored=new Map(),storageBlocked=false,loading=false,advanced=false}={}) {
     const window=new EventTarget();let html='',open=false,opens=0,focused=0;
-    const location={hash:'#city'},state={city:{player_id:1},buildings:{castle:{level:advanced?2:1}},trained_total:0,research:{}},routes=[];
+    const location={hash:'#city'},state={city:{player_id:1,world_id:1,food:100},world:{status:'running'},buildings:{castle:{level:advanced?2:1,cost:{food:0},requirements:{},item_requirements:[]}},trained_total:0,research:{}},routes=[],previews=[];
     const document={querySelector(selector){if(selector==='dialog[open]')return open?{}:null;if(selector==='#game-dialog[open] .kingdom-intro')return open&&html.includes('kingdom-intro')?{}:null;return null;},getElementById(id){return id==='app-start'?(loading?{}:null):id==='kingdom-intro-heading'?{focus(){focused++;}}:null;}};
     window.ConquerLocale={t,text:String};
     const localStorage={getItem(k){if(storageBlocked)throw Error('blocked');return stored.get(k)||null;},setItem(k,v){if(storageBlocked)throw Error('blocked');stored.set(k,v);}};
-    vm.runInNewContext(fs.readFileSync(path.join(root,'assets/js/beginner-guide.js'),'utf8'),{window,document,localStorage,location});
-    const guide=window.ConquerBeginnerGuide({base:'/conquer',esc:String,fmt:String,getState:()=>state,getKingdom:()=>null,getHost:()=>({querySelector:()=>null}),navigate(id,options={}){routes.push(id);location.hash='#'+id;open=false;options.afterCommit?.();},openDialog(value){html=value;open=true;opens++;},buildingDialog(){throw Error('Intro must not trigger a building action');},buildingFunction(){throw Error('Intro must not trigger training');},labels:{},buildingImage:()=>''});
-    return {guide,state,stored,routes,location,get html(){return html;},get opens(){return opens;},get focused(){return focused;},close(){open=false;},loaded(){loading=false;window.dispatchEvent(new Event('conquer:startup-complete'));},click(action){guide.onClick(action,{dataset:{}});}};
+    vm.runInNewContext(fs.readFileSync(path.join(root,'assets/js/beginner-guide.js'),'utf8'),{window,document,localStorage,location,requestAnimationFrame:fn=>fn()});
+    const host={querySelector:()=>null,querySelectorAll:()=>[]};
+    const guide=window.ConquerBeginnerGuide({base:'/conquer',esc:String,fmt:String,getState:()=>state,getKingdom:()=>null,getHost:()=>host,navigate(id,options={}){routes.push(id);location.hash='#'+id;open=false;options.afterCommit?.();},openDialog(value){html=value;open=true;opens++;},closeIntro(){open=false;},buildingDialog(id){previews.push(['building',id]);},buildingFunction(id){previews.push(['training',id]);},labels:{},buildingImage:()=>''});
+    return {guide,state,stored,routes,previews,location,get html(){return html;},get opens(){return opens;},get focused(){return focused;},close(){open=false;},loaded(){loading=false;window.dispatchEvent(new Event('conquer:startup-complete'));},click(action){guide.onClick(action,{dataset:{}});}};
 }
 {
     const h=intro({loading:true});h.guide.maybeWelcome('city');h.guide.maybeWelcome('city');assert.equal(h.opens,0,'modal never covers true startup progress');
@@ -52,10 +53,22 @@ function intro({stored=new Map(),storageBlocked=false,loading=false,advanced=fal
     h.click('guide-intro-back');assert(h.html.includes(catalog['intro.welcome.title']));
     h.click('guide-intro-next');h.click('guide-intro-next');assert(h.html.includes(catalog['intro.quests.title']));
     h.click('guide-intro-next');assert(h.html.includes('data-action="guide-open"'));assert.deepEqual(h.routes,[],'reading does not navigate or execute gameplay');
+    assert.deepEqual(h.previews,[],'reading never opens an action preview');
     h.click('guide-open');assert.deepEqual(h.routes,['help']);h.guide.maybeWelcome('city');assert.equal(h.opens,6,'completed introduction does not reopen');
     const again=intro({stored:h.stored});again.guide.maybeWelcome('city');assert.equal(again.opens,0,'welcome marker survives reload');
     h.click('guide-intro-replay');assert.deepEqual(h.routes,['help','city']);assert(h.html.includes(catalog['intro.welcome.title']),'replay starts over actual city');
     h.close();h.state.city.player_id=2;h.guide.maybeWelcome('city');assert.equal(h.opens,8,'another player has an independent welcome');
+}
+{
+    const h=intro();h.guide.maybeWelcome('city');for(let step=0;step<3;step++)h.click('guide-intro-next');
+    assert(h.html.includes(catalog['intro.next_goal'])&&h.html.includes('data-action="guide-intro-start"'),'final scene offers a concrete current goal');
+    h.click('guide-intro-start');assert.deepEqual(h.previews,[['building','castle']],'explicit handoff opens the existing preview');
+    assert.equal(h.state.buildings.castle.level,1,'opening a preview does not upgrade');
+    h.click('guide-intro-start');assert.equal(h.previews.length,1,'stale handoff cannot reopen a dismissed intro');
+}
+{
+    const h=intro();h.guide.maybeWelcome('city');for(let step=0;step<3;step++)h.click('guide-intro-next');
+    h.state.world.status='paused';h.click('guide-intro-start');assert.deepEqual(h.previews,[],'handoff rechecks a paused world');assert.deepEqual(h.routes,['help'],'a waiting goal opens the guide');
 }
 {
     const h=intro({advanced:true});h.guide.maybeWelcome('city');assert.equal(h.opens,0,'established players are not interrupted');

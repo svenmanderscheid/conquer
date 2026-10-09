@@ -204,6 +204,14 @@ window.ConquerBeginnerGuide = function(ctx) {
             if(document.querySelector('#game-dialog[open] .kingdom-intro'))showIntro(introStep+(act==='guide-intro-next'?1:-1));
             return true;
         }
+        if(act==='guide-intro-start'){
+            if(!document.querySelector('#game-dialog[open] .kingdom-intro'))return true;
+            // Re-evaluate at the tap: a queue, resource balance or world may have changed.
+            const goal=nextGoal();
+            if(goal){ctx.closeIntro?.();onClick(goal.action[1],{dataset:{id:goal.action[2]}});}
+            else {section='start';navigate('help');}
+            return true;
+        }
         if(act==='guide-open'){section='start';navigate('help');}
         if(act==='guide-tab'&&Object.hasOwn(tabs,id)){section=id;if(!host().querySelector('.beginner-guide'))navigate('help');redraw(`[data-action="guide-tab"][data-id="${id}"]`);}
         if(act==='guide-filter'&&Object.hasOwn(groups,id)){group=id;redraw(`[data-action="guide-filter"][data-id="${id}"]`);}
@@ -223,12 +231,13 @@ window.ConquerBeginnerGuide = function(ctx) {
     function showIntro(step) {
         introStep=Math.max(0,Math.min(introScenes.length-1,step));
         const scene=introScenes[introStep],last=introStep===introScenes.length-1;
+        const next=last?nextGoal():null;
         welcomed=true;saved.welcomed=true;save();
         openDialog(`<h2>${esc(introText('title'))}</h2><div class="guide-welcome kingdom-intro">
             <div class="kingdom-intro-portrait" aria-hidden="true"><img src="${base}/assets/art/characters/tier-colors-v1/infantry-t4-ui.webp" alt="" width="768" height="768"></div>
             <section class="kingdom-intro-dialogue"><header><span>${esc(introText('adviser'))}</span><span class="kingdom-intro-count">${esc(introText('step',{current:introStep+1,total:introScenes.length}))}</span></header>
-            <div class="kingdom-intro-copy"><h3 tabindex="-1" id="kingdom-intro-heading">${esc(introText(scene+'.title'))}</h3><p>${esc(introText(scene+'.text'))}</p></div>
-            <footer class="kingdom-intro-actions">${button(introText('skip'),'close-dialog')}${introStep?button(introText('back'),'guide-intro-back'):''}${button(introText(last?'begin':'next'),last?'guide-open':'guide-intro-next','',true)}</footer></section></div>`,{focusHeading:true});
+            <div class="kingdom-intro-copy"><h3 tabindex="-1" id="kingdom-intro-heading">${esc(introText(scene+'.title'))}</h3><p>${esc(introText(scene+'.text'))}</p>${next?`<section class="kingdom-intro-next"><strong>${esc(introText('next_goal'))}</strong><h4>${esc(local(next.title))}</h4><p>${esc(local(next.ready===false?next.reason:next.text))}</p><small>${esc(introText('preview_only'))}</small></section>`:''}</div>
+            <footer class="kingdom-intro-actions">${button(introText(last&&next?'begin':'skip'),last&&next?'guide-open':'close-dialog')}${introStep?button(introText('back'),'guide-intro-back'):''}${button(introText(last?(next?'open_step':'begin'):'next'),last?(next?'guide-intro-start':'guide-open'):'guide-intro-next','',true)}</footer></section></div>`,{focusHeading:true});
         document.getElementById('kingdom-intro-heading')?.focus({preventScroll:true});
     }
     function maybeWelcome(current) {

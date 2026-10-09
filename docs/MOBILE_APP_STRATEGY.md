@@ -14,6 +14,20 @@ Am 1. Oktober wurden Android Studio, Java 21 und das Android SDK installiert. De
 
 ## Anforderungen während der laufenden Entwicklung
 
+### Lokales Komfortpaket vom 9. Oktober 2026
+
+`assets/js/app-polling.js` ergänzt die vorhandenen Browserereignisse um `appStateChange` des bereits eingebundenen Capacitor-App-Moduls. Ein nativer Hintergrundzustand pausiert Spielstandsabrufe auch bei weiterhin sichtbarer WebView; die Rückkehr liest den Zustand sofort neu. Gleichzeitige Rückkehrereignisse erzeugen keine parallelen Spielstandsabrufe. Bei fehlender nativer Schnittstelle bleiben die Browserereignisse wirksam; nur der eigene native Listener wird beim Stoppen entfernt. Der gemeinsame Sekundentimer pausiert ebenfalls. Die Rückkehrübersicht sichert beim nativen Pausieren ihren bisherigen Besuchszeitpunkt.
+
+Der bestehende Verbindungshinweis unterscheidet Offlinezustand, erneuten Abruf, Serverfehler und unvollständig geladene Teilbereiche. „Refresh game state“ im Spielmenü liest den Zustand ausdrücklich neu; diese Aktion führt keine ausstehenden Spielaufträge erneut aus. Die vorhandenen Auftragsbelege und ihre ausdrückliche Wiederholung bleiben der Weg für eine fehlende Aktionsantwort. Aktualisierungen erhalten fokussierte Eingabefelder auch in `#panel-content`.
+
+Die letzte Beraterszene bietet den aktuellen nächsten Einsteigerschritt als ausdrücklichen Einstieg in die bestehende Aktionsansicht an; siehe [BEGINNER_GUIDE.md](BEGINNER_GUIDE.md). Neue Texte sind im gemeinsamen Sprachsystem vollständig in EN/DE/FR vorhanden. Das Paket benötigt kein neues Plugin, keine Servermigration und keinen App-Build. Am 9. Oktober hat der Nutzer Commit und Push für die Handyprüfung beauftragt; die vorhandene App lädt die veröffentlichten Web-Dateien vom Spielserver.
+
+Prüfungen: `tests/app_polling.cjs` (einschließlich nativer Hintergrundzustände, konkurrierender Rückkehrereignisse und Listener-Cleanup), `tests/kingdom_entry.cjs`, `tests/beginner_journey_selection.cjs` und `tests/mobile_comfort_app.cjs`. Die Haupt-App-Prüfung verwendet eine Wegwerf-Datenbank, synthetische gelesene Spielstände und einen simulierten Capacitor-Listener. Sie prüft fünf Bildschirmformate, echte Einsteiger-Navigation, erhaltene Eingaben bei geändertem Serverzustand, Offline-/Serverausfall und manuelle Wiederverbindung ohne schreibende API-Anfragen. Aufnahmen und Bericht: `output/playwright/mobile-comfort-20261009/`. Die bestehende Rückkehr-/Auftragskomfortprüfung `tests/game_comfort_app.cjs` bestand ebenfalls in fünf Bildschirmformaten. Eine echte Android-/iOS-Geräteabnahme wird durch diese Browserprüfungen nicht bestätigt.
+
+Der allgemeine Prüflauf `tests/localization.php` scheitert bereits im unveränderten Arbeitsstand an Katalogparität: FR fehlen gegenüber DE 240 vorhandene Talent-Schlüssel; EN enthält 45 zusätzliche vorhandene Rechtstext-Schlüssel. Die zehn neuen Schlüssel wurden separat auf vollständige EN/DE/FR-Texte, identische Platzhalter und unveränderte bestehende Übersetzungen geprüft. Diese bestehenden Unterschiede wurden nicht durch Kopieren deutscher Texte in andere Sprachen kaschiert.
+
+Die abschließende Haupt-App-Prüfung bestand 15 Darstellungsfälle: Berater, Spielmenü und Verbindungshinweis jeweils bei 1280 × 800, 390 × 844, 320 × 568, 844 × 390 und 568 × 320. Der Verbindungshinweis hält die tatsächlich sichtbaren HUD-Aktionen frei, einschließlich der zweispaltigen Werkzeuge auf schmalen Handys. Die Aufnahmen wurden visuell geprüft; es gab keine JavaScript-Seitenfehler oder schreibenden Spielanfragen im neuen Prüflauf. Die bestehende `tests/beginner_guide_app.cjs` bestand anschließend ihre fünf Formate einschließlich aller Gebäude, Kapitel, Wiederaufnahme und Zurück-Navigation.
+
 ### Oberfläche und Eingabe
 
 - Vollständige Touch-Bedienung ohne Abhängigkeit von Hover, Rechtsklick oder Tastatur.

@@ -10100,5 +10100,15 @@
   "troop.name.50300201": "Cavalier du crépuscule",
   "troop.name.50300301": "Lancier de la nuit",
   "troop.name.50300401": "Chevalier de l’ombre",
-  "troop.name.50300501": "Cavalier de l’éclipse"
+  "troop.name.50300501": "Cavalier de l’éclipse",
+  "connection.saved": "Progression enregistrée",
+  "connection.refreshing": "Actualisation de votre royaume…",
+  "connection.offline": "Vous êtes hors ligne. Reconnexion automatique dès que possible.",
+  "connection.failed": "Connexion interrompue. Nouvel essai automatique.",
+  "connection.partial": "Certaines parties du jeu sont indisponibles. Nouvel essai automatique.",
+  "connection.refresh": "Actualiser le jeu",
+  "connection.wait_action": "Attendez la confirmation de votre action en cours.",
+  "intro.next_goal": "Votre prochaine étape",
+  "intro.open_step": "Ouvrir la prochaine étape",
+  "intro.preview_only": "L’écran de l’action s’ouvre. Vous y vérifiez le coût et confirmez vous-même l’action."
 }
