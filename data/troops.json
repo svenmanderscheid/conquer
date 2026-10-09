@@ -4,7 +4,7 @@
   "reference": "data/balance-source/troop.json; original values, adjusted training times (2026-09-29).",
   "troops": [
     {
-      "name": "Fighter",
+      "name": "Village Guard",
       "type": 1,
       "hp": 130,
       "attack": 45,
@@ -16,7 +16,7 @@
       "code": 50100101,
       "source_code": 50100101,
       "tier": 1,
-      "name_de": "Schwertkämpfer",
+      "name_de": "Dorfgarde",
       "march_speed": 65,
       "time": 3,
       "source_time": 3,
@@ -30,7 +30,7 @@
       "need_gold": 15
     },
     {
-      "name": "Warrior",
+      "name": "Shield Guard",
       "type": 1,
       "hp": 150,
       "attack": 55,
@@ -42,7 +42,7 @@
       "code": 50100201,
       "source_code": 50100102,
       "tier": 2,
-      "name_de": "Krieger",
+      "name_de": "Schildwache",
       "march_speed": 65,
       "time": 5,
       "source_time": 6,
@@ -56,7 +56,7 @@
       "need_gold": 30
     },
     {
-      "name": "Knight",
+      "name": "Iron Sentinel",
       "type": 1,
       "hp": 190,
       "attack": 65,
@@ -68,7 +68,7 @@
       "code": 50100301,
       "source_code": 50100103,
       "tier": 3,
-      "name_de": "Ritter",
+      "name_de": "Eisenwächter",
       "march_speed": 70,
       "time": 9,
       "source_time": 12,
@@ -82,7 +82,7 @@
       "need_gold": 45
     },
     {
-      "name": "Guardian",
+      "name": "Royal Guardian",
       "type": 1,
       "hp": 220,
       "attack": 92,
@@ -94,7 +94,7 @@
       "code": 50100401,
       "source_code": 50100104,
       "tier": 4,
-      "name_de": "Wächter",
+      "name_de": "Königsgarde",
       "march_speed": 70,
       "time": 16,
       "source_time": 24,
@@ -108,7 +108,7 @@
       "need_gold": 90
     },
     {
-      "name": "Crusader",
+      "name": "Crown Warden",
       "type": 1,
       "hp": 300,
       "attack": 126,
@@ -120,7 +120,7 @@
       "code": 50100501,
       "source_code": 50100105,
       "tier": 5,
-      "name_de": "Kreuzritter",
+      "name_de": "Kronenhüter",
       "march_speed": 75,
       "time": 27,
       "source_time": 48,
@@ -134,7 +134,7 @@
       "need_gold": 180
     },
     {
-      "name": "Hunter",
+      "name": "Bow Recruit",
       "type": 2,
       "hp": 115,
       "attack": 57,
@@ -146,7 +146,7 @@
       "code": 50200101,
       "source_code": 50100201,
       "tier": 1,
-      "name_de": "Bogenschützen",
+      "name_de": "Bogenrekrut",
       "march_speed": 75,
       "time": 3,
       "source_time": 3,
@@ -160,7 +160,7 @@
       "need_gold": 15
     },
     {
-      "name": "Longbow Man",
+      "name": "Scout Archer",
       "type": 2,
       "hp": 135,
       "attack": 67,
@@ -172,7 +172,7 @@
       "code": 50200201,
       "source_code": 50100202,
       "tier": 2,
-      "name_de": "Langbogenschützen",
+      "name_de": "Spähschütze",
       "march_speed": 75,
       "time": 5,
       "source_time": 6,
@@ -186,7 +186,7 @@
       "need_gold": 30
     },
     {
-      "name": "Ranger",
+      "name": "Ember Archer",
       "type": 2,
       "hp": 160,
       "attack": 89,
@@ -198,7 +198,7 @@
       "code": 50200301,
       "source_code": 50100203,
       "tier": 3,
-      "name_de": "Waldläufer",
+      "name_de": "Glutschütze",
       "march_speed": 80,
       "time": 9,
       "source_time": 12,
@@ -212,7 +212,7 @@
       "need_gold": 45
     },
     {
-      "name": "Veteran Archers",
+      "name": "Flame Ranger",
       "type": 2,
       "hp": 200,
       "attack": 119,
@@ -224,7 +224,7 @@
       "code": 50200401,
       "source_code": 50100204,
       "tier": 4,
-      "name_de": "Veteranenbogenschützen",
+      "name_de": "Flammenwaldläufer",
       "march_speed": 80,
       "time": 16,
       "source_time": 24,
@@ -238,7 +238,7 @@
       "need_gold": 90
     },
     {
-      "name": "Sniper",
+      "name": "Phoenix Ranger",
       "type": 2,
       "hp": 255,
       "attack": 169,
@@ -250,7 +250,7 @@
       "code": 50200501,
       "source_code": 50100205,
       "tier": 5,
-      "name_de": "Scharfschützen",
+      "name_de": "Phönixwaldläufer",
       "march_speed": 85,
       "time": 27,
       "source_time": 48,
@@ -264,7 +264,7 @@
       "need_gold": 180
     },
     {
-      "name": "Stableman",
+      "name": "Mounted Scout",
       "type": 3,
       "hp": 120,
       "attack": 54,
@@ -276,7 +276,7 @@
       "code": 50300101,
       "source_code": 50100301,
       "tier": 1,
-      "name_de": "Reiter",
+      "name_de": "Berittener Späher",
       "march_speed": 95,
       "time": 3,
       "source_time": 3,
@@ -290,7 +290,7 @@
       "need_gold": 15
     },
     {
-      "name": "Horseman",
+      "name": "Dusk Rider",
       "type": 3,
       "hp": 140,
       "attack": 64,
@@ -302,7 +302,7 @@
       "code": 50300201,
       "source_code": 50100302,
       "tier": 2,
-      "name_de": "Berittene Krieger",
+      "name_de": "Dämmerungsreiter",
       "march_speed": 95,
       "time": 5,
       "source_time": 6,
@@ -316,7 +316,7 @@
       "need_gold": 30
     },
     {
-      "name": "Heavy Cavalry",
+      "name": "Night Lancer",
       "type": 3,
       "hp": 170,
       "attack": 83,
@@ -328,7 +328,7 @@
       "code": 50300301,
       "source_code": 50100303,
       "tier": 3,
-      "name_de": "Schwere Kavallerie",
+      "name_de": "Nachtlanzer",
       "march_speed": 105,
       "time": 9,
       "source_time": 12,
@@ -342,7 +342,7 @@
       "need_gold": 45
     },
     {
-      "name": "Iron Cavalry",
+      "name": "Shadow Knight",
       "type": 3,
       "hp": 200,
       "attack": 113,
@@ -354,7 +354,7 @@
       "code": 50300401,
       "source_code": 50100304,
       "tier": 4,
-      "name_de": "Eiserne Kavallerie",
+      "name_de": "Schattenritter",
       "march_speed": 105,
       "time": 16,
       "source_time": 24,
@@ -368,7 +368,7 @@
       "need_gold": 90
     },
     {
-      "name": "Dragoon",
+      "name": "Eclipse Rider",
       "type": 3,
       "hp": 270,
       "attack": 158,
@@ -380,7 +380,7 @@
       "code": 50300501,
       "source_code": 50100305,
       "tier": 5,
-      "name_de": "Dragoner",
+      "name_de": "Finsternisreiter",
       "march_speed": 110,
       "time": 27,
       "source_time": 48,

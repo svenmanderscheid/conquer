@@ -628,5 +628,20 @@
   "admin.world_delete.pending_purchase": "An dëser Welt gëtt et en net ofgeschlossene Kaf. Klär oppen oder scho bezuelte Kafvirgäng virum Läschen.",
   "admin.world_delete.migration_required": "Installéier d’Datebankmigratioun 0137, ier s du eng Welt mat Kafbeleeger läschs.",
   "admin.world_delete.dependency_error": "D’Ofhängegkeete vun de Weltdonnéeë konnten net opgeléist ginn. Näischt gouf gespäichert.",
-  "admin.world_delete.storage_error": "All Welttabelle musse virum Läschen transaktionale Späicher benotzen. Näischt gouf gespäichert."
+  "admin.world_delete.storage_error": "All Welttabelle musse virum Läschen transaktionale Späicher benotzen. Näischt gouf gespäichert.",
+  "troop.name.50100101": "Duerfgarde",
+  "troop.name.50100201": "Schëldwaach",
+  "troop.name.50100301": "Eisewiechter",
+  "troop.name.50100401": "Kinnekegarde",
+  "troop.name.50100501": "Krounewiechter",
+  "troop.name.50200101": "Bourekrut",
+  "troop.name.50200201": "Spéi-Bouschützer",
+  "troop.name.50200301": "Glouschützer",
+  "troop.name.50200401": "Flamebëschleefer",
+  "troop.name.50200501": "Phoenixbëschleefer",
+  "troop.name.50300101": "Beriddene Spéier",
+  "troop.name.50300201": "Dämmerungsreider",
+  "troop.name.50300301": "Nuetslanzer",
+  "troop.name.50300401": "Schietritter",
+  "troop.name.50300501": "Däischterreider"
 }

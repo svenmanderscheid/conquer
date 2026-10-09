@@ -19,7 +19,7 @@
         research_speed:'Wissensdurst', construction_speed:'Flotte Baumeister', production_resource_protect:'Geschützte Vorräte', resource_protect:'Strategischer Vorratsschutz',
         troops_storage:'Traglast der Armee', march_size:'Größere Marschverbände', march_limit:'Zusätzlicher Marschplatz', hospital_capacity:'Größeres Hospital', healing_time_reduced:'Schnellere Heilung', rally_attack_amount:'Größere Sammelangriffe',
         resource_production:'Reichsweite Produktion', resource_capacity:'Reichsweite Lagerung', troop_speed_when_participating_a_rally:'Tempo im Sammelangriff',
-        warrior:'Krieger', longbow_man:'Langbogenschützen', horseman:'Reiter', knight:'Ritter', ranger:'Waldläufer', heavy_cavalry:'Schwere Kavallerie', guardian:'Wächter', crossbow_man:'Veteranenbogenschützen', iron_cavalry:'Eiserne Kavallerie', crusader:'Kreuzritter', sniper:'Scharfschützen', dragoon:'Dragoner'
+        warrior:'Schildwache', longbow_man:'Spähschütze', horseman:'Dämmerungsreiter', knight:'Eisenwächter', ranger:'Glutschütze', heavy_cavalry:'Nachtlanzer', guardian:'Königsgarde', crossbow_man:'Flammenwaldläufer', iron_cavalry:'Schattenritter', crusader:'Kronenhüter', sniper:'Phönixwaldläufer', dragoon:'Finsternisreiter'
     };
     const paths = {
         book:'M3 4h7l2 2 2-2h7v15h-7l-2 2-2-2H3V4Zm9 2v15M6 8h3m-3 4h3m6-4h3m-3 4h3',

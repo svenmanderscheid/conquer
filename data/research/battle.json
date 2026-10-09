@@ -1635,7 +1635,7 @@
     },
     {
       "code": "warrior",
-      "name": "Warrior",
+      "name": "Shield Guard",
       "row": "infantry",
       "category": "unlock",
       "stat": "",
@@ -1669,7 +1669,7 @@
     },
     {
       "code": "longbow_man",
-      "name": "Longbow Man",
+      "name": "Scout Archer",
       "row": "ranged",
       "category": "unlock",
       "stat": "",
@@ -1703,7 +1703,7 @@
     },
     {
       "code": "horseman",
-      "name": "Horseman",
+      "name": "Dusk Rider",
       "row": "cavalry",
       "category": "unlock",
       "stat": "",
@@ -3041,7 +3041,7 @@
     },
     {
       "code": "knight",
-      "name": "Knight",
+      "name": "Iron Sentinel",
       "row": "infantry",
       "category": "unlock",
       "stat": "",
@@ -3075,7 +3075,7 @@
     },
     {
       "code": "ranger",
-      "name": "Ranger",
+      "name": "Ember Archer",
       "row": "ranged",
       "category": "unlock",
       "stat": "",
@@ -3109,7 +3109,7 @@
     },
     {
       "code": "heavy_cavalry",
-      "name": "Heavy Cavalry",
+      "name": "Night Lancer",
       "row": "cavalry",
       "category": "unlock",
       "stat": "",
@@ -4609,7 +4609,7 @@
     },
     {
       "code": "guardian",
-      "name": "Guardian",
+      "name": "Royal Guardian",
       "row": "infantry",
       "category": "unlock",
       "stat": "",
@@ -4643,7 +4643,7 @@
     },
     {
       "code": "crossbow_man",
-      "name": "Veteran Archers",
+      "name": "Flame Ranger",
       "row": "ranged",
       "category": "unlock",
       "stat": "",
@@ -4677,7 +4677,7 @@
     },
     {
       "code": "iron_cavalry",
-      "name": "Iron Cavalry",
+      "name": "Shadow Knight",
       "row": "cavalry",
       "category": "unlock",
       "stat": "",
@@ -7854,7 +7854,7 @@
     },
     {
       "code": "crusader",
-      "name": "Crusader",
+      "name": "Crown Warden",
       "row": "infantry",
       "category": "unlock",
       "stat": "",
@@ -7888,7 +7888,7 @@
     },
     {
       "code": "sniper",
-      "name": "Sniper",
+      "name": "Phoenix Ranger",
       "row": "ranged",
       "category": "unlock",
       "stat": "",
@@ -7922,7 +7922,7 @@
     },
     {
       "code": "dragoon",
-      "name": "Dragoon",
+      "name": "Eclipse Rider",
       "row": "cavalry",
       "category": "unlock",
       "stat": "",

@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "created": "2026-10-09",
+  "tool": "built-in image_gen",
+  "purpose": "Dedicated city completion markers, replacing menu/item previews.",
+  "icons": {
+    "building": {
+      "master": "masters/building-complete.png",
+      "runtime": "building-complete.webp",
+      "width": 128,
+      "height": 128,
+      "bytes": 9322,
+      "master_sha256": "5be08567d18d293623bd8eb25ee4c517cdfb41c8d6b20638609c1696632a07d8",
+      "runtime_sha256": "588dcfa4ec9738493ba08a903d72d05b9f05887b3ea4623bf8b1a75df5fe8b4d",
+      "prompt": "Use case: stylized-concept. Asset type: one production completion notification icon for the painted fantasy strategy game Union of Kingdoms, used at 44–54 px above a building. Create exactly one isolated compact icon, square canvas, genuinely transparent background. Style: simple hand-drawn 2D cartoon mobile fantasy game, thick dark espresso brown outlines, chunky rounded exaggerated silhouettes, broad flat two-tone cel shading, warm cream highlights. Clean readable silhouette, coherent modest detail, no photorealism, no glossy 3D, no metallic UI frame, no square card, no border, no backdrop, no ground scene, no text, no letters, no numbers, no watermark, no checkmark (the game overlays its own success check). Subject fills about 84% of the square with generous clean transparent margins. Subject: a finished tiny warm ivory timber-and-stone house facade with a squat terracotta orange roof and dark doorway, with a single chunky wooden builder's mallet diagonally in front at the lower right. The finished roof and mallet immediately communicate construction completed. Brown wood and restrained ochre accents."
+    },
+    "research": {
+      "master": "masters/research-complete.png",
+      "runtime": "research-complete.webp",
+      "width": 128,
+      "height": 128,
+      "bytes": 7882,
+      "master_sha256": "6a57859416ba4d71f9fb26299b94a97c99feb60e67e3d0942693eaad5ba26734",
+      "runtime_sha256": "9d3ba33ca56445fe6ef83837bd37c7d6008148b50a7d1d663f581de161f41360",
+      "prompt": "Use case: stylized-concept. Asset type: one production completion notification icon for the painted fantasy strategy game Union of Kingdoms, used at 44–54 px above a building. Create exactly one isolated compact icon, square canvas, genuinely transparent background. Style: simple hand-drawn 2D cartoon mobile fantasy game, thick dark espresso brown outlines, chunky rounded exaggerated silhouettes, broad flat two-tone cel shading, warm cream highlights. Clean readable silhouette, coherent modest detail, no photorealism, no glossy 3D, no metallic UI frame, no square card, no border, no backdrop, no ground scene, no text, no letters, no numbers, no watermark, no checkmark (the game overlays its own success check). Subject fills about 84% of the square with generous clean transparent margins. Subject: a thick open ivory spellbook with purple binding, two broad pages and one small violet four-point discovery spark rising above its central fold. No writing or page markings. One compact book silhouette, restrained purple and golden details, clearly communicates research completed."
+    },
+    "training": {
+      "master": "masters/training-complete.png",
+      "runtime": "training-complete.webp",
+      "width": 128,
+      "height": 128,
+      "bytes": 8352,
+      "master_sha256": "d11149472e006c5d22dc858de83db217af770d630db6613a011cca675ab2667c",
+      "runtime_sha256": "a820c87a8cd5728bbeb593d93bdf3644dcc7b332920f69b1a6aaba48559b8516",
+      "prompt": "Use case: stylized-concept. Asset type: one production completion notification icon for the painted fantasy strategy game Union of Kingdoms, used at 44–54 px above a building. Create exactly one isolated compact icon, square canvas, genuinely transparent background. Style: simple hand-drawn 2D cartoon mobile fantasy game, thick dark espresso brown outlines, chunky rounded exaggerated silhouettes, broad flat two-tone cel shading, warm cream highlights. Clean readable silhouette, coherent modest detail, no photorealism, no glossy 3D, no metallic UI frame, no square card, no border, no backdrop, no ground scene, no text, no letters, no numbers, no watermark, no checkmark (the game overlays its own success check). Subject fills about 84% of the square with generous clean transparent margins. Subject: a compact royal-blue wooden shield with a simple ivory central vertical stripe and warm ochre rim, crossed behind by one short chunky practice sword with an ivory gray blade and brown grip. Friendly cartoon equipment, clearly communicates troops trained, no human figure."
+    },
+    "healing": {
+      "master": "masters/healing-complete.png",
+      "runtime": "healing-complete.webp",
+      "width": 128,
+      "height": 128,
+      "bytes": 9586,
+      "master_sha256": "65f53c06f4d0b78e8a3cfd947d28b6d740a7456a896ea145acc2191ecd02476a",
+      "runtime_sha256": "f77d8db5e8b5560ba9f831dd028921636f700d6a7210fb54ccd5e10cca543f5f",
+      "prompt": "Use case: stylized-concept. Asset type: one production completion notification icon for the painted fantasy strategy game Union of Kingdoms, used at 44–54 px above a building. Create exactly one isolated compact icon, square canvas, genuinely transparent background. Style: simple hand-drawn 2D cartoon mobile fantasy game, thick dark espresso brown outlines, chunky rounded exaggerated silhouettes, broad flat two-tone cel shading, warm cream highlights. Clean readable silhouette, coherent modest detail, no photorealism, no glossy 3D, no metallic UI frame, no square card, no border, no backdrop, no ground scene, no text, no letters, no numbers, no watermark, no checkmark (the game overlays its own success check). Subject fills about 84% of the square with generous clean transparent margins. Subject: a chunky closed ivory healer's satchel with warm brown leather handle and straps, one simple leaf-green equal-armed medical plus symbol centered on its flap and a rolled ivory bandage nestled at the lower right. Clearly communicates healing completed, no red cross."
+    }
+  }
+}

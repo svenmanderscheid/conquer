@@ -10287,5 +10287,20 @@
   "admin.world_delete.pending_purchase": "In dieser Welt gibt es einen nicht abgeschlossenen Kauf. Kläre ausstehende oder bereits bezahlte Käufe vor dem Löschen.",
   "admin.world_delete.migration_required": "Spiele Datenbankmigration 0137 ein, bevor du eine Welt mit Kaufbelegen löschst.",
   "admin.world_delete.dependency_error": "Die Abhängigkeiten der Weltdaten konnten nicht aufgelöst werden. Es wurde nichts gespeichert.",
-  "admin.world_delete.storage_error": "Alle Welttabellen müssen vor dem Löschen transaktionalen Speicher verwenden. Es wurde nichts gespeichert."
+  "admin.world_delete.storage_error": "Alle Welttabellen müssen vor dem Löschen transaktionalen Speicher verwenden. Es wurde nichts gespeichert.",
+  "troop.name.50100101": "Dorfgarde",
+  "troop.name.50100201": "Schildwache",
+  "troop.name.50100301": "Eisenwächter",
+  "troop.name.50100401": "Königsgarde",
+  "troop.name.50100501": "Kronenhüter",
+  "troop.name.50200101": "Bogenrekrut",
+  "troop.name.50200201": "Spähschütze",
+  "troop.name.50200301": "Glutschütze",
+  "troop.name.50200401": "Flammenwaldläufer",
+  "troop.name.50200501": "Phönixwaldläufer",
+  "troop.name.50300101": "Berittener Späher",
+  "troop.name.50300201": "Dämmerungsreiter",
+  "troop.name.50300301": "Nachtlanzer",
+  "troop.name.50300401": "Schattenritter",
+  "troop.name.50300501": "Finsternisreiter"
 }

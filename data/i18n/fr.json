@@ -10047,5 +10047,20 @@
   "admin.world_delete.pending_purchase": "Ce monde contient un achat inachevé. Résolvez les achats en attente ou payés avant de le supprimer.",
   "admin.world_delete.migration_required": "Appliquez la migration 0137 avant de supprimer un monde contenant un historique d’achats.",
   "admin.world_delete.dependency_error": "Les dépendances des données du monde n’ont pas pu être résolues. Aucune modification n’a été enregistrée.",
-  "admin.world_delete.storage_error": "Toutes les tables du monde doivent utiliser un stockage transactionnel avant la suppression. Aucune modification n’a été enregistrée."
+  "admin.world_delete.storage_error": "Toutes les tables du monde doivent utiliser un stockage transactionnel avant la suppression. Aucune modification n’a été enregistrée.",
+  "troop.name.50100101": "Garde du village",
+  "troop.name.50100201": "Garde au bouclier",
+  "troop.name.50100301": "Sentinelle de fer",
+  "troop.name.50100401": "Garde royal",
+  "troop.name.50100501": "Gardien de la couronne",
+  "troop.name.50200101": "Recrue à l’arc",
+  "troop.name.50200201": "Archer éclaireur",
+  "troop.name.50200301": "Archer de braise",
+  "troop.name.50200401": "Rôdeur des flammes",
+  "troop.name.50200501": "Rôdeur du phénix",
+  "troop.name.50300101": "Éclaireur monté",
+  "troop.name.50300201": "Cavalier du crépuscule",
+  "troop.name.50300301": "Lancier de la nuit",
+  "troop.name.50300401": "Chevalier de l’ombre",
+  "troop.name.50300501": "Cavalier de l’éclipse"
 }

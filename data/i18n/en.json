@@ -10287,5 +10287,20 @@
   "admin.world_delete.pending_purchase": "This world has an unfinished purchase. Resolve pending or paid purchases before deleting it.",
   "admin.world_delete.migration_required": "Apply database migration 0137 before deleting a world with purchase history.",
   "admin.world_delete.dependency_error": "World data dependencies could not be resolved. No changes were saved.",
-  "admin.world_delete.storage_error": "All world tables must use transactional storage before deletion. No changes were saved."
+  "admin.world_delete.storage_error": "All world tables must use transactional storage before deletion. No changes were saved.",
+  "troop.name.50100101": "Village Guard",
+  "troop.name.50100201": "Shield Guard",
+  "troop.name.50100301": "Iron Sentinel",
+  "troop.name.50100401": "Royal Guardian",
+  "troop.name.50100501": "Crown Warden",
+  "troop.name.50200101": "Bow Recruit",
+  "troop.name.50200201": "Scout Archer",
+  "troop.name.50200301": "Ember Archer",
+  "troop.name.50200401": "Flame Ranger",
+  "troop.name.50200501": "Phoenix Ranger",
+  "troop.name.50300101": "Mounted Scout",
+  "troop.name.50300201": "Dusk Rider",
+  "troop.name.50300301": "Night Lancer",
+  "troop.name.50300401": "Shadow Knight",
+  "troop.name.50300501": "Eclipse Rider"
 }

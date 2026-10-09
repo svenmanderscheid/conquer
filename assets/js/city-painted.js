@@ -28,7 +28,7 @@ window.ConquerPaintedCity=(()=>{
   return definition?.training_building||({1:'barrack',2:'archery_range',3:'stable'}[Number(job.barrack_slot)]??'barrack');
  };
  const completionKinds={train_complete:'training',research_complete:'research',heal_complete:'healing',build_complete:'building'};
- const readyIcons={training:'menu-icons-v2/army.png',research:'menu-icons-v2/research.png',healing:'items/healing.svg',building:'items/builders-hammer.png',chest:'items/daily-chest-gold-v1.png'};
+ const readyIcons={training:'status-icons-v1/training-complete.webp',research:'status-icons-v1/research-complete.webp',healing:'status-icons-v1/healing-complete.webp',building:'status-icons-v1/building-complete.webp',chest:'items/daily-chest-gold-v1.png'};
  // Only confirmed server events can produce a completion marker. An expired
  // countdown still belongs to the running queue until the server settles it.
  function readiness({state,kingdom}){
