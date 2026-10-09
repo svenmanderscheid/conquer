@@ -379,6 +379,7 @@ final class KingdomService
         $id = $db->lastInsertId();
         $db->execute("INSERT INTO alliance_members (alliance_id,player_id,world_id,role,role_level) VALUES (?,?,?,'leader',?)", [$id,$playerId,WorldContext::id(),AllianceRank::level('leader')]);
         $db->execute('INSERT INTO alliance_treasury (alliance_id) VALUES (?)', [$id]);
+        \Conquer\Game\Community\AllianceCommunityService::closeApplicationsAfterJoin($playerId,$id,WorldContext::id());
         return ['message'=>'Deine Allianz ist gegründet. Lade andere Königreiche ein, sich dir anzuschließen.','alliance_id'=>$id];
     }
 

@@ -66,7 +66,36 @@ window.ConquerPanels = function(ctx) {
     function panelPager(page){return `<nav class="panel-pagination" aria-label="Seiten">${button('‹','panel-page',page.key,'secondary small',`data-page="${page.index-1}" aria-label="Vorherige Seite" ${page.index===0?'disabled':''}`)}<span class="panel-page-status" role="status" tabindex="-1">Seite ${page.index+1} / ${page.pages}</span>${button('›','panel-page',page.key,'secondary small',`data-page="${page.index+1}" aria-label="Nächste Seite" ${page.index+1===page.pages?'disabled':''}`)}</nav>`;}
     function achievements(p) {const page=panelPage(p.achievements||[],'achievements',window.innerHeight<540?1:window.innerWidth<700?3:4);return `<div class="achievement-list">${page.items.map(a=>`<article class="achievement ${a.unlocked?'unlocked':''}"><span>${a.unlocked?'✦':'◇'}</span><div><h3>${esc(a.name)}</h3><p>${esc(a.description)}</p><small>${a.unlocked?'Freigeschaltet':'Noch nicht erreicht'}</small></div></article>`).join('')}</div>${page.total?panelPager(page):empty('◇','Deine Geschichte beginnt.','Errungenschaften werden durch deinen Fortschritt freigeschaltet.')}`;}
     function editProfile() {const p=K().profile;openDialog(`<h2>Dein Herrscherprofil</h2><form data-form="profile"><label for="profile-name">Herrschername</label><input id="profile-name" name="display_name" type="text" value="${esc(p.display_name)}" minlength="3" maxlength="30" required autocomplete="nickname"><label>Gezeichnetes Ersatzporträt</label><div class="avatar-options">${K().avatars.map(a=>`<label class="avatar-choice"><input type="radio" name="avatar" value="${esc(a.id)}" ${p.avatar===a.id?'checked':''} required><img src="${portrait(a.id)}" alt=""><span>${esc(a.name)}</span></label>`).join('')}</div><section class="profile-photo-upload" aria-labelledby="profile-photo-title"><div class="profile-photo-preview"><img src="${portrait(p.avatar,p.profile_image)}" alt="Aktuelles Profilfoto"></div><div><strong id="profile-photo-title">Eigenes Profilfoto</strong><p>JPG, PNG oder WebP · maximal 5 MB. Das Bild wird vor der Veröffentlichung automatisch geprüft. Dabei wird es an OpenAI übertragen. Ohne eigenes Foto erscheint das Ersatzporträt.</p><label class="button secondary" for="profile-image">Foto auswählen</label><input id="profile-image" name="profile_image" type="file" accept="image/jpeg,image/png,image/webp">${p.profile_image?button('Eigenes Foto entfernen','profile-image-remove','','danger small'):''}</div></section><label for="profile-bio">Über dein Königreich</label><textarea id="profile-bio" name="bio" maxlength="300" placeholder="Wofür steht dein Königreich?">${esc(p.bio||'')}</textarea><small class="form-help">Bis zu 300 Zeichen. Dein Profil ist für andere Spieler sichtbar.</small><button class="button gold wide" style="margin-top:20px">Profil speichern</button></form>`);}
-    async function publicProfile(id) {try {const data=await api('kingdom/state?player_id='+encodeURIComponent(id));openDialog(`<h2>Profil</h2>${profileBody(data.profile,false)}`);}catch(e){toast(e.message);}}
+    const profileInvitations=new Map();
+    const invitationText=key=>window.ConquerLocale.t('alliance_community.'+key);
+    async function publicProfile(id) {
+        const world=Number(S()?.city?.world_id||1),viewer=Number(K()?.profile?.id);
+        try {
+            const data=await api('kingdom/state?player_id='+encodeURIComponent(id));
+            if(world!==Number(S()?.city?.world_id||1)||viewer!==Number(K()?.profile?.id))return;
+            openDialog(`<h2>Profil</h2>${profileBody(data.profile,false)}`);
+            const alliance=K()?.alliance;
+            if(!data.profile.alliance&&Number(data.profile.id)!==viewer&&alliance&&ranks.level(alliance.role)>=4){
+                $('#game-dialog .lok-profile-contact')?.insertAdjacentHTML('beforeend',button(esc(invitationText('profile_invite')),'alliance-profile-invite',Number(data.profile.id),'profile-contact invite',`data-world-id="${world}" data-alliance-id="${Number(alliance.id)}"`));
+            }
+        }catch(e){toast(e.message);}
+    }
+    async function inviteProfile(b){
+        const world=Number(S()?.city?.world_id||1),viewer=Number(K()?.profile?.id),alliance=K()?.alliance,target=Number(b.dataset.id);
+        if(b.disabled||!b.isConnected||!alliance||ranks.level(alliance.role)<4||target===viewer||!Number.isSafeInteger(target)||target<=0||Number(b.dataset.worldId)!==world||Number(b.dataset.allianceId)!==Number(alliance.id))return;
+        const key=[world,viewer,alliance.id,target].join(':'),pending=profileInvitations.get(key)||{request:crypto.randomUUID(),sending:false};
+        if(pending.sending)return;pending.sending=true;profileInvitations.set(key,pending);
+        b.disabled=true;b.setAttribute('aria-busy','true');b.textContent=window.ConquerLocale.t('social_chat.sending');
+        const current=()=>b.isConnected&&world===Number(S()?.city?.world_id||1)&&viewer===Number(K()?.profile?.id)&&Number(alliance.id)===Number(K()?.alliance?.id);
+        try{
+            await api('community/alliance-action',{action:'invitation.send',player_id:target,world_id:world,request_id:pending.request});
+            profileInvitations.delete(key);
+            if(current()){b.textContent=invitationText('invitation_sent');toast(invitationText('invitation_sent'));}
+        }catch(e){
+            if(e.definite)profileInvitations.delete(key);
+            if(current()){b.disabled=false;b.textContent=invitationText('profile_invite');toast(e.message);}
+        }finally{pending.sending=false;if(b.isConnected)b.removeAttribute('aria-busy');}
+    }
     const allianceHomeState=new Map();
     const allianceGoalCache=new Map();
     const allianceText=(key,params={})=>window.ConquerLocale.t('alliance_home.'+key,params);
@@ -92,7 +121,10 @@ window.ConquerPanels = function(ctx) {
         if(previous)allianceHomeState.set(previous.dataset.allianceView,{scroll:previous.scrollTop,expanded:[...previous.querySelectorAll('details[open][data-alliance-details]')].map(detail=>detail.dataset.allianceDetails)});
         const viewKey=[S()?.city?.world_id||1,a?.id||0,tabsState.alliance].join(':');
         const restore=()=>{const view=host().querySelector('[data-alliance-view]'),saved=allianceHomeState.get(viewKey);if(view&&saved){view.querySelectorAll('details[data-alliance-details]').forEach(detail=>detail.open=saved.expanded.includes(detail.dataset.allianceDetails));view.scrollTop=saved.scroll;}};
-        const finish=(html,restoreNow=true)=>{host().insertAdjacentHTML('beforeend',`<section class="alliance-home-scroll" data-alliance-view="${esc(viewKey)}">${html}</section>`);if(restoreNow)restore();};
+        const finish=(html,restoreNow=true)=>{
+            const recruitment=a&&ranks.level(a.role)>=4&&['members','manage'].includes(tabsState.alliance)?`<div class="alliance-home-recruitment">${button(esc(window.ConquerLocale.t('alliance_community.invite')),'alliance-social-open','invite')}${button(esc(window.ConquerLocale.t('alliance_community.recruitment')),'alliance-social-open','manage','secondary')}</div>`:'';
+            host().insertAdjacentHTML('beforeend',`<section class="alliance-home-scroll" data-alliance-view="${esc(viewKey)}">${recruitment}${html}</section>`);if(restoreNow)restore();
+        };
         const homeLink=(icon,label,hint,act,id='',extra='')=>`<button type="button" class="alliance-home-link" data-action="${act}" data-id="${esc(id)}" ${extra}><img src="${window.ConquerItemArt?.artUrl(base,icon) || `${base}/assets/art/${icon}`}" alt=""><span><strong>${esc(allianceText(label))}</strong>${hint?`<small>${esc(allianceText(hint))}</small>`:''}</span><span class="alliance-home-arrow" aria-hidden="true">›</span></button>`;
         if(!a){host().innerHTML='';finish(`<div class="alliance-home-empty"><img src="${base}/assets/art/menu-icons-v2/alliance.png" alt=""><h2>${esc(allianceText('find_title'))}</h2><p>${esc(allianceText('find_hint'))}</p><div class="button-row">${button(esc(window.ConquerLocale.t('social.find_alliance')),'tab','alliance-community','gold')}${button(esc(allianceText('create')),'alliance-create','','secondary')}</div></div>`);return;}
         const leader=Number(a.leader_id)===Number(k.profile.id)&&a.role==='leader';
@@ -376,6 +408,7 @@ window.ConquerPanels = function(ctx) {
         if(act==='profile-image-remove'){ctx.removeProfileImage().then(async()=>{await refresh(false);editProfile();}).catch(error=>toast(error.message));return true;}
         if(act==='arena-report'){const r=K().arena.challenges.find(r=>Number(r.id)===Number(id));openDialog(`<h2>Arenabericht</h2>${row(r.challenger_name,fmt(r.result?.challenger_score)+' Kampfkraft')}${row(r.opponent_name,fmt(r.result?.opponent_score)+' Kampfkraft')}<p class="success">Keine Truppenverluste</p>`);return true;}
         if(act==='public-profile'){publicProfile(id);return true;}
+        if(act==='alliance-profile-invite'){inviteProfile(b);return true;}
         if(act==='private-chat'){ctx.openPrivateChat?.(Number(id),b.dataset.playerName);return true;}
         if(act==='treasures-tab'){navigate('treasures');return true;}
         if(act==='alliance-members'){tabsState.alliance='members';renderAlliance();return true;}

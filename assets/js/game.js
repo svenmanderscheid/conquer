@@ -424,7 +424,7 @@
         if(hasPanel){
             panelDialog.dataset.panel=current;
             if(!panelDialog.open){panelDialog.showModal();$('#page-title').focus({preventScroll:true});}
-            if(current==='bugreport')bugReports.render();else if(current==='treasures')treasurePanel.render();else if(current==='market')tradingPanel.render();else if(current==='dungeons')dungeonPanel.render(current);else if(current==='community')socialHub.render(current);else if(current==='alliance-tools')communityPanel.render(current);else if(current==='alliance-community')allianceCommunity.render(current);else if(current==='defense')defensePanel.render();else if(landPanel.render(current)||worldPanel.render(current)||progressionPanel.render(current)){}else if(native[current])native[current]();else panels.render(current);
+            if(current==='bugreport')bugReports.render();else if(current==='treasures')treasurePanel.render();else if(current==='market')tradingPanel.render();else if(current==='dungeons')dungeonPanel.render(current);else if(current==='community')socialHub.render(current);else if(current==='alliance-tools')communityPanel.render(current);else if(current==='alliance-community'||(current==='alliance'&&kingdom&&!kingdom.alliance))allianceCommunity.render(current);else if(current==='defense')defensePanel.render();else if(landPanel.render(current)||worldPanel.render(current)||progressionPanel.render(current)){}else if(native[current])native[current]();else panels.render(current);
             if(current==='settings')$('#content').insertAdjacentHTML('afterbegin','<p><button class="button secondary" data-action="tab" data-id="account">Passwort & Wiederherstellung</button></p>');
         }
         if(current==='army'&&panels.armyMode!=='hospital'){$('#content > .subtabs')?.remove();$('#content').insertAdjacentHTML('afterbegin',panels.armyHeader());}
@@ -681,7 +681,11 @@
     const landmarkActions=window.ConquerLandmarkActions({...featureContext,marchPanel,territoryPanel});
     const communityPanel=window.ConquerCommunity({...featureContext,openSharedReport,openSharedLocation,openStructureLocation:async location=>{navigate('world',{focusTitle:false});window.ConquerWorld.focus(location.x,location.y);await refresh();if(!window.ConquerWorld.locate(location.x,location.y,[location.kind],location.id))toast('Das Allianzgebäude ist an dieser Position nicht mehr vorhanden.');},beginStructurePlacement:structureType=>{const center=structureType==='center';teleportSelection={kind:'alliance-structure',structure_type:center?'center':'outpost',footprint:center?5:3,label:center?'Allianzzentrum':'Außenposten',art:center?'painted-v2/alliance-center.webp':'alliance-outpost'};navigate('world',{focusTitle:false});toast(`${teleportSelection.label} auf einen freien Platz ziehen.`);},openMailbox:()=>{navigate('reports');mailboxPanel.select('private');}});
     const socialHub=window.ConquerSocialHub({...featureContext,openPublicProfile:id=>panels.onClick('public-profile',{dataset:{id:String(id)}}),openPrivate:(id,name)=>{navigate(playfield);worldChat?.openPrivate(id,name);},openChat:channel=>{navigate(playfield);worldChat?.openChannel(channel);},chatChanged:()=>worldChat?.refresh(),openMailbox:()=>{navigate('reports');mailboxPanel.select('private');}});
-    const allianceCommunity=window.ConquerAllianceCommunity(featureContext);
+    const allianceCommunity=window.ConquerAllianceCommunity({...featureContext,refresh:async renderPage=>{
+        // A poll already in flight may still describe membership before joining.
+        if(polling)await polling;
+        return refresh(renderPage);
+    }});
     const dungeonPanel=window.ConquerDungeons({...featureContext,unitName,
         onMelusinaSource:(source,worldId)=>openWorldTarget({x:source.x,y:source.y,kind:source.type==='monster'?'monsters':'nodes',id:source.id},worldId,()=>toast(t('melusina.source_changed'))),
         onMelusinaEntrance:(entrance,worldId)=>openWorldTarget({x:entrance.x,y:entrance.y,kind:'dungeons',id:entrance.id||'melusina_well'},worldId)

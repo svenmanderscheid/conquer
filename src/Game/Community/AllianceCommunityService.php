@@ -23,6 +23,8 @@ final class AllianceCommunityService
         $state=['world_id'=>$world,'player_id'=>$player,'server_time'=>time(),'power'=>$power,'alliance'=>$alliance?:null,'role'=>$member['role']??null,'role_level'=>AllianceRank::level($member['role']??''),
             'search'=>$search,'can_manage'=>AllianceRank::level($member['role']??'')>=4,'can_plan'=>AllianceRank::level($member['role']??'')>=3,
             'applications'=>$db->query("SELECT ap.*,a.name,a.tag FROM alliance_applications ap JOIN alliances a ON a.id=ap.alliance_id AND a.world_id=ap.world_id WHERE ap.player_id=? AND ap.world_id=? ORDER BY (ap.status='pending') DESC,ap.updated_at DESC LIMIT 30",[$player,$world])->fetchAll(),
+            'invitations'=>$db->query("SELECT i.*,a.name,a.tag,a.description,a.max_members,a.minimum_power,(SELECT COUNT(*) FROM alliance_members m WHERE m.alliance_id=a.id) AS member_count,COALESCE(k.display_name,p.username) AS sender_name FROM alliance_invitations i JOIN alliances a ON a.id=i.alliance_id AND a.world_id=i.world_id JOIN players p ON p.id=i.invited_by LEFT JOIN kingdom_profiles k ON k.player_id=p.id WHERE i.player_id=? AND i.world_id=? AND i.status='pending' AND i.expires_at>UTC_TIMESTAMP() ORDER BY i.id DESC LIMIT 20",[$player,$world])->fetchAll(),
+            'sent_invitations'=>[],'invite_candidates'=>[],
             'notices'=>[],'events'=>[],'polls'=>[],'recent_members'=>[],'open_help'=>[],'research'=>[],'territory_goal'=>null,'pending_applications'=>[]];
         if(!$aid)return $state;
         $state['alliance']['member_count']=(int)$db->query('SELECT COUNT(*) FROM alliance_members WHERE alliance_id=? AND world_id=?',[$aid,$world])->fetchColumn();
@@ -49,8 +51,24 @@ final class AllianceCommunityService
             foreach($db->query('SELECT v.choice,COUNT(*) AS votes FROM alliance_poll_votes v JOIN alliance_members m ON m.player_id=v.player_id AND m.alliance_id=? AND m.world_id=? WHERE v.poll_id=? GROUP BY v.choice',[$aid,$world,$poll['id']])->fetchAll()as$vote)$poll['counts'][(int)$vote['choice']]=(int)$vote['votes'];
             $poll['open']=!$poll['closed_at']&&strtotime($poll['closes_at'].' UTC')>time();
         }unset($poll);$state['polls']=$polls;
-        if($state['can_manage'])$state['pending_applications']=$db->query("SELECT ap.*,COALESCE(k.display_name,p.username) AS username FROM alliance_applications ap JOIN players p ON p.id=ap.player_id LEFT JOIN kingdom_profiles k ON k.player_id=p.id WHERE ap.alliance_id=? AND ap.world_id=? AND ap.status='pending' ORDER BY ap.id LIMIT 100",[$aid,$world])->fetchAll();
+        if($state['can_manage']){
+            $state['pending_applications']=$db->query("SELECT ap.*,COALESCE(k.display_name,p.username) AS username FROM alliance_applications ap JOIN players p ON p.id=ap.player_id LEFT JOIN kingdom_profiles k ON k.player_id=p.id WHERE ap.alliance_id=? AND ap.world_id=? AND ap.status='pending' ORDER BY ap.id LIMIT 100",[$aid,$world])->fetchAll();
+            $state['sent_invitations']=$db->query("SELECT i.*,COALESCE(k.display_name,p.username) AS username FROM alliance_invitations i JOIN players p ON p.id=i.player_id LEFT JOIN kingdom_profiles k ON k.player_id=p.id WHERE i.alliance_id=? AND i.world_id=? AND i.status='pending' AND i.expires_at>UTC_TIMESTAMP() ORDER BY i.id DESC LIMIT 100",[$aid,$world])->fetchAll();
+            $state['invite_candidates']=self::inviteCandidates($player,$world,$filters);
+        }
         return $state;
+    }
+
+    private static function inviteCandidates(int $player,int $world,array $filters): array
+    {
+        $needle=self::text($filters,'invite_search',0,50,'');
+        if($needle==='')return [];
+        $like='%'.addcslashes($needle,'%_\\').'%';
+        $exactId=ctype_digit($needle)&&strlen($needle)<=10&&(int)$needle<=2147483647?(int)$needle:0;
+        $rows=Connection::getInstance()->query('SELECT p.id,p.id AS player_id,COALESCE(k.display_name,p.username) AS username,COALESCE(k.display_name,p.username) AS display_name FROM players p JOIN cities c ON c.player_id=p.id AND c.world_id=? LEFT JOIN kingdom_profiles k ON k.player_id=p.id WHERE p.id<>? AND p.is_banned=0 AND NOT EXISTS(SELECT 1 FROM alliance_members m WHERE m.player_id=p.id AND m.world_id=?) AND (p.username LIKE ? OR k.display_name LIKE ? OR p.id=?) ORDER BY COALESCE(k.display_name,p.username),p.id LIMIT 20',[$world,$player,$world,$like,$like,$exactId])->fetchAll();
+        $summaries=$rows?KingdomService::publicSummaries(array_column($rows,'player_id')):[];
+        foreach($rows as &$row)$row['power']=(int)($summaries[(int)$row['player_id']]['power']??0);unset($row);
+        return $rows;
     }
 
     private static function search(int $player,int $world,int $power,array $filters): array
@@ -81,6 +99,7 @@ final class AllianceCommunityService
             $result=match($action){
                 'recruitment.save'=>self::recruitment($player,$world,$body),
                 'alliance.join','application.submit','application.withdraw','application.accept','application.decline'=>self::application($player,$world,$body),
+                'invitation.send','invitation.accept','invitation.decline','invitation.revoke'=>self::invitation($player,$world,$body),
                 'notice.create','notice.archive','notice.complete','notice.pin'=>self::notice($player,$world,$body),
                 'event.create','event.cancel','event.rsvp'=>self::event($player,$world,$body),
                 'poll.create','poll.vote','poll.close'=>self::poll($player,$world,$body),
@@ -121,6 +140,42 @@ final class AllianceCommunityService
         return ['application_id'=>$newId];
     }
 
+    private static function invitation(int $player,int $world,array $body): array
+    {
+        $db=Connection::getInstance();$action=$body['action'];
+        if($action==='invitation.send'){
+            $a=self::managed($player,$world,4);$target=self::integer($body,'player_id');
+            self::require($target!==$player,'invitation_target');
+            self::assertCanJoin($target,$a,true);
+            $old=$db->query('SELECT * FROM alliance_invitations WHERE alliance_id=? AND player_id=? FOR UPDATE',[$a['id'],$target])->fetch();
+            if($old&&$old['status']==='pending'&&strtotime($old['expires_at'].' UTC')>time())return ['invitation_id'=>(int)$old['id'],'alliance_id'=>(int)$a['id']];
+            self::require(!$old||strtotime($old['updated_at'].' UTC')<=time()-60,'cooldown');
+            self::require((int)$db->query("SELECT COUNT(*) FROM alliance_invitations WHERE alliance_id=? AND status='pending' AND expires_at>UTC_TIMESTAMP() FOR UPDATE",[$a['id']])->fetchColumn()<100,'invitation_limit');
+            self::require((int)$db->query("SELECT COUNT(*) FROM alliance_invitations WHERE player_id=? AND world_id=? AND status='pending' AND expires_at>UTC_TIMESTAMP() FOR UPDATE",[$target,$world])->fetchColumn()<20,'invitation_limit');
+            if($old){$db->execute("UPDATE alliance_invitations SET invited_by=?,status='pending',created_at=UTC_TIMESTAMP(),expires_at=DATE_ADD(UTC_TIMESTAMP(),INTERVAL 7 DAY),updated_at=UTC_TIMESTAMP() WHERE id=?",[$player,$old['id']]);$id=(int)$old['id'];}
+            else{$db->execute('INSERT INTO alliance_invitations(alliance_id,world_id,player_id,invited_by,expires_at)VALUES(?,?,?,?,DATE_ADD(UTC_TIMESTAMP(),INTERVAL 7 DAY))',[$a['id'],$world,$target,$player]);$id=$db->lastInsertId();}
+            return ['invitation_id'=>$id,'alliance_id'=>(int)$a['id']];
+        }
+        $id=self::integer($body,'invitation_id');
+        if($action==='invitation.revoke'){
+            $a=self::managed($player,$world,4);
+            $invite=$db->query("SELECT * FROM alliance_invitations WHERE id=? AND alliance_id=? AND world_id=? AND status='pending' AND expires_at>UTC_TIMESTAMP() FOR UPDATE",[$id,$a['id'],$world])->fetch();
+        }else{
+            // Read only the addressed recipient's invitation, then take locks in
+            // the same alliance-before-invitation order as sending and revoking.
+            $candidate=$db->query("SELECT alliance_id FROM alliance_invitations WHERE id=? AND player_id=? AND world_id=? AND status='pending' AND expires_at>UTC_TIMESTAMP()",[$id,$player,$world])->fetch();
+            self::require((bool)$candidate,'invitation',404);
+            $a=$db->query('SELECT * FROM alliances WHERE id=? AND world_id=? FOR UPDATE',[$candidate['alliance_id'],$world])->fetch();
+            self::require((bool)$a,'alliance',404);
+            $invite=$db->query("SELECT * FROM alliance_invitations WHERE id=? AND alliance_id=? AND player_id=? AND world_id=? AND status='pending' AND expires_at>UTC_TIMESTAMP() FOR UPDATE",[$id,$a['id'],$player,$world])->fetch();
+        }
+        self::require((bool)$invite,'invitation',404);
+        if($action==='invitation.accept'){
+            self::assertCanJoin($player,$a,true);self::insertMember($player,$a,$world);
+        }else $db->execute('UPDATE alliance_invitations SET status=? WHERE id=?',[$action==='invitation.revoke'?'revoked':'declined',$id]);
+        return ['invitation_id'=>$id,'alliance_id'=>(int)$a['id']];
+    }
+
     /** Called by the original KingdomService join route inside its alliance lock as well. */
     public static function assertCanJoin(int $player,array $alliance,bool $approvedApplication=false): void
     {
@@ -143,6 +198,7 @@ final class AllianceCommunityService
     public static function closeApplicationsAfterJoin(int $player,int $alliance,int $world): void
     {
         Connection::getInstance()->execute("UPDATE alliance_applications SET status=IF(alliance_id=?,'accepted','withdrawn') WHERE player_id=? AND world_id=? AND status='pending'",[$alliance,$player,$world]);
+        Connection::getInstance()->execute("UPDATE alliance_invitations SET status=IF(alliance_id=? AND expires_at>UTC_TIMESTAMP(),'accepted','revoked') WHERE player_id=? AND world_id=? AND status='pending'",[$alliance,$player,$world]);
     }
 
     private static function notice(int $player,int $world,array $body): array

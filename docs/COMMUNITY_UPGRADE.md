@@ -9,7 +9,7 @@ Implemented locally on 30 September 2026. The shared web frontend remains the ba
 | `/city#community` | Community overview, persistent conversations, friends and player search, official news, privacy and notification settings. |
 | `/city#alliance-community` | Alliance recruitment, applications, announcements, shared goals, calendar, attendance and polls. |
 | `/city#alliance-tools` | Existing alliance help, research, buildings, members, diplomacy and deliveries. Existing `community-open` actions now route here. The mail action opens the shared mailbox. |
-| `/city#alliance` | Existing alliance overview, with a Community and planning entry. |
+| `/city#alliance` | Alliance overview for members; direct discovery, join/application actions and incoming invitations for players without an alliance. R4/R5 find recruitment and invitations under Members and More. |
 | Chat dock and player profiles | World, alliance and private chat with the same conversation state as Community. |
 | `/admin/chat` | Player reports, temporary chat restrictions, official news and the world-chat log. |
 
@@ -33,6 +33,20 @@ Private-message permissions are `everyone`, `friends`, `alliance` or `nobody`. N
 Recruitment can be open or application-based. Alliance search supports language, preferred activity period, play style, recruitment mode and minimum power. Recruitment stores an IANA time zone. Existing join entry points enforce the same admission rules, including capacity, world membership and minimum power.
 
 Leaders and vice leaders manage recruitment and applications. Officers and higher ranks can create announcements or shared goals, pin or archive notices, complete goals, create or cancel events and create or close polls. Members can respond to events and vote. Authorization is checked again on the server for each mutation.
+
+### Invitations and direct discovery (9 October 2026)
+
+Players without an alliance enter discovery directly from the main Alliance button. Incoming invitations identify the alliance, sender, member count and expiration, with explicit Accept & join and Decline actions. Open alliances offer direct joining; application alliances retain their application and approval workflow. Advanced discovery filters are collapsible so that the search and results remain easy to reach on phones.
+
+R4 and R5 members can search unallied players in their current world by name or exact player ID, send an invitation and withdraw a pending invitation. Invitations last seven days; sending one does not change membership. Acceptance authorizes entry into an application alliance, while current capacity, minimum power, world access and existing membership are checked again. Joining or founding an alliance closes other pending invitations. A repeat of the same request returns its saved result. The retired `/api/alliance/join` entry remains blocked with HTTP 410; active Kingdom and Community join paths enforce the admission rules.
+
+The public profile of an unallied player also offers **Invite to alliance** to R4/R5 viewers. It sends directly from the profile, disables repeated clicks while waiting and shows **Invitation sent** on success. Own profiles, allied players and viewers without invitation rights do not show the button. A retry after a lost response retains the original request ID; a stale profile from another world cannot send an invitation.
+
+`GET /api/community/alliance` additionally returns `invitations`, leadership-only `sent_invitations` and `invite_candidates` filtered by `invite_search`. The existing action endpoint accepts `invitation.send` with `player_id`, or `invitation.accept`, `invitation.decline` and `invitation.revoke` with `invitation_id`. All use the existing authentication, CSRF and request receipts. Only the recipient can accept or decline; only the sending alliance's R4/R5 can revoke.
+
+The additive migration `0141_alliance_invitations.sql` creates only the invitation table. `tools/migrate-alliance-invitations.php --apply` installs this migration in the local database without running other pending migrations. Deployment must include the migration before the updated PHP read model is used. New text is supplied through `alliance_community.*` in EN/DE/FR/LB; English remains the default and fallback.
+
+Focused checks: `tests/alliance_invitations.php`, `tests/alliance_admission_http.php`, `tests/alliance_community.php`, `tests/alliance_ranks.php`, `tests/alliance_community_panel.cjs` and `tests/alliance_recruitment_app.cjs`. The browser test uses the real `/city` shell with controlled recruitment responses and a disposable database; the PHP tests verify actual invitation state, authenticated HTTP requests and concurrent capacity checks. Browser captures are stored in `output/playwright/alliance-recruitment/`. These checks do not constitute native device or production verification. The local invitation migration was applied on 9 October 2026; this does not deploy it to the live server.
 
 Calendar events have a title, description, start time, duration and time zone. Attendance is Yes, Maybe or No. Upcoming events to which the player replied Yes or Maybe receive an in-app reminder in the alliance overview during the preceding 24 hours. Choice and time polls support one changeable vote per member. No automatic Discord posting, external-calendar synchronization or native reminders are implied by these features.
 

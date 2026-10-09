@@ -57,6 +57,7 @@ final class FeatureDatabase
             }
             \Conquer\Db\MigrationSql::apply(\Conquer\Db\Connection::getInstance()->getPdo(),(string)file_get_contents(ROOT_DIR.'/migrations/0135_vip_benefits.sql'));
             \Conquer\Db\MigrationSql::apply(\Conquer\Db\Connection::getInstance()->getPdo(),(string)file_get_contents(ROOT_DIR.'/migrations/0136_healing_report_preference.sql'));
+            \Conquer\Db\MigrationSql::apply(\Conquer\Db\Connection::getInstance()->getPdo(),(string)file_get_contents(ROOT_DIR.'/migrations/0141_alliance_invitations.sql'));
             // The cloned source may already contain 0107. Replay its additive
             // columns independently in this disposable schema, not in the user DB.
             foreach(["report_type ENUM('bug','idea') NOT NULL DEFAULT 'bug' AFTER world_id",'screenshot MEDIUMBLOB NULL AFTER client_context',"screenshot_mime VARCHAR(32) NOT NULL DEFAULT '' AFTER screenshot"] as $column){
