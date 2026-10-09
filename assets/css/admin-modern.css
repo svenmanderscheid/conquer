@@ -1,4 +1,30 @@
 /* Approved independent administration design. The game keeps its painted theme. */
+.admin-modern .link-tracker .card{margin-bottom:18px;}
+.admin-modern .link-stats{grid-template-columns:repeat(3,minmax(0,1fr));}
+.admin-modern .link-insights,.admin-modern .link-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;}
+.admin-modern .link-target-field{grid-column:1/-1;}
+.admin-modern .link-editor{margin-top:16px;}
+.admin-modern .link-editor :is(fieldset,input,select){min-width:0;width:100%;}
+.admin-modern .link-editor fieldset{padding:0;border:0;}
+.admin-modern .link-editor small{display:block;font-weight:400;margin-top:5px;}
+.admin-modern .link-editor button{margin-top:14px;}
+.admin-modern .link-chart{max-height:260px;overflow:auto;}
+.admin-modern .link-chart>div{display:grid;grid-template-columns:86px minmax(20px,1fr) 45px;align-items:center;gap:10px;margin:8px 0;font-size:12px;}
+.admin-modern .link-chart progress{width:100%;accent-color:var(--ui-primary);}
+.admin-modern .link-chart strong{text-align:right;}
+.admin-modern .link-list{display:grid;gap:18px;}
+.admin-modern .link-row{padding:16px;border:1px solid var(--ui-line);border-radius:var(--ui-radius-card);min-width:0;}
+.admin-modern .link-row-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+.admin-modern .link-row h3{margin:0 0 8px;overflow-wrap:anywhere;}
+.admin-modern .link-row-stats{display:grid;grid-template-columns:1fr 1fr 2fr;gap:12px;margin:14px 0;}
+.admin-modern .link-row-stats :is(dt,dd){margin:0;overflow-wrap:anywhere;}
+.admin-modern .link-row-stats dt{color:var(--ui-muted);font-size:12px;}
+.admin-modern .link-row-stats dd{font-weight:600;}
+.admin-modern .link-copy{display:flex;gap:8px;margin-top:6px;}
+.admin-modern .link-copy input{flex:1;min-width:0;width:100%;}
+.admin-modern .link-destination{overflow-wrap:anywhere;font-size:12px;}
+.admin-modern .link-tracker summary{cursor:pointer;min-height:44px;align-content:center;overflow-wrap:anywhere;}
+@media(max-width:700px){.admin-modern .link-insights,.admin-modern .link-form-grid{grid-template-columns:1fr;}.admin-modern .link-target-field{grid-column:auto;}.admin-modern .link-row-stats{grid-template-columns:1fr 1fr;}.admin-modern .link-row-stats>div:last-child{grid-column:1/-1;}.admin-modern .link-stats{grid-template-columns:1fr;}}
 body.admin-village.admin-modern {
  --ui-font:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--ui-font-number:var(--ui-font);
  --ui-paper:#f5f7fa;--ui-card:#fff;--ui-card-light:#fff;--ui-inset:#eef2f7;

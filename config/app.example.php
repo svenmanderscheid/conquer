@@ -22,6 +22,8 @@ return [
     // URLs
     'base_url' => 'http://localhost:8080',
     'asset_url' => '/assets',
+    // Cookie-free aggregate counters for public campaign and website links.
+    'link_tracking_enabled' => true,
     
     // Game
     'world_speed_factor' => 1.0,

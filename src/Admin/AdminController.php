@@ -71,6 +71,15 @@ final class AdminController
         catch (\Throwable $e) {error_log('Layout editor: '.$e->getMessage());http_response_code(500);echo '{"error":"Layout konnte nicht gespeichert werden. Bitte Verbindung und Migration prüfen."}';}
     }
     public static function analytics(): void {self::render('analytics','Statistiken');}
+    public static function links(): void
+    {
+        AdminAuth::requireAuth();
+        header('Cache-Control: private, no-store');
+        header('Referrer-Policy: same-origin');
+        if(($_SERVER['REQUEST_METHOD']??'GET')!=='GET'){http_response_code(405);header('Allow: GET');return;}
+        if(($_GET['export']??null)==='csv'){LinkTrackerAdmin::export(Connection::getInstance(),$_GET);return;}
+        self::render('links',\Conquer\Game\Locale::t('links.title'));
+    }
     public static function rewards(): void {self::render('rewards','Beute & Drops');}
     public static function lands(): void {self::render('lands','Länder & Entwicklung');}
     public static function items(): void {self::render('items','Gegenstandskatalog');}
@@ -122,6 +131,7 @@ final class AdminController
         if($action==='bug-report-update')$return='/admin/bug-reports';
         if(str_starts_with($action,'community-'))$return='/admin/chat';
         if($action==='alpha-waitlist-update')$return='/admin/alpha-waitlist';
+        if($action==='link-save')$return='/admin/links';
         $alphaAction=in_array($action,['alpha-key-create','alpha-key-revoke'],true);
         if($alphaAction)$return='/admin/alpha-keys';
         $rewardAction=in_array($action,['reward-save','reward-reset','reward-batch-save'],true);
@@ -162,6 +172,14 @@ final class AdminController
             $_SESSION['admin_world_create_draft']=$_POST;
             unset($_SESSION['admin_world_create_draft']['csrf_token'],$_SESSION['admin_world_create_draft']['operation_id'],$_SESSION['admin_world_create_draft']['reason']);
             if(is_array($_SESSION['admin_world_create_draft']['settings']??null)&&!array_key_exists('enabled',$_SESSION['admin_world_create_draft']['settings']))$_SESSION['admin_world_create_draft']['settings']['enabled']=0;
+        }
+        if($action==='link-save'){
+            if(($_SESSION['admin_flash_kind']??'')==='error'){
+                $_SESSION['admin_link_draft']=[];
+                foreach(['label'=>120,'slug'=>64,'destination'=>2048,'reason'=>500,'link_id'=>20,'revision'=>20,'enabled'=>1] as $field=>$limit)
+                    if(is_string($_POST[$field]??null))$_SESSION['admin_link_draft'][$field]=mb_substr($_POST[$field],0,$limit);
+            }else unset($_SESSION['admin_link_draft']);
+            header('Location: '.APP_BASE.$return,true,303);exit;
         }
         if($alphaAction||$action==='alpha-waitlist-update'){header('Location: '.APP_BASE.$return,true,303);exit;}
         $extraEventQuery=$action==='extra-event-save'?'&event_id='.(int)($result['event_id']??$_POST['event_id']??0).'#extra-event-settings':'';

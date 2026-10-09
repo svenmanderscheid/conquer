@@ -38,6 +38,7 @@ final class AdminService
                 $db->execute('INSERT INTO admin_operations(operation_id,admin_id,action,payload_hash) VALUES(?,?,?,?)',[$op,$adminId,$action,$hash]);
                 $result=match($action) {
                     'layout-save'=>\Conquer\Game\Ui\LayoutSettings::save($db,$input),
+                    'link-save'=>LinkTrackerAdmin::save($db,$input),
                     'alpha-waitlist-update'=>AlphaWaitlistAdmin::update($db,$input),
                     'alpha-key-create'=>AlphaKeyAdmin::create($db,$input),
                     'alpha-key-revoke'=>AlphaKeyAdmin::revoke($db,$input),

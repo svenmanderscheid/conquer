@@ -8,7 +8,7 @@ Seven primary areas group existing features; secondary links expose every page:
 
 | Area | Pages |
 | --- | --- |
-| Overview | Dashboard, statistics |
+| Overview | Dashboard, statistics, link tracker |
 | Players & alliances | Players, gifts, alliances |
 | Worlds | World settings and spawns, world creation, land development |
 | Drops & rewards | Mines, monsters, dungeons, chests, expeditions |
@@ -17,6 +17,10 @@ Seven primary areas group existing features; secondary links expose every page:
 | System & history | Audit log, game layout editor |
 
 The dashboard uses live counts and recent audit records. The mobile menu retains language selection and logout. English remains the default and fallback; new copy lives in `data/i18n/`.
+
+## Link statistics
+
+**Overview → Link tracker** (`/admin/links`) counts visits through shareable campaign links and clicks on 13 public website targets. It provides UTC calendar-period filters, per-link and lifetime counts, daily activity, source/device categories and CSV export. Superadmins create, copy, edit and pause campaigns; moderators have read/export access. Counts measure clicks rather than unique visitors. No analytics cookies or raw visitor IPs are stored in the statistics. Migration, safeguards and verification are documented in [LINK_TRACKER.md](LINK_TRACKER.md).
 
 ## Deleting a world
 

@@ -17,14 +17,17 @@ $descriptions=[
     'audit'=>'Nachsehen, wer welche Einstellung geändert hat.'
 ];
 $globalPage=in_array($activePage,['layout_editor','items','alpha_keys','alpha_waitlist','world_create'],true)||($activePage==='rewards'&&($_GET['scope']??'global')!=='world');
+$globalPage=$globalPage||$activePage==='links';
+$descriptions['links']=\Conquer\Game\Locale::t('links.description');
 $areas=[
- 'overview'=>['dashboard','analytics'], 'players'=>['players','alliances'],
+ 'overview'=>['dashboard','analytics','links'], 'players'=>['players','alliances'],
  'worlds'=>['world','world_create','lands'], 'drops'=>['rewards'], 'catalog'=>['items'],
  'access'=>array_merge(['alpha_keys'], $canEdit?['alpha_waitlist']:[], ['bug_reports','chat']),
  'system'=>['audit','layout_editor']
 ];
 $pages=['dashboard'=>['','Übersicht'],'analytics'=>['/analytics','Statistiken'],'players'=>['/players','Spieler & Geschenke'],'alliances'=>['/alliances','Allianzen'],'world'=>['/world','Welten & Spawns'],'world_create'=>['/world-create','Welt erstellen'],'lands'=>['/lands','Länder & Entwicklung'],'rewards'=>['/rewards?type=farm','Beute & Drops'],'items'=>['/items','Gegenstände'],'alpha_keys'=>['/alpha-keys','Alpha-Keys'],'alpha_waitlist'=>['/alpha-waitlist','Alpha-E-Mails'],'bug_reports'=>['/bug-reports','Bugmeldungen'],'chat'=>['/chat','Chatprotokoll'],'audit'=>['/audit','Änderungsprotokoll'],'layout_editor'=>['/layout','Layout-Editor']];
 $currentArea='overview';foreach($areas as $area=>$members)if(in_array($activePage,$members,true))$currentArea=$area;
+$pages['links']=['/links',\Conquer\Game\Locale::t('links.title')];
 $adminUrl=static fn(string $path):string=>APP_BASE.'/admin'.$path.(str_contains($path,'?')?'&':'?').'world_id='.$selectedWorld;
 if($activePage==='dashboard'){$pageTitle=\Conquer\Game\Locale::t('admin.modern.nav_overview');$descriptions['dashboard']=\Conquer\Game\Locale::t('admin.modern.overview_description');}
 if($activePage==='rewards'){$pageTitle=\Conquer\Game\Locale::t('admin.modern.nav_drops');$descriptions['rewards']=\Conquer\Game\Locale::t('admin.modern.drops_description');}
@@ -41,6 +44,7 @@ $newBugCount=(int)$db->query("SELECT COUNT(*) FROM bug_reports WHERE world_id=? 
 <?php require ROOT_DIR.'/views/partials/localization-head.php'; ?>
 <?php if($activePage==='rewards'): ?><script src="<?= APP_BASE ?>/assets/js/relic-presentation.js?v=<?= filemtime(ROOT_DIR.'/assets/js/relic-presentation.js') ?>" defer></script><?php endif ?>
 <script src="<?= APP_BASE ?>/assets/js/admin-modern.js?v=<?= filemtime(ROOT_DIR.'/assets/js/admin-modern.js') ?>" defer></script>
+<?php if($activePage==='links'): ?><script src="<?= APP_BASE ?>/assets/js/admin-links.js?v=<?= filemtime(ROOT_DIR.'/assets/js/admin-links.js') ?>" defer></script><?php endif ?>
 <script src="<?= APP_BASE ?>/assets/js/admin-backoffice.js?v=<?= filemtime(ROOT_DIR.'/assets/js/admin-backoffice.js') ?>" defer></script>
 </head><body class="admin-village admin-modern" data-i18n-scope>
 <a class="skip-link" href="#main">Zum Inhalt</a>

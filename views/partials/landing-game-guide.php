@@ -18,8 +18,8 @@
       '10-alpha' => ['Be part of the beginning.', 'A guardian and archer welcoming players through the city gates', '#zugang', $openAlpha ? \Conquer\Game\Locale::t('landing.open_cta') : 'Register for closed alpha'],
     ] as $art => [$title, $description, $target, $link]): ?>
     <figure class="lp-campaign-card">
-      <a href="<?= $target ?>"><img src="<?= $base ?>/assets/marketing/<?= $art === '01-build' ? ($openAlpha ? 'kingdom-social-en-open-alpha-v1' : 'kingdom-social-en-v5') : 'campaign-' . $art . ($openAlpha ? '-open-alpha-v2' : '-v5') ?>.webp" width="1122" height="1402" loading="lazy" decoding="async" alt="<?= $description ?>"></a>
-      <figcaption><h3><?= $title ?></h3><a href="<?= $target ?>"><?= $link ?> <span aria-hidden="true">→</span></a></figcaption>
+      <a href="<?= $target ?>" data-track-link="<?= \Conquer\Analytics\LinkTracker::galleryTarget($art) ?>"><img src="<?= $base ?>/assets/marketing/<?= $art === '01-build' ? ($openAlpha ? 'kingdom-social-en-open-alpha-v1' : 'kingdom-social-en-v5') : 'campaign-' . $art . ($openAlpha ? '-open-alpha-v2' : '-v5') ?>.webp" width="1122" height="1402" loading="lazy" decoding="async" alt="<?= $description ?>"></a>
+      <figcaption><h3><?= $title ?></h3><a href="<?= $target ?>" data-track-link="<?= \Conquer\Analytics\LinkTracker::galleryTarget($art) ?>"><?= $link ?> <span aria-hidden="true">→</span></a></figcaption>
     </figure>
     <?php endforeach ?>
   </div>
@@ -93,5 +93,5 @@
   <details class="lp-guide-faq"><summary>Is this a seasonal game with regular restarts?</summary><p>The intended model is lasting kingdom development, PvP competition and continuing alliance PvE. Routine seasonal restarts are not the design goal. Alpha testing may still require resets.</p></details>
   <details class="lp-guide-faq"><summary>Can I play now?</summary><p><?= $openAlpha ? \Conquer\Game\Locale::html('landing.open_faq') : \Conquer\Game\Locale::html('copy.939bef382ac7fb8a') ?></p></details>
   <details class="lp-guide-faq"><summary>Is the Star Crown story the endgame?</summary><p>The Star Crown is an earlier story concept, not a confirmed playable campaign or a fixed seasonal ending. The confirmed direction is ongoing development, kingdom conquest and stronger cooperative monster challenges.</p></details>
-  <a class="lp-button lp-guide-cta" href="<?= $openAlpha ? $registerUrl : '#zugang' ?>"><?= $openAlpha ? \Conquer\Game\Locale::html('landing.open_cta') : \Conquer\Game\Locale::html('copy.4b0368646e5780e9') ?> <span aria-hidden="true">→</span></a>
+  <a class="lp-button lp-guide-cta" href="<?= $openAlpha ? $registerUrl : '#zugang' ?>" data-track-link="site-register-guide"><?= $openAlpha ? \Conquer\Game\Locale::html('landing.open_cta') : \Conquer\Game\Locale::html('copy.4b0368646e5780e9') ?> <span aria-hidden="true">→</span></a>
 </section>

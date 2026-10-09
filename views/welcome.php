@@ -69,8 +69,9 @@ $structuredData = [
 <script nonce="<?= htmlspecialchars($landingCspNonce, ENT_QUOTES) ?>">document.documentElement.classList.replace('no-js','js')</script>
 <script nonce="<?= htmlspecialchars($landingCspNonce, ENT_QUOTES) ?>" type="application/ld+json"><?= json_encode($structuredData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_THROW_ON_ERROR) ?></script>
 <script src="<?= $base ?>/assets/js/landing.js?v=<?= filemtime(ROOT_DIR . '/assets/js/landing.js') ?>" defer></script>
+<?php if(\Conquer\Analytics\LinkTracker::enabled()): ?><script src="<?= $base ?>/assets/js/link-tracker.js?v=<?= filemtime(ROOT_DIR . '/assets/js/link-tracker.js') ?>" defer></script><?php endif ?>
 </head>
-<body class="welcome landing-page" data-i18n-scope>
+<body class="welcome landing-page" data-i18n-scope data-link-endpoint="<?= $base ?>/api/links/click">
 <a class="skip-link" href="#main-content">Skip to content</a>
 <header class="lp-header">
   <a class="lp-brand" href="<?= $base ?>/" aria-label="Union of Kingdoms home page">
@@ -78,7 +79,7 @@ $structuredData = [
   </a>
   <div class="lp-header-actions">
     <div data-locale-controls data-locale-compact="true" data-locale-install="false"></div>
-    <a class="lp-sign-in" href="https://play.unionofkingdoms.com/"><span>Log in</span> <span aria-hidden="true">→</span></a>
+    <a class="lp-sign-in" href="https://play.unionofkingdoms.com/" data-track-link="site-login"><span>Log in</span> <span aria-hidden="true">→</span></a>
   </div>
 </header>
 
@@ -94,9 +95,9 @@ $structuredData = [
       <h1 id="hero-title"><span>Your kingdom.</span><br><em>Our next adventure.</em></h1>
       <p class="lp-lead"><?= \Conquer\Game\Locale::html('landing.seo.intro', [], 'en') ?></p>
       <?php if ($openAlpha): ?>
-      <a class="lp-button lp-hero-start" href="<?= $registerUrl ?>"><span><?= $openText('cta') ?></span> <span aria-hidden="true">→</span></a>
+      <a class="lp-button lp-hero-start" href="<?= $registerUrl ?>" data-track-link="site-register-hero"><span><?= $openText('cta') ?></span> <span aria-hidden="true">→</span></a>
       <?php else: ?>
-      <a class="lp-button lp-hero-start" href="<?= $base ?>/?zugang=waitlist#zugang" data-auth-target="waitlist"><span>Register for closed alpha</span> <span aria-hidden="true">→</span></a>
+      <a class="lp-button lp-hero-start" href="<?= $base ?>/?zugang=waitlist#zugang" data-auth-target="waitlist" data-track-link="site-waitlist"><span>Register for closed alpha</span> <span aria-hidden="true">→</span></a>
       <?php endif ?>
     </div>
     <div class="lp-hero-controls" role="group" aria-label="Choose featured artwork">
@@ -118,9 +119,9 @@ $structuredData = [
       </div>
       <div class="lp-auth-body">
         <p class="lp-waitlist-intro"><?= $openText('access') ?></p>
-        <a class="lp-button lp-submit" href="<?= $registerUrl ?>"><?= $openText('cta') ?> <span aria-hidden="true">→</span></a>
+        <a class="lp-button lp-submit" href="<?= $registerUrl ?>" data-track-link="site-register-access"><?= $openText('cta') ?> <span aria-hidden="true">→</span></a>
         <p class="lp-alpha-note"><?= $openText('notice') ?></p>
-        <div class="lp-auth-footer"><a href="https://play.unionofkingdoms.com/" data-i18n="login.login"><?= \Conquer\Game\Locale::html('login.login') ?></a></div>
+        <div class="lp-auth-footer"><a href="https://play.unionofkingdoms.com/" data-track-link="site-login" data-i18n="login.login"><?= \Conquer\Game\Locale::html('login.login') ?></a></div>
       </div>
     </div>
     <?php else: ?>
@@ -131,8 +132,8 @@ $structuredData = [
       </div>
       <div class="lp-auth-body">
         <div class="auth-switch" role="group" aria-label="Choose access option">
-          <a href="<?= $base ?>/?zugang=waitlist#zugang" class="active" data-auth-target="waitlist" aria-current="true"><?= $wt('tab') ?></a>
-          <a href="https://play.unionofkingdoms.com/">Log in</a>
+          <a href="<?= $base ?>/?zugang=waitlist#zugang" class="active" data-auth-target="waitlist" data-track-link="site-waitlist" aria-current="true"><?= $wt('tab') ?></a>
+          <a href="https://play.unionofkingdoms.com/" data-track-link="site-login">Log in</a>
         </div>
         <div data-access-panel="waitlist">
           <?php if ($waitlistSuccess): ?>
@@ -158,7 +159,7 @@ $structuredData = [
             <p><span><?= $wt('privacy_contact') ?></span> <a href="mailto:hello@unionofkingdoms.com">hello@unionofkingdoms.com</a></p>
           </details>
         </div>
-        <div class="lp-auth-footer lp-key-link"><a href="https://play.unionofkingdoms.com/?mode=register"><?= $wt('redeem') ?></a></div>
+        <div class="lp-auth-footer lp-key-link"><a href="https://play.unionofkingdoms.com/?mode=register" data-track-link="site-register-access"><?= $wt('redeem') ?></a></div>
       </div>
     </div>
     <?php endif ?>
@@ -167,9 +168,10 @@ $structuredData = [
 </main>
 
 <footer class="lp-footer">
-  <?php if($discordInvite=\Conquer\Game\Community\CommunityNewsService::discordInvite()): ?><a href="<?= htmlspecialchars($discordInvite,ENT_QUOTES) ?>" target="_blank" rel="noopener noreferrer"><?= \Conquer\Game\Locale::html('social.discord_join') ?></a><?php endif ?>
+  <?php if($discordInvite=\Conquer\Game\Community\CommunityNewsService::discordInvite()): ?><a href="<?= htmlspecialchars($discordInvite,ENT_QUOTES) ?>" data-track-link="site-discord" target="_blank" rel="noopener noreferrer"><?= \Conquer\Game\Locale::html('social.discord_join') ?></a><?php endif ?>
   <small>© <?= date('Y') ?> Sven Manderscheid</small>
-  <a href="mailto:hello@unionofkingdoms.com">Contact</a>
+  <a href="mailto:hello@unionofkingdoms.com" data-track-link="site-contact">Contact</a>
+  <?php require ROOT_DIR . '/views/partials/link-tracker-notice.php'; ?>
 </footer>
 </body>
 </html>

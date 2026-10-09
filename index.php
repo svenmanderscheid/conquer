@@ -91,6 +91,16 @@ $_publicRoot = $_configuredOrigin;
 $_landingCspNonce = base64_encode(random_bytes(18));
 $_landingCsp = "default-src 'self'; img-src 'self' data:; style-src 'self'; font-src 'self'; script-src 'self' 'nonce-{$_landingCspNonce}'; connect-src 'self'; manifest-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; object-src 'none'";
 
+// Session-free public analytics; redirects keep working if only counting fails.
+if ($_normalizedPath === '/api/links/click') {
+    \Conquer\Analytics\LinkTracker::click();
+    exit;
+}
+if (preg_match('~^/go/([^/]+)$~D', $_normalizedPath, $_linkMatch)) {
+    \Conquer\Analytics\LinkTracker::redirect($_linkMatch[1]);
+    exit;
+}
+
 if ($_normalizedPath === '/robots.txt' && $method === 'GET') {
     header('Content-Type: text/plain; charset=utf-8');
     header('Cache-Control: public, max-age=3600');
@@ -196,6 +206,8 @@ if (str_starts_with($_normalizedPath, '/admin')) {
             => \Conquer\Admin\AdminController::dashboard(),
         $adminUri === '/admin/analytics'
             => \Conquer\Admin\AdminController::analytics(),
+        $adminUri === '/admin/links'
+            => \Conquer\Admin\AdminController::links(),
         $adminUri === '/admin/layout'
             => \Conquer\Admin\AdminController::layoutEditor(),
         $adminUri === '/admin/layout-data'
