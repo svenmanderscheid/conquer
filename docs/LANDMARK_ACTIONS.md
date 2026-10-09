@@ -2,6 +2,8 @@
 
 Selecting a Commune, canton Shrine, Royal Congress, or a legacy Shrine/Congress opens the shared compact map menu. Details opens the existing full target view. Rally checks fresh authenticated eligibility before opening troop selection. An unavailable rally opens a centered explanation with the attack window and requirements; its muted button remains clickable for this explanation. Scouts can observe defenders without starting an attack.
 
+Territory Rally uses the same attack window as monster rallies, from both the map shortcut and the territory details: troop portraits, sliders, saved formations, Max and the 1/5/15/30-minute gathering picker. The target retains its name, coordinates and shared territory artwork; crown rallies also retain the gate/arsenal/throne choice. Troops are sent only by the explicit Start rally action. The existing `territory/action` endpoint and saved territory receipt preserve string target IDs, world context and identical retries after a lost response. Rally speed and capacity use the existing PvP rally values.
+
 English, German and French copy uses the `landmark.*` entries in the shared catalogs. Target names remain unchanged. Layout uses the common warm cream theme and supports portrait, landscape, reduced motion and browser Back. Landmarks have one measured card with a wrapping name, a separate 44-pixel close button and stationary action hit areas. The map nameplate disappears during selection. Small screens frame the artwork and card together, reducing map zoom when needed; overlapping map shortcuts reappear when the selection closes.
 
 ## Server contracts
@@ -18,7 +20,9 @@ No database migration is required: these actions use the existing marches, ralli
 
 `php tests/landmark_actions.php` uses a disposable database for arrival intelligence, reservations, joining, outcomes, world context, delayed event settlement, CSRF and command retries.
 
-`tests/landmark_actions_app.cjs` runs against `tools/preview-feature-fixture.php --territory --port=18946`. It checks the actual main app, all three Luxembourg landmark categories, complete names, stationary edge clicks and touch taps, visible artwork without card overlap, centered blocked-rally information, troop selection and Back in five screen sizes. It also confirms a real Commune rally and its idempotent retry, followed by real scouting dispatch. Restart the fixture after changing application assets: it copies the code when started.
+`tests/landmark_actions_app.cjs` runs against `tools/preview-feature-fixture.php --territory --port=18946`. It checks the actual main app, all three Luxembourg landmark categories, complete names, stationary edge clicks and touch taps, visible artwork without card overlap, centered blocked-rally information, shared troop selection from the map and details, and Back in five screen sizes. It also confirms a real Commune rally after explicit troop/time selection, drops the successful response and verifies that recovery sends the identical saved order, followed by real scouting dispatch. Restart the fixture after changing application assets: it copies the code when started.
+
+`tests/march_windows.cjs` covers the shared territory composer for Commune, Shrine and crown targets in portrait, landscape and desktop, including crown objectives, rally capacity, PvP/cavalry speed, eligibility changes and duplicate-confirm prevention.
 
 `tests/landmark_legacy_app.cjs` runs against `tools/preview-feature-fixture.php --teleport --landmark-actions --port=18947`. It checks Congress and four elemental Shrines, full details, closed event information, real rally dispatch and the arriving scout report in the actual mailbox.
 

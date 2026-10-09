@@ -1,4 +1,9 @@
 {
+  "landmark.territory_rally_note": "Lancez un ralliement pour conquérir ce territoire. Des pertes sont possibles. Le lancement met fin à la protection de votre ville.",
+  "landmark.siege_objective": "Objectif du siège",
+  "landmark.objective_gate": "Porte",
+  "landmark.objective_arsenal": "Arsenal",
+  "landmark.objective_throne": "Trône",
   "landmark.details": "Détails",
   "landmark.rally": "Ralliement",
   "landmark.scout": "Espionner",

@@ -121,8 +121,25 @@ window.ConquerTerritory=function(ctx){
   function schedule(){clearTimeout(timer);if(active())timer=setTimeout(()=>{if(active()&&!working&&!formMode&&!document.hidden)load();else schedule();},15000);}
   async function open(id=null){if(!enabled()){toast('Die Kontinent-Eroberung ist in dieser Welt nicht aktiv.');return;}remember();targetId=id;formMode=null;detail=null;loading=true;error='';feedback='';if(Number(state?.world_id)!==world()){state=null;views.clear();}if(!active())openDialog('<section class="territory-shell"><h2>Allianzgebiete</h2><p role="status">Gebiete werden geladen …</p></section>');draw();await load();}
   async function openRally(id){
+    if(working)return;
     await open(id);
     if(!active()||targetId!==id||!detail?.can_attack||!leadership())return;
+    if(pending()){error='Bitte setze zuerst deinen unbestätigten Auftrag fort.';draw();return;}
+    if(ctx.marchPanel){
+      const requestedWorld=world(),cityId=Number(getState().city.id);
+      clearTimeout(timer);
+      ctx.marchPanel.open(id,'territory-rally',{
+        target:detail,
+        onTerritoryRally:async ({troops,rally_minutes,objective})=>{
+          if(requestedWorld!==world()||cityId!==Number(getState().city.id))return null;
+          const composer=dialog()?.querySelector('.march-command');
+          const result=await execute({action:'start',city_id:cityId,target_id:id,troops,rally_minutes,...(objective?{objective}:{})});
+          if(requestedWorld===world()&&composer?.isConnected&&dialog()?.open&&(result||pending()))await open(id);
+          return result;
+        }
+      });
+      return;
+    }
     formMode={mode:'start',id};draw();host()?.querySelector('.territory-army')?.scrollIntoView({block:'start'});
   }
   async function joinRally(id,button){
@@ -153,7 +170,7 @@ window.ConquerTerritory=function(ctx){
     if(receipt&&!retry){error='Bitte setze zuerst deinen unbestätigten Auftrag fort.';draw();return;}
     if(!receipt){receipt={...body,world_id:world(),expected_world_id:world(),request_id:crypto.randomUUID()};try{sessionStorage.setItem(key(),JSON.stringify(receipt));}catch{error='Der Auftrag kann nicht gegen Verbindungsabbruch gesichert werden. Bitte erlaube den Sitzungsspeicher.';draw();return;}}
     const storageKey=key(),requestedWorld=world();working=true;host()?.querySelectorAll('button,input,select').forEach(b=>b.disabled=true);
-    try{const result=await api('territory/action',receipt);sessionStorage.removeItem(storageKey);if(requestedWorld!==world())return;toast(result.message||'Auftrag bestätigt.');formMode=null;error='';feedback=result.scouting?`Aufklärung: ${fmt(result.scouting.npc_troops)} NPC-Truppen · Befestigung ${fmt(result.scouting.fortification)}.`:'';await refresh(false);}
+    try{const result=await api('territory/action',receipt);sessionStorage.removeItem(storageKey);if(requestedWorld!==world())return;toast(result.message||'Auftrag bestätigt.');formMode=null;error='';feedback=result.scouting?`Aufklärung: ${fmt(result.scouting.npc_troops)} NPC-Truppen · Befestigung ${fmt(result.scouting.fortification)}.`:'';await refresh(false);return result;}
     catch(e){if(e.definite)sessionStorage.removeItem(storageKey);error=e.message;toast(e.message);}
     finally{working=false;if(requestedWorld===world()){await load(false);if(active())draw();}}
   }
@@ -167,7 +184,7 @@ window.ConquerTerritory=function(ctx){
     else if(a==='filter'){filter=['all','commune','canton','crown'].includes(id)?id:'all';draw(true);}
     else if(a==='reload'){formMode=null;load();}
     else if(a==='locate'){const t=list(state?.targets).find(t=>t.id===id)||detail;if(t){dialog()?.close();ctx.navigate('world');window.ConquerWorld.focus(Number(t.x),Number(t.y));window.ConquerWorld.locate(Number(t.x),Number(t.y),['territory'],t.id);}}
-    else if(a==='army'){if(b.dataset.mode==='join'){joinRally(id,b);return true;}formMode={mode:b.dataset.mode,id};draw();host()?.querySelector('.territory-army')?.scrollIntoView({block:'start'});}
+    else if(a==='army'){if(b.dataset.mode==='join'){joinRally(id,b);return true;}if(b.dataset.mode==='start'&&ctx.marchPanel){openRally(id);return true;}formMode={mode:b.dataset.mode,id};draw();host()?.querySelector('.territory-army')?.scrollIntoView({block:'start'});}
     else if(a==='army-close'){formMode=null;draw();}
     else if(a==='retry')execute(null,true);
     else if(a==='goal')execute({action:'set_goal',target_id:id});

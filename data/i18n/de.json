@@ -1,4 +1,9 @@
 {
+  "landmark.territory_rally_note": "Erobere dieses Gebiet mit einer Rally. Truppenverluste sind möglich. Der Start beendet deinen Stadtschutz.",
+  "landmark.siege_objective": "Belagerungsziel",
+  "landmark.objective_gate": "Tor",
+  "landmark.objective_arsenal": "Arsenal",
+  "landmark.objective_throne": "Thron",
   "landmark.details": "Details",
   "landmark.rally": "Rally",
   "landmark.scout": "Spähen",

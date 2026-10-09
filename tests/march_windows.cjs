@@ -25,6 +25,57 @@ const checkTargetArtwork=async label=>{
  });
  if(overlap)check(label+': target artwork does not overlap text',()=>assert.deepEqual(overlap,[]));
 };
+// Territory orders share this composer while retaining their own receipt-protected sender.
+await page.addScriptTag({path:root+'/assets/js/territory-art.js'});
+await page.evaluate(()=>{
+ window.openTerritoryRally=kind=>{
+  localStorage.clear();sent=[];window.territorySubmitted=[];
+  state.buildings={hall_of_alliance:{rally_capacity:{total:1200}}};
+  window.territoryTarget={id:kind+':wiltz',kind,name:kind==='commune'?'Commune Wiltz':kind==='canton'?'Shrine Wiltz':'Royal Castle',benefit_type:'lumber',x:170,y:260,can_attack:true,npc_troops:120};
+  march.open(territoryTarget.id,'territory-rally',{target:territoryTarget,onTerritoryRally:async payload=>{territorySubmitted.push(payload);await new Promise(resolve=>window.releaseTerritoryCallback=resolve);return {};}});
+ };
+});
+for(const viewport of [{width:320,height:568},{width:568,height:320},{width:1280,height:800}]){
+ await page.setViewportSize(viewport);
+ for(const kind of ['commune','canton','crown']){
+  await page.evaluate(kind=>openTerritoryRally(kind),kind);
+  const label=`${viewport.width}×${viewport.height} ${kind} rally`;
+  const target=await page.evaluate(()=>territoryTarget),title=page.locator('.march-target-heading h3');
+  assert.equal(await title.textContent(),target.name);assert.equal(await title.getAttribute('translate'),'no');
+  const art=await page.locator('.march-target-art img').evaluate(async img=>{await img.decode();return {src:img.src,loaded:img.naturalWidth>0};});
+  const expectedArt=await page.evaluate(base=>ConquerTerritoryArt.image(base,territoryTarget),assetBase);
+  check(label+': string target keeps its name and approved territory art',()=>{assert.equal(typeof target.id,'string');assert(art.loaded);assert.equal(art.src,expectedArt);});
+  assert.equal(await page.locator('[data-action="march-preview"]').count(),0,'territory does not send unsupported battle-preview requests');
+  await page.evaluate(()=>march.onClick('march-max',{}));
+  const troops=await page.locator('.march-unit-amount input').evaluateAll(inputs=>Object.fromEntries(inputs.map(i=>[i.id.replace('march-unit-',''),Number(i.value)]).filter(([,count])=>count>0)));
+  check(label+': Max respects the smaller rally capacity',()=>assert.equal(Object.values(troops).reduce((sum,count)=>sum+count,0),1200));
+  const time=await page.locator('#march-travel-time').textContent(),seconds=Math.floor(Math.hypot(150,240)*100/50);
+  check(label+': ETA uses PvP rally speed',()=>assert.equal(time,`${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,'0')} Min.`));
+  let objective;
+  if(kind==='crown'){
+   if(await page.locator('[data-action="march-view"][data-id="target"]').isVisible())await page.locator('[data-action="march-view"][data-id="target"]').click();
+   assert.deepEqual(await page.locator('#march-territory-objective option').evaluateAll(options=>options.map(o=>o.value)),['gate','arsenal','throne']);
+   objective=viewport.width===320?'arsenal':viewport.width===568?'throne':'gate';await page.locator('#march-territory-objective').selectOption(objective);
+  }else assert.equal(await page.locator('#march-territory-objective').count(),0);
+  await page.locator('[data-action="march-time-open"]').click();await page.locator('[data-action="march-time-select"][data-id="15"]').click();await page.locator('[data-action="march-time-confirm"]').click();
+  const confirm=await page.locator('#march-confirm').evaluate(button=>{const r=button.getBoundingClientRect();return {height:r.height,visible:r.left>=0&&r.top>=0&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1,hit:button.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2))};});
+  check(label+': confirmation stays reachable after choosing target and duration',()=>assert(confirm.height>=44&&confirm.visible&&confirm.hit));
+  assert.deepEqual(await page.evaluate(()=>({generic:sent.length,territory:territorySubmitted.length})),{generic:0,territory:0});
+  await page.evaluate(()=>{march.onClick('march-send',{});march.onClick('march-send',{});});await page.waitForFunction(()=>territorySubmitted.length===1);
+  const submitted=await page.evaluate(()=>({generic:sent.length,payloads:territorySubmitted}));
+  check(label+': explicit confirmation invokes its sender once with the exact selection',()=>{assert.equal(submitted.generic,0);assert.deepEqual(submitted.payloads,[{troops,rally_minutes:15,objective}]);});
+  await page.evaluate(()=>releaseTerritoryCallback());await page.waitForFunction(()=>!document.querySelector('#march-confirm').disabled);
+  await page.screenshot({path:path.join(out,`territory-${kind}-${viewport.width}x${viewport.height}.png`)});
+ }
+}
+await page.evaluate(()=>{
+ openTerritoryRally('commune');state.troop_defs.forEach(t=>{t.power=10*t.tier;t.cavalry_pvp_rally_speed=125;});march.onClick('march-clear',{});
+ document.querySelector('.march-unit-row[data-type="3"] input[type="number"]').value=1200;march.update();
+});
+{const actual=await page.locator('#march-travel-time').textContent(),seconds=Math.floor(Math.hypot(150,240)*100/125);check('Territory cavalry army uses the server-provided PvP rally cavalry speed',()=>assert.equal(actual,`${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,'0')} Min.`));}
+await page.evaluate(()=>{territoryTarget.can_attack=false;march.onClick('march-send',{});});
+assert.equal(await page.locator('#march-confirm').isDisabled(),true);assert.equal(await page.evaluate(()=>territorySubmitted.length),0,'withdrawn target eligibility blocks dispatch');
+await page.evaluate(()=>{delete state.buildings;state.troop_defs.forEach(t=>{delete t.power;delete t.cavalry_pvp_rally_speed;});});
 for(const viewport of [{width:390,height:844},{width:320,height:568},{width:568,height:320},{width:768,height:1024},{width:1280,height:720}]){await page.setViewportSize(viewport);
 for(const kind of ['players','rally','monster-rally','nodes','node-attack','rally-join','congress','congress-garrison','shrine','shrine-garrison']){
  await page.evaluate(kind=>openMarch(kind),kind);
