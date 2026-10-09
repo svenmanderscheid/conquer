@@ -83,7 +83,7 @@ window.ConquerPaintedCity=(()=>{
   if(!resources)return;
   // Allow even the highest roof marker to move below the fixed resource bar.
   // This is real scrollable space, so markers always stay anchored to their roofs.
-  const room=Math.max(0,Math.ceil(resources.getBoundingClientRect().bottom-village.getBoundingClientRect().top+12-scene.offsetHeight*.1+27));
+  const room=Math.max(Number(village.dataset.plaqueHeadroom)||0,Math.ceil(resources.getBoundingClientRect().bottom-village.getBoundingClientRect().top+12-scene.offsetHeight*.1+27));
   scroll.style.setProperty('--painted-headroom',room+'px');
  }
  const zoomLevels=[1,.9,.8];
@@ -246,6 +246,7 @@ window.ConquerPaintedCity=(()=>{
     const centerX=(scroll.scrollLeft+scroll.clientWidth/2-scene.offsetLeft)/oldWidth;
     const centerY=(scroll.scrollTop+scroll.clientHeight/2-scene.offsetTop)/oldWidth;
     clear();zoomIndex=next;scroll.closest('.painted-village').dataset.zoom=zoomLevels[next];
+    delete scroll.closest('.painted-village').dataset.plaqueHeadroom;
     syncView(scroll.closest('.painted-village'));
     scroll.scrollLeft=scene.offsetLeft+centerX*scene.offsetWidth-scroll.clientWidth/2;
     scroll.scrollTop=scene.offsetTop+centerY*scene.offsetWidth-scroll.clientHeight/2;
@@ -262,21 +263,42 @@ window.ConquerPaintedCity=(()=>{
     menu.querySelector('[data-building-icon]').innerHTML=buildingMenuIcons[b.dataset.id]??buildingMenuIcons.castle;
     menu.querySelector('[data-action="training-building"]').setAttribute('aria-label',b.dataset.name+' öffnen');
     menu.querySelectorAll('[data-action]').forEach(a=>a.dataset.id=b.dataset.id);
-    menu.hidden=false;menu.dataset.scroll=scroll.scrollLeft+','+scroll.scrollTop;
-    const r=b.getBoundingClientRect(),p=host.getBoundingClientRect();
+    menu.hidden=false;
+    const p=host.getBoundingClientRect(),plaque=b.querySelector('.painted-building-label');
     const resourceBottom=document.getElementById('resources')?.getBoundingClientRect().bottom??0;
-    const safeTop=Math.max(74,resourceBottom-p.top+8);
-    menu.style.left=Math.max(8,Math.min(p.width-menu.offsetWidth-8,r.left-p.left+r.width/2-menu.offsetWidth/2))+'px';
+    let safeTop=Math.max(74,resourceBottom-p.top+8);
+    const initialBounds=b.getBoundingClientRect();
+    menu.style.left=Math.max(8,Math.min(p.width-menu.offsetWidth-8,initialBounds.left-p.left+initialBounds.width/2-menu.offsetWidth/2))+'px';
     const actions=menu.querySelector('.painted-building-actions'),actionBounds=actions.getBoundingClientRect();
+    const zoomBounds=zoomControls.getBoundingClientRect();
+    if(actionBounds.left<zoomBounds.right&&actionBounds.right>zoomBounds.left)safeTop=Math.max(safeTop,zoomBounds.bottom-p.top+8);
     let safeBottom=Math.min(p.bottom,innerHeight)-8;
     for(const overlay of document.querySelectorAll('#world-chat,#navigation')){
      const bounds=overlay.getBoundingClientRect(),style=getComputedStyle(overlay);
      if(bounds.width&&bounds.height&&style.visibility!=='hidden'&&style.display!=='none'&&bounds.right>actionBounds.left&&bounds.left<actionBounds.right&&bounds.top>p.top+safeTop)safeBottom=Math.min(safeBottom,bounds.top-8);
     }
-    // Keep the only name/level plaque uncovered. Retain the same action row,
-    // placing it below the plaque where possible, or above in short views.
-    const label=b.querySelector('.painted-building-label').getBoundingClientRect();
-    const below=label.bottom+10,above=label.top-actionBounds.height-10;
+    let label=plaque.getBoundingClientRect(),labelTop=p.top+safeTop;
+    if(label.left<zoomBounds.right&&label.right>zoomBounds.left)labelTop=Math.max(labelTop,zoomBounds.bottom+8);
+    const reveal=Math.max(0,labelTop-label.top);
+    if(Math.max(initialBounds.bottom,label.bottom)+reveal+10+actionBounds.height>safeBottom)labelTop=Math.max(labelTop,p.top+safeTop+actionBounds.height+10);
+    // Reveal a roof plaque hidden behind the HUD without detaching it from
+    // its building. Extra room uses the existing outer woodland at scroll zero.
+    if(label.top<labelTop){
+     const needed=labelTop-label.top,available=scroll.scrollTop;
+     if(needed>available){
+      const room=parseFloat(getComputedStyle(scroll).getPropertyValue('--painted-headroom'))||0;
+      const nextRoom=room+needed-available;
+      scroll.closest('.painted-village').dataset.plaqueHeadroom=nextRoom;
+      scroll.style.setProperty('--painted-headroom',nextRoom+'px');
+     }
+     scroll.scrollTop=Math.max(0,available-needed);
+     label=plaque.getBoundingClientRect();
+    }
+    menu.dataset.scroll=scroll.scrollLeft+','+scroll.scrollTop;
+    const r=b.getBoundingClientRect();
+    // Keep the plaque above the building and the action row below its artwork
+    // where possible, or above the plaque in short views.
+    const below=Math.max(r.bottom,label.bottom)+10,above=label.top-actionBounds.height-10;
     const actionTop=below+actionBounds.height<=safeBottom?below:Math.max(p.top+safeTop,Math.min(above,safeBottom-actionBounds.height));
     menu.style.setProperty('--selected-actions-top',(actionTop-p.top-safeTop)+'px');
     menu.style.top=safeTop+'px';

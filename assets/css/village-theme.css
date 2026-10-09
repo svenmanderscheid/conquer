@@ -5596,6 +5596,9 @@ body.mobile-game .world-chat-tabs>button[aria-pressed=true] {
 }
 /* Keep the existing plaque at the building, only for the current selection.
    Construction/training status remains visible even when its name is hidden. */
+body.mobile-game .painted-village-building[aria-pressed="true"]>.painted-building-label {
+  top:auto;bottom:calc(100% + 8px);
+}
 body.mobile-game .painted-village-building:not([aria-pressed="true"]) :is(.painted-building-name,.painted-building-level),
 body.mobile-game .painted-village-building:not([aria-pressed="true"]):not(.is-building):not(.is-training)>.painted-building-label { display:none; }
 body.mobile-game .painted-village-building:not([aria-pressed="true"]):is(.is-building,.is-training)>.painted-building-label {
