@@ -3697,11 +3697,6 @@ body.mobile-game #game-dialog.march-dialog:has(.is-monster-rally) .march-command
   body.mobile-game #panel-dialog[data-panel] :is(.panel-emblem,.panel-close),
   body.mobile-game #game-dialog.mobile-detail-page > .dialog-close,
   body.mobile-game #game-dialog.mobile-detail-page .march-close { display:none!important; }
-  body.mobile-game #panel-dialog[data-panel] .panel-report-button,
-  body.mobile-game #game-dialog.mobile-detail-page > .dialog-report-button {
-    position:absolute!important;top:calc(6px + env(safe-area-inset-top))!important;right:6px!important;
-    width:44px!important;height:44px!important;min-height:44px!important;
-  }
   body.mobile-game #panel-dialog[data-panel] #inventory-overview-button { margin:0!important;min-width:44px!important;min-height:44px!important; }
   body.mobile-game #panel-dialog[data-panel] #content {
     flex:1!important;min-height:0!important;min-width:0!important;overflow:auto;
@@ -3980,10 +3975,9 @@ body.mobile-game #panel-dialog .hospital-showcase-empty>.button { min-height:44p
 /* Contextual building actions take precedence over hints and the closed chat preview. */
 body.mobile-game.city-mode:has(.painted-building-menu:not([hidden])) :is(#hud-objective,#world-chat:not(.is-open)) { visibility:hidden; pointer-events:none; }
 
-/* Reserve separate header space for tabs, report and close actions. */
+/* Reserve separate header space for tabs and the close action. */
 @media(min-width:701px) and (min-height:521px) {
- body.mobile-game #game-dialog.march-dialog .march-command-heading { padding-right:114px!important; }
- body.mobile-game #game-dialog.march-dialog > .dialog-report-button { top:6px!important;right:54px!important; }
+ body.mobile-game #game-dialog.march-dialog .march-command-heading { padding-right:64px!important; }
 }
 
 /* Continent objectives retain the common violet heading under legacy window rules. */
@@ -3997,7 +3991,6 @@ body.mobile-game #game-dialog:has(.territory-shell) #dialog-content{padding:0!im
 body.mobile-game #game-dialog:has(.territory-shell) .territory-shell{width:100%}
 
 body.mobile-game #game-dialog .territory-heading{padding-right:64px}
-body.mobile-game #game-dialog:has(.territory-shell)>.dialog-report-button{right:8px!important;top:6px!important}
 body.mobile-game #game-dialog .territory-attack:not(:disabled){background:var(--ui-red)!important;color:var(--ui-card-light)!important;border-color:var(--ui-red-dark)!important;box-shadow:0 3px var(--ui-red-dark)!important}
 body.mobile-game #game-dialog .territory-defend:not(:disabled){background:var(--ui-blue)!important;color:var(--ui-card-light)!important;border-color:var(--ui-blue-dark)!important;box-shadow:0 3px var(--ui-blue-dark)!important}
 @media(max-width:360px){
@@ -5043,7 +5036,7 @@ body.mobile-game #hud-gems>.hud-gems-compact { display:none; }
   body.mobile-game #hud-left-tools .hud-job .hud-edge-art { width:26px;height:26px;background:transparent;box-shadow:none!important; }
   body.mobile-game #hud-left-tools .hud-job .hud-edge-art :is(img,svg) { width:26px;height:26px; }
   body.mobile-game #hud-left-tools .hud-job .hud-job-time { font-size:11px;line-height:13px; }
-  body.mobile-game #hud-build-second:is([data-job-state="locked"],[data-job-state="idle"]),body.mobile-game #hud-report { display:none!important; }
+  body.mobile-game #hud-build-second:is([data-job-state="locked"],[data-job-state="idle"]) { display:none!important; }
   body.mobile-game #hud-marches .hud-edge-status { font-size:11px;line-height:13px; }
   body.mobile-game #navigation.game-dock { width:calc(100vw - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px) - 6px)!important;max-width:600px!important;gap:0!important;padding:0!important;border:1px solid var(--ui-line);border-radius:10px;background:color-mix(in srgb,var(--ui-card) 95%,transparent);box-shadow:0 1px 3px color-mix(in srgb,var(--ui-primary-dark) 20%,transparent); }
   body.mobile-game #navigation .game-dock-item,body.mobile-game #navigation .game-dock-item.hud-scene-switch {

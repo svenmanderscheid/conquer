@@ -53,8 +53,9 @@ const output=path.resolve(__dirname,'../artifacts/inventory-overview');fs.mkdirS
     if(r.left<0||r.top<0||r.right>innerWidth+1||r.bottom>innerHeight+1)bad.push('dialog outside viewport');
     if(panel.scrollWidth>panel.clientWidth+1)bad.push('horizontal overflow');
     const heading=panel.querySelector(':scope > .popup-heading'),title=heading?.querySelector('h2');
-    const headerActions=[...panel.querySelectorAll(':scope > .dialog-close,:scope > .dialog-report-button')];
-    if(headerActions.length!==2)bad.push('missing overview header action');
+    const headerActions=[...panel.querySelectorAll(':scope > .dialog-close')];
+    if(headerActions.length!==1)bad.push('missing overview close action');
+    if(panel.querySelector('[data-action="bug-report-open"]'))bad.push('report button outside the main screen');
     if(!heading||!title?.textContent.trim()||!title.checkVisibility({checkOpacity:true,checkVisibilityCSS:true}))bad.push('missing visible overview title');
     else{
      const head=heading.getBoundingClientRect(),range=document.createRange();range.selectNodeContents(title);

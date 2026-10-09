@@ -84,15 +84,8 @@
 .bug-capture-consent { max-width: 560px; }
 .bug-capture-consent .button-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
 .bug-capture-consent .button { min-height: 44px; }
-.panel-report-button,
-.dialog-report-button { display: grid; place-items: center; width: 44px; min-width: 44px; height: 44px; border: 1px solid var(--ui-line); border-radius: 11px; background: var(--ui-card); color: var(--ui-primary); cursor: pointer; }
-.panel-report-button > img,
-.dialog-report-button > img { width: 34px; height: 34px; max-width: none; object-fit: contain; }
 .hud-report-button .hud-edge-art > img { object-fit: contain; }
-.dialog-report-button { position: absolute; z-index: 3; top: 10px; right: 60px; }
 .hud-report-button .hud-edge-art { display: grid; place-items: center; color: var(--ui-card-light); }
-.panel-report-button:focus-visible,
-.dialog-report-button:focus-visible { outline: 3px solid var(--ui-primary-dark); outline-offset: 2px; }
 @media (max-width: 539px) {
   .bug-report-fields { grid-template-columns: 1fr; }
   .bug-report-intro { align-items: flex-start; padding: 13px; }

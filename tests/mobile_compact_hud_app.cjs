@@ -73,7 +73,7 @@ function measureNumbers(){return [...document.querySelectorAll('.hud-compact-pow
     assert(result.boxes['#world-chat'].height<=45,'Collapsed mobile chat uses one touch row');
     assert.equal(await page.locator('.hud-power').isVisible(),false,'Power is incorporated in the mobile account action');
     assert.equal(await page.locator('.hud-compact-power').isVisible(),true,'Power remains visible on mobile');
-    assert.equal(await page.locator('#hud-report').isVisible(),false,'Bug reporting is available from the menu');
+    assert.equal(await page.locator('#hud-report').isVisible(),true,'Bug reporting remains available on the main screen');
     if(['idle','locked'].includes(await page.locator('#hud-build-second').getAttribute('data-job-state')))assert.equal(await page.locator('#hud-build-second').isVisible(),false,'Inactive secondary build slot does not occupy the field');
     const baseline={'390x844':537,'320x568':261,'844x390':155,'568x320':86}[width+'x'+height];
     if(baseline!==undefined)assert(result.centerHeight>=baseline+(height>width?70:25),'The central playfield is substantially taller than before');
@@ -88,11 +88,12 @@ function measureNumbers(){return [...document.querySelectorAll('.hud-compact-pow
    // Reach the complete views with actual taps. No reward, purchase or production action is triggered.
    for(const selector of ['#account-button','#hud-energy','#hud-vip-button','#lord-talent-button','#hud-gems'])await opensPanel(selector);
    for(const resource of ['food','lumber','stone','gold'])await opensPanel('#resources [data-id="'+resource+'"]');
+   await opensPanel('#hud-report');
    if(compact)await opensPanel('#hud-mail');
    if(compact){await page.locator('#navigation [data-id="shop"]').tap();await page.locator('#panel-dialog[data-panel="market"]').waitFor();await closePanels();}
    await page.locator('#hud-menu').tap();await page.locator('.menu-groups').waitFor();
    assert.equal(await page.locator('.menu-groups [data-id="market"]').count(),1,'Market remains reachable from the menu');
-   assert.equal(await page.locator('.menu-groups [data-action="bug-report-open"][data-id="bugreport"]').count(),1,'Reporting remains in the menu');
+   assert.equal(await page.locator('.menu-groups [data-action="bug-report-open"], .menu-groups [data-id="bugreport"]').count(),0,'Reporting is only available on the main screen');
    assert.equal(await page.locator('.menu-groups [data-action="vip-open"]').count(),1,'VIP and the second builder remain available');
    if(width===390&&mode==='world')await page.screenshot({path:path.join(output,'after-390x844-menu.png')});await closePanels();
    await page.locator('.world-chat-preview').tap();await page.locator('#world-chat-body').waitFor();

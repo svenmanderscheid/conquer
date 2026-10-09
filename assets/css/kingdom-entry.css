@@ -25,7 +25,7 @@ body.mobile-game #game-dialog:has(.guide-welcome.kingdom-intro) > .popup-heading
     padding:0!important;border:0!important;margin:-1px!important;overflow:hidden!important;
     clip-path:inset(50%);white-space:nowrap;
 }
-body.mobile-game #game-dialog:has(.guide-welcome.kingdom-intro) > :is(.dialog-close,.dialog-report-button),
+body.mobile-game #game-dialog:has(.guide-welcome.kingdom-intro) > .dialog-close,
 body.mobile-game #game-dialog:has(.guide-welcome.kingdom-intro) .mobile-page-back { display:none!important; }
 body.mobile-game #game-dialog .guide-welcome.kingdom-intro {
     display:grid;grid-template-columns:minmax(150px,.65fr) minmax(0,1.6fr);align-items:end;

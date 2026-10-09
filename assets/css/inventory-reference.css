@@ -183,18 +183,17 @@ body.mobile-game #game-dialog:has(.inventory-overview) {
   height:min(620px,calc(100dvh - 24px))!important;
 }
 body.mobile-game #game-dialog:has(.inventory-overview) #dialog-content { display:flex; padding:0; overflow:hidden; }
-/* Reserve both header actions; translated titles may grow to multiple lines. */
+/* Reserve the close action; translated titles may grow to multiple lines. */
 body.mobile-game #game-dialog:has(.inventory-overview) > .popup-heading {
-  flex:0 0 auto; min-height:56px; padding:8px 108px 8px 12px;
+  flex:0 0 auto; min-height:56px; padding:8px 58px 8px 12px;
 }
 body.mobile-game #game-dialog:has(.inventory-overview) > .popup-heading h2 {
   min-width:0; white-space:normal; overflow-wrap:anywhere; line-height:1.25;
 }
-body.mobile-game #game-dialog:has(.inventory-overview) > :is(.dialog-close,.dialog-report-button) {
+body.mobile-game #game-dialog:has(.inventory-overview) > .dialog-close {
   top:6px; width:44px; min-width:44px; height:44px; min-height:44px;
 }
 body.mobile-game #game-dialog:has(.inventory-overview) > .dialog-close { right:8px; }
-body.mobile-game #game-dialog:has(.inventory-overview) > .dialog-report-button { right:58px; }
 .inventory-overview { display:flex; flex-direction:column; flex:1; min-width:0; min-height:0; }
 .inventory-overview-tabs { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; padding:12px 14px 10px; flex:none; }
 .inventory-overview-tabs button { min-width:0; min-height:44px; font-size:15px; font-weight:800; padding:8px; }
