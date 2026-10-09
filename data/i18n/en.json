@@ -1,7 +1,5 @@
 {
-  "city.zoom.controls": "Village zoom",
-  "city.zoom.out": "Zoom out of village",
-  "city.zoom.in": "Zoom in on village",
+  "city.view.help": "Village view. Hold the left mouse button or drag with one finger to move. Use the mouse wheel or pinch with two fingers to zoom. Plus and minus also zoom.",
   "settings.reports.title": "Completion reports",
   "settings.reports.hint": "Choose which new reports arrive in your inbox. Saved for your account in all worlds. Existing reports and building completion indicators remain available.",
   "settings.reports.build": "Buildings",

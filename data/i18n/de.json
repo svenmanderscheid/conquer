@@ -1,7 +1,5 @@
 {
-  "city.zoom.controls": "Dorfzoom",
-  "city.zoom.out": "Dorfansicht verkleinern",
-  "city.zoom.in": "Dorfansicht vergrößern",
+  "city.view.help": "Dorfansicht. Zum Verschieben die linke Maustaste halten oder mit einem Finger ziehen. Mit dem Mausrad oder zwei Fingern zoomen. Plus und Minus ändern ebenfalls den Zoom.",
   "settings.reports.title": "Fertigstellungsberichte",
   "settings.reports.hint": "Wähle, welche neuen Berichte in deiner Post erscheinen. Die Auswahl gilt für dein Konto in allen Welten. Bestehende Berichte und Fertigstellungshinweise an Gebäuden bleiben erhalten.",
   "settings.reports.build": "Gebäude",

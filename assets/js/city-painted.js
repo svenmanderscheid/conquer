@@ -75,7 +75,6 @@ window.ConquerPaintedCity=(()=>{
   const scene=village.querySelector('.painted-village-scene'),scroll=village.querySelector('.painted-village-scroll');
   const resources=document.getElementById('resources');
   if(!scene||!scroll)return;
-  village.style.setProperty('--painted-zoom-top',Math.max(8,(resources?.getBoundingClientRect().bottom??village.getBoundingClientRect().top)-village.getBoundingClientRect().top+8)+'px');
   // End scrolling at the painting's real lower edge; never expose a fallback
   // background or reserve more HUD space than the approved artwork contains.
   const ground=scene.parentElement;
@@ -86,7 +85,7 @@ window.ConquerPaintedCity=(()=>{
   const room=Math.max(Number(village.dataset.plaqueHeadroom)||0,Math.ceil(resources.getBoundingClientRect().bottom-village.getBoundingClientRect().top+12-scene.offsetHeight*.1+27));
   scroll.style.setProperty('--painted-headroom',room+'px');
  }
- const zoomLevels=[1,.9,.8];
+ const zoomMin=.8,zoomMax=1;
  function syncView(village){
   const scroll=village.querySelector('.painted-village-scroll'),scene=village.querySelector('.painted-village-scene');
   if(!scroll?.clientWidth||!scroll.clientHeight||!scene)return;
@@ -234,28 +233,26 @@ window.ConquerPaintedCity=(()=>{
    menu.innerHTML='<div class="painted-building-actions"><button type="button" data-action="building"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 4.5 19 9l-3 3-1.7-1.7-7.6 7.6-2.6-2.6 7.6-7.6L10 6l3-3 1.5 1.5Z"/><path d="M4 20h7"/></svg><small>Ausbauen / Info</small></button><button type="button" data-action="training-building"><svg data-building-icon viewBox="0 0 24 24" aria-hidden="true"></svg><small>Öffnen</small></button><button type="button" class="painted-selection-close" aria-label="Gebäudeauswahl schließen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>';
    host.querySelector('.painted-village').append(menu);
    const clear=()=>{menu.hidden=true;scroll.querySelectorAll('[aria-pressed="true"]').forEach(b=>b.setAttribute('aria-pressed','false'));};
-   const zoomControls=document.createElement('div');
-   zoomControls.className='painted-village-zoom';zoomControls.setAttribute('role','group');
-   zoomControls.setAttribute('aria-label','Village zoom');zoomControls.setAttribute('data-i18n-attrs','aria-label:city.zoom.controls');
-   zoomControls.innerHTML='<button type="button" data-city-zoom="out" aria-label="Zoom out of village" data-i18n-attrs="aria-label:city.zoom.out">−</button><span class="painted-village-zoom-value" data-i18n-ignore>100%</span><button type="button" data-city-zoom="in" aria-label="Zoom in on village" data-i18n-attrs="aria-label:city.zoom.in" disabled>+</button>';
-   host.querySelector('.painted-village').append(zoomControls);
-   let zoomIndex=0;
-   const setZoom=next=>{
-    next=Math.max(0,Math.min(zoomLevels.length-1,next));if(next===zoomIndex)return;
-    const scene=scroll.querySelector('.painted-village-scene'),oldWidth=scene.offsetWidth;
-    const centerX=(scroll.scrollLeft+scroll.clientWidth/2-scene.offsetLeft)/oldWidth;
-    const centerY=(scroll.scrollTop+scroll.clientHeight/2-scene.offsetTop)/oldWidth;
-    clear();zoomIndex=next;scroll.closest('.painted-village').dataset.zoom=zoomLevels[next];
-    delete scroll.closest('.painted-village').dataset.plaqueHeadroom;
-    syncView(scroll.closest('.painted-village'));
-    scroll.scrollLeft=scene.offsetLeft+centerX*scene.offsetWidth-scroll.clientWidth/2;
-    scroll.scrollTop=scene.offsetTop+centerY*scene.offsetWidth-scroll.clientHeight/2;
-    zoomControls.querySelector('[data-city-zoom="out"]').disabled=next===zoomLevels.length-1;
-    zoomControls.querySelector('[data-city-zoom="in"]').disabled=next===0;
-    zoomControls.querySelector('.painted-village-zoom-value').textContent=Math.round(zoomLevels[next]*100)+'%';
+   const village=scroll.closest('.painted-village');village.dataset.zoom='1';
+   scroll.setAttribute('aria-label','Village view. Hold the left mouse button or drag with one finger to move. Use the mouse wheel or pinch with two fingers to zoom. Plus and minus also zoom.');
+   scroll.setAttribute('data-i18n-attrs','aria-label:city.view.help');
+   const zoomAnchor=(x,y)=>{const scene=scroll.querySelector('.painted-village-scene'),bounds=scene.getBoundingClientRect();return{x:(x-bounds.left)/scene.offsetWidth,y:(y-bounds.top)/scene.offsetWidth};};
+   const setZoom=(value,x,y,anchor)=>{
+    const next=Math.max(zoomMin,Math.min(zoomMax,value));
+    if(next===Number(village.dataset.zoom)&&!anchor)return;
+    const view=scroll.getBoundingClientRect();x??=view.left+view.width/2;y??=view.top+view.height/2;
+    anchor??=zoomAnchor(x,y);clear();village.dataset.zoom=next;
+    delete village.dataset.plaqueHeadroom;syncView(village);
+    const scene=scroll.querySelector('.painted-village-scene');
+    scroll.scrollLeft=scene.offsetLeft+anchor.x*scene.offsetWidth-(x-view.left);
+    scroll.scrollTop=scene.offsetTop+anchor.y*scene.offsetWidth-(y-view.top);
    };
-   zoomControls.addEventListener('click',e=>{const button=e.target.closest('[data-city-zoom]');if(button&&!button.disabled)setZoom(zoomIndex+(button.dataset.cityZoom==='out'?1:-1));});
-   scroll.addEventListener('keydown',e=>{if(e.target!==scroll||!['+','=','-','−'].includes(e.key))return;e.preventDefault();setZoom(zoomIndex+(['-','−'].includes(e.key)?1:-1));});
+   scroll.addEventListener('wheel',e=>{
+    e.preventDefault();
+    const delta=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?scroll.clientHeight:1);
+    if(delta)setZoom(Number(village.dataset.zoom)*Math.exp(-Math.max(-240,Math.min(240,delta))*.0012),e.clientX,e.clientY);
+   },{passive:false});
+   scroll.addEventListener('keydown',e=>{if(e.target!==scroll||!['+','=','-','−'].includes(e.key))return;e.preventDefault();setZoom(Number(village.dataset.zoom)*(['-','−'].includes(e.key)?.9:1/.9));});
    scroll.addEventListener('click',e=>{
     const b=e.target.closest('.painted-village-building');
     if(!b){clear();return;}
@@ -270,15 +267,12 @@ window.ConquerPaintedCity=(()=>{
     const initialBounds=b.getBoundingClientRect();
     menu.style.left=Math.max(8,Math.min(p.width-menu.offsetWidth-8,initialBounds.left-p.left+initialBounds.width/2-menu.offsetWidth/2))+'px';
     const actions=menu.querySelector('.painted-building-actions'),actionBounds=actions.getBoundingClientRect();
-    const zoomBounds=zoomControls.getBoundingClientRect();
-    if(actionBounds.left<zoomBounds.right&&actionBounds.right>zoomBounds.left)safeTop=Math.max(safeTop,zoomBounds.bottom-p.top+8);
     let safeBottom=Math.min(p.bottom,innerHeight)-8;
     for(const overlay of document.querySelectorAll('#world-chat,#navigation')){
      const bounds=overlay.getBoundingClientRect(),style=getComputedStyle(overlay);
      if(bounds.width&&bounds.height&&style.visibility!=='hidden'&&style.display!=='none'&&bounds.right>actionBounds.left&&bounds.left<actionBounds.right&&bounds.top>p.top+safeTop)safeBottom=Math.min(safeBottom,bounds.top-8);
     }
     let label=plaque.getBoundingClientRect(),labelTop=p.top+safeTop;
-    if(label.left<zoomBounds.right&&label.right>zoomBounds.left)labelTop=Math.max(labelTop,zoomBounds.bottom+8);
     const reveal=Math.max(0,labelTop-label.top);
     if(Math.max(initialBounds.bottom,label.bottom)+reveal+10+actionBounds.height>safeBottom)labelTop=Math.max(labelTop,p.top+safeTop+actionBounds.height+10);
     // Reveal a roof plaque hidden behind the HUD without detaching it from
@@ -317,30 +311,66 @@ window.ConquerPaintedCity=(()=>{
    menu.addEventListener('click',e=>{if(e.target.closest('[data-action]'))clear();});
    host.addEventListener('keydown',e=>{if(e.key==='Escape'){clear();}});
    scroll.addEventListener('scroll',()=>{if(menu.dataset.scroll!==scroll.scrollLeft+','+scroll.scrollTop)clear();},{passive:true});
-   let drag=null,suppressClick=false;
+   let drag=null,pinch=null,suppressClick=false;
+   const touches=new Map();
+   const startDrag=(id,x,y,moved=false)=>({id,x,y,left:scroll.scrollLeft,top:scroll.scrollTop,moved});
+   const startPinch=()=>{
+    const ids=[...touches.keys()].slice(0,2),a=touches.get(ids[0]),b=touches.get(ids[1]);
+    const x=(a.x+b.x)/2,y=(a.y+b.y)/2;
+    pinch={ids,distance:Math.max(2,Math.hypot(a.x-b.x,a.y-b.y)),zoom:Number(village.dataset.zoom),anchor:zoomAnchor(x,y)};
+    drag=null;suppressClick=true;clear();scroll.classList.add('is-dragging');
+    for(const id of touches.keys())scroll.setPointerCapture(id);
+   };
    scroll.addEventListener('pointerdown',e=>{
-    suppressClick=false;
-    if(e.pointerType!=='mouse'||e.button!==0)return;
-    drag={id:e.pointerId,x:e.clientX,y:e.clientY,left:scroll.scrollLeft,top:scroll.scrollTop,moved:false};
+    if(!touches.size)suppressClick=false;
+    if(e.pointerType==='mouse'){
+     if(e.button===0&&!touches.size)drag=startDrag(e.pointerId,e.clientX,e.clientY);
+     return;
+    }
+    touches.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(touches.size>=2)startPinch();else drag=startDrag(e.pointerId,e.clientX,e.clientY);
    });
    scroll.addEventListener('pointermove',e=>{
+    if(touches.has(e.pointerId))touches.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(pinch){
+     const a=touches.get(pinch.ids[0]),b=touches.get(pinch.ids[1]);
+     if(!a||!b)return;
+     e.preventDefault();
+     setZoom(pinch.zoom*Math.hypot(a.x-b.x,a.y-b.y)/pinch.distance,(a.x+b.x)/2,(a.y+b.y)/2,pinch.anchor);return;
+    }
     if(!drag||drag.id!==e.pointerId)return;
-    if(!(e.buttons&1)){drag=null;scroll.classList.remove('is-dragging');return;}
+    if(e.pointerType==='mouse'&&!(e.buttons&1)){finish(e);return;}
     const dx=e.clientX-drag.x,dy=e.clientY-drag.y;
     if(!drag.moved&&Math.hypot(dx,dy)<6)return;
-    if(!drag.moved){drag.moved=true;scroll.setPointerCapture(e.pointerId);scroll.classList.add('is-dragging');}
+    if(!drag.moved){drag.moved=true;suppressClick=true;clear();scroll.setPointerCapture(e.pointerId);scroll.classList.add('is-dragging');}
     e.preventDefault();
     scroll.scrollLeft=drag.left-dx;scroll.scrollTop=drag.top-dy;
    });
    const finish=e=>{
-    if(!drag||drag.id!==e.pointerId)return;
-    suppressClick=drag.moved;drag=null;scroll.classList.remove('is-dragging');
+    if(e.type==='lostpointercapture'&&e.target!==scroll)return;
+    if(touches.has(e.pointerId)){
+     const moved=Boolean(pinch||drag?.moved);suppressClick||=moved;
+     touches.delete(e.pointerId);pinch=null;
+     if(touches.size>=2)startPinch();
+     else if(touches.size){const [id,point]=touches.entries().next().value;drag=startDrag(id,point.x,point.y,moved);}
+     else{drag=null;scroll.classList.remove('is-dragging');}
+    }else{
+     if(!drag||drag.id!==e.pointerId)return;
+     suppressClick||=drag.moved;drag=null;scroll.classList.remove('is-dragging');
+    }
     if(scroll.hasPointerCapture(e.pointerId))scroll.releasePointerCapture(e.pointerId);
+   };
+   const cancelGestures=()=>{
+    const ids=[...touches.keys()];if(drag)ids.push(drag.id);
+    suppressClick||=Boolean(pinch||drag?.moved);touches.clear();drag=null;pinch=null;scroll.classList.remove('is-dragging');
+    for(const id of ids)if(scroll.hasPointerCapture(id))scroll.releasePointerCapture(id);
    };
    scroll.addEventListener('pointerup',finish);
    scroll.addEventListener('pointercancel',finish);
    scroll.addEventListener('lostpointercapture',finish);
-   scroll.addEventListener('pointerleave',e=>{if(drag&&!drag.moved)finish(e);});
+   scroll.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse'&&drag&&!drag.moved)finish(e);});
+   window.addEventListener('blur',cancelGestures);
+   document.addEventListener('visibilitychange',()=>{if(document.hidden)cancelGestures();});
    scroll.addEventListener('click',e=>{if(suppressClick&&e.detail!==0){e.preventDefault();e.stopImmediatePropagation();suppressClick=false;}},true);
   }
   syncCastleSkin(host.querySelector('[data-id="castle"]'),base,citySkin??state.city?.city_skin??'default');

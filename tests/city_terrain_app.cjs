@@ -22,6 +22,21 @@ fs.mkdirSync(output,{recursive:true});
   await page.goto(base+'/?zugang=login');await page.locator('[name=identifier], [name=username]').fill('PreviewPlayer');await page.locator('[name=password]').fill('PreviewFixture!2026');
   await Promise.all([page.waitForURL('**/city'),page.locator('form[action$="/auth/local"] button[type=submit]').click()]);
   const ready=async()=>{await page.locator('.painted-village-scene').waitFor();await page.waitForFunction(()=>!document.querySelector('.scene-transition.is-active'));await page.waitForFunction(()=>[...document.querySelectorAll('.painted-village img')].every(i=>i.complete&&i.naturalWidth>0));await page.evaluate(()=>document.fonts.ready);};
+  const frame=()=>page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+  const camera=()=>page.locator('.painted-village-scroll').evaluate(scroll=>({left:scroll.scrollLeft,top:scroll.scrollTop,zoom:Number(scroll.closest('.painted-village').dataset.zoom),dragging:scroll.classList.contains('is-dragging')}));
+  const gesturePoint=async(radius=0)=>{
+   const point=await page.locator('.painted-village-scroll').evaluate((scroll,radius)=>{
+    const r=scroll.getBoundingClientRect();
+    for(let fy=.35;fy<.72;fy+=.06)for(let fx=.25;fx<.8;fx+=.08){
+     const x=r.left+r.width*fx,y=r.top+r.height*fy;
+     if([x-radius,x,x+radius].every(px=>{const hit=document.elementFromPoint(px,y);return hit&&scroll.contains(hit)&&!hit.closest('button');}))return{x,y};
+    }
+    return null;
+   },radius);
+   assert(point,'Unoccupied village terrain remains available for gestures');return point;
+  };
+  const wheel=async delta=>{const point=await gesturePoint();await page.mouse.move(point.x,point.y);await page.mouse.wheel(0,delta);await frame();};
+  const touch=await page.context().newCDPSession(page);
   const sizes=[[1280,800],[2134,1154],[390,844],[320,568],[844,390],[568,320]].filter(size=>!process.env.CITY_TERRAIN_VIEWPORT||size.join('x')===process.env.CITY_TERRAIN_VIEWPORT);
   for(const [width,height] of sizes){
    await page.setViewportSize({width,height});await page.goto(base+'/city#city');await ready();
@@ -31,19 +46,29 @@ fs.mkdirSync(output,{recursive:true});
     assert(await status.isVisible(),'Ongoing work remains visible without selecting the building');
     assert.equal(await status.evaluate(node=>getComputedStyle(node.parentElement).boxShadow),'none','Unselected work keeps only the existing status badge, without an extra plaque shadow');
    }
-   const zoomOut=page.locator('[data-city-zoom="out"]'),zoomIn=page.locator('[data-city-zoom="in"]'),zoomValue=page.locator('.painted-village-zoom-value');
-   assert.equal(await page.locator('.painted-village-zoom').count(),1,'The city has one zoom control group');
-   assert(await zoomIn.isDisabled(),'The original city scale is the upper limit');
+   assert.equal(await page.locator('.painted-village-zoom,[data-city-zoom]').count(),0,'The city has no zoom buttons or percentage display');
+   await page.locator('.painted-village-scroll').evaluate(scroll=>{scroll.scrollLeft=(scroll.scrollWidth-scroll.clientWidth)/2;scroll.scrollTop=(scroll.scrollHeight-scroll.clientHeight)/2;});
+   await frame();
+   const point=await gesturePoint(),initial=await camera();
+   await page.mouse.move(point.x,point.y);await page.mouse.move(point.x+25,point.y+20);await frame();
+   assert.deepEqual(await camera(),initial,'Moving the mouse without a pressed button cannot pan the village');
+   await page.mouse.move(point.x,point.y);await page.mouse.down({button:'right'});await page.mouse.move(point.x-30,point.y-20,{steps:3});await page.mouse.up({button:'right'});await frame();
+   assert.deepEqual(await camera(),initial,'The right mouse button cannot pan the village');
+   await page.keyboard.press('Escape');
+   await page.mouse.move(point.x,point.y);await page.mouse.down({button:'left'});await page.mouse.move(point.x-35,point.y-25,{steps:4});await page.mouse.up({button:'left'});await frame();
+   const dragged=await camera();assert.equal(dragged.left,initial.left+35,'Holding the left mouse button pans horizontally');assert.equal(dragged.top,initial.top+25,'Holding the left mouse button pans vertically');assert.equal(dragged.dragging,false,'Releasing the button ends the drag');
+   await page.mouse.move(point.x-60,point.y-45);await frame();assert.deepEqual(await camera(),dragged,'The village stops following the mouse when the left button is released');
+   assert.equal(await page.locator('.painted-building-menu:visible').count(),0,'A drag does not select a building');
    let previousWidth=Infinity;
-   for(const percent of [100,90,80]){
-    if(percent<100)await zoomOut.tap();
-    assert.equal(await zoomValue.textContent(),percent+'%','Both additional zoom-out steps are reachable');
+   for(const level of ['normal','middle','wide']){
+    if(level!=='normal')await wheel(level==='middle'?90:400);
+    const state=await camera();
+    if(level==='normal')assert.equal(state.zoom,1,'The original city scale is retained');
+    else if(level==='middle')assert(state.zoom>.8&&state.zoom<1,'The mouse wheel zooms continuously');
+    else assert.equal(state.zoom,.8,'The expanded overview limit remains reachable');
     const sceneWidth=await page.locator('.painted-village-scene').evaluate(node=>node.offsetWidth);
     assert(sceneWidth<previousWidth,'Each step really reveals more of the city');previousWidth=sceneWidth;
-    const controls=await page.locator('.painted-village-zoom button').evaluateAll(nodes=>nodes.map(node=>{const r=node.getBoundingClientRect(),hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return {width:r.width,height:r.height,reachable:hit?.closest('button')===node};}));
-    assert(controls.every(control=>control.width>=44&&control.height>=44&&control.reachable),'Zoom controls remain touch-reachable and uncovered');
-    assert.equal(await zoomOut.isDisabled(),percent===80,'Zoom stops at the second added level');
-    await page.screenshot({path:path.join(output,`city-${percent}-${width}x${height}.png`)});
+    await page.screenshot({path:path.join(output,`city-${level}-${width}x${height}.png`)});
     for(const side of ['left','center','right']){
     const geometry=await page.evaluate(side=>{
      const scroll=document.querySelector('.painted-village-scroll'),village=document.querySelector('.painted-village'),ground=document.querySelector('.painted-village-ground'),terrain=document.querySelector('.painted-village-scene>img');
@@ -60,8 +85,32 @@ fs.mkdirSync(output,{recursive:true});
     assert.equal(geometry.documentOverflow,false,'No document overflow');
     assert.equal(geometry.scrollbar,'none','Village scrollbars stay hidden at every zoom level');
     }
-    await page.screenshot({path:path.join(output,`bottom-${percent}-${width}x${height}.png`)});
+    await page.screenshot({path:path.join(output,`bottom-${level}-${width}x${height}.png`)});
    }
+   await page.locator('.painted-village-scroll').evaluate(scroll=>{scroll.scrollLeft=(scroll.scrollWidth-scroll.clientWidth)/2;scroll.scrollTop=(scroll.scrollHeight-scroll.clientHeight)/2;});
+   const pair=await gesturePoint(40),points=(half)=>[{id:10,x:pair.x-half,y:pair.y},{id:11,x:pair.x+half,y:pair.y}];
+   await touch.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:points(28)});
+   await touch.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:points(40)});await frame();
+   assert.equal((await camera()).zoom,1,'Spreading two fingers zooms in to the original scale');
+   const afterPinch=await camera();
+   // A partial touchEnd names the lifted finger, leaving the other one down.
+   await touch.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[points(40)[0]]});
+   await touch.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{id:11,x:pair.x+10,y:pair.y-20}]});await frame();
+   const continued=await camera();assert(continued.left!==afterPinch.left||continued.top!==afterPinch.top,'One remaining finger continues panning after a pinch: '+JSON.stringify({width,height,afterPinch,continued}));
+   await touch.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await frame();assert.equal((await camera()).dragging,false,'Lifting both fingers clears the gesture');
+   const finger=await gesturePoint(),beforeSwipe=await camera();
+   await touch.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{id:12,...finger}]});
+   await touch.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{id:12,x:finger.x-30,y:finger.y-20}]});
+   await touch.send('Input.dispatchTouchEvent',{type:'touchCancel',touchPoints:[]});await frame();
+   const afterSwipe=await camera();assert(afterSwipe.left!==beforeSwipe.left||afterSwipe.top!==beforeSwipe.top,'One finger pans the village');assert.equal(afterSwipe.dragging,false,'Cancelling a touch releases the drag');
+   const inward=await gesturePoint(40),inwardPoints=half=>[{id:13,x:inward.x-half,y:inward.y},{id:14,x:inward.x+half,y:inward.y}];
+   await touch.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:inwardPoints(40)});
+   await touch.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:inwardPoints(20)});
+   await touch.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await frame();
+   assert.equal((await camera()).zoom,.8,'Pinching inward zooms out to the expanded overview');
+   assert.equal((await camera()).dragging,false,'Pinching never leaves a stuck drag');
+   assert.equal(await page.evaluate(()=>visualViewport.scale),1,'Two-finger gestures zoom the village without magnifying the app');
+   assert.equal(await page.locator('.painted-building-menu:visible').count(),0,'Touch gestures never open building actions');
    const mine=page.locator('.painted-village-building[data-id="gold_mine"]');
    await mine.evaluate(node=>{const scroll=node.closest('.painted-village-scroll'),b=node.getBoundingClientRect(),r=scroll.getBoundingClientRect();scroll.scrollLeft+=b.left+b.width/2-r.left-r.width/2;scroll.scrollTop+=b.top+b.height/2-r.top-r.height/2;});
    await mine.tap();await page.locator('.painted-building-menu:not([hidden]) .painted-building-actions').waitFor();
@@ -84,12 +133,16 @@ fs.mkdirSync(output,{recursive:true});
    await page.locator('#navigation [data-id="world"]').tap();await page.locator('.atlas-viewport').waitFor();
    await page.locator('#navigation [data-id="city"]').tap();await ready();
    assert.equal(await page.locator('.painted-village-scene>img').count(),1,'Returning from the map retains a single terrain image');
-   assert.equal(await zoomValue.textContent(),'80%','Returning from the world map preserves the village zoom');
-   await page.locator('.painted-village-scroll').press('+');assert.equal(await zoomValue.textContent(),'90%','Keyboard zoom remains available');
-   await zoomIn.tap();assert.equal(await zoomValue.textContent(),'100%','Plus returns to the original scale');
-   assert(await zoomIn.isDisabled(),'Repeated zoom-in cannot exceed the original scale');
+   assert.equal((await camera()).zoom,.8,'Returning from the world map preserves the village zoom');
+   await page.locator('.painted-village-scroll').press('+');assert((await camera()).zoom>.8,'Keyboard zoom remains available');
+   await wheel(-400);assert.equal((await camera()).zoom,1,'Scrolling up zooms back in');
+   await wheel(-400);assert.equal((await camera()).zoom,1,'Further scrolling cannot exceed the original scale');
+   await page.locator('.painted-village-scroll').evaluate(scroll=>scroll.scrollTop=0);await page.locator('.painted-village-scroll').press('ArrowDown');
+   await page.waitForFunction(()=>document.querySelector('.painted-village-scroll').scrollTop>0);
+   // Let native keyboard scrolling finish before changing the viewport.
+   await page.waitForTimeout(250);
   }
   assert.deepEqual(errors,[],'No browser errors or missing assets');
-  console.log('Village terrain: three zoom levels, touch/keyboard controls, hidden scrollbars, lower/side edges and three pan positions, proportions, building touch/actions and preserved zoom after world return passed in '+sizes.length+' viewport sizes.');
+  console.log('Village terrain: wheel and two-finger zoom, one-finger pan, held-left-button pan, release/cancel recovery, no zoom toolbar, hidden scrollbars, keyboard access, lower/side edges, building actions and zoom persistence passed in '+sizes.length+' viewport sizes.');
  }finally{if(browser)await browser.close();fixture.stdin.write('exit\n');await new Promise(resolve=>{if(fixture.exitCode!==null)return resolve();fixture.once('exit',resolve);setTimeout(()=>{fixture.kill();resolve();},5000);});}
 })().catch(error=>{console.error(error);process.exitCode=1;});

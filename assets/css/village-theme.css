@@ -2031,18 +2031,13 @@ body.mobile-game .march-time-dialog button { cursor:pointer; font:inherit; borde
 body.mobile-game #game-dialog.march-dialog #march-action-points { white-space:normal; overflow:visible; font-size:12px; line-height:1.35; }
 body.mobile-game #game-dialog.march-dialog #march-button-ap { white-space:nowrap; font-size:.85em; }
 .painted-village { position:absolute; inset:0; overflow:hidden; background:var(--ui-green); }
-.painted-village-scroll { position:absolute; inset:0; overflow:auto; touch-action:pan-x pan-y; overscroll-behavior:contain; }
+.painted-village-scroll { position:absolute; inset:0; overflow:auto; touch-action:none; overscroll-behavior:contain; }
 /* Clip the extended painting to the actual scrollable space, including HUD room.
    An overflowing image must not create another empty strip past the terrain. */
 .painted-village-ground { position:relative; width:max(100%,var(--painted-scene-width,max(calc(100% + 240px),1200px,150dvh))); padding-top:var(--painted-headroom,0px); padding-bottom:var(--painted-footroom,160px); overflow:hidden; }
 /* Stretch only the outer forest when a safe-area or custom HUD needs more room. */
 .painted-village-ground::before { content:''; position:absolute; inset:0 0 auto; height:0; border-style:solid; border-color:transparent; border-width:var(--painted-headroom,0px) 0 0; border-image:var(--painted-terrain-image) 99 113 168 106 / 1 0 0 / 0 stretch; z-index:1; pointer-events:none; }
 .painted-village-scene { position:relative; width:var(--painted-scene-width,100%); margin-inline:auto; aspect-ratio:3/2; }
-.painted-village-zoom { position:absolute; z-index:6; top:var(--painted-zoom-top,112px); left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:4px; padding:4px; border:1px solid var(--ui-line); border-radius:12px; background:var(--ui-paper); color:var(--ui-ink); box-shadow:0 3px 0 var(--ui-primary-edge); }
-.painted-village-zoom button { display:grid; place-items:center; width:44px; min-height:44px; padding:0; border:1px solid var(--ui-line); border-radius:9px; background:var(--ui-surface); color:var(--ui-ink); font:24px/1 var(--ui-font); cursor:pointer; }
-.painted-village-zoom button:disabled { background:var(--ui-disabled); color:var(--ui-ink); cursor:default; }
-.painted-village-zoom button:focus-visible { outline:3px solid var(--ui-accent-gold-edge); outline-offset:1px; }
-.painted-village-zoom-value { min-width:40px; text-align:center; font:700 13px/1 var(--ui-font-number); font-variant-numeric:tabular-nums; }
 .painted-village-scroll { cursor:grab; user-select:none; }
 .painted-village-scroll.is-dragging, .painted-village-scroll.is-dragging * { cursor:grabbing; }
 .painted-village-scroll.is-dragging .painted-village-building>.painted-scaffold { display:none; }
