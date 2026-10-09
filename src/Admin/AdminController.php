@@ -130,6 +130,11 @@ final class AdminController
             $result=AdminService::execute((int)$admin['id'],$action,$_POST);
             $worldId=(int)($result['world_id']??$worldId);
             if($action==='world-create'){$return='/admin/world';unset($_SESSION['admin_world_create_draft']);}
+            if($action==='world-delete'){
+                $return='/admin/world';
+                $worldId=(int)Connection::getInstance()->query('SELECT id FROM worlds ORDER BY id LIMIT 1')->fetchColumn();
+                $_SESSION['admin_world_id']=$worldId;
+            }
             $_SESSION['admin_flash']=($result['duplicate']?'Bereits ausgeführt: ':'').$result['message'];
             $_SESSION['admin_flash_kind']='success';
             if($rewardAction)unset($_SESSION['admin_reward_draft'],$_SESSION['admin_reward_batch_draft']);

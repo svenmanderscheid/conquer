@@ -23,6 +23,13 @@ body.admin-village.admin-modern :is(button,a,input,select,textarea,summary):focu
 body.admin-village.admin-modern :is(label,.field-label){font-size:12px;color:var(--ui-muted);font-weight:400;}
 body.admin-village.admin-modern :is(.card,.stat,.quick-action,.catalog-item,.alpha-key-row){background:#fff;border:1px solid var(--ui-line);border-radius:10px;box-shadow:none;}
 body.admin-village.admin-modern .card{padding:20px;}
+body.admin-village.admin-modern .world-delete-card{border-color:var(--ui-red);margin-bottom:20px;}
+body.admin-village.admin-modern .world-delete-card h2{color:var(--ui-red-dark);}
+body.admin-village.admin-modern .card.world-delete-card :is(p,label){overflow-wrap:anywhere;color:var(--ui-ink);}
+body.admin-village.admin-modern .card.world-delete-card .subtle{color:var(--ui-muted);}
+body.admin-village.admin-modern .world-delete-card .check{min-height:44px;align-items:center;}
+body.admin-village.admin-modern .world-delete-card button{min-height:44px;white-space:normal;}
+body.admin-village.admin-modern .card.world-delete-card .hint.world-delete-warning{background:var(--ui-red-soft);color:var(--ui-red-dark);border-color:var(--ui-red);}
 body.admin-village.admin-modern :is(.hint,.notice){font-size:13px;padding:12px 14px;border-radius:8px;box-shadow:none;}
 body.admin-village.admin-modern :is(.hint,.notice:not(.error):not(.success)){background:var(--ui-primary-light);color:var(--ui-ink);border-color:var(--ui-line);}
 body.admin-village.admin-modern .notice.error{color:var(--ui-red-dark);background:var(--ui-red-soft);border-color:#e9b9bf;}

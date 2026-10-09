@@ -5,6 +5,7 @@ $runs=$db->query('SELECT * FROM world_spawn_runs WHERE world_id=? ORDER BY id DE
 $recipientCount=(int)$db->query('SELECT COUNT(*) FROM cities c JOIN players p ON p.id=c.player_id WHERE c.world_id=? AND p.is_banned=0',[$selectedWorld])->fetchColumn();
 $mapProfile=\Conquer\Game\World\WorldMapProfile::forWorld($selectedWorld);
 ?>
+<?php require __DIR__.'/world_delete.php'; ?>
 <?php require __DIR__.'/extra_event.php'; ?>
 <section class="card"><div class="split"><div><h2><?= ah($world['name']) ?></h2><p>Welt #<?= $selectedWorld ?> · <?= (int)$mapProfile['width'] ?> × <?= (int)$mapProfile['height'] ?> Kartenfelder<?= $mapProfile['key']==='luxembourg'?' · Luxemburg':'' ?></p></div><span class="pill <?= ah($world['status']) ?>"><?= ah($world['status']) ?></span></div>
 <?php adminForm('world-save',$selectedWorld); ?>

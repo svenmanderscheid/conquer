@@ -315,7 +315,7 @@
             const missing=$$('input[name$="[target]"]',form).find(i=>!i.value);
             if(missing){e.preventDefault();missing.closest('.item-select').querySelector('button').click();return;}
         }
-        submitting=true;const button=$('button[type="submit"]',f);if(button){button.disabled=true;button.textContent='Wird gespeichert …';}
+        submitting=true;const button=$('button[type="submit"]',f);if(button){button.disabled=true;button.textContent=f.getAttribute('action')?.endsWith('/world-delete')?(window.ConquerLocale?.t('admin.world_delete.deleting')||'Deleting world…'):'Wird gespeichert …';}
     }));
     window.addEventListener('pageshow',e=>{if(e.persisted)location.reload();});
 })();

@@ -18,6 +18,16 @@ Seven primary areas group existing features; secondary links expose every page:
 
 The dashboard uses live counts and recent audit records. The mobile menu retains language selection and logout. English remains the default and fallback; new copy lives in `data/i18n/`.
 
+## Deleting a world
+
+Superadmins open **Delete world** from the dashboard or **Worlds → World settings**. Select the world and close it in its settings first. The deletion card shows the affected city and alliance counts. Enter the exact world name, acknowledge permanent deletion and provide an audit reason. The final remaining world cannot be deleted.
+
+`POST /admin/action/world-delete` uses the existing authentication, CSRF validation, operation receipt and audit transaction, plus the shared combat, world spawn and reward locks. It removes world-scoped records, city/alliance descendants, legacy children without foreign keys and world notifications. It revokes game sessions currently using the deleted world and redirects the administrator to a surviving world. A successful request replay returns its receipt even after the world is gone; failures roll back the deletion, sessions, receipt and audit together.
+
+Player accounts, global inventory, cosmetics, global rules, other worlds, admin gift history and audit history survive. Migration `0137_world_deletion_purchase_history.sql` makes the original world/city references in purchase orders nullable, preserving orders, entitlements and provider receipts. Pending or paid orders block deletion until resolved. Apply this migration during deployment; locally, `php tools/migrate-world-deletion.php --apply` applies only this migration. Login and stale sessions choose an existing world if the original world has been removed; retained accounts can use the existing explicit world-join action to start again.
+
+Verification: `php tests/admin_world_delete.php --browser` uses a disposable database. It covers authorization, confirmations, closed/last-world restrictions, purchase preservation, foreign keys and legacy dependencies, future declared children, rollback after a late failure, receipt replay, session recovery and explicit re-entry. The browser checks English, German and French in desktop, narrow portrait and landscape layouts, including successful deletion and redirect. Captures: `output/playwright/admin-world-delete/`.
+
 ## Editing mine and monster drops
 
 Open **Drops & rewards → Mines** (`/admin/rewards?type=farm`) or **Monsters**. Choose **All worlds** for global rules or **World override** and a world for a local rule. The **Whole relics**, **Relic fragments** and **Items** tabs have independent rows with a target, quantity and chance. Whole relic rows choose a specific current relic; fragment rows choose a specific relic or a random rarity. Average per 100 events is quantity multiplied by percentage chance. Adding a row starts at 0%.

@@ -29,7 +29,8 @@ final class Session
         $token      = bin2hex(random_bytes(32));
         $csrfToken  = bin2hex(random_bytes(32));
         $expiresAt  = gmdate('Y-m-d H:i:s', time() + self::LIFETIME_SECS);
-        $activeWorld=(int)($db->query('SELECT world_id FROM cities WHERE player_id=? ORDER BY world_id LIMIT 1',[$playerId])->fetchColumn()?:1);
+        $activeWorld=(int)($db->query('SELECT c.world_id FROM cities c JOIN worlds w ON w.id=c.world_id WHERE c.player_id=? ORDER BY c.world_id LIMIT 1',[$playerId])->fetchColumn()
+            ?:($db->query("SELECT id FROM worlds ORDER BY CASE WHEN status IN ('open','running') THEN 0 ELSE 1 END,id LIMIT 1")->fetchColumn()?:1));
 
         $db->execute(
             'INSERT INTO sessions (player_id, token, csrf_token, ip_address, user_agent, expires_at, active_world_id)
@@ -95,8 +96,13 @@ final class Session
             self::destroy();
             return null;
         }
-        $owned=$db->query('SELECT id FROM cities WHERE player_id=? AND world_id=?',[$row['player_id'],$row['active_world_id']])->fetchColumn();
-        if(!$owned){$fallback=$db->query('SELECT world_id FROM cities WHERE player_id=? ORDER BY world_id LIMIT 1',[$row['player_id']])->fetchColumn();if($fallback){$row['active_world_id']=(int)$fallback;$db->execute('UPDATE sessions SET active_world_id=? WHERE id=?',[$fallback,$row['id']]);}}
+        $owned=$db->query('SELECT c.id FROM cities c JOIN worlds w ON w.id=c.world_id WHERE c.player_id=? AND c.world_id=?',[$row['player_id'],$row['active_world_id']])->fetchColumn();
+        if(!$owned){
+            $fallback=$db->query('SELECT c.world_id FROM cities c JOIN worlds w ON w.id=c.world_id WHERE c.player_id=? ORDER BY c.world_id LIMIT 1',[$row['player_id']])->fetchColumn();
+            if(!$fallback&&!$db->query('SELECT id FROM worlds WHERE id=?',[$row['active_world_id']])->fetchColumn())
+                $fallback=$db->query("SELECT id FROM worlds ORDER BY CASE WHEN status IN ('open','running') THEN 0 ELSE 1 END,id LIMIT 1")->fetchColumn();
+            if($fallback){$row['active_world_id']=(int)$fallback;$db->execute('UPDATE sessions SET active_world_id=? WHERE id=?',[$fallback,$row['id']]);}
+        }
         \Conquer\Game\World\WorldContext::bind((int)$row['active_world_id'],(int)$row['player_id']);
         $row['vip_level']=\Conquer\Game\Vip\VipService::status((int)$row['player_id'],(int)$row['active_world_id'])['level'];
 

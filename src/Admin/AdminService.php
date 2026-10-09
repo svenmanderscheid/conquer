@@ -21,6 +21,10 @@ final class AdminService
         $hash=hash('sha256',json_encode($input,JSON_THROW_ON_ERROR));
         $locks=['conquer-admin-op-'.$op];
         if(in_array($action,['reward-save','reward-reset','reward-batch-save'],true))$locks[]='conquer-admin-rewards';
+        if($action==='world-delete'){
+            $deleteWorld=WorldSettings::integer($input['world_id']??0,1,2147483647,'World ID');
+            $locks[]='conquer-city-combat';$locks[]='conquer-spawn-'.$deleteWorld;$locks[]='conquer-admin-rewards';
+        }
         $playerId=WorldSettings::integer($input['player_id']??0,0,2147483647,'Spieler-ID');
         if($playerId>0)$locks[]='conquer-player-'.$playerId;
         $acquired=[];
@@ -38,6 +42,7 @@ final class AdminService
                     'alpha-key-create'=>AlphaKeyAdmin::create($db,$input),
                     'alpha-key-revoke'=>AlphaKeyAdmin::revoke($db,$input),
                     'world-save','world-create'=>self::world($db,$adminId,$action,$input),
+                    'world-delete'=>WorldDeletion::delete($db,$input),
                     'world-events'=>self::events($input),
                     'extra-event-save'=>\Conquer\Game\Ui\ExtraEventButton::save($db,$input),
                     'world-territory-rules'=>self::territoryRules($input),
