@@ -53,7 +53,7 @@ const styles=sheets.map(file=>fs.readFileSync(path.join(root,'assets/css',file),
   assert.equal(crystalCall.item_code,crystalFirst.item_code);assert.equal(crystalCall.quantity,1);assert.match(crystalCall.request_id,/^[a-z0-9-]{36}$/);
   assert.equal(await page.evaluate(()=>K.trading.crystals.offers[0].remaining),100);
   assert.equal(await page.evaluate(()=>K.trading.vip.offers[0].remaining),10);
-  for(const category of ['resource_pack','speedup','teleport','boost']){
+  for(const category of ['resource_pack','speedup','teleport','boost','material']){
    await page.locator('[data-action="trading-crystal-category"][data-id="'+category+'"]').click();
    assert(await page.locator('.trading-card').count()>0);assert(await page.evaluate(cat=>[...document.querySelectorAll('.trading-buy')].every(b=>K.trading.crystals.offers.find(o=>o.id===b.dataset.id).item.category===cat),category));
   }
@@ -65,7 +65,7 @@ const styles=sheets.map(file=>fs.readFileSync(path.join(root,'assets/css',file),
   await page.evaluate(()=>{fail=false;});await crystalBuy().click();await page.waitForFunction(()=>calls.filter(c=>c.payload.action==='crystal.buy').length===3);
   assert.equal(await page.evaluate(()=>calls.at(-1).payload.request_id),retryRequest);await page.evaluate(()=>toasts=[]);
   checks.push('Crystal Shop keeps the purchase receipt on errors and generates a new receipt after success');
-  checks.push('Independent Crystal Shop uses its own purchase action, no VIP gates, no weekly depletion and four category filters');
+  checks.push('Independent Crystal Shop uses its own purchase action, no VIP gates, no weekly depletion and a building material filter');
   await tab('merchant').click();assert.equal(await page.locator('.shop-merchant-card').count(),2);assert.equal(await page.locator('.shop-merchant-reward img').count(),2);assert.equal(await page.locator('.shop-merchant-reward strong').first().innerText(),'+1.000 Holz');assert.equal(await page.locator('.shop-merchant-cost strong').first().innerText(),'1.000');assert(await page.locator('.shop-merchant-action.pays-gems').isVisible());assert.equal(await page.locator('[data-trading-countdown]').innerText(),'1d 00:00:00');assert((await page.locator('.trading-footer').innerText()).includes('Nach jedem Kauf'));checks.push('Merchant cards show received material art, replacement rule, daily timer and icon-labelled costs');
   await page.evaluate(async()=>{await document.fonts.load('16px \"Conquer UI\"','Äé Kingdom 0123456789');await document.fonts.ready;});
   assert(await page.evaluate(()=>document.fonts.check('16px \"Conquer UI\"','Äé Kingdom 0123456789')),'Layout uses the loaded shared typeface');

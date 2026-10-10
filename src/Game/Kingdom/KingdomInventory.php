@@ -55,6 +55,7 @@ final class KingdomInventory
         $message=$crystalShop&&$item['category']==='vip_point'
             ? \Conquer\Game\Locale::t('crystal_shop.vip_purchased',['quantity'=>$quantity,'points'=>$item['vip_points']])
             : $quantity.' × '.$item['name'].' wurde deinem Inventar hinzugefügt.';
+        if($crystalShop && $code===119000002)$message=\Conquer\Game\Locale::t('crystal_shop.badges_purchased',['quantity'=>$quantity]);
         $result=['message'=>$message,'item_code'=>$code,'quantity'=>$quantity,'cost_gems'=>$cost];
         $db->execute("INSERT INTO world_operations(player_id,session_id,request_id,payload_hash,action,world_id,result_json)VALUES(?,0,?,?,?,?,?)",[$playerId,$request,$hash,$purchaseAction,$world,json_encode($result,JSON_THROW_ON_ERROR)]);
         return $result+['duplicate'=>false];

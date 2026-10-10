@@ -18,8 +18,12 @@ try{
     $db->execute("INSERT INTO cities(id,player_id,world_id,name,coord_x,coord_y,castle_level)VALUES(1,1,1,'CrystalFixture',30,40,1)");
     foreach(\Conquer\Game\City\CityState::BUILDING_CODES as $code)$db->execute('INSERT INTO city_buildings(city_id,building_code,level)VALUES(1,?,?)',[$code,$code==='trading_post'?0:1]);
     WorldContext::bind(1);
+    $initialVipPoints=VipService::status(1)['points'];
     $offers=CrystalShop::offers();$categories=array_unique(array_column(array_column($offers,'item'),'category'));sort($categories);
-    crystalCheck($categories===['boost','resource_pack','speedup','teleport','vip_point'],'five independent product categories');
+    crystalCheck($categories===['boost','material','resource_pack','speedup','teleport','vip_point'],'six independent product categories');
+    $badgeOffers=array_values(array_filter($offers,static fn(array $offer):bool=>$offer['item']['category']==='material'));
+    crystalCheck(count($badgeOffers)===1 && $badgeOffers[0]['item_code']===119000002 && $badgeOffers[0]['quantity']===1 && $badgeOffers[0]['price']===['resource'=>'gems','amount'=>10],'one Alliance Badge costs exactly ten Crystals');
+    crystalCheck($badgeOffers[0]['item']['is_usable']===false && $badgeOffers[0]['item']['usage_context']==='building','purchased badges retain automatic building consumption');
     $vipOffers=array_values(array_filter($offers,static fn(array $offer):bool=>$offer['item']['category']==='vip_point'));
     crystalCheck(array_column(array_column($vipOffers,'item'),'vip_points')===[10,100,500,1000,10000],'exact requested VIP pack sizes');
     foreach($vipOffers as $offer)crystalCheck($offer['price']===['resource'=>'gems','amount'=>$offer['item']['vip_points']],'one Crystal per VIP point '.$offer['item_code']);
@@ -37,7 +41,7 @@ try{
         crystalCheck(CrystalShop::offers()===$offers,'no weekly stock depletion '.$code);
         crystalReject(fn()=> $db->transaction(fn()=>KingdomInventory::buy(1,array_replace($body,['quantity'=>3]),true)),'receipt rejects changed quantity '.$code);
     }
-    crystalCheck(VipService::status(1)['points']===200,'purchased VIP packs wait in world inventory');
+    crystalCheck(VipService::status(1)['points']===$initialVipPoints,'purchased VIP packs wait in world inventory');
     foreach($vipOffers as $offer){
         $code=(int)$offer['item_code'];$points=VipService::status(1)['points'];
         $body=['action'=>'inventory.use','item_code'=>$code,'quantity'=>2,'operation_key'=>'crystal-vip-use-'.$code,'vip_points'=>999999];
@@ -52,12 +56,20 @@ try{
     $body=['action'=>'crystal.buy','item_code'=>10208002,'quantity'=>1,'request_id'=>'crystal-action-test-0001','expected_world_id'=>1,'price_crystals'=>1];
     $result=KingdomService::action(1,$body);crystalCheck($result['result']['cost_gems']===500,'real action ignores client price');
     crystalCheck(KingdomService::action(1,$body)['result']['duplicate']===true,'real action supports safe replay');
+    $badgeBody=array_replace($body,['item_code'=>119000002,'quantity'=>7,'request_id'=>'crystal-badge-test-0001','price_crystals'=>1]);
+    $badgeBefore=(int)$db->query('SELECT quantity FROM player_inventory WHERE player_id=1 AND item_code=119000002')->fetchColumn();
+    $badgeResult=KingdomService::action(1,$badgeBody);
+    crystalCheck($badgeResult['result']['cost_gems']===70,'seven badges cost seventy Crystals despite client price');
+    crystalCheck((int)$db->query('SELECT quantity FROM player_inventory WHERE player_id=1 AND item_code=119000002')->fetchColumn()===$badgeBefore+7,'seven badges added to building inventory');
     crystalReject(fn()=>KingdomService::action(1,array_replace($body,['expected_world_id'=>2])),'wrong world rejected');
     foreach([['item_code'=>10106003],['item_code'=>10206003],['item_code'=>999],['quantity'=>0],['quantity'=>101],['quantity'=>1.5],['request_id'=>'bad']] as $bad)crystalReject(fn()=>KingdomService::action(1,array_replace($body,$bad)),'invalid purchase rejected');
     $db->execute('UPDATE players SET gems=0 WHERE id=1');
     $before=(int)$db->query('SELECT quantity FROM player_inventory WHERE player_id=1 AND item_code=10208002')->fetchColumn();
     crystalReject(fn()=>KingdomService::action(1,array_replace($body,['request_id'=>'crystal-insufficient-0001'])),'insufficient crystals rejected');
     crystalCheck((int)$db->query('SELECT quantity FROM player_inventory WHERE player_id=1 AND item_code=10208002')->fetchColumn()===$before,'failed purchase grants nothing');
+    $badgeBefore=(int)$db->query('SELECT quantity FROM player_inventory WHERE player_id=1 AND item_code=119000002')->fetchColumn();
+    crystalReject(fn()=>KingdomService::action(1,array_replace($badgeBody,['request_id'=>'crystal-badge-insufficient-0001'])),'insufficient Crystals reject badges');
+    crystalCheck((int)$db->query('SELECT quantity FROM player_inventory WHERE player_id=1 AND item_code=119000002')->fetchColumn()===$badgeBefore,'failed badge purchase grants nothing');
     foreach($vipOffers as $offer){
         $code=(int)$offer['item_code'];$points=VipService::status(1)['points'];
         crystalReject(fn()=>KingdomService::action(1,array_replace($body,['item_code'=>$code,'request_id'=>'crystal-vip-insufficient-'.$code,'price_crystals'=>0,'vip_points'=>999999])),'insufficient crystals reject VIP pack '.$code);

@@ -81,7 +81,7 @@ window.ConquerTrading = function(ctx){
     }
     function crystalView(){
         const t=(key,params)=>window.ConquerLocale.t('crystal_shop.'+key,params);
-        const gems=balance('gems'),cats=[['all','all'],['resource_pack','resources'],['speedup','speedups'],['teleport','teleports'],['boost','buffs'],['vip_point','vip_points']];
+        const gems=balance('gems'),cats=[['all','all'],['resource_pack','resources'],['speedup','speedups'],['teleport','teleports'],['boost','buffs'],['vip_point','vip_points'],['material','materials']];
         const items=allOffers().filter(o=>crystalCategory==='all'||o.item?.category===crystalCategory);
         return `${shopTabs()}<header class="trading-summary"><div><h2>${esc(t('title'))}</h2><p>${esc(t(crystalCategory==='vip_point'?'vip_rate':'intro'))}</p></div><span class="trading-level">${fmt(gems)} ${esc(resources.gems)}</span></header><div class="trading-categories crystal-categories" role="group" aria-label="${esc(t('categories'))}">${cats.map(([id,key])=>`<button type="button" data-action="trading-crystal-category" data-id="${id}" class="${crystalCategory===id?'active':''}" aria-pressed="${crystalCategory===id}">${esc(t(key))}</button>`).join('')}</div><div class="trading-scroll shop-crystal-view" data-mode="crystals" tabindex="0" aria-label="${esc(t('title'))}"><div class="trading-grid">${items.map(card).join('')}</div>${!data()?`<p class="notice">${esc(t('loading'))}</p>`:''}</div><footer class="trading-footer"><span>${esc(t('inventory'))}</span><span>${esc(t('regular'))}</span></footer>`;
     }
@@ -129,7 +129,7 @@ window.ConquerTrading = function(ctx){
         if(!act.startsWith('trading-'))return false;
         if(b.disabled||busy)return true;
         if(act==='trading-tab'&&['merchant','crystals','vip','caravan'].includes(b.dataset.id)){mode=b.dataset.id;render();host()?.querySelector(`[data-action="trading-tab"][data-id="${mode}"]`)?.focus({preventScroll:true});}
-        else if(act==='trading-crystal-category'&&['all','resource_pack','speedup','teleport','boost','vip_point'].includes(b.dataset.id)){crystalCategory=b.dataset.id;render();host()?.querySelector(`[data-action="trading-crystal-category"][data-id="${crystalCategory}"]`)?.focus({preventScroll:true});}
+        else if(act==='trading-crystal-category'&&['all','resource_pack','speedup','teleport','boost','vip_point','material'].includes(b.dataset.id)){crystalCategory=b.dataset.id;render();host()?.querySelector(`[data-action="trading-crystal-category"][data-id="${crystalCategory}"]`)?.focus({preventScroll:true});}
         else if(act==='trading-view'&&['mine','all'].includes(b.dataset.id)){vipView=b.dataset.id;render();host()?.querySelector(`[data-action="trading-view"][data-id="${vipView}"]`)?.focus({preventScroll:true});}
         else if(act==='trading-category'&&['all','resources','speedups','boosts','progress','treasures'].includes(b.dataset.id)){vipCategory=b.dataset.id;render();host()?.querySelector(`[data-action="trading-category"][data-id="${vipCategory}"]`)?.focus({preventScroll:true});}
         else if(act==='trading-upgrade')ctx.onUpgrade?.();

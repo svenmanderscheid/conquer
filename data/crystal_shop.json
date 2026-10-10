@@ -2,6 +2,10 @@
   "version": 1,
   "offers": [
     {
+      "item_code": 119000002,
+      "price_crystals": 10
+    },
+    {
       "item_code": 10201004,
       "price_crystals": 70
     },

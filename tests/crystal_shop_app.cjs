@@ -31,6 +31,20 @@ const root=path.resolve(__dirname,'..'),output=path.join(root,'artifacts/crystal
   const replayState=await state();assert.equal(replayState.profile.gems,after.profile.gems);assert.equal(quantity(replayState),quantity(after));
   const denied=await page.request.post(base+'/api/kingdom/action',{data:{...payload,request_id:'crystal-no-csrf-0001'}});assert.equal(denied.status(),403);
   const anonymous=await browser.newContext();assert.equal((await anonymous.request.post(base+'/api/kingdom/action',{data:payload})).status(),401);await anonymous.close();
+  const materialFilter=()=>page.locator('[data-action=trading-crystal-category][data-id=material]');
+  await materialFilter().scrollIntoViewIfNeeded();await materialFilter().tap();
+  assert.equal(await page.locator('.trading-card').count(),1);
+  const badgeBuy=()=>page.locator('[data-action=trading-buy][data-id="crystal-119000002"]');
+  assert.equal(await badgeBuy().locator('.trading-price strong').innerText(),'10');
+  assert.equal(await page.locator('.trading-card h3').innerText(),'Alliance Badge');
+  const badgeBefore=await state(),badgeQuantity=s=>Number(s.inventory.find(i=>Number(i.item_code)===119000002)?.quantity||0);
+  const badgeResponsePromise=page.waitForResponse(r=>r.url().endsWith('/api/kingdom/action')&&r.request().postDataJSON()?.action==='crystal.buy');
+  await badgeBuy().tap();const badgeResponse=await badgeResponsePromise,badgePurchase=await badgeResponse.json();assert.equal(badgePurchase.ok,true);
+  assert.equal(badgePurchase.data.message,'1 × Alliance Badge added to your inventory.');
+  const badgeAfter=await state();assert.equal(badgeBefore.profile.gems-badgeAfter.profile.gems,10);assert.equal(badgeQuantity(badgeAfter)-badgeQuantity(badgeBefore),1);
+  const badgeReplay=await page.request.post(base+'/api/kingdom/action',{data:badgeResponse.request().postDataJSON(),headers:{'X-CSRF-Token':headers['x-csrf-token'],'X-World-ID':'1'}});
+  assert.equal((await badgeReplay.json()).data.result.duplicate,true);
+  const badgeReplayState=await state();assert.equal(badgeReplayState.profile.gems,badgeAfter.profile.gems);assert.equal(badgeQuantity(badgeReplayState),badgeQuantity(badgeAfter));
   const vipFilter=()=>page.locator('[data-action=trading-crystal-category][data-id=vip_point]');
   await vipFilter().scrollIntoViewIfNeeded();await vipFilter().tap();
   const vipOffers=before.trading.crystals.offers.filter(o=>o.item.category==='vip_point');
@@ -58,6 +72,16 @@ const root=path.resolve(__dirname,'..'),output=path.join(root,'artifacts/crystal
    }
    for(const [width,height]of [[390,844],[320,568],[568,320],[1280,800]]){
    await page.setViewportSize({width,height});await page.locator('.trading-scroll').evaluate(e=>e.scrollTop=0);
+   await materialFilter().scrollIntoViewIfNeeded();await materialFilter().tap();
+   assert.equal(await page.locator('.trading-card').count(),1);
+   assert.equal(await page.locator('.trading-card h3').innerText(),{en:'Alliance Badge',de:'Allianzabzeichen',fr:"Insigne d’alliance"}[locale]);
+   assert.equal(await materialFilter().innerText(),{en:'Materials',de:'Materialien',fr:'Matériaux'}[locale]);
+   assert.equal(await badgeBuy().locator('.trading-price strong').innerText(),'10');
+   assert.equal(await page.locator('.trading-card img').first().evaluate(async i=>{i.loading='eager';await i.decode();return i.naturalWidth>0;}),true);
+   await badgeBuy().scrollIntoViewIfNeeded();assert(await badgeBuy().evaluate(b=>{const r=b.getBoundingClientRect(),hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return r.height>=44&&(b===hit||b.contains(hit));}));
+   assert(await page.locator('#panel-dialog').evaluate(d=>d.scrollWidth<=d.clientWidth+1));
+   await page.screenshot({path:path.join(output,width+'x'+height+'-'+locale+'-badges-app.png')});
+   await vipFilter().scrollIntoViewIfNeeded();await vipFilter().tap();
    assert.equal(await page.locator('.trading-scroll').evaluate(e=>getComputedStyle(e).scrollbarWidth),'none');
    assert.equal(await page.locator('.trading-card').count(),5);
    for(const offer of vipOffers){
