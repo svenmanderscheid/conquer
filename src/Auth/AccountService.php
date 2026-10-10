@@ -90,11 +90,24 @@ final class AccountService
         $created=$db->transaction(function()use($db,$player,$hash):bool{
             $current=$db->query('SELECT email,is_banned FROM players WHERE id=? FOR UPDATE',[$player['id']])->fetch();
             if(!$current||$current['is_banned']||$current['email']!==$player['email'])return false;
-            $db->execute('UPDATE password_reset_tokens SET used_at=UTC_TIMESTAMP() WHERE player_id=? AND used_at IS NULL',[$player['id']]);
+            // Mail can arrive late or out of order. A retry must not invalidate
+            // an already delivered link; resetWithToken revokes all links when used.
             $db->execute('INSERT INTO password_reset_tokens(player_id,token_hash,expires_at) VALUES(?,?,DATE_ADD(UTC_TIMESTAMP(),INTERVAL 30 MINUTE))',[$player['id'],$hash]);
             return true;
         });
-        if($created)AccountMailer::passwordReset((string)$player['email'],$token);
+        if(!$created)return;
+        try{
+            $sent=AccountMailer::passwordReset((string)$player['email'],$token);
+        }catch(\Throwable $e){
+            // Keep the public response identical for known and unknown accounts.
+            // Do not log the exception message: a transport can include mail/token data.
+            \Conquer\Logger::getInstance()->warn('Password reset email transport failed ('.$e::class.').');
+            $sent=false;
+        }
+        if(!$sent){
+            // Only discard this undelivered attempt, preserving earlier links.
+            $db->execute('DELETE FROM password_reset_tokens WHERE token_hash=? AND used_at IS NULL',[$hash]);
+        }
     }
 
     public static function resetWithToken(string $token,mixed $new): void
