@@ -88,6 +88,32 @@ try {
   $health=\Conquer\Game\Map\MonsterData::mapData($monster);
   mrCheck((int)$health['hp_current']>0&&(int)$health['hp_current']<$previousHp&&$health['hp_max']===$maximum,'remaining HP decrease while full HP stay fixed after attack '.$attempt);
   $previousHp=(int)$health['hp_current'];
+  $failed=BattleReportService::list(1)[0];
+  $haul=json_decode($db->query('SELECT haul_json FROM marches WHERE id=?',[$march])->fetchColumn(),true);
+  mrCheck($failed['outcome']==='defender_wins'&&$failed['reward_delivery']==='returning'&&($haul['items'][10203022]??0)===1&&$failed['details']['items']===$haul['items']&&$failed['details']['loot']===$haul['loot'],'unsuccessful attack '.$attempt.' reports real guaranteed loot in its returning haul');
+  mrCheck(($failed['details']['lord_xp']??0)===0&&(int)$db->query('SELECT COUNT(*) FROM monster_kill_receipts WHERE field_monster_id=?',[$monsterId])->fetchColumn()===0,'unsuccessful attack grants no kill XP or kill receipt');
+  $itemBefore=(int)$db->query('SELECT COALESCE(SUM(quantity),0) FROM player_inventory WHERE player_id=1 AND item_code=10203022')->fetchColumn();
+  MarchTick::runForPlayer(1);
+  mrCheck(json_decode($db->query('SELECT haul_json FROM marches WHERE id=?',[$march])->fetchColumn(),true)===$haul&&(int)$db->query('SELECT COALESCE(SUM(quantity),0) FROM player_inventory WHERE player_id=1 AND item_code=10203022')->fetchColumn()===$itemBefore,'pending defeated army neither rerolls nor pays loot early');
+  $db->execute('UPDATE marches SET return_time=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 1 SECOND) WHERE id=?',[$march]);MarchTick::runForPlayer(1);MarchTick::runForPlayer(1);
+  mrCheck(BattleReportService::get(1,(int)$failed['id'])['reward_delivery']==='delivered'&&(int)$db->query('SELECT COALESCE(SUM(quantity),0) FROM player_inventory WHERE player_id=1 AND item_code=10203022')->fetchColumn()===$itemBefore+1,'defeated army delivers guaranteed items exactly once on return');
+  mrCheck((int)$db->query("SELECT COUNT(*) FROM reward_grant_ledger WHERE player_id=1 AND item_code=10203022 AND source_reference=? AND rule_revision LIKE 'sha256:%'",['march:'.$march])->fetchColumn()===1,'defeated army loot retains its frozen reward rule in the grant ledger');
  }
+ $emptyRewards=\Conquer\Game\Rewards\RewardCatalog::defaults('monster','20209901');
+ $emptyRewards['resource_reward']=['food'=>0,'lumber'=>0,'stone'=>0,'gold'=>0];
+ $emptyRewards['drops']=[];$emptyRewards['fragment_drops']=[];$emptyRewards['relic_drops']=[];$emptyRewards['gems_drop']=['chance'=>0,'amount'=>0];
+ $db->execute("INSERT INTO reward_world_overrides(world_id,source_type,source_key,config_json) VALUES(1,'monster','20209901',?)",[json_encode($emptyRewards)]);
+ \Conquer\Game\Rewards\RewardCatalog::resetCache();
+ $db->execute("INSERT INTO field_monsters(world_id,monster_code,coord_x,coord_y,hp_current,monster_type) VALUES(1,20209901,81,65,?,'solo')",[$maximum]);
+ MarchDispatcher::dispatchMonster(1,1,65,65,81,65,[50100101=>1]);
+ $march=(int)$db->query('SELECT MAX(id) FROM marches')->fetchColumn();
+ $db->execute('UPDATE marches SET departure_time=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 61 SECOND),arrival_time=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 1 SECOND) WHERE id=?',[$march]);MarchTick::runForPlayer(1);
+ $fallbackReport=BattleReportService::list(1)[0];
+ mrCheck($fallbackReport['outcome']==='defender_wins'&&$fallbackReport['details']['loot']===['food'=>100,'lumber'=>100,'stone'=>50,'gold'=>50]&&$fallbackReport['details']['items']===[],'defeated encounter with an empty world override receives real fallback resources');
+ $before=$db->query('SELECT food,lumber,stone,gold FROM cities WHERE id=1')->fetch();
+ $db->execute('UPDATE marches SET return_time=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 1 SECOND) WHERE id=?',[$march]);MarchTick::runForPlayer(1);MarchTick::runForPlayer(1);
+ $after=$db->query('SELECT food,lumber,stone,gold FROM cities WHERE id=1')->fetch();
+ foreach($fallbackReport['details']['loot'] as $resource=>$quantity)mrCheck((int)$after[$resource]===(int)$before[$resource]+$quantity,'fallback '.$resource.' arrives exactly once');
+ mrCheck((int)$db->query("SELECT COUNT(*) FROM reward_grant_ledger WHERE reward_kind='resource' AND source_reference=?",['march:'.$march])->fetchColumn()===4,'fallback resources receive confirmed payout receipts');
  echo "ALL MONSTER REPORT CHECKS PASSED\n";
 } finally {$fixture->close();}

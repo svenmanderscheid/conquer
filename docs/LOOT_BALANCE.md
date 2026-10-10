@@ -2,6 +2,8 @@
 
 Approved on 9 October 2026. These are the shipped global defaults. Saved global and world overrides retain the existing precedence; there were no saved overrides in the local database when this change was installed. The online server has not been deployed by this task.
 
+Updated on 10 October 2026: every resolved solo monster attack and every human rally contributor receives personal loot even when the monster survives. The frozen encounter configuration supplies resources, items, fragments, relics and crystal chances for each battle. If all rolls are empty, the existing basic bundle guarantees 100 food, 100 lumber, 50 stone and 50 gold; zero-chance item settings remain respected. Loot is frozen in the report and returning army and delivered once on return. Kill XP, kill counters, quest kill progress, regional supply, public charms and alliance gifts still require a kill. Cancelled attacks and unavailable/replaced targets do not constitute a fought encounter; AI support receives no personal rewards. Historical reports and completed payouts remain unchanged.
+
 | Source | Reward rule |
 | --- | --- |
 | Every monster, including rallies and goblins | One random grey or blue relic, equal rarity shares, 1–5 matching fragments. Combined chance increases linearly from 20% at level 1 to 80% at level 10. |

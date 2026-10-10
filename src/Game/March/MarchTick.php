@@ -263,12 +263,8 @@ final class MarchTick
             $buffs=\Conquer\Game\Research\BuffEngine::getBuffs($playerId,WorldContext::id());
             $result=BattleEngine::resolveMonster($troops,$monster,$monsterDef,$buffs);
             $result['report']['source_snapshot']=MonsterReport::capture($playerId,$cityId,WorldContext::id());
-            $result['loot']=$result['monster_killed']?($monsterDef['resource_reward']??['food'=>100,'lumber'=>100,'stone'=>50,'gold'=>50]):[];
-            $result['items']=$result['monster_killed']?\Conquer\Game\Rewards\RewardCatalog::rollItems($monsterDef['drops']??[]):[];
-            $result['fragments']=$result['monster_killed']?\Conquer\Game\Rewards\RewardCatalog::rollFragments($monsterDef['fragment_drops']??[]):[];
-            $result['relics']=$result['monster_killed']?\Conquer\Game\Rewards\RewardCatalog::rollRelics($monsterDef['relic_drops']??[]):[];
-            $gems=$monsterDef['gems_drop']??[];
-            if($result['monster_killed']&&\Conquer\Game\Rewards\RewardCatalog::roll((float)($gems['chance']??0)))$result['loot']['gems']=(int)($gems['amount']??0);
+            $result=array_replace($result,\Conquer\Game\Rewards\MonsterRewardRules::rollEncounter($monsterDef));
+            $rewardContext=\Conquer\Admin\RewardLedger::ruleContext('monster',(string)$monsterCode,(int)$march['world_id'],'march:'.$marchId,$monsterDef);
             $result['loot']=\Conquer\Game\Player\TalentEffects::monsterLoot($result['loot'],$buffs);
             $result['report']['items']=$result['items'];$result['report']['item_rewards']=[];
             $result['report']['fragments']=$result['fragments'];
@@ -295,7 +291,6 @@ final class MarchTick
                     $result['report']['item_rewards'][]=['code'=>(int)$code,'count'=>$count,'name'=>$item['name']??'Well-key fragment'];
                 }
                 $result['report']['items']=$result['items'];
-                $rewardContext=\Conquer\Admin\RewardLedger::ruleContext('monster',(string)$monsterCode,(int)$march['world_id'],'march:'.$marchId,$monsterDef);
                 $rewardContext['allowed_items']=array_values(array_unique(array_merge($rewardContext['allowed_items'],array_map('intval',array_keys($questItems)))));
                 if($questItems)$db->execute("UPDATE monster_kill_receipts SET reward_snapshot_json=JSON_SET(reward_snapshot_json,'$.items',JSON_EXTRACT(?,'$')) WHERE id=? AND world_id=?",[json_encode($result['items'],JSON_THROW_ON_ERROR),(int)$settlement['receipt_id'],(int)$march['world_id']]);
                 $result['report']['regional_supply']=\Conquer\Game\Territory\TerritoryEconomy::regionalKill(WorldContext::id(),$playerId,$targetX,$targetY,'monster-march:'.$marchId,\Conquer\Game\Territory\TerritoryEconomy::regionalBaseResources($monsterDef),strtotime($march['arrival_time'].' UTC'));

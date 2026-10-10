@@ -20,6 +20,8 @@ Alte Berichte bleiben lesbar. Nicht gespeicherte Boni und Ausrüstung werden aus
 
 ## Belohnungen und Postaktionen
 
+Seit dem 10. Oktober 2026 gewährt jedes tatsächlich ausgetragene Monstergefecht persönliche Beute, auch bei einer Niederlage. Das gilt für Soloangriffe und jeden menschlichen Rally-Teilnehmer. Bleiben alle konfigurierten Funde aus, erhält die Armee 100 Nahrung, 100 Holz, 50 Stein und 50 Gold. Bericht und Rückmarsch enthalten dieselbe echte Beute; wiederholte Statusabfragen würfeln sie nicht erneut aus. Kill-XP und die übrigen Kill-Belohnungen benötigen weiterhin ein besiegtes Monster. Alte Berichte werden nicht nachträglich verändert.
+
 Ressourcen und Gegenstände werden weiterhin genau einmal beim Rückmarsch ausgezahlt. Hunter-XP werden beim Kampfabschluss vergeben. `BattleReportService` liest den tatsächlichen Marsch-/Rallystatus für `reward_delivery`; ein unbekannter Zustand wird nicht als ausgezahlt dargestellt. Öffnen und Statusabfragen lösen keine Auszahlung aus. Ein öffentlicher Charm wird als separat einzusammelnder Fund bezeichnet.
 
 `POST /api/battle/report/:id/delete` verlangt Sitzung und CSRF-Token und prüft Spieler, Welt und Monsterziel. Es blendet den Bericht über `hidden_by_attacker` aus. Kampfdatensatz und Rückmarsch bleiben erhalten. Die Post übernimmt diesen Zustand sowie den Gelesenstatus; erneut gesendetes Löschen verändert keine Belohnung. Die Berichtserweiterung benötigt keine eigene Schemamigration.

@@ -42,4 +42,22 @@ foreach([20200501,20200510,20202101,20202210,20202305,20202410] as $code){
 }
 
 rewardCheck(InventoryService::getItemDef(MonsterRewardRules::ALLIANCE_COIN)['name_de']==='Allianzmünze','Alliance coin is a real inventory item');
+$empty=['resource_reward'=>['food'=>0,'lumber'=>0,'stone'=>0,'gold'=>0],
+    'drops'=>[['item_code'=>10203022,'count'=>1,'probability'=>0]],
+    'fragment_drops'=>[['treasure_code'=>60100001,'count'=>1,'probability'=>0]],
+    'relic_drops'=>[['treasure_code'=>60100001,'count'=>1,'probability'=>0]],
+    'gems_drop'=>['chance'=>0,'amount'=>100]];
+$fallback=MonsterRewardRules::rollEncounter($empty);
+rewardCheck($fallback===['loot'=>['food'=>100,'lumber'=>100,'stone'=>50,'gold'=>50],'items'=>[],'fragments'=>[],'relics'=>[]],'empty encounter guarantees basic resources without overriding zero drop chances');
+foreach([
+    ['resource_reward'=>['gold'=>25]],
+    ['drops'=>[['item_code'=>10203022,'count'=>1,'probability'=>1]]],
+    ['fragment_drops'=>[['treasure_code'=>60100001,'count'=>1,'probability'=>1]]],
+    ['relic_drops'=>[['treasure_code'=>60100001,'count'=>1,'probability'=>1]]],
+    ['gems_drop'=>['chance'=>1,'amount'=>10]],
+] as $override){
+    $reward=MonsterRewardRules::rollEncounter(array_replace($empty,$override));
+    rewardCheck($reward['loot']['food']===0&&array_sum($reward['loot'])+array_sum($reward['items'])+array_sum($reward['fragments'])+array_sum($reward['relics'])>0,'configured '.array_key_first($override).' counts as loot without an extra fallback');
+}
+
 echo "ALL $checks MONSTER REWARD BALANCE CHECKS PASSED\n";

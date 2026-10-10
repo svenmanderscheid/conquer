@@ -77,17 +77,17 @@ final class MonsterRally
         }unset($army);
         $result=BattleEngine::resolveMonsterArmies($armies,$target,$meta['monster']);
         $loot=[];$items=[];$fragments=[];$relics=[];$xp=[];$settlement=null;
+        $rewardDefinition=array_replace($meta['monster'],['drops'=>$meta['drops']??[]]);
+        foreach($armies as $i=>$army){
+            if(!empty($army['is_ai']))continue;
+            $reward=\Conquer\Game\Rewards\MonsterRewardRules::rollEncounter($rewardDefinition);
+            $loot[$i]=$reward['loot'];$items[$i]=$reward['items'];
+            $fragments[$i]=$reward['fragments'];$relics[$i]=$reward['relics'];
+        }
         if($result['monster_killed']){
-            $basePool=$meta['monster']['resource_reward']??['food'=>100,'lumber'=>100,'stone'=>50,'gold'=>50];
-            $gems=$meta['monster']['gems_drop']??[];
             $baseXp=(int)($meta['monster']['xp']??(max(1,(int)$meta['monster']['level'])*($meta['monster']['xp_per_level']??(str_contains(strtolower($meta['monster']['name']),'deathkar')?20:10))));
             foreach($armies as $i=>$army){
                 if(!empty($army['is_ai']))continue;
-                foreach($basePool as $resource=>$amount)if(in_array($resource,['food','lumber','stone','gold'],true))$loot[$i][$resource]=(int)$amount;
-                if(self::roll((float)($gems['chance']??0)))$loot[$i]['gems']=(int)($gems['amount']??0);
-                $items[$i]=\Conquer\Game\Rewards\RewardCatalog::rollItems($meta['drops']);
-                $fragments[$i]=\Conquer\Game\Rewards\RewardCatalog::rollFragments($meta['monster']['fragment_drops']??[]);
-                $relics[$i]=\Conquer\Game\Rewards\RewardCatalog::rollRelics($meta['monster']['relic_drops']??[]);
                 $xp[$i]=$baseXp;
             }
             $settlement=\Conquer\Game\Charm\MonsterCharmLifecycle::settle(
@@ -125,8 +125,4 @@ final class MonsterRally
         return $result;
     }
 
-    private static function roll(float $chance): bool
-    {
-        return $chance>=1||($chance>0&&random_int(1,1000000)<=(int)round($chance*1000000));
-    }
 }

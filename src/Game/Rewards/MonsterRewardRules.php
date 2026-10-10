@@ -9,6 +9,28 @@ final class MonsterRewardRules
     public const ALLIANCE_BADGE = 119000002;
     public const SUPPLY_RELIC = 60300105;
 
+    /** Every fought encounter grants personal loot, regardless of the kill outcome. */
+    public static function rollEncounter(array $definition): array
+    {
+        $loot=[];
+        $resources=$definition['resource_reward']??['food'=>100,'lumber'=>100,'stone'=>50,'gold'=>50];
+        foreach(['food','lumber','stone','gold'] as $resource){
+            $loot[$resource]=max(0,(int)($resources[$resource]??0));
+        }
+        $items=RewardCatalog::rollItems($definition['drops']??[]);
+        $fragments=RewardCatalog::rollFragments($definition['fragment_drops']??[]);
+        $relics=RewardCatalog::rollRelics($definition['relic_drops']??[]);
+        $gems=$definition['gems_drop']??[];
+        if(RewardCatalog::roll((float)($gems['chance']??0)))$loot['gems']=max(0,(int)($gems['amount']??0));
+
+        // Keep configured chances intact. An empty roll receives the existing
+        // basic resource bundle, including encounters with empty admin overrides.
+        if(array_sum($loot)+array_sum($items)+array_sum($fragments)+array_sum($relics)<=0){
+            $loot=['food'=>100,'lumber'=>100,'stone'=>50,'gold'=>50];
+        }
+        return ['loot'=>$loot,'items'=>$items,'fragments'=>$fragments,'relics'=>$relics];
+    }
+
     /** One grey or blue relic per successful fragment roll, with equal rarity shares. */
     public static function fragments(int $level): array
     {
