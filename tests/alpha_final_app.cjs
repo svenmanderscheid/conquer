@@ -63,25 +63,21 @@ fs.mkdirSync(out,{recursive:true});
    await page.evaluate(({x,y})=>ConquerWorld.focus(x,y),{x:body.target_x,y:body.target_y});
    const marker=page.locator(`[data-atlas-target="monsters:${monster.id}"]`);await marker.waitFor();
    const pos=await marker.evaluate(el=>{const r=el.getBoundingClientRect();for(const [fx,fy]of [[.5,.5],[.5,.9],[.1,.9],[.9,.9],[.1,.1]]){const x=r.width*fx,y=r.height*fy;if(el.contains(document.elementFromPoint(r.x+x,r.y+y)))return{x,y};}return null;});
-   assert(pos,'monster reachable by touch');await marker.click({position:pos});await page.locator('[data-action=march-preview]').waitFor();
+   assert(pos,'monster reachable by touch');await marker.click({position:pos});await page.locator('.march-power').waitFor();
   };
-  await page.evaluate(()=>{
-   window.__previewNavigation=[];
-   const record=event=>{const dialog=document.querySelector('#game-dialog');__previewNavigation.push({event:event.type,target:event.target?.id||event.target?.className||'window',width:innerWidth,url:location.href,history:structuredClone(history.state),parentOpen:dialog?.open,previewOpen:Boolean(document.querySelector('.battle-preview-dialog[open]'))});};
-   for(const name of ['popstate','hashchange'])window.addEventListener(name,record,true);
-   for(const name of ['close','cancel'])document.addEventListener(name,record,true);
-  });
   await openMonster();
   await page.locator('[data-action=march-clear]').click();await page.locator('#march-unit-50100101').fill('100');
   for(const [width,height]of [[1280,800],[390,844],[320,568],[844,390],[568,320]]){
-   await page.setViewportSize({width,height});await page.locator('[data-action=march-preview]').click();
-   await page.locator('.battle-preview-result table').waitFor();
-   assert.deepEqual((await textContrast(page,'.battle-preview-dialog')).failures,[],'calculator text remains readable');
-   assert.equal(await page.locator('.battle-preview-result tbody td').first().textContent(),new Intl.NumberFormat('de-DE').format(expected.attacker.survivors));
-   const geometry=await page.locator('.battle-preview-dialog').evaluate(el=>{const r=el.getBoundingClientRect(),close=el.querySelector('[data-preview-close]').getBoundingClientRect();return{fits:r.left>=0&&r.top>=0&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1,overflow:el.scrollWidth-el.clientWidth,close:close.height>=44&&close.bottom<=innerHeight};});
-   assert(geometry.fits&&geometry.overflow<=1&&geometry.close);report.push({width,height,...geometry});
-   await page.screenshot({path:path.join(out,`battle-${width}x${height}.png`)});
-   if(width===390)await page.goBack();else await page.keyboard.press('Escape');await page.waitForFunction(()=>!history.state?.conquerBattlePreview);assert(await page.locator('#game-dialog').isVisible(),'closing calculation retains march selection '+JSON.stringify(await page.evaluate(()=>({width:innerWidth,height:innerHeight,history:history.state,events:window.__previewNavigation,dialog:{open:document.querySelector('#game-dialog').open,display:getComputedStyle(document.querySelector('#game-dialog')).display}}))));assert.equal(await page.locator('#march-unit-50100101').inputValue(),'100');
+   await page.setViewportSize({width,height});await page.locator('.march-power').scrollIntoViewIfNeeded();
+   assert.equal(await page.locator('[data-action=march-preview],#march-preflight,.battle-preview-dialog').count(),0,'solo monster selection has no calculator or preflight text');
+   assert.deepEqual((await textContrast(page,'.march-power')).failures,[],'solo monster power remains readable');
+   assert.equal(await page.locator('#march-power-required').textContent(),new Intl.NumberFormat('de-DE').format(expected.required_power),'required power matches the server preview');
+   assert(await page.locator('.march-power #march-strength').isVisible(),'selected power is in the visible power card');
+   const geometry=await page.locator('#game-dialog').evaluate(el=>{const r=el.getBoundingClientRect(),power=el.querySelector('.march-power'),button=el.querySelector('#march-confirm'),action=button.getBoundingClientRect(),hit=document.elementFromPoint(action.x+action.width/2,action.y+action.height/2);return{fits:r.left>=0&&r.top>=0&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1,overflow:el.scrollWidth-el.clientWidth,powerOverflow:power.scrollWidth-power.clientWidth,action:action.height>=44&&action.left>=0&&action.top>=0&&action.right<=innerWidth+1&&action.bottom<=innerHeight+1&&button.contains(hit)};});
+   assert(geometry.fits&&geometry.overflow<=1&&geometry.powerOverflow<=1&&geometry.action,JSON.stringify({width,height,...geometry}));report.push({width,height,...geometry});
+   assert(await page.locator('#march-confirm').isEnabled(),'attack remains available');
+   assert.equal(await page.locator('#march-unit-50100101').inputValue(),'100','viewport changes retain the troop selection');
+   await page.screenshot({path:path.join(out,`monster-march-${width}x${height}.png`)});
   }
   await page.keyboard.press('Escape');
   const after=await read();assert.deepEqual(after.troops,state.troops);assert.equal(after.marches.length,state.marches.length);
@@ -113,7 +109,7 @@ fs.mkdirSync(out,{recursive:true});
   await waitContext.close();
   assert.deepEqual(errors,[]);assert.deepEqual(badAssets,[]);
   fs.writeFileSync(path.join(out,'report.json'),JSON.stringify({performanceState,report,errors,badAssets},null,2));
-  console.log('PASS actual app: calculator + authenticated HTTP, 5 viewports, menu icons, hidden polling, resume, painted city and no embedded HUD');
+  console.log('PASS actual app: solo monster power, PvP calculator + authenticated HTTP, 5 viewports, menu icons, hidden polling, resume, painted city and no embedded HUD');
  }catch(error){console.error({errors,badAssets});if(browser)for(const c of browser.contexts())for(const [i,p]of c.pages().entries()){console.error(await p.locator('dialog').allTextContents().catch(()=>[]));await p.screenshot({path:path.join(out,`failure-${i}.png`)}).catch(()=>{});}throw error;}
  finally{if(browser)await browser.close();if(fixture.exitCode===null){fixture.stdin.end('\n');await new Promise(resolve=>fixture.once('exit',resolve));}}
 })().catch(e=>{console.error(e);process.exitCode=1;});

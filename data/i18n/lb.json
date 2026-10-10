@@ -1,4 +1,10 @@
 {
+  "march.power.available": "Verfügbar Muecht",
+  "march.power.required": "Néideg Muecht",
+  "march.power.ready": "Néideg Muecht erreecht",
+  "march.power.low": "Ze wéineg Muecht",
+  "march.power.empty": "Keng Truppen ausgewielt",
+  "march.power.unavailable": "Zil net verfügbar",
   "landmark.territory_rally_note": "Erober dëst Gebitt mat enger Rally. Truppeverloschter si méiglech. De Start hält däi Stadschutz op.",
   "landmark.siege_objective": "Belagerungszil",
   "landmark.objective_gate": "Paart",

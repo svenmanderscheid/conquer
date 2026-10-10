@@ -1,4 +1,10 @@
 {
+  "march.power.available": "Verfügbare Macht",
+  "march.power.required": "Benötigte Macht",
+  "march.power.ready": "Benötigte Macht erreicht",
+  "march.power.low": "Zu wenig Macht",
+  "march.power.empty": "Keine Truppen gewählt",
+  "march.power.unavailable": "Ziel nicht verfügbar",
   "landmark.territory_rally_note": "Erobere dieses Gebiet mit einer Rally. Truppenverluste sind möglich. Der Start beendet deinen Stadtschutz.",
   "landmark.siege_objective": "Belagerungsziel",
   "landmark.objective_gate": "Tor",

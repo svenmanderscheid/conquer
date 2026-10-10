@@ -120,8 +120,8 @@ let automatic=await page.evaluate(()=>({total:[...document.querySelectorAll('.ma
 check('Solo monster attack preselects the minimum sufficient troop count',()=>{assert.equal(automatic.total,3);assert(automatic.power>=121);});
 check('Solo monster attack prefers cavalry when equally economical',()=>assert.deepEqual(automatic.types,[3]));
 await page.evaluate(counts=>{const [code,count]=Object.entries(counts)[0];document.querySelector('#march-unit-'+code).value=count-1;march.update();},automatic.counts);
-const belowMinimumForecast=await page.locator('#march-forecast').textContent();
-check('One fewer troop falls below the solo monster power requirement',()=>assert.match(belowMinimumForecast,/zu wenig Macht|knapp unter der Siegesschwelle/));
+const belowMinimumForecast=await page.locator('#march-power-status').textContent();
+check('One fewer troop falls below the solo monster power requirement',()=>assert.match(belowMinimumForecast,/Zu wenig Macht/));
 await page.evaluate(()=>{state.monsters[0].definition.type='rally';openMarch('monster-rally');});
 automatic=await page.evaluate(()=>({total:[...document.querySelectorAll('.march-unit-amount input')].reduce((sum,input)=>sum+Number(input.value),0),power:Number(document.querySelector('#march-strength').textContent.replace(/\D/g,'')),types:[...document.querySelectorAll('.march-unit-amount input')].filter(input=>Number(input.value)>0).map(input=>Number(input.closest('.march-unit-row').dataset.type))}));
 check('Monster rally preselects its minimum sufficient own contribution',()=>{assert.equal(automatic.total,2);assert(automatic.power>=121);});

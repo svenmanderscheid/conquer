@@ -1,4 +1,10 @@
 {
+  "march.power.available": "Available power",
+  "march.power.required": "Required power",
+  "march.power.ready": "Required power reached",
+  "march.power.low": "Not enough power",
+  "march.power.empty": "No troops selected",
+  "march.power.unavailable": "Target unavailable",
   "landmark.territory_rally_note": "Rally to conquer this territory. Troop losses are possible. Starting ends your city protection.",
   "landmark.siege_objective": "Siege objective",
   "landmark.objective_gate": "Gate",

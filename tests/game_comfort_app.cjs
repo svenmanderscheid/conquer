@@ -63,10 +63,14 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/game-feel-
   const state=(await(await context.request.get(base+'/api/game/state')).json()).data,monster=state.monsters.find(m=>m.definition?.type==='solo');assert(monster);
   const openMonster=async()=>{await page.evaluate(({x,y})=>ConquerWorld.focus(x,y),{x:Number(monster.coord_x),y:Number(monster.coord_y)});await page.locator(`[data-atlas-target="monsters:${monster.id}"]`).waitFor();await page.locator(`[data-atlas-target="monsters:${monster.id}"]`).click({force:true});await page.locator('#march-confirm').waitFor();};
   await openMonster();await page.locator('[data-action=march-clear]').click();await page.locator('#march-unit-50100101').fill('100');
-  await page.waitForFunction(()=>document.querySelector('#march-preflight').textContent.includes('verwundet'));
+  await page.locator('.march-power').waitFor();
   for(const [width,height]of [[1280,800],[390,844],[320,568],[844,390],[568,320]]){
-   await page.setViewportSize({width,height});assert.match(await page.locator('#march-preflight').textContent(),/Freie Hospitalplätze/);
-   await page.locator('#march-preflight').scrollIntoViewIfNeeded();
+   await page.setViewportSize({width,height});
+   assert.equal(await page.locator('[data-action=march-preview],#march-preflight,.battle-preview-dialog').count(),0,'solo monster selection omits the calculator and preflight text');
+   await page.locator('.march-power').scrollIntoViewIfNeeded();
+   assert(await page.locator('.march-power #march-strength').isVisible(),'selected power remains visible');
+   assert(await page.locator('#march-power-required').isVisible(),'required power remains visible');
+   assert(await page.locator('#march-power-status').isVisible(),'power status remains visible');
    const layout=await page.locator('#game-dialog').evaluate(el=>{const r=el.getBoundingClientRect();return {fits:r.x>=0&&r.y>=0&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1,overflow:el.scrollWidth-el.clientWidth};});assert(layout.fits&&layout.overflow<=1);checks.push({screen:'march',width,height,...layout});
    await page.screenshot({path:path.join(out,`march-${width}x${height}.png`)});
   }
@@ -75,7 +79,7 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/game-feel-
   const stored=await page.evaluate(()=>JSON.parse(localStorage.getItem('conquer:march-choice:v1::1:1:monsters')));assert.deepEqual(stored,{'50100101':100});
   await openMonster();assert.equal(await page.locator('#march-unit-50100101').inputValue(),'100');assert.equal(await page.locator('[data-action=march-default]').count(),1);
   await page.locator('[data-action=march-default]').click();assert.equal(await page.locator('.march-remembered').count(),0);
-  assert.deepEqual(errors,[]);fs.writeFileSync(path.join(out,'report.json'),JSON.stringify({checks,errors,claims},null,2));console.log('PASS game comfort: feedback, goal hint, return summary, march forecast and memory, quest continuation and scroll; 5 viewports');
+  assert.deepEqual(errors,[]);fs.writeFileSync(path.join(out,'report.json'),JSON.stringify({checks,errors,claims},null,2));console.log('PASS game comfort: feedback, goal hint, return summary, march power and memory, quest continuation and scroll; 5 viewports');
  }catch(error){if(page){console.error(await page.locator('dialog[open]').allTextContents());await page.screenshot({path:path.join(out,'failure.png')}).catch(()=>{});}console.error(errors);throw error;}
  finally{if(browser)await browser.close();if(fixture.exitCode===null){fixture.stdin.end('\n');await new Promise(resolve=>fixture.once('exit',resolve));}}
 })().catch(error=>{console.error(error);process.exitCode=1;});

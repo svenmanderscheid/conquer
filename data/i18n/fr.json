@@ -1,4 +1,10 @@
 {
+  "march.power.available": "Puissance disponible",
+  "march.power.required": "Puissance requise",
+  "march.power.ready": "Puissance requise atteinte",
+  "march.power.low": "Puissance insuffisante",
+  "march.power.empty": "Aucune troupe sélectionnée",
+  "march.power.unavailable": "Cible indisponible",
   "landmark.territory_rally_note": "Lancez un ralliement pour conquérir ce territoire. Des pertes sont possibles. Le lancement met fin à la protection de votre ville.",
   "landmark.siege_objective": "Objectif du siège",
   "landmark.objective_gate": "Porte",
