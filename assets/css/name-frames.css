@@ -118,40 +118,84 @@
   background-size:100% 100%;
 }
 .map-overlay-shell :is(.atlas-marker--home,.atlas-marker--players) .atlas-marker-name.name-frame {
-  top:calc(100% - 30px);
+  /* Fit inside the village footprint at every zoom, leaving a clear gap to
+     neighboring plates. Long names remain complete in the selection banner. */
+  --map-name-room:calc(var(--tile-size,44px)*var(--footprint,3));
+  --map-name-badge:clamp(16px,calc(var(--map-name-room) - 26px),22px);
+  top:calc(100% - 28px);
   bottom:auto;
+  width:max-content;
+  max-width:min(180px,calc(var(--map-name-room) - 8px));
+  min-height:28px;
+  height:28px;
+  gap:clamp(0px,calc(var(--map-name-room) - 50px),4px);
+  padding:2px clamp(3px,calc(var(--map-name-room) - 90px),16px) 2px 3px;
+  border:1px solid var(--ui-accent-gold,var(--ui-line));
+  border-radius:16px;
+  background:var(--ui-head-surface,var(--ui-paper));
+  box-shadow:inset 0 1px 0 var(--ui-card-light),0 2px 2px color-mix(in srgb,var(--ui-ink),transparent 78%);
+  filter:none;
+  font-size:12px;
+}
+.map-overlay-shell :is(.atlas-marker--home,.atlas-marker--players) .atlas-marker-name.name-frame > .name-frame-label {
+  flex:0 1 auto;
+}
+.map-overlay-shell :is(.atlas-marker--home,.atlas-marker--players) .atlas-marker-name.name-frame > .name-frame-ornament:last-child {
+  display:grid;
+  right:3px;
+  width:10px;
+  max-width:clamp(0px,calc(var(--map-name-room) - 100px),10px);
+  height:12px;
+  border:0;
+  border-radius:0;
+  background:none;
+  box-shadow:none;
+  filter:none;
+  animation:none;
 }
 .map-overlay-shell .atlas-marker--home .atlas-marker-name.name-frame { display:inline-flex;opacity:1!important; }
 .map-overlay-shell .atlas-marker-name.name-frame .name-frame-ornament { width:16px;height:16px; }
 .map-overlay-shell :is(.atlas-marker--home,.atlas-marker--players) .atlas-marker-level {
-  z-index:10!important;
-  left:6px;
-  top:50%;
-  bottom:auto;
+  position:static;
+  z-index:auto!important;
+  inset:auto;
   display:grid;
   place-items:center;
-  width:40px;
-  height:40px;
+  flex:0 0 var(--map-name-badge,22px);
+  width:var(--map-name-badge,22px);
+  height:22px;
+  min-width:0;
+  max-width:none;
   padding:0;
-  translate:0 0;
-  color:var(--name-frame-name-ink,var(--ui-ink,#493b33));
+  translate:none;
+  color:var(--ui-ink);
   isolation:isolate;
-  border:0;
+  border:1px solid var(--ui-accent-gold,var(--ui-line));
   border-radius:50%;
-  background:none;
-  box-shadow:none;
+  background:var(--ui-card);
+  box-shadow:0 0 0 2px var(--name-frame-accent),inset 0 1px 0 var(--ui-card-light);
   font-family:var(--ui-font-number,var(--ui-font));
-  font-size:15px;
+  font-size:12px;
   font-weight:800;
   line-height:1;
-  text-shadow:0 1px 0 #fff9;
-  transform:translateY(-50%) translateZ(1px);
+  text-shadow:none;
+  transform:none;
 }
 .map-overlay-shell :is(.atlas-marker--home,.atlas-marker--players) .atlas-marker-level::before {
   display:none;
 }
 .map-overlay-shell :is(.atlas-marker--home,.atlas-marker--players) .atlas-marker-level::after {
   display:none;
+}
+
+/* Touch selection must reveal the complete name when its map plate is short. */
+.map-overlay-shell .atlas-target-actions.is-village:not(.is-simple-target):not(.is-landmark):not(.is-alliance-center) .atlas-village-banner > strong {
+  min-width:0;
+  max-width:100%;
+  overflow:visible;
+  white-space:normal;
+  overflow-wrap:anywhere;
+  text-overflow:clip;
 }
 
 /* Badge and plate use one material palette for each castle skin. */
@@ -188,8 +232,6 @@ body.mobile-game #game-dialog:has(.name-frame-picker) #dialog-content { display:
   body.mobile-game #game-dialog .name-frame-grid { grid-auto-rows:126px; }
   body.mobile-game #game-dialog .name-frame-card { min-height:126px; }
   .map-overlay-shell .atlas-marker-name.name-frame { width:154px;min-width:0;min-height:40px;max-width:154px;padding:7px 10px 7px 45px;font-size:11px;background-size:100% 100%; }
-  .map-overlay-shell :is(.atlas-marker--home,.atlas-marker--players) .atlas-marker-name.name-frame { top:calc(100% - 30px);bottom:auto; }
-  .map-overlay-shell :is(.atlas-marker--home,.atlas-marker--players) .atlas-marker-level { left:6px;top:50%;width:37px;height:37px;font-size:14px; }
 }
 @media(min-width:421px) and (max-height:540px) {
   .skin-collection-tabs button { gap:2px;padding-inline:2px; }
