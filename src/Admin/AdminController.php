@@ -52,13 +52,21 @@ final class AdminController
         }
         require ROOT_DIR.'/views/admin/change_password.php';
     }
-    public static function dashboard(): void {self::render('dashboard','Übersicht');}
+    public static function dashboard(): void
+    {
+        if(AdminAuth::requireAuth()['role']==='support'){header('Location: '.APP_BASE.'/admin/cases');return;}
+        self::render('dashboard',\Conquer\Game\Locale::t('admin.ops.overview_title'));
+    }
+    public static function activity(): void {self::render('activity',\Conquer\Game\Locale::t('admin.ops.activity_title'));}
+    public static function technical(): void {self::render('technical',\Conquer\Game\Locale::t('admin.ops.technical_title'));}
+    public static function cases(): void {self::render('cases',\Conquer\Game\Locale::t('admin.cases.title'));}
     public static function layoutEditor(): void {self::render('layout_editor','Layout-Editor');}
     public static function layoutData(): void
     {
         $admin=AdminAuth::requireAuth();
         header('Content-Type: application/json; charset=utf-8');
         header('Cache-Control: private, no-store');
+        if($admin['role']==='support'){http_response_code(403);echo json_encode(['error'=>\Conquer\Game\Locale::t('admin.ops.access_denied')],JSON_THROW_ON_ERROR);return;}
         try {
             if (($_SERVER['REQUEST_METHOD']??'GET')==='GET') {
                 echo json_encode(\Conquer\Game\Ui\LayoutSettings::read(),JSON_THROW_ON_ERROR);return;
@@ -68,14 +76,15 @@ final class AdminController
             $result=AdminService::execute((int)$admin['id'],'layout-save',$_POST);
             echo json_encode(['message'=>$result['message'],'revision'=>$result['after']['revision']],JSON_THROW_ON_ERROR);
         } catch (\InvalidArgumentException|\DomainException $e) {http_response_code(409);echo json_encode(['error'=>$e->getMessage()]);}
-        catch (\Throwable $e) {error_log('Layout editor: '.$e->getMessage());http_response_code(500);echo '{"error":"Layout konnte nicht gespeichert werden. Bitte Verbindung und Migration prüfen."}';}
+        catch (\Throwable $e) {\Conquer\Observability\EventLog::exception($e,'admin.layout','ADMIN_LAYOUT_FAILED');http_response_code(500);echo '{"error":"Layout konnte nicht gespeichert werden. Bitte Verbindung und Migration prüfen."}';}
     }
     public static function analytics(): void {self::render('analytics','Statistiken');}
     public static function links(): void
     {
-        AdminAuth::requireAuth();
+        $admin=AdminAuth::requireAuth();
         header('Cache-Control: private, no-store');
         header('Referrer-Policy: same-origin');
+        if($admin['role']==='support'){http_response_code(403);echo \Conquer\Game\Locale::html('admin.ops.access_denied');return;}
         if(($_SERVER['REQUEST_METHOD']??'GET')!=='GET'){http_response_code(405);header('Allow: GET');return;}
         if(($_GET['export']??null)==='csv'){LinkTrackerAdmin::export(Connection::getInstance(),$_GET);return;}
         self::render('links',\Conquer\Game\Locale::t('links.title'));
@@ -105,10 +114,15 @@ final class AdminController
     public static function worldCreate(): void {self::render('world_create','Welt erstellen');}
     public static function alliances(): void {self::render('alliances','Allianzen');}
     public static function chat(): void {self::render('chat','Chatprotokoll');}
-    public static function bugReports(): void {self::render('bug_reports','Bugmeldungen');}
-    public static function bugReportScreenshot(int $id): void
+    public static function bugReports(): void
     {
         AdminAuth::requireAuth();
+        header('Location: '.APP_BASE.'/admin/cases?'.http_build_query(['case_world'=>max(0,(int)($_GET['world_id']??0))]),true,302);
+    }
+    public static function bugReportScreenshot(int $id): void
+    {
+        $admin=AdminAuth::requireAuth();
+        if(!in_array($admin['role'],['superadmin','support'],true)){http_response_code(403);return;}
         $row=Connection::getInstance()->query('SELECT screenshot,screenshot_mime FROM bug_reports WHERE id=?',[$id])->fetch();
         if(!$row||!is_string($row['screenshot'])||$row['screenshot']===''){http_response_code(404);return;}
         $mime=in_array($row['screenshot_mime'],['image/jpeg','image/png'],true)?$row['screenshot_mime']:'image/jpeg';
@@ -154,9 +168,9 @@ final class AdminController
                 elseif($result['duplicate'])$_SESSION['admin_flash'].=' Es wurden keine weiteren Keys erstellt. Falls du die einmalige Anzeige verpasst hast, sperre die betroffenen Keys und erstelle neue.';
             }
         } catch(\InvalidArgumentException|\DomainException|\RuntimeException $e) {
-            if($e instanceof \PDOException){error_log('Admin action failed: '.$e->getMessage());$message='Datenbankfehler. Der Vorgang wurde zurückgerollt.';}else $message=$e->getMessage();
+            if($e instanceof \PDOException){\Conquer\Observability\EventLog::exception($e,'admin.action','ADMIN_ACTION_FAILED');$message='Datenbankfehler. Der Vorgang wurde zurückgerollt.';}else $message=$e->getMessage();
             $_SESSION['admin_flash']=$message;$_SESSION['admin_flash_kind']='error';
-        } catch(\Throwable $e){error_log('Admin action failed: '.$e->getMessage());$_SESSION['admin_flash']='Der Vorgang konnte nicht gespeichert werden. Alle Änderungen wurden zurückgerollt.';$_SESSION['admin_flash_kind']='error';}
+        } catch(\Throwable $e){\Conquer\Observability\EventLog::exception($e,'admin.action','ADMIN_ACTION_FAILED');$_SESSION['admin_flash']='Der Vorgang konnte nicht gespeichert werden. Alle Änderungen wurden zurückgerollt.';$_SESSION['admin_flash_kind']='error';}
         if($rewardAction&&($_SESSION['admin_flash_kind']??'')==='error'&&$action==='reward-save')$_SESSION['admin_reward_draft']=$_POST;
         if($action==='reward-batch-save'&&($_SESSION['admin_flash_kind']??'')==='error'){
             $_SESSION['admin_reward_batch_draft']=[];
@@ -188,6 +202,8 @@ final class AdminController
     private static function render(string $view,string $title,array $vars=[]): void
     {
         $adminSession=AdminAuth::requireAuth();$db=Connection::getInstance();$csrf=self::getCsrfToken();
+        header('Cache-Control: private, no-store');
+        if($adminSession['role']==='support'&&$view!=='cases'){http_response_code(403);echo \Conquer\Game\Locale::html('admin.ops.access_denied');return;}
         $worlds=$db->query('SELECT * FROM worlds ORDER BY id')->fetchAll();
         $selectedWorld=(int)($_GET['world_id']??$_SESSION['admin_world_id']??($worlds[0]['id']??0));
         if(!in_array($selectedWorld,array_map(static fn(array $w):int=>(int)$w['id'],$worlds),true))$selectedWorld=(int)($worlds[0]['id']??0);
@@ -196,12 +212,12 @@ final class AdminController
         $pageTitle=$title;$activePage=$view==='player_detail'?'players':$view;$canEdit=$adminSession['role']==='superadmin';
         // The searchable item picker is sizeable and only used by reward
         // editing and player gifts. Keep it out of every other admin response.
-        $usesItemPicker=in_array($view,['rewards','player_detail'],true);
+        $usesItemPicker=$view==='player_detail'||($view==='rewards'&&!in_array($_GET['tab']??'', ['actual','invalid'],true));
         extract($vars,EXTR_SKIP);
         require_once ROOT_DIR.'/views/admin/helpers.php';
         ob_start();
         try{require ROOT_DIR.'/views/admin/'.$view.'.php';}
-        catch(\Throwable $e){ob_end_clean();ob_start();error_log('Admin render failed: '.$e->getMessage());echo '<div class="notice error">Die Ansicht konnte nicht geladen werden. Prüfe den Migrationsstand und das Serverprotokoll.</div>';}
+        catch(\Throwable $e){ob_end_clean();ob_start();\Conquer\Observability\EventLog::exception($e,'admin.render','ADMIN_RENDER_FAILED');echo '<div class="notice error">Die Ansicht konnte nicht geladen werden. Prüfe den Migrationsstand und das Serverprotokoll.</div>';}
         $content=ob_get_clean();require ROOT_DIR.'/views/admin/layout.php';
     }
     private static function getCsrfToken(): string

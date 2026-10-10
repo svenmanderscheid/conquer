@@ -53,6 +53,8 @@ final class Response
     {
         $json=json_encode($body, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
         \Conquer\Security\ApiOperation::finish($status,$json);
+        // A success is observed only after the command receipt and gameplay transaction committed.
+        \Conquer\Observability\RequestTrace::complete($status,$body);
         if (!headers_sent()) {
             http_response_code($status);
             header('Content-Type: application/json; charset=utf-8');

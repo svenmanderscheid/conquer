@@ -94,7 +94,7 @@ final class TradingShopService
             }
             if($changed!==1)throw new \DomainException('Du hast nicht genügend Rohstoffe oder Edelsteine.');
             $grant=$quantity*(int)$offer['quantity'];
-            if(isset($offer['item_code']))InventoryService::addItems($playerId,(int)$offer['item_code'],$grant);
+            if(isset($offer['item_code']))InventoryService::addItems($playerId,(int)$offer['item_code'],$grant,null,['source_type'=>'trading_shop','source_key'=>(string)$offerId,'reference'=>'rotation:'.$rotation]);
             else TreasureService::addFragments($playerId,(int)$offer['treasure_code'],$grant);
             $db->execute('INSERT INTO trading_shop_purchases(player_id,scope_world_id,shop_mode,rotation,offer_id,quantity)VALUES(?,?,?,?,?,?) ON DUPLICATE KEY UPDATE quantity=quantity+VALUES(quantity)',[$playerId,WorldContext::id(),$mode,$rotation,$offerId,$quantity]);
             return ['message'=>$grant.' × '.($offer['item']['name_de']??$offer['item']['name']).' erhalten.','item_code'=>$offer['item_code']??null,'treasure_code'=>$offer['treasure_code']??null,'quantity'=>$grant,'cost'=>['resource'=>$resource,'amount'=>$cost],'remaining'=>$offer['remaining']-$quantity];

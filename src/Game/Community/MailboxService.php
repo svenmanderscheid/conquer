@@ -219,9 +219,9 @@ final class MailboxService
         $gift=$db->query('SELECT g.gift_json FROM alliance_gifts g JOIN alliances a ON a.id=g.alliance_id JOIN alliance_members m ON m.alliance_id=a.id AND m.player_id=? WHERE g.id=? AND a.world_id=? AND g.expires_at>UTC_TIMESTAMP() FOR UPDATE',[$player,$entry['source_id'],$world])->fetch();
         if(!$gift)return 0;
         $reward=self::decode($gift['gift_json']);$code=(int)($reward['item_code']??0);$quantity=(int)($reward['quantity']??0);
-        if($code<=0||$quantity<=0||!InventoryService::getItemDef($code))throw new \DomainException('Diese Belohnung ist derzeit nicht verfügbar.');
+        \Conquer\Admin\RewardLedger::validate($player,$world,$code,$quantity,['source_type'=>'alliance_gift','source_key'=>(string)$entry['source_id'],'reference'=>'alliance-gift:'.$entry['source_id']]);
         $added=$db->execute('INSERT IGNORE INTO alliance_gift_claims(gift_id,player_id)VALUES(?,?)',[$entry['source_id'],$player]);
-        if($added)InventoryService::addItems($player,$code,$quantity,$world);
+        if($added)InventoryService::addItems($player,$code,$quantity,$world,['source_type'=>'alliance_gift','source_key'=>(string)$entry['source_id'],'reference'=>'alliance-gift:'.$entry['source_id']]);
         $db->execute("UPDATE mailbox_entries SET reward_status='claimed' WHERE id=?",[$entry['id']]);
         return $added?1:0;
     }

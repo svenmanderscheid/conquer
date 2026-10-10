@@ -8,7 +8,7 @@ final class BugReportService
 {
     private const CATEGORIES=['gameplay','interface','performance','account','other'];
     private const SEVERITIES=['minor','normal','blocking'];
-    private const TYPES=['bug','idea'];
+    private const TYPES=['bug','idea','support'];
 
     /** @return array{id:int,duplicate:bool,message:string} */
     public static function submit(int $playerId,int $worldId,array $input,string $userAgent,string $ip): array

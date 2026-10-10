@@ -21,6 +21,6 @@ final class BugReportHandler
         $result=BugReportService::submit((int)$session['player_id'],WorldContext::id(),$body,(string)($_SERVER['HTTP_USER_AGENT']??''),(string)($_SERVER['REMOTE_ADDR']??''));
         header('Cache-Control: no-store');Response::ok($result);
         } catch(\DomainException $e){Response::error(422,'BUG_REPORT_INVALID',$e->getMessage());}
-        catch(\Throwable $e){error_log('Bug report submission failed: '.$e->getMessage());Response::error(500,'BUG_REPORT_FAILED','Die Meldung konnte nicht gespeichert werden.');}
+        catch(\Throwable $e){\Conquer\Observability\EventLog::exception($e,'bugs.submit');Response::error(500,'BUG_REPORT_FAILED','Die Meldung konnte nicht gespeichert werden.');}
     }
 }

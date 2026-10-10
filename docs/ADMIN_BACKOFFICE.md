@@ -4,27 +4,40 @@ The modern administration design was approved on 5 October 2026. It uses its own
 
 ## Navigation
 
-Seven primary areas group existing features; secondary links expose every page:
+Eight primary areas group the administration; secondary links expose each workspace:
 
 | Area | Pages |
 | --- | --- |
-| Overview | Dashboard, statistics, link tracker |
-| Players & alliances | Players, gifts, alliances |
+| Overview | Activity analysis, economy/drop shortcuts, stability, current cases and world state |
+| Players & alliances | Players, action history, gifts, alliances |
+| Reports & support | Shared case inbox, bug/support conversations, content moderation, chat history |
 | Worlds | World settings and spawns, world creation, land development |
-| Drops & rewards | Mines, monsters, dungeons, chests, expeditions |
-| Catalog | Illustrated item catalog |
-| Access & reports | Alpha keys, alpha waitlist, bug reports, chat moderation |
-| System & history | Audit log, game layout editor |
+| Drops & rewards | Rules, actual grants, invalid attempts, illustrated item catalog |
+| Technical health | Grouped errors, connection observations, safe event details |
+| Analytics | Gathering, battles, world-specific alpha analysis, link tracker |
+| System & history | Audit log, game layout editor, alpha keys and alpha waitlist |
 
-The dashboard uses live counts and recent audit records. The mobile menu retains language selection and logout. English remains the default and fallback; new copy lives in `data/i18n/`.
+The dashboard uses recorded activity and current state, with world and 24-hour/7/30/90-day filters. Player activity is the default analysis tab; economy and stability are one click away. Metrics link to the corresponding players, cases or events. Missing instrumentation is shown as unavailable, and unindexed fallback logs produce a visible warning. The mobile menu retains language selection and logout. English remains the default and fallback; new copy lives in `data/i18n/`.
+
+The 10 October operational expansion is local until deployed. Apply additive migrations `0142_observability.sql`, `0143_team_reports.sql` and `0144_reward_ledger.sql` with the corresponding application code. Existing installations remain readable before optional telemetry/ledger tables exist; confirmed history starts with instrumentation and is not reconstructed. See [ADMIN_OPERATIONS.md](ADMIN_OPERATIONS.md), [OBSERVABILITY.md](OBSERVABILITY.md), [TEAM_REPORTS.md](TEAM_REPORTS.md) and [REWARD_LEDGER.md](REWARD_LEDGER.md).
 
 ## Link statistics
 
-**Overview → Link tracker** (`/admin/links`) counts visits through shareable campaign links and clicks on 13 public website targets. It provides UTC calendar-period filters, per-link and lifetime counts, daily activity, source/device categories and CSV export. Superadmins create, copy, edit and pause campaigns; moderators have read/export access. Counts measure clicks rather than unique visitors. No analytics cookies or raw visitor IPs are stored in the statistics. Migration, safeguards and verification are documented in [LINK_TRACKER.md](LINK_TRACKER.md).
+**Analytics → Link tracker** (`/admin/links`) counts visits through shareable campaign links and clicks on 13 public website targets. It provides UTC calendar-period filters, per-link and lifetime counts, daily activity, source/device categories and CSV export. Superadmins create, copy, edit and pause campaigns; moderators have read/export access. Counts measure clicks rather than unique visitors. No analytics cookies or raw visitor IPs are stored in the statistics. Migration, safeguards and verification are documented in [LINK_TRACKER.md](LINK_TRACKER.md).
+
+## World workspace
+
+The world detail page (`/admin/world?world_id=…`) is organized into **Overview**, **General settings**, **Spawns**, **Territories**, **Events**, **World gifts**, **Spawn history** and **World management**. The overview shows the selected world's status, eligible players, map dimensions, automatic-spawn setting and next scheduled run. Navigation stays beside the content on wide desktops and becomes a wrapping button grid on smaller screens. Mines/resources, monsters and free villages have separate expandable spawn groups. Creation and permanent deletion are grouped last under World management.
+
+General settings, spawn rules and alliance radii remain one complete `world-save` form with a shared save area. Switching sections keeps unsaved values; leaving the page warns about pending settings. Validation opens the section and expandable group containing the first invalid field before focusing it. Existing territory, event, gift and deletion forms retain their own save actions and authorization. Local fragment navigation supports browser Back/Forward, remembers the last section per world in the browser session, and preserves the existing `#world-delete` and `#extra-event-settings` links. Without JavaScript, every section remains accessible on the page.
+
+New labels use `admin.world_workspace.*` in English, German and French. The new `assets/js/admin-world.js` is loaded only for world administration; styling stays scoped to `body.admin-modern`. No schema or game-rule changes are required. Focused verification: `ADMIN_WORLD_ONLY=1 php tests/reward_admin.php --browser` (set the environment variable separately in PowerShell), using the existing disposable database and `tests/admin_world_workspace.cjs`. Evidence is stored in `output/playwright/admin-world-workspace/`. These source changes are local until deployed.
+
+Verified locally on 10 October 2026: all eight sections in five desktop, portrait and landscape sizes across EN/DE/FR; complete settings saves with hidden fields; invalid-field focus; cancelled submission of a separate form with an intact settings draft; Back/Forward and legacy links; both map profiles; independent Luxembourg territory-rule saving; moderator access; and the no-JavaScript fallback. No horizontal overflow or browser errors were found. The existing world-deletion and extra-event server/browser regressions also passed using disposable databases. Desktop/mobile previews use synthetic Luxembourg-world data (`preview-desktop.png`, `preview-mobile.png`); browser checks do not constitute physical-device testing or publication.
 
 ## Deleting a world
 
-Superadmins open **Delete world** from the dashboard or **Worlds → World settings**. Select the world and close it in its settings first. The deletion card shows the affected city and alliance counts. Enter the exact world name, acknowledge permanent deletion and provide an audit reason. The final remaining world cannot be deleted.
+Superadmins open **Delete world** under **Worlds → World settings → World management**. Select the world and close it in its settings first. The deletion card shows the affected city and alliance counts. Enter the exact world name, acknowledge permanent deletion and provide an audit reason. The final remaining world cannot be deleted.
 
 `POST /admin/action/world-delete` uses the existing authentication, CSRF validation, operation receipt and audit transaction, plus the shared combat, world spawn and reward locks. It removes world-scoped records, city/alliance descendants, legacy children without foreign keys and world notifications. It revokes game sessions currently using the deleted world and redirects the administrator to a surviving world. A successful request replay returns its receipt even after the world is gone; failures roll back the deletion, sessions, receipt and audit together.
 

@@ -149,7 +149,7 @@ final class AdminAuth
         $row = Connection::getInstance()->query('SELECT id,username,role,password_hash,must_change_password FROM admin_users WHERE id=?', [(int)$session['id']])->fetch();
         if (!$row || !is_string($session['credential_version'] ?? null)
             || !hash_equals(hash('sha256', (string)$row['password_hash']), $session['credential_version'])
-            || !in_array($row['role'], ['superadmin','moderator'], true)) {
+            || !in_array($row['role'], ['superadmin','moderator','support'], true)) {
             unset($_SESSION[self::SESSION_KEY], $_SESSION['admin_csrf']);
             return null;
         }

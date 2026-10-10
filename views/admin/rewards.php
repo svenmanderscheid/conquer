@@ -4,6 +4,9 @@ use Conquer\Game\Rewards\RewardCatalog;
 use Conquer\Game\Rewards\RewardPreview;
 use Conquer\Admin\ItemPresentation;
 use Conquer\Game\Locale;
+$rewardTab=is_string($_GET['tab']??null)&&in_array($_GET['tab'],['actual','invalid'],true)?$_GET['tab']:'rules';
+require __DIR__.'/reward_navigation.php';
+if($rewardTab!=='rules'){require __DIR__.'/reward_history.php';return;}
 $types=['monster'=>['Monster','hud/expeditions.svg'],'farm'=>[Locale::t('admin.modern.mine_tab'),'ui-resources/food.png'],'dungeon'=>['Dungeons','hud/city.svg'],'chest'=>['Truhen','items/chest-gold.svg'],'expedition'=>['Feldzüge','hud/alliance.svg']];
 $type=is_string($_GET['type']??null)&&isset($types[$_GET['type']])?$_GET['type']:'monster';
 $rewardScope=($_GET['scope']??'global')==='world'?'world':'global';

@@ -1,4 +1,61 @@
 /* Approved independent administration design. The game keeps its painted theme. */
+body.admin-village.admin-modern .world-summary{display:flex;align-items:center;justify-content:space-between;gap:16px;}
+body.admin-village.admin-modern .world-summary>div{min-width:0;}
+body.admin-village.admin-modern .world-summary h2{font-size:24px;margin:0;overflow-wrap:anywhere;}
+body.admin-village.admin-modern .world-summary .world-eyebrow{font-size:12px;margin:0 0 5px;color:var(--ui-muted);}
+body.admin-village.admin-modern .world-workspace-layout{display:grid;grid-template-columns:190px minmax(0,1fr);gap:24px;align-items:start;}
+body.admin-village.admin-modern .world-section-nav{display:grid;gap:5px;position:sticky;top:18px;}
+body.admin-village.admin-modern .world-section-nav a{display:flex;align-items:center;gap:10px;min-height:46px;padding:10px 12px;color:var(--ui-ink);font-size:13px;border-radius:8px;border:1px solid transparent;overflow-wrap:anywhere;}
+body.admin-village.admin-modern .world-section-nav a:hover{background:var(--ui-card);text-decoration:none;}
+body.admin-village.admin-modern .world-section-nav a[aria-current]{background:var(--ui-primary-light);color:var(--ui-primary-dark);border-color:var(--ui-line);font-weight:600;}
+body.admin-village.admin-modern .world-section-nav a:last-child{margin-top:12px;border-top-color:var(--ui-line);}
+body.admin-village.admin-modern .world-workspace-content,body.admin-village.admin-modern .world-workspace-content form,body.admin-village.admin-modern .world-workspace-content fieldset{min-width:0;}
+body.admin-village.admin-modern .world-panel-heading{margin:0 0 18px;}
+body.admin-village.admin-modern .world-panel-heading h2{font-size:20px;margin:0 0 6px;}
+body.admin-village.admin-modern .world-panel-heading p{font-size:13px;color:var(--ui-muted);margin:0;}
+body.admin-village.admin-modern .world-workspace :is([data-world-panel],#world-delete,#extra-event-settings){scroll-margin-top:18px;}
+body.admin-village.admin-modern .world-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:0 0 20px;}
+body.admin-village.admin-modern .world-metrics>div{background:var(--ui-card);border:1px solid var(--ui-line);padding:18px;border-radius:10px;}
+body.admin-village.admin-modern .world-metrics dt{color:var(--ui-muted);font-size:12px;}
+body.admin-village.admin-modern .world-metrics dd{font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;margin:8px 0 0;overflow-wrap:anywhere;}
+body.admin-village.admin-modern .world-metrics dd.world-metric-time{font-size:16px;}
+body.admin-village.admin-modern .world-shortcuts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+body.admin-village.admin-modern .world-shortcuts .world-shortcut{display:flex;gap:12px;align-items:flex-start;padding:18px;margin:0;color:var(--ui-ink);}
+body.admin-village.admin-modern .world-shortcut>div{flex:1;min-width:0;}
+body.admin-village.admin-modern .world-shortcut>.admin-ui-icon{color:var(--ui-primary);margin-top:2px;}
+body.admin-village.admin-modern .world-shortcut h3{font-size:14px;margin:0 0 6px;}
+body.admin-village.admin-modern .world-shortcut p{font-size:12px;line-height:1.5;margin:0;color:var(--ui-muted);}
+body.admin-village.admin-modern .world-shortcut:hover{border-color:var(--ui-primary);text-decoration:none;}
+body.admin-village.admin-modern .world-workspace .fields{grid-template-columns:repeat(2,minmax(0,1fr));}
+body.admin-village.admin-modern .world-workspace :is(input:not([type=checkbox]):not([type=hidden]),select,textarea){min-width:0;width:100%;max-width:100%;}
+body.admin-village.admin-modern .world-group{border:1px solid var(--ui-line);border-radius:9px;margin-top:12px;background:var(--ui-card);}
+body.admin-village.admin-modern .world-group>summary{min-height:50px;padding:14px 16px;font-size:14px;font-weight:600;color:var(--ui-ink);cursor:pointer;}
+body.admin-village.admin-modern .world-group[open]>summary{border-bottom:1px solid var(--ui-line);background:var(--ui-primary-light);border-radius:8px 8px 0 0;}
+body.admin-village.admin-modern .world-group-body{padding:16px;}
+body.admin-village.admin-modern .world-group-help>summary{font-size:12px;font-weight:400;color:var(--ui-muted);}
+body.admin-village.admin-modern .world-settings-save{border-top:3px solid var(--ui-primary);}
+body.admin-village.admin-modern .world-settings-save>label{max-width:600px;}
+body.admin-village.admin-modern .world-save-actions{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;}
+body.admin-village.admin-modern .world-save-actions p{font-size:12px;margin:0;}
+body.admin-village.admin-modern .world-save-actions .is-dirty{color:var(--ui-primary-dark);font-weight:600;}
+body.admin-village.admin-modern .world-workspace .table-wrap{max-width:100%;overflow:auto;}
+@media(max-width:1150px){
+ body.admin-village.admin-modern .world-workspace-layout{grid-template-columns:minmax(0,1fr);gap:20px;}
+ body.admin-village.admin-modern .world-section-nav{position:static;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;}
+ body.admin-village.admin-modern .world-section-nav a{background:var(--ui-card);border-color:var(--ui-line);padding:10px;font-size:12px;}
+ body.admin-village.admin-modern .world-section-nav a:last-child{margin-top:0;}
+}
+@media(max-width:600px){
+ body.admin-village.admin-modern .world-section-nav{grid-template-columns:repeat(2,minmax(0,1fr));}
+ body.admin-village.admin-modern .world-shortcuts{grid-template-columns:minmax(0,1fr);}
+ body.admin-village.admin-modern .world-workspace .fields{grid-template-columns:minmax(0,1fr);}
+ body.admin-village.admin-modern .world-group-body{padding:12px;}
+ body.admin-village.admin-modern .world-metrics>div{padding:14px;}
+ body.admin-village.admin-modern .world-metrics dd{font-size:18px;}
+ body.admin-village.admin-modern .world-metrics dd.world-metric-time{font-size:14px;}
+ body.admin-village.admin-modern .world-save-actions{align-items:stretch;flex-direction:column;}
+ body.admin-village.admin-modern .world-save-actions button{width:100%;}
+}
 .admin-modern .link-tracker .card{margin-bottom:18px;}
 .admin-modern .link-stats{grid-template-columns:repeat(3,minmax(0,1fr));}
 .admin-modern .link-insights,.admin-modern .link-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;}

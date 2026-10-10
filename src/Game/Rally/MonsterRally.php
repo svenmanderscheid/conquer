@@ -107,6 +107,7 @@ final class MonsterRally
             $army['loot']=\Conquer\Game\Player\TalentEffects::monsterLoot($loot[$i]??[],$armies[$i]['buffs']);$army['items']=$items[$i]??[];
             $army['fragments']=$fragments[$i]??[];
             $army['relics']=$relics[$i]??[];
+            $army['reward_context']=\Conquer\Admin\RewardLedger::ruleContext('monster',(string)($meta['monster']['code']??$target['monster_code']??''),$world,'rally:'.$r['id'],array_replace($meta['monster'],['drops'=>$meta['drops']??[]]));
             $earned=$result['monster_killed']?LordLevel::addXp($pid,$xp[$i]??0,$world,'monster-rally:'.$r['id']):0;
             if($result['monster_killed']){DailyQuestService::trackProgress($pid,'attack_monster');$db->execute('UPDATE players SET kill_count=kill_count+1 WHERE id=?',[$pid]);}
             $ownTroops=[];

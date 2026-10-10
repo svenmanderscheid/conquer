@@ -60,6 +60,7 @@ final class StarterMissionService
             $db->execute('INSERT INTO player_starter_missions(player_id,world_id,quest_code) VALUES(?,?,?)',[$playerId,WorldContext::id(),$code]);
             $reward=self::MISSIONS[$code]['reward'];
             $db->execute('UPDATE cities SET food=food+?,lumber=lumber+?,stone=stone+?,gold=gold+? WHERE id=? AND player_id=? AND world_id=?',[$reward,$reward,$reward,$reward,$city['id'],$playerId,WorldContext::id()]);
+            \Conquer\Admin\RewardLedger::resources($playerId,WorldContext::id(),array_fill_keys(['food','lumber','stone','gold'],$reward),['source_type'=>'daily_quest','source_key'=>$code,'reference'=>'starter:'.$code]);
             return $quest['rewards'];
         });
     }

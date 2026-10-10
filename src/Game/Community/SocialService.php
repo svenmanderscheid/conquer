@@ -236,10 +236,22 @@ final class SocialService
     /** AdminService owns the outer replay receipt and audit; this also validates its actor. */
     public static function moderate(int $admin,array $body):array
     {
-        return Connection::getInstance()->transaction(static function(Connection $db)use($admin,$body):array{
-            self::check($db->query('SELECT role FROM admin_users WHERE id=? FOR UPDATE',[$admin])->fetchColumn()==='superadmin','denied',403);$action=$body['action']??'';
+        return self::moderateAuthorized($admin,$body,false);
+    }
+
+    /** Narrow team-case entry; existing generic admin routes still require superadmin. */
+    public static function moderateCase(int $admin,array $body):array
+    {
+        return self::moderateAuthorized($admin,$body,true);
+    }
+
+    private static function moderateAuthorized(int $admin,array $body,bool $caseScope):array
+    {
+        return Connection::getInstance()->transaction(static function(Connection $db)use($admin,$body,$caseScope):array{
+            $role=$db->query('SELECT role FROM admin_users WHERE id=? FOR UPDATE',[$admin])->fetchColumn();
+            self::check($role==='superadmin'||($caseScope&&$role==='moderator'),'denied',403);$action=$body['action']??'';
             if($action==='report.update'){
-                $id=self::integer($body,'report_id');$status=self::string($body,'status',1,12);self::check(in_array($status,['new','reviewing','resolved','dismissed'],true),'invalid');$note=self::string($body,'admin_note',0,2000,'');
+                $id=self::integer($body,'report_id');$status=self::string($body,'status',1,12);self::check(in_array($status,$caseScope?['new','reviewing','waiting','resolved','dismissed']:['new','reviewing','resolved','dismissed'],true),'invalid');$note=self::string($body,'admin_note',0,2000,'');
                 $before=$db->query('SELECT id,world_id,status,admin_note,handled_by,handled_at FROM community_reports WHERE id=? FOR UPDATE',[$id])->fetch();self::check((bool)$before,'unavailable');
                 $after=['status'=>$status,'admin_note'=>$note,'handled_by'=>$admin,'handled_at'=>in_array($status,['resolved','dismissed'],true)?gmdate('Y-m-d H:i:s'):null];
                 $db->execute('UPDATE community_reports SET status=?,admin_note=?,handled_by=?,handled_at=? WHERE id=?',[$status,$note,$admin,$after['handled_at'],$id]);return ['target_type'=>'community_report','target_id'=>$id,'world_id'=>(int)$before['world_id'],'before'=>$before,'after'=>$after,'message'=>self::t('moderated')];

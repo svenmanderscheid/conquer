@@ -190,6 +190,14 @@ if (str_starts_with($_normalizedPath, '/admin')) {
 
     $adminUri = $_normalizedPath;
 
+    // A support account can work on cases without acquiring settings or gift privileges.
+    $currentAdmin=\Conquer\Auth\AdminAuth::current();
+    if(($currentAdmin['role']??'')==='support'
+        && !in_array($adminUri,['/admin','/admin/','/admin/login','/admin/logout','/admin/change-password','/admin/cases','/admin/cases/action','/admin/bug-reports'],true)
+        && !preg_match('#^/admin/bug-reports/\d+/screenshot$#D',$adminUri)) {
+        http_response_code(403);echo \Conquer\Game\Locale::html('admin.ops.access_denied');exit;
+    }
+
     $m = [];
     match (true) {
         $adminUri === '/admin/login' && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET'
@@ -206,6 +214,14 @@ if (str_starts_with($_normalizedPath, '/admin')) {
             => \Conquer\Admin\AdminController::dashboard(),
         $adminUri === '/admin/analytics'
             => \Conquer\Admin\AdminController::analytics(),
+        $adminUri === '/admin/activity'
+            => \Conquer\Admin\AdminController::activity(),
+        $adminUri === '/admin/technical'
+            => \Conquer\Admin\AdminController::technical(),
+        $adminUri === '/admin/cases'
+            => \Conquer\Admin\AdminController::cases(),
+        $adminUri === '/admin/cases/action'
+            => \Conquer\Admin\CaseController::action(),
         $adminUri === '/admin/links'
             => \Conquer\Admin\AdminController::links(),
         $adminUri === '/admin/layout'
@@ -311,6 +327,7 @@ if ($path === '/auth/local') {
 
 // JSON API — all /api/* requests are handled here.
 if (str_starts_with($path, '/api/')) {
+    \Conquer\Observability\RequestTrace::begin($method,$path);
     \Conquer\Security\ApiGuard::beforeSession();
     $router  = new \Conquer\Router();
     // Provider callbacks authenticate with their adapter signature, never with a player cookie.
@@ -321,6 +338,14 @@ if (str_starts_with($path, '/api/')) {
     if (!isset($session['player_id'])) {
         \Conquer\Security\ApiGuard::limit('api.anonymous', \Conquer\Security\RateLimit::ip(), 60, 60);
         \Conquer\Api\Response::error(401, 'UNAUTHENTICATED', 'Bitte melde dich an.');
+    }
+    \Conquer\Observability\RequestTrace::bind($session);
+    // Diagnostics have their own CSRF check and budget; they must not consume game actions
+    // or wait on a player lock, and remain available while a world is paused.
+    if ($path==='/api/telemetry') \Conquer\Observability\ClientTelemetry::handle($session);
+    if (in_array($method,['POST','PUT','PATCH','DELETE'],true) && (int)($_SERVER['CONTENT_LENGTH']??0)<=65536) {
+        $traceBody=json_decode((string)file_get_contents('php://input'),true);
+        if(is_array($traceBody))\Conquer\Observability\RequestTrace::captureBody($traceBody);
     }
     \Conquer\Security\ApiGuard::authenticated($session, $method, $path);
     // The new client uses the validated kingdom/expedition/market actions.
@@ -346,6 +371,7 @@ if (str_starts_with($path, '/api/')) {
         if(!$fresh||$fresh['is_banned'])\Conquer\Api\Response::error(401,'UNAUTHENTICATED','Bitte melde dich erneut an.');
         \Conquer\Auth\Session::setActiveWorld((int)$fresh['active_world_id']);
         $session['active_world_id']=(int)$fresh['active_world_id'];
+        \Conquer\Observability\RequestTrace::bind($session);
     }
     if(\Conquer\Game\World\WorldContext::id()!==1&&$method==='GET'
         &&preg_match('#^/api/(alliance/|chat/|player/|world-chat$|conquest/)#',$path)){
@@ -360,7 +386,7 @@ if (str_starts_with($path, '/api/')) {
             && !in_array($path,['/api/worlds/action','/api/auth/logout'],true)) {
             $input=json_decode(file_get_contents('php://input')?:'{}',true);
             if(is_array($input))\Conquer\Game\World\WorldContext::current($input['expected_world_id']??null);
-            $account=$path==='/api/discord/account-action'||$path==='/api/bug-reports'||($path==='/api/progression/action'&&in_array($input['action']??'',['password.change','recovery.generate','sessions.revoke'],true))
+            $account=$path==='/api/discord/account-action'||$path==='/api/bug-reports'||str_starts_with($path,'/api/support-cases/')||($path==='/api/progression/action'&&in_array($input['action']??'',['password.change','recovery.generate','sessions.revoke'],true))
                 ||($path==='/api/kingdom/action'&&($input['action']??'')==='theme_bundle.checkout');
             $returning=in_array($path,['/api/march/recall','/api/march/recall-reinforce'],true)||preg_match('#^/api/shrines/\d+/recall$#',$path)
                 ||($path==='/api/territory/action'&&in_array($input['action']??'',['recall','cancel','claim'],true));
@@ -393,6 +419,9 @@ if (str_starts_with($path, '/api/')) {
     $router->get('/api/progression/state', [\Conquer\Api\Handlers\ProgressionHandler::class, 'state']);
     $router->post('/api/progression/action', [\Conquer\Api\Handlers\ProgressionHandler::class, 'action']);
     $router->post('/api/bug-reports', [\Conquer\Api\Handlers\BugReportHandler::class, 'submit']);
+    $router->get('/api/support-cases', [\Conquer\Api\Handlers\SupportCaseHandler::class, 'inbox']);
+    $router->get('/api/support-cases/:source/:id', [\Conquer\Api\Handlers\SupportCaseHandler::class, 'detail']);
+    $router->post('/api/support-cases/:source/:id/reply', [\Conquer\Api\Handlers\SupportCaseHandler::class, 'reply']);
     $router->get('/api/game/state', [\Conquer\Api\Handlers\GameHandler::class, 'state']);
     $router->post('/api/march/preview', [\Conquer\Api\Handlers\BattlePreviewHandler::class, 'calculate']);
     $router->get('/api/map/search', [\Conquer\Api\Handlers\MapSearchHandler::class, 'search']);

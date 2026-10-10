@@ -341,7 +341,7 @@ final class DailyQuestService
         }
 
         // Distribute rewards.
-        self::distributeRewards($playerId, $rewards);
+        self::distributeRewards($playerId, $rewards,['source_type'=>'daily_quest','source_key'=>$questCode,'reference'=>'quest:'.$questCode.':'.$date]);
 
         return $rewards;
     }
@@ -380,7 +380,7 @@ final class DailyQuestService
      *
      * @param list<array<string, mixed>> $rewards
      */
-    private static function distributeRewards(int $playerId, array $rewards): void
+    private static function distributeRewards(int $playerId, array $rewards,array $rewardContext=[]): void
     {
         $db = Connection::getInstance();
 
@@ -392,6 +392,7 @@ final class DailyQuestService
                         'UPDATE players SET gems = gems + ? WHERE id = ?',
                         [$gems, $playerId],
                     );
+                    \Conquer\Admin\RewardLedger::resources($playerId,\Conquer\Game\World\WorldContext::id(),['gems'=>$gems],$rewardContext);
                 }
             }
 
@@ -400,7 +401,7 @@ final class DailyQuestService
                 $quantity = (int) ($reward['quantity'] ?? 1);
 
                 if ($itemCode > 0 && $quantity > 0) {
-                    InventoryService::addItems($playerId, $itemCode, $quantity);
+                    InventoryService::addItems($playerId, $itemCode, $quantity,null,$rewardContext);
                 }
             }
         }

@@ -40,7 +40,7 @@ final class DiscordHandler
             self::output(200, MinigameService::handle($interaction, $config));
         } catch (\Throwable $e) {
             // Never log the raw interaction: it can contain a linking code or token.
-            error_log('Discord minigame failed: ' . get_class($e));
+            \Conquer\Observability\EventLog::exception($e,'discord.minigame');
             self::output(200, InteractionProtocol::message(InteractionProtocol::text('busy')));
         }
     }

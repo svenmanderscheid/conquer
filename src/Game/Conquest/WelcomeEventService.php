@@ -58,7 +58,7 @@ final class WelcomeEventService
                 }
                 $db->execute('INSERT INTO player_welcome_event_claims(player_id,world_id,milestone_code,reward_json) VALUES(?,?,?,?)', [$playerId, $worldId, $milestoneCode, json_encode($rewards, JSON_THROW_ON_ERROR)]);
                 foreach ($rewards as $reward) {
-                    InventoryService::addItems($playerId, (int)$reward['item_code'], (int)$reward['quantity'], $worldId);
+                    InventoryService::addItems($playerId, (int)$reward['item_code'], (int)$reward['quantity'], $worldId,['source_type'=>'welcome_event','source_key'=>$milestoneCode,'reference'=>'milestone:'.$milestoneCode]);
                 }
                 return ['message'=>Locale::t('welcome_event.claimed'), 'rewards'=>$rewards, 'milestone_code'=>$milestoneCode];
             });

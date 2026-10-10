@@ -154,33 +154,47 @@ final class TreasureService
         return $level===false?0:(int)$level;
     }
 
-    public static function addFragments(int $playerId, int $treasureCode, int $amount): array
+    public static function addFragments(int $playerId, int $treasureCode, int $amount, array $rewardContext=[]): array
     {
-        if ($amount<=0 || TreasureData::get($treasureCode)===null) throw new \InvalidArgumentException('Ungültige Schatzfragmente.');
-        return self::atomic($playerId,static function(Connection $db)use($playerId,$treasureCode,$amount):array{
+        if ($amount<=0 || $amount>4294967295 || TreasureData::get($treasureCode)===null) {
+            \Conquer\Admin\RewardLedger::rejected($amount<=0||$amount>4294967295?'invalid_quantity':'unknown_fragment',$playerId,(int)($rewardContext['world_id']??WorldContext::id()),$treasureCode,$amount,$rewardContext);
+            throw new \InvalidArgumentException('Ungültige Schatzfragmente.');
+        }
+        return self::atomic($playerId,static function(Connection $db)use($playerId,$treasureCode,$amount,$rewardContext):array{
             $db->execute('INSERT IGNORE INTO player_treasures(player_id,treasure_code,fragments) VALUES(?,?,0)',[$playerId,$treasureCode]);
             $before=(int)$db->query('SELECT fragments FROM player_treasures WHERE player_id=? AND treasure_code=? FOR UPDATE',[$playerId,$treasureCode])->fetchColumn();
-            if($before>4294967295-$amount)throw new \DomainException('Zu viele Schatzfragmente.');
+            if($before>4294967295-$amount){
+                \Conquer\Admin\RewardLedger::rejected('inventory_limit',$playerId,(int)($rewardContext['world_id']??WorldContext::id()),$treasureCode,$amount,$rewardContext);
+                throw new \DomainException('Zu viele Schatzfragmente.');
+            }
             $db->execute('UPDATE player_treasures SET fragments=fragments+? WHERE player_id=? AND treasure_code=?',[$amount,$playerId,$treasureCode]);
             $newlyUnlocked=self::unlockIfReady($db,$playerId,$treasureCode);
             $remaining=(int)$db->query('SELECT fragments FROM player_treasures WHERE player_id=? AND treasure_code=?',[$playerId,$treasureCode])->fetchColumn();
+            \Conquer\Admin\RewardLedger::granted($playerId,(int)($rewardContext['world_id']??WorldContext::id()),0,$treasureCode,$amount,$rewardContext+['reward_kind'=>'fragment','result'=>['newly_unlocked'=>$newlyUnlocked,'fragments_remaining'=>$remaining]]);
             return ['fragments'=>$remaining,'level'=>$newlyUnlocked?2:(self::isUnlocked($db,$playerId,$treasureCode)?2:0),'newly_unlocked'=>$newlyUnlocked];
         });
     }
 
     /** A first whole relic unlocks its first effect without spending collected fragments. */
-    public static function addRelics(int $playerId,int $treasureCode,int $amount=1): array
+    public static function addRelics(int $playerId,int $treasureCode,int $amount=1,array $rewardContext=[]): array
     {
         $definition=TreasureData::get($treasureCode);
-        if($amount<1||$amount>intdiv(4294967295,self::UNLOCK_COST)||!$definition||!empty($definition['legacy_only'])||!self::effectDefinitions($definition,$treasureCode))throw new \InvalidArgumentException(\Conquer\Game\Locale::t('admin.drops.relic_invalid'));
-        return self::atomic($playerId,static function(Connection $db)use($playerId,$treasureCode,$amount):array{
+        if($amount<1||$amount>intdiv(4294967295,self::UNLOCK_COST)||!$definition||!empty($definition['legacy_only'])||!self::effectDefinitions($definition,$treasureCode)){
+            \Conquer\Admin\RewardLedger::rejected($amount<1||$amount>intdiv(4294967295,self::UNLOCK_COST)?'invalid_quantity':'unknown_relic',$playerId,(int)($rewardContext['world_id']??WorldContext::id()),$treasureCode,$amount,$rewardContext);
+            throw new \InvalidArgumentException(\Conquer\Game\Locale::t('admin.drops.relic_invalid'));
+        }
+        return self::atomic($playerId,static function(Connection $db)use($playerId,$treasureCode,$amount,$rewardContext):array{
             $db->execute('INSERT IGNORE INTO player_treasures(player_id,treasure_code,fragments) VALUES(?,?,0)',[$playerId,$treasureCode]);
             $before=(int)$db->query('SELECT fragments FROM player_treasures WHERE player_id=? AND treasure_code=? FOR UPDATE',[$playerId,$treasureCode])->fetchColumn();
             $newlyUnlocked=!self::isUnlocked($db,$playerId,$treasureCode);
             $duplicates=$amount-($newlyUnlocked?1:0);$fragments=$duplicates*self::UNLOCK_COST;
-            if($before>4294967295-$fragments)throw new \DomainException(\Conquer\Game\Locale::t('admin.drops.relic_overflow'));
+            if($before>4294967295-$fragments){
+                \Conquer\Admin\RewardLedger::rejected('inventory_limit',$playerId,(int)($rewardContext['world_id']??WorldContext::id()),$treasureCode,$amount,$rewardContext);
+                throw new \DomainException(\Conquer\Game\Locale::t('admin.drops.relic_overflow'));
+            }
             if($newlyUnlocked)$db->execute('INSERT INTO player_treasure_effects(player_id,treasure_code,effect_index,parts) VALUES(?,?,0,1)',[$playerId,$treasureCode]);
             if($fragments>0)$db->execute('UPDATE player_treasures SET fragments=fragments+? WHERE player_id=? AND treasure_code=?',[$fragments,$playerId,$treasureCode]);
+            \Conquer\Admin\RewardLedger::granted($playerId,(int)($rewardContext['world_id']??WorldContext::id()),0,$treasureCode,$amount,$rewardContext+['reward_kind'=>'relic','result'=>['newly_unlocked'=>$newlyUnlocked,'duplicate_relics'=>$duplicates,'fragments_added'=>$fragments]]);
             return ['fragments'=>$before+$fragments,'level'=>2,'newly_unlocked'=>$newlyUnlocked,'duplicate_relics'=>$duplicates,'fragments_added'=>$fragments];
         });
     }
@@ -321,12 +335,12 @@ final class TreasureService
         }
     }
 
-    public static function addRandomFragment(int $playerId,string $grade,int $amount=1): array
+    public static function addRandomFragment(int $playerId,string $grade,int $amount=1,array $rewardContext=[]): array
     {
         $codes=TreasureData::getCodesByGrade($grade);
         if(!$codes)throw new \RuntimeException('No treasures found for grade: '.$grade);
         $code=$codes[array_rand($codes)];$definition=TreasureData::get($code);
-        $state=self::addFragments($playerId,$code,$amount);
+        $state=self::addFragments($playerId,$code,$amount,$rewardContext);
         return ['treasure_code'=>$code,'name'=>(string)($definition['name_de'] ?? $definition['name']),'fragments_added'=>$amount,'new_total'=>$state['fragments']];
     }
 

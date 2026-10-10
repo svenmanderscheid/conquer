@@ -148,8 +148,9 @@ final class CityState
             if ($memberRow !== false) {
                 $allianceResearchBonuses = AllianceResearchService::getProductionBonuses((int) $memberRow['alliance_id']);
             }
-        } catch (\Throwable) {
+        } catch (\Throwable $error) {
             // Non-fatal — no alliance bonuses applied
+            \Conquer\Observability\EventLog::exception($error,'city.alliance_bonuses');
         }
 
         // Merge alliance research bonuses into vipBonuses for ResourceTick

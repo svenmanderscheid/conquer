@@ -98,20 +98,26 @@ final class InventoryService
      * Grants $quantity of $itemCode to a player.
      * Creates the row if it doesn't exist yet.
      */
-    public static function addItems(int $playerId, int $itemCode, int $quantity, ?int $worldId = null): void
+    public static function addItems(int $playerId, int $itemCode, int $quantity, ?int $worldId = null, array $rewardContext = []): void
     {
-        if ($quantity <= 0 || !self::isDropEligible($itemCode)) {
-            return;
-        }
-
+        $worldId??=WorldContext::id();
+        \Conquer\Admin\RewardLedger::validate($playerId,$worldId,$itemCode,$quantity,$rewardContext);
         $scope=self::scope($itemCode,$worldId);
         if($scope>0)WorldContext::city($playerId,$scope);
-        Connection::getInstance()->execute(
+        Connection::getInstance()->transaction(static function(Connection $db)use($playerId,$worldId,$scope,$itemCode,$quantity,$rewardContext):void{
+        $before=(int)$db->query('SELECT quantity FROM player_inventory WHERE player_id=? AND world_id=? AND item_code=? FOR UPDATE',[$playerId,$scope,$itemCode])->fetchColumn();
+        if($before>4294967295-$quantity){
+            \Conquer\Admin\RewardLedger::rejected('inventory_limit',$playerId,$worldId,$itemCode,$quantity,$rewardContext);
+            throw new \DomainException(\Conquer\Game\Locale::t('admin.reward_ledger.grant_rejected'));
+        }
+        $db->execute(
             'INSERT INTO player_inventory (player_id, world_id, item_code, quantity)
              VALUES (?, ?, ?, ?)
              ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity)',
             [$playerId, $scope, $itemCode, $quantity],
         );
+        \Conquer\Admin\RewardLedger::granted($playerId,$worldId,$scope,$itemCode,$quantity,$rewardContext);
+        });
     }
 
     /**
@@ -490,8 +496,8 @@ final class InventoryService
             $hours      = (int) ceil($durationSeconds / 3600.0);
             try {
                 ActiveBuffService::apply($playerId, $activeBuffType, $multiplier, $hours);
-            } catch (\Throwable) {
-                // non-critical
+            } catch (\Throwable $error) {
+                \Conquer\Observability\EventLog::exception($error,'inventory.active_buff');
             }
         }
 

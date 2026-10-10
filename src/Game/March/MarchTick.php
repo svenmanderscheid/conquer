@@ -212,9 +212,11 @@ final class MarchTick
             if (!empty($loot['gems'])) {
                 $db->execute('UPDATE players SET gems = gems + ? WHERE id = ?', [(int) $loot['gems'], $playerId]);
             }
-            foreach(($haul['items']??[]) as $code=>$count)\Conquer\Game\Inventory\InventoryService::addItems($playerId,(int)$code,(int)$count,(int)$march['world_id']);
-            \Conquer\Game\Rewards\RewardCatalog::grantFragments($playerId,$haul['fragments']??[]);
-            \Conquer\Game\Rewards\RewardCatalog::grantRelics($playerId,$haul['relics']??[]);
+            $rewardContext=($haul['reward_context']??[]) + ['source_type'=>match((int)$march['march_type']){9=>'farm',5=>'monster',7=>'pvp',11=>'neutral_village',default=>'march'},'reference'=>'march:'.$marchId,'world_id'=>(int)$march['world_id']];
+            foreach(($haul['items']??[]) as $code=>$count)\Conquer\Game\Inventory\InventoryService::addItems($playerId,(int)$code,(int)$count,(int)$march['world_id'],$rewardContext);
+            \Conquer\Admin\RewardLedger::resources($playerId,(int)$march['world_id'],$loot,$rewardContext);
+            \Conquer\Game\Rewards\RewardCatalog::grantFragments($playerId,$haul['fragments']??[],$rewardContext);
+            \Conquer\Game\Rewards\RewardCatalog::grantRelics($playerId,$haul['relics']??[],$rewardContext);
             $db->execute(
                 "UPDATE marches SET state = 'complete' WHERE id = ?",
                 [$marchId],
@@ -293,6 +295,8 @@ final class MarchTick
                     $result['report']['item_rewards'][]=['code'=>(int)$code,'count'=>$count,'name'=>$item['name']??'Well-key fragment'];
                 }
                 $result['report']['items']=$result['items'];
+                $rewardContext=\Conquer\Admin\RewardLedger::ruleContext('monster',(string)$monsterCode,(int)$march['world_id'],'march:'.$marchId,$monsterDef);
+                $rewardContext['allowed_items']=array_values(array_unique(array_merge($rewardContext['allowed_items'],array_map('intval',array_keys($questItems)))));
                 if($questItems)$db->execute("UPDATE monster_kill_receipts SET reward_snapshot_json=JSON_SET(reward_snapshot_json,'$.items',JSON_EXTRACT(?,'$')) WHERE id=? AND world_id=?",[json_encode($result['items'],JSON_THROW_ON_ERROR),(int)$settlement['receipt_id'],(int)$march['world_id']]);
                 $result['report']['regional_supply']=\Conquer\Game\Territory\TerritoryEconomy::regionalKill(WorldContext::id(),$playerId,$targetX,$targetY,'monster-march:'.$marchId,\Conquer\Game\Territory\TerritoryEconomy::regionalBaseResources($monsterDef),strtotime($march['arrival_time'].' UTC'));
                 \Conquer\Game\Hospital\HospitalService::addWounded($cityId,$result['attacker_losses'],true);
@@ -335,7 +339,7 @@ final class MarchTick
                      haul_json   = :haul
                  WHERE id = :id",
                 [
-                    ':haul' => json_encode(['survivors' => $result['attacker_survivors'], 'loot' => $result['loot'], 'items'=>$result['items'],'fragments'=>$result['fragments'],'relics'=>$result['relics']]),
+                    ':haul' => json_encode(['survivors' => $result['attacker_survivors'], 'loot' => $result['loot'], 'items'=>$result['items'],'fragments'=>$result['fragments'],'relics'=>$result['relics'],'reward_context'=>$rewardContext??['source_type'=>'monster','source_key'=>(string)$monsterCode,'reference'=>'march:'.$marchId]]),
                     ':id'   => $marchId,
                 ],
             );

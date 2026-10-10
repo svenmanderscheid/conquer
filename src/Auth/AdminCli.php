@@ -7,12 +7,12 @@ final class AdminCli
 {
     public static function run(array $args, callable $create, $input, $output, $error, string $defaultRole = 'moderator', ?callable $hiddenReader = null): int
     {
-        $usage = "Usage: php create_admin.php <username> [superadmin|moderator] [--must-change] [--password-stdin]\nPasswords are never accepted as arguments. Use a terminal or explicitly pipe one password line.\n";
+        $usage = "Usage: php create_admin.php <username> [superadmin|moderator|support] [--must-change] [--password-stdin]\nPasswords are never accepted as arguments. Use a terminal or explicitly pipe one password line.\n";
         if ($args === ['--help']) { fwrite($output, $usage); return 0; }
         $username = array_shift($args); $role = $defaultRole; $roleSeen = false; $flags = [];
         if (!is_string($username) || $username === '' || str_starts_with($username, '--')) { fwrite($error, $usage); return 1; }
         foreach ($args as $arg) {
-            if (in_array($arg, ['superadmin', 'moderator'], true) && !$roleSeen) { $role = $arg; $roleSeen = true; }
+            if (in_array($arg, ['superadmin', 'moderator', 'support'], true) && !$roleSeen) { $role = $arg; $roleSeen = true; }
             elseif (in_array($arg, ['--must-change', '--password-stdin'], true) && !isset($flags[$arg])) { $flags[$arg] = true; }
             else { fwrite($error, "Invalid arguments. Password arguments and unknown or repeated options are rejected.\n" . $usage); return 1; }
         }

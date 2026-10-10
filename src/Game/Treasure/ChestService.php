@@ -109,24 +109,23 @@ final class ChestService
         if (!Connection::getInstance()->getPdo()->inTransaction()) {
             throw new \LogicException('Chest rewards require the enclosing consumption transaction.');
         }
-        $rewards=[];
+        $rewards=[];$rewardContext=self::rewardContext($type);
         foreach(self::rollDropTable($type)as$drop){
             $quantity=(int)$drop['quantity'];
             if ($quantity < 1) throw new \RuntimeException('Ungültige Beutemenge in der Schatztruhe.');
             if(isset($drop['relic_code'])){
-                $code=(int)$drop['relic_code'];$result=TreasureService::addRelics($playerId,$code,$quantity);
+                $code=(int)$drop['relic_code'];$result=TreasureService::addRelics($playerId,$code,$quantity,$rewardContext);
                 $rewards[]=['type'=>'relic','quantity'=>$quantity]+$result+\Conquer\Game\Rewards\RewardPresentation::relic($code);
             }elseif(isset($drop['treasure_code'])){
-                $code=(int)$drop['treasure_code'];$result=TreasureService::addFragments($playerId,$code,$quantity);
+                $code=(int)$drop['treasure_code'];$result=TreasureService::addFragments($playerId,$code,$quantity,$rewardContext);
                 $rewards[]=['type'=>'fragment','quantity'=>$quantity]+$result+\Conquer\Game\Rewards\RewardPresentation::fragment($code);
             }elseif(isset($drop['fragment_grade'])){
-                $result=TreasureService::addRandomFragment($playerId,(string)$drop['fragment_grade'],$quantity);
+                $result=TreasureService::addRandomFragment($playerId,(string)$drop['fragment_grade'],$quantity,$rewardContext);
                 $rewards[]=['type'=>'fragment','quantity'=>$quantity]+$result
                     +\Conquer\Game\Rewards\RewardPresentation::fragment((int)$result['treasure_code']);
             }else{
                 $code=(int)$drop['item_code'];$def=InventoryService::getItemDef($code);
-                if(!$def)throw new \RuntimeException('Unbekannter Gegenstand in der Schatztruhe.');
-                InventoryService::addItems($playerId,$code,$quantity);
+                InventoryService::addItems($playerId,$code,$quantity,null,$rewardContext);
                 $rewards[]=['type'=>'item','quantity'=>$quantity]+\Conquer\Game\Rewards\RewardPresentation::item($code);
             }
         }
@@ -160,13 +159,7 @@ final class ChestService
      */
     public static function rollDropTable(string $chestType): array
     {
-        $table  = self::loadDropTable();
-        $config = $table['chests'][$chestType] ?? null;
-        $config = \Conquer\Game\Rewards\RewardCatalog::override('chest',$chestType) ?? $config;
-
-        if ($config === null) {
-            throw new \RuntimeException('No drop table configured for chest type: ' . $chestType);
-        }
+        $config=self::rewardConfig($chestType);
 
         $rolls   = (int) ($config['rolls'] ?? 1);
         $entries = array_values(array_filter((array)$config['drop_table'],\Conquer\Game\Rewards\RewardCatalog::isDropEligible(...)));
@@ -178,6 +171,19 @@ final class ChestService
         }
 
         return $results;
+    }
+
+    /** Audit validation and the random draws must use exactly the same cached rule. */
+    public static function rewardContext(string $chestType): array
+    {
+        return \Conquer\Admin\RewardLedger::ruleContext('chest',$chestType,\Conquer\Game\World\WorldContext::id(),'',self::rewardConfig($chestType));
+    }
+
+    private static function rewardConfig(string $chestType): array
+    {
+        $config=\Conquer\Game\Rewards\RewardCatalog::override('chest',$chestType)??(self::loadDropTable()['chests'][$chestType]??null);
+        if($config===null)throw new \RuntimeException('No drop table configured for chest type: '.$chestType);
+        return $config;
     }
 
     /**

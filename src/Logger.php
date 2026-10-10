@@ -70,19 +70,25 @@ final class Logger
 
     private function write(string $level, string $message): void
     {
+        $message=\Conquer\Observability\SafeData::message($message,2048);
+        if (in_array($level,['WARN','ERROR'],true) && !str_starts_with($message,'PHP Error [') && !str_starts_with($message,'Uncaught ')) {
+            \Conquer\Observability\EventLog::record(['category'=>'error','severity'=>$level==='ERROR'?'error':'warning',
+                'code'=>'APPLICATION_'.$level,'message'=>$message,
+                'context'=>['source'=>substr(hash('sha256',(string)preg_replace('/\d+/','#',$message)),0,24)]]);
+        }
         if ((self::LEVELS[$level] ?? 0) < $this->minLevel) {
             return;
         }
 
         $dir = dirname($this->logFile);
         if (!is_dir($dir)) {
-            mkdir($dir, 0755, true);
+            @mkdir($dir, 0755, true);
         }
 
         $timestamp = gmdate('Y-m-d H:i:s');
         $line = "[{$timestamp} UTC] [{$level}] {$message}" . PHP_EOL;
 
-        file_put_contents($this->logFile, $line, FILE_APPEND | LOCK_EX);
+        @file_put_contents($this->logFile, $line, FILE_APPEND | LOCK_EX);
     }
 
     /**

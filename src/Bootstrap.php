@@ -70,6 +70,7 @@ final class Bootstrap
         $logFile  = ($config['paths']['logs'] ?? $rootDir . '/logs') . '/app.log';
         $logLevel = $config['log_level'] ?? ($env === 'development' ? 'DEBUG' : 'INFO');
         Logger::init($logFile, $logLevel);
+        \Conquer\Observability\EventLog::init($rootDir,dirname($logFile),(string)($config['release_id']??$config['version']??''));
 
         // 5. Register error / exception handlers
         self::registerHandlers($showErrors ? 'development' : 'production');
@@ -88,11 +89,12 @@ final class Bootstrap
         try {
             \Conquer\Db\Connection::init($rootDir);
             Logger::getInstance()->debug('DB connection established');
+        } catch (\PDOException $e) {
+            \Conquer\Observability\EventLog::exception($e,'bootstrap.database','DATABASE_UNAVAILABLE');
+            Logger::getInstance()->error('DB connection failed');
         } catch (\RuntimeException $e) {
             // config/database.php missing — expected in fresh dev setups
             Logger::getInstance()->warn('DB unavailable: ' . $e->getMessage());
-        } catch (\PDOException $e) {
-            Logger::getInstance()->error('DB connection failed: ' . $e->getMessage());
         }
     }
 
@@ -118,6 +120,14 @@ final class Bootstrap
 
     private static function registerHandlers(string $env): void
     {
+        register_shutdown_function(static function (): void {
+            $error=error_get_last();
+            if ($error && in_array($error['type'],[E_ERROR,E_PARSE,E_CORE_ERROR,E_COMPILE_ERROR],true)) {
+                \Conquer\Observability\EventLog::record(['category'=>'error','severity'=>'critical','code'=>'PHP_FATAL',
+                    'message'=>'Fatal PHP error','outcome'=>'failed',
+                    'context'=>['file'=>self::diagnosticFile($error['file']),'line'=>$error['line'],'exception_code'=>$error['type']]]);
+            }
+        });
         set_error_handler(static function (
             int $errno,
             string $errstr,
@@ -130,7 +140,11 @@ final class Bootstrap
             }
 
             $logger  = Logger::getInstance();
-            $message = "PHP Error [{$errno}]: {$errstr} in {$errfile}:{$errline}";
+            $message = "PHP Error [{$errno}] in {$errfile}:{$errline}: ".\Conquer\Observability\SafeData::message($errstr);
+            \Conquer\Observability\EventLog::record(['category'=>'error',
+                'severity'=>in_array($errno,[E_ERROR,E_USER_ERROR,E_PARSE,E_COMPILE_ERROR],true)?'error':'warning',
+                'code'=>'PHP_'.$errno,'message'=>\Conquer\Observability\SafeData::message($errstr),
+                'context'=>['file'=>self::diagnosticFile($errfile),'line'=>$errline,'exception_code'=>$errno]]);
 
             match (true) {
                 in_array($errno, [E_ERROR, E_USER_ERROR, E_PARSE, E_COMPILE_ERROR], true)
@@ -147,10 +161,9 @@ final class Bootstrap
 
         set_exception_handler(static function (\Throwable $e) use ($env): void {
             Logger::getInstance()->error(
-                'Uncaught ' . $e::class . ': ' . $e->getMessage()
-                    . ' in ' . $e->getFile() . ':' . $e->getLine()
-                    . PHP_EOL . $e->getTraceAsString(),
+                'Uncaught ' . $e::class . ' in ' . $e->getFile() . ':' . $e->getLine(),
             );
+            \Conquer\Observability\EventLog::exception($e,'bootstrap.uncaught','UNCAUGHT_EXCEPTION');
 
             if (!headers_sent()) {
                 http_response_code(500);
@@ -176,5 +189,13 @@ final class Bootstrap
                     . '</body></html>';
             }
         });
+    }
+
+    private static function diagnosticFile(string $file): string
+    {
+        // Relative source location only; never expose server home directories.
+        $file=str_replace('\\','/',$file);
+        $root=defined('ROOT_DIR')?str_replace('\\','/',ROOT_DIR):'';
+        return $root!=='' && str_starts_with($file,$root.'/') ? '/'.substr($file,strlen($root)+1) : '';
     }
 }

@@ -1,52 +1,52 @@
-<?php
-declare(strict_types=1);
-$state=\Conquer\Game\World\WorldSettings::get($selectedWorld);$cfg=$state['settings'];
-$counts=['players'=>(int)$db->query('SELECT COUNT(*) FROM cities WHERE world_id=?',[$selectedWorld])->fetchColumn(),'resources'=>(int)$db->query('SELECT COUNT(*) FROM field_objects WHERE world_id=? AND resource_amount>0 AND expires_at>UTC_TIMESTAMP()',[$selectedWorld])->fetchColumn(),'monsters'=>(int)$db->query('SELECT COUNT(*) FROM field_monsters WHERE world_id=? AND hp_current>0',[$selectedWorld])->fetchColumn(),'villages'=>(int)$db->query('SELECT COUNT(*) FROM neutral_villages WHERE world_id=?',[$selectedWorld])->fetchColumn(),'bugs'=>(int)$db->query("SELECT COUNT(*) FROM bug_reports WHERE world_id=? AND status IN ('new','in_progress')",[$selectedWorld])->fetchColumn()];
-$runs=$db->query('SELECT * FROM world_spawn_runs WHERE world_id=? ORDER BY id DESC LIMIT 5',[$selectedWorld])->fetchAll();
-$alphaWaiting=$canEdit?(int)$db->query('SELECT COUNT(*) FROM alpha_waitlist WHERE invited_at IS NULL')->fetchColumn():0;
+<?php declare(strict_types=1);
+require_once __DIR__.'/operations_helpers.php';
+$filters=\Conquer\Admin\OperationsDashboard::filters($_GET,$worlds);
+$overview=\Conquer\Admin\OperationsDashboard::snapshot($filters);
+$tab=$filters['tab'];
 ?>
-<?php
-$urgent=(int)$db->query("SELECT COUNT(*) FROM bug_reports WHERE world_id=? AND status IN ('new','in_progress') AND priority IN ('high','urgent')",[$selectedWorld])->fetchColumn();
-$openWorlds=(int)$db->query("SELECT COUNT(*) FROM worlds WHERE status IN ('open','running')")->fetchColumn();
-$recent=$db->query('SELECT a.*,u.username FROM admin_audit_log a LEFT JOIN admin_users u ON u.id=a.admin_id ORDER BY a.id DESC LIMIT 5')->fetchAll();
-$historyLabel=static function(string $action):string {
-    $key=match(true){
-        str_contains($action,'login')||str_contains($action,'logout')=>'session',
-        str_contains($action,'password')=>'password',str_contains($action,'reward')=>'drops',
-        str_contains($action,'world')||str_contains($action,'land')=>'worlds',
-        str_contains($action,'alpha')=>'access',str_contains($action,'bug')||str_contains($action,'community')=>'reports',
-        str_contains($action,'layout')=>'layout',str_contains($action,'player')||str_contains($action,'gift')=>'players',
-        default=>'change'
-    };return \Conquer\Game\Locale::html('admin.modern.history_'.$key);
-};
-?>
-<div class="stats dashboard-metrics"><?php foreach(['world_players'=>$counts['players'],'open_bugs'=>$counts['bugs'],'open_worlds'=>$openWorlds] as $label=>$value): ?><div class="stat"><small><?= \Conquer\Game\Locale::html('admin.modern.'.$label) ?></small><strong><?= an($value) ?></strong><span <?= $label==='open_worlds'?'':'data-user-content' ?>><?= $label==='open_worlds'?\Conquer\Game\Locale::html('admin.modern.all_worlds'):ah($world['name']) ?></span></div><?php endforeach ?></div>
-<div class="dashboard-work"><section class="card"><h2><?= \Conquer\Game\Locale::html('admin.modern.attention') ?></h2>
-<div class="dashboard-task"><div><strong><?= \Conquer\Game\Locale::html('admin.modern.urgent_reports',['count'=>$urgent]) ?></strong><p class="subtle"><?= $urgent?'':\Conquer\Game\Locale::html('admin.modern.no_attention') ?></p></div><a class="button secondary" href="<?= APP_BASE ?>/admin/bug-reports?world_id=<?= $selectedWorld ?>"><?= \Conquer\Game\Locale::html('admin.modern.open_reports') ?></a></div>
-<?php if($canEdit&&$alphaWaiting): ?><div class="dashboard-task"><strong><?= \Conquer\Game\Locale::html('admin.modern.waiting',['count'=>$alphaWaiting]) ?></strong><a class="button secondary" href="<?= APP_BASE ?>/admin/alpha-waitlist"><?= \Conquer\Game\Locale::html('admin.modern.open_waitlist') ?></a></div><?php endif ?>
-<div class="dashboard-task"><strong><?= \Conquer\Game\Locale::html('admin.modern.edit_mines') ?></strong><a class="button secondary" href="<?= APP_BASE ?>/admin/rewards?type=farm&amp;world_id=<?= $selectedWorld ?>"><?= \Conquer\Game\Locale::html('admin.modern.nav_drops') ?></a></div>
-<?php if($canEdit): ?><div class="dashboard-task"><strong><?= \Conquer\Game\Locale::html('admin.world_delete.manage') ?></strong><a class="button secondary" href="<?= APP_BASE ?>/admin/world?world_id=<?= $selectedWorld ?>#world-delete"><?= \Conquer\Game\Locale::html('admin.world_delete.title') ?></a></div><?php endif ?></section>
-<section class="card"><div class="split"><h2><?= \Conquer\Game\Locale::html('admin.modern.recent') ?></h2><a href="<?= APP_BASE ?>/admin/audit"><?= \Conquer\Game\Locale::html('admin.modern.view_history') ?> ↗</a></div>
-<?php foreach($recent as $change): $details=json_decode($change['details']??'{}',true); ?><div class="dashboard-history-row"><div><strong data-user-content><?= ah($change['username']??'—') ?></strong><div><?= $historyLabel($change['action']) ?></div><small class="subtle" data-user-content><?= ah($details['reason']??'') ?></small></div><time datetime="<?= ah(str_replace(' ','T',$change['created_at']).'Z') ?>"><?= ah($change['created_at']) ?> UTC</time></div><?php endforeach ?>
-<?php if(!$recent): ?><p class="subtle"><?= \Conquer\Game\Locale::html('admin.modern.no_history') ?></p><?php endif ?></section></div>
-<details class="card dashboard-secondary"><summary><?= \Conquer\Game\Locale::html('admin.modern.workspaces') ?></summary>
-<div class="quick-actions">
+<div class="ops-workspace" data-operations-overview>
+<?php opsFilters($filters,$worlds,['tab'=>$tab]); ?>
+<?php opsFallbackNotice(); ?>
+<div class="ops-metrics">
 <?php foreach([
-    ...($canEdit?[[ '/alpha-waitlist','hud/reports.svg','Alpha-E-Mails ansehen',\Conquer\Game\Locale::t('admin.dashboard.waiting_invitations',['count'=>$alphaWaiting]),'Warteliste öffnen' ]]:[]),
-    ['/world-create','hud/city.svg','Welt erstellen','Name, Tempo, Minen, Monster und Spawnregeln in einem Schritt festlegen.','Neue Welt vorbereiten'],
-    ['/rewards','items/chest-gold.svg','Beute festlegen','Monster, Dungeons, Truhen und Feldzüge. Bestimme Gegenstände, Mengen und Chancen.','Beuteverwaltung öffnen'],
-    ['/items','hud/inventory.svg','Gegenstände entdecken','Finde Items über ihre Bilder, Seltenheit und Wirkung.','Bildkatalog öffnen'],
-    ['/players?world_id='.$selectedWorld,'knight.png','Spielern helfen','Konten suchen, Fortschritt prüfen und Geschenke mit persönlicher Nachricht senden.','Spieler suchen'],
-    ['/analytics?world_id='.$selectedWorld,'hud/reports.svg','Statistiken auswerten','Online-Aktivität, Farmen, Kämpfe, Monsterkills und Drops nach Zeitraum prüfen.','Statistiken öffnen'],
-    ['/bug-reports?world_id='.$selectedWorld,'menu-icons-v2/bug-report.png','Bugmeldungen prüfen','Neue Meldungen aus dem Spiel priorisieren, untersuchen und abschließen.','Meldungen öffnen']
-] as [$path,$art,$label,$description,$action]): ?><a class="quick-action" href="<?= APP_BASE ?>/admin<?= ah($path) ?>"><?= adminIcon($art) ?><h2><?= ah($label) ?></h2><p><?= ah($description) ?></p><span><?= ah($action) ?> →</span></a><?php endforeach ?>
+    ['online',$overview['online'],'last_five',opsUrl('/activity',$filters,['mode'=>'online'])],
+    ['active_players',$overview['active'],'unique_in_period',opsUrl('/activity',$filters,['mode'=>'players'])],
+    ['open_cases',$overview['reports'],$overview['reports_legacy']?'legacy_cases':'all_open_cases',opsUrl('/cases',$filters,['case_world'=>$filters['world_id']])],
+    ['affected_players',$overview['affected'],'error_players',opsUrl('/technical',$filters,['category'=>'error'])]
+] as [$label,$value,$hint,$url]): ?><a class="ops-metric" href="<?= ah($url) ?>"><span><?= opsText($label) ?></span><strong><?= opsNumber($value) ?></strong><small><?= opsText($value===null?'unavailable':$hint) ?></small></a><?php endforeach ?>
 </div>
-</details>
-<h2 class="dashboard-world-heading"><span data-user-content><?= ah($world['name']??'Your world') ?></span> at a glance</h2>
-<div class="stats"><?php foreach(['players'=>['Spieler','Städte in dieser Welt','knight.png'],'resources'=>['Rohstoffvorkommen','Aktiv auf der Karte','ui-resources/gold.png'],'monsters'=>['Monster','Solo- und Rally-Ziele','hud/expeditions.svg'],'villages'=>['Freie Dörfer','Verborgene Vorräte','map/castle-default.png'],'bugs'=>['Offene Bugmeldungen','Neu oder in Bearbeitung','menu-icons-v2/bug-report.png']] as $key=>[$label,$sub,$art]): ?><div class="stat"><?= adminIcon($art) ?><small><?= ah($label) ?></small><strong><?= an($counts[$key]) ?></strong><span><?= ah($sub) ?></span></div><?php endforeach ?></div>
-<div class="grid"><section class="card"><div class="split"><h2>Leben auf der Weltkarte</h2><span class="pill <?= ah($world['status']) ?>"><?= ah(['open'=>'Offen','running'=>'Aktiv','paused'=>'Pausiert','closed'=>'Geschlossen'][$world['status']]??$world['status']) ?></span></div><p>So viele Ziele sind vorhanden und geplant.</p>
-<?php foreach(['resource'=>'Rohstoffvorkommen','monster'=>'Monster','village'=>'Freie Dörfer'] as $kind=>$label): $target=min($cfg[$kind.'_limit'],floor($world['map_size']**2*$cfg[$kind.'_density_pct']/100));$current=$counts[$kind==='resource'?'resources':($kind==='monster'?'monsters':'villages')]; ?><div class="split"><span><?= $label ?></span><strong><?= an($current) ?> / <?= an($target) ?></strong></div><div class="progress"><i style="width:<?= min(100,$target>0?$current/$target*100:0) ?>%"></i></div><?php endforeach ?>
-<a class="button secondary" href="<?= APP_BASE ?>/admin/world?world_id=<?= $selectedWorld ?>">Welten & Spawns bearbeiten →</a></section>
-<section class="card"><h2>Automatische Auffüllung</h2><p>Neue Rohstoffvorkommen, Monster und freie Dörfer erscheinen nach deinem Zeitplan.</p><div class="split"><span>Zustand</span><strong><?= $cfg['enabled']?'Eingeschaltet':'Pausiert' ?></strong></div><hr><div class="split"><span>Nächster Termin</span><strong><?= ah($state['next_run_at']??'Noch nicht geplant') ?></strong></div><div class="split"><span>Letzter Lauf</span><strong><?= ah($state['last_run_at']??'Noch kein Lauf') ?></strong></div><p class="subtle">Prüfung alle <?= (int)$cfg['interval_minutes'] ?> Minuten · Zeiten in UTC</p></section></div>
-<details class="card dashboard-secondary"><summary>Letzte Spawnläufe ansehen</summary><?php require ROOT_DIR.'/views/admin/spawn_runs.php'; ?></details>
-<a class="button secondary" href="<?= APP_BASE ?>/admin/audit"><?= adminIcon('hud/reports.svg') ?> Änderungen nachvollziehen</a>
+<div class="ops-overview-grid">
+<section class="card ops-analysis"><div class="split"><h2><?= opsText('analysis') ?></h2><a href="<?= ah(opsUrl('/analytics',$filters)) ?>"><?= opsText('deep_analysis') ?> →</a></div>
+<nav class="ops-tabs" aria-label="<?= opsText('analysis') ?>"><?php foreach(['activity','economy','stability'] as $key): ?><a href="<?= ah(opsUrl('',$filters,['tab'=>$key])) ?>" <?= $key===$tab?'aria-current="page"':'' ?>><?= opsText('tab_'.$key) ?></a><?php endforeach ?></nav>
+<?php if($tab==='activity'): ?>
+<div class="ops-chart-heading"><div><h3><?= opsText('active_players') ?></h3><p class="subtle"><?= opsText($filters['days']===1?'two_hour_buckets':'daily_buckets') ?></p></div><div><strong><?= opsNumber($overview['active']) ?></strong><small><?= opsText('previous_period',['count'=>$overview['previous_active']??'—']) ?></small></div></div>
+<?php if(!$overview['activity_available']): ?><p class="notice"><?= opsText('activity_missing') ?></p><?php else: $max=max(1,...array_column($overview['activity'],'count')); ?>
+<div class="ops-chart" role="img" aria-label="<?= opsText('activity_chart',['max'=>$max]) ?>"><?php foreach($overview['activity'] as $i=>$bucket): ?><div class="ops-chart-column"><span style="height:<?= round($bucket['count']/$max*100,3) ?>%" title="<?= ah($bucket['time'].' UTC · '.$bucket['count']) ?>"></span><small><?= $i%max(1,(int)ceil(count($overview['activity'])/6))===0?ah($bucket['label']):'' ?></small></div><?php endforeach ?></div>
+<details class="ops-chart-values"><summary><?= opsText('show_values') ?></summary><div class="table-wrap"><table><thead><tr><th><?= opsText('time') ?> UTC</th><th><?= opsText('active_players') ?></th></tr></thead><tbody><?php foreach($overview['activity'] as $bucket): ?><tr><td><?= ah($bucket['time']) ?></td><td><?= opsNumber($bucket['count']) ?></td></tr><?php endforeach ?></tbody></table></div></details>
+<?php endif ?>
+<div class="ops-analysis-footer"><a href="<?= ah(opsUrl('/activity',$filters,['mode'=>'registrations'])) ?>"><?= opsText('new_accounts',['count'=>$overview['registrations']]) ?></a><a href="<?= ah(opsUrl('/activity',$filters)) ?>"><?= opsText('inspect_activity') ?> →</a></div>
+<?php elseif($tab==='economy'): ?>
+<h3><?= opsText('reward_analysis') ?></h3><p class="subtle"><?= opsText('rewards_explanation') ?></p>
+<a class="ops-attention-row" href="<?= ah(opsUrl('/rewards',$filters,['tab'=>'actual','type'=>'monster'])) ?>"><span><strong><?= opsText('actual_rewards') ?></strong><small><?= opsText('actual_rewards_hint') ?></small></span><span>→</span></a>
+<a class="ops-attention-row" href="<?= ah(opsUrl('/rewards',$filters,['tab'=>'invalid','type'=>'monster'])) ?>"><span><strong><?= opsText('invalid_rewards') ?></strong><small><?= opsText('invalid_rewards_hint') ?></small></span><strong><?= opsNumber($overview['invalid_rewards']) ?></strong></a>
+<a class="ops-attention-row" href="<?= ah(opsUrl('/rewards',$filters,['tab'=>'rules','type'=>'farm'])) ?>"><span><strong><?= opsText('drop_rules') ?></strong><small><?= opsText('drop_rules_hint') ?></small></span><span>→</span></a>
+<a class="ops-attention-row" href="<?= ah(opsUrl('/analytics',$filters)) ?>"><span><strong><?= opsText('resource_economy') ?></strong><small><?= opsText('economy_scope') ?></small></span><span>→</span></a>
+<?php else: ?>
+<h3><?= opsText('technical_state') ?></h3>
+<?php foreach(['errors'=>'errors','connections'=>'connection_signals','recovered'=>'recoveries','invalid_rewards'=>'invalid_rewards'] as $key=>$label): ?><a class="ops-attention-row" href="<?= ah(opsUrl('/technical',$filters,['category'=>$key==='connections'||$key==='recovered'?'connection':($key==='invalid_rewards'?'reward':'error')])) ?>"><span><?= opsText($label) ?></span><strong><?= opsNumber($overview[$key]) ?></strong></a><?php endforeach ?>
+<div class="ops-attention-row"><span><?= opsText('mutation_p95') ?><small><?= opsText('sample_size',['count'=>$overview['latency_samples']]) ?></small></span><strong><?= opsNumber($overview['p95']) ?> ms</strong></div>
+<p class="subtle"><?= opsText('connection_scope') ?></p>
+<?php endif ?>
+</section>
+<section class="card ops-attention"><h2><?= opsText('attention') ?></h2>
+<a class="ops-attention-row" href="<?= ah(opsUrl('/cases',$filters,['case_world'=>$filters['world_id'],'priority'=>'attention'])) ?>"><span><strong><?= opsText('urgent_cases') ?></strong><small><?= opsText('review_team_cases') ?></small></span><strong><?= opsNumber($overview['urgent_reports']) ?></strong></a>
+<a class="ops-attention-row" href="<?= ah(opsUrl('/rewards',$filters,['tab'=>'invalid','type'=>'monster'])) ?>"><span><strong><?= opsText('invalid_rewards') ?></strong><small><?= opsText('invalid_rewards_hint') ?></small></span><strong><?= opsNumber($overview['invalid_rewards']) ?></strong></a>
+<?php foreach($overview['groups'] as $group): ?><a class="ops-attention-row" href="<?= ah(opsUrl('/technical',$filters,['group'=>$group['group_hash']])) ?>"><span><strong data-user-content><?= ah($group['code']) ?></strong><small><?= opsText('group_summary',['events'=>$group['total'],'players'=>$group['players']]) ?></small></span><span>→</span></a><?php endforeach ?>
+<?php foreach($overview['overdue'] as $w): ?><a class="ops-attention-row" href="<?= ah(opsUrl('/world',['world_id'=>(int)$w['id'],'days'=>$filters['days']])) ?>#activity"><span><strong><?= opsText('spawn_overdue') ?></strong><small data-user-content><?= ah($w['name']) ?> · <?= ah($w['next_run_at']) ?> UTC</small></span><span>→</span></a><?php endforeach ?>
+<?php if(!$overview['events_available']): ?><p class="notice"><?= opsText('events_missing') ?></p><?php elseif(!$overview['groups']&&!$overview['overdue']): ?><p class="subtle"><?= opsText('no_recorded_incidents') ?></p><?php endif ?>
+</section>
+</div>
+<section class="card"><div class="split"><h2><?= opsText('world_overview') ?></h2><a href="<?= APP_BASE ?>/admin/world"><?= opsText('world_settings') ?> →</a></div><div class="table-wrap" tabindex="0" role="region" aria-label="<?= opsText('world_overview') ?>"><table class="ops-world-table"><thead><tr><th><?= opsText('world') ?></th><th><?= opsText('online') ?></th><th><?= opsText('world_players') ?></th><th><?= opsText('spawn_state') ?></th><th><?= opsText('last_run') ?> UTC</th></tr></thead><tbody><?php foreach($overview['worlds'] as $w): ?><tr><td><a href="<?= APP_BASE ?>/admin/world?world_id=<?= (int)$w['id'] ?>" data-user-content><?= ah($w['name']) ?></a><small data-user-content>#<?= (int)$w['id'] ?> · <?= ah($w['status']) ?></small></td><td><?= opsNumber($w['online']) ?></td><td><?= opsNumber($w['players']) ?></td><td><span class="pill <?= $w['spawn_state']==='overdue'?'closed':'' ?>"><?= opsText('spawn_'.$w['spawn_state']) ?></span></td><td><?= ah($w['last_run_at']??'—') ?></td></tr><?php endforeach ?></tbody></table></div></section>
+<section class="card"><div class="split"><h2><?= opsText('recent_actions') ?></h2><a href="<?= ah(opsUrl('/activity',$filters)) ?>"><?= opsText('all_actions') ?> →</a></div><?php opsEvents($overview['recent'],$filters); ?></section>
+<p class="ops-coverage subtle"><?= opsText('coverage') ?> <?= ah($overview['first_event']??'—') ?> UTC · <?= opsText('latest_record') ?> <?= ah($overview['last_event']??'—') ?> UTC. <?= opsText('coverage_hint') ?></p>
+</div>

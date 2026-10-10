@@ -118,8 +118,9 @@ final class Session
                 'INSERT IGNORE INTO player_activity_minutes(player_id,world_id,minute_slot) VALUES(?,?,DATE_FORMAT(UTC_TIMESTAMP(),\'%Y-%m-%d %H:%i:00\'))',
                 [(int)$row['player_id'],(int)$row['active_world_id']],
             );
-        } catch (\Throwable) {
+        } catch (\Throwable $error) {
             // non-critical
+            \Conquer\Observability\EventLog::exception($error,'session.activity');
         }
 
         self::$current = $row;

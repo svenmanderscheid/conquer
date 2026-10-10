@@ -217,7 +217,10 @@ final class RewardCatalog
             }
             else {
                 $code=$integer($target,1,2147483647,'Gegenstand');
-                if (InventoryService::getItemDef($code)===null) throw new \InvalidArgumentException('Dieser Gegenstand existiert nicht im Katalog.');
+                if (InventoryService::getItemDef($code)===null) {
+                    \Conquer\Admin\RewardLedger::rejected('unknown_item',0,0,$code,is_scalar($row['quantity']??null)?(int)$row['quantity']:0,['source_type'=>$type,'source_key'=>$key,'reference'=>'drop-rule-validation']);
+                    throw new \InvalidArgumentException('Dieser Gegenstand existiert nicht im Katalog.');
+                }
                 $entry['item_code']=$code;
             }
             if (isset($seen[(string)$target])) throw new \InvalidArgumentException('Jeder Gegenstand darf nur einmal in der Beuteliste stehen.');
@@ -314,10 +317,10 @@ final class RewardCatalog
         return $fragments;
     }
 
-    public static function grantFragments(int $playerId,array $fragments): void
+    public static function grantFragments(int $playerId,array $fragments,array $rewardContext=[]): void
     {
-        foreach($fragments as $code=>$count)if(TreasureData::get((int)$code)&&(int)$count>0)
-            \Conquer\Game\Treasure\TreasureService::addFragments($playerId,(int)$code,(int)$count);
+        foreach($fragments as $code=>$count)if(!TreasureData::isRetired((int)$code))
+            \Conquer\Game\Treasure\TreasureService::addFragments($playerId,(int)$code,(int)$count,$rewardContext);
     }
 
     /** Freeze whole-relic rewards separately from fragments for returns and reports. */
@@ -332,10 +335,10 @@ final class RewardCatalog
         return $relics;
     }
 
-    public static function grantRelics(int $playerId,array $relics): void
+    public static function grantRelics(int $playerId,array $relics,array $rewardContext=[]): void
     {
-        foreach($relics as $code=>$count)if(self::isRelicDropEligible(['treasure_code'=>$code])&&(int)$count>0)
-            \Conquer\Game\Treasure\TreasureService::addRelics($playerId,(int)$code,(int)$count);
+        foreach($relics as $code=>$count)if(!TreasureData::isRetired((int)$code))
+            \Conquer\Game\Treasure\TreasureService::addRelics($playerId,(int)$code,(int)$count,$rewardContext);
     }
 
     private static function isRelicDropEligible(array $row): bool

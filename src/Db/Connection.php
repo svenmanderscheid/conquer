@@ -99,9 +99,15 @@ final class Connection
      */
     public function query(string $sql, array $params = []): \PDOStatement
     {
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
-        return $stmt;
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute($params);
+            return $stmt;
+        } catch (\PDOException $error) {
+            // Observe even errors handled by compatibility fallbacks; never retain SQL or bindings.
+            \Conquer\Observability\EventLog::exception($error,'database.query','DATABASE_EXCEPTION');
+            throw $error;
+        }
     }
 
     /**
@@ -112,9 +118,14 @@ final class Connection
      */
     public function execute(string $sql, array $params = []): int
     {
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->rowCount();
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute($params);
+            return $stmt->rowCount();
+        } catch (\PDOException $error) {
+            \Conquer\Observability\EventLog::exception($error,'database.execute','DATABASE_EXCEPTION');
+            throw $error;
+        }
     }
 
     /**

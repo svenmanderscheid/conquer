@@ -37,7 +37,7 @@ final class AlphaWaitlist
             return $e->getMessage();
         } catch (\Throwable $e) {
             // Never log form values or SQL exception messages containing contact data.
-            error_log('Alpha waitlist storage unavailable (' . get_class($e) . ').');
+            \Conquer\Observability\EventLog::exception($e,'alpha.waitlist');
             header('Retry-After: 30');
             http_response_code(503);
             return 'waitlist.error_unavailable';

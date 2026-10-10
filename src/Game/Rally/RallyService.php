@@ -240,9 +240,11 @@ final class RallyService
             foreach(($army['survivors']??$army['troops']) as $code=>$count)if($count>0)$db->execute('INSERT INTO city_troops(city_id,troop_code,count) VALUES(?,?,?) ON DUPLICATE KEY UPDATE count=count+VALUES(count)',[$army['city_id'],\Conquer\Game\City\TroopData::activeCode((int)$code),$count]);
             $world=(int)$db->query('SELECT world_id FROM cities WHERE id=?',[$army['city_id']])->fetchColumn();$loot=$army['loot']??[];
             if(!empty($loot['gems']))$db->execute('UPDATE players SET gems=gems+? WHERE id=?',[(int)$loot['gems'],$army['player_id']]);
-            foreach(($army['items']??[]) as $code=>$amount)\Conquer\Game\Inventory\InventoryService::addItems($army['player_id'],(int)$code,(int)$amount,$world);
-            \Conquer\Game\Rewards\RewardCatalog::grantFragments($army['player_id'],$army['fragments']??[]);
-            \Conquer\Game\Rewards\RewardCatalog::grantRelics($army['player_id'],$army['relics']??[]);
+            $rewardContext=($army['reward_context']??[])+['source_type'=>'rally','reference'=>'rally-return','world_id'=>$world];
+            foreach(($army['items']??[]) as $code=>$amount)\Conquer\Game\Inventory\InventoryService::addItems($army['player_id'],(int)$code,(int)$amount,$world,$rewardContext);
+            \Conquer\Admin\RewardLedger::resources((int)$army['player_id'],$world,$loot,$rewardContext);
+            \Conquer\Game\Rewards\RewardCatalog::grantFragments($army['player_id'],$army['fragments']??[],$rewardContext);
+            \Conquer\Game\Rewards\RewardCatalog::grantRelics($army['player_id'],$army['relics']??[],$rewardContext);
             $db->execute('UPDATE cities SET food=food+?,lumber=lumber+?,stone=stone+?,gold=gold+? WHERE id=?',[$loot['food']??0,$loot['lumber']??0,$loot['stone']??0,$loot['gold']??0,$army['city_id']]);
         }
     }

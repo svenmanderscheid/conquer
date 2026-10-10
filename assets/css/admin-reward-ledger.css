@@ -1,0 +1,23 @@
+body.admin-modern .reward-ledger-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 20px}
+body.admin-modern .reward-ledger-tabs a{min-height:44px;display:flex;align-items:center;padding:10px 16px;border:1px solid var(--ui-line);border-radius:10px;color:var(--ui-ink);background:var(--ui-card);text-decoration:none;font-weight:650}
+body.admin-modern .reward-ledger-tabs a.active{background:var(--ui-primary-light);color:var(--ui-primary-dark);border-color:var(--ui-primary)}
+body.admin-modern .reward-ledger-filters{display:grid;grid-template-columns:repeat(3,minmax(120px,1fr));gap:12px;align-items:end;margin-top:20px}
+body.admin-modern .reward-ledger-filters label{display:grid;gap:7px;min-width:0}
+body.admin-modern .reward-ledger-filters input,body.admin-modern .reward-ledger-filters select{width:100%;min-width:0;box-sizing:border-box;min-height:44px}
+body.admin-modern .reward-ledger-list{padding:0;overflow:hidden}
+body.admin-modern .reward-ledger-row{border-bottom:1px solid var(--ui-line)}
+body.admin-modern .reward-ledger-row:last-child{border:0}
+body.admin-village.admin-modern .reward-ledger-row summary{display:grid;grid-template-columns:minmax(135px,.8fr) minmax(150px,1.4fr) minmax(120px,1fr) minmax(95px,.8fr) auto 16px;gap:12px;align-items:center;min-height:76px;padding:16px;cursor:pointer;list-style:none;color:var(--ui-ink)}
+body.admin-modern .reward-ledger-row summary .pill.blocked{color:var(--ui-red-dark);background:var(--ui-red-soft)}
+body.admin-modern .reward-ledger-row summary .pill.done{color:var(--ui-green-dark);background:var(--ui-green-soft)}
+body.admin-modern .reward-ledger-row summary::-webkit-details-marker{display:none}
+body.admin-modern .reward-ledger-row summary small,body.admin-modern .reward-ledger-row summary time{display:block;color:var(--ui-muted);font-size:12px;margin-top:5px}
+body.admin-modern .reward-ledger-row summary>span{min-width:0;overflow-wrap:anywhere}
+body.admin-modern .reward-ledger-row[open]{background:var(--ui-card)}
+body.admin-modern .reward-ledger-detail{padding:0 20px 20px;border-top:1px solid var(--ui-line)}
+body.admin-modern .reward-ledger-detail dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:20px 0}
+body.admin-modern .reward-ledger-detail dt{font-size:12px;color:var(--ui-muted);margin-bottom:5px}
+body.admin-modern .reward-ledger-detail dd{margin:0;overflow-wrap:anywhere}
+body.admin-modern .reward-ledger-links{display:flex;gap:8px;flex-wrap:wrap}
+@media(max-width:1000px){body.admin-village.admin-modern .reward-ledger-row summary{grid-template-columns:1fr 1.3fr 1fr}body.admin-modern .reward-ledger-row summary>span:last-child{display:none}}
+@media(max-width:600px){body.admin-modern .reward-ledger-filters{grid-template-columns:repeat(2,minmax(0,1fr))}body.admin-village.admin-modern .reward-ledger-row summary{grid-template-columns:1fr 1fr;padding:14px;gap:12px}body.admin-modern .reward-ledger-reward{grid-column:2;grid-row:1}body.admin-modern .reward-ledger-detail dl{grid-template-columns:1fr}body.admin-modern .reward-ledger-links>a{width:100%}}

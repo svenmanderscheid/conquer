@@ -119,6 +119,8 @@ $base = htmlspecialchars(APP_BASE, ENT_QUOTES);
 <div id="toast" role="status" aria-live="polite"></div>
 <script>window.CONQUER_ITEM_ART_VERSION = <?= max(filemtime(__DIR__ . '/../data/items.json'), ...array_map('filemtime', array_merge(glob(__DIR__ . '/../assets/art/items/*.svg'), glob(__DIR__ . '/../assets/art/items/backpack/*.svg'), glob(__DIR__ . '/../assets/art/items/reference/*.png'), glob(__DIR__ . '/../assets/art/items/painted-v1/*.webp'), glob(__DIR__ . '/../assets/art/items/painted-v2/*.webp')))) ?>;window.CONQUER_WORLD = <?= \Conquer\Game\World\WorldContext::id() ?>;window.CONQUER_BASE = <?= json_encode(APP_BASE, JSON_HEX_TAG | JSON_HEX_AMP) ?>;</script>
 <script src="<?= $base ?>/assets/js/browser-compat.js?v=<?= filemtime(__DIR__ . '/../assets/js/browser-compat.js') ?>" defer></script>
+<script>window.CONQUER_TELEMETRY = <?= json_encode(['player'=>(int)($session['player_id']??0),'world'=>(int)($session['active_world_id']??0),'csrf'=>(string)($session['csrf_token']??''),'release'=>\Conquer\Observability\EventLog::release()], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;</script>
+<script src="<?= $base ?>/assets/js/client-telemetry.js?v=<?= filemtime(ROOT_DIR.'/assets/js/client-telemetry.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/item-art.js?v=<?= filemtime(ROOT_DIR.'/assets/js/item-art.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/reward-dialog.js?v=<?= filemtime(__DIR__ . '/../assets/js/reward-dialog.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/castle-skins.js?v=<?= filemtime(__DIR__ . '/../assets/js/castle-skins.js') ?>" defer></script>

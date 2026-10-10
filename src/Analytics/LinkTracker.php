@@ -84,7 +84,7 @@ final class LinkTracker
         if (str_starts_with($destination, '/')) $destination = (defined('APP_BASE') ? APP_BASE : '') . $destination;
         if ($method === 'GET') {
             try { self::record((int)$row['id'], self::source((string) ($_SERVER['HTTP_REFERER'] ?? '')), $_SERVER); }
-            catch (\Throwable) { error_log('Link tracker counter unavailable.'); }
+            catch (\Throwable $error) { \Conquer\Observability\EventLog::exception($error,'links.counter'); }
         }
         // Even a failed counter must never block the saved destination.
         header('Location: ' . $destination, true, 302);
@@ -107,7 +107,7 @@ final class LinkTracker
             self::record((int)$row['id'], $source, $_SERVER);
         } catch (\Throwable) {
             // Analytics is best effort; do not log submitted content or SQL values.
-            error_log('Link tracker counter unavailable.');
+            \Conquer\Logger::getInstance()->error('Link tracker counter unavailable.');
         }
         http_response_code(204);
     }

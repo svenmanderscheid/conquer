@@ -252,8 +252,17 @@ final class AdminService
         $id=WorldSettings::integer($input['player_id']??0,0,2147483647,'Spieler-ID');
         $title=self::text($input['title']??'',3,100,'Geschenktitel');$message=self::text($input['message']??'',0,1000,'Nachricht');
         $rewards=[];foreach(['food','lumber','stone','gold','gems'] as $resource)$rewards[$resource]=WorldSettings::integer($input[$resource]??0,0,$resource==='gems'?1000000:1000000000,$resource);
-        $item=WorldSettings::integer($input['item_code']??0,0,2147483647,'Gegenstand');$quantity=WorldSettings::integer($input['quantity']??0,0,100000,'Anzahl');
-        if(($item>0)!==($quantity>0)||($item>0&&!InventoryService::getItemDef($item)))throw new \InvalidArgumentException('Gegenstand und Menge müssen gemeinsam gültig sein.');
+        $item=WorldSettings::integer($input['item_code']??0,0,2147483647,'Gegenstand');
+        try {$quantity=WorldSettings::integer($input['quantity']??0,0,100000,'Anzahl');}
+        catch(\InvalidArgumentException $error) {
+            $rawQuantity=$input['quantity']??0;
+            RewardLedger::rejected('invalid_quantity',$id,$world,$item,is_scalar($rawQuantity)&&filter_var($rawQuantity,FILTER_VALIDATE_INT)!==false?(int)$rawQuantity:0,['source_type'=>'admin_gift','operation_id'=>$operation]);
+            throw $error;
+        }
+        if(($item>0)!==($quantity>0)||($item>0&&!InventoryService::getItemDef($item))){
+            RewardLedger::rejected($item>0&&!InventoryService::getItemDef($item)?'unknown_item':'invalid_quantity',$id,$world,$item,$quantity,['source_type'=>'admin_gift','operation_id'=>$operation]);
+            throw new \InvalidArgumentException('Gegenstand und Menge müssen gemeinsam gültig sein.');
+        }
         if(array_sum($rewards)===0&&$quantity===0)throw new \InvalidArgumentException('Mindestens eine Belohnung ist erforderlich.');
         $rewards['item_code']=$item;$rewards['quantity']=$quantity;
         $recipients=$db->query('SELECT c.id,c.player_id FROM cities c JOIN players p ON p.id=c.player_id WHERE c.world_id=?'.($id?' AND p.id=?':' AND p.is_banned=0').' ORDER BY p.id LIMIT 1001',$id?[$world,$id]:[$world])->fetchAll();
@@ -270,7 +279,9 @@ final class AdminService
             if($after['gems']>2000000000||$after['item_quantity']>4000000000)throw new \InvalidArgumentException('Ein Empfänger würde das Bestandslimit überschreiten.');
             $db->execute('UPDATE cities SET food=food+?,lumber=lumber+?,stone=stone+?,gold=gold+? WHERE id=?',[$rewards['food'],$rewards['lumber'],$rewards['stone'],$rewards['gold'],$cid]);
             $db->execute('UPDATE players SET gems=gems+? WHERE id=?',[$rewards['gems'],$pid]);
-            if($item)InventoryService::addItems($pid,$item,$quantity,$world);
+            $rewardContext=['source_type'=>'admin_gift','reference'=>'admin-operation:'.$operation,'operation_id'=>$operation];
+            if($item)InventoryService::addItems($pid,$item,$quantity,$world,$rewardContext);
+            RewardLedger::resources($pid,$world,$rewards,$rewardContext);
             $db->execute('INSERT INTO admin_gifts(operation_id,player_id,world_id,title,message,rewards_json,before_json,after_json) VALUES(?,?,?,?,?,?,?,?)',[$operation,$pid,$world,$title,$message,json_encode($rewards,JSON_THROW_ON_ERROR),json_encode($before,JSON_THROW_ON_ERROR),json_encode($after,JSON_THROW_ON_ERROR)]);
             $giftId=$db->lastInsertId();
             $db->execute("INSERT INTO notifications(player_id,type,data_json) VALUES(?,'admin_gift',?)",[$pid,json_encode(['gift_id'=>$giftId,'title'=>$title,'message'=>$message,'rewards'=>$rewards,'world_id'=>$world],JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR)]);

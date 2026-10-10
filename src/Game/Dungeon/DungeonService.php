@@ -164,8 +164,11 @@ final class DungeonService
         $db=Connection::getInstance();$row=$db->query('SELECT * FROM dungeon_rewards WHERE run_id=? AND player_id=? FOR UPDATE',[$run['id'],$playerId])->fetch();
         if(!$row)throw new DungeonException('NO_REWARD','Für diesen Lauf liegt keine Belohnung vor.');if($row['claimed_at']!==null)throw new DungeonException('ALREADY_CLAIMED','Diese Belohnung wurde bereits abgeholt.',409);
         $reward=self::visibleReward(json_decode($row['reward_json'],true)?:[]);$awarded=[];
-        if(($reward['fragments']??0)>0&&($reward['treasure_code']??0)>0)$awarded['treasure']=TreasureService::addFragments($playerId,(int)$reward['treasure_code'],(int)$reward['fragments']);
-        if(($reward['item_code']??0)>0&&($reward['item_quantity']??0)>0){InventoryService::addItems($playerId,(int)$reward['item_code'],(int)$reward['item_quantity'],(int)$run['world_id']);$awarded['item_code']=(int)$reward['item_code'];}
+        $snapshot=self::runDefinition($run);$base=$snapshot['reward_config']??['items'=>array_map(static fn($code)=>['item_code'=>$code,'weight'=>1],$snapshot['item_codes']??[])];
+        $rewardContext=['source_type'=>'dungeon','source_key'=>(string)$run['dungeon_code'],'reference'=>'dungeon:'.$run['id'],'rule_revision'=>!empty($run['definition_json'])?'sha256:'.hash('sha256',self::json($snapshot)):'','world_id'=>(int)$run['world_id']];
+        if(!empty($run['definition_json']))$rewardContext['allowed_items']=($base['item_chance']??1)>0?array_map('intval',array_column(array_filter($base['items']??[],static fn($entry)=>($entry['weight']??1)>0),'item_code')):[];
+        if(($reward['fragments']??0)>0&&($reward['treasure_code']??0)>0)$awarded['treasure']=TreasureService::addFragments($playerId,(int)$reward['treasure_code'],(int)$reward['fragments'],$rewardContext);
+        if(($reward['item_code']??0)>0&&($reward['item_quantity']??0)>0){InventoryService::addItems($playerId,(int)$reward['item_code'],(int)$reward['item_quantity'],(int)$run['world_id'],$rewardContext);$awarded['item_code']=(int)$reward['item_code'];}
         $reward['awarded']=$awarded;$db->execute('UPDATE dungeon_rewards SET reward_json=?,claimed_at=UTC_TIMESTAMP() WHERE run_id=? AND player_id=? AND claimed_at IS NULL',[self::json($reward),$run['id'],$playerId]);return 'Dungeon-Belohnung abgeholt.';
     }
 

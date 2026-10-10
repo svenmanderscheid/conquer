@@ -37,9 +37,11 @@ final class KingdomInventory
         $code=KingdomService::integer($body,'item_code');
         $quantity=isset($body['quantity'])?KingdomService::integer($body,'quantity'):1;
         KingdomService::require($quantity>=1&&$quantity<=100,'Kaufe zwischen 1 und 100 Gegenstände.');
+        \Conquer\Admin\RewardLedger::validate($playerId,WorldContext::id(),$code,$quantity,['source_type'=>$crystalShop?'crystal_shop':'item_shop','source_key'=>(string)$code]);
         $item=InventoryService::getItemDef($code);$price=(int)($item['price_gems']??0);
         if($crystalShop)$price=\Conquer\Game\Trading\CrystalShop::price($code);
         else \Conquer\Game\CrystalEconomy::requireItem($item);
+        if($price<=0)\Conquer\Admin\RewardLedger::rejected('source_not_allowed',$playerId,WorldContext::id(),$code,$quantity,['source_type'=>$crystalShop?'crystal_shop':'item_shop','source_key'=>(string)$code]);
         KingdomService::require($price>0,'Dieser Gegenstand wird nicht zum Kauf angeboten.');
         $request=$body['request_id']??'';
         KingdomService::require(is_string($request)&&preg_match('/^[A-Za-z0-9_-]{16,80}$/D',$request)===1,'Eine eindeutige Kaufkennung wird benötigt.');
@@ -49,7 +51,7 @@ final class KingdomInventory
         if($receipt){KingdomService::require(hash_equals($receipt['payload_hash'],$hash),'Diese Kaufkennung wurde bereits anders verwendet.');return json_decode($receipt['result_json'],true,32,JSON_THROW_ON_ERROR)+['duplicate'=>true];}
         $cost=$price*$quantity;
         KingdomService::require($db->execute('UPDATE players SET gems=gems-? WHERE id=? AND gems>=?',[$cost,$playerId,$cost])===1,'Du hast nicht genügend Edelsteine.');
-        InventoryService::addItems($playerId,$code,$quantity);
+        InventoryService::addItems($playerId,$code,$quantity,$world,['source_type'=>$crystalShop?'crystal_shop':'item_shop','source_key'=>(string)$code,'operation_id'=>$request,'reference'=>'purchase:'.$request]);
         $message=$crystalShop&&$item['category']==='vip_point'
             ? \Conquer\Game\Locale::t('crystal_shop.vip_purchased',['quantity'=>$quantity,'points'=>$item['vip_points']])
             : $quantity.' × '.$item['name'].' wurde deinem Inventar hinzugefügt.';
@@ -169,21 +171,22 @@ final class KingdomInventory
                 }
             }
         }
+        $rewardContext=$category==='chest'?\Conquer\Game\Treasure\ChestService::rewardContext((string)$def['chest_type']):['source_type'=>'item_use','source_key'=>(string)$def['code']];
         $rewards = [];
         foreach ($items as $code=>$amount) {
-            InventoryService::addItems($playerId, $code, $amount);
+            InventoryService::addItems($playerId, $code, $amount,null,$rewardContext);
             $rewards[] = ['type'=>'item','quantity'=>$amount] + \Conquer\Game\Rewards\RewardPresentation::item($code);
         }
         foreach($relics as $code=>$amount){
-            $result=TreasureService::addRelics($playerId,$code,$amount);
+            $result=TreasureService::addRelics($playerId,$code,$amount,$rewardContext);
             $rewards[]=['type'=>'relic','quantity'=>$amount]+$result+\Conquer\Game\Rewards\RewardPresentation::relic($code);
         }
         foreach ($fragments as $code=>$amount) {
-            TreasureService::addFragments($playerId, $code, $amount);
+            TreasureService::addFragments($playerId,$code,$amount,$rewardContext);
             $rewards[] = ['type'=>'fragment','quantity'=>$amount] + \Conquer\Game\Rewards\RewardPresentation::fragment($code);
         }
         foreach ($resources as $resource=>$amount) {
-            self::resource($playerId, $cityId, ['resource'=>$resource,'amount'=>$amount]);
+            self::resource($playerId, $cityId, ['resource'=>$resource,'amount'=>$amount,'code'=>$def['code']]);
             $rewards[] = ['type'=>'resource','resource'=>$resource,'quantity'=>$amount,'amount'=>$amount,'name'=>$resourceNames[$resource],'rarity'=>'normal'];
         }
         if ($category === 'chest') \Conquer\Game\Quest\DailyQuestService::trackProgress($playerId, 'open_chest', $quantity);
@@ -199,6 +202,7 @@ final class KingdomInventory
         // Earned, unopened packs retain their full value even when the passive storage is full.
         if ($resource==='gems') { $db->execute('UPDATE players SET gems=gems+? WHERE id=?', [$amount,$playerId]); }
         else { $db->execute("UPDATE cities SET $resource=$resource+? WHERE id=?", [$amount,$cityId]); }
+        \Conquer\Admin\RewardLedger::resources($playerId,WorldContext::id(),[$resource=>$amount],['source_type'=>'item_use','source_key'=>(string)($def['code']??''),'reference'=>'resource-pack']);
         $name = ['food'=>'Nahrung','lumber'=>'Holz','stone'=>'Stein','gold'=>'Gold','gems'=>'Edelsteine'][$resource];
         return ['message'=>"$amount $name wurden gutgeschrieben.",'resource'=>$resource,'amount'=>$amount];
     }
@@ -206,7 +210,7 @@ final class KingdomInventory
     private static function resourceBox(int $playerId,int $cityId,array $def): array
     {
         $resources=['food','lumber','stone','gold'];
-        $result=self::resource($playerId,$cityId,['resource'=>$resources[random_int(0,3)],'amount'=>random_int((int)$def['amount_min'],(int)$def['amount_max'])]);
+        $result=self::resource($playerId,$cityId,['resource'=>$resources[random_int(0,3)],'amount'=>random_int((int)$def['amount_min'],(int)$def['amount_max']),'code'=>$def['code']]);
         $names=['food'=>'Nahrung','lumber'=>'Holz','stone'=>'Stein','gold'=>'Gold'];
         return $result+['drops'=>[['type'=>'resource','resource'=>$result['resource'],'quantity'=>$result['amount'],
             'amount'=>$result['amount'],'name'=>$names[$result['resource']],'rarity'=>'normal']]];
@@ -214,9 +218,10 @@ final class KingdomInventory
 
     private static function fragmentPack(int $playerId,array $def): array
     {
+        $context=['source_type'=>'item_use','source_key'=>(string)$def['code']];
         $drop=isset($def['treasure_code'])
-            ? TreasureService::addFragments($playerId,(int)$def['treasure_code'],(int)$def['fragment_amount'])+['treasure_code'=>(int)$def['treasure_code']]
-            : TreasureService::addRandomFragment($playerId,(string)$def['fragment_grade'],(int)$def['fragment_amount']);
+            ? TreasureService::addFragments($playerId,(int)$def['treasure_code'],(int)$def['fragment_amount'],$context)+['treasure_code'=>(int)$def['treasure_code']]
+            : TreasureService::addRandomFragment($playerId,(string)$def['fragment_grade'],(int)$def['fragment_amount'],$context);
         return ['message'=>$def['fragment_amount'].' Reliktfragmente wurden deiner Sammlung hinzugefügt.','drops'=>[['type'=>'fragment','quantity'=>(int)$def['fragment_amount']]+$drop
             +\Conquer\Game\Rewards\RewardPresentation::fragment((int)$drop['treasure_code'])]];
     }

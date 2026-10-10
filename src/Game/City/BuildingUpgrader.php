@@ -193,7 +193,8 @@ final class BuildingUpgrader
                     : json_decode($entry['cost_json'],true,32,JSON_THROW_ON_ERROR);
                 $r = $paid['resources'];
                 $db->execute('UPDATE cities SET food=food+?,lumber=lumber+?,stone=stone+?,gold=gold+? WHERE id=?',[$r['food'],$r['lumber'],$r['stone'],$r['gold'],$city['id']]);
-                foreach ($paid['items'] as $code=>$quantity) \Conquer\Game\Inventory\InventoryService::addItems($playerId,(int)$code,(int)$quantity);
+                \Conquer\Admin\RewardLedger::resources($playerId,(int)$city['world_id'],$r,['source_type'=>'building_refund','reference'=>'building-queue:'.$queueId]);
+                foreach ($paid['items'] as $code=>$quantity) \Conquer\Game\Inventory\InventoryService::addItems($playerId,(int)$code,(int)$quantity,null,['source_type'=>'building_refund','reference'=>'building-queue:'.$queueId]);
                 $db->execute('DELETE FROM building_queue WHERE id=?',[$queueId]);
                 return ['cancelled'=>true,'refunded_food'=>$r['food'],'refunded_lumber'=>$r['lumber'],'refunded_stone'=>$r['stone'],'refunded_gold'=>$r['gold'],'refunded_items'=>$paid['items']];
             });

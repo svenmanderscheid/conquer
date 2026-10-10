@@ -102,13 +102,18 @@ final class AllianceGiftService
      */
     public static function claimGift(int $playerId, int $giftId): void
     {
+        Connection::getInstance()->transaction(static fn()=>self::claimGiftInTransaction($playerId,$giftId));
+    }
+
+    private static function claimGiftInTransaction(int $playerId, int $giftId): void
+    {
         $db = Connection::getInstance();
 
         // Load gift — must be alive
         $gift = $db->query(
             'SELECT g.id, g.alliance_id, g.gift_json, a.world_id
              FROM alliance_gifts g JOIN alliances a ON a.id=g.alliance_id
-             WHERE g.id = ? AND g.expires_at > UTC_TIMESTAMP()',
+             WHERE g.id = ? AND g.expires_at > UTC_TIMESTAMP() FOR UPDATE',
             [$giftId],
         )->fetch();
 
@@ -143,17 +148,15 @@ final class AllianceGiftService
         $itemCode = (int) ($payload['item_code'] ?? 0);
         $quantity = (int) ($payload['quantity']  ?? 1);
 
-        if ($itemCode <= 0) {
-            throw new \RuntimeException('invalid_gift_payload');
-        }
+        \Conquer\Admin\RewardLedger::validate($playerId,(int)$gift['world_id'],$itemCode,$quantity,['source_type'=>'alliance_gift','source_key'=>(string)$giftId,'reference'=>'alliance-gift:'.$giftId]);
 
-        // Insert claim + add item (non-transactional — claim first to avoid doubles)
+        // Claim, grant and audit receipt must succeed or roll back together.
         $db->execute(
             'INSERT INTO alliance_gift_claims (gift_id, player_id) VALUES (?, ?)',
             [$giftId, $playerId],
         );
 
-        InventoryService::addItems($playerId, $itemCode, $quantity, (int)$gift['world_id']);
+        InventoryService::addItems($playerId, $itemCode, $quantity, (int)$gift['world_id'],['source_type'=>'alliance_gift','source_key'=>(string)$giftId,'reference'=>'alliance-gift:'.$giftId]);
     }
 
     // -------------------------------------------------------------------------

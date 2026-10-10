@@ -29,6 +29,7 @@ function adminDropRow(string $type,int|string $index,array $row): void {
     echo '<div class="drop-row-end"><span class="drop-probability" aria-live="polite"></span><button type="button" class="secondary remove-drop" aria-label="Beuteeintrag entfernen">✕</button></div></div>';
 }
 function adminUiIcon(string $name):string {
+    $name=['reports'=>'access','tech'=>'system','analytics'=>'overview'][$name]??$name;
     $paths=['overview'=>'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
         'players'=>'<circle cx="9" cy="8" r="3"/><path d="M3 21v-3a6 6 0 0 1 12 0v3M16 5a3 3 0 0 1 0 6M21 21v-3a6 6 0 0 0-4-5"/>',
         'worlds'=>'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c5 5 5 13 0 18M12 3c-5 5-5 13 0 18"/>',
