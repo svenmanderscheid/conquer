@@ -76,7 +76,11 @@ final class MonsterCharmLifecycle
 
         $charmId = $receipt['charm_id'] === null ? null : (int)$receipt['charm_id'];
         if ($created) {
-            \Conquer\Game\Alliance\AllianceGiftService::createSourceGift($winnerPlayerId,$worldId,$definition);
+            if ($sourceKind === 'rally') {
+                \Conquer\Game\Alliance\AllianceGiftService::createRallyGift($winnerPlayerId,$worldId);
+            } else {
+                \Conquer\Game\Alliance\AllianceGiftService::createSourceGift($winnerPlayerId,$worldId,$definition);
+            }
             $charmId = CharmSpawner::spawn($worldId,$x,$y,$monsterCode,(int)$receipt['id'],$monsterLevel,$definition);
             if ($charmId !== null) {
                 $db->execute('UPDATE monster_kill_receipts SET charm_id=? WHERE id=?',[$charmId,$receipt['id']]);

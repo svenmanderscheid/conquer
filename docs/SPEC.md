@@ -2471,11 +2471,12 @@ Real-time chat (via polling, not WebSocket).
 
 ### 15.9 Alliance gifts
 
-When a member kills certain monsters or participates in rallies, the alliance is rewarded with **Alliance Gifts**. Source: `alliance_gift_*` fields in monster JSON.
+When a member kills certain monsters or wins a monster rally, the alliance is rewarded with **Alliance Gifts**. Solo source gifts use `alliance_gift_*` fields in monster JSON; rally gifts use the bounded server pool in `src/Game/Alliance/RallyGiftRewards.php`.
 
 - All members claim from the gift pool (each member can claim once per gift)
-- Gifts contain Resources, Speedups, fragments, etc.
-- Gifts auto-expire after 7 days [DEFAULT]
+- Each successful monster rally creates one shared gift, including rallies started before the current reward rules. The server rolls its contents once; all members receive the same single item.
+- Rally gifts contain only one resource pack (1,000 / 5,000 / 10,000 food, lumber, stone or gold), one crystal pack (10 or 50), or one building, research, training or healing speedup (5 / 10 / 30 minutes). Every item in `RallyGiftRewards` has equal probability. Chests, fragments, materials, long speedups and percentage boosts are excluded. Saved monster gift IDs and counts cannot override this pool.
+- Gifts auto-expire after 24 hours. Claiming or retrying never rerolls the saved item or grants it twice. Previously created gifts retain their stored contents.
 
 This rewards active alliances and encourages collective monster hunting.
 

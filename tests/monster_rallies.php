@@ -66,6 +66,12 @@ try{
  badgeChance(1.0);
  ck((float)badgeSnapshot($defaultId)[0]['probability']===0.40,'later reward changes do not rewrite a started rally 40% snapshot');RallyService::cancel($defaultId,1);
  $id=MonsterRally::start(1,1,60,60,[50100101=>5000],5,'Together');$storedBadges=badgeSnapshot($id);
+ // A started rally may still carry an invalid or oversized gift in its saved definition.
+ $giftSnapshot=json_decode(rally($id)['result_json'],true);
+ $giftSnapshot['monster']['alliance_gift']=\Conquer\Game\Map\MonsterData::source(20200202,1)['alliance_gift'];
+ $giftSnapshot['monster']['alliance_gift']['count']=1000;
+ ck((int)$giftSnapshot['monster']['alliance_gift']['count']>0,'victory fixture retains an oversized historical alliance gift snapshot');
+ $db->execute('UPDATE rallies SET result_json=? WHERE id=?',[json_encode($giftSnapshot),$id]);
  ck(count($storedBadges)===1&&$storedBadges[0]['count']===$badgeReward&&(float)$storedBadges[0]['probability']===1.0,'explicit 100% test override is captured before the deterministic victory');
  ck(stock(1)===20000&&(int)$db->query('SELECT action_points FROM players WHERE id=1')->fetchColumn()===175,'captain reserves troops and pays catalog AP');
  ck($db->query('SELECT beginner_shield_until FROM players WHERE id=1')->fetchColumn()!==null,'monster rally preserves beginner protection');
@@ -78,6 +84,9 @@ try{
  WorldContext::bind(2);rejects(fn()=>RallyService::launch($id,1),'cross-world launch rejected');WorldContext::bind(1);
  joinersArrive($id);RallyService::launch($id,1);$before=(int)$db->query('SELECT gold FROM cities WHERE id=1')->fetchColumn();arrive($id);
  $result=json_decode(rally($id)['result_json'],true);ck($result['monster_killed']&&rally($id)['status']==='returning','combined army kills monster and begins return');
+ $rallyGift=$db->query('SELECT * FROM alliance_gifts')->fetchAll();
+ $smallGift=json_decode($rallyGift[0]['gift_json']??'null',true);
+ ck(count($rallyGift)===1&&in_array($smallGift,\Conquer\Game\Alliance\RallyGiftRewards::pool(),true),'successful rally creates exactly one small gift despite its oversized historical snapshot');
  ck((int)$db->query('SELECT COUNT(*) FROM field_monsters WHERE id=?',[$mid])->fetchColumn()===0,'monster removed exactly once');
  $rallyCharm=$db->query("SELECT c.* FROM monster_kill_receipts k JOIN map_charms c ON c.id=k.charm_id WHERE k.source_kind='rally' AND k.source_id=?",[$id])->fetch();
  ck($rallyCharm&&(int)$rallyCharm['coord_x']===60&&(int)$rallyCharm['coord_y']===60,'rally kill creates one public charm at the stored monster location');
@@ -93,6 +102,7 @@ try{
  ck((int)$db->query('SELECT gold FROM cities WHERE id=1')->fetchColumn()===$before&&stock(1)===20000,'troops and haul wait for return');
  RallyService::tick();ck((int)$db->query('SELECT COUNT(*) FROM battle_reports')->fetchColumn()===2,'repeated tick does not repeat rewards');
  home($id);home($id);ck(stock(1)===25000&&stock(2)===25000,'both armies return exactly once');
+ ck($db->query('SELECT * FROM alliance_gifts')->fetchAll()===$rallyGift,'repeated rally settlement and army returns neither duplicate nor reroll the alliance gift');
  ck((int)$db->query('SELECT SUM(fragments) FROM player_treasures WHERE player_id=1')->fetchColumn()===3&&(int)$db->query('SELECT SUM(fragments) FROM player_treasures WHERE player_id=2')->fetchColumn()===3&&(int)$db->query('SELECT COUNT(*) FROM player_treasures WHERE player_id=3')->fetchColumn()===0,'Rally return grants each participant relic fragments exactly once');
  ck((int)$db->query('SELECT COUNT(*) FROM player_treasure_effects WHERE treasure_code=60100003 AND effect_index=0 AND parts=1')->fetchColumn()===2,'Rally return unlocks each participant relic exactly once without consuming fragments');
  ck(badges(1)===$badgeReward&&badges(2)===$badgeReward&&badges(3)===0,'captain and participant receive badges once despite repeated settlement and return processing');
@@ -120,6 +130,7 @@ try{
  ck($noDrop['monster_killed']&&empty($noDrop['armies'][0]['items'][119000002])&&empty($noDrop['armies'][1]['items'][119000002]),'saved 0% chance gives neither successful participant a badge even after a later rule change');
  ck(empty($noDrop['armies'][0]['relics'])&&empty($noDrop['armies'][1]['relics']),'Rally whole relic probabilities remain frozen despite later admin changes');
  home($id);home($id);ck(badges(1)===$badgeReward*2&&badges(2)===$badgeReward,'zero-chance victory and repeated returns do not add badges');
+ ck((int)$db->query('SELECT COUNT(*) FROM alliance_gifts')->fetchColumn()===3,'only the three successful rallies create alliance gifts, independent of personal drop chances');
  $db->execute("UPDATE worlds SET status='paused' WHERE id=1");rejects(fn()=>MonsterRally::start(1,1,60,60,[50100101=>1],1,''),'paused worlds reject new rallies');$db->execute("UPDATE worlds SET status='running' WHERE id=1");
  foreach(\Conquer\Game\Charm\CharmEffects::KEYS as $category=>$key){
   $db->execute('DELETE FROM player_charms_active');$base=BuffEngine::getBuffs(1);

@@ -9,8 +9,8 @@ use Conquer\Game\Inventory\InventoryService;
 /**
  * Alliance Gift system.
  *
- * Gifts are triggered by game events (monster kills, rally wins) with a 20%
- * probability. When triggered, a small reward item is made available to all
+ * Rally wins grant one small item; legacy monster kills have a 20% chance.
+ * When triggered, a reward item is made available to all
  * alliance members for 24 hours. Members must explicitly claim their gift.
  *
  * Tables:
@@ -84,6 +84,17 @@ final class AllianceGiftService
         if ($alliance === false) return;
         $db->execute("INSERT INTO alliance_gifts(alliance_id,trigger_type,gift_json,expires_at,created_by) VALUES(?,'monster_kill',?,DATE_ADD(UTC_TIMESTAMP(),INTERVAL 24 HOUR),?)",
             [$alliance,json_encode(['item_code'=>(int)$gift['item_code'],'quantity'=>(int)$gift['count']],JSON_THROW_ON_ERROR),$playerId]);
+    }
+
+    /** Called atomically with a new rally kill receipt, including older rally snapshots. */
+    public static function createRallyGift(int $playerId, int $worldId): void
+    {
+        $db = Connection::getInstance();
+        if (!$db->getPdo()->inTransaction()) throw new \LogicException('Rally gifts require the kill transaction.');
+        $alliance = $db->query('SELECT alliance_id FROM alliance_members WHERE player_id=? AND world_id=?',[$playerId,$worldId])->fetchColumn();
+        if ($alliance === false) return;
+        $db->execute("INSERT INTO alliance_gifts(alliance_id,trigger_type,gift_json,expires_at,created_by) VALUES(?,'monster_kill',?,DATE_ADD(UTC_TIMESTAMP(),INTERVAL 24 HOUR),?)",
+            [$alliance,json_encode(RallyGiftRewards::roll(),JSON_THROW_ON_ERROR),$playerId]);
     }
 
     // -------------------------------------------------------------------------
