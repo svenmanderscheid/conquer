@@ -58,8 +58,10 @@ window.ConquerRewards = (() => {
             if(!pending)save({...payload,operation_key:crypto.randomUUID(),expected_world_id:Number(getState().city.world_id)});
             return {...pending};
         }
-        function success(response,payload){
+        function success(response,payload,{show:showResult=true}={}){
             save(null);
+            // A confirmed receipt is retained in server history; do not reopen a newer dialog.
+            if(!showResult)return;
             const result=response?.result||response||{},drops=Array.isArray(result.drops)?result.drops:payload.action==='welcome.claim'?(result.rewards||[]).flatMap(r=>r.item_code?[{...r,type:'item'}]:Number(r.gems)>0?[{type:'resource',resource:'gems',quantity:Number(r.gems)}]:Object.entries(r.resources||{}).map(([resource,quantity])=>({type:'resource',resource,quantity}))):[];
             if(!drops.length){dialog.close();return;}
             const rewards=drops.map(drop=>resolve(drop,getKingdom(),ctx.base)).filter(r=>r.quantity>0);

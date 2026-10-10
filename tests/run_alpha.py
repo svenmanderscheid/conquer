@@ -36,6 +36,7 @@ BACKEND.remove('dungeon_lifecycle')
 BACKEND += ['dungeon_availability', 'melusina_lifecycle', 'item_sources']
 APP[APP.index('dungeon_app')] = 'melusina_app'
 STATIC.append('melusina_panel')
+APP.append('core_flow_app')
 FIXTURE_FLAGS={'territory_main_report':['--territory'],'monster_report_app':['--monster-reports'],'hospital_quick_heal_app':['--hospital'],'map_search_app':['--regional-bosses','--chat','--map-search'],'research_app':['--speed-bonuses']}
 FIXTURE_FLAGS['melusina_app'] = ['--melusina']
 

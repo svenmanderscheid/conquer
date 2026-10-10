@@ -4,17 +4,24 @@ window.ConquerWorld = (() => {
   const editorial=value=>window.ConquerLocale?.text(value)??value;
   const translated=(key,fallback)=>{const value=window.ConquerLocale?.t(key);return value&&value!==key?value:fallback;};
   const sceneryImages=new Map();
-  let painted=null,paintedLoading=false;
-  function loadPainted(){
+  let painted=null,paintedLoading=false,preloadScheduled=false;
+  function loadPainted(root=context.base){
     if(paintedLoading)return;paintedLoading=true;
-    import(`${context.base}/assets/js/world-painted.js?v=11`).then(async module=>{
-      await module.init(context.base,invalidateArtwork,()=>!sceneVisible||motionReduced()||cameraGesture());
+    import(`${root}/assets/js/world-painted.js?v=11`).then(async module=>{
+      await module.init(root,invalidateArtwork,()=>!sceneVisible||motionReduced()||cameraGesture());
       painted=module;invalidateArtwork();
-    }).catch(error=>{console.warn('Painted world fallback',error);loadScenery();});
+    }).catch(error=>{console.warn('Painted world fallback',error);loadScenery(root);});
+  }
+  function preload(root){
+    if(paintedLoading||preloadScheduled||navigator.connection?.saveData)return;
+    preloadScheduled=true;
+    const prepare=()=>{preloadScheduled=false;if(!document.hidden)loadPainted(root);};
+    // Warm the existing ground artwork while the player is in the city. No map, motion or game reads.
+    if(window.requestIdleCallback)window.requestIdleCallback(prepare,{timeout:1000});else setTimeout(prepare,0);
   }
   function invalidateArtwork(){if(view?.el.isConnected){view.terrainStamp=null;view.cameraDirty=true;view.markersDirty=true;}}
   function cameraGesture(){return Boolean(view?.pinch||(view?.drag?.moved&&!view.drag.teleport));}
-  function loadScenery(){for(const name of ['pine','oak','cherry','mountain','rocks']){if(sceneryImages.has(name))continue;const img=new Image();sceneryImages.set(name,img);img.onload=()=>{if(view?.el.isConnected){view.terrainStamp=null;view.cameraDirty=true;}};img.src=`${context.base}/assets/art/map/scenery-${name}.png?v=fantasy3d1`;}}
+  function loadScenery(root=context.base){for(const name of ['pine','oak','cherry','mountain','rocks']){if(sceneryImages.has(name))continue;const img=new Image();sceneryImages.set(name,img);img.onload=()=>{if(view?.el.isConnected){view.terrainStamp=null;view.cameraDirty=true;}};img.src=`${root}/assets/art/map/scenery-${name}.png?v=fantasy3d1`;}}
   const TILE = 44, MIN_ZOOM = .4, MOBILE_MIN_ZOOM = .25, MAX_ZOOM = 1.8;
   // Use the short screen edge so phones retain their overview in landscape.
   const minZoom = () => Math.min(window.innerWidth,window.innerHeight)<=600 ? MOBILE_MIN_ZOOM : MIN_ZOOM;
@@ -1294,5 +1301,5 @@ window.ConquerWorld = (() => {
       if(!frameId){view.lastAnimation=performance.now();frameId=requestAnimationFrame(animate);}
     }
   }
-  return {render,getCenter,focus,locate,followMarch,setVisible};
+  return {render,getCenter,focus,locate,followMarch,setVisible,preload};
 })();

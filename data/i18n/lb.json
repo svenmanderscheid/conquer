@@ -1,4 +1,5 @@
 {
+  "hud.resource.open": "{name}: {amount}. Detailer opmaachen",
   "march.power.available": "Verfügbar Muecht",
   "march.power.required": "Néideg Muecht",
   "march.power.ready": "Néideg Muecht erreecht",

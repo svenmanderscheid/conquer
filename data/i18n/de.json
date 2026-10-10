@@ -1,4 +1,5 @@
 {
+  "hud.resource.open": "{name}: {amount}. Details öffnen",
   "march.power.available": "Verfügbare Macht",
   "march.power.required": "Benötigte Macht",
   "march.power.ready": "Benötigte Macht erreicht",

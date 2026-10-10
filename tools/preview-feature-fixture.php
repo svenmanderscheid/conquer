@@ -260,5 +260,6 @@ try{
  mkdir($dir.'/sessions',0700,true);
  $log=$dir.'/logs/server.log';$server=proc_open([PHP_BINARY,'-d','session.save_path='.$dir.'/sessions','-d','display_startup_errors=0','-S','127.0.0.1:'.$port,'-t',$dir,$dir.'/router.php'],[0=>['pipe','r'],1=>['file',$log,'a'],2=>['file',$log,'a']],$pipes,$dir);
  if(!is_resource($server))throw new RuntimeException('Cannot start preview.');
+ if(in_array('--core-flow',$argv,true))echo "Core flow fixture root: $dir\n";
  echo "Synthetic preview ready at http://127.0.0.1:$port\nPress Enter to stop and clean up.\n";fflush(STDOUT);fgets(STDIN);
 }finally{if(is_resource($server)){proc_terminate($server);proc_close($server);}foreach(['src','views','data','logs','assets','sessions']as$part)if(is_dir($dir.'/'.$part))removePreviewTree($dir.'/'.$part,$dir);foreach(['index.php','router.php','config/app.php','manifest.php','service-worker.js','offline.html']as$f)if(is_file($dir.'/'.$f))unlink($dir.'/'.$f);$fixture->close();}

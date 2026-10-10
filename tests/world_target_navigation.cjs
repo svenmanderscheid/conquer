@@ -7,9 +7,9 @@ function setup(){
  const events=[],timers=new Map();let next=0;
  const classes=new Set(),veil={dataset:{},classList:{contains:k=>classes.has(k),add:(...ks)=>ks.forEach(k=>classes.add(k)),remove:(...ks)=>ks.forEach(k=>classes.delete(k))},querySelector:()=>({})};
  const el={dataset:{},open:false,focus:()=>{},close(){this.open=false;},querySelector:()=>null};
- const c={events,timers,console,URLSearchParams,Number,Object,Map,performance:{now:()=>0},base:'',setTimeout:fn=>{timers.set(++next,fn);return next;},clearTimeout:id=>timers.delete(id),requestAnimationFrame:fn=>fn(),matchMedia:()=>({matches:false}),document:{body:{classList:{contains:()=>false}},activeElement:null},location:{hash:''},$:s=>s==='#scene-transition'?veil:el,window:{},pendingRefresh:null};
+ const c={events,timers,console,URLSearchParams,Number,Object,Map,performance:{now:()=>0},base:'',setTimeout:fn=>{timers.set(++next,fn);return next;},clearTimeout:id=>timers.delete(id),requestAnimationFrame:fn=>{timers.set(++next,fn);return next;},cancelAnimationFrame:id=>timers.delete(id),matchMedia:()=>({matches:false}),document:{body:{classList:{contains:()=>false}},activeElement:null},location:{hash:''},$:s=>s==='#scene-transition'?veil:el,window:{},pendingRefresh:null};
  vm.createContext(c);vm.runInContext(`
- let sceneTransitionToken=0,sceneTransitionTimer=0,sceneCommitPending=false,navigationVersion=0;
+ let sceneTransitionToken=0,sceneTransitionTimer=0,sceneTransitionFrame=0,sceneCommitPending=false,navigationVersion=0;
  let state={city:{world_id:1},monsters:[]},current='city',playfield='city',polling=null,teleportSelection=null,panelTrigger=null,mounted=false;
  const navs={world:1,city:1,help:1},isPlayfield=t=>t==='city'||t==='world',mobilePages=null,viewPositions=new Map(),panelDialog={open:false},panelHost={scrollTop:0,querySelector:()=>null};
  function rememberView(){} function render(){mounted=playfield==='world';events.push(['render',current]);}

@@ -68,6 +68,7 @@
     };
     let state, kingdom, expeditions, market, allianceRallies=[], publicMarches=[], current = Object.hasOwn(navs, location.hash.slice(1)) ? location.hash.slice(1) : 'city', filter = 'monsters', busy = false, polling = null, offset = 0, toastTimer, lastSignature = '', dialogTrigger=null, teleportSelection=null;
     const loadErrors = {};
+    let refreshVersion=0,lastNavigationMarkup='';
     let apiRetryAt=0,appLifecycle=null;
     let rallyRequestSequence=0,rallyAppliedSequence=0,rallyDataScope='';
     let dialogVersion=0;
@@ -85,7 +86,7 @@
     let rallyToastScope='';
     let panelTrigger=null;
     let sceneHosts=null;
-    let sceneTransitionToken=0,sceneTransitionTimer=0,sceneCommitPending=false,navigationVersion=0;
+    let sceneTransitionToken=0,sceneTransitionTimer=0,sceneTransitionFrame=0,sceneCommitPending=false,navigationVersion=0;
     const isPlayfield=tab=>tab==='city'||tab==='world';
     const mobilePages=window.ConquerMobilePages?.({navigate,getRoute:()=>current,getPlayfield:()=>playfield,closeChat:()=>worldChat?.close()});
     const now = () => Date.now() + offset;
@@ -190,46 +191,74 @@
         if(!document.hidden&&appLifecycle?.isActive()!==false)rallyNotifications.observe(allianceRallies,{...context,serverTime:now()/1000});
         return true;
     }
-    async function refresh(renderPage = true) {
-        if (polling) return polling;
-        polling = (async()=>{
+    function renderSnapshot(renderPage) {
+        if(!renderPage||sceneCommitPending||$('#game-dialog').open)return;
+        const editing=current!=='world'&&([playfieldHost,panelHost].some(host=>host.dataset.dirty==='true'||(host.contains(document.activeElement)&&document.activeElement.matches('input,textarea,select'))));
+        if(editing)return;
+        const signature=JSON.stringify([state.buildings,state.troops,state.build_queue,state.troop_queue,state.research,state.research_queue,state.research_duration_factor,state.research_defs.map(n=>canAfford(n.levels.find(l=>l.level===Number(state.research[n.code]||0)+1)?.resources||{})),state.marches,state.public_marches,state.reports,state.monsters,state.charms,state.nodes,state.players,state.congress,state.shrines,state.land_progression,state.territory,state.world?.map_profile,state.map_center,kingdom?.profile,kingdom?.march_skins,kingdom?.name_frames,kingdom?.theme_bundles,kingdom?.skin_bundles,kingdom?.alliance,kingdom?.inventory,kingdom?.quests,kingdom?.quest_activity,kingdom?.welcome_event,kingdom?.hospital,kingdom?.treasures,[kingdom?.trading?.rotation,kingdom?.trading?.offers,kingdom?.trading?.vip],[kingdom?.chests?.free_silver_remaining,kingdom?.chests?.free_silver_available,kingdom?.chests?.free_gold_available],kingdom?.rankings,kingdom?.arena,expeditions?.expeditions,market]);
+        if(signature!==lastSignature){render();lastSignature=signature;}
+    }
+    async function refresh(renderPage = true,{supersede=false,priority=false}={}) {
+        if(busy&&!supersede)return false;
+        if(polling&&!supersede)return polling;
+        const version=++refreshVersion;
+        const request=(async()=>{
             try {
                 if(!state||$('#save-state').classList.contains('error'))connectionStatus('refreshing');
                 const center=playfield==='world'?window.ConquerWorld.getCenter():null,returnSince=comfort.since();
                 const query=new URLSearchParams(center?{map_x:center.x,map_y:center.y,map_radius:center.radius||30}:{});
                 if(returnSince)query.set('return_since',returnSince);
-                const rallyRequest=beginRallyRequest();
-                const results=await Promise.allSettled([api('game/state'+(query.size?'?'+query:'')),api('kingdom/state'),api('expeditions/state'),current==='market'?api('market/state'):Promise.resolve(market),api('rally/list'),playfield==='world'?api('map/marches'):Promise.resolve({marches:publicMarches})]);
-                if(results[0].status==='rejected')throw results[0].reason;
-                state=results[0].value;offset=state.server_time*1000-Date.now();
+                const loadSupplementary=()=>{
+                    const rallyRequest=beginRallyRequest();
+                    return Promise.allSettled([api('kingdom/state'),api('expeditions/state'),current==='market'?api('market/state'):Promise.resolve(market),api('rally/list'),playfield==='world'?api('map/marches'):Promise.resolve({marches:publicMarches})]).then(results=>({results,rallyRequest}));
+                };
+                const primary=api('game/state'+(query.size?'?'+query:''));
+                // After a command, give its authoritative city read priority over optional reads.
+                const supplementary=priority?null:loadSupplementary();
+                const fresh=await primary;
+                if(version!==refreshVersion)return false;
+                state=fresh;offset=state.server_time*1000-Date.now();
                 state.research_defs.forEach(node=>{researchNames[node.code]=window.ConquerResearch.title(node);});
-                ['kingdom','expeditions','market'].forEach((name,i)=>{const r=results[i+1];if(!r)return;if(r.status==='fulfilled'){if(name==='kingdom')kingdom=r.value;if(name==='expeditions')expeditions=r.value;if(name==='market')market=r.value;delete loadErrors[name];}else{loadErrors[name]=r.reason.message;}});
-                // Keep supplementary HUD data through a brief outage only within the same
-                // player/world/alliance, and never replace a newer event refresh with an old poll.
-                syncRallyScope();
-                if(results[4]?.status==='fulfilled'&&acceptRallies(results[4].value,rallyRequest)&&results[1]?.status==='fulfilled')sound?.observeRallies?.(allianceRallies,{playerId:state.player?.id||state.city?.player_id,worldId:state.city?.world_id,allianceId:kingdom?.alliance?.id||0,serverTime:now()/1000});
-                if(results[5]?.status==='fulfilled')publicMarches=results[5].value?.marches||[];
                 state.public_marches=publicMarches;
-                connectionStatus(Object.keys(loadErrors).length?'partial':'saved');
-                document.body.classList.toggle('reduced-motion',Boolean(kingdom?.settings?.reduced_motion));
-                renderHud();
-                syncCityReadiness();
-                mailboxPanel.refresh();
-                const signature=JSON.stringify([state.buildings,state.troops,state.build_queue,state.troop_queue,state.research,state.research_queue,state.research_duration_factor,state.research_defs.map(n=>canAfford(n.levels.find(l=>l.level===Number(state.research[n.code]||0)+1)?.resources||{})),state.marches,state.public_marches,state.reports,state.monsters,state.charms,state.nodes,state.players,state.congress,state.shrines,state.land_progression,state.territory,state.world?.map_profile,state.map_center,kingdom?.profile,kingdom?.march_skins,kingdom?.name_frames,kingdom?.theme_bundles,kingdom?.skin_bundles,kingdom?.alliance,kingdom?.inventory,kingdom?.quests,kingdom?.quest_activity,kingdom?.welcome_event,kingdom?.hospital,kingdom?.treasures,[kingdom?.trading?.rotation,kingdom?.trading?.offers,kingdom?.trading?.vip],[kingdom?.chests?.free_silver_remaining,kingdom?.chests?.free_silver_available,kingdom?.chests?.free_gold_available],kingdom?.rankings,kingdom?.arena,expeditions?.expeditions,market]);
-                const editing=current!=='world'&&([playfieldHost,panelHost].some(host=>host.dataset.dirty==='true'||(host.contains(document.activeElement)&&document.activeElement.matches('input,textarea,select'))));
-                if(renderPage&&!editing&&!$('#game-dialog').open&&signature!==lastSignature){render();lastSignature=signature;}
-                panels.updateHospital();
-                trainingPanel.update();
-                inventoryOverview.update();
-                itemSources.update();
+                renderHud();syncCityReadiness();
+                if(isPlayfield(current)||kingdom)renderSnapshot(renderPage);
                 monsterReports.update(state.reports);
-                if(current==='help')beginnerGuide.render();
-                beginnerGuide.maybeWelcome(current);
-                comfort.update();
                 sound?.observe(state);
-                window.ConquerStartup?.ready();
-                return true;
+                if(priority||isPlayfield(current))window.ConquerStartup?.ready();
+                if(playfield==='city')window.ConquerWorld.preload?.(base);
+                const applySupplementary=({results,rallyRequest})=>{
+                    if(version!==refreshVersion)return false;
+                    ['kingdom','expeditions','market'].forEach((name,i)=>{const r=results[i];if(!r)return;if(r.status==='fulfilled'){if(name==='kingdom')kingdom=r.value;if(name==='expeditions')expeditions=r.value;if(name==='market')market=r.value;delete loadErrors[name];}else{loadErrors[name]=r.reason.message;}});
+                    // Keep supplementary HUD data through a brief outage only within the same
+                    // player/world/alliance, and never replace a newer event refresh with an old poll.
+                    syncRallyScope();
+                    if(results[3]?.status==='fulfilled'&&acceptRallies(results[3].value,rallyRequest)&&results[0]?.status==='fulfilled')sound?.observeRallies?.(allianceRallies,{playerId:state.player?.id||state.city?.player_id,worldId:state.city?.world_id,allianceId:kingdom?.alliance?.id||0,serverTime:now()/1000});
+                    if(results[4]?.status==='fulfilled')publicMarches=results[4].value?.marches||[];
+                    state.public_marches=publicMarches;
+                    connectionStatus(Object.keys(loadErrors).length?'partial':'saved');
+                    document.body.classList.toggle('reduced-motion',Boolean(kingdom?.settings?.reduced_motion));
+                    renderHud();
+                    syncCityReadiness();
+                    mailboxPanel.refresh();
+                    renderSnapshot(priority?!busy:renderPage);
+                    panels.updateHospital();
+                    trainingPanel.update();
+                    inventoryOverview.update();
+                    itemSources.update();
+                    monsterReports.update(state.reports);
+                    if(current==='help')beginnerGuide.render();
+                    beginnerGuide.maybeWelcome(current);
+                    comfort.update();
+                    window.ConquerStartup?.ready();
+                    return true;
+                };
+                if(priority){
+                    void loadSupplementary().then(applySupplementary).catch(error=>{if(version===refreshVersion){console.warn('Supplementary refresh failed:',error);connectionStatus('partial');}});
+                    return true;
+                }
+                return await supplementary.then(applySupplementary);
             } catch(e) {
+                if(version!==refreshVersion)return false;
                 console.warn('Game refresh failed:',e);
                 if(!state)window.ConquerStartup?.fail();
                 connectionStatus('failed');
@@ -237,13 +266,16 @@
                 return false;
             }
         })();
-        try{return await polling;}finally{polling=null;}
+        polling=request;
+        try{return await request;}finally{if(polling===request)polling=null;}
     }
     async function action(path, payload, message) {
         if (busy) {toast('Dein Auftrag wird noch bestätigt …');return null;}
         const receipt=path==='kingdom/action'&&rewards.tracked(payload);
         if(receipt){payload=rewards.prepare(payload);if(!payload)return null;}
         busy=true;
+        // Responses started before this write must never restore a pre-command snapshot.
+        ++refreshVersion;polling=null;
         const version=dialogVersion,trigger=document.activeElement?.closest('button'),form=trigger?.closest('form');
         const buttons=(form?[...form.querySelectorAll('button,input,select,textarea')]:trigger?[trigger]:[]).filter(el=>!el.disabled);
         const triggerHtml=trigger?.innerHTML;
@@ -251,12 +283,11 @@
         if(trigger){trigger.setAttribute('aria-busy','true');trigger.textContent='Wird bestätigt …';}
         toast('Dein Auftrag wird bestätigt …');clearTimeout(toastTimer);
         try {
-            if(polling)await polling;
             const result=await api(path,payload);if(!receipt&&version===dialogVersion)$('#game-dialog').close();delete $('#content').dataset.dirty;
             if(!receipt||!result?.result?.drops?.length)toast(result?.message||message||'Gespeichert.');
             if(path==='kingdom/action'&&result?.state)kingdom=result.state;if(path==='expeditions/action'&&result?.state)expeditions=result.state;
-            await refresh(false);render();lastSignature='';
-            if(receipt)rewards.success(result,payload);
+            if(receipt)rewards.success(result,payload,{show:version===dialogVersion});
+            await refresh(false,{supersede:true,priority:true});if(!sceneCommitPending)render();lastSignature='';
             return result;
         } catch(e){sound?.play('error');if(receipt)rewards.failure(e);toast(e.message);return null;}
         finally{busy=false;buttons.forEach(b=>{if(b.isConnected)b.disabled=false;});if(trigger?.isConnected){trigger.innerHTML=triggerHtml;trigger.removeAttribute('aria-busy');}}
@@ -292,20 +323,18 @@
         if(!veil||reduced){commit();return;}
         const token=++sceneTransitionToken;
         clearTimeout(sceneTransitionTimer);
+        cancelAnimationFrame(sceneTransitionFrame);
         veil.dataset.target=tab;
         veil.querySelector('img').src=`${base}/assets/art/hud/${tab}.svg`;
         veil.querySelector('.scene-transition-label').textContent=tab==='city'?'Zurück ins Dorf':'Auf zur Weltkarte';
         veil.classList.remove('is-covering','is-revealing');
-        void veil.offsetWidth;
         veil.classList.add('is-active','is-covering');
-        sceneTransitionTimer=setTimeout(()=>{
+        const commitScene=()=>{
+            sceneTransitionFrame=0;
             if(token!==sceneTransitionToken)return;
             commit();
-            const renderedAt=performance.now();
-            let revealed=false;
-            const reveal=()=>{
-                if(revealed||token!==sceneTransitionToken)return;
-                revealed=true;
+            sceneTransitionFrame=requestAnimationFrame(()=>{
+                sceneTransitionFrame=0;
                 if(token!==sceneTransitionToken)return;
                 veil.classList.remove('is-covering');
                 veil.classList.add('is-revealing');
@@ -313,14 +342,10 @@
                     if(token!==sceneTransitionToken)return;
                     veil.classList.remove('is-active','is-revealing');
                     delete veil.dataset.target;
-                },330);
-            };
-            const revealAfterMinimum=()=>{
-                const remaining=Math.max(0,420-(performance.now()-renderedAt));
-                sceneTransitionTimer=setTimeout(()=>requestAnimationFrame(()=>requestAnimationFrame(reveal)),remaining);
-            };
-            revealAfterMinimum();
-        },260);
+                },160);
+            });
+        };
+        sceneTransitionFrame=requestAnimationFrame(commitScene);
     }
     function navigate(tab,{focusTitle=true,fromHistory=false,afterCommit=null}={}) {
         if(!Object.hasOwn(navs,tab))return;
@@ -328,7 +353,7 @@
         const version=++navigationVersion,worldId=Number(state?.city.world_id);
         const isCurrent=()=>version===navigationVersion&&current===tab&&Number(state?.city.world_id)===worldId;
         // Superseded scene commits must not redraw a newer route or reopen its target.
-        ++sceneTransitionToken;clearTimeout(sceneTransitionTimer);sceneCommitPending=changesScene;
+        ++sceneTransitionToken;clearTimeout(sceneTransitionTimer);cancelAnimationFrame(sceneTransitionFrame);sceneTransitionFrame=0;sceneCommitPending=changesScene;
         if(!changesScene){const veil=$('#scene-transition');veil?.classList.remove('is-active','is-covering','is-revealing');if(veil)delete veil.dataset.target;}
         rememberView();
         if(tab==='research')viewPositions.delete(tab);
@@ -385,7 +410,17 @@
         updateExtraEvent();
         const compact=n=>kingdom?.settings?.compact_numbers||Number(n)>=1000000?Intl.NumberFormat(window.ConquerLocale?.locale??'en',{notation:'compact',maximumFractionDigits:1}).format(Number(n)||0):fmt(n);
         const mobileCompact=n=>i18n?.formatHudNumber?.(n)??fmt(n);
-        $('#resources').innerHTML = Object.keys(resourceIcons).map(k => `<button class="resource" data-action="resource" data-id="${k}" aria-label="${resourceNames[k]}: ${fmt(state.city[k])}, Details öffnen" title="${resourceNames[k]}: ${fmt(state.city[k])}"><span class="resource-icon" aria-hidden="true"><img src="${window.ConquerItemArt?.resourceUrl(base,k) || `${base}/assets/art/ui-resources/${k}.png`}" alt=""></span><span><strong><span class="hud-value-full">${compact(state.city[k])}</span><span class="hud-value-compact" aria-hidden="true">${mobileCompact(state.city[k])}</span></strong><small>${resourceNames[k]}</small></span></button>`).join('');
+        const resourceHost=$('#resources');
+        if(!resourceHost.querySelector('.resource'))resourceHost.innerHTML=Object.keys(resourceIcons).map(k=>`<button class="resource" data-action="resource" data-id="${k}"><span class="resource-icon" aria-hidden="true"><img src="${window.ConquerItemArt?.resourceUrl(base,k) || `${base}/assets/art/ui-resources/${k}.png`}" alt=""></span><span><strong><span class="hud-value-full"></span><span class="hud-value-compact" aria-hidden="true"></span></strong><small>${resourceNames[k]}</small></span></button>`).join('');
+        for(const k of Object.keys(resourceIcons)){
+            const button=resourceHost.querySelector(`[data-id="${k}"]`),full=button.querySelector('.hud-value-full'),short=button.querySelector('.hud-value-compact');
+            const value=compact(state.city[k]),brief=mobileCompact(state.city[k]),title=`${resourceNames[k]}: ${fmt(state.city[k])}`;
+            if(full.textContent!==value)full.textContent=value;
+            if(short.textContent!==brief)short.textContent=brief;
+            if(button.title!==title)button.title=title;
+            const label=t('hud.resource.open',{name:resourceNames[k],amount:fmt(state.city[k])});
+            if(button.getAttribute('aria-label')!==label)button.setAttribute('aria-label',label);
+        }
         const gemIcon=$('#hud-gems > img'),gemArt=window.ConquerItemArt?.resourceUrl(base,'gems');if(gemIcon&&gemArt&&gemIcon.getAttribute('src')!==gemArt)gemIcon.src=gemArt;
         $('#player-hud-name').textContent=kingdom?.profile?.display_name||state.player.name;
         $('#hud-power-value').textContent=fmt(kingdom?.profile?.power||state.city.power);
@@ -449,7 +484,7 @@
         const focusedNav=document.activeElement?.closest('#navigation [data-id]')?.dataset.id;
         const sceneTab=playfield==='world'?'city':'world';
         const dock=[['quests',t('nav.quests_short'),'quest','tab'],['inventory',t('nav.inventory_short'),'inventory','tab'],['reports','Post','reports','tab'],['chat','Chat','chat','chat-open'],['shop',t('nav.shop'),'shop','shop-open'],['alliance','Allianz','alliance','tab'],[sceneTab,t('hud.scene.'+sceneTab),sceneTab,'tab']];
-        $('#navigation').innerHTML=dock.map(([key,name,art,act])=>{
+        const navigationMarkup=dock.map(([key,name,art,act])=>{
             const dockMenuArt={quests:'quests',inventory:'inventory',reports:'reports',chat:'chat',shop:'market',alliance:'alliance',city:'village',world:'world-map'}[key];
             const icon=dockMenuArt?`<img class="dock-icon dock-menu-art" src="${base}/assets/art/menu-icons-v2/${dockMenuArt}.png" alt="">`:`<img class="dock-icon" src="${base}/assets/art/hud/${art}.svg" alt="">`;
             const badge=key==='quests'?'<span class="dock-badge" aria-hidden="true" hidden></span>':key==='chat'?'<span class="dock-badge chat-dock-badge" aria-hidden="true" hidden></span>':'';
@@ -457,6 +492,7 @@
             const sceneAction=key===sceneTab?'hud.scene.'+key+'_open':null;
             return `<button class="game-dock-item ${key===sceneTab?'hud-scene-switch':''} ${current===key?'current':''}" data-action="${act}" data-id="${key}" aria-label="${sceneAction?esc(t(sceneAction)):`${name} öffnen`}" ${sceneAction?`data-i18n-attrs="aria-label:${sceneAction}"`:''} ${current===key?'aria-current="page"':''}>${icon}<span class="dock-label" ${labelKey?`data-i18n="${labelKey}"`:''}>${name}</span>${badge}</button>`;
         }).join('');
+        if(navigationMarkup!==lastNavigationMarkup){$('#navigation').innerHTML=navigationMarkup;lastNavigationMarkup=navigationMarkup;}
         updateQuestBadge();
         mailboxPanel.badge();
         worldChat?.syncBadge();
@@ -854,7 +890,8 @@
         const dialog=$('#game-dialog');
         if(!dialog.open) { await refresh(); return; }
         const before=JSON.stringify([state?.buildings,state?.build_queue]);
-        await refresh(false);
+        const version=dialogVersion,updated=await refresh(false);
+        if(!updated||version!==dialogVersion||busy)return;
         marchPanel.update();queueSpeedups.update();
         if(dialog.open&&dialog.dataset.research&&state&&!state.research_queue.some(q=>(q.research_code||q.code)===dialog.dataset.research))researchDialog(dialog.dataset.research);
         if(dialog.open && dialog.dataset.building && before!==JSON.stringify([state?.buildings,state?.build_queue])) buildingDialog(dialog.dataset.building,{recommended:dialog.dataset.buildingRecommendation==='true'});

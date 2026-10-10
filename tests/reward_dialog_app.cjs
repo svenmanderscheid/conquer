@@ -20,8 +20,12 @@ const out=path.resolve(process.env.REWARD_OUTPUT||'artifacts/reward-dialog-revie
   await page.locator(`[data-action="inventory-item"][data-id="${chest.item_code}"]`).click();await page.locator('[data-form="item-use"] button[type="submit"]').click();await page.locator('.reward-recovery').waitFor();
   assert(originalBody.operation_key,'Persistent receipt included before submission');
   await page.reload();await page.locator('.reward-recovery').waitFor();
+  let releaseRead,readReleased=false;
+  const heldRead=new Promise(resolve=>releaseRead=()=>{readReleased=true;resolve();});
+  await page.route('**/api/game/state*',async route=>{const response=await route.fetch();await heldRead;await route.fulfill({response});});
   const responsePromise=page.waitForResponse(r=>r.url().endsWith('/api/kingdom/action')&&r.request().postDataJSON()?.operation_key===originalBody.operation_key);
-  await page.locator('[data-action="reward-retry"]').click();const replay=(await(await responsePromise).json()).data;await page.locator('.reward-result').waitFor();
+  await page.locator('[data-action="reward-retry"]').click();const replay=(await(await responsePromise).json()).data;await page.locator('.reward-result').waitFor({timeout:1500});
+  assert.equal(readReleased,false,'confirmed reward appears before the post-command city read');releaseRead();await page.unrouteAll({behavior:'wait'});
   assert.deepEqual(replay.result,originalResult.result,'Lost response replays the exact server receipt');
   const after=await page.evaluate(async()=>(await(await fetch('/api/kingdom/state')).json()).data);
   const chestDrop=originalResult.result.drops.filter(d=>d.item_code===chest.item_code).reduce((n,d)=>n+d.quantity,0);

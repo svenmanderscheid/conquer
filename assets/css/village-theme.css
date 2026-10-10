@@ -1822,8 +1822,7 @@ body.mobile-game .scene-transition {
   background:
     radial-gradient(circle at 50% 48%,color-mix(in srgb,var(--ui-primary-light) 74%,transparent) 0 9%,transparent 36%),
     color-mix(in srgb,var(--ui-primary-dark) 90%,transparent);
-  backdrop-filter:blur(3px);
-  transition:opacity 260ms ease,visibility 0s linear 330ms;
+  transition:opacity 100ms ease,visibility 0s linear 160ms;
 }
 body.mobile-game .scene-transition::before,
 body.mobile-game .scene-transition::after {
@@ -1849,23 +1848,24 @@ body.mobile-game .scene-transition.is-active {
   pointer-events:auto;
   transition-delay:0s;
 }
-body.mobile-game:has(.scene-transition.is-active) :is(.topbar,#navigation,.hud-edge-tools,#hud-menu,.world-chat) {
+body.mobile-game .scene-transition.is-revealing { pointer-events:none; }
+body.mobile-game:has(.scene-transition.is-covering) :is(.topbar,#navigation,.hud-edge-tools,#hud-menu,.world-chat) {
   pointer-events:none!important;
 }
 body.mobile-game .scene-transition.is-covering { opacity:1; }
 body.mobile-game .scene-transition.is-covering::before {
   opacity:.65;
   transform:translate(-50%,-50%) scale(1);
-  transition:opacity 360ms ease,transform 850ms cubic-bezier(.16,.75,.2,1);
+  transition:opacity 100ms ease,transform 160ms ease;
 }
 body.mobile-game .scene-transition.is-covering::after {
   opacity:.42;
   transform:translate(-50%,-50%) scale(1);
-  transition:opacity 360ms ease 80ms,transform 900ms cubic-bezier(.16,.75,.2,1) 40ms;
+  transition:opacity 100ms ease,transform 160ms ease;
 }
 body.mobile-game .scene-transition.is-revealing {
   opacity:0;
-  transition-duration:330ms;
+  transition-duration:160ms;
 }
 body.mobile-game .scene-transition-emblem {
   position:relative;
@@ -1879,7 +1879,7 @@ body.mobile-game .scene-transition-emblem {
   box-shadow:0 0 0 7px color-mix(in srgb,var(--ui-primary) 78%,transparent),0 10px 28px #24182f66;
   opacity:0;
   transform:scale(.82);
-  transition:opacity 220ms ease,transform 760ms cubic-bezier(.2,.75,.25,1);
+  transition:opacity 100ms ease,transform 160ms ease;
 }
 body.mobile-game .scene-transition-emblem::before,
 body.mobile-game .scene-transition-emblem::after {
@@ -1925,7 +1925,7 @@ body.mobile-game .scene-transition-label {
   letter-spacing:.03em;
   opacity:0;
   transform:translate(-50%,8px);
-  transition:opacity 180ms ease,transform 480ms cubic-bezier(.2,.75,.25,1);
+  transition:opacity 100ms ease,transform 160ms ease;
 }
 body.mobile-game .scene-transition.is-covering .scene-transition-label { opacity:1;transform:translate(-50%,0); }
 body.mobile-game .scene-transition.is-revealing .scene-transition-label { opacity:0;transform:translate(-50%,-5px); }

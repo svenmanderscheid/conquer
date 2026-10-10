@@ -15,32 +15,33 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/world-targ
   }
   assert(/^http:\/\/127\.0\.0\.1:\d+$/.test(base),'Disposable preview required');
   browser=await chromium.launch({headless:true,channel:'chrome'});
-  const page=await browser.newPage({viewport:{width:1280,height:800},hasTouch:true}),errors=[],writes=[];
+  const page=await browser.newPage({viewport:{width:1280,height:800},hasTouch:true,serviceWorkers:'block'}),errors=[],writes=[];
   page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(20000);
   await require('./fixtures/inventory_access.cjs')(page);
   await page.goto(base);const csrf=await page.locator('[name=csrf]').first().inputValue();
   await page.request.post(base+'/auth/local',{form:{csrf,mode:'login',identifier:'PreviewPlayer',password:'PreviewFixture!2026'}});
 
-  // Exaggerate the existing transition delay to make a fast-response race deterministic.
-  await page.route('**/assets/js/game.js*',async route=>{const response=await route.fetch();const body=(await response.text()).replace('},260);','},1200);');await route.fulfill({response,body});});
+  // Hold the scene commit explicitly; elapsed browser waits are not a reliable race gate.
+  await page.route('**/assets/js/game.js*',async route=>{const response=await route.fetch();const body=(await response.text()).replace('sceneTransitionFrame=requestAnimationFrame(commitScene);','if(window.__holdSceneCommit)window.__heldSceneCommit=commitScene;else sceneTransitionFrame=requestAnimationFrame(commitScene);');assert.notEqual(body,await response.text(),'held scene hook matched');await route.fulfill({response,body});});
   const mapCalls=async()=>page.evaluate(()=>window.__mapCalls);
   async function instrument(){await page.evaluate(()=>{window.__mapCalls=[];for(const key of ['focus','locate']){const original=window.ConquerWorld[key];window.ConquerWorld[key]=(...args)=>{const result=original(...args);window.__mapCalls.push({key,args,result,mounted:!!document.querySelector('.atlas-viewport'),at:performance.now()});return result;};}});}
   if(!process.env.DUNGEON_ONLY){
   await page.goto(base+'/city#inventory');await page.reload();await page.locator('.inventory-shell').waitFor();await instrument();
-  page.on('request',r=>{if(r.method()==='POST'&&r.url().includes('/api/'))writes.push(r.url());});
+  page.on('request',r=>{if(r.method()==='POST'&&r.url().includes('/api/')&&!new URL(r.url()).pathname.endsWith('/api/telemetry'))writes.push(r.url());});
   async function openChestSource(){await page.locator('[data-action=inventory-category][data-id=other]').click();await require('./fixtures/inventory_access.cjs').showItem(page,10105001);await page.locator('.inventory-inspector [data-action=item-sources]').click();await page.locator('.item-source-card').first().waitFor();}
-  await openChestSource();
-  await page.locator('.item-source-card').filter({has:page.getByRole('button',{name:'Show on map'})}).first().getByRole('button').click();
-  await page.waitForFunction(()=>location.hash==='#world');await page.waitForTimeout(150);
+  await openChestSource();await page.evaluate(()=>window.__holdSceneCommit=true);
+  await page.locator('.item-source-card').filter({has:page.getByRole('button',{name:'Show on map'})}).first().getByRole('button').evaluate(button=>button.click());
+  await page.waitForFunction(()=>location.hash==='#world'&&!!window.__heldSceneCommit);
   assert.equal((await mapCalls()).length,0,'no focus while first world scene is still unmounted');
+  await page.evaluate(()=>{window.__holdSceneCommit=false;window.__heldSceneCommit();});
   await page.waitForFunction(()=>window.__mapCalls.some(c=>c.key==='locate'));
   let calls=await mapCalls();assert(calls.every(c=>c.mounted),'all target operations use a mounted map');assert.equal(calls.find(c=>c.key==='locate').result,true,'actual source target is selected after viewport refresh');
   assert.equal(await page.locator('.march-command').count(),0,'selection does not dispatch or open an attack form');
   console.log('First map source survives a delayed scene and fast response.');
   // A second route before the scene commits must cancel target selection.
-  await page.goto(base+'/city#inventory');await page.reload();await page.locator('.inventory-shell').waitFor();await instrument();await openChestSource();
-  await page.locator('.item-source-card').filter({has:page.getByRole('button',{name:'Show on map'})}).first().getByRole('button').click();await page.waitForFunction(()=>location.hash==='#world');
-  await page.evaluate(()=>location.hash='help');await page.locator('.beginner-guide').waitFor();await page.waitForTimeout(1500);
+  await page.goto(base+'/city#inventory');await page.reload();await page.locator('.inventory-shell').waitFor();await instrument();await openChestSource();await page.evaluate(()=>window.__holdSceneCommit=true);
+  await page.locator('.item-source-card').filter({has:page.getByRole('button',{name:'Show on map'})}).first().getByRole('button').evaluate(button=>button.click());await page.waitForFunction(()=>location.hash==='#world');
+  await page.waitForFunction(()=>!!window.__heldSceneCommit);await page.evaluate(()=>location.hash='help');await page.locator('.beginner-guide').waitFor();await page.evaluate(()=>{window.__holdSceneCommit=false;window.__heldSceneCommit();});await page.waitForTimeout(200);
   assert.equal((await mapCalls()).length,0,'new route cancels a pending source map target');
   // The beginner guide uses the same committed map target flow on the first map mount.
   await page.goto(base+'/city#help');await page.reload();await page.locator('.beginner-guide').waitFor();await instrument();
@@ -48,7 +49,7 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/world-targ
   await page.waitForFunction(()=>window.__mapCalls.some(c=>c.key==='locate'));calls=await mapCalls();assert(calls.every(c=>c.mounted));assert.equal(calls.find(c=>c.key==='locate').result,true,'beginner goal selects a real loaded target');
   console.log('Guide first-world navigation and route cancellation passed.');
   // A dungeon source must leave the remembered reports tab and reveal the exact adventure.
-  }else{await page.goto(base+'/city#dungeons');await page.locator('.dungeon-shell').waitFor();page.on('request',r=>{if(r.method()==='POST'&&r.url().includes('/api/'))writes.push(r.url());});}
+  }else{await page.goto(base+'/city#dungeons');await page.locator('.dungeon-shell').waitFor();page.on('request',r=>{if(r.method()==='POST'&&r.url().includes('/api/')&&!new URL(r.url()).pathname.endsWith('/api/telemetry'))writes.push(r.url());});}
   const dungeonData=(await (await page.request.get(base+'/api/dungeons/state')).json()).data;
   const upcoming=dungeonData.next_rotation[0],available=dungeonData.rotation[0]||dungeonData.permanent_dungeons.find(d=>d.dungeon_code==='melusina_well');
   if(!available){
