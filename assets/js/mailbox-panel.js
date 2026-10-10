@@ -27,7 +27,7 @@ window.ConquerMailbox=function(ctx){
         return file?`${base}/assets/art/monsters/2.5d/bright-v2/${file}.png`:/^monsters\/[a-z0-9-]+$/.test(art)?`${base}/assets/art/${art}.png`:`${base}/assets/art/monsters/2.5d/bright-v2/orc.png`;
     };
     const menuIcon=key=>`${base}/assets/art/menu-icons-v2/${key}.png`;
-    const icon=r=>r.source==='battle'&&r.category==='reports'?monsterIcon(r):menuIcon(r.source==='alliance_gift'?'inventory':r.category==='war'?'expeditions':r.category==='alliance'?'alliance':r.category==='system'?'quests':'reports');
+    const icon=r=>r.source==='battle'&&r.category==='reports'?monsterIcon(r):menuIcon(['admin_gift','alliance_gift'].includes(r.source)?'inventory':r.category==='war'?'expeditions':r.category==='alliance'?'alliance':r.category==='system'?'quests':'reports');
     const btn=(label,act,extra='',style='')=>`<button type="button" class="mail-button ${style}" data-action="mailbox-${act}" ${extra}>${label}</button>`;
     function badge(){const n=loadedWorld===world()?Number(data?.unread||0):0;for(const b of document.querySelectorAll('#navigation [data-id="reports"],#hud-mail')){let count=b.querySelector('.mail-dock-badge');if(!count){count=document.createElement('span');count.className='dock-badge mail-dock-badge';count.setAttribute('aria-hidden','true');b.append(count);}count.hidden=!n;count.textContent=n>99?'99+':fmt(n);b.setAttribute('aria-label',window.ConquerLocale.t(n?'hud.mail.unread':'hud.mail.open',{count:fmt(n)}));}}
     function render(){
@@ -86,11 +86,19 @@ window.ConquerMailbox=function(ctx){
     }
     const rewardHtml=m=>{
         const r=m.metadata?.rewards||{},resources=r.resources||r;
-        const rows=Object.entries(resourceNames).filter(([k])=>Number(resources[k])>0).map(([k,label])=>`<span>${esc(label)} <strong>${fmt(resources[k])}</strong></span>`);
-        if(Number(r.item_code)>0)rows.push(`<span>${esc(m.metadata.item_name||'Gegenstand #'+r.item_code)} <strong>× ${fmt(r.quantity)}</strong></span>`);
+        const t=(key,args={})=>window.ConquerLocale.t('mail.reward.'+key,args);
+        const drops=Object.keys(resourceNames).filter(k=>Number(resources[k])>0).map(resource=>({type:'resource',resource,quantity:Number(resources[resource])}));
+        if(Number(r.item_code)>0)drops.push({type:'item',item_code:r.item_code,quantity:r.quantity,name:m.metadata.item_name});
         const items=Array.isArray(r.items)?r.items:Object.entries(r.items||{}).map(([item_code,quantity])=>({item_code,quantity}));
-        for(const item of items)rows.push(`<span>${esc(item.name||'Gegenstand #'+item.item_code)} <strong>× ${fmt(item.quantity||item.count)}</strong></span>`);
-        return rows.length?`<section class="mail-rewards"><h3>Belohnung</h3><div>${rows.join('')}</div><p>${esc(rewardLabels[m.reward_status]||'')}</p></section>`:'';
+        drops.push(...items.map(item=>({...item,type:'item',quantity:item.quantity??item.count})));
+        const rows=drops.filter(drop=>Number(drop.quantity)>0).map(drop=>{
+            const resolved=window.ConquerRewards.resolve(drop,ctx.getKingdom?.()||{},base);
+            const known=(ctx.getKingdom?.()?.inventory_catalog||[]).some(item=>Number(item.item_code||item.code)===Number(drop.item_code));
+            const name=drop.type==='resource'?window.ConquerLocale.text(resourceNames[drop.resource]):known?window.ConquerLocale.text(resolved.name):drop.name||t('unknown_item',{code:drop.item_code});
+            return `<li class="mail-reward-card" data-reward-code="${Number(drop.item_code)||0}" data-reward-quantity="${Number(drop.quantity)}"><span class="reward-art grade-${resolved.rarity}${resolved.stamp?' item-value-art':''}" data-value-lines="${resolved.labels.length}"${resolved.speedupTier?` data-speedup-tier="${resolved.speedupTier}"`:''}>${resolved.icon?`<img src="${esc(resolved.icon)}" alt="" loading="lazy">`:'<span aria-hidden="true">✦</span>'}${resolved.stamp?`<strong class="speedup-stamp">${resolved.labels.map(label=>`<span>${esc(label)}</span>`).join('')}</strong>`:''}</span><span class="mail-reward-name">${esc(name)}</span><strong class="mail-reward-quantity">${drop.type==='item'?'× ':''}${fmt(drop.quantity)}</strong></li>`;
+        });
+        const status=Object.hasOwn(rewardLabels,m.reward_status)?m.reward_status:'';
+        return rows.length?`<section class="mail-rewards mail-reward-receipt"><header><h3>${esc(t(['admin_gift','alliance_gift'].includes(m.source)?'gift':'title'))}</h3>${status?`<div class="mail-reward-status is-${status}">${['claimed','credited'].includes(status)?'<span aria-hidden="true">✓</span>':''}<p>${esc(t(status))}</p></div>`:''}</header><ul class="mail-reward-grid">${rows.join('')}</ul></section>`:'';
     };
     function battleHtml(m){
         const d=m.metadata?.details||{};
@@ -113,7 +121,7 @@ window.ConquerMailbox=function(ctx){
         if(m.source==='battle'&&['city','rally','territory'].includes(m.metadata?.details?.battle_kind)&&ctx.openPlayerReport){
             ctx.openPlayerReport({id:Number(m.source_id),created_at:m.created_at,target_x:m.metadata.x,target_y:m.metadata.y,outcome:m.metadata.details.outcome,details:m.metadata.details});return;
         }
-        openDialog(`<h2>${esc(m.subject)}</h2><section class="mail-detail"><div class="mail-detail-scroll"><div class="mail-letter-heading"><img src="${icon(m)}" alt=""><div><strong>${esc(m.metadata.sender||'Dein Reich')}${m.metadata.recipient?' → '+esc(m.metadata.recipient):''}</strong><time>${esc(time(m.created_at))}</time></div></div><div class="mail-letter-body">${esc(m.body)}</div>${battleHtml(m)}${rewardHtml(m)}</div><footer class="mail-detail-actions">${btn('‹ Zur Post','back')}${btn(star(Boolean(Number(m.starred))),'detail-star',`data-id="${Number(m.id)}" data-starred="${!Number(m.starred)}" aria-pressed="${Boolean(Number(m.starred))}" aria-label="${Number(m.starred)?'Favorit entfernen':'Als Favorit speichern'}"`,'mail-star')}${m.source==='letter'?btn('Antworten','reply',`data-id="${Number(m.id)}"`):''}${m.reward_status==='pending'?btn('Abholen','claim',`data-id="${Number(m.id)}"`,'mail-collect'):''}</footer></section>`);
+        openDialog(`<h2>${esc(m.subject)}</h2><section class="mail-detail${['admin_gift','alliance_gift'].includes(m.source)?' mail-gift-detail':''}"><div class="mail-detail-scroll"><div class="mail-letter-heading"><img src="${icon(m)}" alt=""><div><strong>${esc(m.metadata.sender||'Dein Reich')}${m.metadata.recipient?' → '+esc(m.metadata.recipient):''}</strong><time>${esc(time(m.created_at))}</time></div></div>${m.body?`<div class="mail-letter-body">${esc(m.body)}</div>`:''}${battleHtml(m)}${rewardHtml(m)}</div><footer class="mail-detail-actions">${btn('‹ Zur Post','back')}${btn(star(Boolean(Number(m.starred))),'detail-star',`data-id="${Number(m.id)}" data-starred="${!Number(m.starred)}" aria-pressed="${Boolean(Number(m.starred))}" aria-label="${Number(m.starred)?'Favorit entfernen':'Als Favorit speichern'}"`,'mail-star')}${m.source==='letter'?btn('Antworten','reply',`data-id="${Number(m.id)}"`):''}${m.reward_status==='pending'?btn('Abholen','claim',`data-id="${Number(m.id)}"`,'mail-collect'):''}</footer></section>`);
     }
     async function compose(reply=false){
         const w=world(),seq=++detailSequence;
