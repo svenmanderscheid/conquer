@@ -44,9 +44,7 @@
 
   const heroSlides = [...document.querySelectorAll('.lp-hero-slide')];
   const heroButtons = [...document.querySelectorAll('[data-hero-slide]')];
-  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   let heroIndex = 0;
-  let heroTimer = null;
   const showHero = index => {
     if (!heroSlides.length) return;
     heroIndex = (index + heroSlides.length) % heroSlides.length;
@@ -57,15 +55,8 @@
       button.setAttribute('aria-pressed', String(active));
     });
   };
-  const restartHero = () => {
-    if (reduceMotion || heroSlides.length < 2) return;
-    clearInterval(heroTimer);
-    heroTimer = setInterval(() => showHero(heroIndex + 1), 7000);
-  };
   heroButtons.forEach(button => button.addEventListener('click', () => {
     showHero(Number(button.dataset.heroSlide));
-    restartHero();
   }));
   showHero(0);
-  restartHero();
 })();

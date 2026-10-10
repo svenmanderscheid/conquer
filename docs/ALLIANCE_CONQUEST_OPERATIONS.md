@@ -21,7 +21,7 @@ Die Werte sind konfigurierbare Ausgangswerte für die Erprobung, keine endgülti
 |---|---|
 | Gemeinde-/Kantons-PvP | Täglich 17:00–21:00 UTC |
 | Kronenkrieg | Alle 14 Tage, vier Stunden; Kalenderanker 28.09.2026 17:00 UTC |
-| Neutrale Besatzung | Gemeinde 120, Shrine 800, Kronenziel 1.600 |
+| Neutrale Besatzung | Commune 1.400.000, Shrine 2.100.000, Kronenziel 2.800.000 T1-Wachen |
 | Rohstoffgemeinde | 1.200 Einheiten ihres Typs je Besitzstunde in die Allianzkasse |
 | Persönlicher Kampfsieg | 500 Gold je tatsächlichem Teilnahmebeleg |
 | Unterstützung | 1.000 Nahrung; ein Beitrag je Spieler, Auftragstyp und UTC-Tag |
@@ -54,6 +54,7 @@ Serverprüfungen verwenden `tests/Support/FeatureDatabase.php` und erstellen eig
 - `php tests/luxembourg_world.php`
 - `node tests/luxembourg_geometry_parity.mjs`
 - `php tests/territory_lifecycle.php`
+- `php tests/territory_npc_balance.php`
 - `php tests/territory_ordering.php`
 - `php tests/territory_http.php`
 - `php tests/luxembourg_app_integration.php`
@@ -62,6 +63,10 @@ Serverprüfungen verwenden `tests/Support/FeatureDatabase.php` und erstellen eig
 - `php tests/multiworld_integration.php`
 - `php tests/kingdom_regressions.php`
 
-Für die echte Oberfläche startet `php tools/preview-feature-fixture.php --territory --port=18946` eine lokale synthetische Welt. Enter beendet den Server und räumt seine Datenbank auf. `tests/territory_main_app.cjs` prüft darauf Haupt-App und Backoffice in fünf Bildschirmgrößen; `tests/territory_main_report.cjs` führt eine echte Gemeinde-Rally und deren Bericht durch. `tests/territory_frontend.cjs` prüft zusätzlich verlorene Antworten und Berichte. Diese Testprogramme benötigen die vorhandene Playwright-Laufzeit. Zugangsdaten der Vorschau stehen nur im Fixture-Quelltext und gelten ausschließlich für diese synthetische Umgebung.
+Für die echte Oberfläche startet `php tools/preview-feature-fixture.php --territory --port=18946` eine lokale synthetische Welt mit den aktuellen NPC-Stärken. Enter beendet den Server und räumt seine Datenbank auf. `tests/territory_main_app.cjs` prüft darauf Haupt-App und Backoffice in fünf Bildschirmgrößen.
+
+Für `tests/territory_main_report.cjs` stattdessen eine frische Vorschau mit `php tools/preview-feature-fixture.php --territory --territory-report --port=18946` starten. Nur dieser ausdrückliche Berichtstest verwendet kleine eigene Besatzungen von 120/800/1.600 Wachen, damit die echte Rally mit 1.000 Truppen einen Siegesbericht erzeugt. Die gesetzte NPC-Balancerevision bewahrt diese Testwerte; die gewöhnliche Vorschau und Spielwelten behalten ihre reguläre Stärke. Ohne diesen Schalter bricht der Berichtstest vor dem ersten Angriff mit einem Hinweis ab.
+
+`tests/territory_frontend.cjs` prüft zusätzlich verlorene Antworten und Berichte. Diese Testprogramme benötigen die vorhandene Playwright-Laufzeit. Zugangsdaten der Vorschau stehen nur im Fixture-Quelltext und gelten ausschließlich für diese synthetische Umgebung.
 
 Ein echter Mobilgerätetest und der Lastnachweis für 1.000 gleichzeitige Spieler sind gesonderte Freigabeschritte und wurden nicht durch Desktop-Emulation ersetzt.

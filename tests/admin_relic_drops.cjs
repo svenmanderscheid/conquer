@@ -16,7 +16,7 @@ module.exports=async({page,base,errors})=>{
  for(const type of ['monster','farm']){
   await page.goto(base+`/admin/rewards?type=${type}`);await page.locator('[data-batch-status]').filter({hasText:'No unsaved'}).waitFor();
   const fragments=await group(type,'fragment_rows').locator('[data-field=target]').evaluateAll(es=>es.map(e=>e.value));
-  await page.locator('[data-batch-kind=relic_rows]').click();
+  await page.locator('[data-batch-category=items]').click();
   while(await group(type,'relic_rows').locator('[data-batch-remove]').count())await group(type,'relic_rows').locator('[data-batch-remove]').last().click();
   await group(type,'relic_rows').locator('[data-batch-add]').click();
   const row=group(type,'relic_rows').locator('.batch-entry').last();
@@ -26,7 +26,7 @@ module.exports=async({page,base,errors})=>{
   assert.equal(await row.locator('option[value^="treasure:"]').count(),0,'Whole relic group never disguises fragments');
   await page.locator('[data-batch-form] [name=reason]').fill('Whole relic isolated browser check');await saved(page.locator('[data-batch-save]'));
   assert.deepEqual(await group(type,'fragment_rows').locator('[data-field=target]').evaluateAll(es=>es.map(e=>e.value)),fragments,'Whole relic changes preserve fragments');
-  await page.locator('[data-batch-kind=relic_rows]').click();
+  await page.locator('[data-batch-category=items]').click();
   assert.equal(await group(type,'relic_rows').locator('[data-field=chance]').inputValue(),'12.3456','Precision survives batch save');
   await page.goto(base+`/admin/rewards?type=${type}&source=${source(type)}`);
   assert.equal(await page.locator('.relic-row select').inputValue(),'relic:60100001','Detail opens same whole relic');
@@ -53,7 +53,7 @@ module.exports=async({page,base,errors})=>{
  for(const [locale,width,height] of [['en',1440,1000],['de',320,700],['fr',568,320],['lb',390,844]]){
   await page.context().addCookies([{name:'conquer_locale',value:locale,url:base}]);await page.setViewportSize({width,height});
   for(const type of ['monster','farm']){
-   await page.goto(base+`/admin/rewards?type=${type}`);await page.locator('[data-batch-kind=relic_rows]').click();await fit(type+' table '+width);
+   await page.goto(base+`/admin/rewards?type=${type}`);await page.locator('[data-batch-category=items]').click();await fit(type+' table '+width);
    await page.locator('[data-batch-search]').fill(source(type));await page.screenshot({path:path.join(out,`${type}-table-${locale}-${width}.png`)});
    await page.goto(base+`/admin/rewards?type=${type}&source=${source(type)}`);await page.locator('.reward-relics').scrollIntoViewIfNeeded();await fit(type+' detail '+width);
    assert(await page.locator('.relic-row').evaluateAll(rows=>rows.every(row=>[...row.querySelectorAll('select,input,button')].every(e=>{const r=e.getBoundingClientRect();return r.width>=44&&r.height>=44;}))),'Whole relic controls remain touchable');

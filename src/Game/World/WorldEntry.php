@@ -28,10 +28,13 @@ final class WorldEntry
     }
 
     /** Caller owns the world placement lock; never scatter players when the region is full. */
-    public static function position(Connection $db,int $worldId,?int $ignoreCityId=null): ?array
+    public static function position(Connection $db,int $worldId,?int $ignoreCityId=null,?int $now=null): ?array
     {
         $entry=self::settings($worldId);
         if (!$entry || $entry['spawn_x']===null || $entry['spawn_y']===null) return null;
+        // Deadlines are exclusive UTC instants; null keeps permanent entry regions.
+        $until=$entry['spawn_until']??null;
+        if ($until!==null && ($now??time())>=strtotime($until.' UTC')) return null;
         $x=(int)$entry['spawn_x']; $y=(int)$entry['spawn_y']; $radius=(int)$entry['spawn_radius'];
         for ($r=0;$r<=$radius;$r++) for ($dy=-$r;$dy<=$r;$dy++) {
             foreach (abs($dy)===$r?range(-$r,$r):[-$r,$r] as $dx) {

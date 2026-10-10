@@ -13,7 +13,7 @@ final class FeatureDatabase
     public function serve(string $routes, array $phpOptions = []): string
     {
         if(is_resource($this->server))throw new \RuntimeException('Fixture server already running.');
-        $router="<?php declare(strict_types=1); define('ROOT_DIR',".var_export(ROOT_DIR,true)."); require ROOT_DIR.'/src/Autoloader.php'; (new \\Conquer\\Autoloader(ROOT_DIR.'/src'))->register(); date_default_timezone_set('UTC'); \\Conquer\\Db\\Connection::init(__DIR__); \\Conquer\\Logger::init(__DIR__.'/http.log'); ". $routes;
+        $router="<?php declare(strict_types=1); define('ROOT_DIR',".var_export(ROOT_DIR,true)."); require ROOT_DIR.'/src/Autoloader.php'; (new \\Conquer\\Autoloader(ROOT_DIR.'/src'))->register(); date_default_timezone_set('UTC'); \\Conquer\\Db\\Connection::init(__DIR__); \\Conquer\\Logger::init(__DIR__.'/http.log'); \\Conquer\\Observability\\EventLog::init(__DIR__,__DIR__,'fixture'); ". $routes;
         $router=substr($router,0,strlen($router)-strlen($routes))."if(preg_match('~(/locale-assets/[^?]+)$~D',parse_url(\$_SERVER['REQUEST_URI'],PHP_URL_PATH),\$match)){\$asset=\\Conquer\\Game\\Locale::assetResponse(\$match[1],\$_SERVER['REQUEST_METHOD'],\$_SERVER['HTTP_IF_NONE_MATCH']??'');http_response_code(\$asset['status']);foreach(\$asset['headers'] as \$key=>\$value)header(\$key.': '.\$value);echo \$asset['body'];exit;} ".$routes;
         file_put_contents($this->directory.'/router.php',$router);
         $socket=stream_socket_server('tcp://127.0.0.1:0',$errno,$error);
@@ -39,6 +39,7 @@ final class FeatureDatabase
             $this->admin->exec("INSERT INTO `".$this->name."`.worlds(id,name,slug,status,map_size,map_seed) VALUES(1,'Fixture Realm','fixture-realm','running',256,42)");
             mkdir($this->directory.'/config',0700,true);$cfg['database']=$this->name;file_put_contents($this->directory.'/config/database.php',"<?php return ".var_export($cfg,true).';');
             \Conquer\Db\Connection::init($this->directory);
+            \Conquer\Db\MigrationSql::apply(\Conquer\Db\Connection::getInstance()->getPdo(),(string)file_get_contents(ROOT_DIR.'/migrations/0138_formation_percentages.sql'));
             // Bring the disposable schema up to the feature contracts, even while
             // the user's database has not yet received these additive migrations.
             foreach(['0083_reward_overrides.sql','0084_land_progression.sql','0085_monster_charms.sql','0086_reward_world_revisions.sql','0087_charm_compatibility.sql','0088_march_skins.sql','0089_mailbox.sql','0090_training_buildings.sql','0091_hospital_healing.sql','0092_theme_bundles.sql','0093_theme_bundle_order_once.sql','0094_building_cost_snapshot.sql','0095_epic_charm_bonus.sql','0096_private_chat.sql','0097_start_at_vip_one.sql','0098_shared_battle_reports.sql'] as $migration){
@@ -58,6 +59,11 @@ final class FeatureDatabase
             \Conquer\Db\MigrationSql::apply(\Conquer\Db\Connection::getInstance()->getPdo(),(string)file_get_contents(ROOT_DIR.'/migrations/0135_vip_benefits.sql'));
             \Conquer\Db\MigrationSql::apply(\Conquer\Db\Connection::getInstance()->getPdo(),(string)file_get_contents(ROOT_DIR.'/migrations/0136_healing_report_preference.sql'));
             \Conquer\Db\MigrationSql::apply(\Conquer\Db\Connection::getInstance()->getPdo(),(string)file_get_contents(ROOT_DIR.'/migrations/0141_alliance_invitations.sql'));
+            foreach(['0142_observability.sql','0143_team_reports.sql','0144_reward_ledger.sql'] as $migration){
+                $path=ROOT_DIR.'/migrations/'.$migration;
+                if(is_file($path))\Conquer\Db\MigrationSql::apply(\Conquer\Db\Connection::getInstance()->getPdo(),(string)file_get_contents($path));
+            }
+            \Conquer\Observability\EventLog::init($this->directory,$this->directory,'fixture');
             // The cloned source may already contain 0107. Replay its additive
             // columns independently in this disposable schema, not in the user DB.
             foreach(["report_type ENUM('bug','idea') NOT NULL DEFAULT 'bug' AFTER world_id",'screenshot MEDIUMBLOB NULL AFTER client_context',"screenshot_mime VARCHAR(32) NOT NULL DEFAULT '' AFTER screenshot"] as $column){
@@ -77,6 +83,7 @@ final class FeatureDatabase
         }catch(\PDOException){} // A disconnected fixture cannot retain its transaction.
         if(is_resource($this->server)){proc_terminate($this->server);proc_close($this->server);$this->server=null;}
         foreach(['router.php','http.log','server.log'] as $name){$path=$this->directory.'/'.$name;if(is_file($path))unlink($path);}
+        foreach(glob($this->directory.'/operational-fallback-????-??-??.ndjson')?:[] as $path)if(is_file($path))unlink($path);
         foreach(glob($this->directory.'/sess_*')?:[] as $path)if(is_file($path))unlink($path);
         if(preg_match('/^conquer_feature_test_[a-f0-9]{12}$/D',$this->name))$this->admin->exec('DROP DATABASE IF EXISTS `'.$this->name.'`');
         $file=$this->directory.'/config/database.php';if(is_file($file))unlink($file);if(is_dir($this->directory.'/config'))rmdir($this->directory.'/config');if(is_dir($this->directory))rmdir($this->directory);

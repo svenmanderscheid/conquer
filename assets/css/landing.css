@@ -238,3 +238,70 @@ body.landing-page .lp-language .locale-tools { margin:0; padding:0; border:0; ba
   .lp-button { transition:none; }
   .lp-hero-picture img { transform:none; transition:none; }
 }
+
+/* Open Alpha website: the approved cream/gold materials and current game views. */
+body.landing-page { margin:0; background:var(--ui-paper); color:var(--ui-ink); }
+body.landing-page .lp-header { background:var(--ui-head-surface); color:var(--ui-ink); border-color:var(--ui-line); box-shadow:0 4px 14px color-mix(in srgb,var(--ui-primary-edge) 18%,transparent); }
+body.landing-page .lp-brand { gap:12px; min-width:0; }
+body.landing-page .lp-brand img { width:64px; height:64px; border-radius:14px; }
+.lp-brand-copy { display:grid; gap:5px; }
+body.landing-page .lp-brand-copy strong { font:400 clamp(19px,2vw,26px)/1.1 var(--ui-font-heading); }
+body.landing-page .lp-brand-copy small { color:var(--ui-muted); font-size:12px; }
+body.landing-page .lp-sign-in { background:var(--ui-card); color:var(--ui-ink); border-color:var(--ui-line); box-shadow:0 3px var(--ui-primary-edge); }
+body.landing-page .lp-sign-in:hover { background:var(--ui-accent-gold-soft); }
+body.landing-page :is(a,summary,button,input):focus-visible { outline-color:var(--ui-accent-gold-edge); }
+body.landing-page .lp-hero { display:grid; grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr); gap:36px; align-items:center; min-height:0; max-width:1440px; margin:0 auto; padding:64px 40px 78px; background:var(--ui-paper); color:var(--ui-ink); overflow:visible; }
+body.landing-page .lp-hero::after { display:none; }
+body.landing-page .lp-hero-picture { position:relative; inset:auto; grid-column:2; grid-row:1; z-index:auto; width:100%; aspect-ratio:8/5; overflow:hidden; border:2px solid var(--ui-frame); border-radius:20px; background:var(--ui-inset); box-shadow:0 8px 0 color-mix(in srgb,var(--ui-primary-edge) 35%,transparent),0 18px 32px color-mix(in srgb,var(--ui-primary-edge) 24%,transparent); }
+body.landing-page .lp-hero-picture img { object-fit:contain; transform:none; transition:opacity .2s ease; }
+body.landing-page .lp-hero-content { grid-column:1; grid-row:1; max-width:600px; }
+body.landing-page .lp-kicker { color:var(--ui-accent-gold-ink); font-weight:700; font-size:14px; }
+body.landing-page .lp-hero h1 { font:400 clamp(38px,4.5vw,66px)/1.06 var(--ui-font-heading); letter-spacing:-.6px; color:var(--ui-ink); }
+body.landing-page .lp-hero h1 em { color:var(--ui-primary); }
+body.landing-page .lp-lead { max-width:470px; font-size:19px; line-height:1.6; }
+.lp-hero-note { margin:16px 0 0; color:var(--ui-muted); font-size:14px; line-height:1.5; }
+body.landing-page .lp-button { border-color:var(--ui-action-green-edge); background:linear-gradient(var(--ui-action-green-light),var(--ui-action-green) 18%,var(--ui-action-green-base)); color:var(--ui-action-green-ink); box-shadow:0 5px 0 var(--ui-action-green-edge),inset 0 1px var(--ui-card); font:400 19px/1.3 var(--ui-font-heading); transition:transform 170ms ease,box-shadow 170ms ease; }
+body.landing-page .lp-button>span { font-family:var(--ui-font-heading); }
+body.landing-page :is(.lp-button,.lp-sign-in):active { transform:translateY(3px); box-shadow:0 2px var(--ui-action-green-edge); transition-duration:65ms; }
+body.landing-page .lp-hero-controls { right:calc(27% - 44px); bottom:22px; gap:2px; }
+body.landing-page .lp-hero-controls button::before { border-color:var(--ui-primary); background:var(--ui-card); box-shadow:none; }
+body.landing-page .lp-hero-controls button.is-active::before { border-color:var(--ui-accent-gold-edge); background:var(--ui-accent-gold); }
+.lp-platforms { padding:0 max(24px,calc((100vw - 1180px)/2)) 52px; }
+.lp-platforms>h2 { margin:0 0 24px; font-size:30px; text-align:center; }
+.lp-platform-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; }
+.lp-platform-card { min-width:0; padding:24px; border:1px solid var(--ui-line); border-radius:16px; background:var(--ui-surface); box-shadow:0 4px 0 color-mix(in srgb,var(--ui-primary-edge) 28%,transparent); }
+.lp-platform-card h3 { margin:16px 0 10px; font-size:26px; }
+.lp-platform-card p:not(.lp-platform-status) { margin:0; color:var(--ui-muted); line-height:1.6; }
+.lp-platform-status { display:inline-flex; margin:0; padding:6px 12px; border:1px solid var(--ui-line); border-radius:20px; background:var(--ui-accent-gold-soft); color:var(--ui-accent-gold-ink); font-size:13px; font-weight:700; }
+.lp-platform-status.is-live { background:var(--ui-green-soft); color:var(--ui-green-dark); border-color:var(--ui-green); }
+.lp-platform-card a { display:inline-flex; align-items:center; min-height:44px; margin-top:10px; color:var(--ui-accent-gold-ink); font-weight:700; text-decoration:underline; text-underline-offset:4px; }
+body.landing-page .lp-guide-nav { background:var(--ui-head-surface); color:var(--ui-ink); border-block:1px solid var(--ui-line); }
+body.landing-page .lp-campaign-card { box-shadow:0 4px 0 color-mix(in srgb,var(--ui-primary-edge) 25%,transparent); }
+.lp-campaign-card figcaption p { margin:0 0 12px; color:var(--ui-muted); line-height:1.6; }
+body.landing-page .lp-tier-picker button[aria-pressed=true] { background:var(--ui-selected-surface); color:var(--ui-accent-gold-ink); border-color:var(--ui-accent-gold-edge); }
+body.landing-page .lp-auth-heading { background:var(--ui-head-surface); color:var(--ui-ink); border-color:var(--ui-line); }
+body.landing-page .lp-auth-badge { color:var(--ui-green-dark); font-weight:700; }
+body.landing-page .lp-auth-body { padding-top:24px; }
+body.landing-page .lp-footer { flex-wrap:wrap; justify-content:center; gap:8px 28px; }
+@media(max-width:1000px) {
+  body.landing-page .lp-hero { gap:24px; padding:44px 24px 70px; }
+}
+@media(max-width:800px) {
+  body.landing-page .lp-hero { grid-template-columns:1fr; padding:34px max(20px,env(safe-area-inset-right)) 66px max(20px,env(safe-area-inset-left)); gap:30px; }
+  body.landing-page .lp-hero-content { grid-column:1; grid-row:1; }
+  body.landing-page .lp-hero-picture { grid-column:1; grid-row:2; max-width:650px; justify-self:center; }
+  body.landing-page .lp-hero h1 { font-size:clamp(38px,7vw,58px); }
+  body.landing-page .lp-hero-controls { right:calc(50% - 66px); bottom:8px; }
+  .lp-platforms { padding:12px max(20px,env(safe-area-inset-right)) 44px max(20px,env(safe-area-inset-left)); }
+  .lp-platform-grid { grid-template-columns:1fr; }
+  .lp-campaign-grid { grid-template-columns:1fr; max-width:650px; margin:auto; }
+}
+@media(max-width:560px) {
+  body.landing-page .lp-header { flex-wrap:wrap; justify-content:center; gap:12px; padding-block:14px; }
+  body.landing-page .lp-header-actions { width:100%; justify-content:center; }
+  body.landing-page .lp-brand img { width:52px; height:52px; }
+  body.landing-page .lp-brand-copy strong { font-size:22px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  body.landing-page :is(.lp-button,.lp-sign-in,.lp-hero-picture img) { transition:none; }
+}

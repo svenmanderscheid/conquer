@@ -3,6 +3,7 @@ declare(strict_types=1);
 $base = htmlspecialchars(APP_BASE, ENT_QUOTES);
 $openAlpha = \Conquer\Auth\AlphaAccess::isOpen();
 $openText = static fn(string $key): string => \Conquer\Game\Locale::html('landing.open_' . $key);
+$launchText = static fn(string $key): string => \Conquer\Game\Locale::html('landing.launch.' . $key);
 $registerUrl = 'https://play.unionofkingdoms.com/?mode=register';
 $config = \Conquer\Bootstrap::getConfig();
 $configuredRoot = rtrim((string) ($config['base_url'] ?? ''), '/');
@@ -16,8 +17,8 @@ if (!filter_var($configuredRoot, FILTER_VALIDATE_URL)) {
 }
 $publicRoot = $configuredRoot;
 $canonical = $publicRoot . '/';
-$socialImage = $publicRoot . '/assets/marketing/' . ($openAlpha ? 'kingdom-social-en-open-alpha-v1.webp' : 'kingdom-social-en-v5.webp');
-$seoTitle = \Conquer\Game\Locale::t('landing.seo.title', [], 'en');
+$socialImage = $publicRoot . '/assets/marketing/alpha-city-20261009.webp';
+$seoTitle = \Conquer\Game\Locale::t($openAlpha ? 'landing.launch.seo_title' : 'landing.seo.title', [], 'en');
 $seoDescription = \Conquer\Game\Locale::t($openAlpha ? 'landing.open_description' : 'landing.seo.description', [], 'en');
 $waitlistError = $waitlistError ?? '';
 $waitlistSuccess = $waitlistSuccess ?? false;
@@ -57,9 +58,9 @@ $structuredData = [
 <meta property="og:site_name" content="Union of Kingdoms"><meta property="og:title" content="<?= htmlspecialchars($seoTitle, ENT_QUOTES) ?>">
 <meta property="og:description" content="<?= htmlspecialchars($seoDescription, ENT_QUOTES) ?>">
 <meta property="og:url" content="<?= htmlspecialchars($canonical, ENT_QUOTES) ?>"><meta property="og:image" content="<?= htmlspecialchars($socialImage, ENT_QUOTES) ?>">
-<meta property="og:image:width" content="1122"><meta property="og:image:height" content="1402"><meta property="og:image:alt" content="The illustrated fantasy world of Union of Kingdoms">
+<meta property="og:image:width" content="1280"><meta property="og:image:height" content="800"><meta property="og:image:alt" content="<?= $launchText('city_alt') ?>">
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="<?= htmlspecialchars($seoTitle, ENT_QUOTES) ?>"><meta name="twitter:description" content="<?= htmlspecialchars($seoDescription, ENT_QUOTES) ?>"><meta name="twitter:image" content="<?= htmlspecialchars($socialImage, ENT_QUOTES) ?>">
-<link rel="preload" as="image" href="<?= $base ?>/assets/art/loading/branded/royal-sunrise-logo-v2.webp" type="image/webp" fetchpriority="high">
+<link rel="preload" as="image" href="<?= $base ?>/assets/marketing/alpha-city-20261009.webp" type="image/webp" fetchpriority="high">
 <link rel="stylesheet" href="<?= $base ?>/assets/css/fantasy-fonts.css?v=<?= filemtime(ROOT_DIR . '/assets/css/fantasy-fonts.css') ?>">
 <link rel="stylesheet" href="<?= $base ?>/assets/css/landing.css?v=<?= filemtime(ROOT_DIR . '/assets/css/landing.css') ?>">
 <link rel="stylesheet" href="<?= $base ?>/assets/css/localization.css?v=<?= filemtime(ROOT_DIR . '/assets/css/localization.css') ?>">
@@ -75,7 +76,8 @@ $structuredData = [
 <a class="skip-link" href="#main-content">Skip to content</a>
 <header class="lp-header">
   <a class="lp-brand" href="<?= $base ?>/" aria-label="Union of Kingdoms home page">
-    <img src="<?= $base ?>/assets/art/logo-union-of-kingdoms-en-v3.webp" width="190" height="127" alt="Union of Kingdoms – A new Era begins">
+    <img src="<?= $base ?>/assets/marketing/alpha-kingdom-20261009.png" width="64" height="64" alt="">
+    <span class="lp-brand-copy"><strong>Union of Kingdoms</strong><small>A new Era begins</small></span>
   </a>
   <div class="lp-header-actions">
     <div data-locale-controls data-locale-compact="true" data-locale-install="false"></div>
@@ -86,24 +88,39 @@ $structuredData = [
 <main id="main-content" class="lp-main">
   <section class="lp-hero" aria-labelledby="hero-title">
     <div class="lp-hero-picture" data-hero-gallery aria-hidden="true">
-      <img class="lp-hero-slide is-active" src="<?= $base ?>/assets/art/loading/branded/royal-sunrise-logo-v2.webp" width="1672" height="936" alt="" fetchpriority="high">
-      <img class="lp-hero-slide" src="<?= $base ?>/assets/art/loading/branded/heroes-monsters-logo-v2.webp" width="1672" height="936" alt="" loading="lazy">
-      <img class="lp-hero-slide" src="<?= $base ?>/assets/art/loading/branded/moonlit-kingdom-logo-v2.webp" width="1672" height="936" alt="" loading="lazy">
+      <img class="lp-hero-slide is-active" src="<?= $base ?>/assets/marketing/alpha-city-20261009.webp" width="1280" height="800" alt="" fetchpriority="high">
+      <img class="lp-hero-slide" src="<?= $base ?>/assets/marketing/alpha-world-luxembourg-20261009.webp" width="1280" height="800" alt="" loading="lazy">
+      <img class="lp-hero-slide" src="<?= $base ?>/assets/marketing/alpha-army-20261009.webp" width="1280" height="800" alt="" loading="lazy">
     </div>
     <div class="lp-hero-content">
-      <p class="lp-kicker"><span>In your browser</span><i aria-hidden="true">·</i><span>no download</span></p>
+      <p class="lp-kicker"><span data-i18n="landing.open_alpha"><?= \Conquer\Game\Locale::html('landing.open_alpha') ?></span><i aria-hidden="true">·</i><span data-i18n="landing.launch.browser_short"><?= $launchText('browser_short') ?></span></p>
+      <?php if ($openAlpha): ?>
+      <h1 id="hero-title"><span data-i18n="landing.launch.hero_title"><?= $launchText('hero_title') ?></span><br><em data-i18n="landing.launch.hero_subtitle"><?= $launchText('hero_subtitle') ?></em></h1>
+      <p class="lp-lead" data-i18n="landing.launch.hero_intro"><?= $launchText('hero_intro') ?></p>
+      <?php else: ?>
       <h1 id="hero-title"><span>Your kingdom.</span><br><em>Our next adventure.</em></h1>
       <p class="lp-lead"><?= \Conquer\Game\Locale::html('landing.seo.intro', [], 'en') ?></p>
+      <?php endif ?>
       <?php if ($openAlpha): ?>
       <a class="lp-button lp-hero-start" href="<?= $registerUrl ?>" data-track-link="site-register-hero"><span><?= $openText('cta') ?></span> <span aria-hidden="true">→</span></a>
+      <p class="lp-hero-note" data-i18n="landing.launch.hero_note"><?= $launchText('hero_note') ?></p>
       <?php else: ?>
       <a class="lp-button lp-hero-start" href="<?= $base ?>/?zugang=waitlist#zugang" data-auth-target="waitlist" data-track-link="site-waitlist"><span>Register for closed alpha</span> <span aria-hidden="true">→</span></a>
       <?php endif ?>
     </div>
     <div class="lp-hero-controls" role="group" aria-label="Choose featured artwork">
-      <button class="is-active" type="button" data-hero-slide="0" aria-label="Kingdom at sunrise" aria-pressed="true"></button>
-      <button type="button" data-hero-slide="1" aria-label="Troops and monsters" aria-pressed="false"></button>
-      <button type="button" data-hero-slide="2" aria-label="Kingdom at night" aria-pressed="false"></button>
+      <button class="is-active" type="button" data-hero-slide="0" aria-label="<?= $launchText('city_title') ?>" data-i18n-attrs="aria-label:landing.launch.city_title" aria-pressed="true"></button>
+      <button type="button" data-hero-slide="1" aria-label="<?= $launchText('world_title') ?>" data-i18n-attrs="aria-label:landing.launch.world_title" aria-pressed="false"></button>
+      <button type="button" data-hero-slide="2" aria-label="<?= $launchText('army_title') ?>" data-i18n-attrs="aria-label:landing.launch.army_title" aria-pressed="false"></button>
+    </div>
+  </section>
+
+  <section id="platforms" class="lp-platforms" aria-labelledby="platform-title">
+    <h2 id="platform-title" data-i18n="landing.launch.platform_title"><?= $launchText('platform_title') ?></h2>
+    <div class="lp-platform-grid">
+      <article class="lp-platform-card"><p class="lp-platform-status is-live" data-i18n="landing.launch.browser_status"><?= $launchText('browser_status') ?></p><h3 data-i18n="landing.launch.browser_title"><?= $launchText('browser_title') ?></h3><p data-i18n="landing.launch.browser_intro"><?= $launchText('browser_intro') ?></p><a href="<?= $registerUrl ?>" data-track-link="site-register-browser" data-i18n="landing.launch.register"><?= $launchText('register') ?></a></article>
+      <article class="lp-platform-card"><p class="lp-platform-status" data-i18n="landing.launch.android_status"><?= $launchText('android_status') ?></p><h3>Android</h3><p data-i18n="landing.launch.android_intro"><?= $launchText('android_intro') ?></p></article>
+      <article class="lp-platform-card"><p class="lp-platform-status" data-i18n="landing.launch.ios_status"><?= $launchText('ios_status') ?></p><h3>iOS</h3><p data-i18n="landing.launch.ios_intro"><?= $launchText('ios_intro') ?></p></article>
     </div>
   </section>
 
@@ -172,6 +189,8 @@ $structuredData = [
   <small>© <?= date('Y') ?> Sven Manderscheid</small>
   <a href="mailto:hello@unionofkingdoms.com" data-track-link="site-contact">Contact</a>
   <?php require ROOT_DIR . '/views/partials/link-tracker-notice.php'; ?>
+  <a href="<?= $base ?>/privacy" data-track-link="site-privacy"><?= \Conquer\Game\Locale::html('legal.privacy.title') ?></a>
+  <a href="<?= $base ?>/account-deletion" data-track-link="site-deletion"><?= \Conquer\Game\Locale::html('legal.deletion.title') ?></a>
 </footer>
 </body>
 </html>

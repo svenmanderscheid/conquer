@@ -107,12 +107,15 @@ try {
     ck(stock(1)===20000,'invalid requests leave troops untouched');
     $result=act(1,'create',0,$create);$id=(int)$result['run_id'];
     ck($id>0,'creation returns its persisted run ID');
+    $storedDefinition=json_decode((string)$db->query('SELECT definition_json FROM dungeon_runs WHERE id=?',[$id])->fetchColumn(),true,64,JSON_THROW_ON_ERROR);
+    ck((float)$storedDefinition['enemy_factor']===24.0,'new groups persist the recalibrated NPC strength in their run snapshot');
     ck(stock(1)===10000&&stock(1,2)===20000,'creation reserves troops only from selected world');
     deny(fn()=>act(1,'create',0,$create),'one active reservation per player and world');
     deny(fn()=>act(1,'start',$id),'a solo player cannot start');
     deny(fn()=>act(2,'start',$id),'outsider cannot start a party');
     deny(fn()=>act(2,'claim',$id),'outsider cannot claim rewards');
     $joinPreview=act(2,'preview',$id,['dungeon_code'=>$code,'difficulty'=>'normal','stance'=>'cautious','role'=>'defense','troops'=>[50100101=>10000]]);ck(in_array($joinPreview['forecast']['status'],['ready','risky'],true)&&$joinPreview['forecast']['missing_roles']===[]&&$joinPreview['forecast']['total_troops']===20000,'join preview combines authoritative prospective stats with recruiting snapshots');
+    ck($joinPreview['forecast']['status']==='risky','server preview reflects the stronger NPCs for a small early party');
     ck(stock(2)===20000,'join preview leaves available army untouched');
     deny(fn()=>act(2,'preview',$id,['dungeon_code'=>$code,'difficulty'=>'hard','stance'=>'cautious','role'=>'defense','troops'=>[50100101=>10000]]),'preview rejects stale run difficulty');
     W::bind(2,2);

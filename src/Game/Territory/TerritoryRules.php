@@ -5,6 +5,10 @@ namespace Conquer\Game\Territory;
 /** Versioned operational defaults; snapshots make already-started campaigns immutable. */
 final class TerritoryRules
 {
+    public const NPC_TROOP_CODE = 50100101;
+    public const MAX_NPC_TROOPS = 10000000;
+    private const NPC_BALANCE_REVISION = 2;
+
     public static function defaults(): array
     {
         return ['version'=>1,'canton_limit'=>2,'active_cantons'=>[],
@@ -14,14 +18,41 @@ final class TerritoryRules
             'crown_tie_rule'=>'control_seconds_desc,first_control_at_asc,alliance_id_asc',
             'crown_eligibility'=>'snapshot_at_campaign_start; canton loss does not cancel admitted attacks',
             'canton_eligibility'=>'snapshot_at_campaign_start_with_reserved_slot',
-            'npc_troops'=>['commune'=>120,'canton'=>800,'crown'=>1600],
+            // T1 militia with the existing 10% fortification: roughly 1M / 1.5M / 2M
+            // unbuffed, evenly mixed T3 attackers. Troop quality and buffs still matter.
+            'npc_balance_revision'=>self::NPC_BALANCE_REVISION,
+            'npc_troops'=>['commune'=>1400000,'canton'=>2100000,'crown'=>2800000],
             'income_per_hour'=>1200,'conquest_reward_gold'=>500,'support_cost'=>1000,
             'special_daily_limit'=>5,'rune_daily_charges'=>3,'rune_radius'=>16,
             'office_daily_uses'=>1,'office_resource_grant'=>1000,'office_acceleration_seconds'=>300,
             'regional_supply_percent'=>5,'regional_daily_cap'=>2000,'canton_mission_contributors'=>3,'canton_mission_reward'=>500];
     }
 
+    /** Upgrade old world defaults on read; never apply this to campaign/cycle snapshots. */
+    public static function currentProfile(array $rules): array
+    {
+        if ((int)($rules['npc_balance_revision'] ?? 1) >= self::NPC_BALANCE_REVISION) return $rules;
+        $defaults = self::defaults()['npc_troops'];
+        foreach (['commune'=>120,'canton'=>800,'crown'=>1600] as $kind=>$oldCount) {
+            // Preserve intentionally customized world tuning, including test worlds.
+            if (!isset($rules['npc_troops'][$kind]) || (int)$rules['npc_troops'][$kind] === $oldCount) {
+                $rules['npc_troops'][$kind] = $defaults[$kind];
+            }
+        }
+        $rules['npc_balance_revision'] = self::NPC_BALANCE_REVISION;
+        return $rules;
+    }
+
     public static function majority(int $total): int { return intdiv($total,2)+1; }
+
+    /** Public protection describes the target, independently of a viewer's alliance. */
+    public static function protection(array $target,array $window,array $rules): array
+    {
+        $state=empty($target['active'])?'inactive':
+            ($target['owner_alliance_id']===null&&$target['kind']!=='crown'?'neutral':($window['open']?'open':'protected'));
+        return ['state'=>$state,'until'=>match($state){'protected'=>$window['starts_at'],'open'=>$window['ends_at'],default=>null},
+            'period_seconds'=>$target['kind']==='crown'?max(1,(int)$rules['crown_period_days'])*86400:86400];
+    }
 
     /** Always UTC and based on the event time, never the next login time. */
     public static function window(array $rules,int $at,bool $crown=false): array

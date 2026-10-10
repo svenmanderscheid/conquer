@@ -74,7 +74,7 @@ if($mode==='register'){
           <button class="play-submit" type="submit" data-i18n="<?= $mode === 'register' ? 'login.create' : 'login.continue' ?>"><?= $mode === 'register' ? 'Create kingdom →' : 'Continue playing →' ?></button>
         </form>
         <?php if ($openAlpha): ?><p class="play-world-rule" data-i18n="landing.open_notice">The game is in active development. Features and balance may change, and alpha progress may be reset.</p><?php endif ?>
-        <div class="play-links"><a href="<?= $base ?>/auth/recover" data-i18n="login.forgot">Forgot your password?</a></div>
+        <div class="play-links"><a href="<?= $base ?>/auth/recover" data-i18n="login.forgot">Forgot your password?</a><a href="<?= $base ?>/privacy"><?= \Conquer\Game\Locale::html('legal.privacy.title') ?></a><a href="<?= $base ?>/account-deletion"><?= \Conquer\Game\Locale::html('legal.deletion.title') ?></a></div>
       </div>
     </div>
     <div class="play-panel-footer">

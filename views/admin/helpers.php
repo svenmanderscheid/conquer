@@ -20,11 +20,14 @@ function adminItemPicker(string $name,mixed $code,bool $fragments=false,bool $op
     $item=$catalog[(string)$code]??null;
     echo '<div class="item-select" data-fragments="'.($fragments?'1':'0').'" data-optional="'.($optional?'1':'0').'"><input type="hidden" name="'.ah($name).'" value="'.ah($code).'"><button class="item-choice secondary" type="button" data-item-picker aria-label="'.ah($item?'Gegenstand ändern: '.$item['name']:'Gegenstand auswählen').'"><img src="'.ah($item['image']??\Conquer\Admin\ItemPresentation::image('items/pouch.svg')).'" alt=""><span><strong>'.ah($item['name']??($optional?'Kein Gegenstand':'Gegenstand auswählen')).'</strong><small>'.ah(\Conquer\Game\Locale::text($item['category_name']??'Katalog öffnen')).' · '.ah(\Conquer\Game\Locale::text('Auswählen')).'</small></span><span aria-hidden="true">⌄</span></button></div>';
 }
-function adminDropRow(string $type,int|string $index,array $row): void {
-    $prefix='config[rows]['.$index.']';$weighted=in_array($type,['chest','dungeon'],true);
-    echo '<div class="drop-row"><div><span class="field-label">'.($type==='chest'?\Conquer\Game\Locale::html('admin.drops.chest_reward'):'Gegenstand').'</span>';
+function adminQuantity(string $prefix,array $row,string $label): void {
+    echo '<label>'.ah($label).'<input type="number" name="'.ah($prefix.'[quantity]').'" value="'.ah($row['quantity']??1).'" min="1" max="100000" step="1" required><details'.(isset($row['quantity_min'])?' open':'').'><summary>'.\Conquer\Game\Locale::html('admin.drops.quantity_min').'</summary><input aria-label="'.\Conquer\Game\Locale::html('admin.drops.quantity_min').'" type="number" name="'.ah($prefix.'[quantity_min]').'" value="'.ah($row['quantity_min']??'').'" min="1" max="100000" step="1"></details>'.(!empty($row['exclusive_group'])?'<small>'.\Conquer\Game\Locale::html('admin.drops.exclusive_hint').'</small>':'').'</label>';
+}
+function adminDropRow(string $type,int|string $index,array $row,string $group='rows'): void {
+    $prefix='config['.$group.']['.$index.']';$weighted=in_array($type,['chest','dungeon'],true);
+    echo '<div class="drop-row"'.($group==='bonus_rows'?' data-chest-bonus':'').'><div><span class="field-label">'.($type==='chest'?\Conquer\Game\Locale::html('admin.drops.chest_reward'):'Gegenstand').'</span>';
     adminItemPicker($prefix.'[target]',$row['target']??'', $type==='chest');echo '</div>';
-    if($type!=='dungeon')adminNumber('Anzahl',$prefix.'[quantity]',$row['quantity']??1,1,100000);
+    if($type!=='dungeon')adminQuantity($prefix,$row,\Conquer\Game\Locale::t('admin.drops.quantity_max'));
     adminNumber($weighted?'Gewichtung':'Chance (%)',$prefix.($weighted?'[weight]':'[chance]'),$row[$weighted?'weight':'chance']??($weighted?1:100),0,$weighted?1000000:100,$weighted?'1':'.01');
     echo '<div class="drop-row-end"><span class="drop-probability" aria-live="polite"></span><button type="button" class="secondary remove-drop" aria-label="Beuteeintrag entfernen">✕</button></div></div>';
 }
@@ -56,7 +59,8 @@ function adminFragmentRow(int|string $index,array $row): void {
         echo '<option value="'.$value.'"'.($target===$value?' selected':'').'>'.ah(\Conquer\Game\Locale::text($def['name_de']??$def['name'])).'</option>';
     }
     echo '</optgroup></select></label>';
-    adminNumber(\Conquer\Game\Locale::t('admin.drops.fragment_quantity'),$prefix.'[quantity]',$row['quantity']??1,1,100000);
+    adminQuantity($prefix,$row,\Conquer\Game\Locale::t('admin.drops.quantity_max'));
+    if(!empty($row['exclusive_group']))echo '<input type="hidden" name="'.ah($prefix.'[exclusive_group]').'" value="'.ah($row['exclusive_group']).'">';
     adminNumber(\Conquer\Game\Locale::t('admin.drops.fragment_chance'),$prefix.'[chance]',$row['chance']??0,0,100,'.0001');
     echo '<div class="drop-row-end"><button type="button" class="secondary" data-remove-fragment aria-label="'.\Conquer\Game\Locale::html('admin.drops.fragment_remove').'">✕</button></div><small class="fragment-outcome" aria-live="polite"></small></div>';
 }

@@ -16,6 +16,12 @@ final class RewardEditor
             'fragment_rows'=>array_map(static fn(array $row):array=>['target'=>isset($row['treasure_code'])?'treasure:'.$row['treasure_code']:'fragment:'.$row['fragment_grade'],'quantity'=>$row['count'],'chance'=>round($row['probability']*100,4)],$config['fragment_drops']??[]),
             'relic_rows'=>array_map(static fn(array $row):array=>['target'=>'relic:'.$row['treasure_code'],'quantity'=>$row['count'],'chance'=>round($row['probability']*100,4)],$config['relic_drops']??[])];
         if($type==='monster')$form+=['resources'=>$config['resource_reward'],'gems_amount'=>$config['gems_drop']['amount'],'gems_chance'=>round($config['gems_drop']['chance']*100,4),'charms'=>$config['charms']];
+        foreach(['rows'=>'drops','fragment_rows'=>'fragment_drops'] as $group=>$field){
+            foreach($config[$field]??[] as $index=>$row){
+                if(isset($row['count_min']))$form[$group][$index]['quantity_min']=$row['count_min'];
+                if(isset($row['exclusive_group']))$form[$group][$index]['exclusive_group']=$row['exclusive_group'];
+            }
+        }
         return $form;
     }
 

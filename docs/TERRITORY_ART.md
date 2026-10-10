@@ -1,6 +1,18 @@
 # Eroberungsmotive für die Luxemburg-Welt
 
-## Aktive Reihe vom 5. Oktober 2026
+## Aktive Reihe vom 9. Oktober 2026
+
+Der Nutzer hat die neue, auffälligere Gebäudereihe ausdrücklich freigegeben und ihren Einbau beauftragt. `assets/art/territory-v4/` enthält sechs edle Commune-Rathäuser, den repräsentativen Kantonssitz mit Uhr und Glocke sowie den majestätischen Congress-Palast mit großer Krone, gestaffelten blauen Kuppeln und rotem Treppenläufer. Die verbindliche Konzepttafel liegt unter `source/approved-concept.png`. Weiche überzeichnete Formen, kräftige dunkelbraune Konturen und große Wappen orientieren sich an der bestehenden Stadt.
+
+Die Commune-Typen bleiben anhand ihrer Dachfarben und Wappen erkennbar: Nahrung – Orange/Ähren; Holz – Grün/Äxte und Eichenblatt; Stein – Schieferblau/Steinmetzhammer; Gold – Ocker/Waage; Forschung – Purpur/Buch; Runen – Türkis/Spirale. Der Shrine der Luxemburg-Welt ist das Kantongebäude. Die vier klassischen Elementarschreine behalten ihre bestehenden Motive; Congress verwendet in beiden Welttypen den neuen Ratspalast.
+
+Die technischen Bildschlüssel bleiben erhalten, einschließlich `canton-shrine` und `congress-forum`. Die gemeinsamen Zuordnungen und alle direkten Congress-/Allianzziel-Verbraucher verwenden die neue Reihe. Besitzer, Namen, Koordinaten, Grundflächen, Kampfregeln und Aktionen kommen weiterhin aus dem bestehenden Spielstand. Frühere Bildreihen bleiben verfügbar; neue Pfade vermeiden veraltete Bilder im Browsercache.
+
+Die Illustrationen wurden mit dem eingebauten Imagegen-Werkzeug aus dem freigegebenen Entwurf erstellt. `source.json` enthält die vollständigen Prompts und Herkunft, `manifest.json` die Quellen-/Export-Hashes und Dateigrößen. `tools/prepare-civic-landmarks.cjs` exportiert die Bilder proportional in transparente 512×512-WebP-Dateien und entfernt ausschließlich abgelöste Hintergrundfragmente. Es zeichnet keine Motive nach.
+
+Abnahme am 9. Oktober: `tests/territory_frontend.cjs` und `tests/territory_main_app.cjs` bestanden in fünf Desktop-/Handy-/Querformaten. Die echte Haupt-App zeigte alle acht Bilder identisch in Karte und Gebietsfenstern, außerdem erreichbare Gebäudeaktionen in der Stadt; keine JavaScript-Seitenfehler. `tests/alliance_simplified_app.cjs` bestand bei 1280×800, 390×844 und 568×320 einschließlich gemeinsamer Allianz-Ziele. `tests/world_shrines.cjs` bestand in vier Formaten einschließlich bewegter Effekte, unveränderter sechs/sieben Felder, aller 144 Shrine-Feldtreffer und System-/Spiel-Einstellung für reduzierte Bewegung. Der Prüflauf verwendet nun die aktuelle Bildschirmposition nach Auswahl-Panning und die tatsächliche responsive Kachelgröße; die alte Annahme fester Bildschirmkoordinaten scheiterte nachweislich auch mit den bisherigen Grafiken. Die acht Exporte haben echte transparente Ecken und zusammen 411.814 Bytes (rund 402 KiB). Haupt-App-Aufnahmen: `artifacts/territory-main/`; gesicherte Spielvorschauen, Allianz-Aufnahmen und Prüfbericht: `output/civic-landmarks-20261009/`. Geprüft wurde mit isolierten synthetischen Spielständen im Browser; eine physische Android-/iOS-Geräteabnahme ist damit nicht bestätigt.
+
+## Vorherige Reihe vom 5. Oktober 2026
 
 Auf Nutzerwunsch erhalten Shrines, Communes und Congress deutlich unterscheidbare Motive ohne Burg. Die aktive Zuordnung liegt in `assets/js/territory-art.js` und verwendet `assets/art/territory-v3/`:
 

@@ -9,6 +9,66 @@ window.ConquerPaintedCity=(()=>{
  // Each approved site has four registered poses in one lightweight atlas.
  // A discrete frame change never blends duplicate buildings or scaffolds.
  const constructionAtlases={"castle":[384,373,"a731439a7968"],"academy":[384,367,"b61e0fd018dc"],"treasure_house":[384,370,"5e92d1eb03e8"],"hospital":[384,344,"d41b82889c22"],"hall_of_alliance":[384,350,"1cb6fc3cc6c5"],"trading_post":[384,329,"3265c26c88d7"],"storage":[384,376,"49d78d22bd5f"],"watch_tower":[324,384,"381af0f126a1"],"stable":[384,327,"bf2916f97cf5"],"archery_range":[384,323,"98110e9be806"],"barrack":[384,368,"10d1d87663e9"],"farm":[384,335,"ea0473d1bd6f"],"lumber_camp":[384,364,"392a8af688d2"],"gold_mine":[384,320,"a56238f87933"],"quarry":[384,297,"caded5832281"],"wall":[377,384,"81827528d31c"]};
+ const roofMetrics=new Map(),constructionImages=new WeakMap();
+ function artworkRoof(image,columns=1){
+  if(!image?.complete||!image.naturalWidth)return null;
+  const key=image.src+':'+columns;
+  if(roofMetrics.has(key))return roofMetrics.get(key);
+  const roof={width:image.naturalWidth/columns,height:image.naturalHeight,top:0};
+  // One small, cached scan per asset. An atlas uses the highest roof in all
+  // four registered poses, so the label never follows the animation frames.
+  const canvas=document.createElement('canvas');canvas.width=Math.min(512,image.naturalWidth);
+  canvas.height=Math.max(1,Math.round(image.naturalHeight*canvas.width/image.naturalWidth));
+  try{
+   const ctx=canvas.getContext('2d',{willReadFrequently:true});ctx.drawImage(image,0,0,canvas.width,canvas.height);
+   const pixels=ctx.getImageData(0,0,canvas.width,canvas.height).data;
+   outer:for(let y=0;y<canvas.height;y++)for(let x=0;x<canvas.width;x++)if(pixels[(y*canvas.width+x)*4+3]>32){roof.top=y/canvas.height;break outer;}
+  }catch{/* Loaded artwork still uses its fitted image bounds if pixels are unavailable. */}
+  roofMetrics.set(key,roof);return roof;
+ }
+ function syncLabelAnchor(building,force=false){
+  if(!building.isConnected)return;
+  const selected=building.getAttribute('aria-pressed')==='true';if(!selected&&!force)return;
+  let inset=0;
+  if(building.classList.contains('is-empty'))inset=Math.max(0,building.clientHeight*.85-34);
+  else{
+   const working=building.classList.contains('has-construction-art');
+   const roof=artworkRoof(working?constructionImages.get(building):building.querySelector('.painted-building-sprite'),working?4:1);
+   if(roof){
+    const artwork=building.querySelector(working?'.painted-construction-art':'.painted-building-sprite');
+    const box=artwork.getBoundingClientRect(),target=building.getBoundingClientRect();
+    const scale=Math.min(box.width/roof.width,box.height/roof.height);
+    // Images and SVG artwork are contained and aligned to the bottom. Include
+    // both letterboxing and the transparent margin above this building's roof.
+    inset=box.top-target.top+box.height-roof.height*scale+roof.top*roof.height*scale;
+   }
+  }
+  const value=inset.toFixed(2)+'px';
+  if(building.style.getPropertyValue('--painted-label-inset')===value)return;
+  building.style.setProperty('--painted-label-inset',value);
+  if(selected)building.dispatchEvent(new Event('painted-roof-change',{bubbles:true}));
+ }
+ function syncReadinessLabel(village){
+  const notices=village.querySelectorAll('.painted-building-ready');
+  for(const notice of notices){notice.style.removeProperty('--painted-ready-shift-x');notice.style.removeProperty('--painted-ready-shift-y');}
+  const label=village.querySelector('.painted-village-building[aria-pressed="true"]>.painted-building-label');if(!label)return;
+  const plaque=label.getBoundingClientRect(),view=village.getBoundingClientRect();
+  const overlaps=(a,b)=>a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top;
+  const controls=[...document.querySelectorAll('.topbar :is(.hud-profile,#resources,#hud-gems),.hud-edge-tools>button,#navigation,#world-chat,.painted-building-actions')]
+   .filter(node=>node.checkVisibility()&&getComputedStyle(node).visibility!=='hidden').map(node=>node.getBoundingClientRect());
+  for(const notice of notices){
+   const bounds=notice.getBoundingClientRect();if(!overlaps(bounds,plaque))continue;
+   // Keep the existing completion/chest action nearby without covering the
+   // lower roof label. Narrow views may only have room just below the label.
+   const candidates=[[plaque.right+8,plaque.top],[plaque.left-bounds.width-8,plaque.top],[bounds.left,plaque.bottom+8]];
+   for(const [left,top]of candidates){
+    const next={left,top,right:left+bounds.width,bottom:top+bounds.height};
+    if(next.left<view.left+8||next.right>view.right-8||next.top<view.top+8||next.bottom>view.bottom-8||controls.some(control=>overlaps(next,control)))continue;
+    notice.style.setProperty('--painted-ready-shift-x',(left-bounds.left)+'px');
+    notice.style.setProperty('--painted-ready-shift-y',(top-bounds.top)+'px');break;
+   }
+  }
+ }
  function constructionArtwork(base,code){
   const [width,height,version]=constructionAtlases[code],id='painted-construction-'+code;
   const src=`${base}/assets/art/city-construction-v1/${code}.webp?v=${version}`.replaceAll('&','&amp;').replaceAll('"','&quot;');
@@ -19,7 +79,8 @@ window.ConquerPaintedCity=(()=>{
   const art=scaffold.firstElementChild,image=new Image();
   // Keep the normal building until its entire worksite has loaded. Late
   // image callbacks cannot hide a building whose queue has already settled.
-  image.onload=()=>{if(scaffold.firstElementChild===art&&building.classList.contains('is-building'))building.classList.add('has-construction-art');};
+  constructionImages.set(building,image);
+  image.onload=()=>{if(scaffold.firstElementChild===art&&building.classList.contains('is-building')){building.classList.add('has-construction-art');syncLabelAnchor(building);}};
   image.src=art.querySelector('image').getAttribute('href');
  }
  const villageSkinAsset=url=>url+(url.includes('?')?'&':'?')+'village=3';
@@ -70,6 +131,7 @@ window.ConquerPaintedCity=(()=>{
    const image=button.querySelector('img'),src=`${base}/assets/art/${notice.icon}`;
    if(image.getAttribute('src')!==src)image.src=src;
   }
+  syncReadinessLabel(scene.closest('.painted-village'));
  }
  function syncHeadroom(village){
   const scene=village.querySelector('.painted-village-scene'),scroll=village.querySelector('.painted-village-scroll');
@@ -100,6 +162,8 @@ window.ConquerPaintedCity=(()=>{
   const width=Math.ceil(Math.max(baseWidth*zoom,widthFloor,heightFloor))+1;
   scene.parentElement.style.setProperty('--painted-scene-width',width+'px');
   syncHeadroom(village);
+  village.querySelectorAll('.painted-village-building[aria-pressed="true"]').forEach(building=>syncLabelAnchor(building));
+  syncReadinessLabel(village);
  }
  window.addEventListener('resize',()=>requestAnimationFrame(()=>document.querySelectorAll('.painted-village').forEach(syncView)));
  function syncCastleSkin(button,base,skinId){
@@ -224,6 +288,7 @@ window.ConquerPaintedCity=(()=>{
    if(terrain.complete)mountRiverMotion(terrain);else terrain.addEventListener('load',()=>mountRiverMotion(terrain),{once:true});
    host.querySelectorAll('.painted-building-sprite').forEach(img=>{
     const mount=()=>mountBuildingMotion(img,img.parentElement.dataset.id);
+    img.addEventListener('load',()=>syncLabelAnchor(img.parentElement));
     if(img.complete&&img.naturalWidth)mount();else img.addEventListener('load',mount,{once:true});
    });
    host.querySelector('.painted-village').classList.toggle('is-paused',document.hidden);
@@ -232,7 +297,7 @@ window.ConquerPaintedCity=(()=>{
    menu.className='painted-building-menu';menu.hidden=true;
    menu.innerHTML='<div class="painted-building-actions"><button type="button" data-action="building"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 4.5 19 9l-3 3-1.7-1.7-7.6 7.6-2.6-2.6 7.6-7.6L10 6l3-3 1.5 1.5Z"/><path d="M4 20h7"/></svg><small>Ausbauen / Info</small></button><button type="button" data-action="training-building"><svg data-building-icon viewBox="0 0 24 24" aria-hidden="true"></svg><small>Öffnen</small></button><button type="button" class="painted-selection-close" aria-label="Gebäudeauswahl schließen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>';
    host.querySelector('.painted-village').append(menu);
-   const clear=()=>{menu.hidden=true;scroll.querySelectorAll('[aria-pressed="true"]').forEach(b=>b.setAttribute('aria-pressed','false'));};
+   const clear=()=>{menu.hidden=true;scroll.querySelectorAll('[aria-pressed="true"]').forEach(b=>b.setAttribute('aria-pressed','false'));syncReadinessLabel(scroll.closest('.painted-village'));};
    const village=scroll.closest('.painted-village');village.dataset.zoom='1';
    scroll.setAttribute('aria-label','Village view. Hold the left mouse button or drag with one finger to move. Use the mouse wheel or pinch with two fingers to zoom. Plus and minus also zoom.');
    scroll.setAttribute('data-i18n-attrs','aria-label:city.view.help');
@@ -253,20 +318,39 @@ window.ConquerPaintedCity=(()=>{
     if(delta)setZoom(Number(village.dataset.zoom)*Math.exp(-Math.max(-240,Math.min(240,delta))*.0012),e.clientX,e.clientY);
    },{passive:false});
    scroll.addEventListener('keydown',e=>{if(e.target!==scroll||!['+','=','-','−'].includes(e.key))return;e.preventDefault();setZoom(Number(village.dataset.zoom)*(['-','−'].includes(e.key)?.9:1/.9));});
-   scroll.addEventListener('click',e=>{
-    const b=e.target.closest('.painted-village-building');
-    if(!b){clear();return;}
-    e.stopPropagation();clear();b.setAttribute('aria-pressed','true');
+   const selectBuilding=b=>{
+    clear();syncLabelAnchor(b,true);b.setAttribute('aria-pressed','true');
     menu.querySelector('[data-building-icon]').innerHTML=buildingMenuIcons[b.dataset.id]??buildingMenuIcons.castle;
     menu.querySelector('[data-action="training-building"]').setAttribute('aria-label',b.dataset.name+' öffnen');
     menu.querySelectorAll('[data-action]').forEach(a=>a.dataset.id=b.dataset.id);
     menu.hidden=false;
     const p=host.getBoundingClientRect(),plaque=b.querySelector('.painted-building-label');
+    // Keep the compact ribbon and its small tails clear of the fixed HUD.
+    const view=scroll.getBoundingClientRect(),ribbon=plaque.getBoundingClientRect(),edge=20;
+    let ribbonLeft=view.left+edge,ribbonRight=view.right-edge;
+    for(const tools of document.querySelectorAll('.hud-edge-tools')){
+     const bounds=tools.getBoundingClientRect();
+     if(!tools.checkVisibility()||!bounds.width||!bounds.height)continue;
+     if(bounds.left+bounds.width/2<view.left+view.width/2)ribbonLeft=Math.max(ribbonLeft,bounds.right+edge);
+     else ribbonRight=Math.min(ribbonRight,bounds.left-edge);
+    }
+    const targetLeft=ribbonRight-ribbonLeft>=ribbon.width
+     ?Math.max(ribbonLeft,Math.min(ribbonRight-ribbon.width,ribbon.left))
+     :view.left+(view.width-ribbon.width)/2;
+    scroll.scrollLeft+=ribbon.left-targetLeft;
     const resourceBottom=document.getElementById('resources')?.getBoundingClientRect().bottom??0;
     let safeTop=Math.max(74,resourceBottom-p.top+8);
     const initialBounds=b.getBoundingClientRect();
     menu.style.left=Math.max(8,Math.min(p.width-menu.offsetWidth-8,initialBounds.left-p.left+initialBounds.width/2-menu.offsetWidth/2))+'px';
     const actions=menu.querySelector('.painted-building-actions'),actionBounds=actions.getBoundingClientRect();
+    const visibleRibbon=plaque.getBoundingClientRect();
+    for(const overlay of document.querySelectorAll('.topbar :is(.hud-profile,#resources,#hud-gems),.hud-edge-tools>button')){
+     const bounds=overlay.getBoundingClientRect();
+     if(!overlay.checkVisibility()||!bounds.width||!bounds.height)continue;
+     const overRibbon=bounds.right>visibleRibbon.left-14&&bounds.left<visibleRibbon.right+14;
+     const overActions=bounds.right>actionBounds.left-8&&bounds.left<actionBounds.right+8;
+     if(overRibbon||overActions)safeTop=Math.max(safeTop,bounds.bottom-p.top+8);
+    }
     let safeBottom=Math.min(p.bottom,innerHeight)-8;
     for(const overlay of document.querySelectorAll('#world-chat,#navigation')){
      const bounds=overlay.getBoundingClientRect(),style=getComputedStyle(overlay);
@@ -306,7 +390,14 @@ window.ConquerPaintedCity=(()=>{
      else maxCenter=Math.min(maxCenter,bounds.left-half-8);
     }
     if(minCenter<=maxCenter)menu.style.left=Math.max(minCenter,Math.min(maxCenter,row.left+half))-p.left-menu.offsetWidth/2+'px';
+    syncReadinessLabel(village);
+   };
+   scroll.addEventListener('click',e=>{
+    const b=e.target.closest('.painted-village-building');
+    if(!b){clear();return;}
+    e.stopPropagation();selectBuilding(b);
    });
+   scroll.addEventListener('painted-roof-change',e=>selectBuilding(e.target));
    menu.querySelector('.painted-selection-close').addEventListener('click',clear);
    menu.addEventListener('click',e=>{if(e.target.closest('[data-action]'))clear();});
    host.addEventListener('keydown',e=>{if(e.key==='Escape'){clear();}});
@@ -385,7 +476,7 @@ window.ConquerPaintedCity=(()=>{
    if(queue&&!scaffold.firstChild){
     mountConstruction(scaffold,b,base,code);
     scaffold.style.setProperty('--construction-delay',-(places.findIndex(place=>place[0]===code)%5)*.47+'s');
-   }else if(!queue){scaffold.replaceChildren();b.classList.remove('has-construction-art');}
+   }else if(!queue){scaffold.replaceChildren();b.classList.remove('has-construction-art');constructionImages.delete(b);}
    b.classList.toggle('is-training',Boolean(training));
    b.classList.toggle('is-empty',!queue&&level<=0&&code!=='wall');
    b.dataset.status=status;
@@ -403,7 +494,7 @@ window.ConquerPaintedCity=(()=>{
    // The name is available to assistive technology without an unselected hover tooltip.
    b.setAttribute('aria-label',text);
    b.querySelector('.painted-building-name').textContent=b.dataset.name;
-   b.querySelector('.painted-building-level').textContent=window.ConquerLocale?.t('template.level',{level})||`Level ${level}`;
+   b.querySelector('.painted-building-level').textContent=window.ConquerLocale?.t('city.selection.level',{level})||`Lv. ${level}`;
   }
   updateReadiness({host,base,state,kingdom,labels});
  }

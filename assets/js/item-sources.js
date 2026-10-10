@@ -8,7 +8,6 @@
         const world=()=>Number(getState()?.city?.world_id||getState()?.world_id||1);
         const active=()=>dialog.open&&!!dialog.querySelector('.item-sources');
         const fmt=n=>Number(n).toLocaleString(window.ConquerLocale?.locale||'en',{maximumFractionDigits:3});
-        const pct=n=>(Number(n)*100).toLocaleString(window.ConquerLocale?.locale||'en',{maximumSignificantDigits:3});
         let sequence=0,query=null,result=null,requestWorld=null;
         function note(value){
             const params={...value.params};
@@ -16,10 +15,10 @@
             return t(value.key,params);
         }
         function reward(entry){
-            const chance=t(entry.per_draw?'sources.chance_draw':'sources.chance',{chance:pct(entry.chance)});
-            const quantity=t(entry.reward_type==='relic'?'sources.relics':query.treasure_code?'sources.fragments':'sources.items',{count:fmt(entry.quantity)});
-            if(entry.via_item_code)return `<p class="item-source-reward">${esc(t('sources.pack_reward',{count:fmt(entry.pack_quantity),chance:pct(entry.chance)}))}${entry.per_draw?`<small>${esc(chance)}</small>`:''}<small>${esc(t('sources.pack_selection',{quantity:fmt(entry.quantity),chance:pct(entry.selection_chance)}))}</small></p>`;
-            return `<p class="item-source-reward"><strong>${esc(quantity)}</strong> · ${esc(chance)}${entry.random_relic?`<small>${esc(t('sources.random_included'))}</small>`:''}</p>`;
+            const count=entry.quantity_min!=null&&Number(entry.quantity_min)!==Number(entry.quantity)?`${fmt(entry.quantity_min)}–${fmt(entry.quantity)}`:fmt(entry.quantity);
+            const quantity=t(entry.reward_type==='relic'?'sources.relics':query.treasure_code?'sources.fragments':'sources.items',{count});
+            if(entry.via_item_code)return `<p class="item-source-reward"><strong>${esc(t('sources.pack_reward',{count:fmt(entry.pack_quantity)}))}</strong><small>${esc(t('sources.pack_selection',{quantity:fmt(entry.quantity)}))}</small></p>`;
+            return `<p class="item-source-reward"><strong>${esc(quantity)}</strong>${entry.random_relic?`<small>${esc(t('sources.random_included'))}</small>`:''}</p>`;
         }
         function render(data) {
             const panel=dialog.querySelector('.item-sources');if(!panel)return;

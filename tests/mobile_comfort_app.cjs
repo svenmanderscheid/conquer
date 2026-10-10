@@ -29,7 +29,7 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'output/playwright/mo
   const base='http://127.0.0.1:'+port;
   await page.goto(base+'/?zugang=login');await page.locator('[name=identifier], [name=username]').fill('PreviewPlayer');await page.locator('[name=password]').fill('PreviewFixture!2026');
   await Promise.all([page.waitForURL('**/city'),page.locator('form[action$="/auth/local"] button[type=submit]').click()]);
-  page.on('request',r=>{if(r.method()==='POST'&&r.url().includes('/api/'))writes.push(r.url());});
+  page.on('request',r=>{if(r.method()==='POST'&&r.url().includes('/api/')&&!new URL(r.url()).pathname.endsWith('/api/telemetry'))writes.push(r.url());});
   await page.locator('.painted-village').waitFor();await page.locator('.kingdom-intro').waitFor();
   const sizes=[[1280,800],[390,844],[320,568],[844,390],[568,320]];
   for(const [width,height]of sizes){

@@ -11,3 +11,4 @@ mobile.local.json
 *.aab
 local.properties
 key.properties
+.signing/

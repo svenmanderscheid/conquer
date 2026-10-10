@@ -9,7 +9,6 @@ use Conquer\Game\Rally\RallyService;
 use Conquer\Game\March\{MarchSpeed,MarchSkinService,PvpRules,CombatReport};
 use Conquer\Game\Research\{BuffEngine,ResearchEffects};
 use Conquer\Game\Hospital\HospitalService;
-use Conquer\Game\City\TroopData;
 
 /** Ordinary reserved rally armies, with a chronological scheduler for territorial events. */
 final class TerritoryRally
@@ -90,7 +89,7 @@ final class TerritoryRally
         foreach($eligible as $a){$s=self::combatSnapshot($a,$world,true,$defenseTroops);$attack+=array_sum(array_column($s['troops'],'strength'));$attSnapshots[]=$s;}
         foreach($defenders as $a){$s=self::combatSnapshot($a,$world,false,$attackTroops);$defense+=array_sum(array_column($s['troops'],'strength'));$defSnapshots[]=$s;}
         // Neutral militia disappears on ordinary ownership; crown objectives retain their fixed guards.
-        $npcCount=(!$defAid||$t['kind']==='crown')?(int)$rules['npc_troops'][$t['kind']]:0;$troopCode=(int)array_key_first(TroopData::all());$npcScore=PvpRules::strength($troopCode,$npcCount,[]);$defense=($defense+$npcScore)*(1.1+(int)$t['fortification']*.01);
+        $npcCount=(!$defAid||$t['kind']==='crown')?(int)$rules['npc_troops'][$t['kind']]:0;$npcScore=PvpRules::strength(TerritoryRules::NPC_TROOP_CODE,$npcCount,[]);$defense=($defense+$npcScore)*(1.1+(int)$t['fortification']*.01);
         $support=(int)$db->query("SELECT COUNT(*) FROM territory_support WHERE world_id=? AND target_id=? AND alliance_id=? AND kind='supply' AND created_at<=? AND created_at>=DATE_SUB(?,INTERVAL 1 DAY)",[$world,$t['id'],$aid,TerritoryService::date($at),TerritoryService::date($at)])->fetchColumn();$attack*=1+min(.1,$support*.01);
         $won=PvpRules::attackerWins($attack,$defense);$result=['outcome'=>$won?'attacker_wins':'defender_wins','cancelled'=>false,'armies'=>$returned,'target_name'=>$t['name'],'territory_id'=>$t['id'],'campaign_id'=>(int)$c['id'],'objective'=>$c['objective'],'attacker_score'=>(int)$attack,'defender_score'=>(int)$defense,'npc_troops'=>$npcCount,'at'=>TerritoryService::date($at)];
         foreach($eligible as $i=>$a){$loss=PvpRules::losses($a['troops'],$defense<=0?0:($won?.10:.30),$a['army_snapshot']['buffs']??BuffEngine::getBuffs((int)$a['player_id'],$world),$defenseTroops);HospitalService::addWounded((int)$a['city_id'],$loss['wounded']);$result['armies'][]=$a+$loss+['loot'=>[]];$attSnapshots[$i]=CombatReport::settle($attSnapshots[$i],$loss);if($won)TerritoryEconomy::reward($t,(int)$a['player_id'],$aid,'campaign:'.$c['id'],['gold'=>$rules['conquest_reward_gold']],$at);}

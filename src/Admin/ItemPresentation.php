@@ -6,6 +6,12 @@ final class ItemPresentation
 {
     public const CATEGORIES=['resource_pack'=>'Rohstoffe','resource_box'=>'Rohstoffkisten','speedup'=>'Beschleuniger','boost'=>'Boni','chest'=>'Truhen','ap_refill'=>'Aktionspunkte','vip_point'=>'Prestige','fragment_pack'=>'Reliktfragmente','treasure_fragment'=>'Reliktfragmente','teleport'=>'Teleporter','other'=>'Sonstiges'];
     public const GRADES=['normal'=>'Normal','common'=>'Normal','uncommon'=>'Ungewöhnlich','rare'=>'Selten','epic'=>'Episch','legendary'=>'Legendär','mythic'=>'Mythisch'];
+    public const DROP_GROUPS=['items','speedups','boosts','resources'];
+
+    public static function dropGroup(string $category): string
+    {
+        return match($category){'speedup'=>'speedups','boost'=>'boosts','resource_pack','resource_box'=>'resources',default=>'items'};
+    }
 
     public static function item(array $d): array
     {
@@ -18,7 +24,7 @@ final class ItemPresentation
         elseif($category==='vip_point')$image='items/prestige.svg';
         elseif($category==='fragment_pack')$image='items/fragment-'.($d['fragment_grade']??$d['rarity']??'normal').'.svg';
         elseif($category==='boost')$image='items/'.(['resource_production'=>'production.svg','gathering_speed'=>'gathering.svg','construction_speed'=>'hammer.svg','research_speed'=>'research.svg','training_speed'=>'helmet.svg','anti_spy'=>'anti-spy.svg'][$d['boost_type']??'']??'shield.svg');
-        return ['code'=>(string)$d['code'],'name'=>$d['name_de']??$d['name'],'category'=>$category,'category_name'=>self::CATEGORIES[$category]??'Sonstiges','rarity'=>$d['rarity']??'normal','image'=>self::image($image),'description'=>$d['description_de']??$d['description']??''];
+        return ['code'=>(string)$d['code'],'name'=>$d['name_de']??$d['name'],'category'=>$category,'drop_group'=>self::dropGroup($category),'category_name'=>self::CATEGORIES[$category]??'Sonstiges','rarity'=>$d['rarity']??'normal','image'=>self::image($image),'description'=>$d['description_de']??$d['description']??''];
     }
 
     public static function image(string $relative): string

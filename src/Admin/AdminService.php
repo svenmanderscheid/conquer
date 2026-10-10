@@ -154,7 +154,7 @@ final class AdminService
         }
         if(isset($raw['npc_troops'])){
             if(!is_array($raw['npc_troops']))throw new \InvalidArgumentException('Ungültige NPC-Verteidigung.');
-            foreach(['commune','canton','crown']as$kind)$changes['npc_troops'][$kind]=WorldSettings::integer($raw['npc_troops'][$kind]??null,1,500000,'NPC-Verteidigung');
+            foreach(['commune','canton','crown']as$kind)$changes['npc_troops'][$kind]=WorldSettings::integer($raw['npc_troops'][$kind]??null,1,\Conquer\Game\Territory\TerritoryRules::MAX_NPC_TROOPS,'NPC-Verteidigung');
         }
         $before=\Conquer\Game\Territory\TerritoryService::profile($world);
         $after=\Conquer\Game\Territory\TerritoryService::saveProfile($world,$changes,$version);

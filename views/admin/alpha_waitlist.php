@@ -1,10 +1,19 @@
 <?php
 declare(strict_types=1);
 $list = \Conquer\Admin\AlphaWaitlistAdmin::listing($db, $_GET);
+$emails = \Conquer\Admin\AlphaWaitlistAdmin::emails($db);
+$copyText = static fn(string $key): string => \Conquer\Game\Locale::html('admin.waitlist.' . $key);
 $pageUrl = static fn(int $page): string => APP_BASE.'/admin/alpha-waitlist?'.http_build_query(['q'=>$list['search'],'status'=>$list['status'],'page'=>$page]);
 ?>
-<section class="card" aria-labelledby="waitlist-title">
-    <div class="split"><div><h2 id="waitlist-title">Interessenten für die Alpha</h2><p>Kontaktdaten aus dem Anmeldeformular der öffentlichen Startseite.</p></div><a class="button secondary" href="<?= APP_BASE ?>/admin/alpha-waitlist?export=csv">CSV exportieren</a></div>
+<script src="<?= APP_BASE ?>/assets/js/admin-waitlist.js?v=<?= filemtime(ROOT_DIR.'/assets/js/admin-waitlist.js') ?>" defer></script>
+<section class="card alpha-waitlist" aria-labelledby="waitlist-title">
+    <div class="split waitlist-heading"><div><h2 id="waitlist-title">Interessenten für die Alpha</h2><p>Kontaktdaten aus dem Anmeldeformular der öffentlichen Startseite.</p></div><div class="waitlist-actions"><button type="button" data-waitlist-copy data-email-count="<?= count($emails) ?>" aria-describedby="waitlist-copy-hint" data-i18n="admin.waitlist.copy_all" <?= !$emails ? 'disabled' : '' ?>><?= $copyText('copy_all') ?></button><a class="button secondary" href="<?= APP_BASE ?>/admin/alpha-waitlist?export=csv">CSV exportieren</a></div></div>
+    <p class="subtle" id="waitlist-copy-hint" data-i18n="admin.waitlist.copy_hint"><?= $copyText('copy_hint') ?></p>
+    <p class="subtle" data-waitlist-copy-status role="status" aria-live="polite" hidden></p>
+    <div data-waitlist-copy-list hidden>
+        <label for="waitlist-emails" data-i18n="admin.waitlist.email_list"><?= $copyText('email_list') ?></label>
+        <textarea id="waitlist-emails" rows="4" readonly spellcheck="false" autocomplete="off" translate="no" data-user-content><?= ah(implode(', ', $emails)) ?></textarea>
+    </div>
     <form method="get" action="<?= APP_BASE ?>/admin/alpha-waitlist" class="toolbar">
         <label>Name oder E-Mail<input type="search" name="q" maxlength="120" value="<?= ah($list['search']) ?>" placeholder="Alpha-Anmeldungen suchen"></label>
         <label>Status<select name="status"><option value="">Alle</option><option value="waiting" <?= $list['status']==='waiting'?'selected':'' ?>>Wartet</option><option value="invited" <?= $list['status']==='invited'?'selected':'' ?>>Eingeladen</option></select></label>

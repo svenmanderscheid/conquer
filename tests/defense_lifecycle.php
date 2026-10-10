@@ -31,6 +31,7 @@ try{
     foreach($admin->query('SHOW TABLES FROM `'.$source.'`')->fetchAll(PDO::FETCH_COLUMN) as $table){if(!preg_match('/^[a-zA-Z0-9_]+$/D',$table))throw new RuntimeException('Invalid table.');$admin->exec('CREATE TABLE `'.$name.'`.`'.$table.'` LIKE `'.$source.'`.`'.$table.'`');}
     mkdir($temp.'/config',0700,true);$cfg['database']=$name;file_put_contents($temp.'/config/database.php',"<?php return ".var_export($cfg,true).';');$db=Connection::init($temp);\Conquer\Logger::init($temp.'/test.log');
     foreach(['0066_community_systems.sql','0067_defense_and_promotions.sql','0068_progression_and_events.sql','0072_multiworld_context.sql','0073_city_anti_spy.sql','0090_training_buildings.sql'] as $migration)\Conquer\Db\MigrationSql::apply($db->getPdo(),file_get_contents(ROOT_DIR.'/migrations/'.$migration));
+    \Conquer\Db\MigrationSql::apply($db->getPdo(),file_get_contents(ROOT_DIR.'/migrations/0138_formation_percentages.sql'));
     $db->execute("INSERT INTO worlds(id,name,slug,map_size) VALUES(1,'Defense A','defense-a',256),(2,'Defense B','defense-b',320)");
     for($pid=1;$pid<=5;$pid++){
         $world=$pid<4?1:2;$x=[1=>30,2=>80,3=>95,4=>280,5=>290][$pid];
@@ -95,6 +96,32 @@ try{
         rejectD(fn()=>D::action(1,['action'=>'formation.delete','slot'=>$slot]),'formation delete rejects slot '.$slot);
     }
     rejectD(fn()=>D::action(1,['action'=>'formation.save','slot'=>1,'name'=>'Bad','troops'=>[50100101=>'2']]),'formation counts must be integers');
+    $ratio=['percentages'=>[1=>70,2=>30,3=>0],'total'=>100];
+    $db->execute('INSERT INTO city_troops(city_id,troop_code,count) VALUES(1,50200501,100)');
+    D::action(1,['action'=>'formation.save','slot'=>2,'name'=>'70 / 30 / 0','composition'=>$ratio,'troops'=>[50300101=>999999]]);
+    $saved=array_column(D::state(1)['formations'],null,'slot');
+    checkD($saved[2]['composition']===$ratio&&$saved[2]['troops']===[50100101=>70,50200501=>30],'percentage templates persist exact ratios and ignore client-supplied preview counts');
+    checkD(stockD(1)===$before&&stockD(1,50200501)===100,'saving percentage templates reserves no troops');
+    foreach([
+        ['percentages'=>[1=>70,2=>40,3=>0],'total'=>100],
+        ['percentages'=>[1=>70.0,2=>30,3=>0],'total'=>100],
+        ['percentages'=>[1=>'70',2=>30,3=>0],'total'=>100],
+        ['percentages'=>[1=>101,2=>0,3=>-1],'total'=>100],
+        ['percentages'=>[1=>70,2=>30],'total'=>100],
+        ['percentages'=>[1=>70,2=>30,3=>0,4=>0],'total'=>100],
+        ['percentages'=>[1=>70,2=>30,3=>0],'total'=>0],
+        ['percentages'=>[1=>70,2=>30,3=>0],'total'=>100000000],
+        null,
+    ] as $invalid)rejectD(fn()=>D::action(1,['action'=>'formation.save','slot'=>2,'name'=>'Bad mix','composition'=>$invalid]),'invalid percentage template is rejected');
+    $db->execute('UPDATE city_troops SET count=0 WHERE city_id=1 AND troop_code=50200501');
+    D::action(1,['action'=>'formation.save','slot'=>2,'name'=>'Future mix','composition'=>$ratio]);
+    $saved=array_column(D::state(1)['formations'],null,'slot');
+    checkD($saved[2]['composition']===$ratio&&$saved[2]['troops']===[],'a future percentage mix saves even while one required troop type is unavailable');
+    D::action(1,['action'=>'formation.save','slot'=>2,'name'=>'Fixed amounts','troops'=>[50100101=>3]]);
+    $saved=array_column(D::state(1)['formations'],null,'slot');
+    checkD(!isset($saved[2]['composition'])&&$saved[2]['troops']===[50100101=>3],'saving fixed amounts clears previous percentage metadata');
+    D::action(1,['action'=>'formation.delete','slot'=>2]);
+    $db->execute('DELETE FROM city_troops WHERE city_id=1 AND troop_code=50200501');
     $ownFormations=D::state(1)['formations'];
     D::action(3,['action'=>'formation.save','slot'=>6,'name'=>'Own army','troops'=>[50100101=>10]]);
     checkD(count(D::state(3)['formations'])===1&&D::state(3)['formations'][0]['name']==='Own army','formations read only the current owner even for the same slot');

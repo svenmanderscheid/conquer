@@ -337,7 +337,7 @@ final class MapHandler
                 foreach ($stats['drops'] ?? [] as $drop) {
                     $item = \Conquer\Game\Inventory\InventoryService::getItemDef((int)$drop['item_code']);
                     $label = $item['name_de'] ?? $item['name'] ?? 'Gegenstand';
-                    $drops[] = $drop['count'].'× '.$label.' ('.round($drop['probability']*100,2).'%)';
+                    $drops[] = $drop['count'].'× '.$label;
                 }
 
                 $occ = [

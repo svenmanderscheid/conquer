@@ -3,6 +3,11 @@ declare(strict_types=1);
 /** Synthetic Luxembourg browser fixture only; never loaded by the game. */
 if(PHP_SAPI!=='cli'||!str_starts_with((string)$db->query('SELECT DATABASE()')->fetchColumn(),'conquer_feature_test_'))throw new RuntimeException('Isolated fixture required.');
 $rules=\Conquer\Game\Territory\TerritoryRules::defaults();
+if(in_array('--territory-report',$argv,true)){
+ // Report rendering deliberately uses a small custom garrison; ordinary previews keep real balance.
+ $rules['npc_troops']=['commune'=>120,'canton'=>800,'crown'=>1600];
+ $rules['npc_balance_revision']=2;
+}
 $rules['pvp_window_start_hour_utc']=0;$rules['pvp_window_hours']=24;
 $rules['crown_anchor']=gmdate('Y-m-d 00:00:00');$rules['crown_duration_hours']=24;
 $db->execute('UPDATE territory_profiles SET rules_json=? WHERE world_id=1',[json_encode($rules,JSON_THROW_ON_ERROR)]);
@@ -35,3 +40,10 @@ foreach(['food','abbey','rune']as$benefit){
 }
 $id=$db->query("SELECT id FROM territory_targets WHERE world_id=1 AND kind='commune' AND owner_alliance_id IS NULL AND id<>? ORDER BY id LIMIT 1",[$target['id']])->fetchColumn();
 $db->execute('UPDATE territory_targets SET owner_alliance_id=2,owned_since=UTC_TIMESTAMP(),last_income_at=UTC_TIMESTAMP(),ownership_seq=1 WHERE world_id=1 AND id=?',[$id]);
+if(in_array('--territory-protection',$argv,true)){
+ // A closed custom window verifies that the renderer does not assume 17:00 UTC.
+ $rules['pvp_window_start_hour_utc']=((int)gmdate('G')+2)%24;$rules['pvp_window_hours']=1;
+ $db->execute('UPDATE territory_profiles SET rules_json=? WHERE world_id=1',[json_encode($rules,JSON_THROW_ON_ERROR)]);
+ $shrine=$db->query("SELECT id FROM territory_targets WHERE world_id=1 AND kind='canton' ORDER BY id LIMIT 1")->fetchColumn();
+ $db->execute('UPDATE territory_targets SET owner_alliance_id=2,owned_since=UTC_TIMESTAMP(),last_income_at=UTC_TIMESTAMP(),ownership_seq=1 WHERE world_id=1 AND id=?',[$shrine]);
+}

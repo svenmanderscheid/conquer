@@ -11,5 +11,5 @@ window.ConquerTerritoryArt = (() => {
     if (target?.kind === 'canton') return 'canton-shrine';
     return Object.hasOwn(communes, target?.benefit_type) ? communes[target.benefit_type] : 'commune-food';
   }
-  return Object.freeze({key, image: (base, target) => `${base}/assets/art/territory-v3/${key(target)}.webp`});
+  return Object.freeze({key, image: (base, target) => `${base}/assets/art/territory-v4/${key(target)}.webp`});
 })();

@@ -271,7 +271,7 @@ window.ConquerWorld = (() => {
     for(const charm of state.charms||[]){const x=number(charm.x??charm.coord_x),y=number(charm.y??charm.coord_y);targets.push({key:`charms:${charm.id}`,kind:'charms',id:Number(charm.id),x,y,name:charmName(charm),level:{normal:1,epic:2,legendary:3}[charm.grade]||1,art:`${context.base}/assets/art/map/runes-v1/${['normal','epic','legendary'].includes(charm.grade)?charm.grade:'normal'}.webp`,data:{...charm,coord_x:x,coord_y:y}});}
     for(const p of state.players||[])targets.push({key:`players:${p.id}`,kind:'players',id:p.id,x:number(p.coord_x),y:number(p.coord_y),name:p.display_name||p.username||'Siedlung',level:number(p.castle_level)||1,art:castleArt(p.city_skin),data:p});
     for(const p of state.neutral_villages||[])targets.push({key:`neutral_villages:${p.id}`,kind:'neutral_villages',id:p.id,x:number(p.coord_x),y:number(p.coord_y),name:p.name||'Freies Dorf',level:number(p.level)||1,art:`${context.base}/assets/art/map/castle-default.png`,data:p});
-    if(!isLux()&&state.congress){const g=state.congress;targets.push({key:"congress",kind:"congress",id:g.id,x:number(g.coord_x),y:number(g.coord_y),name:g.name||"Kongress",level:1,art:`${context.base}/assets/art/territory-v3/congress-forum.webp`,data:g});}
+    if(!isLux()&&state.congress){const g=state.congress;targets.push({key:"congress",kind:"congress",id:g.id,x:number(g.coord_x),y:number(g.coord_y),name:g.name||"Kongress",level:1,art:`${context.base}/assets/art/territory-v4/congress-forum.webp`,data:g});}
     for(const g of (isLux()?[]:state.shrines)||[]){const element=shrineElement(g);if(!shrineElements[element]||!Number.isFinite(Number(g.coord_x))||!Number.isFinite(Number(g.coord_y)))continue;targets.push({key:`shrine:${g.id}`,kind:'shrine',id:g.id,element,x:number(g.coord_x),y:number(g.coord_y),name:g.name||`${shrineElements[element].label}schrein`,art:`${context.base}/assets/art/map/painted-v2/shrine-${element}.${motionPreference.matches||document.body.classList.contains('reduced-motion')?'png':'webp'}?v=shrines1`,data:g});}
     for(const g of state.alliance_structures||[]){const kind=g.structure_type==='center'?'alliance_center':'outpost';targets.push({key:`${kind}:${g.id}`,kind,id:g.id,x:number(g.coord_x),y:number(g.coord_y),name:g.name||(`${g.alliance_tag?'['+g.alliance_tag+'] ':''}${kind==='alliance_center'?'Allianzzentrum':'Außenposten'}`),level:1,art:asset(kind==='alliance_center'?'painted-v2/alliance-center.webp':'alliance-outpost'),data:g});}
     for(const g of state.territory?.map_targets||state.territory?.targets||[]){targets.push({key:`territory:${g.id}`,kind:'territory',id:g.id,x:number(g.x??g.coord_x),y:number(g.y??g.coord_y),name:g.name,level:1,art:window.ConquerTerritoryArt.image(context.base,g),artKey:window.ConquerTerritoryArt.key(g),data:g});}
@@ -339,7 +339,7 @@ window.ConquerWorld = (() => {
     el.addEventListener('click',handleClick);
     el.addEventListener('keydown',e=>{if(e.key==='Escape'&&memory.panel){e.preventDefault();e.stopPropagation();clearSelection();}});
     viewport.addEventListener('pointerdown',pointerDown);viewport.addEventListener('pointermove',pointerMove);viewport.addEventListener('pointerup',pointerUp);viewport.addEventListener('pointercancel',e=>pointerUp(e,true));viewport.addEventListener('lostpointercapture',e=>pointerUp(e,true));
-    viewport.addEventListener('click',e=>{if(performance.now()<view.suppressUntil&&!e.target.closest('.atlas-zoom,.atlas-minimap')){e.preventDefault();e.stopPropagation();}},true);
+    viewport.addEventListener('click',e=>{const handled=e.detail>0&&view.suppressNextClick;if(handled)view.suppressNextClick=false;if((handled||performance.now()<view.suppressUntil)&&!e.target.closest('.atlas-zoom,.atlas-minimap')){e.preventDefault();e.stopPropagation();}},true);
     viewport.addEventListener('wheel',e=>{e.preventDefault();const box=viewport.getBoundingClientRect();zoomTo(memory.zoom*(e.deltaY<0?1.12:1/1.12),e.clientX-box.left,e.clientY-box.top);},{passive:false});
     viewport.addEventListener('keydown',e=>{if(e.target!==viewport)return;const step=e.shiftKey?8:1;const keys={ArrowLeft:[-step,0],ArrowRight:[step,0],ArrowUp:[0,-step],ArrowDown:[0,step]};if(keys[e.key]){e.preventDefault();moveTo(memory.x+keys[e.key][0],memory.y+keys[e.key][1]);}else if(e.key==='Enter'||e.key===' '){e.preventDefault();selectCell(memory.x,memory.y);}else if(e.key==='+'||e.key==='='){e.preventDefault();zoomTo(memory.zoom*1.15);}else if(e.key==='-'){e.preventDefault();zoomTo(memory.zoom/1.15);}else if(e.key==='Home'){e.preventDefault();home();}else if(e.key==='Escape'){clearSelection();}});
     const mini=el.querySelector('.atlas-minimap');mini.addEventListener('pointerdown',e=>e.stopPropagation());mini.addEventListener('click',e=>{e.stopPropagation();if(e.detail===0)return;const box=view.mini.getBoundingClientRect();isLux()&&view.miniProjection?moveTo(((e.clientX-box.left)/box.width*160-view.miniProjection.ox)/view.miniProjection.s,((e.clientY-box.top)/box.height*160-view.miniProjection.oy)/view.miniProjection.s):moveTo((e.clientX-box.left)/box.width*(mapWidth()-1),(e.clientY-box.top)/box.height*(mapHeight()-1));clearSelection();});mini.addEventListener('keydown',e=>{const shift={ArrowLeft:[-20,0],ArrowRight:[20,0],ArrowUp:[0,-20],ArrowDown:[0,20]}[e.key];if(shift){e.preventDefault();e.stopPropagation();moveTo(memory.x+shift[0],memory.y+shift[1]);}});
@@ -451,6 +451,7 @@ window.ConquerWorld = (() => {
   }
   function pointerDown(e){
     if(e.button!==0||e.target.closest('.atlas-zoom,.atlas-minimap'))return;
+    view.suppressNextClick=false;
     view.viewport.focus({preventScroll:true});view.pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});view.viewport.setPointerCapture(e.pointerId);
     if(view.pointers.size===1){const box=view.viewport.getBoundingClientRect(),point=unproject(e.clientX-box.left,e.clientY-box.top),teleport=!!(context.teleport&&memory.cell&&e.target.closest('.atlas-cell-focus'));view.drag={x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY,moved:false,teleport,offsetX:teleport?point[0]-memory.cell.x:0,offsetY:teleport?point[1]-memory.cell.y:0,march:e.target.closest('[data-follow-march]')?.dataset.followMarch,target:e.target.closest('[data-atlas-target]')?.dataset.atlasTarget};}
     if(view.pointers.size===2){const points=[...view.pointers.values()];view.pinch={distance:Math.hypot(points[0].x-points[1].x,points[0].y-points[1].y),zoom:memory.zoom};if(view.drag)view.drag.moved=true;view.el.classList.add('is-camera-moving');}
@@ -487,6 +488,9 @@ window.ConquerWorld = (() => {
     const drag=view.drag;view.pointers.delete(e.pointerId);if(view.viewport.hasPointerCapture(e.pointerId))view.viewport.releasePointerCapture(e.pointerId);
     if(view.pointers.size===0){
       const flushedZoom=flushZoom();resetGesture();
+      // Touch browsers may emit their compatibility click after expensive map painting.
+      // Consume that one click even when the short time-based drag guard has elapsed.
+      view.suppressNextClick=!cancelled;
       view.suppressUntil=performance.now()+(drag?.moved?400:100);
       if(!applyPendingRender()&&drag?.moved&&!drag.teleport&&!flushedZoom)paint();
       if(!cancelled&&!drag?.moved&&!drag?.teleport){const box=view.viewport.getBoundingClientRect();if(context.teleport)selectCell(...unproject(e.clientX-box.left,e.clientY-box.top));else if(drag?.march)followMarch(drag.march);else if(drag?.target)select(drag.target,false,true);else selectCell(...unproject(e.clientX-box.left,e.clientY-box.top));}
@@ -510,6 +514,51 @@ window.ConquerWorld = (() => {
     health.querySelector('.atlas-monster-hp-track>span').style.width=`${Math.max(0,Math.min(100,current/maximum*100))}%`;
     health.dataset.current=String(current);health.dataset.max=String(maximum);
     button.setAttribute('aria-label',`${button.getAttribute('aria-label')}, Lebenspunkte ${format(current)} von ${format(maximum)}`);
+  }
+  const protectionIcon='<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 4 4 7 8 9 4-2 8-5 8-9V6l-8-3Z"/><path d="m8 12 3 3 5-6"/></svg>';
+  function protectionStatus(target){
+    const protection=target.kind==='territory'?target.data.protection:null;
+    if(!protection)return null;
+    let state=protection.state,until=Date.parse(protection.until),now=context.now();
+    // Advance only the displayed calendar; the rally action still checks fresh server eligibility.
+    if(['protected','open'].includes(state)){
+      let start=Date.parse(target.data.next_window?.starts_at),end=Date.parse(target.data.next_window?.ends_at);
+      const period=Number(protection.period_seconds)*1000;
+      if(Number.isFinite(start)&&Number.isFinite(end)&&period>0){
+        if(now>=end){const cycles=Math.floor((now-end)/period)+1;start+=cycles*period;end+=cycles*period;}
+        state=now<start?'protected':'open';until=state==='protected'?start:end;
+      }
+    }
+    const remaining=Number.isFinite(until)?Math.max(0,Math.ceil((until-now)/1000)):null;
+    const clock=remaining===null?'':`${String(Math.floor(remaining/3600)).padStart(2,'0')}:${String(Math.floor(remaining/60)%60).padStart(2,'0')}:${String(remaining%60).padStart(2,'0')}`;
+    const key={protected:'protected',open:'open',neutral:'neutral',inactive:'inactive'}[state];
+    if(!key)return null;
+    const label=translated(`landmark.protection.${key}`,{protected:'Protected',open:'Attack window open',neutral:'Neutral · attack anytime',inactive:'Conquest not unlocked'}[state]);
+    return {state,clock,text:clock?`${label} · ${clock}`:label};
+  }
+  function protectionMarkup(target){
+    const status=protectionStatus(target);if(!status)return '';
+    const progress=target.data.commune_progress,missing=progress&&Number(progress.held)<Number(progress.required);
+    const requirement=missing?translated('landmark.protection.majority','Communes controlled: {held}/{required} required').replace('{held}',format(progress.held)).replace('{required}',format(progress.required)):'';
+    return `<div class="atlas-conquest-status" data-protection="${status.state}"><span class="atlas-conquest-timing">${protectionIcon}<span>${escape(status.text)}</span></span>${requirement?`<small>${escape(requirement)}</small>`:''}</div>`;
+  }
+  function updateProtection(button,target){
+    const status=protectionStatus(target),protectedNow=status?.state==='protected';
+    if(status&&button.dataset.landmarkLabel)button.setAttribute('aria-label',`${button.dataset.landmarkLabel}, ${status.text}`);
+    button.classList.toggle('is-protected',protectedNow);
+    let ring=button.querySelector('.atlas-landmark-protection'),badge=button.querySelector('.atlas-protection-badge');
+    if(!protectedNow){ring?.remove();badge?.remove();return;}
+    if(!ring){ring=document.createElement('span');ring.className='atlas-landmark-protection';ring.setAttribute('aria-hidden','true');button.insertBefore(ring,button.querySelector('img'));}
+    if(!badge){badge=document.createElement('span');badge.className='atlas-protection-badge';badge.setAttribute('aria-hidden','true');badge.innerHTML=protectionIcon+'<span></span>';button.append(badge);}
+    badge.lastElementChild.textContent=status.text;
+  }
+  function updateProtectionTimers(){
+    const second=Math.floor(context.now()/1000);if(view.protectionSecond===second)return;view.protectionSecond=second;
+    for(const target of view.targets){if(target.kind!=='territory')continue;const button=view.markerNodes.get(target.key);if(button&&!button.hidden)updateProtection(button,target);}
+    const target=selectedTarget(),current=view.el.querySelector('.atlas-target-actions .atlas-conquest-status');
+    if(current&&target?.kind==='territory'){
+      const status=protectionStatus(target);if(status){const changed=current.dataset.protection!==status.state;current.dataset.protection=status.state;current.querySelector('.atlas-conquest-timing>span').textContent=status.text;if(changed)positionActions();}
+    }
   }
   function updateMarkers(){
     view.markersDirty=false;
@@ -546,6 +595,8 @@ window.ConquerWorld = (() => {
       if(isVillage(target))window.ConquerNameFrames?.apply(nameNode,window.ConquerNameFrames.resolve(target.data,target.data.city_skin));
       button.setAttribute('aria-label',`${target.name}${target.kind==='shrine'?`, ${shrineStatus(target,true)}`:target.kind==='charms'?`, ${charmGrades[target.data.grade]||'magisch'}, ${charmCategories[target.data.stat_category]||target.data.stat_category||'Bonus'} plus ${format(target.data.bonus_pct)} Prozent` :`, Stufe ${target.level}`}, X ${target.x}, Y ${target.y}, ${footprint(target)} mal ${footprint(target)} Felder${target.data.gatherer_march_id?', derzeit besetzt':''}`);
       updateMonsterHealth(button,target);
+      if(target.kind==='territory')button.dataset.landmarkLabel=button.getAttribute('aria-label');
+      updateProtection(button,target);
       if(['home','players'].includes(target.kind))button.setAttribute('aria-label',`${button.getAttribute('aria-label')}, ${cityAlliance(target).text}`);
       if(target.kind==='shrine'){button.dataset.shrine=target.element;button.classList.toggle('is-event-active',!!target.data.event?.active);button.title=shrineStatus(target,true);}
       button.classList.toggle('is-regional-boss',isRegionalBoss(target));
@@ -638,7 +689,7 @@ window.ConquerWorld = (() => {
       const close=target.kind==='charms'?'':`<button data-atlas="clear" aria-label="Zielmenü schließen">${icon('close')}</button>`;
       const membership=['home','players'].includes(target.kind)?cityAlliance(target):null;
       const name=membership?cityNameMarkup(target,membership):escape(target.name);
-      return `<div class="atlas-village-banner"><strong${['territory','home','players','alliance_center'].includes(target.kind)?' data-user-content':''}>${name}</strong>${summary}${close}</div><div class="atlas-actions-buttons">${actions}</div>`;
+      return `<div class="atlas-village-banner"><strong${['territory','home','players','alliance_center'].includes(target.kind)?' data-user-content':''}>${name}</strong>${summary}${close}</div>${protectionMarkup(target)}<div class="atlas-actions-buttons">${actions}</div>`;
     }
     return `<div class="atlas-actions-heading"><span${['territory','home','players','alliance_center'].includes(target.kind)?' data-user-content':''}>${escape(target.name)} · ${target.x}, ${target.y}</span><button data-atlas="clear" aria-label="Zielmenü schließen">${icon('close')}</button></div>${target.kind==='shrine'?`<small class="atlas-actions-status" title="${escape(shrineStatus(target,true))}">${escape(shrineStatus(target))}</small>`:''}<div class="atlas-actions-buttons">${actions}</div>`;
   }
@@ -731,8 +782,9 @@ window.ConquerWorld = (() => {
     const topbar=document.querySelector('.topbar')?.getBoundingClientRect(),chat=document.querySelector('.world-chat')?.getBoundingClientRect();
     const safeTop=Math.max(8,(topbar?.bottom||0)-viewport.top+8),safeBottom=Math.min(view.height-8,chat&&chat.height>32?chat.top-viewport.top-8:view.height-8);
     const landmark=isLandmark(target),objectSize=scale()*footprint(target),safeHeight=safeBottom-safeTop;
+    const protection=protectionStatus(target),shieldSpace=protection?.state==='protected'?32:0;
     if(landmark){
-      const room=Math.max(safeHeight-height-gap,Math.min(safeHeight-gap*2,view.width-width-gap*3));
+      const room=Math.min(view.width-gap*2,Math.max(safeHeight-height-gap-shieldSpace,Math.min(safeHeight-gap*2-shieldSpace,view.width-width-gap*3)))/(shieldSpace?1.03:1);
       if(room>0&&objectSize>room+1&&memory.zoom>minZoom()+.001){zoomTo(memory.zoom*room/objectSize);return;}
     }
     const framing=`card:${target.key}:${view.width}:${view.height}:${memory.zoom}`;
@@ -748,6 +800,23 @@ window.ConquerWorld = (() => {
     }
     const marker=view.markerNodes.get(target.key),art=marker.querySelector('img').getBoundingClientRect(),tile=marker.getBoundingClientRect();
     const object={left:Math.min(art.left,tile.left)-viewport.left,right:Math.max(art.right,tile.right)-viewport.left,top:Math.min(art.top,tile.top)-viewport.top,bottom:Math.max(art.bottom,tile.bottom)-viewport.top};
+    for(const decoration of marker.querySelectorAll('.atlas-landmark-protection,.atlas-protection-badge')){
+      const rect=decoration.getBoundingClientRect();object.left=Math.min(object.left,rect.left-viewport.left);object.right=Math.max(object.right,rect.right-viewport.left);object.top=Math.min(object.top,rect.top-viewport.top);object.bottom=Math.max(object.bottom,rect.bottom-viewport.top);
+    }
+    // Keep the whole landmark, including a fixed-size shield timer, clear of HUD and safe edges.
+    if(landmark){
+      const dx=object.left<gap?object.left-gap:object.right>view.width-gap?object.right-(view.width-gap):0;
+      const dy=object.top<safeTop?object.top-safeTop:object.bottom>safeBottom?object.bottom-safeBottom:0;
+      if((Math.abs(dx)>1||Math.abs(dy)>1)&&object.right-object.left<=view.width-gap*2&&object.bottom-object.top<=safeHeight){moveTo(memory.x+dx/scale(),memory.y+dy/scale());return;}
+      const badge=marker.querySelector('.atlas-protection-badge')?.getBoundingClientRect();
+      if(badge)for(const obstacle of obstacles){
+        const label={left:badge.left-viewport.left,right:badge.right-viewport.left,top:badge.top-viewport.top,bottom:badge.bottom-viewport.top};
+        if(label.left>=obstacle.right||label.right<=obstacle.left||label.top>=obstacle.bottom||label.bottom<=obstacle.top)continue;
+        const shift=obstacle.right<view.width/2?obstacle.right+gap-label.left:obstacle.left-gap-label.right;
+        if(object.left+shift>=gap&&object.right+shift<=view.width-gap){moveTo(memory.x-shift/scale(),memory.y);return;}
+        const down=obstacle.bottom+gap-label.top;if(object.bottom+down<=safeBottom){moveTo(memory.x,memory.y-down/scale());return;}
+      }
+    }
     const [x,y]=projectTarget(target),left=clamp(x-width/2,8,Math.max(8,view.width-width-8));
     const sideTop=clamp(y-height/2,safeTop,Math.max(safeTop,safeBottom-height));
     const candidates=[{left,top:object.bottom+gap},{left,top:object.top-height-gap},{left:object.right+gap,top:sideTop},{left:object.left-width-gap,top:sideTop}];
@@ -1181,6 +1250,7 @@ window.ConquerWorld = (() => {
     if(document.hidden){view.lastAmbience=null;return;}
     if(time-view.lastMotionFrame<1000/30)return;
     view.lastMotionFrame=time;
+    updateProtectionTimers();
     const interacting=Boolean(view.pointers.size);
     if(!interacting){
       syncMotion();

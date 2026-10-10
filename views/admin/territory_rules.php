@@ -23,7 +23,7 @@ $territoryCantons=$db->query("SELECT canton_id,name FROM territory_targets WHERE
 </div>
 <p class="subtle">Neutrale Communes und Shrines sind jederzeit angreifbar. Bei besetzten Gebieten muss der Angriff im PvP-Fenster eintreffen. Für die Krone sind Tor, Arsenal und Thron erforderlich; gehaltene Kontrollzeit entscheidet, bei Gleichstand die frühere erste Kontrolle und anschließend die Allianzkennung.</p>
 <h3>Verteidigung & Belohnungen</h3><div class="fields">
-<?php foreach(['commune'=>'Commune','canton'=>'Shrine','crown'=>'Royal Castle']as$kind=>$label)adminNumber('NPC-Truppen · '.$label,'rules[npc_troops]['.$kind.']',$territoryRules['npc_troops'][$kind],1,500000); ?>
+<?php foreach(['commune'=>'Commune','canton'=>'Shrine','crown'=>'Royal Castle']as$kind=>$label)adminNumber('NPC-Truppen · '.$label,'rules[npc_troops]['.$kind.']',$territoryRules['npc_troops'][$kind],1,\Conquer\Game\Territory\TerritoryRules::MAX_NPC_TROOPS); ?>
 <?php foreach(['income_per_hour'=>'Rohstoffertrag je Commune und Stunde','conquest_reward_gold'=>'Gold je erfolgreicher Teilnahme','support_cost'=>'Nahrung je Unterstützungsauftrag','special_daily_limit'=>'Gemeinsame Abteiaufträge pro Tag','rune_daily_charges'=>'Gemeinsame Runenteleports pro Tag','rune_radius'=>'Runenwacht · Ankunftsradius']as$key=>$label)adminNumber($label,'rules['.$key.']',$territoryRules[$key],0,1000000); ?>
 </div>
 <h3>Regionale Versorgung & Shrine-Auftrag</h3><div class="fields">

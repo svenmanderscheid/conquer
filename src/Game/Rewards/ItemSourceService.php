@@ -33,11 +33,12 @@ final class ItemSourceService
     {
         if($chance<=0||$quantity<1)return null;
         $chance=max(0.0,min(1.0,$chance));$code=(int)($entry['item_code']??0);
-        if(isset($query['item_code']))return $code===$query['item_code']?['quantity'=>$quantity,'chance'=>$chance]:null;
+        $range=isset($entry['count_min'])||isset($entry['quantity_min'])?['quantity_min'=>(int)($entry['count_min']??$entry['quantity_min'])]:[];
+        if(isset($query['item_code']))return $code===$query['item_code']?['quantity'=>$quantity,'chance'=>$chance]+$range:null;
         $treasureCode=(int)$query['treasure_code'];$definition=TreasureData::get($treasureCode);
         if(!$definition)return null;
         if(isset($entry['relic_code']))return (int)$entry['relic_code']===$treasureCode?['quantity'=>$quantity,'chance'=>$chance,'reward_type'=>'relic']:null;
-        if(isset($entry['treasure_code']))return (int)$entry['treasure_code']===$treasureCode?['quantity'=>$quantity,'chance'=>$chance]:null;
+        if(isset($entry['treasure_code']))return (int)$entry['treasure_code']===$treasureCode?['quantity'=>$quantity,'chance'=>$chance]+$range:null;
         $pack=$code>0?InventoryService::getItemDef($code):null;
         if($code>0&&($pack['category']??'')!=='fragment_pack')return null;
         if($pack&&isset($pack['treasure_code'])){
@@ -50,7 +51,7 @@ final class ItemSourceService
         if(!in_array($treasureCode,$pool,true)||!$pool)return null;
         $selection=1/count($pool);
         if($pack)return ['quantity'=>(int)$pack['fragment_amount'],'chance'=>$chance,'via_item_code'=>$code,'pack_quantity'=>$quantity,'selection_chance'=>$selection];
-        return ['quantity'=>$quantity,'chance'=>$chance*$selection,'random_relic'=>true];
+        return ['quantity'=>$quantity,'chance'=>$chance*$selection,'random_relic'=>true]+$range;
     }
 
     public static function search(int $playerId,array $input): array
@@ -102,6 +103,7 @@ final class ItemSourceService
         foreach(RewardCatalog::sources('chest')as$type=>$source){
             $cfg=RewardCatalog::effective('chest',(string)$type,$world);$total=array_sum(array_column($cfg['drop_table'],'weight'));$rewards=[];
             foreach($cfg['drop_table']as$entry){$match=self::matchReward($query,$entry,$total>0?(int)$entry['weight']/$total:0,(int)$entry['quantity']);if($match)$rewards[]=$match+['rolls'=>(int)$cfg['rolls'],'per_draw'=>true];}
+            foreach($cfg['bonus_drops']??[] as $entry){$match=self::matchReward($query,$entry,(float)$entry['probability'],(int)$entry['count']);if($match)$rewards[]=$match;}
             if(!$rewards)continue;
             $inventoryChest=null;$chestItem=null;
             foreach(InventoryService::allDefs()as$item)if(($item['chest_type']??'')===$type){$chestItem=(int)$item['code'];break;}

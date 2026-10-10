@@ -52,12 +52,15 @@ final class TerritoryService
         self::ensureWorld($world);
         $json=Connection::getInstance()->query('SELECT rules_json FROM territory_profiles WHERE world_id=?',[$world])->fetchColumn();
         self::require((bool)$json,'Gebietseroberungen sind in dieser Welt nicht aktiv.');
-        return json_decode((string)$json,true,32,JSON_THROW_ON_ERROR);
+        return TerritoryRules::currentProfile(json_decode((string)$json,true,32,JSON_THROW_ON_ERROR));
     }
     public static function compactState(int $player,int $world,?array $bounds=null): array
     {
         if(!self::enabled($world))return ['available'=>false,'map_targets'=>[]];
-        return ['available'=>true,'alliance_id'=>self::member($player,$world)['alliance_id']??null,'map_targets'=>self::mapTargets($world,$bounds),
+        $rules=self::profile($world);$aid=(int)(self::member($player,$world)['alliance_id']??0);$progress=self::progress($world,$aid);
+        $targets=self::mapTargets($world,$bounds);
+        foreach($targets as &$target)$target=self::describe($target,$rules,$aid,$progress,false);unset($target);
+        return ['available'=>true,'alliance_id'=>$aid?:null,'map_targets'=>$targets,
             'ownership'=>Connection::getInstance()->query('SELECT t.id,t.owner_alliance_id,a.name AS owner_name FROM territory_targets t LEFT JOIN alliances a ON a.id=t.owner_alliance_id WHERE t.world_id=? ORDER BY t.id',[$world])->fetchAll()];
     }
     public static function mapTargets(int $world,?array $bounds=null): array
@@ -100,18 +103,21 @@ final class TerritoryService
     {
         return self::displayNames(Connection::getInstance()->query("SELECT f.id AS target_id,f.canton_id,f.name,f.owner_alliance_id,COUNT(c.id) AS total,SUM(c.owner_alliance_id=?) AS held,FLOOR(COUNT(c.id)/2)+1 AS required FROM territory_targets f JOIN territory_targets c ON c.world_id=f.world_id AND c.canton_id=f.canton_id AND c.kind='commune' WHERE f.world_id=? AND f.kind='canton' GROUP BY f.id,f.canton_id,f.name,f.owner_alliance_id ORDER BY f.name",[$aid,$world])->fetchAll());
     }
-    private static function describe(array $t,array $rules,int $aid,array $progress): array
+    private static function describe(array $t,array $rules,int $aid,array $progress,bool $includeGarrisons=true): array
     {
         $t['name']=self::displayName($t['name']);
         $t['x']=(int)$t['x'];$t['y']=(int)$t['y'];$t['owner_alliance_id']=$t['owner_alliance_id']===null?null:(int)$t['owner_alliance_id'];
         $t['active']=!$rules['active_cantons']||$t['kind']==='crown'||in_array($t['canton_id'],$rules['active_cantons'],true);
         $t['next_window']=TerritoryRules::window($rules,time(),$t['kind']==='crown');
+        $t['protection']=TerritoryRules::protection($t,$t['next_window'],$rules);
+        if($t['kind']==='canton')foreach($progress as $p)if($p['canton_id']===$t['canton_id'])
+            $t['commune_progress']=['held'=>(int)$p['held'],'required'=>(int)$p['required'],'total'=>(int)$p['total']];
         $reason=$aid===0?'Tritt zuerst einer Allianz bei.':(!$t['active']?'Dieser Kanton ist noch nicht für Eroberungen geöffnet.':($t['owner_alliance_id']===$aid&&$t['kind']!=='crown'?'Eure Allianz hält dieses Gebiet.':null));
         if(!$reason&&$t['kind']==='canton')foreach($progress as $p)if($p['canton_id']===$t['canton_id']&&(int)$p['held']<(int)$p['required'])$reason='Zuerst mehr als die Hälfte der Communes im Kanton kontrollieren.';
         if(!$reason&&$t['kind']==='crown'&&!array_filter($progress,fn($p)=>(int)$p['owner_alliance_id']===$aid))$reason='Zuerst einen Shrine erobern.';
         if(!$reason&&($t['owner_alliance_id']!==null||$t['kind']==='crown')&&!$t['next_window']['open'])$reason='Das nächste angekündigte Kampffenster abwarten.';
         $t['blocked_reason']=$reason;$t['can_attack']=$reason===null;
-        $t['garrison_count']=isset($t['garrison_count'])?(int)$t['garrison_count']:(int)Connection::getInstance()->query("SELECT COUNT(*) FROM territory_garrisons WHERE world_id=? AND target_id=? AND status='active'",[$t['world_id'],$t['id']])->fetchColumn();
+        if($includeGarrisons)$t['garrison_count']=isset($t['garrison_count'])?(int)$t['garrison_count']:(int)Connection::getInstance()->query("SELECT COUNT(*) FROM territory_garrisons WHERE world_id=? AND target_id=? AND status='active'",[$t['world_id'],$t['id']])->fetchColumn();
         return $t;
     }
     public static function action(int $player,array $body,int $world): array
@@ -238,10 +244,10 @@ final class TerritoryService
     public static function saveProfile(int $world,array $changes,int $expectedVersion): array
     {
         self::profile($world);self::tick($world,time(),1000);$defaults=TerritoryRules::defaults();
-        foreach($changes as $key=>$value)self::require(array_key_exists($key,$defaults)&&$key!=='version','Unbekannter oder unveränderlicher Regelwert: '.$key);
+        foreach($changes as $key=>$value)self::require(array_key_exists($key,$defaults)&&!in_array($key,['version','npc_balance_revision'],true),'Unbekannter oder unveränderlicher Regelwert: '.$key);
         return WorldRules::combatLock(fn()=>Connection::getInstance()->transaction(function(Connection $db)use($world,$changes,$expectedVersion):array{
             self::assertCaughtUp($world);$row=$db->query('SELECT * FROM territory_profiles WHERE world_id=? FOR UPDATE',[$world])->fetch();self::require((int)$row['version']===$expectedVersion,'Das Regelprofil wurde inzwischen geändert.',409);
-            $rules=array_replace(json_decode($row['rules_json'],true),$changes);self::require(in_array($rules['canton_limit'],[1,2],true),'Das Shrine-Limit muss eins oder zwei sein.');
+            $rules=array_replace(TerritoryRules::currentProfile(json_decode($row['rules_json'],true)),$changes);self::require(in_array($rules['canton_limit'],[1,2],true),'Das Shrine-Limit muss eins oder zwei sein.');
             foreach(['income_per_hour','conquest_reward_gold','support_cost','special_daily_limit','rune_daily_charges','rune_radius','office_daily_uses','office_resource_grant','office_acceleration_seconds','regional_supply_percent','regional_daily_cap','canton_mission_contributors','canton_mission_reward'] as $k)self::require(is_int($rules[$k])&&$rules[$k]>=0&&$rules[$k]<=1000000,'Ungültiger Regelwert: '.$k);
             self::require($rules['regional_supply_percent']<=10&&$rules['canton_mission_contributors']>=1&&$rules['canton_mission_contributors']<=20,'Regionale Versorgung bleibt klein und Aufträge benötigen 1 bis 20 Mitglieder.');
             self::require(is_int($rules['pvp_window_start_hour_utc'])&&$rules['pvp_window_start_hour_utc']>=0&&$rules['pvp_window_start_hour_utc']<=23,'Ungültige UTC-Startstunde.');
@@ -254,7 +260,7 @@ final class TerritoryService
             foreach(['crown_tie_rule','crown_eligibility','canton_eligibility'] as $k)self::require($rules[$k]===TerritoryRules::defaults()[$k],'Die veröffentlichte Entscheidungsregel kann nicht geändert werden.');
             self::require(is_array($rules['active_cantons']),'Aktive Kantone müssen eine Liste sein.');$ids=$db->query("SELECT canton_id FROM territory_targets WHERE world_id=? AND kind='canton'",[$world])->fetchAll(\PDO::FETCH_COLUMN);
             foreach($rules['active_cantons'] as $id)self::require(is_string($id)&&in_array($id,$ids,true),'Unbekannter Kanton.');
-            self::require(is_array($rules['npc_troops'])&&count($rules['npc_troops'])===3,'Ungültige NPC-Verteidigung.');foreach(['commune','canton','crown'] as $kind)self::require(is_int($rules['npc_troops'][$kind]??null)&&$rules['npc_troops'][$kind]>=1&&$rules['npc_troops'][$kind]<=500000,'Ungültige NPC-Verteidigung.');
+            self::require(is_array($rules['npc_troops'])&&count($rules['npc_troops'])===3,'Ungültige NPC-Verteidigung.');foreach(['commune','canton','crown'] as $kind)self::require(is_int($rules['npc_troops'][$kind]??null)&&$rules['npc_troops'][$kind]>=1&&$rules['npc_troops'][$kind]<=TerritoryRules::MAX_NPC_TROOPS,'Ungültige NPC-Verteidigung.');
             $above=$db->query("SELECT alliance_id,SUM(n) AS count FROM (SELECT owner_alliance_id AS alliance_id,COUNT(*) AS n FROM territory_targets WHERE world_id=? AND kind='canton' AND owner_alliance_id IS NOT NULL GROUP BY owner_alliance_id UNION ALL SELECT alliance_id,COUNT(*) AS n FROM territory_campaigns WHERE world_id=? AND slot_reserved=1 GROUP BY alliance_id) a GROUP BY alliance_id HAVING SUM(n)>?",[$world,$world,$rules['canton_limit']])->fetch();self::require(!$above,'Das neue Shrine-Limit unterschreitet vorhandenen oder reservierten Besitz.');
             $old=json_decode($row['rules_json'],true);foreach($db->query('SELECT * FROM territory_targets WHERE world_id=? AND owner_alliance_id IS NOT NULL FOR UPDATE',[$world])->fetchAll() as $t)TerritoryEconomy::settle($t,time(),$old);
             $rules['version']=$expectedVersion+1;$db->execute('UPDATE territory_profiles SET version=?,rules_json=? WHERE world_id=?',[$rules['version'],json_encode($rules),$world]);return $rules;

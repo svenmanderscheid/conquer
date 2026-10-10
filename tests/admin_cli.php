@@ -40,6 +40,7 @@ try{
     foreach(['bin'=>'moderator','cron'=>'superadmin']as$entry=>$default){
         cliCheck($run($entry,['FixtureAdmin','--password-stdin'],$secret."\r\n",['FixtureAdmin',hash('sha256',$secret),$default,false])===[0,true,true],"$entry exact UTF-8 and whitespace, CRLF, default role");
         cliCheck($run($entry,['FixtureAdmin','--must-change','moderator','--password-stdin'],$secret."\n",['FixtureAdmin',hash('sha256',$secret),'moderator',true])===[0,true,true],"$entry flags independent of role position");
+        cliCheck($run($entry,['FixtureSupport','support','--must-change','--password-stdin'],$secret."\n",['FixtureSupport',hash('sha256',$secret),'support',true])===[0,true,true],"$entry provisions the scoped support role without exposing credentials");
         cliCheck($run($entry,['FixtureAdmin',$secret,'superadmin'],'')===[1,false,false],"$entry rejects legacy secret argument before bootstrap");
         cliCheck($run($entry,['FixtureAdmin'],$secret."\n")===[1,false,false],"$entry refuses implicit redirected password");
         cliCheck($run($entry,['--help'],'')===[0,false,false],"$entry help has no application side effects");

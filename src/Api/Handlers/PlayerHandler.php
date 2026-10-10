@@ -182,7 +182,7 @@ final class PlayerHandler
         Connection::getInstance()->execute(
             'INSERT INTO troop_formations (player_id, slot, troops_json)
              VALUES (?, ?, ?)
-             ON DUPLICATE KEY UPDATE troops_json = VALUES(troops_json), updated_at = UTC_TIMESTAMP()',
+             ON DUPLICATE KEY UPDATE troops_json = VALUES(troops_json), composition_json = NULL, updated_at = UTC_TIMESTAMP()',
             [$playerId, $slot, json_encode($clean)],
         );
 

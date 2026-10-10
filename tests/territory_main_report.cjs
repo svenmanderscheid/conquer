@@ -1,6 +1,6 @@
 'use strict';
 require('./fixtures/browser_locale.cjs')('de'); // This suite asserts the explicit German UI.
-// Mutates only the explicitly isolated territory preview account/database.
+// Uses --territory --territory-report; mutates only the isolated small-garrison report fixture.
 const assert=require('assert'),fs=require('fs'),path=require('path');
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const base=process.env.TERRITORY_FIXTURE_URL||'http://127.0.0.1:18946';assert(/^http:\/\/127\.0\.0\.1:\d+$/.test(base),'Disposable localhost fixture required');
@@ -9,7 +9,7 @@ const out=path.resolve(__dirname,'../artifacts/territory-main');fs.mkdirSync(out
  const page=await browser.newPage({viewport:{width:1280,height:800}}),errors=[];page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(12000);page.setDefaultNavigationTimeout(45000);
  await page.goto(base+'/?zugang=login');await page.locator('[name="identifier"],[name="username"]').fill('PreviewPlayer');await page.locator('[name="password"]').fill('PreviewFixture!2026');await Promise.all([page.waitForURL('**/city'),page.locator('form[action$="/auth/local"] button[type="submit"]').click()]);await page.waitForFunction(()=>document.querySelector('#player-hud-name')?.textContent.includes('PreviewPlayer'));
  async function read(route){const response=await page.request.get(base+'/api/'+route),payload=await response.json();assert(payload.ok,payload.message);return payload.data;}
- const state=await read('territory/state?world_id=1');assert.equal(state.targets.length,113);const goal=state.targets.find(t=>t.id===state.goal.target_id);assert(goal&&goal.y>255);
+ const state=await read('territory/state?world_id=1');assert.equal(state.profile?.npc_troops?.commune,120,'Start the disposable preview with --territory --territory-report for the 1,000-troop report fixture.');assert.equal(state.targets.length,113);const goal=state.targets.find(t=>t.id===state.goal.target_id);assert(goal&&goal.y>255);
  await page.locator('#navigation [data-id="world"]').click();await page.waitForFunction(()=>document.querySelector('.atlas-shell.is-luxembourg'));await page.evaluate(t=>ConquerWorld.focus(t.x,t.y),goal);await page.waitForSelector(`[data-atlas-target="territory:${goal.id}"]`);await page.locator(`[data-atlas-target="territory:${goal.id}"]`).click();await page.locator('.atlas-target-actions [data-action="territory-target"]').click();await page.waitForSelector('.territory-target-summary');
  let target=await read('territory/target?world_id=1&id='+encodeURIComponent(goal.id));
  if(Number(target.owner_alliance_id)!==Number(state.alliance_id)&&!target.campaigns.some(c=>['gathering','marching'].includes(c.status))){

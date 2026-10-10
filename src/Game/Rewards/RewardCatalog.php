@@ -126,7 +126,7 @@ final class RewardCatalog
         $source = self::sources($type)[$key] ?? null;
         if (!$source) throw new \InvalidArgumentException('Diese Beutequelle wurde nicht gefunden.');
         $d = $source['definition'];
-        if ($type === 'farm') return ['drops'=>self::availableDrops($d['drops']??[]),'fragment_drops'=>[],'relic_drops'=>[]];
+        if ($type === 'farm') return ['drops'=>self::availableDrops($d['drops']??[]),'fragment_drops'=>MonsterRewardRules::farmFragments((int)$d['level']),'relic_drops'=>[]];
         if ($type === 'monster') {
             $drops = $d['drops'] ?? [];
             if ($d['type'] === 'rally' && !isset($d['source_code'])) {
@@ -137,7 +137,7 @@ final class RewardCatalog
             $drops=MonsterRewardRules::rallyDrops($d,$drops);
             $level = (int)$d['level']; $family = (int)floor((int)$key/100)%100;
             $weights = $level<=3?[82,18,0]:($level<=6?[70,30,0]:($level<=8?[0,80,20]:[0,50,50]));
-            return ['drops'=>self::availableDrops($drops),'fragment_drops'=>[],'relic_drops'=>[],
+            return ['drops'=>self::availableDrops($drops),'fragment_drops'=>$d['fragment_drops']??MonsterRewardRules::fragments($level),'relic_drops'=>[],
                 'resource_reward'=>$d['resource_reward']??['food'=>100,'lumber'=>100,'stone'=>50,'gold'=>50],
                 'gems_drop'=>$d['gems_drop']??['chance'=>0,'amount'=>0],
                 'charms'=>['chance'=>1,'normal'=>$weights[0],'epic'=>$weights[1],'legendary'=>$weights[2]]];
@@ -164,7 +164,7 @@ final class RewardCatalog
         // A few retired world aliases (for example Orc 20200100) have no editor row.
         if(!isset($catalogCodes[$key]))$key=(string)($d['code']??$key);
         $cfg = self::override('monster',$key);
-        if ($cfg === null) { $d['drops']=self::availableDrops($d['drops']??[]);$d['fragment_drops']=[];$d['relic_drops']=[];return $d; }
+        if ($cfg === null) { $d['drops']=self::availableDrops($d['drops']??[]);$d['fragment_drops']??=MonsterRewardRules::fragments((int)$d['level']);$d['relic_drops']??=[];return $d; }
         $cfg['charms']['chance']=1;
         return array_replace($d, ['drops'=>$cfg['drops'],'fragment_drops'=>$cfg['fragment_drops']??[],'relic_drops'=>$cfg['relic_drops']??[],'resource_reward'=>$cfg['resource_reward'],'gems_drop'=>$cfg['gems_drop'],'admin_charms'=>$cfg['charms'],'admin_reward_override'=>true]);
     }
@@ -173,7 +173,7 @@ final class RewardCatalog
     public static function availableDrops(array $drops): array
     {
         $out=[];
-        foreach($drops as $v)if(InventoryService::isDropEligible((int)$v['item_code']))$out[]=['item_code'=>(int)$v['item_code'],'count'=>(int)$v['count'],'probability'=>(float)$v['probability']];
+        foreach($drops as $v)if(InventoryService::isDropEligible((int)$v['item_code']))$out[]=['item_code'=>(int)$v['item_code'],'count'=>(int)$v['count'],'probability'=>(float)$v['probability']]+array_intersect_key($v,['count_min'=>true]);
         return $out;
     }
 
@@ -227,12 +227,28 @@ final class RewardCatalog
             $seen[(string)$target]=true;
             if ($type==='chest'||$type==='dungeon') $entry['weight']=$integer($row['weight']??null,0,1000000,'Gewichtung');
             else $entry['probability']=$chance($row['chance']??null,'Dropchance');
-            if ($type!=='dungeon') $entry[$type==='chest'?'quantity':'count']=$integer($row['quantity']??null,1,100000,'Anzahl');
+            if ($type!=='dungeon') {
+                $entry[$type==='chest'?'quantity':'count']=$integer($row['quantity']??null,1,100000,'Anzahl');
+                if(isset($row['quantity_min'])&&$row['quantity_min']!=='')$entry[$type==='chest'?'quantity_min':'count_min']=$integer($row['quantity_min'],1,(int)$row['quantity'],Locale::t('admin.drops.quantity_min'));
+            }
             $entries[]=$entry;
         }
         if ($type==='chest') {
             if (array_sum(array_column($entries,'weight'))<1) throw new \InvalidArgumentException('Die Truhe braucht mindestens einen Eintrag mit positiver Gewichtung.');
-            return ['rolls'=>$integer($input['rolls']??null,1,20,'Ziehungen'),'drop_table'=>$entries];
+            $bonuses=[];$bonusSeen=[];$bonusRows=$input['bonus_rows']??[];
+            if(!is_array($bonusRows)||count($bonusRows)>50)throw new \InvalidArgumentException(Locale::t('admin.drops.bonus_invalid'));
+            foreach($bonusRows as $row){
+                if(!is_array($row))throw new \InvalidArgumentException(Locale::t('admin.drops.bonus_invalid'));
+                $code=$integer($row['target']??null,1,2147483647,'Gegenstand');
+                if(!InventoryService::isDropEligible($code)||isset($bonusSeen[$code]))throw new \InvalidArgumentException(Locale::t('admin.drops.bonus_invalid'));
+                $bonusSeen[$code]=true;
+                $entry=['item_code'=>$code,'count'=>$integer($row['quantity']??null,1,100000,'Anzahl'),'probability'=>$chance($row['chance']??null,'Dropchance')];
+                if(isset($row['quantity_min'])&&$row['quantity_min']!=='')$entry['count_min']=$integer($row['quantity_min'],1,$entry['count'],Locale::t('admin.drops.quantity_min'));
+                $bonuses[]=$entry;
+            }
+            $config=['rolls'=>$integer($input['rolls']??null,1,20,'Ziehungen'),'drop_table'=>$entries];
+            if($bonuses)$config['bonus_drops']=$bonuses;
+            return $config;
         }
         if ($type==='dungeon') {
             $code=$integer($input['treasure_code']??null,1,2147483647,'Relikt');
@@ -261,10 +277,18 @@ final class RewardCatalog
                 if(isset($fragmentSeen[$target]))throw new \InvalidArgumentException(Locale::t('admin.drops.fragment_duplicate'));
                 $fragmentSeen[$target]=true;
                 $entry['count']=$integer($row['quantity']??null,1,100000,Locale::t('admin.drops.fragment_quantity'));
+                if(isset($row['quantity_min'])&&$row['quantity_min']!=='')$entry['count_min']=$integer($row['quantity_min'],1,$entry['count'],Locale::t('admin.drops.quantity_min'));
+                if(isset($row['exclusive_group'])&&$row['exclusive_group']!==''){
+                    if(!is_string($row['exclusive_group'])||!preg_match('/^[a-z][a-z0-9_]{0,39}$/D',$row['exclusive_group']))throw new \InvalidArgumentException(Locale::t('admin.drops.fragment_invalid'));
+                    $entry['exclusive_group']=$row['exclusive_group'];
+                }
                 $entry['probability']=$chance($row['chance']??null,Locale::t('admin.drops.fragment_chance'));
                 $fragments[]=$entry;
             }
         }
+        $groupChances=[];
+        foreach($fragments as $entry)if(isset($entry['exclusive_group']))$groupChances[$entry['exclusive_group']]=($groupChances[$entry['exclusive_group']]??0)+$entry['probability'];
+        foreach($groupChances as $total)if($total>1.0000001)throw new \InvalidArgumentException(Locale::t('admin.drops.group_chance_invalid'));
         $relics=[];$relicSeen=[];
         $relicRows=$input['relic_rows']??[];
         if(!is_array($relicRows)||count($relicRows)>100)throw new \InvalidArgumentException(Locale::t('admin.drops.relic_limit'));
@@ -294,7 +318,7 @@ final class RewardCatalog
     {
         $items=[];
         foreach ($drops as $drop) if (self::roll((float)$drop['probability'])) {
-            $code=(int)$drop['item_code'];$items[$code]=($items[$code]??0)+(int)$drop['count'];
+            $code=(int)$drop['item_code'];$items[$code]=($items[$code]??0)+self::quantity($drop);
         }
         return $items;
     }
@@ -302,19 +326,40 @@ final class RewardCatalog
     /** Resolve a random relic now; the stored return haul is never rolled again. */
     public static function rollFragments(array $drops): array
     {
-        $fragments=[];
+        $fragments=[];$groups=[];
+        // A shared draw makes rarity alternatives mutually exclusive. Their listed
+        // probabilities remain unconditional and are used unchanged by previews.
+        foreach($drops as $drop)if(isset($drop['exclusive_group'])&&self::isFragmentDropEligible($drop))$groups[$drop['exclusive_group']][]=$drop;
+        $selected=[];
+        foreach($groups as $name=>$rows){
+            $draw=random_int(1,1000000);$total=0;
+            foreach($rows as $index=>$row){$total+=(int)round((float)$row['probability']*1000000);if($draw<=$total){$selected[$name]=$index;break;}}
+        }
+        $indexes=[];
         foreach($drops as $drop){
-            if(!self::isFragmentDropEligible($drop)||!self::roll((float)($drop['probability']??0)))continue;
+            if(!self::isFragmentDropEligible($drop))continue;
+            if(isset($drop['exclusive_group'])){
+                $name=$drop['exclusive_group'];$index=$indexes[$name]??0;$indexes[$name]=$index+1;
+                if(($selected[$name]??-1)!==$index)continue;
+            }elseif(!self::roll((float)($drop['probability']??0)))continue;
             $code=(int)($drop['treasure_code']??0);
             if(!$code){
                 $pool=TreasureData::getCodesByGrade((string)($drop['fragment_grade']??''));
                 if(!$pool)continue;
                 $code=$pool[random_int(0,count($pool)-1)];
             }
-            $count=max(0,(int)($drop['count']??0));
+            $count=self::quantity($drop);
             if($count>0)$fragments[$code]=($fragments[$code]??0)+$count;
         }
         return $fragments;
+    }
+
+    /** Legacy rows keep their fixed amount; ranges are inclusive and uniform. */
+    public static function quantity(array $drop,string $field='count'): int
+    {
+        $max=max(0,(int)($drop[$field]??0));$min=(int)($drop[$field.'_min']??$max);
+        if($min<0||$min>$max)throw new \InvalidArgumentException('Invalid reward quantity range.');
+        return $min===$max?$max:random_int($min,$max);
     }
 
     public static function grantFragments(int $playerId,array $fragments,array $rewardContext=[]): void

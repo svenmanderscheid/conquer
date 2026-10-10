@@ -11,7 +11,7 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/extra-even
   for(let n=0;!log.includes('Synthetic preview ready');n++){assert(n<300&&fixture.exitCode===null,log);await new Promise(r=>setTimeout(r,100));}
   const admin=await browser.newPage({viewport:{width:390,height:844}}),page=await browser.newPage({viewport:{width:390,height:844},hasTouch:true});const errors=[];page.on('pageerror',e=>errors.push(e.message));admin.on('pageerror',e=>errors.push(e.message));
   await admin.goto(base+'/admin/login');await admin.locator('[name=username]').fill('PreviewAdmin');await admin.locator('[name=password]').fill('PreviewFixture!2026');await Promise.all([admin.waitForURL('**/admin'),admin.locator('button[type=submit]').click()]);
-  await admin.goto(base+'/admin/world?world_id=1');const form=admin.locator('#extra-event-settings');
+  await admin.goto(base+'/admin/world?world_id=1#extra-event-settings');const form=admin.locator('#extra-event-settings');
   await form.locator('[name=enabled]').check();await form.locator('[name=name_en]').fill('Harvest Festival');await form.locator('[name=name_de]').fill('Erntefest');
   const utc=n=>new Date(Date.now()+n).toISOString().slice(0,16);await form.locator('[name=starts_at]').fill(utc(-3600000));await form.locator('[name=ends_at]').fill(utc(3600000));await form.locator('[name=reason]').fill('Event preview test');
   await Promise.all([admin.waitForNavigation(),form.locator('button[type=submit]').click()]);assert.equal(await form.locator('[name=name_en]').inputValue(),'Harvest Festival');

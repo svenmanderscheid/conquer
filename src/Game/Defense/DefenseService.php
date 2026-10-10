@@ -34,8 +34,8 @@ final class DefenseService
                 }
                 $troops[]=['code'=>$code,'name'=>$def['name_de']??$def['name'],'type'=>(int)$def['type'],'training_building'=>TroopData::buildingFor($code),'tier'=>(int)$def['tier'],'available'=>$available[$code]??0,'promotion'=>$promotion];
             }
-            $formations=$db->query('SELECT slot,name,troops_json FROM troop_formations WHERE player_id=? ORDER BY slot',[$playerId])->fetchAll();
-            foreach($formations as &$f){$f['slot']=(int)$f['slot'];$f['troops']=json_decode($f['troops_json'],true)?:[];unset($f['troops_json']);}unset($f);
+            $formations=$db->query('SELECT slot,name,troops_json,composition_json FROM troop_formations WHERE player_id=? ORDER BY slot',[$playerId])->fetchAll();
+            foreach($formations as &$f){$f['slot']=(int)$f['slot'];$f['troops']=json_decode($f['troops_json'],true)?:[];if($f['composition_json']!==null)$f['composition']=json_decode($f['composition_json'],true);unset($f['troops_json'],$f['composition_json']);}unset($f);
             $reinforcements=$db->query("SELECT r.*,p.username AS sender_name,q.username AS target_name FROM reinforcements r JOIN players p ON p.id=r.sender_id JOIN players q ON q.id=r.target_player_id WHERE (r.sender_city_id=? OR r.target_city_id=?) AND r.state='active' ORDER BY r.id DESC",[$cityId,$cityId])->fetchAll();
             foreach($reinforcements as &$r){$r['troops']=json_decode($r['troops_json'],true)?:[];$r['can_recall']=(int)$r['sender_id']===$playerId;unset($r['troops_json']);}unset($r);
             return ['city_id'=>$cityId,'world_id'=>$world,'wall'=>self::wallStats($city,$buildings),'shield'=>['active'=>WorldRules::shieldActive($city+$shield),'expires_at'=>$city['shield_expires_at'],'beginner_until'=>$shield['beginner_shield_until']],
@@ -226,8 +226,13 @@ final class DefenseService
     {
         $slot=self::integer($body,'slot',1,self::FORMATION_SLOTS);$name=$body['name']??'';
         if(!is_string($name)||mb_strlen(trim($name))<1||mb_strlen(trim($name))>48)throw new \DomainException('Ein Formationsname mit 1 bis 48 Zeichen ist erforderlich.');
-        $troops=MarchArmy::clean($body['troops']??null,ResearchEffects::limits(BuffEngine::getBuffs($playerId,(int)$city['world_id']))['march_capacity']);
-        Connection::getInstance()->execute('INSERT INTO troop_formations(player_id,slot,name,troops_json) VALUES(?,?,?,?) ON DUPLICATE KEY UPDATE name=VALUES(name),troops_json=VALUES(troops_json)',[$playerId,$slot,trim($name),json_encode($troops)]);
+        $capacity=ResearchEffects::limits(BuffEngine::getBuffs($playerId,(int)$city['world_id']))['march_capacity'];$composition=null;
+        if(array_key_exists('composition',$body)){
+            $composition=FormationComposition::clean($body['composition'],$capacity);
+            $stocks=Connection::getInstance()->query('SELECT troop_code,count FROM city_troops WHERE city_id=?',[(int)$city['id']])->fetchAll(\PDO::FETCH_KEY_PAIR);
+            $troops=FormationComposition::allocate(array_values(TroopData::all()),$stocks,$capacity,$composition);
+        }else $troops=MarchArmy::clean($body['troops']??null,$capacity);
+        Connection::getInstance()->execute('INSERT INTO troop_formations(player_id,slot,name,troops_json,composition_json) VALUES(?,?,?,?,?) ON DUPLICATE KEY UPDATE name=VALUES(name),troops_json=VALUES(troops_json),composition_json=VALUES(composition_json)',[$playerId,$slot,trim($name),json_encode($troops),$composition===null?null:json_encode($composition)]);
         return ['slot'=>$slot,'message'=>'Formation gespeichert. Die Truppen werden erst beim Marsch reserviert.'];
     }
     private static function deleteFormation(int $playerId,int $slot): array {Connection::getInstance()->execute('DELETE FROM troop_formations WHERE player_id=? AND slot=?',[$playerId,$slot]);return ['message'=>'Formation gelöscht.'];}

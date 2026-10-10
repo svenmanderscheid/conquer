@@ -8,8 +8,8 @@ module.exports=async({page,base,errors})=>{
  async function save(){await page.locator('[data-batch-form] [name=reason]').fill('Isolated modern admin browser check');await Promise.all([page.waitForNavigation(),page.locator('[data-batch-save]').click()]);await page.locator('[data-batch-editor]').waitFor();assert.equal(await page.locator('.notice.error').count(),0);}
  async function fit(label){const metrics=await page.evaluate(()=>({overflow:document.documentElement.scrollWidth-innerWidth,font:getComputedStyle(document.body).fontFamily,background:getComputedStyle(document.body).backgroundColor,scrollbars:getComputedStyle(document.body).scrollbarWidth}));assert(metrics.overflow<=1,label+JSON.stringify(metrics));assert(metrics.font.includes('system-ui'),label+' uses a practical administration font');assert.equal(metrics.scrollbars,'none');assert.equal(await page.locator('.notice.error').count(),0,label+' rendered');assert.equal(await page.locator('.sidebar nav a:not(.active)').first().evaluate(e=>getComputedStyle(e).color),'rgb(28, 39, 56)','Unselected navigation has readable contrast');assert.equal(await page.locator('.brand').evaluate(e=>getComputedStyle(e).color),'rgb(28, 39, 56)','Wordmark has readable contrast');return metrics;}
  await page.screenshot({path:path.join(out,'overview-desktop.png'),fullPage:true});
- assert.equal(await page.locator('[data-admin-area]').count(),7);
- for(const route of ['/admin/players','/admin/alliances','/admin/world','/admin/world-create','/admin/lands','/admin/items','/admin/alpha-keys','/admin/alpha-waitlist','/admin/chat','/admin/bug-reports','/admin/audit','/admin/analytics','/admin/layout']){
+ assert.equal(await page.locator('[data-admin-area]').count(),8);
+ for(const route of ['/admin/players','/admin/activity','/admin/cases','/admin/technical','/admin/alliances','/admin/world','/admin/world-create','/admin/lands','/admin/items','/admin/alpha-keys','/admin/alpha-waitlist','/admin/chat','/admin/bug-reports','/admin/audit','/admin/analytics','/admin/layout']){
   const response=await page.goto(base+route+'?world_id=1');assert.equal(response.status(),200,route);await fit(route);
  }
  await page.goto(base+'/admin/rewards?type=farm&world_id=1');await page.locator('[data-batch-count]').filter({hasText:/\d/}).waitFor();
@@ -25,13 +25,14 @@ module.exports=async({page,base,errors})=>{
  assert.equal(await group('20100101.1').locator('[data-field=chance]').first().inputValue(),'7.5');
  assert.equal(await group('20100101.2').locator('[data-field=chance]').first().inputValue(),'9.25');
  assert.equal(await page.locator('[data-batch-save]').isDisabled(),true);
- await page.locator('[data-batch-kind=rows]').click();
+ await page.locator('[data-batch-category=speedups]').click();
  await group('20100101.1','rows').locator('[data-batch-add]').click();
  let added=group('20100101.1','rows').locator('.batch-entry').last();
  await added.locator('select').selectOption('10103002');await added.locator('[data-field=quantity]').fill('2');await added.locator('[data-field=chance]').fill('15');
- await save();await page.locator('[data-batch-kind=rows]').click();
+ await save();await page.locator('[data-batch-category=speedups]').click();
  assert.equal(await group('20100101.1','rows').locator('[data-field=target]').last().inputValue(),'10103002');
  assert.equal(await group('20100101.1').locator('[data-field=quantity]').first().inputValue(),'5','Item table edits preserve direct fragments');
+ await page.locator('[data-batch-category=items]').click();
  await page.locator('[data-modern-context] [name=scope]').selectOption('world');
  await Promise.all([page.waitForNavigation(),page.locator('[data-modern-context] button').click()]);
  assert.equal(await group('20100101.1').locator('[data-field=quantity]').first().inputValue(),'7');
@@ -50,6 +51,7 @@ module.exports=async({page,base,errors})=>{
   await page.context().addCookies([{name:'conquer_locale',value:locale,url:base}]);await page.setViewportSize({width,height});
   for(const type of ['farm','monster']){
    await page.goto(base+`/admin/rewards?type=${type}&world_id=1`);await page.locator('[data-batch-count]').filter({hasText:/\d/}).waitFor();
+   await page.locator('[data-batch-category=items]').click();
    await fit(`${type} ${width}`);await page.locator('[data-batch-search]').fill(type==='farm'?(locale==='fr'?'Mine':locale==='de'?'mine':'mine'):'Or');
    assert(await page.locator('.batch-source:visible').count()>0);await page.locator('[data-batch-search]').fill('');
    await page.locator('[data-batch-level]').selectOption('1');assert(await page.locator('.batch-source:visible').count()>0);
@@ -58,7 +60,7 @@ module.exports=async({page,base,errors})=>{
    await add.locator('[data-field=quantity]').fill('2');await add.locator('[data-field=chance]').fill('10');
    assert.equal(await add.locator('output').innerText(),'20');await add.locator('[data-batch-remove]').click();
    await fit(`${type} editor ${width}`);await page.screenshot({path:path.join(out,`${type}-${locale}-${width}.png`),fullPage:false});
-   if(width<900){await page.locator('.mobile-menu').click();assert.equal(await page.locator('#admin-nav [data-admin-area]:visible').count(),7);assert(await page.locator('.sidebar-bottom button').isVisible());await page.locator('.mobile-menu').click();}
+   if(width<900){await page.locator('.mobile-menu').click();assert.equal(await page.locator('#admin-nav [data-admin-area]:visible').count(),8);assert(await page.locator('.sidebar-bottom button').isVisible());await page.locator('.mobile-menu').click();}
   }
   await page.goto(base+'/admin/rewards?type=farm&source=20100101.1&world_id=1');await fit(`detail ${width}`);await page.screenshot({path:path.join(out,`detail-${locale}-${width}.png`),fullPage:false});
  }

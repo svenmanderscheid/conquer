@@ -61,10 +61,10 @@ try{
  rejects(fn()=>MarchDispatcher::dispatchMonster(1,1,25,40,60,60,[50100101=>100]),'solo dispatch rejected before spending or reservation');
  $badgeReward=\Conquer\Game\Rewards\MonsterRewardRules::allianceBadgeCount((int)\Conquer\Game\Map\MonsterData::get($testMonsterCode)['level']);
  $defaultId=MonsterRally::start(1,1,60,60,[50100101=>100],5,'Default chance');$storedBadges=badgeSnapshot($defaultId);
- ck(count($storedBadges)===1&&$storedBadges[0]['count']===$badgeReward&&(float)$storedBadges[0]['probability']===0.50,'ordinary rally snapshots one level-scaled badge drop with a 50% chance');
+ ck(count($storedBadges)===1&&$storedBadges[0]['count']===$badgeReward&&(float)$storedBadges[0]['probability']===0.40,'ordinary rally snapshots one level-scaled badge drop with a 40% chance');
  // Deterministic fixture overrides exercise delivery without asserting random outcomes.
  badgeChance(1.0);
- ck((float)badgeSnapshot($defaultId)[0]['probability']===0.50,'later reward changes do not rewrite a started rally 50% snapshot');RallyService::cancel($defaultId,1);
+ ck((float)badgeSnapshot($defaultId)[0]['probability']===0.40,'later reward changes do not rewrite a started rally 40% snapshot');RallyService::cancel($defaultId,1);
  $id=MonsterRally::start(1,1,60,60,[50100101=>5000],5,'Together');$storedBadges=badgeSnapshot($id);
  ck(count($storedBadges)===1&&$storedBadges[0]['count']===$badgeReward&&(float)$storedBadges[0]['probability']===1.0,'explicit 100% test override is captured before the deterministic victory');
  ck(stock(1)===20000&&(int)$db->query('SELECT action_points FROM players WHERE id=1')->fetchColumn()===175,'captain reserves troops and pays catalog AP');

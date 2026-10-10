@@ -82,6 +82,12 @@ body.admin-village.admin-modern .world-workspace .table-wrap{max-width:100%;over
 .admin-modern .link-destination{overflow-wrap:anywhere;font-size:12px;}
 .admin-modern .link-tracker summary{cursor:pointer;min-height:44px;align-content:center;overflow-wrap:anywhere;}
 @media(max-width:700px){.admin-modern .link-insights,.admin-modern .link-form-grid{grid-template-columns:1fr;}.admin-modern .link-target-field{grid-column:auto;}.admin-modern .link-row-stats{grid-template-columns:1fr 1fr;}.admin-modern .link-row-stats>div:last-child{grid-column:1/-1;}.admin-modern .link-stats{grid-template-columns:1fr;}}
+.admin-modern .waitlist-heading{flex-wrap:wrap;align-items:flex-start;}
+.admin-modern .waitlist-actions{display:flex;flex-wrap:wrap;gap:10px;}
+.admin-modern .waitlist-actions :is(button,.button){white-space:normal;text-align:center;}
+.admin-modern .alpha-waitlist [data-waitlist-copy-list]{margin-bottom:18px;}
+.admin-modern .alpha-waitlist textarea{margin-top:8px;resize:vertical;}
+@media(max-width:700px){.admin-modern .waitlist-actions{width:100%;}.admin-modern .waitlist-actions :is(button,.button){flex:1 1 180px;}}
 body.admin-village.admin-modern {
  --ui-font:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--ui-font-number:var(--ui-font);
  --ui-paper:#f5f7fa;--ui-card:#fff;--ui-card-light:#fff;--ui-inset:#eef2f7;
@@ -223,6 +229,15 @@ body.admin-village.admin-modern .admin-auth-header :is(h1,p){color:var(--ui-ink)
 .admin-modern .batch-toolbar label:not(.batch-search){flex:0 1 140px;}
 .admin-modern .batch-toolbar select{width:100%;}
 .admin-modern .batch-kind{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
+.admin-modern .batch-drop-section{margin-bottom:18px;}
+.admin-modern :is(.batch-drop-section,.batch-direct-resources) h3{font-size:12px;margin:0 0 10px;color:var(--ui-muted);}
+.admin-modern .batch-direct-resources dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:12px;margin:0;}
+.admin-modern .batch-direct-resources :is(dt,dd){margin:0;font-size:12px;}
+.admin-modern .batch-direct-resources dt{display:flex;align-items:center;gap:6px;color:var(--ui-muted);}
+.admin-modern .batch-direct-resources dt img{width:22px;height:22px;}
+.admin-modern .batch-direct-resources dd{margin-top:5px;font-weight:600;}
+.admin-modern .drop-category{min-width:0;margin:12px 0 20px;}
+.admin-modern .drop-category h4{margin:0 0 10px;font-size:13px;color:var(--ui-primary-dark);}
 body.admin-village.admin-modern .batch-kind button[aria-pressed=true]{background:var(--ui-primary-light);color:var(--ui-primary-dark);border-color:var(--ui-primary);}
 .admin-modern .reward-batch-form fieldset{min-width:0;}
 .admin-modern .batch-table-wrap{border:1px solid var(--ui-line);border-radius:10px;background:#fff;max-height:60dvh;overflow:auto;}

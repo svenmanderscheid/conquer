@@ -6,24 +6,29 @@ const sharp = require('sharp');
 const root = path.resolve(__dirname, '..');
 const iconDir = path.join(root, 'assets', 'icons');
 const source = fs.readFileSync(path.join(iconDir, 'union-of-kingdoms-painted-master.png'));
+const faviconSource = fs.readFileSync(path.join(iconDir, 'union-of-kingdoms-kingdom-favicon-master.png'));
 // Clean-white brand surface; preserve the approved painted motif when exporting.
 const background = '#ffffff';
-async function png(size, opaque = false) {
-  let image = sharp(source).resize(size, size);
+async function png(input, size, opaque = false) {
+  let image = sharp(input).resize(size, size);
   if (opaque) image = image.flatten({ background });
   return image.png({ compressionLevel: 9 }).toBuffer();
 }
 (async () => {
   const master = await sharp(source).metadata();
   if (!master.width || master.width !== master.height) throw new Error('The approved icon master must be square.');
+  const faviconMaster = await sharp(faviconSource).metadata();
+  if (!faviconMaster.hasAlpha || faviconMaster.width !== faviconMaster.height) throw new Error('The favicon master must be square with transparency.');
   const sizes = [16, 32, 48, 192, 512];
   const images = new Map();
-  for (const size of sizes) images.set(size, await png(size));
+  for (const size of sizes) images.set(size, await png(size <= 48 ? faviconSource : source, size));
   for (const size of [16, 32, 192, 512]) fs.writeFileSync(path.join(iconDir, `conquer-${size}.png`), images.get(size));
-  fs.writeFileSync(path.join(root, 'apple-touch-icon.png'), await png(180, true));
-  // Keep the full battle scene inside the safe circle of launcher masks.
-  const inset = await sharp(source).resize(700, 700).png().toBuffer();
-  const maskableMaster = await sharp({ create: { width: 1254, height: 1254, channels: 3, background } })
+  fs.writeFileSync(path.join(root, 'apple-touch-icon.png'), await png(source, 180, true));
+  // The Kingdom master has white padding; this inset keeps its painted silhouette
+  // inside the central 80%-diameter safe circle of maskable launcher icons.
+  const insetSize = Math.floor(master.width * 0.84);
+  const inset = await sharp(source).resize(insetSize, insetSize).png().toBuffer();
+  const maskableMaster = await sharp({ create: { width: master.width, height: master.height, channels: 3, background } })
     .composite([{ input: inset, gravity: 'centre' }]).png({ compressionLevel: 9 }).toBuffer();
   fs.writeFileSync(path.join(iconDir, 'union-of-kingdoms-painted-maskable-master.png'), maskableMaster);
   const maskable = await sharp(maskableMaster)
@@ -46,5 +51,5 @@ async function png(size, opaque = false) {
     offset += images.get(size).length;
   });
   fs.writeFileSync(path.join(root, 'favicon.ico'), Buffer.concat([header, ...frames.map(size => images.get(size))]));
-  console.log('Exported favicon 16/32/48, Apple 180, app 192/512, and maskable 512.');
+  console.log('Exported Kingdom app 192/512, Apple 180, Android launcher, maskable 512, and simplified transparent favicon 16/32/48.');
 })().catch(error => { console.error(error.message); process.exitCode = 1; });

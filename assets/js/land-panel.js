@@ -150,8 +150,8 @@
       if (!list?.length) return '<p class="land-muted">In diesem Land stehen aktuell keine aktiven Monster.</p>';
       return `<div class="land-loot-list">${list.map(monster => {
         const resources = Object.entries(monster.resource_reward || {}).filter(([, amount]) => Number(amount) > 0).map(([key, amount]) => `${editorial(resourceNames[key] || key)} ${fmt(amount)}`);
-        const drops = (monster.drops || []).map(drop => `${editorial(drop.label || `Item ${drop.item_code}`)} × ${fmt(drop.count)} · ${Math.round(Number(drop.probability || 0) * 100)} %`);
-        const gems = monster.gems_drop && Number(monster.gems_drop.amount) > 0 ? [`${editorial("Edelsteine")} ${fmt(monster.gems_drop.amount)} · ${Math.round(Number(monster.gems_drop.chance || 0) * 100)} %`] : [];
+        const drops = (monster.drops || []).map(drop => `${editorial(drop.label || `Item ${drop.item_code}`)} × ${fmt(drop.count)}`);
+        const gems = monster.gems_drop && Number(monster.gems_drop.amount) > 0 ? [`${editorial("Edelsteine")} ${fmt(monster.gems_drop.amount)}`] : [];
         return `<article><h4>${esc(editorial(monster.name))} · Stufe ${fmt(monster.level)}</h4><span>${esc(monster.type === 'rally' ? 'Rally' : 'Solo')}</span><p>${[...resources, ...drops, ...gems].map(esc).join(' · ') || 'Keine Beutevorschau verfügbar'}${monster.guaranteed_charms ? ' · '+editorial('1 Karten-Charm garantiert') : ''}</p></article>`;
       }).join('')}</div>`;
     }

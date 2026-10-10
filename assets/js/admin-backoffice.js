@@ -84,13 +84,13 @@
     const matrix=$('[data-matrix-view]');
     const matrixRows=matrix?$$('[data-matrix-drops]',matrix).map(row=>({row,drops:JSON.parse(row.dataset.matrixDrops)})):[];
     const matrixFormat=value=>Number(value).toLocaleString(window.ConquerLocale?.locale??'en',{maximumFractionDigits:4});
-    const sourceLevel=$('[data-source-level]'),sourceRule=$('[data-source-rule]');
+    const sourceLevel=$('[data-source-level]'),sourceType=$('[data-source-type]'),sourceRule=$('[data-source-rule]');
     const sourceScroll=matrix?.closest('.monster-table-scroll')||$('.source-list');
     const sourceStateKey='admin-reward-view:'+location.pathname+':'+(sourceBrowser?.dataset.sourceContext||'');
     let sourceState={};try{sourceState=JSON.parse(sessionStorage.getItem(sourceStateKey)||'{}')||{};}catch{}
     function saveSourceView(){
         if(!sourceBrowser)return;
-        sourceState={...sourceState,search:sourceSearch.value,level:sourceLevel?.value||'',rule:sourceRule?.value||'',
+        sourceState={...sourceState,search:sourceSearch.value,level:sourceLevel?.value||'',type:sourceType?.value||'',rule:sourceRule?.value||'',
             top:sourceScroll.scrollTop,left:sourceScroll.scrollLeft,view:matrix?.dataset.matrixView,
             items:matrix?$$('[data-compare-item]',matrix).map(s=>s.value):[]};
         try{sessionStorage.setItem(sourceStateKey,JSON.stringify(sourceState));}catch{}
@@ -130,31 +130,32 @@
     }
     function filterSources(changed=false){
         if(!sourceSearch)return;
-        const q=sourceSearch.value.toLocaleLowerCase().trim(),level=$('[data-source-level]')?.value,rule=$('[data-source-rule]')?.value;let count=0;
+        const q=sourceSearch.value.toLocaleLowerCase().trim(),level=sourceLevel?.value,type=sourceType?.value,rule=sourceRule?.value;let count=0;
         $$('[data-source-name]').forEach(e=>{
             e.hidden=!e.dataset.sourceName.toLocaleLowerCase().includes(q)
                 ||Boolean(level&&e.dataset.sourceLevelValue!==level)
+                ||Boolean(type&&e.dataset.sourceTypeValue!==type)
                 ||(rule==='custom'&&e.dataset.sourceCustom!=='1')
                 ||(rule==='default'&&e.dataset.sourceCustom==='1')
                 ||(rule==='empty'&&e.dataset.sourceItems!=='0');
             if(!e.hidden)count++;
         });
         $('[data-source-count]').textContent=rewardText('found',{count});$('[data-source-empty]').hidden=count>0;
-        $('[data-source-reset]').hidden=!q&&!level&&!rule;
+        $('[data-source-reset]').hidden=!q&&!level&&!type&&!rule;
         if(changed){sourceScroll.scrollTop=0;saveSourceView();}
     }
     if(sourceSearch){
         if(typeof sourceState.search==='string')sourceSearch.value=sourceState.search;
-        for(const [field,value] of [[sourceLevel,sourceState.level],[sourceRule,sourceState.rule]]){
+        for(const [field,value] of [[sourceLevel,sourceState.level],[sourceType,sourceState.type],[sourceRule,sourceState.rule]]){
             if(field&&[...field.options].some(o=>o.value===value))field.value=value;
         }
         filterSources();
         requestAnimationFrame(()=>{sourceScroll.scrollTop=Number(sourceState.top)||0;sourceScroll.scrollLeft=Number(sourceState.left)||0;});
     }
     sourceSearch?.addEventListener('input',()=>filterSources(true));
-    $$('[data-source-level],[data-source-rule]').forEach(e=>e.addEventListener('change',()=>filterSources(true)));
+    $$('[data-source-level],[data-source-type],[data-source-rule]').forEach(e=>e.addEventListener('change',()=>filterSources(true)));
     $('[data-source-reset]')?.addEventListener('click',()=>{
-        sourceSearch.value='';if(sourceLevel)sourceLevel.value='';sourceRule.value='';filterSources(true);sourceSearch.focus();
+        sourceSearch.value='';if(sourceLevel)sourceLevel.value='';if(sourceType)sourceType.value='';sourceRule.value='';filterSources(true);sourceSearch.focus();
     });
     $('.source-list')?.addEventListener('click',event=>{
         const link=event.target.closest('a[href]');if(!link)return;
@@ -181,47 +182,69 @@
     const editor=$('[data-reward-editor]'), form=editor?.closest('form');let dirty=false,submitting=false;
     function markDirty(){dirty=true;const s=$('[data-save-status]');if(s){s.textContent='Ungespeicherte Änderungen';s.classList.add('is-dirty');}}
     if(editor?.dataset.hasDraft==='1')markDirty();
+    function groupDropRows(container){
+        if(!container)return;
+        const rows=$$('.drop-row',container);
+        for(const category of ['items','speedups','boosts','resources']){
+            let section=$(`[data-drop-group="${category}"]`,container);
+            if(!section){section=document.createElement('section');section.className='drop-category';section.dataset.dropGroup=category;const heading=document.createElement('h4');heading.textContent=rewardText('group_'+category);const entries=document.createElement('div');entries.dataset.dropGroupEntries='';section.append(heading,entries);container.append(section);}
+            const entries=$('[data-drop-group-entries]',section);
+            for(const row of rows){const code=$('input[name$="[target]"]',row).value,group=byCode.get(code)?.drop_group||'items';if(group===category&&row.parentElement!==entries)entries.append(row);}
+            section.hidden=!$$('.drop-row',section).some(row=>!row.hidden);
+        }
+    }
     function updateRows(){
         if(!editor)return;
         updateFragmentRows();
         updateRelicRows();
-        const rows=$$('.drop-row',editor),weighted=['chest','dungeon'].includes(editor.dataset.rewardEditor);
-        const total=rows.reduce((sum,r)=>sum+Math.max(0,Number($('input[name$="[weight]"]',r)?.value)||0),0);
+        const rows=$$('.drop-row',editor),primaryRows=rows.filter(row=>!row.hasAttribute('data-chest-bonus')),weighted=['chest','dungeon'].includes(editor.dataset.rewardEditor);
+        const total=rows.filter(r=>!r.hasAttribute('data-chest-bonus')).reduce((sum,r)=>sum+Math.max(0,Number($('input[name$="[weight]"]',r)?.value)||0),0);
         const query=$('[data-drop-search]').value.trim().toLocaleLowerCase('de');let visible=0;
         let active=0,guaranteed=0,expected=0;
         const dungeon=editor.dataset.rewardEditor==='dungeon',rolls=editor.dataset.rewardEditor==='chest'?Math.max(0,Number($('[name="config[rolls]"]',editor)?.value)||0):1;
         rows.forEach(row=>{
             const label=$('.drop-probability',row),weight=Math.max(0,Number($('input[name$="[weight]"]',row)?.value)||0);
-            const share=weighted?(total?weight/total:0):Math.min(1,Math.max(0,Number($('input[name$="[chance]"]',row)?.value)||0)/100);
+            const rowWeighted=weighted&&!row.hasAttribute('data-chest-bonus'),rowRolls=row.hasAttribute('data-chest-bonus')?1:rolls;
+            const share=rowWeighted?(total?weight/total:0):Math.min(1,Math.max(0,Number($('input[name$="[chance]"]',row)?.value)||0)/100);
             const probability=share*(dungeon?Math.min(100,Math.max(0,Number($('[name="config[item_chance]"]',editor)?.value)||0))/100:1);
-            const quantity=Math.max(0,Number(dungeon?$('[name="config[item_quantity]"]',editor)?.value:$('input[name$="[quantity]"]',row)?.value)||0);
+            const maximum=Math.max(0,Number(dungeon?$('[name="config[item_quantity]"]',editor)?.value:$('input[name$="[quantity]"]',row)?.value)||0),minimum=$('input[name$="[quantity_min]"]',row)?.value;
+            const quantity=minimum?(maximum+Number(minimum))/2:maximum;
             if(probability>0)active++;if(probability===1)guaranteed++;
-            expected+=probability*quantity*100*rolls;
-            label.textContent=weighted?rewardNumber(share*100)+' %':rewardText(probability===1?'certain':probability===0?'off':'random');
+            expected+=probability*quantity*100*rowRolls;
+            label.textContent=rowWeighted?rewardNumber(share*100)+' %':rewardText(probability===1?'certain':probability===0?'off':'random');
             let outcome=$('.drop-outcome',row);
             if(!outcome){outcome=document.createElement('small');outcome.className='drop-outcome';row.append(outcome);}
-            outcome.textContent=rewardText(dungeon?'row_dungeon':'row_expected',{chance:rewardNumber(probability*100),count:rewardNumber(probability*quantity*100*rolls)});
+            outcome.textContent=rewardText(dungeon?'row_dungeon':'row_expected',{chance:rewardNumber(probability*100),count:rewardNumber(probability*quantity*100*rowRolls)});
             const code=$('input[type="hidden"]',row).value;
-            row.hidden=!`${byCode.get(code)?.name||''} ${code}`.toLocaleLowerCase('de').includes(query);if(!row.hidden)visible++;
+            row.hidden=!`${byCode.get(code)?.name||''} ${code}`.toLocaleLowerCase('de').includes(query);if(!row.hidden&&!row.hasAttribute('data-chest-bonus'))visible++;
         });
+        groupDropRows($('[data-drop-rows]',editor));groupDropRows($('[data-bonus-rows]',editor));
         $('[data-drop-active]').textContent=String(active);
         $('[data-drop-guaranteed]').textContent=String(guaranteed);
         $('[data-drop-expected]').textContent=rewardNumber(expected);
-        $('[data-drop-count]').textContent=query?`${visible} / ${rows.length} Einträge`:`${rows.length} Einträge`;$('[data-drop-empty]').hidden=rows.length>0;
-        $('[data-drop-no-match]').hidden=visible>0||!rows.length;
-        $('[data-add-drop]').disabled=rows.length>=200||form.querySelector('fieldset').disabled;
+        $('[data-drop-count]').textContent=query?`${visible} / ${primaryRows.length} Einträge`:`${primaryRows.length} Einträge`;$('[data-drop-empty]').hidden=primaryRows.length>0;
+        $('[data-drop-no-match]').hidden=visible>0||!primaryRows.length;
+        $('[data-add-drop]').disabled=primaryRows.length>=200||form.querySelector('fieldset').disabled;
+        const bonusButton=$('[data-add-bonus]');if(bonusButton)bonusButton.disabled=rows.length-primaryRows.length>=50||form.querySelector('fieldset').disabled;
     }
     function appendDrop(){
-        if(!editor||form.querySelector('fieldset').disabled||$$('.drop-row',editor).length>=200)return null;
+        if(!editor||form.querySelector('fieldset').disabled||$$('.drop-row',$('[data-drop-rows]',editor)).length>=200)return null;
         const indexes=$$('.drop-row input[type="hidden"]',editor).map(i=>Number(i.name.match(/\[rows\]\[(\d+)\]/)?.[1])||0);
         const index=Math.max(-1,...indexes)+1;
         $('[data-drop-search]').value='';
         $('[data-drop-rows]').insertAdjacentHTML('beforeend',$('#drop-row-template').innerHTML.replaceAll('__ROW__',String(index)));
-        return $$('.drop-row',editor).at(-1);
+        return $$('.drop-row',$('[data-drop-rows]',editor)).at(-1);
     }
     $('[data-add-drop]')?.addEventListener('click',()=>{
         const row=appendDrop();if(!row)return;
         markDirty();updateRows();$('[data-item-picker]',row).click();
+    });
+    $('[data-add-bonus]')?.addEventListener('click',()=>{
+        if(form.querySelector('fieldset').disabled)return;
+        const container=$('[data-bonus-rows]',editor),rows=$$('.drop-row',container);if(rows.length>=50)return;
+        const index=Math.max(-1,...rows.map(row=>Number($('input[name$="[target]"]',row).name.match(/\[bonus_rows\]\[(\d+)\]/)?.[1])||0))+1;
+        container.insertAdjacentHTML('beforeend',$('#bonus-row-template').innerHTML.replaceAll('__ROW__',String(index)));
+        const row=$$('.drop-row',container).at(-1);$('input[name$="[chance]"]',row).value='0';markDirty();updateRows();$('[data-item-picker]',row).click();
     });
     function updateFragmentRows(){
         const container=$('[data-fragment-rows]',editor);if(!container)return;
@@ -233,7 +256,8 @@
                 select.dataset.relicNames='1';
             }
             const chance=Math.min(100,Math.max(0,Number($('input[name$="[chance]"]',row).value)||0));
-            const quantity=Math.max(0,Number($('input[name$="[quantity]"]',row).value)||0);
+            const maximum=Math.max(0,Number($('input[name$="[quantity]"]',row).value)||0),minimum=$('input[name$="[quantity_min]"]',row)?.value;
+            const quantity=minimum?(maximum+Number(minimum))/2:maximum;
             if($('select',row).value&&chance>0)active++;
             const count=$('select',row).value?quantity*chance:0;expected+=count;
             $('.fragment-outcome',row).textContent=rewardText('fragment_outcome',{chance:matrixFormat(chance),count:matrixFormat(count)});

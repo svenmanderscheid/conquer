@@ -101,6 +101,22 @@ if (preg_match('~^/go/([^/]+)$~D', $_normalizedPath, $_linkMatch)) {
     exit;
 }
 
+// Public privacy and deletion instructions do not require a game account.
+if (in_array($_normalizedPath, ['/privacy', '/account-deletion'], true)) {
+    if (!in_array($method, ['GET', 'HEAD'], true)) {
+        http_response_code(405);
+        header('Allow: GET, HEAD');
+        exit;
+    }
+    header('Content-Type: text/html; charset=utf-8');
+    header('Content-Security-Policy: ' . $_landingCsp);
+    header('Cache-Control: public, max-age=300');
+    $legalPage = $_normalizedPath === '/account-deletion' ? 'deletion' : 'privacy';
+    $legalGameUrl = $_useGameLogin ? APP_BASE . '/city' : 'https://play.unionofkingdoms.com/city';
+    if ($method === 'GET') require ROOT_DIR . '/views/legal.php';
+    exit;
+}
+
 if ($_normalizedPath === '/robots.txt' && $method === 'GET') {
     header('Content-Type: text/plain; charset=utf-8');
     header('Cache-Control: public, max-age=3600');
@@ -465,6 +481,7 @@ if (str_starts_with($path, '/api/')) {
     $router->post('/api/march/dispatch-charm',   [\Conquer\Api\Handlers\MarchHandler::class, 'dispatchCharm']);
     $router->post('/api/march/dispatch-player',  [\Conquer\Api\Handlers\MarchHandler::class, 'dispatchPlayer']);
     $router->post('/api/march/dispatch-scout',   [\Conquer\Api\Handlers\MarchHandler::class, 'dispatchScout']);
+    $router->post('/api/march/scout-landmark', [\Conquer\Api\Handlers\LandmarkHandler::class, 'scout']);
     $router->post('/api/march/dispatch-neutral-village', [\Conquer\Api\Handlers\MarchHandler::class, 'dispatchNeutralVillage']);
     $router->post('/api/march/scout-neutral-village', [\Conquer\Api\Handlers\MarchHandler::class, 'scoutNeutralVillage']);
     $router->post('/api/march/dispatch-gather',  fn() => \Conquer\Api\Handlers\MarchHandler::dispatchGather($session));
@@ -481,7 +498,6 @@ if (str_starts_with($path, '/api/')) {
     $router->get('/api/battle/report/:id',   [\Conquer\Api\Handlers\BattleHandler::class, 'report']);
     $router->post('/api/battle/report/:id/delete', [\Conquer\Api\Handlers\BattleHandler::class, 'delete']);
 
-    $router->post('/api/march/scout-landmark', [\Conquer\Api\Handlers\LandmarkHandler::class, 'scout']);
     // Map
     $router->get('/api/map/info',              [\Conquer\Api\Handlers\MapHandler::class, 'info']);
     $router->get('/api/map/tiles',             [\Conquer\Api\Handlers\MapHandler::class, 'tiles']);
@@ -542,6 +558,7 @@ if (str_starts_with($path, '/api/')) {
 
     // Rally
     $router->post('/api/rally/start-monster', [\Conquer\Api\Handlers\RallyHandler::class, 'startMonster']);
+    $router->post('/api/rally/start-shrine', [\Conquer\Api\Handlers\RallyHandler::class, 'startShrine']);
     $router->post('/api/rally/start',  [\Conquer\Api\Handlers\RallyHandler::class, 'start']);
     $router->post('/api/rally/join',   [\Conquer\Api\Handlers\RallyHandler::class, 'join']);
     $router->post('/api/rally/:id/launch', [\Conquer\Api\Handlers\RallyHandler::class, 'launch']);
@@ -558,7 +575,6 @@ if (str_starts_with($path, '/api/')) {
 
     // Conquest Event
     $router->get('/api/conquest/event',           fn() => \Conquer\Api\Handlers\ConquestHandler::current($session));
-    $router->post('/api/rally/start-shrine', [\Conquer\Api\Handlers\RallyHandler::class, 'startShrine']);
     $router->get('/api/conquest/leaderboard',     fn() => \Conquer\Api\Handlers\ConquestHandler::leaderboard($session));
 
     // Hospital

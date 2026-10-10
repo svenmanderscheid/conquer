@@ -1,29 +1,18 @@
 <?php declare(strict_types=1); ?>
 <nav class="lp-guide-nav" aria-label="Explore the game">
-  <a href="#gallery">Discover the world</a><a href="#game-goal">The goal</a><a href="#troops">Troops</a><a href="#items">Items &amp; relics</a><a href="#progression">Your journey</a><a href="#development">Development</a>
+  <a href="#gallery">Discover the world</a><a href="#game-goal">The goal</a><a href="#troops">Troops</a><a href="#items">Items &amp; relics</a><a href="#progression">Your journey</a><a href="#platforms" data-i18n="landing.launch.platform_title"><?= $launchText('platform_title') ?></a>
 </nav>
 <section id="gallery" class="lp-guide-section lp-guide-alt" aria-labelledby="gallery-title">
-  <div class="lp-guide-heading"><p class="lp-section-kicker lp-brand-slogan">A new Era begins</p><h2 id="gallery-title">Discover your next kingdom.</h2><p>A growing city, an army of your own and monsters to face together. Explore the latest artwork from Union of Kingdoms.</p></div>
+  <div class="lp-guide-heading"><p class="lp-section-kicker lp-brand-slogan">A new Era begins</p><h2 id="gallery-title" data-i18n="landing.launch.gallery_title"><?= $launchText('gallery_title') ?></h2><p data-i18n="landing.launch.gallery_intro"><?= $launchText('gallery_intro') ?></p></div>
   <div class="lp-campaign-grid">
-    <?php foreach ([
-      '01-build' => ['A kingdom worth building', 'A sunlit fantasy city with blue-roofed towers', '#game-goal', 'Explore the kingdom'],
-      '02-army' => ['Three troop types. Your strategy.', 'Guardian, fire archer and shadow rider together', '#troops', 'Meet the troops'],
-      '03-infantry' => ['Stand strong.', 'A blue-shielded infantry guardian defending the kingdom', '#troops', 'Discover infantry'],
-      '04-archers' => ['Make every shot count.', 'A red-hooded archer with a flaming arrow', '#troops', 'Discover archers'],
-      '05-cavalry' => ['Ride with purpose.', 'A shadow rider on a mount with violet antlers', '#troops', 'Discover cavalry'],
-      '06-relics' => ['Equip your ambition.', 'A harvest horn, woodland axe and army banner in a treasury', '#items', 'Explore items and relics'],
-      '07-alliance' => ['Stronger together.', 'Three allies planning their next adventure over a map', '#game-goal', 'Find your shared goal'],
-      '08-monsters' => ['Face greater threats together', 'Grumwald in his current storybook design, with a guardian and fire archer', '#bosses', 'Meet the rally monsters'],
-      '09-conquest' => ['Build strength. Challenge rivals.', 'Rival kingdoms and armies facing each other across a valley', '#progression', 'Explore your journey'],
-      '10-alpha' => ['Be part of the beginning.', 'A guardian and archer welcoming players through the city gates', '#zugang', $openAlpha ? \Conquer\Game\Locale::t('landing.open_cta') : 'Register for closed alpha'],
-    ] as $art => [$title, $description, $target, $link]): ?>
+    <?php foreach (['city' => '#game-goal', 'world' => '#progression', 'army' => '#troops'] as $art => $target): ?>
     <figure class="lp-campaign-card">
-      <a href="<?= $target ?>" data-track-link="<?= \Conquer\Analytics\LinkTracker::galleryTarget($art) ?>"><img src="<?= $base ?>/assets/marketing/<?= $art === '01-build' ? ($openAlpha ? 'kingdom-social-en-open-alpha-v1' : 'kingdom-social-en-v5') : 'campaign-' . $art . ($openAlpha ? '-open-alpha-v2' : '-v5') ?>.webp" width="1122" height="1402" loading="lazy" decoding="async" alt="<?= $description ?>"></a>
-      <figcaption><h3><?= $title ?></h3><a href="<?= $target ?>" data-track-link="<?= \Conquer\Analytics\LinkTracker::galleryTarget($art) ?>"><?= $link ?> <span aria-hidden="true">→</span></a></figcaption>
+      <a href="<?= $target ?>" data-track-link="<?= \Conquer\Analytics\LinkTracker::galleryTarget($art) ?>"><img src="<?= $base ?>/assets/marketing/alpha-<?= $art === 'world' ? 'world-luxembourg' : $art ?>-20261009.webp" width="1280" height="800" loading="lazy" decoding="async" alt="<?= $launchText($art . '_alt') ?>" data-i18n-attrs="alt:landing.launch.<?= $art ?>_alt"></a>
+      <figcaption><h3 data-i18n="landing.launch.<?= $art ?>_title"><?= $launchText($art . '_title') ?></h3><p data-i18n="landing.launch.<?= $art ?>_intro"><?= $launchText($art . '_intro') ?></p><a href="<?= $target ?>" data-track-link="<?= \Conquer\Analytics\LinkTracker::galleryTarget($art) ?>"><span data-i18n="landing.launch.explore"><?= $launchText('explore') ?></span> <span aria-hidden="true">→</span></a></figcaption>
     </figure>
     <?php endforeach ?>
   </div>
-  <p class="lp-guide-note"><?= $openAlpha ? \Conquer\Game\Locale::html('landing.open_art_note') : \Conquer\Game\Locale::html('copy.63fa7d65009d2717') ?></p>
+  <p class="lp-guide-note" data-i18n="landing.launch.screenshot_note"><?= $launchText('screenshot_note') ?></p>
 </section>
 <section id="game-goal" class="lp-guide-section" aria-labelledby="goal-title">
   <div class="lp-guide-heading"><p class="lp-section-kicker lp-brand-slogan">A new Era begins</p><h2 id="goal-title">A kingdom built for the long run.</h2>
@@ -84,11 +73,11 @@
   </div>
 </section>
 <section id="development" class="lp-guide-section lp-guide-alt" aria-labelledby="development-title">
-  <div class="lp-guide-heading"><p class="lp-section-kicker">The road ahead · September 2026</p><h2 id="development-title">The road to the full game.</h2><p>The alpha is a working foundation, not the finished destination. Features, visuals, balance and progression are still evolving.</p></div>
+  <div class="lp-guide-heading"><p class="lp-section-kicker" data-i18n="landing.launch.development_kicker"><?= $launchText('development_kicker') ?></p><h2 id="development-title">The road to the full game.</h2><p>The alpha is a working foundation, not the finished destination. Features, visuals, balance and progression are still evolving.</p></div>
   <div class="lp-guide-grid">
     <article class="lp-guide-card"><p class="lp-guide-label">Current alpha foundation</p><h3>Build, train and play together</h3><p>City development, research, three troop types through T5, inventory, relic loadouts, gathering, player combat and alliance rallies are implemented in the current project. Availability follows world settings and alpha access.</p></article>
     <article class="lp-guide-card"><p class="lp-guide-label">Development direction</p><h3>Deeper progression and conquest</h3><p>Continue refining the everyday game loop, combat balance, rewards and alliance coordination. Develop kingdom conquest and expand the ladder of cooperative monster challenges. Exact conquest rules and future reward tiers are not final.</p></article>
-    <article class="lp-guide-card"><p class="lp-guide-label">Later platform step</p><h3>One game across devices</h3><p>The browser is the current entry point. iOS and Android apps are planned after gameplay, navigation and server interfaces are stable. No App Store, Google Play or full-release date is announced.</p></article>
+    <article class="lp-guide-card"><p class="lp-guide-label" data-i18n="landing.launch.platform_title"><?= $launchText('platform_title') ?></p><h3>One game across devices</h3><p data-i18n="landing.launch.platform_summary"><?= $launchText('platform_summary') ?></p></article>
   </div>
   <details class="lp-guide-faq"><summary>Is this a seasonal game with regular restarts?</summary><p>The intended model is lasting kingdom development, PvP competition and continuing alliance PvE. Routine seasonal restarts are not the design goal. Alpha testing may still require resets.</p></details>
   <details class="lp-guide-faq"><summary>Can I play now?</summary><p><?= $openAlpha ? \Conquer\Game\Locale::html('landing.open_faq') : \Conquer\Game\Locale::html('copy.939bef382ac7fb8a') ?></p></details>

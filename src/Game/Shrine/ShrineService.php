@@ -9,7 +9,16 @@ use Conquer\Game\World\WorldMapProfile;
 final class ShrineService
 {
     public const CONTEST_DURATION_SECONDS = 3600;
+    // The shared shrine combat formula compares attacking ATK with defending HP+DEF.
+    // These balanced T3 guards require about 1.5M unbuffed mixed T3 attackers;
+    // Congress/S-tier requires about 2M. Defender headcount is not rally headcount.
     public const NPC_GARRISON = [
+        'C'=>['50100301'=>180_000,'50200301'=>180_000,'50300301'=>180_000],
+        'B'=>['50100301'=>180_000,'50200301'=>180_000,'50300301'=>180_000],
+        'A'=>['50100301'=>180_000,'50200301'=>180_000,'50300301'=>180_000],
+        'S'=>['50100301'=>240_000,'50200301'=>240_000,'50300301'=>240_000],
+    ];
+    private const LEGACY_NPC_GARRISON = [
         'C'=>['50100101'=>50_000,'50200101'=>50_000],
         'B'=>['50100301'=>100_000,'50200301'=>100_000],
         'A'=>['50100401'=>200_000,'50200401'=>200_000],
@@ -55,8 +64,21 @@ final class ShrineService
         $row['bonuses']=$congress||$element?[]:(self::SHRINE_BONUSES[$row['shrine_tier']]??[]);
         $row['npc_garrison']=self::NPC_GARRISON[$row['shrine_tier']]??[];
         $row['garrison_troops']=$row['garrison_troops_json']===null&&$row['alliance_id']===null?$row['npc_garrison']:(json_decode((string)$row['garrison_troops_json'],true)?:[]);
+        if($row['alliance_id']===null)$row['garrison_troops']=self::normalizeNeutralGarrison($row['shrine_tier'],$row['garrison_troops']);
         unset($row['garrison_troops_json']);
         return $row;
+    }
+
+    /** Upgrade known old NPC snapshots without healing attrition or touching player guards. */
+    private static function normalizeNeutralGarrison(string $tier,array $troops): array
+    {
+        // Empty historical capture rows must not turn a neutral landmark into a free capture.
+        if(array_sum($troops)<=0)return self::NPC_GARRISON[$tier]??[];
+        $legacy=self::LEGACY_NPC_GARRISON[$tier]??[];
+        if(!$legacy||count($troops)!==count($legacy)||array_diff_key($troops,$legacy))return $troops;
+        foreach($legacy as $code=>$count)if(!is_int($troops[$code])||$troops[$code]<0||$troops[$code]>$count)return $troops;
+        $remaining=array_sum($troops)/array_sum($legacy);
+        return array_map(static fn(int $count):int=>max(1,(int)round($count*$remaining)),self::NPC_GARRISON[$tier]);
     }
 
     public static function checkSecured(): void

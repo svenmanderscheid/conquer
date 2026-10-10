@@ -1,0 +1,191 @@
+{
+  "generated": "2026-10-09",
+  "mode": "built-in image_gen",
+  "processing": "Retain main alpha cutout and antialiasing; discard disconnected background speckles; proportional fit within 480px and 512px transparent canvas; WebP quality 85, alphaQuality 100. No repainting.",
+  "entries": [
+    {
+      "key": "commune-food",
+      "file": "commune-food.webp",
+      "source": "source/commune-food.png",
+      "sourceSha256": "6cc9dda43f76d9ab3e9392043baaa3dd2e2ca3706be2c4c9f29dbdbe9ddb09cc",
+      "sourceDimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "export": {
+        "width": 512,
+        "height": 512,
+        "bytes": 52006,
+        "sha256": "3bba80d7f36d18db8c13dbe51928035b9aecbd94ffc448449249da83d2647088",
+        "cornerAlpha": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "removedDisconnectedPixels": 8492
+      }
+    },
+    {
+      "key": "canton-shrine",
+      "file": "canton-shrine.webp",
+      "source": "source/canton-shrine.png",
+      "sourceSha256": "78060d0c61470a588c9e41b5218fddda510db67772c3a63ab3b02ea692b92312",
+      "sourceDimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "export": {
+        "width": 512,
+        "height": 512,
+        "bytes": 48572,
+        "sha256": "27c793a7e5cca648a39ddfe4700516db8ea1eb28291e14073ca40df83aeef086",
+        "cornerAlpha": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "removedDisconnectedPixels": 14145
+      }
+    },
+    {
+      "key": "congress-forum",
+      "file": "congress-forum.webp",
+      "source": "source/congress-forum.png",
+      "sourceSha256": "011e60701a6df1c040b4d1a93d4ed3e548670605dc09e6419b1bcb7cb2d5bedd",
+      "sourceDimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "export": {
+        "width": 512,
+        "height": 512,
+        "bytes": 51478,
+        "sha256": "ba6bb3ae3f59dd2202756e5f1fb7aeb0f9f2c78837f388479519c267de0f23fd",
+        "cornerAlpha": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "removedDisconnectedPixels": 22891
+      }
+    },
+    {
+      "key": "commune-lumber",
+      "file": "commune-lumber.webp",
+      "source": "source/commune-lumber.png",
+      "sourceSha256": "cd7add1fe0f4b3e4b360738903919b3979a9fc27cbd3de0f074ac811284d29ee",
+      "sourceDimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "export": {
+        "width": 512,
+        "height": 512,
+        "bytes": 52498,
+        "sha256": "7cb0bd9bc81931ce7d2aa21ffe7f18184ee9bac449e566b4c52c18bf94de11da",
+        "cornerAlpha": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "removedDisconnectedPixels": 7568
+      }
+    },
+    {
+      "key": "commune-stone",
+      "file": "commune-stone.webp",
+      "source": "source/commune-stone.png",
+      "sourceSha256": "2444027fce7a69a83c2abe583a61fa47798adae3a27bdb7c6c3e3dac5401d4bd",
+      "sourceDimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "export": {
+        "width": 512,
+        "height": 512,
+        "bytes": 50966,
+        "sha256": "bc8a6a1b33eb4f535949f8a9ad6254a5df2500f33ec4eaaee5505b97aadd7451",
+        "cornerAlpha": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "removedDisconnectedPixels": 7824
+      }
+    },
+    {
+      "key": "commune-gold",
+      "file": "commune-gold.webp",
+      "source": "source/commune-gold.png",
+      "sourceSha256": "65fdb2facf477aae2bb6edf849fe5a150ef79ddc82f576764021e8f4f8d190f5",
+      "sourceDimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "export": {
+        "width": 512,
+        "height": 512,
+        "bytes": 53294,
+        "sha256": "039b4ca5b6ebc83dbae5d0c37300b0e7dfc654b0283d0729e6711f1349ca1453",
+        "cornerAlpha": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "removedDisconnectedPixels": 6581
+      }
+    },
+    {
+      "key": "commune-abbey",
+      "file": "commune-abbey.webp",
+      "source": "source/commune-abbey.png",
+      "sourceSha256": "63cdf05cdca616323331c7a6b26423152237be10f405e0674c988f334074d32d",
+      "sourceDimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "export": {
+        "width": 512,
+        "height": 512,
+        "bytes": 50588,
+        "sha256": "fc77c7a31e63ef8b76704ffff2b015e133815d99d692845135a4f8a963de3204",
+        "cornerAlpha": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "removedDisconnectedPixels": 7173
+      }
+    },
+    {
+      "key": "commune-rune",
+      "file": "commune-rune.webp",
+      "source": "source/commune-rune.png",
+      "sourceSha256": "f3cbe520b645ce1bb0825106de5239b655666611e3487c8b145fe8b7863bcbaa",
+      "sourceDimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "export": {
+        "width": 512,
+        "height": 512,
+        "bytes": 52412,
+        "sha256": "6a1d6d9b49feaf4e5ff737c759c4a20eadea60a76b32444a4c6445135be774e6",
+        "cornerAlpha": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "removedDisconnectedPixels": 7044
+      }
+    }
+  ]
+}

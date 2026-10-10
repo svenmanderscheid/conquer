@@ -126,3 +126,4 @@ preview/
 __pycache__/
 *.pyc
 logs/*.json
+logs/operational-fallback-*.ndjson

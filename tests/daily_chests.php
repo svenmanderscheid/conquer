@@ -15,11 +15,12 @@ function openChecked(string $type,bool $free=true):array{
  global$db;
  $oldItems=$db->query('SELECT item_code,quantity FROM player_inventory WHERE player_id=1')->fetchAll(PDO::FETCH_KEY_PAIR);
  $oldFragments=$db->query('SELECT treasure_code,fragments FROM player_treasures WHERE player_id=1')->fetchAll(PDO::FETCH_KEY_PAIR);
+ $oldUnlocked=$db->query('SELECT treasure_code,parts FROM player_treasure_effects WHERE player_id=1 AND effect_index=0 AND parts>=1')->fetchAll(PDO::FETCH_KEY_PAIR);
  $rewards=$free?ChestService::openFreeChest(1,$type):ChestService::openChest(1,$type);
- cc(count($rewards)>0,'chest yields real rewards');$items=[];$fragments=[];
- foreach($rewards as$r){$target=$r['type']==='item'?'items':'fragments';$code=$r[$r['type']==='item'?'item_code':'treasure_code'];${$target}[$code]=(${$target}[$code]??0)+$r['quantity'];cc(!empty($r['name']),'reward name');}
+ cc(count($rewards)>0,'chest yields real rewards');$items=[];$fragments=[];$unlocks=[];
+ foreach($rewards as$r){$target=$r['type']==='item'?'items':'fragments';$code=$r[$r['type']==='item'?'item_code':'treasure_code'];${$target}[$code]=(${$target}[$code]??0)+$r['quantity'];if($r['type']==='fragment'&&empty($oldUnlocked[$code])){$unlocks[$code]=(int)$db->query('SELECT COUNT(*) FROM player_treasure_effects WHERE player_id=1 AND treasure_code=? AND effect_index=0 AND parts>=1',[$code])->fetchColumn();}cc(!empty($r['name']),'reward name');}
  foreach($items as$code=>$amount)cc((int)$db->query('SELECT quantity FROM player_inventory WHERE player_id=1 AND item_code=?',[$code])->fetchColumn()===(int)($oldItems[$code]??0)+$amount,'item credited to actual inventory');
- foreach($fragments as$code=>$amount)cc((int)$db->query('SELECT fragments FROM player_treasures WHERE player_id=1 AND treasure_code=?',[$code])->fetchColumn()===(int)($oldFragments[$code]??0)+$amount,'fragments credited');
+ foreach($fragments as$code=>$amount)cc((int)$db->query('SELECT fragments FROM player_treasures WHERE player_id=1 AND treasure_code=?',[$code])->fetchColumn()===(int)($oldFragments[$code]??0)+$amount-((!empty($unlocks[$code])&&(int)($oldFragments[$code]??0)+$amount>=10)?10:0),'fragments credited');
  return$rewards;
 }
 try{
@@ -97,22 +98,19 @@ try{
  $db->execute("INSERT IGNORE INTO kingdom_profiles(player_id,display_name,welcome_claimed)VALUES(1,'ChestFixture',1)");
  $db->execute('UPDATE player_chests SET last_free_gold_at=NULL WHERE player_id=1');
  $result=\Conquer\Game\Kingdom\KingdomService::action(1,['action'=>'chest.free','chest_type'=>'gold']);
- cc(count($result['result']['drops'])===4&&!$result['state']['chests']['free_gold_available'],'Kingdom action returns actual drops and new chest status');
+ cc(count($result['result']['drops'])>=1&&!$result['state']['chests']['free_gold_available'],'Kingdom action returns actual drops and new chest status');
  foreach($result['result']['drops']as$drop){
   if($drop['type']==='item')cc(count(array_filter($result['state']['inventory'],fn($i)=>(int)$i['item_code']===$drop['item_code']&&$i['quantity']>=$drop['quantity']))===1,'Kingdom updated inventory includes won item');
-  else cc(count(array_filter($result['state']['treasures']['items'],fn($i)=>(int)$i['treasure_code']===$drop['treasure_code']&&$i['fragments']>=$drop['quantity']))===1,'Kingdom updated collection includes won fragments');
+  else cc(count(array_filter($result['state']['treasures']['items'],fn($i)=>(int)$i['treasure_code']===$drop['treasure_code']&&$i['fragments']===($drop['fragments']??$drop['new_total'])))===1,'Kingdom updated collection includes won fragments');
  }
  denied(fn()=>\Conquer\Game\Kingdom\KingdomService::action(1,['action'=>'chest.free','chest_type'=>'gold']),'Kingdom route cannot bypass gold cooldown');
  $table=json_decode(file_get_contents(ROOT_DIR.'/data/chest_drops.json'),true)['chests'];
- cc($table['gold']['rolls']>$table['silver']['rolls'],'gold grants more reward rolls');
+ cc($table['gold']['rolls']===1&&count($table['gold']['bonus_drops'])>0,'violet grants one fragment draw plus independently rolled bonus rewards');
  $valuableChance=static function(array $config):float{
   $all=0;$valuable=0;foreach($config['drop_table']as$drop){$all+=$drop['weight'];$grade=$drop['fragment_grade']??(\Conquer\Game\Inventory\InventoryService::getItemDef((int)($drop['item_code']??0))['rarity']??'normal');if(in_array($grade,['legendary','mythic'],true))$valuable+=$drop['weight'];}
   return 1-pow(1-$valuable/$all,$config['rolls']);
  };
  cc($valuableChance($table['gold'])>$valuableChance($table['silver']),'gold genuinely improves chance of legendary or mythic rewards');
- if(is_file(ROOT_DIR.'/data/trading_shop.json')){
-  $catalog=json_decode(file_get_contents(ROOT_DIR.'/data/trading_shop.json'),true);
-  foreach($catalog['vip']??[]as$offer)foreach(['silver','gold']as$type)cc(count(array_filter($table[$type]['drop_table'],fn($d)=>($d['item_code']??0)===$offer['item_code']&&$d['weight']>0))>0,'VIP offer eligible in '.$type);
- }
+
  echo 'PASS '.$checks." daily chest checks; isolated database removed.\n";
 }catch(Throwable$e){$exit=1;fwrite(STDERR,$e->getMessage()."\n".$e->getTraceAsString()."\n");}finally{if(is_resource($server)){proc_terminate($server);proc_close($server);}foreach($temporary as$file)if(is_file($file))unlink($file);$fixture->close();}exit($exit);

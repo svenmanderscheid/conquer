@@ -1,5 +1,15 @@
 apply plugin: 'com.android.application'
 
+// Private upload credentials are local only and never packaged with the app.
+def uploadProperties = new Properties()
+def uploadPropertiesFile = rootProject.file('key.properties')
+if (uploadPropertiesFile.exists()) {
+    uploadPropertiesFile.withInputStream { uploadProperties.load(it) }
+}
+def hasUploadSigning = ['storeFile', 'storePassword', 'keyAlias', 'keyPassword'].every {
+    uploadProperties.getProperty(it)?.trim()
+}
+
 android {
     namespace = "com.unionofkingdoms.app"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -7,13 +17,23 @@ android {
         applicationId "com.unionofkingdoms.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 3
-        versionName "0.1.2"
+        versionCode 4
+        versionName "0.2.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
              // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    signingConfigs {
+        if (hasUploadSigning) {
+            upload {
+                storeFile rootProject.file(uploadProperties.getProperty('storeFile'))
+                storePassword uploadProperties.getProperty('storePassword')
+                keyAlias uploadProperties.getProperty('keyAlias')
+                keyPassword uploadProperties.getProperty('keyPassword')
+            }
         }
     }
     buildTypes {
@@ -22,17 +42,21 @@ android {
             versionNameSuffix "-prototype"
         }
         release {
+            if (hasUploadSigning) signingConfig signingConfigs.upload
+            debuggable false
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 }
 
-// server.url currently loads the PHP website for device testing. A store build
-// needs the bundled app entry/authentication work documented in ../README.md.
-androidComponents {
-    beforeVariants(selector().withBuildType("release")) { variant ->
-        variant.enable = false
+// The user requested a first signed Play Console testing build on 8 October.
+// Keep release builds fail-closed if private upload credentials are absent.
+gradle.taskGraph.whenReady { graph ->
+    if (!hasUploadSigning && graph.allTasks.any {
+        it.project == project && it.name.toLowerCase(java.util.Locale.ROOT).contains('release')
+    }) {
+        throw new GradleException('Release signing is missing. Run pnpm signing:init in mobile for a NEW app, or restore android/key.properties and the existing upload keystore.')
     }
 }
 

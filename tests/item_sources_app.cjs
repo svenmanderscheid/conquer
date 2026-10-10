@@ -83,7 +83,8 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/item-sourc
    assert.equal(await page.locator('.item-sources-selected').innerText(),lookup.item.name);
    const sourceIndex=lookup.sources.findIndex(source=>source.id===badgeSource.id);assert(sourceIndex>=0);
    const sourceCard=page.locator('.item-source-card').nth(sourceIndex);await sourceCard.scrollIntoViewIfNeeded();
-   assert.match(await sourceCard.locator('.item-source-reward').innerText(),/Quantity: 2\s*·\s*50% drop chance/);
+   assert.equal(await sourceCard.locator('.item-source-reward').innerText(),'Quantity: '+badgeDrop.count);
+   assert.doesNotMatch(await page.locator('.item-sources').innerText(),/\d[\d.,]*\s*%/,'Source lookup hides drop and relic-selection chances');
    await page.screenshot({path:path.join(out,'badge-source-'+width+'x'+height+'.png')});
    await sourceCard.locator('[data-action=item-sources-go]').click();await page.waitForFunction(()=>location.hash==='#world'&&!document.querySelector('#game-dialog').open);
    const attack=page.locator(`[data-action="expedition"][data-kind="monsters"][data-id="${badgeTarget.id}"]:visible`).first();await attack.click();await page.locator('.march-command.is-monster-rally').waitFor();
@@ -107,13 +108,14 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/item-sourc
    await page.screenshot({path:path.join(out,'badge-loot-'+width+'x'+height+'.png')});
    await page.keyboard.press('Escape');await page.waitForFunction(()=>!document.querySelector('#game-dialog').open);
   }
-  console.log('PASS badge source tiers with 50% drop chance and all nine rally loot rewards in five viewports.');
+  console.log('PASS badge source tiers without displayed drop chances and complete rally loot in five viewports.');
   await page.setViewportSize({width:390,height:844});
   await page.evaluate(()=>{location.hash='treasures';});await page.locator('.treasury-shell').waitFor();
   await page.locator('.treasury-card').filter({has:page.locator('.is-locked')}).first().click();
   const fragments=page.locator('.treasury-inspector [data-action=item-sources]');
   await fragments.click();await page.locator('.item-source-card').first().waitFor();
   assert.match(await page.locator('.item-sources-selected').innerText(),/Whole relics and fragments/);
+  assert.doesNotMatch((await page.locator('.item-source-reward').allInnerTexts()).join('\n'),/\d[\d.,]*\s*%/,'Chest and fragment-pack rewards hide drop and selection chances');
   await page.keyboard.press('Escape');await page.waitForFunction(()=>!document.querySelector('#game-dialog').open);
   let release;const held=new Promise(resolve=>release=resolve);let intercepted;
   const requested=new Promise(resolve=>intercepted=resolve);

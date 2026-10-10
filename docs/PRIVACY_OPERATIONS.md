@@ -1,0 +1,12 @@
+# Union of Kingdoms: privacy request handling
+
+Owner: Sven Manderscheid (Ekki), hello@unionofkingdoms.com.
+The operator confirmed this mailbox and the reviewed manual deletion process on October 9, 2026. The public pages are `/privacy` and `/account-deletion`; this process does not automatically erase an account when someone opens the page or sends an unverified email.
+
+1. Read the mailbox regularly, acknowledge the request, and verify ownership through the account's registered email. Never ask for a password or recovery code. Agree an alternative verification method if the email is unavailable.
+2. Record the verified account ID, the requested scope and the response deadline in a restricted request register. Aim to complete verified deletion within 30 days. Explain any legally permitted extension or narrowly applicable retention exception to the requester.
+3. Before erasure, identify all associated rows and attachments. Include credentials, OAuth links, recovery/verification tokens, sessions, profiles, game/world progress, messages and participant/read/reaction/pin/report relationships, friend/block relationships, support reports/screenshots and attributable security/activity records. Several social tables have no player foreign-key cascade: deleting `players` alone does **not** fulfill this process. Use a reviewed transaction and remove associated file attachments where applicable. Do not erase unrelated players' data.
+4. Keep only specifically justified legal/security records, with restricted access, a stated purpose and an expiry date. Confirm completion and any limited exception to the requester. Particular messages or support attachments can also be requested without closing the whole account.
+5. Keep the restricted deletion register outside recovery backups so that deletion is reapplied before a restored system becomes available. Recovery backups must not reactivate a deleted account. The project's backup helper is configured for 14 days; verify Hostinger's separate backup cycle and service-provider/transfer terms operationally.
+
+The privacy statement describes the currently deployed build: no advertising SDK or advertising ID; no device location, camera or microphone permission; optional support screenshots; disabled custom profile-photo moderation and disabled real-money checkout. Recheck live features and update both the policy and Play Data safety before enabling additional collection or providers.

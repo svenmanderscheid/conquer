@@ -11,6 +11,7 @@ function checkWaitlist(bool $ok,string $label):void{if(!$ok)throw new RuntimeExc
 $fixture=new \ConquerTests\FeatureDatabase();
 try{
  $db=Connection::getInstance();
+ checkWaitlist(AlphaWaitlistAdmin::emails($db)===[],'empty waitlist has no copy recipients');
  $input=['first_name'=>' Élise ','last_name'=>'Müller','email'=>' Tester@Tests.Invalid ','consent'=>'1'];
  AlphaWaitlist::join($input,'fr');
  $before=$db->query('SELECT * FROM alpha_waitlist')->fetch();
@@ -32,4 +33,33 @@ try{
  $list=AlphaWaitlistAdmin::listing($db,['q'=>'tester@tests.invalid','status'=>'invited']);
  checkWaitlist($list['total']===1&&$list['rows'][0]['email']==='tester@tests.invalid','admin listing exposes stored alpha email');
  checkWaitlist(is_file(ROOT_DIR.'/views/admin/alpha_waitlist.php'),'admin waitlist view exists');
+ for($i=1;$i<=31;$i++){
+  AlphaWaitlist::join(['first_name'=>'Copy','last_name'=>'Fixture '.sprintf('%02d',$i),'email'=>sprintf('copy%02d@tests.invalid',$i),'consent'=>'1'],'en');
+ }
+ $db->execute("UPDATE alpha_waitlist SET invited_at=UTC_TIMESTAMP() WHERE email='copy02@tests.invalid'");
+ $filtered=AlphaWaitlistAdmin::listing($db,['q'=>'copy01','status'=>'waiting','page'=>2]);
+ $pageTwo=AlphaWaitlistAdmin::listing($db,['page'=>2]);
+ $emails=AlphaWaitlistAdmin::emails($db);
+ checkWaitlist($filtered['total']===1&&count($pageTwo['rows'])===7&&count($emails)===32,'copy recipients include filtered-out registrations and every page');
+ checkWaitlist(in_array('tester@tests.invalid',$emails,true)&&in_array('copy02@tests.invalid',$emails,true),'copy recipients include waiting and invited entries');
+ $expected=$emails;sort($expected,SORT_STRING);
+ checkWaitlist($emails===$expected&&count(array_unique($emails))===32,'copy recipients are sorted without repeated addresses');
+ if(in_array('--browser',$argv,true)){
+  $db->execute("INSERT INTO admin_users(username,password_hash,role) VALUES('CopyAdmin',?,'superadmin'),('CopyModerator',?,'moderator')",[password_hash('Waitlist-Fixture-2026!',PASSWORD_DEFAULT),password_hash('Waitlist-Fixture-2026!',PASSWORD_DEFAULT)]);
+  $routes= <<<'PHP'
+  define('APP_BASE','/conquer');$path=parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
+  if(!str_starts_with($path,APP_BASE.'/')){http_response_code(404);exit;}$path=substr($path,strlen(APP_BASE));
+  if(str_starts_with($path,'/assets/')){$file=realpath(ROOT_DIR.$path);if(!$file||!str_starts_with($file,realpath(ROOT_DIR.'/assets').DIRECTORY_SEPARATOR)||!is_file($file)){http_response_code(404);exit;}header('Content-Type: '.(['css'=>'text/css','js'=>'application/javascript','svg'=>'image/svg+xml','png'=>'image/png','webp'=>'image/webp','woff2'=>'font/woff2'][pathinfo($file,PATHINFO_EXTENSION)]??'application/octet-stream'));readfile($file);exit;}
+  session_name('conquer_waitlist_copy_fixture');session_start();
+  if($path==='/admin/login'){if($_SERVER['REQUEST_METHOD']==='POST')\Conquer\Admin\AdminController::loginPost();else \Conquer\Admin\AdminController::loginPage();}
+  elseif($path==='/admin/logout')\Conquer\Admin\AdminController::logout();
+  elseif($path==='/admin/alpha-waitlist')\Conquer\Admin\AdminController::alphaWaitlist();
+  elseif($path==='/admin')\Conquer\Admin\AdminController::dashboard();
+  else http_response_code(404);
+  PHP;
+  $base=$fixture->serve($routes).'/conquer';
+  $process=proc_open(['node',ROOT_DIR.'/tests/alpha_waitlist_copy.cjs',$base],[0=>['pipe','r'],1=>STDOUT,2=>STDERR],$pipes,ROOT_DIR,null,['bypass_shell'=>true]);
+  if(!is_resource($process))throw new RuntimeException('Browser test did not start.');fclose($pipes[0]);
+  if(proc_close($process)!==0)throw new RuntimeException('Waitlist copy browser checks failed.');
+ }
 }finally{$fixture->close();}

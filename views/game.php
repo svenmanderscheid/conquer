@@ -35,7 +35,7 @@ $base = htmlspecialchars(APP_BASE, ENT_QUOTES);
   <link rel="stylesheet" href="<?= $base ?>/assets/css/inventory-reference.css?v=<?= filemtime(__DIR__ . '/../assets/css/inventory-reference.css') ?>">
   <link rel="stylesheet" href="<?= $base ?>/assets/css/world-zones.css?v=<?= filemtime(__DIR__ . '/../assets/css/world-zones.css') ?>">
   <link rel="stylesheet" href="<?= $base ?>/assets/css/world-shrines.css?v=<?= filemtime(__DIR__ . '/../assets/css/world-shrines.css') ?>">
-<link rel="stylesheet" href="<?= $base ?>/assets/css/mailbox-panel.css?v=<?= filemtime(ROOT_DIR.'/assets/css/mailbox-panel.css') ?>"><link rel="stylesheet" href="<?= $base ?>/assets/css/community-panel.css?v=features1"><link rel="stylesheet" href="<?= $base ?>/assets/css/defense-panel.css?v=features1"><link rel="stylesheet" href="<?= $base ?>/assets/css/progression-panel.css?v=features1"><link rel="stylesheet" href="<?= $base ?>/assets/css/lord-talents.css?v=<?= filemtime(ROOT_DIR.'/assets/css/lord-talents.css') ?>"><link rel="stylesheet" href="<?= htmlspecialchars(APP_BASE,ENT_QUOTES) ?>/assets/css/localization.css?v=<?= filemtime(ROOT_DIR.'/assets/css/localization.css') ?>"><?= \Conquer\Game\Locale::bootstrapScripts() ?><script src="<?= htmlspecialchars(APP_BASE,ENT_QUOTES) ?>/assets/js/localization.js?v=<?= filemtime(ROOT_DIR.'/assets/js/localization.js') ?>" defer></script>
+<link rel="stylesheet" href="<?= $base ?>/assets/css/mailbox-panel.css?v=<?= filemtime(ROOT_DIR.'/assets/css/mailbox-panel.css') ?>"><link rel="stylesheet" href="<?= $base ?>/assets/css/community-panel.css?v=features1"><link rel="stylesheet" href="<?= $base ?>/assets/css/defense-panel.css?v=<?= filemtime(ROOT_DIR.'/assets/css/defense-panel.css') ?>"><link rel="stylesheet" href="<?= $base ?>/assets/css/progression-panel.css?v=features1"><link rel="stylesheet" href="<?= $base ?>/assets/css/lord-talents.css?v=<?= filemtime(ROOT_DIR.'/assets/css/lord-talents.css') ?>"><link rel="stylesheet" href="<?= htmlspecialchars(APP_BASE,ENT_QUOTES) ?>/assets/css/localization.css?v=<?= filemtime(ROOT_DIR.'/assets/css/localization.css') ?>"><?= \Conquer\Game\Locale::bootstrapScripts() ?><script src="<?= htmlspecialchars(APP_BASE,ENT_QUOTES) ?>/assets/js/localization.js?v=<?= filemtime(ROOT_DIR.'/assets/js/localization.js') ?>" defer></script>
   <link rel="stylesheet" href="<?= $base ?>/assets/css/world-chat.css?v=<?= filemtime(__DIR__ . '/../assets/css/world-chat.css') ?>">
   <link rel="stylesheet" href="<?= $base ?>/assets/css/trading-panel.css?v=<?= filemtime(__DIR__ . '/../assets/css/trading-panel.css') ?>">
   <link rel="stylesheet" href="<?= $base ?>/assets/css/treasure-panel.css?v=<?= filemtime(__DIR__ . '/../assets/css/treasure-panel.css') ?>">
@@ -150,6 +150,7 @@ $base = htmlspecialchars(APP_BASE, ENT_QUOTES);
 <script src="<?= $base ?>/assets/js/research-tree.js?v=<?= filemtime(__DIR__ . '/../assets/js/research-tree.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/boss-mechanic.js?v=<?= filemtime(ROOT_DIR.'/assets/js/boss-mechanic.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/battle-preview.js?v=<?= filemtime(__DIR__ . '/../assets/js/battle-preview.js') ?>" defer></script>
+<script src="<?= $base ?>/assets/js/formation-composition.js?v=<?= filemtime(ROOT_DIR.'/assets/js/formation-composition.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/march-panel.js?v=<?= filemtime(__DIR__ . '/../assets/js/march-panel.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/report-share.js?v=<?= filemtime(__DIR__ . '/../assets/js/report-share.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/monster-report.js?v=<?= filemtime(__DIR__ . '/../assets/js/monster-report.js') ?>" defer></script>
@@ -159,11 +160,11 @@ $base = htmlspecialchars(APP_BASE, ENT_QUOTES);
 <script src="<?= $base ?>/assets/js/mailbox-panel.js?v=<?= filemtime(ROOT_DIR.'/assets/js/mailbox-panel.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/scout-report.js?v=<?= filemtime(ROOT_DIR.'/assets/js/scout-report.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/territory-panel.js?v=<?= filemtime(ROOT_DIR.'/assets/js/territory-panel.js') ?>" defer></script>
-<script src="<?= $base ?>/assets/js/social-hub.js?v=<?= filemtime(ROOT_DIR.'/assets/js/social-hub.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/landmark-actions.js?v=<?= filemtime(ROOT_DIR.'/assets/js/landmark-actions.js') ?>" defer></script>
+<script src="<?= $base ?>/assets/js/social-hub.js?v=<?= filemtime(ROOT_DIR.'/assets/js/social-hub.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/alliance-community.js?v=<?= filemtime(ROOT_DIR.'/assets/js/alliance-community.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/community-panel.js?v=<?= filemtime(ROOT_DIR.'/assets/js/community-panel.js') ?>" defer></script>
-<script src="<?= $base ?>/assets/js/defense-panel.js?v=features1" defer></script>
+<script src="<?= $base ?>/assets/js/defense-panel.js?v=<?= filemtime(ROOT_DIR.'/assets/js/defense-panel.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/lord-talents.js?v=<?= filemtime(ROOT_DIR.'/assets/js/lord-talents.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/welcome-event.js?v=<?= filemtime(ROOT_DIR.'/assets/js/welcome-event.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/progression-panel.js?v=<?= filemtime(ROOT_DIR.'/assets/js/progression-panel.js') ?>" defer></script>

@@ -7,12 +7,12 @@ require ROOT_DIR.'/src/Autoloader.php';
 use Conquer\Game\Dungeon\DungeonRules;
 
 $ok=0;$check=static function(bool $condition,string $message)use(&$ok):void{if(!$condition)throw new RuntimeException($message);$ok++;};
-$member=static fn(string$role,int$count=1000):array=>['role'=>$role,'specialty_points'=>1,'troops'=>[50100101=>$count],'attack'=>45*$count,'defense'=>35*$count,'hp'=>130*$count,'gather_bonus'=>$role==='gather'?.2:0,'hunter_bonus'=>$role==='hunter'?.25:0];
+$member=static fn(string$role,int$count=40000):array=>['role'=>$role,'specialty_points'=>1,'troops'=>[50100101=>$count],'attack'=>45*$count,'defense'=>35*$count,'hp'=>130*$count,'gather_bonus'=>$role==='gather'?.2:0,'hunter_bonus'=>$role==='hunter'?.25:0];
 $party=[$member('attack'),$member('defense'),$member('gather'),$member('hunter')];
 
 $catalog=DungeonRules::catalog();
 $check(count($catalog['dungeons'])===7&&count($catalog['difficulties'])===2,'catalog includes six weekly dungeons and Melusina');
-$check(count(array_filter($catalog['dungeons'],static fn(array$d):bool=>(float)($d['enemy_factor']??0)===3.5))===7,'all new dungeon definitions use the cooperative enemy factor');
+$check(count(array_filter($catalog['dungeons'],static fn(array$d):bool=>(float)($d['enemy_factor']??0)===24.0))===7,'all new dungeon definitions use the recalibrated cooperative enemy factor');
 $check(array_column(DungeonRules::permanentDungeons(),'dungeon_code')===['melusina_well'],'Melusina has a permanent regional definition');
 $rotation=DungeonRules::weeklyRotation(new DateTimeImmutable('2026-09-12T18:00:00+02:00'));
 $check($rotation['week_start']==='2026-09-07T00:00:00+00:00'&&count($rotation['available'])===3,'UTC Monday rotation');
@@ -38,7 +38,7 @@ $utilityResult=DungeonRules::simulate($d,$utilityParty,'normal','balanced',42,'e
 $check($utilityResult['fragments']>3&&$utilityResult['duration_seconds']<(int)ceil($d['base_duration']*1.25),'gather and hunter bonuses apply without combat roles');
 $weak=[$member('attack',10),$member('defense',10)];$check(!DungeonRules::simulate($d,$weak,'normal','balanced',42,'skip')['success'],'minimum army loses');
 $typical=[$member('attack'),$member('defense')];$check(DungeonRules::simulate($d,$typical,'normal','balanced',42,'skip')['success'],'typical two-player army wins normal');
-$doubleKo=$d;$doubleKo['encounters'][0]=['name'=>'Gleichzeitiger Fall','attack'=>100000,'defense'=>0,'hp'=>1];$ko=DungeonRules::simulate($doubleKo,$typical,'normal','balanced',42,null);$check(!$ko['success']&&!$ko['decision_required']&&$ko['hp_remaining']===0,'simultaneous knockout never heals or advances');
+$doubleKo=$d;$doubleKo['encounters'][0]=['name'=>'Gleichzeitiger Fall','attack'=>100000,'defense'=>0,'hp'=>1];$ko=DungeonRules::simulate($doubleKo,$weak,'normal','balanced',42,null);$check(!$ko['success']&&!$ko['decision_required']&&$ko['hp_remaining']===0,'simultaneous knockout never heals or advances');
 $check(DungeonRules::simulate($d,$typical,'hard','balanced',42,'skip')['success'],'typical two-player army can win hard');
 $skip=DungeonRules::simulate($d,$party,'normal','balanced',42,'skip');
 $check($skip['duration_seconds']===(int)ceil($d['base_duration']*.75),'hunter reduces base travel');
@@ -62,7 +62,8 @@ $profileParty=static function(array$mix,int$total):array{
 };
 $names=[];$mixes=[];
 foreach($catalog['dungeons']as$def){$guidance=DungeonRules::guidance($def);$names[]=$guidance['profile_name'];$mixes[]=json_encode($guidance['mix']);$check(array_sum(array_column($guidance['mix'],'percent'))===100,'profile mix sums to 100 for '.$def['dungeon_code']);
-    $check($guidance['requirements']['normal']['skip']>20,'normal guidance exceeds the two-member minimum army for '.$def['dungeon_code']);
+    $check($guidance['requirements']['normal']['skip']>=28000&&$guidance['requirements']['normal']['skip']<=42000,'normal dungeon requires a developed cooperative T1 army for '.$def['dungeon_code']);
+    $check($guidance['requirements']['hard']['explore']>=65000&&$guidance['requirements']['hard']['explore']<=100000,'hard dungeon remains possible within two members at 50000 troops each for '.$def['dungeon_code']);
     $check($guidance['requirements']['hard']['skip']>$guidance['requirements']['normal']['skip'],'hard guidance requires a larger army than normal for '.$def['dungeon_code']);
     $check($guidance['requirements']['normal']['explore']>=$guidance['requirements']['normal']['skip']&&$guidance['requirements']['hard']['explore']>=$guidance['requirements']['hard']['skip'],'side-room guidance never understates the safer route for '.$def['dungeon_code']);
     foreach(['normal','hard']as$difficulty)foreach(['skip','explore']as$choice){$recommended=$profileParty($guidance['mix'],$guidance['requirements'][$difficulty][$choice]);foreach([1,42,777,20260912,2147483647]as$seed){$run=DungeonRules::simulate($def,$recommended,$difficulty,'balanced',$seed,$choice);$max=DungeonRules::effectivePartyHp($def,$recommended);$check($run['success']&&$run['hp_remaining']>=$max*.35,'computed guidance is safe across reference samples');}}
@@ -70,7 +71,12 @@ foreach($catalog['dungeons']as$def){$guidance=DungeonRules::guidance($def);$name
     // Advisory formations promise a safe army, not maximum HP over every mix.
     $count=$guidance['requirements']['hard']['explore'];$recommended=$profileParty($guidance['mix'],$count);$neutral=$def;unset($neutral['army_profile']);
     $profileRun=DungeonRules::simulate($def,$recommended,'hard','balanced',42,'explore');$neutralRun=DungeonRules::simulate($neutral,$recommended,'hard','balanced',42,'explore');
-    $check($profileRun['success']&&$profileRun['hp_remaining']>$neutralRun['hp_remaining'],'recommended formation benefits from its dungeon profile for '.$def['dungeon_code']);
+    $check($profileRun['success']&&(!$neutralRun['success']||$profileRun['hp_remaining']>$neutralRun['hp_remaining']),'recommended formation benefits through victory or more remaining HP from its dungeon profile for '.$def['dungeon_code']);
+    $smallParty=$profileParty($guidance['mix'],2000);$savedDefinition=$def;$savedDefinition['enemy_factor']=3.5;
+    foreach([1,42,777,20260912,2147483647]as$seed){
+        $check(!DungeonRules::simulate($def,$smallParty,'normal','balanced',$seed,'skip')['success'],'small early army no longer clears '.$def['dungeon_code']);
+        $check(DungeonRules::simulate($savedDefinition,$smallParty,'normal','balanced',$seed,'skip')['success'],'stored pre-balance definitions retain their previous combat strength for '.$def['dungeon_code']);
+    }
 }
 $check(count(array_unique($names))===7&&count(array_unique($mixes))===7,'all seven dungeons have distinct named formations');
 $legacy=$catalog['dungeons'][0];unset($legacy['army_profile']);$legacyBefore=$legacy;$legacyGuidance=DungeonRules::guidance($legacy);$check($legacy===$legacyBefore&&!empty($legacyGuidance['requirements']['hard']['explore'])&&array_sum(array_column($legacyGuidance['mix'],'percent'))===100,'legacy definition receives neutral advisory guidance without mutation');$withTypes=$profileParty($catalog['dungeons'][0]['army_profile']['mix'],300);$withoutTypes=array_map(static function(array$m):array{unset($m['type_stats']);return$m;},$withTypes);$check(DungeonRules::simulate($legacy,$withTypes,'normal','balanced',42,'skip')===DungeonRules::simulate($legacy,$withoutTypes,'normal','balanced',42,'skip'),'saved definitions without profiles retain legacy aggregate combat math');

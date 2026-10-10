@@ -11,7 +11,10 @@ const out=path.join(os.tmpdir(),'conquer-admin-ui');fs.mkdirSync(out,{recursive:
  try{
   await page.context().addCookies([{name:'conquer_locale',value:'de',url:base}]);
   await page.goto(base+'/admin/login');await page.locator("[name=identifier], [name=username]").fill('RewardAdmin');await page.locator('[name=password]').fill('Fixture-Reward-123!');await page.getByRole('button',{name:'Anmelden',exact:true}).click();await page.waitForURL(base+'/admin');
-  assert.equal(await page.locator('.quick-action').count(),7);
+  assert.equal(await page.locator('[data-operations-overview]').count(),1,'Analytical overview is the administration landing page');
+  assert.equal(await page.locator('.ops-metric').count(),4,'Overview exposes the four operational metrics');
+  assert.equal(await page.locator('.ops-analysis .ops-tabs a').count(),3,'Activity, economy and stability are one click apart');
+  if(process.env.ADMIN_WORLD_ONLY==='1'){await require('./admin_world_workspace.cjs')({page,base,errors});return;}
   if(process.env.ADMIN_RELICS_ONLY==='1'){await require('./admin_relic_drops.cjs')({page,base,errors});await browser.close();return;}
   if(process.env.ADMIN_MODERN_ONLY==='1'){await require('./admin_modern.cjs')({page,base,errors});await browser.close();return;}
   if(process.env.ADMIN_FRAGMENTS_ONLY==='1'){
@@ -85,9 +88,9 @@ const out=path.join(os.tmpdir(),'conquer-admin-ui');fs.mkdirSync(out,{recursive:
    assert((await page.locator('.picker-result').count())>0);await page.locator('.picker-result img').evaluateAll(async images=>{await Promise.all(images.map(i=>{i.loading='eager';return i.decode();}));});
    assert.equal(await page.locator('#item-picker-dialog').evaluate(e=>e.scrollWidth>e.clientWidth+2),false,'Picker does not overflow');
    await page.screenshot({path:path.join(out,`picker-${width}x${height}.png`)});await page.keyboard.press('Escape');assert.equal(await page.locator('#item-picker-dialog').evaluate(e=>e.open),false);
-   if(width<850){await page.locator('.mobile-menu').click();assert.equal(await page.locator('.mobile-menu').getAttribute('aria-expanded'),'true');await page.locator('#admin-nav a').filter({hasText:'Katalog'}).click();await page.waitForURL('**/admin/items?world_id=1');}
+   if(width<850){await page.locator('.mobile-menu').click();assert.equal(await page.locator('.mobile-menu').getAttribute('aria-expanded'),'true');await page.locator('#admin-nav a[data-admin-area="drops"]').click();await page.waitForURL(url=>url.pathname.endsWith('/admin/rewards'));await page.locator('.admin-section-nav a[href*="/admin/items"]').click();await page.waitForURL(url=>url.pathname.endsWith('/admin/items'));}
   }
-  await page.goto(base+'/admin/rewards?type=chest&source=gold');const rows=await page.locator('.drop-row').count();assert(rows>100,'Large chest table is complete');await page.locator('[data-drop-search]').fill('Nahrung');assert(await page.locator('.drop-row:visible').count()<rows);assert(!(await page.locator('[data-save-status]').innerText()).includes('Ungespeicherte'),'Filtering does not mark config dirty');
+  await page.goto(base+'/admin/rewards?type=chest&source=platinum');const rows=await page.locator('.drop-row').count();assert(rows>100,'Large chest table is complete');await page.locator('[data-drop-search]').fill('Nahrung');assert(await page.locator('.drop-row:visible').count()<rows);assert(!(await page.locator('[data-save-status]').innerText()).includes('Ungespeicherte'),'Filtering does not mark config dirty');
   await page.setViewportSize({width:1440,height:1000});
   await page.goto(base+'/admin/rewards?type=farm&source=20100101.1');
   await page.locator('[data-source-level]').selectOption('3');

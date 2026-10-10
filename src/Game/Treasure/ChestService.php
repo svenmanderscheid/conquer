@@ -167,7 +167,14 @@ final class ChestService
         $results = [];
 
         for ($i = 0; $i < $rolls; $i++) {
-            $results[] = self::weightedRandom($entries);
+            $drop=self::weightedRandom($entries);
+            $drop['quantity']=\Conquer\Game\Rewards\RewardCatalog::quantity($drop,'quantity');
+            $results[]=$drop;
+        }
+
+        foreach($config['bonus_drops']??[] as $drop){
+            if(!\Conquer\Game\Rewards\RewardCatalog::isDropEligible($drop)||!\Conquer\Game\Rewards\RewardCatalog::roll((float)$drop['probability']))continue;
+            $results[]=['item_code'=>(int)$drop['item_code'],'quantity'=>\Conquer\Game\Rewards\RewardCatalog::quantity($drop)];
         }
 
         return $results;

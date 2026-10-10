@@ -55,6 +55,15 @@ try{
  $names=array_column($r['json']['data']['targets'],'name','id');
  territoryHttpCheck($names[$target]==='Commune Dippach'&&$names['canton:01']==='Shrine of Capellen'&&$names['crown:krounbuerg']==='Royal Castle','existing targets expose Commune, Shrine and Royal Castle without changing IDs');
  territoryHttpCheck($db->query('SELECT name FROM territory_targets WHERE world_id=2 AND id=?',[$target])->fetchColumn()==='Vogtei Dippach','name presentation does not rewrite stored territory data');
+ $compact=\Conquer\Game\Territory\TerritoryService::compactState(1,2);$mapped=array_column($compact['map_targets'],null,'id');
+ territoryHttpCheck($mapped[$target]['protection']['state']==='neutral'&&$mapped[$target]['protection']['until']===null,'main map exposes neutral targets without a shield countdown');
+ territoryHttpCheck(isset($mapped['canton:01']['commune_progress']['required'])&&!isset($mapped[$target]['garrison_count']),'main map exposes shrine requirements without per-target garrison queries');
+ $originalRules=\Conquer\Game\Territory\TerritoryService::profile(2);$closedRules=array_replace($originalRules,['pvp_window_start_hour_utc'=>((int)gmdate('G')+2)%24,'pvp_window_hours'=>1]);
+ $db->execute('UPDATE territory_profiles SET rules_json=? WHERE world_id=2',[json_encode($closedRules)]);$db->execute('UPDATE territory_targets SET owner_alliance_id=2 WHERE world_id=2 AND id=?',[$target]);
+ $mapped=array_column(\Conquer\Game\Territory\TerritoryService::compactState(1,2)['map_targets'],null,'id');
+ $r=$call('/api/territory/target?id='.rawurlencode($target));
+ territoryHttpCheck($mapped[$target]['protection']['state']==='protected'&&$mapped[$target]['protection']===$r['json']['data']['protection'],'map shield and authenticated detail share world-specific server protection');
+ $db->execute('UPDATE territory_profiles SET rules_json=? WHERE world_id=2',[json_encode($originalRules)]);$db->execute('UPDATE territory_targets SET owner_alliance_id=NULL WHERE world_id=2 AND id=?',[$target]);
  $r=$call('/api/territory/target?id='.rawurlencode($target));territoryHttpCheck($r['status']===200&&($r['json']['data']['id']??'')===$target,'stable territory identifier reaches actual detail route',$r);
  $first=$call('/api/territory/action','POST',$body);territoryHttpCheck($first['status']===200,'officer sets valid goal',$first);
  $retry=$call('/api/territory/action','POST',$body);territoryHttpCheck($retry['status']===200&&$retry['json']['data']===$first['json']['data'],'lost response can be retried without a second mutation',$retry);

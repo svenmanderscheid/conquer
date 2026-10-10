@@ -37,7 +37,15 @@ try{
  $s=CongressService::state(1);checkCongress($s['id']===71&&$s['alliance_id']===1&&$s['state']==='secured','existing central shrine ID and legacy ownership survive migration');
  checkCongress($s['bonuses']===[]&&ShrineService::getAllianceBonuses(1)===[],'Congress invents no economy or military passive bonus');
  $db->execute('DELETE FROM shrine_captures');$db->execute('UPDATE shrines SET owner_alliance_id=NULL,secured_at=NULL');
- $s=CongressService::state(1);checkCongress($s['state']==='neutral'&&$s['garrison_total']===1500000&&$s['hold_seconds']===3600,'neutral S-tier catalog garrison and one-hour hold are preserved');
+ $s=CongressService::state(1);checkCongress($s['state']==='neutral'&&$s['garrison_total']===720000&&$s['hold_seconds']===3600,'neutral Congress uses a two-million-attacker target and keeps its one-hour hold');
+ $legacyCongress=[50100401=>500000,50200401=>500000,50300401=>500000];
+ $db->execute('INSERT INTO shrine_captures(shrine_id,garrison_troops_json) VALUES(71,?)',[json_encode($legacyCongress)]);
+ checkCongress(CongressService::state(1)['garrison_troops']===ShrineService::NPC_GARRISON['S'],'known full legacy NPC snapshot upgrades without a database migration');
+ $db->execute('UPDATE shrine_captures SET garrison_troops_json=? WHERE shrine_id=71',[json_encode(array_map(static fn($n)=>intdiv($n,2),$legacyCongress))]);
+ checkCongress(CongressService::state(1)['garrison_total']===360000,'legacy NPC upgrade preserves fifty percent prior attrition');
+ $db->execute("UPDATE shrine_captures SET garrison_troops_json='{}' WHERE shrine_id=71");
+ checkCongress(CongressService::state(1)['garrison_total']===720000,'empty neutral historical capture record cannot bypass NPC defenders');
+ $db->execute('DELETE FROM shrine_captures WHERE shrine_id=71');
  checkCongress(!$s['can_garrison']&&$s['can_attack']&&!CongressService::state(4)['can_attack'],'read model exposes alliance-dependent actions');
  checkCongress(WorldTerrain::isWater(128,128),'Congress is intentionally at great lake center');
  foreach(['city','resource','monster'] as $kind)checkCongress(!WorldPlacement::canPlace($db,1,$kind,128,128),$kind.' still cannot occupy lake/Congress');
@@ -46,8 +54,8 @@ try{
  checkCongress(countAt($db,1)===200000&&(int)$db->query('SELECT COUNT(*) FROM marches')->fetchColumn()===0,'failed dispatches reserve no troops or march slots');
  $attack=CongressService::dispatch(1,71,[50100101=>1000]);$mid=$attack['march_id'];
  checkCongress(countAt($db,1)===199000&&$attack['state']==='marching','attack reserves actual city troops and has travel time');
- CongressService::resolveMarch($mid);checkCongress(CongressService::state(1)['garrison_total']===1500000,'capture cannot resolve before arrival');
- arrive($db,$mid);$s=CongressService::state(1);checkCongress($s['state']==='neutral'&&$s['garrison_total']<1500000&&$s['garrison_total']>0,'failed allied attack permanently weakens NPC garrison');
+ CongressService::resolveMarch($mid);checkCongress(CongressService::state(1)['garrison_total']===720000,'capture cannot resolve before arrival');
+ arrive($db,$mid);$s=CongressService::state(1);checkCongress($s['state']==='neutral'&&$s['garrison_total']<720000&&$s['garrison_total']>0,'failed allied attack permanently weakens NPC garrison');
  $snapshot=$s['garrison_total'];CongressService::resolveMarch($mid);checkCongress(CongressService::state(1)['garrison_total']===$snapshot,'repeat settlement cannot damage defenders twice');
  $row=$db->query('SELECT * FROM marches WHERE id=?',[$mid])->fetch();$haul=json_decode($row['haul_json'],true);checkCongress($row['state']==='returning'&&$haul['survivors'][50100101]===200,'defeated survivors return with original maximum80 percent loss rule');
  checkCongress((int)$db->query('SELECT count FROM hospital_wounded WHERE city_id=1 AND troop_code=50100101')->fetchColumn()===240,'thirty percent of casualties enter the real hospital');

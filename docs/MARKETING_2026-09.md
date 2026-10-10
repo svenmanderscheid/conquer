@@ -1,5 +1,17 @@
 # English campaign and public website — 24 September 2026
 
+## Public website refresh — 9 October 2026
+
+The public website now leads with the live Open Alpha and direct browser registration. The approved Kingdom symbol, cream/gold materials, Bree Serif main actions and current city, world and training screenshots replace the previous branded slideshow and ten-poster website gallery. The campaign exports described below remain available separately. The screenshots use a disposable demonstration kingdom, with no real player contact data, and are labelled as current Alpha screenshots.
+
+Browser play is available now. The owner confirmed the Android app is under review and iOS will be released later; these statuses appear near the main call to action and in the development section. No store link or release date is announced. Thirty launch-copy keys were added in English, German and French through the shared language system; English remains the default. Registration links work without JavaScript, and the screenshot selector changes only when selected.
+
+Map-image correction, 9 October 2026: the initial world screenshot mistakenly used the legacy test map. Both the hero selector and gallery now use `assets/marketing/alpha-world-luxembourg-20261009.webp`, captured from the actual main-app Luxembourg renderer in an isolated demonstration world, with Rumelange and its canton visible. The new filename prevents reuse of the cached legacy image. Only the new image and the two template references were published; all three hashes were verified, with backups under `/home/u171686647/uok-website-map-backup-20261009-152037-a919c1`. Local and live checks confirmed both image references, decoded dimensions, the delivered image hash and seven language/viewport combinations without overflow or browser errors. Evidence: `output/playwright/alpha-website-20261009/map-correction/`.
+
+The targeted update was published through the existing SSH access after reading the current live files. Existing live translations and unrelated shared styles were preserved. Twelve installed files were verified by SHA-256; the previous files are backed up outside the webroot under `/home/u171686647/uok-website-alpha-backup-20261009-131913-c3aea5`. No database migration or player-state change was made. Local checks passed the existing landing localization and troop-art suites plus fifteen language/viewport combinations (1440×1000, 390×844, 320×568, 844×390, 568×320), no-JavaScript access, fonts, imagery, platform cards and registration links. Release and browser evidence: `output/playwright/alpha-website-20261009/`.
+
+Two unsent Gmail launch drafts were prepared for the eight current waitlist entries according to their saved language: six German and two English. Waitlist recipients are in BCC; replies go to `hello@unionofkingdoms.com`. The drafts explain browser registration, Android review, the later iOS release and the Alpha development notice. No launch email was sent and no waitlist status was changed.
+
 ## Open Alpha launch — 5 October 2026
 
 The owner chose Open Alpha without invitation keys. All ten campaign PNGs now say **Play the Open Alpha**, retain **www.unionofkingdoms.com**, the approved artwork and **A new Era begins**. Post 10 also says **No key needed. Create your kingdom.** Current edit prompts are in `outputs/social-2026-09/OPEN-ALPHA-EDIT-PROMPTS.json`; earlier prompt files record historical revisions.

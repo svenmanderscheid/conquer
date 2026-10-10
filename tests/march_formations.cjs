@@ -7,7 +7,7 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/march-form
 fs.mkdirSync(out,{recursive:true});
 const catalogs=Object.fromEntries(['en','de','fr'].map(locale=>[locale,JSON.parse(fs.readFileSync(path.join(root,'data/i18n',locale+'.json'),'utf8'))]));
 const styles=[...fs.readFileSync(path.join(root,'views/game.php'),'utf8').matchAll(/assets\/css\/([a-z0-9-]+)\.css/g)].map(match=>match[1]);
-const scripts=['localization','mobile-pages','castle-skins','reward-dialog','march-panel'];
+const scripts=['localization','mobile-pages','castle-skins','reward-dialog','formation-composition','march-panel'];
 const html=`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 ${styles.map(name=>'<link rel="stylesheet" href="/assets/css/'+name+'.css">').join('')}
 </head><body class="mobile-game world-mode"><dialog id="panel-dialog"><div class="page-heading"></div></dialog><dialog id="game-dialog"><button class="dialog-close" aria-label="Close">×</button><div id="dialog-content"></div></dialog>
@@ -122,6 +122,18 @@ const settle=page=>page.evaluate(()=>new Promise(requestAnimationFrame));
   await page.evaluate(()=>{reset();failRead=true;openMarch();});await settle(page);assert(await page.locator('#march-formation-save').isDisabled(),'failed loading cannot accidentally overwrite an unknown slot');
   assert(await page.locator('[data-action="march-formations-retry"]').isVisible(),'failed loading offers a retry');await page.evaluate(()=>{failRead=false;formations=[];});await page.locator('[data-action="march-formations-retry"]').click();await page.waitForFunction(()=>!document.querySelector('[data-action="march-formation-load"][data-id="6"]').disabled);assert.equal(await page.locator('[data-action="march-formation-load"]').count(),6,'six empty slots remain available');
   const unsaved=await values(page);await page.locator(slot(6)).click();assert.deepEqual(await values(page),unsaved);await page.locator('#march-formation-save').click();assert.equal(await page.locator(destination(6)).getAttribute('aria-pressed'),'true');await page.keyboard.press('Escape');checks++;
+
+  await page.evaluate(()=>{reset();formations.push({slot:4,name:'70 / 30 / 0',composition:{percentages:{1:70,2:30,3:0},total:1000},troops:{50100305:1000}});});
+  await open(page);await page.locator(slot(4)).click();let percentageArmy=await values(page);
+  let percentageSums=await page.evaluate(army=>ConquerFormationComposition.totals(state.troop_defs,army),percentageArmy);
+  assert.deepEqual(percentageSums,{1:700,2:300,3:0},'march loads percentage metadata rather than old snapshot counts');
+  assert.equal(percentageArmy[50100105],500,'percentage formation uses highest tiers first');
+  await open(page,'rally-join');await page.locator(slot(4)).click();percentageArmy=await values(page);
+  percentageSums=await page.evaluate(army=>ConquerFormationComposition.totals(state.troop_defs,army),percentageArmy);
+  assert.deepEqual(percentageSums,{1:490,2:210,3:0},'percentage mix respects remaining rally capacity');
+  await page.evaluate(()=>state.troop_defs.filter(t=>t.type===2).forEach(t=>state.troops[t.code]=0));
+  await open(page);await page.locator(slot(4)).click();assert.deepEqual(await values(page),{},'missing archers never get replaced by infantry or cavalry');
+  console.log('PASS percentage templates: 70/30/0, highest tiers, rally capacity and missing troop types');checks++;
 
   for(const viewport of [{width:1280,height:800},{width:390,height:844},{width:320,height:568},{width:844,height:390},{width:568,height:320}]){
    const label=viewport.width+'x'+viewport.height;

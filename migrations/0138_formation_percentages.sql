@@ -1,0 +1,1 @@
+ALTER TABLE troop_formations ADD COLUMN IF NOT EXISTS composition_json TEXT NULL DEFAULT NULL;

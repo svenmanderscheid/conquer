@@ -85,7 +85,7 @@ final class MonsterRally
                 if(!empty($army['is_ai']))continue;
                 foreach($basePool as $resource=>$amount)if(in_array($resource,['food','lumber','stone','gold'],true))$loot[$i][$resource]=(int)$amount;
                 if(self::roll((float)($gems['chance']??0)))$loot[$i]['gems']=(int)($gems['amount']??0);
-                foreach($meta['drops'] as $drop)if(self::roll((float)$drop['probability']))$items[$i][(int)$drop['item_code']]=($items[$i][(int)$drop['item_code']]??0)+(int)$drop['count'];
+                $items[$i]=\Conquer\Game\Rewards\RewardCatalog::rollItems($meta['drops']);
                 $fragments[$i]=\Conquer\Game\Rewards\RewardCatalog::rollFragments($meta['monster']['fragment_drops']??[]);
                 $relics[$i]=\Conquer\Game\Rewards\RewardCatalog::rollRelics($meta['monster']['relic_drops']??[]);
                 $xp[$i]=$baseXp;

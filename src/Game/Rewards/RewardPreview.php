@@ -41,8 +41,9 @@ final class RewardPreview
                 'item_code' => $code,
                 'name' => (string)($definition['name_de'] ?? $definition['name'] ?? ('Gegenstand '.$code)),
                 'quantity_on_drop' => $quantity,
+                'quantity_min' => $drop['count_min'] ?? $quantity,
                 'chance' => $chance,
-                'expected_per_100' => $quantity * $chance * 100,
+                'expected_per_100' => (($drop['count_min']??$quantity)+$quantity)/2 * $chance * 100,
             ];
         }
 
@@ -54,7 +55,7 @@ final class RewardPreview
             $fragments[]=[
                 'treasure_code'=>$drop['treasure_code']??null,
                 'name'=>$definition?Locale::text($definition['name_de']??$definition['name']):Locale::t('admin.drops.fragment_random_'.$drop['fragment_grade']),
-                'quantity_on_drop'=>$quantity,'chance'=>$chance,'expected_per_100'=>$quantity*$chance*100,
+                'quantity_on_drop'=>$quantity,'quantity_min'=>$drop['count_min']??$quantity,'chance'=>$chance,'expected_per_100'=>(($drop['count_min']??$quantity)+$quantity)/2*$chance*100,
             ];
         }
         $relics=[];

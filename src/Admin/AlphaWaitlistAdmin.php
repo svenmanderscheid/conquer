@@ -7,6 +7,12 @@ use Conquer\Game\World\WorldSettings;
 
 final class AlphaWaitlistAdmin
 {
+    /** All registrations, independent of the overview's filters and pagination. */
+    public static function emails(Connection $db): array
+    {
+        return $db->query('SELECT email FROM alpha_waitlist ORDER BY email')->fetchAll(\PDO::FETCH_COLUMN);
+    }
+
     public static function listing(Connection $db, array $input): array
     {
         $search = trim(is_string($input['q'] ?? null) ? $input['q'] : '');
