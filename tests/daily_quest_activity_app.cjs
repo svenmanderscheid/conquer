@@ -30,7 +30,27 @@ async function startFixture(){
   async function closePreview(){await page.locator('.quest-activity-actions [data-action=close-dialog]').click();await page.waitForFunction(()=>!document.querySelector('#game-dialog').open);}
   async function preview(target){await page.locator(`[data-action=quest-activity-preview][data-id=daily_activity_${target}]`).click();await page.locator('.quest-activity-preview').waitFor();}
   async function checkBadge(){const kingdom=await state(),expected=kingdom.quests.filter(q=>q.completed&&!q.claimed).length+kingdom.quest_activity.milestones.filter(m=>m.completed&&!m.claimed).length;await page.waitForFunction(expected=>{const badge=document.querySelector('#navigation [data-id=quests] .dock-badge');return expected?Number(badge.textContent)===expected&&!badge.hidden:badge.hidden;},expected);}
-  for(const [width,height] of [[1280,800],[390,844],[320,568],[568,320],[844,390]]){
+  const viewports=[[1280,800],[390,844],[320,568],[568,320],[844,390]];
+  async function checkPreviewLayout(width,height){
+   await page.locator('.quest-activity-preview').evaluate(async section=>{await Promise.all([...section.querySelectorAll('img')].map(image=>image.decode()));});
+   // No automatic scrolling: both footer actions must already be available
+   // when the chest opens, including the ready-to-claim state on short screens.
+   await page.waitForFunction(()=>[...document.querySelectorAll('.quest-activity-actions button')].every(button=>{const r=button.getBoundingClientRect();return r.width>=44&&r.height>=44&&r.left>=0&&r.right<=innerWidth+1&&r.top>=0&&r.bottom<=innerHeight+1&&button.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2));}),null,{timeout:5000});
+   const layout=await page.locator('.quest-activity-preview').evaluate(section=>{
+    const dialog=section.closest('dialog'),r=dialog.getBoundingClientRect(),grid=section.querySelector('.quest-activity-rewards'),scroll=section.querySelector('.quest-activity-preview-scroll'),footer=section.querySelector('.quest-activity-footer');
+    return {fits:r.left>=0&&r.top>=0&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1,horizontal:[dialog,section,grid,scroll,footer,...grid.children].some(el=>el.scrollWidth>el.clientWidth+1),columns:getComputedStyle(grid).gridTemplateColumns.split(' ').length,images:[...section.querySelectorAll('img')].every(image=>image.complete&&image.naturalWidth>0),scrollEnabled:['auto','scroll'].includes(getComputedStyle(scroll).overflowY),footerOutsideScroll:!scroll.contains(footer)};
+   });
+   assert.deepEqual(layout,{fits:true,horizontal:false,columns:width<540?2:4,images:true,scrollEnabled:true,footerOutsideScroll:true},`${width}x${height} preview layout`);
+   const lastReward=await page.locator('.quest-activity-preview').evaluate(async section=>{
+    const scroll=section.querySelector('.quest-activity-preview-scroll'),footer=section.querySelector('.quest-activity-footer'),initialFooter=footer.getBoundingClientRect().top;
+    scroll.scrollTop=scroll.scrollHeight;await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+    const bounds=scroll.getBoundingClientRect(),last=section.querySelector('.quest-activity-rewards>li:last-child'),r=last.getBoundingClientRect();
+    const result={lastVisible:r.top>=bounds.top-1&&r.bottom<=bounds.bottom+1&&last.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)),scrollReachedEnd:Math.abs(scroll.scrollHeight-scroll.clientHeight-scroll.scrollTop)<=1,footerStayed:Math.abs(footer.getBoundingClientRect().top-initialFooter)<=1,actionsReachable:[...footer.querySelectorAll('button')].every(button=>{const b=button.getBoundingClientRect();return b.top>=0&&b.bottom<=innerHeight+1&&button.contains(document.elementFromPoint(b.x+b.width/2,b.y+b.height/2));})};
+    scroll.scrollTop=0;return result;
+   });
+   assert.deepEqual(lastReward,{lastVisible:true,scrollReachedEnd:true,footerStayed:true,actionsReachable:true},`${width}x${height} last reward and fixed actions`);
+  }
+  for(const [width,height] of viewports){
    await page.setViewportSize({width,height});
    // The panel animates after a resize and after the reward dialog closes.
    // Wait for its real touch targets to settle rather than sampling mid-transition.
@@ -40,7 +60,7 @@ async function startFixture(){
    assert.equal(layout.horizontal,false);assert(layout.listHeight>=60,JSON.stringify({width,height,...layout}));assert.equal(layout.buttons,true,JSON.stringify({width,height,...layout}));
    await page.screenshot({path:path.join(output,`${locale}-${width}x${height}-activity.png`)});
    const before=writes;await preview(100);assert.equal(await page.locator('[data-action=quest-activity-claim]').count(),0);assert.equal(await page.locator('.quest-activity-rewards>li').count(),8);assert.equal(writes,before,'Preview must never claim a chest');
-   await page.locator('.quest-activity-actions button').scrollIntoViewIfNeeded();await page.screenshot({path:path.join(output,`${locale}-${width}x${height}-preview.png`)});await closePreview();
+   await checkPreviewLayout(width,height);assert.equal(writes,before,'Inspecting and scrolling the preview must not claim a chest');await page.screenshot({path:path.join(output,`${locale}-${width}x${height}-preview.png`)});await closePreview();
   }
   await page.setViewportSize({width:390,height:844});
   await page.locator('[data-action=quest-category][data-id=main]').click();
@@ -58,6 +78,8 @@ async function startFixture(){
     const chest=(await state()).quest_activity.milestones.find(m=>m.target===points);assert(chest.completed&&!chest.claimed);
     const before=writes;await preview(points);assert.equal(writes,before,'A ready preview also requires a separate claim');
     const amounts=await page.locator('.quest-activity-rewards>li>strong').allTextContents();assert.deepEqual(amounts,chest.rewards.map(r=>'×'+(r.quantity||r.gems).toLocaleString(locale)),'Preview exposes exact reward quantities');
+    if(points===100){await page.waitForFunction(()=>!document.querySelector('#toast')?.classList.contains('visible'));for(const [width,height] of viewports){await page.setViewportSize({width,height});await checkPreviewLayout(width,height);await page.screenshot({path:path.join(output,`${locale}-${width}x${height}-ready-preview.png`)});}await page.setViewportSize({width:390,height:844});}
+    await checkPreviewLayout(390,844);assert.equal(writes,before,'A ready preview remains read-only until its claim action');
     await page.screenshot({path:path.join(output,`${locale}-ready-${points}.png`)});
     const receipt=await claim(`[data-action=quest-activity-claim][data-id="${chest.quest_code}"]`,chest.quest_code);assert.deepEqual(receipt.result.rewards,chest.rewards);
     await page.waitForFunction(code=>document.querySelector(`[data-action=quest-activity-preview][data-id="${code}"]`)?.classList.contains('is-claimed'),chest.quest_code);
@@ -68,7 +90,7 @@ async function startFixture(){
   assert.equal(await page.locator('.quest-activity-chest.is-claimed').count(),5);assert.equal(await badge.isVisible(),false);
   assert.equal(await page.locator('.quest-activity [role=progressbar]').getAttribute('aria-valuenow'),'100','Progress bar caps at the last milestone');assert.match(await page.locator('.quest-activity-heading>span').innerText(),/130/,'Actual activity is retained above 100');assert.match(await page.locator('.quest-page-summary').innerText(),/13\s*\/\s*13/);
   await page.screenshot({path:path.join(output,`${locale}-all-claimed.png`)});assert.deepEqual(errors,[],'No browser errors');
-  console.log('PASS daily activity: five responsive layouts, exact previews without writes, 13 real daily claims, starter exclusion, all five chest claims, badges and capped bar. '+output);
+  console.log('PASS daily activity: five responsive reward grids, fixed reachable actions, loaded artwork, scrollable final rewards, exact previews without writes, 13 real daily claims, starter exclusion, all five chest claims, badges and capped bar. '+output);
  }catch(error){if(page){await page.screenshot({path:path.join(output,'activity-failure.png')}).catch(()=>{});fs.writeFileSync(path.join(output,'activity-failure.txt'),error.stack+'\n'+await page.locator('body').innerText().catch(()=>''));}throw error;}
  finally{await browser.close();if(fixture&&fixture.exitCode===null){fixture.stdin.write('\n');await new Promise(resolve=>fixture.exitCode!==null?resolve():fixture.once('exit',resolve));}}
 })().catch(error=>{console.error(error);console.error('Screenshots: '+output);process.exitCode=1;});

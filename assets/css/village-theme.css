@@ -5446,19 +5446,66 @@ body.mobile-game #panel-dialog[data-panel=quests] .quest-reward-icons>.quest-rew
 body.mobile-game #panel-dialog[data-panel=quests] .quest-reward-art { width:28px;height:28px;border-radius:6px; }
 body.mobile-game #panel-dialog[data-panel=quests] .quest-activity-award { margin-left:auto;font-size:11px;padding:3px 5px; }
 body.mobile-game #panel-dialog[data-panel=quests] .quest-row>.quest-action { grid-column:3;grid-row:1/4;align-self:center;min-height:44px;margin:0;padding:8px;font-size:15px; }
-.quest-activity-preview { display:flex;flex-direction:column;gap:10px;min-width:0; }
+/* Activity loot: compact illustrated cards with actions outside the scroll area. */
+body.mobile-game #game-dialog:has(.quest-activity-preview) {
+  width:min(760px,calc(100dvw / var(--ui-desktop-scale,1) - 24px - env(safe-area-inset-left) - env(safe-area-inset-right)))!important;
+  height:auto!important;max-height:calc(100dvh / var(--ui-desktop-scale,1) - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
+  padding:0!important;overflow:hidden;
+}
+body.mobile-game #game-dialog:has(.quest-activity-preview) #dialog-content { display:flex;flex-direction:column;min-height:0;padding:0!important;overflow:hidden; }
+.quest-activity-preview { display:flex;flex-direction:column;min-width:0;min-height:0;color:var(--ui-ink); }
+.quest-activity-preview-scroll { display:flex;flex-direction:column;gap:14px;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:18px;scroll-padding:18px; }
+.quest-activity-preview-scroll:focus-visible { outline:3px solid var(--ui-accent-gold-edge);outline-offset:-3px; }
 .quest-activity-preview-summary { display:flex;align-items:center;gap:16px; }
-.quest-activity-preview-summary>img { width:84px;height:84px;object-fit:contain; }
-.quest-activity-preview-summary strong { color:var(--ui-primary-dark);font-size:22px; }
-.quest-activity-preview p { margin:0; }
-.quest-activity-rewards { display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none; }
-.quest-activity-rewards>li { display:grid;grid-template-columns:50px minmax(0,1fr) auto;align-items:center;gap:10px;padding:6px 10px;background:var(--ui-card);border:1px solid var(--ui-line);border-radius:10px;color:var(--ui-ink); }
-.quest-activity-reward-art { display:grid;place-items:center;width:50px;height:50px; }
-.quest-activity-reward-art img { max-width:100%;max-height:100%;object-fit:contain; }
-.quest-activity-rewards>li>span:nth-child(2) { overflow-wrap:anywhere; }
-.quest-activity-reset { font-size:13px;color:var(--ui-muted); }
+.quest-activity-preview-summary>img { flex:none;width:80px;height:80px;object-fit:contain; }
+.quest-activity-preview-summary>div { flex:1;min-width:0; }
+.quest-activity-preview-summary strong { font-weight:400;font-size:25px;line-height:1.2; }
+body.mobile-game .quest-activity-preview-summary strong { font-family:var(--ui-font-heading)!important; }
+.quest-activity-preview p { margin:0;line-height:1.4; }
+.quest-activity-preview-summary p { margin:4px 0 8px;font-size:14px; }
+.quest-activity-preview-summary .progress-track { max-width:320px;height:8px; }
+.quest-activity-preview-scroll>.muted { font-size:13px; }
+.quest-activity-rewards { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:0;padding:0 0 3px;list-style:none; }
+.quest-activity-rewards>li { display:grid;grid-template-rows:68px auto 1fr;justify-items:center;align-content:start;gap:6px;min-width:0;padding:12px 8px;background:var(--ui-card);border:1px solid var(--ui-line);border-radius:14px;box-shadow:0 3px 0 var(--ui-inset);color:var(--ui-ink);text-align:center; }
+.quest-activity-reward-art { position:relative;display:grid;place-items:center;width:68px;height:68px;border:1px solid var(--ui-line);border-radius:13px;background:var(--ui-surface); }
+.quest-activity-reward-art.rarity-blue { border-color:var(--ui-blue); }
+.quest-activity-reward-art.rarity-purple { border-color:var(--ui-purple); }
+.quest-activity-reward-art.rarity-gold { border-color:var(--ui-gold); }
+.quest-activity-reward-art.rarity-mythic { border-color:var(--ui-red); }
+.quest-activity-reward-art>img { width:60px;height:60px;max-width:100%;object-fit:contain; }
+.quest-activity-reward-name { grid-row:3;min-width:0;overflow-wrap:anywhere;font-size:14px;line-height:1.25; }
+.quest-activity-rewards>li>strong { grid-row:2;max-width:100%;padding:2px 10px;border-radius:8px;background:var(--ui-accent-gold-soft);font:800 21px/1.2 var(--ui-font-number);font-variant-numeric:tabular-nums;overflow-wrap:anywhere; }
+.quest-activity-footer { flex:none;display:grid;gap:10px;padding:12px 18px;background:var(--ui-surface-footer);border-top:1px solid var(--ui-line); }
+.quest-activity-reset { font-size:12px;color:var(--ui-muted);text-align:center; }
+.quest-activity-reset [data-end] { display:inline-block;font-variant-numeric:tabular-nums; }
 .quest-activity-actions { display:flex;flex-wrap:wrap;gap:8px;align-items:center; }
-.quest-activity-actions>.button { flex:1 1 180px;min-height:44px;white-space:normal; }
+.quest-activity-actions>.button { flex:1 1 180px;min-height:46px;white-space:normal;margin:0; }
+.quest-activity-actions>:is(p,strong) { flex:1 1 100%;text-align:center;font-size:13px; }
+@media(max-width:539px) {
+  .quest-activity-preview-scroll { padding:12px;gap:10px;scroll-padding:12px; }
+  .quest-activity-preview-summary { gap:12px; }
+  .quest-activity-preview-summary>img { width:64px;height:64px; }
+  .quest-activity-preview-summary strong { font-size:22px; }
+  .quest-activity-rewards { grid-template-columns:repeat(2,minmax(0,1fr));gap:8px; }
+  .quest-activity-rewards>li { padding:10px 6px; }
+  .quest-activity-footer { padding:10px 12px;gap:8px; }
+  .quest-activity-actions { flex-direction:column;align-items:stretch; }
+  .quest-activity-actions>.button,.quest-activity-actions>:is(p,strong) { flex:0 0 auto; }
+}
+@media(max-height:450px) and (min-width:540px) {
+  .quest-activity-preview-scroll { padding:10px 12px;gap:8px; }
+  .quest-activity-preview-summary>img { width:48px;height:48px; }
+  .quest-activity-preview-summary strong { font-size:21px; }
+  .quest-activity-preview-summary p { margin:2px 0 5px; }
+  .quest-activity-rewards { gap:8px; }
+  .quest-activity-rewards>li { grid-template-rows:48px auto 1fr;padding:8px 5px;gap:4px; }
+  .quest-activity-reward-art { width:48px;height:48px;border-radius:10px; }
+  .quest-activity-reward-art>img { width:44px;height:44px; }
+  .quest-activity-reward-name { font-size:12px; }
+  .quest-activity-rewards>li>strong { font-size:18px; }
+  .quest-activity-footer { padding:8px 12px;gap:6px; }
+  .quest-activity-actions>:is(p,strong) { flex:1 1 180px; }
+}
 @media(max-width:539px) {
   body.mobile-game #panel-dialog[data-panel=quests] .quest-activity { padding:7px 6px 4px;margin-bottom:6px; }
   body.mobile-game #panel-dialog[data-panel=quests] .quest-activity-heading { padding:0 3px;font-size:14px; }

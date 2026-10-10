@@ -340,8 +340,17 @@ window.ConquerPanels = function(ctx) {
     function questActivityPreview(code){
         const activity=K().quest_activity,m=activity?.milestones?.find(m=>m.quest_code===code);if(!m)return;
         const t=window.ConquerLocale.t,status=t('quests.activity.'+(m.claimed?'claimed':m.completed?'ready':'locked'));
-        const rewardRows=questRewards(m).map(reward=>{const item=reward.type==='item'?questItem(reward.item_code):null,name=item?itemName(item):t('resource.'+reward.resource);return `<li><span class="quest-activity-reward-art">${item?itemArt(item):`<img src="${reward.resource==='gems'?itemImage('gems.svg'):`${window.ConquerItemArt?.resourceUrl(base,reward.resource) || `${base}/assets/art/ui-resources/${reward.resource}.png`}`}" alt="">`}</span><span>${esc(name)}</span><strong>×${fmt(reward.quantity)}</strong></li>`;}).join('');
-        openDialog(`<h2>${esc(t('quests.activity.chest',{count:fmt(m.target)}))}</h2><div class="quest-activity-preview"><div class="quest-activity-preview-summary"><img src="${questActivityArt(m)}" alt=""><div><strong>${esc(status)}</strong><p>${esc(t('quests.activity.progress',{points:fmt(activity.points),target:fmt(m.target)}))}</p></div></div><p class="muted">${esc(t('quests.activity.explanation'))}</p><ul class="quest-activity-rewards">${rewardRows}</ul><p class="quest-activity-reset">${esc(t('quests.activity.reset'))} ${countdown(K().quest_resets_at)}</p><div class="quest-activity-actions">${m.claimed?`<strong class="success">${esc(status)}</strong>`:m.completed?button(esc(t('quests.activity.claim')),'quest-activity-claim',code,'green wide'):`<p>${esc(t('quests.activity.remaining',{count:fmt(Math.max(0,m.target-activity.points))}))}</p>`}${button(esc(t('quests.activity.back')),'close-dialog','','secondary wide')}</div></div>`);
+        const rewardRows=questRewards(m).map(reward=>{
+            const item=reward.type==='item'?questItem(reward.item_code):null,name=item?itemName(item):t('resource.'+reward.resource);
+            return `<li><span class="quest-activity-reward-art${item?' rarity-'+itemRarity(item):''}">${item?itemArt(item):`<img src="${reward.resource==='gems'?itemImage('gems.svg'):`${window.ConquerItemArt?.resourceUrl(base,reward.resource) || `${base}/assets/art/ui-resources/${reward.resource}.png`}`}" alt="">`}</span><span class="quest-activity-reward-name">${esc(name)}</span><strong>×${fmt(reward.quantity)}</strong></li>`;
+        }).join('');
+        openDialog(`<h2>${esc(t('quests.activity.chest',{count:fmt(m.target)}))}</h2><div class="quest-activity-preview">
+            <div class="quest-activity-preview-scroll" tabindex="0" role="region" aria-label="${esc(t('quests.activity.chest',{count:fmt(m.target)}))}">
+                <div class="quest-activity-preview-summary"><img src="${questActivityArt(m)}" alt=""><div><strong>${esc(status)}</strong><p>${esc(t('quests.activity.progress',{points:fmt(activity.points),target:fmt(m.target)}))}</p>${progress(activity.points,m.target,'green',t('quests.activity.title'))}</div></div>
+                <p class="muted">${esc(t('quests.activity.explanation'))}</p><ul class="quest-activity-rewards">${rewardRows}</ul>
+            </div>
+            <footer class="quest-activity-footer"><p class="quest-activity-reset">${esc(t('quests.activity.reset'))} ${countdown(K().quest_resets_at)}</p><div class="quest-activity-actions">${m.claimed?`<strong class="success">${esc(status)}</strong>`:m.completed?button(esc(t('quests.activity.claim')),'quest-activity-claim',code,'green wide'):`<p>${esc(t('quests.activity.remaining',{count:fmt(Math.max(0,m.target-activity.points))}))}</p>`}${button(esc(t('quests.activity.back')),'close-dialog','','secondary wide')}</div></footer>
+        </div>`);
     }
     function questCategories(scope){
         const qs=K().quests,t=window.ConquerLocale.t,event=K().welcome_event,state=S();
