@@ -10474,5 +10474,6 @@
   "links.site.gallery_world": "Webseite · Weltgalerie",
   "links.site.gallery_army": "Webseite · Armeegalerie",
   "legal.privacy.link_stats": "Öffentliche Kampagnenlinks und ausgewählte Webseitenlinks verwenden zusammengefasste Klickzähler, damit wir erkennen können, welche Links genutzt werden. Gespeichert werden Summen je Link, UTC-Kalendertag, grober Herkunfts- und Gerätekategorie sowie der Zeitpunkt des letzten erfassten Klicks. Diese Statistik speichert keine IP-Adressen, vollständigen Referrer-Adressen, Browserkennungen oder Spielerprofile und setzt keine Analyse-Cookies oder Browserspeicher. Die vorübergehende Missbrauchsbegrenzung verwendet einen täglich wechselnden gehashten Anfragezähler. Erkennbare Do-Not-Track- und Global-Privacy-Control-Signale schalten die Erfassung aus. Die Zahlen messen Klicks und keine einzelnen Besucher.",
-  "links.privacy_title": "Linkstatistik und Datenschutz"
+  "links.privacy_title": "Linkstatistik und Datenschutz",
+  "march.neutral.attack_note": "Truppenverluste sind möglich. Ein Angriff beendet deinen Stadtschutz."
 }

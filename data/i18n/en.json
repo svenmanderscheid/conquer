@@ -10474,5 +10474,6 @@
   "links.site.gallery_world": "Website · world gallery",
   "links.site.gallery_army": "Website · army gallery",
   "legal.privacy.link_stats": "Public campaign links and selected website links use aggregate click counters to help us understand which links are used. We store totals by link, UTC calendar day, broad source category and device category, plus the last counted click time. These statistics do not store IP addresses, full referring URLs, browser identifiers or player profiles, and they set no analytics cookies or browser storage. Temporary abuse protection uses a hashed daily request bucket. Detectable Do Not Track and Global Privacy Control signals disable counting. Counts measure clicks rather than unique visitors.",
-  "links.privacy_title": "Link statistics and privacy"
+  "links.privacy_title": "Link statistics and privacy",
+  "march.neutral.attack_note": "Troop losses are possible. Attacking ends your city protection."
 }

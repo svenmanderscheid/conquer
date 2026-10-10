@@ -10234,5 +10234,6 @@
   "links.site.gallery_world": "Site · galerie du monde",
   "links.site.gallery_army": "Site · galerie de l’armée",
   "legal.privacy.link_stats": "Les liens de campagne publics et certains liens du site utilisent des compteurs agrégés pour comprendre quels liens sont utilisés. Nous enregistrons les totaux par lien, jour calendaire UTC, catégorie générale de source et d’appareil, ainsi que l’heure du dernier clic comptabilisé. Ces statistiques ne stockent ni adresses IP, ni URL de référent complètes, ni identifiants de navigateur ou profils de joueur, et n’utilisent aucun cookie ni stockage de navigateur pour l’analyse. La protection temporaire contre les abus utilise un compteur de requêtes haché qui change chaque jour. Les signaux Do Not Track et Global Privacy Control détectables désactivent le comptage. Les chiffres mesurent des clics, pas des visiteurs uniques.",
-  "links.privacy_title": "Statistiques des liens et confidentialité"
+  "links.privacy_title": "Statistiques des liens et confidentialité",
+  "march.neutral.attack_note": "Des pertes de troupes sont possibles. Attaquer met fin à la protection de votre ville."
 }
