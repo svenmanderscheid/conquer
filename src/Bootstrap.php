@@ -99,12 +99,21 @@ final class Bootstrap
     private static function loadConfig(string $rootDir): array
     {
         $file = $rootDir . '/config/app.php';
+        $cfg = [];
         if (is_file($file)) {
             /** @var array<string, mixed> $cfg */
             $cfg = require $file;
-            return is_array($cfg) ? $cfg : [];
+            $cfg = is_array($cfg) ? $cfg : [];
         }
-        return [];
+        // Mail credentials can be provisioned independently of application settings.
+        // This private file is ignored by Git and blocked from public HTTP access.
+        $mailFile = $rootDir . '/config/mail.php';
+        if (is_file($mailFile)) {
+            $mail = require $mailFile;
+            if (!is_array($mail)) throw new \RuntimeException('Invalid private mail configuration.');
+            $cfg['mail'] = array_replace(is_array($cfg['mail'] ?? null) ? $cfg['mail'] : [], $mail);
+        }
+        return $cfg;
     }
 
     private static function registerHandlers(string $env): void

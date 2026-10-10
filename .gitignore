@@ -8,6 +8,7 @@ config/app.php
 config/secrets.php
 config/local.php
 config/discord.php
+config/mail.php
 .env
 .env.local
 .env.*.local

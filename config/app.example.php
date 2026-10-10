@@ -43,8 +43,10 @@ return [
     'csrf_token_lifetime_minutes' => 30,
     'rate_limit_per_minute' => 120,
 
-    // Transactional account email. The server's PHP mail transport must be configured.
+    // Transactional account email. Production can override this section with
+    // private config/mail.php (see mail.example.php) for authenticated delivery.
     'mail' => [
+        'transport' => 'php',
         'from_address' => 'noreply@unionofkingdoms.com',
         'from_name' => 'Union of Kingdoms',
     ],
