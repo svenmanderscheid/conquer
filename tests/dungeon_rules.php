@@ -11,14 +11,15 @@ $member=static fn(string$role,int$count=40000):array=>['role'=>$role,'specialty_
 $party=[$member('attack'),$member('defense'),$member('gather'),$member('hunter')];
 
 $catalog=DungeonRules::catalog();
-$check(count($catalog['dungeons'])===7&&count($catalog['difficulties'])===2,'catalog includes six weekly dungeons and Melusina');
+$check(count($catalog['dungeons'])===7&&count($catalog['difficulties'])===2,'catalog preserves all definitions for existing runs');
+$check(array_column(array_filter($catalog['dungeons'],static fn(array $d): bool => DungeonRules::isEnabled($d['dungeon_code'])),'dungeon_code')===['melusina_well'],'only Melusina is enabled');
+$check(!DungeonRules::isEnabled('unknown_dungeon'),'unknown dungeons are unavailable');
 $check(count(array_filter($catalog['dungeons'],static fn(array$d):bool=>(float)($d['enemy_factor']??0)===24.0))===7,'all new dungeon definitions use the recalibrated cooperative enemy factor');
 $check(array_column(DungeonRules::permanentDungeons(),'dungeon_code')===['melusina_well'],'Melusina has a permanent regional definition');
 $rotation=DungeonRules::weeklyRotation(new DateTimeImmutable('2026-09-12T18:00:00+02:00'));
-$check($rotation['week_start']==='2026-09-07T00:00:00+00:00'&&count($rotation['available'])===3,'UTC Monday rotation');
+$check($rotation['week_start']==='2026-09-07T00:00:00+00:00'&&$rotation['available']===[],'disabled weekly dungeons leave an empty UTC Monday rotation');
 $preview=DungeonRules::preview(new DateTimeImmutable('2026-09-12T18:00:00+02:00'));
-$check($preview['week_start']==='2026-09-14T00:00:00+00:00'&&$preview['available']!==$rotation['available'],'next week preview');
-$check(count(array_unique(array_merge(array_column($rotation['available'],'dungeon_code'),array_column($preview['available'],'dungeon_code'))))===6&&!in_array('melusina_well',array_column($rotation['available'],'dungeon_code'),true),'six weekly dungeons keep their original alternating rotation');
+$check($preview['week_start']==='2026-09-14T00:00:00+00:00'&&$preview['available']===[],'disabled dungeons stay absent from next week preview');
 $check(DungeonRules::validateParty($party),'valid mixed party');
 foreach ([[$member('attack')]] as $bad){try{DungeonRules::validateParty($bad);$check(false,'invalid party accepted');}catch(InvalidArgumentException){$ok++;}}
 $check(DungeonRules::validateParty([$member('attack'),$member('attack')]),'duplicate roles are valid');

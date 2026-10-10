@@ -93,10 +93,10 @@ try {
     $create=['dungeon_code'=>'melusina_well','difficulty'=>'normal','stance'=>'cautious','role'=>'attack','troops'=>[50100101=>40000]];
     $join=['role'=>'defense','troops'=>[50100101=>40000]];
     W::bind(2,1);$legacy=D::state(1);
-    ck(count($legacy['rotation'])===3&&$legacy['permanent_dungeons']===[],'legacy worlds retain their three weekly dungeons');
+    ck($legacy['rotation']===[]&&$legacy['next_rotation']===[]&&$legacy['permanent_dungeons']===[],'legacy worlds expose no disabled dungeons');
     deny(fn()=>act(1,'create',0,$create,2),'Melusina cannot be created on a legacy map');
     W::bind(1,1);$state=D::state(1);
-    ck(count($state['rotation'])===3&&array_column($state['permanent_dungeons'],'dungeon_code')===['melusina_well'],'Luxembourg has one additional permanent entrance');
+    ck($state['rotation']===[]&&$state['next_rotation']===[]&&array_column($state['permanent_dungeons'],'dungeon_code')===['melusina_well'],'Luxembourg exposes only the permanent Melusina dungeon');
     act(1,'accept_melusina',0,['request_id'=>'fixture-accept-0001']);
     $id=(int)act(1,'create',0,$create)['run_id'];
     act(2,'join',$id,$join);

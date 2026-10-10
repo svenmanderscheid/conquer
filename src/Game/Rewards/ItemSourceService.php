@@ -124,6 +124,7 @@ final class ItemSourceService
         $specialized=(bool)$db->query("SELECT 1 FROM player_lord_talents WHERE player_id=? AND world_id=? AND rank>0 AND talent_code REGEXP '^(attack|defense|gather|hunter|infantry|archer|cavalry|monster|combat|gathering)_' LIMIT 1",[$playerId,$world])->fetchColumn();
         $activeDungeon=(bool)$db->query("SELECT 1 FROM dungeon_members m JOIN dungeon_runs r ON r.id=m.run_id WHERE m.player_id=? AND r.world_id=? AND r.status IN ('recruiting','running','decision') LIMIT 1",[$playerId,$world])->fetchColumn();
         foreach(RewardCatalog::sources('dungeon')as$key=>$source){
+            if(($source['definition']['enabled']??true)===false)continue;
             $permanent=($source['definition']['availability']??'weekly')==='permanent';
             if($permanent&&!$regionalAvailable)continue;
             $cfg=RewardCatalog::effective('dungeon',(string)$key,$world);$rewards=[];

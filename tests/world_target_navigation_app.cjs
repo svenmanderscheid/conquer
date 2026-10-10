@@ -47,11 +47,19 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/world-targ
   await page.locator('.guide-tabs [data-id=goals]').click();await page.locator('[data-guide-goal=monster] button').click();
   await page.waitForFunction(()=>window.__mapCalls.some(c=>c.key==='locate'));calls=await mapCalls();assert(calls.every(c=>c.mounted));assert.equal(calls.find(c=>c.key==='locate').result,true,'beginner goal selects a real loaded target');
   console.log('Guide first-world navigation and route cancellation passed.');
-  // A next-week source must leave the remembered reports tab and reveal the exact preview card.
+  // A dungeon source must leave the remembered reports tab and reveal the exact adventure.
   }else{await page.goto(base+'/city#dungeons');await page.locator('.dungeon-shell').waitFor();page.on('request',r=>{if(r.method()==='POST'&&r.url().includes('/api/'))writes.push(r.url());});}
   const dungeonData=(await (await page.request.get(base+'/api/dungeons/state')).json()).data;
-  const upcoming=dungeonData.next_rotation[0],available=dungeonData.rotation[0];
-  for(const [width,height,dungeon]of[[1280,800,upcoming],[390,844,upcoming],[568,320,available]]){
+  const upcoming=dungeonData.next_rotation[0],available=dungeonData.rotation[0]||dungeonData.permanent_dungeons.find(d=>d.dungeon_code==='melusina_well');
+  if(!available){
+   assert.deepEqual(dungeonData.rotation,[],'legacy world has no enabled weekly dungeons');
+   assert.deepEqual(dungeonData.next_rotation,[],'disabled dungeons stay absent from next week');
+   assert.deepEqual(dungeonData.permanent_dungeons,[],'legacy world has no permanent regional adventure');
+   await page.evaluate(()=>location.hash='dungeons');await page.locator('.dungeon-shell').waitFor();
+   await page.locator('[data-action=dungeon-tab][data-id=overview]').click();
+   assert.equal(await page.locator('.dungeon-card,.dungeon-preview,.melusina-adventure').count(),0,'disabled world offers no dungeon cards or preview');
+  }
+  for(const [width,height,dungeon]of(available?[[1280,800,upcoming||available],[390,844,upcoming||available],[568,320,available]]:[])){
    await page.setViewportSize({width,height});await page.evaluate(()=>location.hash='dungeons');await page.locator('.dungeon-shell').waitFor();await page.locator('[data-action=dungeon-tab][data-id=reports]').click();
    await page.evaluate(()=>location.hash='treasures');await page.locator('.treasury-shell').waitFor();
    const detailClose=page.locator('[data-action=treasury-detail-close]');if(await detailClose.isVisible())await detailClose.click();
@@ -63,11 +71,11 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'artifacts/world-targ
    assert.equal(await page.locator('[data-action=dungeon-tab][data-id=overview]').getAttribute('aria-pressed'),'true','source replaces a remembered reports tab');
    const card=page.locator(`[data-dungeon-code="${dungeon.dungeon_code}"]`);assert(await card.isVisible(),'exact source is visible');
    const titleRect=await card.locator('h3').boundingBox();assert(titleRect&&titleRect.y>=50&&titleRect.y+titleRect.height<=height,'source name is visible even in short landscape');
-   if(dungeon===upcoming)assert.equal(await card.evaluate(e=>e.closest('details').open),true,'next-week preview is expanded');
+   if(upcoming&&dungeon===upcoming)assert.equal(await card.evaluate(e=>e.closest('details').open),true,'next-week preview is expanded');
    assert.equal(await page.locator('.dungeon-planner').count(),0,'source only previews; starting a group remains deliberate');
    await page.screenshot({path:path.join(out,'dungeon-'+width+'x'+height+'.png')});
   }
   assert.deepEqual(writes,[],'all target handoffs are read-only');assert.deepEqual(errors,[],'no browser errors');
-  console.log(process.env.DUNGEON_ONLY?'PASS DUNGEON SOURCES: exact current/next-week card from reports, visible title in 3 sizes, no writes.':'PASS WORLD TARGET APP: first scene, cancellation, guide, exact dungeon current/next-week from reports, 3 sizes, no writes.');
- }finally{if(browser)await browser.close();if(child){child.stdin.end('\n');await new Promise(resolve=>child.on('exit',resolve));}}
+  console.log(process.env.DUNGEON_ONLY?'PASS DUNGEON SOURCES: current dungeon availability and read-only navigation.':'PASS WORLD TARGET APP: first scene, cancellation, guide, current dungeon availability and read-only navigation.');
+ }finally{if(browser)await browser.close();if(child&&child.exitCode===null){const stopped=new Promise(resolve=>child.once('exit',resolve));child.stdin.end('\n');await stopped;}}
 })().catch(e=>{console.error(e);process.exitCode=1;});

@@ -1,10 +1,14 @@
 # Kooperative Dungeons
 
-Zusätzlich zur unveränderten Wochenrotation gibt es auf Luxembourg-Karten den dauerhaft verfügbaren Kantons-Dungeon **Melusina's Sealed Well**. Seine angenommene Schlüsselsuche, regionale Fragmentfunde mit Fortschrittsgarantie, weltgebundene Herstellung, ein erst bei Erfolg verbrauchter Gruppenschlüssel und die Erzählung als Erstbefreiung beziehungsweise Echo sind in [MELUSINA_DUNGEON.md](MELUSINA_DUNGEON.md) dokumentiert. Die Erweiterung benötigt die additiven Migrationen `0131` und `0132`.
+Seit dem 10. Oktober 2026 ist ausschließlich der dauerhafte Kantons-Dungeon **Melusina's Sealed Well** auf Luxembourg-Karten aktiviert. Die sechs übrigen Dungeons bleiben mit `enabled: false` in `data/dungeons.json` erhalten, erscheinen aber weder in der Wochenrotation und Vorschau noch in den Gegenstands-Fundorten. Neue Gruppen, Beitritte, Starts und Planungen sind für deaktivierte Dungeons gesperrt. Noch rekrutierende Gruppen werden beim nächsten Dungeon-Tick aufgelöst; ihre Truppen kehren über den bestehenden Rückgabeablauf zurück. Bereits laufende Abenteuer und Belohnungsansprüche bleiben erhalten. Es ist keine neue Datenbankmigration erforderlich.
+
+Melusinas angenommene Schlüsselsuche, regionale Fragmentfunde mit Fortschrittsgarantie, weltgebundene Herstellung, ein erst bei Erfolg verbrauchter Gruppenschlüssel und die Erzählung als Erstbefreiung beziehungsweise Echo sind in [MELUSINA_DUNGEON.md](MELUSINA_DUNGEON.md) dokumentiert. Die Erweiterung benötigt die additiven Migrationen `0131` und `0132`.
 
 Der Dungeonlauf ist eine Gruppe aus zwei bis vier Spielern. Beim Beitritt werden Truppen, Angriff, Verteidigung, Lebenspunkte und die wirksamen Talent-, Forschungs-, Schatz- und Buffwerte vom Backend berechnet und unveränderlich gespeichert. Jede Rolle (`attack`, `defense`, `gather`, `hunter`) verlangt mindestens einen real investierten Talentpunkt im passenden Zweig und mindestens zehn gebundene Truppen. Ab zwei Mitgliedern kann jede beliebige Kombination dieser Rollen starten; Rollen dürfen mehrfach vorkommen und behalten ihre jeweiligen Vorteile. Die Regelgrenze akzeptiert nur bekannte Truppencodes mit positiven ganzzahligen Mengen, endliche positive Kampfwerte und keine doppelte Spieler-ID.
 
 ## Rotation und Schwierigkeiten
+
+Die folgende Rotationsbeschreibung gilt für aktivierte Wochendungeons. Da derzeit alle sechs deaktiviert sind, bleiben Wochenübersicht und Folgewoche leer; der Katalog und die Kampfregeln bleiben für vorhandene Läufe erhalten.
 
 Der Katalog enthält sechs rotierende thematische Dungeons und den zusätzlichen dauerhaften Melusina-Dungeon. Eine stabile, auf Montag 00:00 UTC verankerte Rotation zeigt jede Woche drei der sechs rotierenden Dungeons; `preview()` zeigt dieselbe Auswahlregel für die Folgewoche. Es gibt `normal` und `hard`. Seit der NPC-Neubalance vom 10. Oktober 2026 multiplizieren neue Dungeon-Definitionen die Basiswerte der Gegner mit dem gespeicherten kooperativen Faktor 24; Schwer multipliziert diese Werte zusätzlich mit 1,55 und die Beute mit 1,6. Die anhand der aktuellen echten T1-Werte simulierte Richtgröße der gesamten Gruppe liegt auf Normal bei 28.411 bis 40.921 und auf Schwer bei 67.734 bis 97.716 Truppen. Alle sieben Dungeons bleiben damit innerhalb der bestehenden Obergrenze von 50.000 Truppen pro Mitglied auch für zwei gut vorbereitete Mitglieder erreichbar. Die frühere Stärke 3,5 benötigte nach Wiederherstellung der Truppenwerte tatsächlich nur rund 800 bis 2.200 T1-Truppen; die zuvor hier genannten 12.000 bis 30.000 waren veraltet. Bereits erstellte Gruppen behalten ihre gespeicherte Definition einschließlich Faktor 3,5, auch wenn die Woche oder die Balance wechselt; ältere Definitionen ohne Faktor verwenden weiterhin 1,0. Die Millionen-Rally-Richtgröße für Gemeinden wird nicht auf diese eigenständigen Zwei- bis Vier-Spieler-Dungeons übertragen.
 
@@ -21,7 +25,8 @@ Erfolg erzeugt für jedes Gruppenmitglied einen persönlichen Anspruch auf Fragm
 ## Regel-API
 
 - `catalog()` lädt Definitionen und beide Schwierigkeiten.
-- `weeklyRotation(?DateTimeImmutable)` und `preview(?DateTimeImmutable)` liefern `week_start`, `week_end` und drei Definitionen unter `available`.
+- `isEnabled(string $code)` prüft den aktuellen Katalogschalter, unabhängig von gespeicherten Laufdefinitionen.
+- `weeklyRotation(?DateTimeImmutable)` und `preview(?DateTimeImmutable)` liefern `week_start`, `week_end` und bis zu drei aktivierte Definitionen unter `available`; derzeit ist diese Liste leer. `permanentDungeons()` liefert nur aktivierte permanente Abenteuer.
 - `validateParty(array $snapshots)` liefert `true` oder wirft `InvalidArgumentException`.
 - `simulate($definition, $party, $difficulty, $stance, $seed, $sideChoice)` liefert `success`, `rounds`, `hp_remaining`, `duration_seconds`, `decision_required`, `decision_seconds`, `choice`, `encounters_done`, `encounters_total`, `base_reward`, `fragments` und `item_chance`. Mit `null` als Wahl stoppt sie nach Begegnung eins am Entscheidungspunkt; mit einer Wahl simuliert sie den vollständigen Lauf deterministisch.
 - `resolveSideChoice($votes, $stance, $deadline, $now)` liefert vor Fristende immer `null`; nach Fristende entscheidet die Stimmenmehrheit, bei Gleichstand die Haltung.
@@ -47,3 +52,5 @@ Angreifer erhalten pro investiertem Punkt ihres Bereichs 2 % zusätzlichen Dunge
 Die Itembeute enthält kurze Beschleunigungen und vorhandene Verstärkungen. Fragmente nennen den konkreten Schatz aus der bestehenden Schatzkammer. Belohnungen werden mit dem Ergebnis gespeichert und transaktional nur einmal gutgeschrieben.
 
 Zusätzliche Prüfung: `php tests/dungeon_lifecycle.php` nutzt ausschließlich eine wegwerfbare Testdatenbank für Lebenszyklus-, Parallelitäts- und HTTP-Tests. `tests/dungeon_panel.cjs` prüft Bedienzustände; `tests/dungeon_app.cjs` prüft zwei echte Testsitzungen gegen `php tools/preview-feature-fixture.php --dungeons --port=18946`.
+
+Für den aktuellen Melusina-only-Betrieb prüfen `tests/dungeon_availability.php` die serverseitige Deaktivierung und bestehende Läufe, `tests/melusina_lifecycle.php` den aktiven Dungeon und `tests/item_sources.php` die Fundorte. Die älteren Wochenrotation-Lebenszyklus-/App-Szenarien setzen aktivierte Wochendungeons voraus.

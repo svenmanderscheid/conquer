@@ -16,6 +16,7 @@
   "dungeons": [
     {
       "dungeon_code": "ember_vault",
+      "enabled": false,
       "name": "Glutgewölbe",
       "theme": "Feuer und alte Schmieden",
       "enemy_factor": 24.0,
@@ -56,6 +57,7 @@
     },
     {
       "dungeon_code": "frost_hollow",
+      "enabled": false,
       "name": "Frosthöhle",
       "theme": "Eis und gefrorene Runen",
       "enemy_factor": 24.0,
@@ -96,6 +98,7 @@
     },
     {
       "dungeon_code": "thorn_maze",
+      "enabled": false,
       "name": "Dornenlabyrinth",
       "theme": "Wildnis und lebende Ranken",
       "enemy_factor": 24.0,
@@ -136,6 +139,7 @@
     },
     {
       "dungeon_code": "sunken_temple",
+      "enabled": false,
       "name": "Versunkener Tempel",
       "theme": "Wasser und vergessene Götter",
       "enemy_factor": 24.0,
@@ -176,6 +180,7 @@
     },
     {
       "dungeon_code": "storm_spire",
+      "enabled": false,
       "name": "Sturmspitze",
       "theme": "Blitze und schwebende Ruinen",
       "enemy_factor": 24.0,
@@ -216,6 +221,7 @@
     },
     {
       "dungeon_code": "shadow_crypt",
+      "enabled": false,
       "name": "Schattenkrypta",
       "theme": "Nacht und ruhelose Könige",
       "enemy_factor": 24.0,
@@ -256,6 +262,7 @@
     },
     {
       "dungeon_code": "melusina_well",
+      "enabled": true,
       "art_code": "sunken_temple",
       "availability": "permanent",
       "map_profile": "luxembourg",

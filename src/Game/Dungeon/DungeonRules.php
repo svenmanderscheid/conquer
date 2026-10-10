@@ -46,23 +46,30 @@ final class DungeonRules
         return $catalog;
     }
 
-    /** Three consecutive entries, anchored to the stable UTC Monday week. */
+    public static function isEnabled(string $code): bool
+    {
+        foreach (self::catalog()['dungeons'] as $definition) {
+            if ($definition['dungeon_code'] === $code) return ($definition['enabled'] ?? true) === true;
+        }
+        return false;
+    }
+
+    /** Up to three enabled entries, anchored to the stable UTC Monday week. */
     public static function weeklyRotation(?DateTimeImmutable $at = null): array
     {
         $at = ($at ?? new DateTimeImmutable('now', new DateTimeZone('UTC')))->setTimezone(new DateTimeZone('UTC'));
         $monday = $at->modify('monday this week')->setTime(0, 0);
         $week = intdiv($monday->getTimestamp(), 604800);
-        $all = array_values(array_filter(self::catalog()['dungeons'], static fn(array $d): bool => ($d['availability'] ?? 'weekly') === 'weekly'));
-        if (count($all) < 3) throw new RuntimeException('Der wöchentliche Dungeon-Katalog ist unvollständig.');
+        $all = array_values(array_filter(self::catalog()['dungeons'], static fn(array $d): bool => ($d['enabled'] ?? true) === true && ($d['availability'] ?? 'weekly') === 'weekly'));
         $available = [];
-        for ($i=0; $i<3; $i++) $available[] = $all[($week * 3 + $i) % count($all)];
+        for ($i=0; $i<min(3, count($all)); $i++) $available[] = $all[($week * 3 + $i) % count($all)];
         return ['week_start'=>$monday->format(DATE_ATOM),'week_end'=>$monday->modify('+7 days')->format(DATE_ATOM),'available'=>$available];
     }
 
     /** Permanent regional adventures never alter the existing weekly rotation. */
     public static function permanentDungeons(): array
     {
-        return array_values(array_filter(self::catalog()['dungeons'], static fn(array $d): bool => ($d['availability'] ?? 'weekly') === 'permanent'));
+        return array_values(array_filter(self::catalog()['dungeons'], static fn(array $d): bool => ($d['enabled'] ?? true) === true && ($d['availability'] ?? 'weekly') === 'permanent'));
     }
 
     public static function preview(?DateTimeImmutable $at = null): array

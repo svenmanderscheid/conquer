@@ -58,24 +58,34 @@ try{
     $db->execute("INSERT INTO trading_shop_purchases(player_id,scope_world_id,shop_mode,rotation,offer_id,quantity)VALUES(1,1,'caravan',?,?,?)",[$shop['rotation'],$offer['id'],$offer['limit']]);
     $trade=array_values(array_filter(S::search(1,$offerQuery)['sources'],static fn($s)=>$s['id']==='shop:caravan:'.$offer['id']));
     sourceCheck($trade[0]['status']==='unavailable'&&$trade[0]['reason']['key']==='sources.sold_out','current rotation stock is respected');
-    $dungeon=DungeonRules::weeklyRotation()['available'][0];
-    $dungeons=S::search(1,['treasure_code'=>$dungeon['treasure_code']]);$row=array_values(array_filter($dungeons['sources'],static fn($s)=>$s['id']==='dungeon:'.$dungeon['dungeon_code']))[0];
-    sourceCheck($row['status']==='unavailable'&&$row['reason']['key']==='sources.talent','dungeon advertises real specialization prerequisite');
-    $itemCodes=$dungeon['item_codes'];$selected=$itemCodes[1%count($itemCodes)];
-    $dungeonItems=S::search(1,['item_code'=>$selected]);
-    sourceCheck((bool)array_filter($dungeonItems['sources'],static fn($s)=>$s['id']==='dungeon:'.$dungeon['dungeon_code']),'default dungeon item follows account-specific reward selection');
-    if(count($itemCodes)>1&&$itemCodes[0]!==$selected){$other=S::search(1,['item_code'=>$itemCodes[0]]);sourceCheck(!array_filter($other['sources'],static fn($s)=>$s['id']==='dungeon:'.$dungeon['dungeon_code']),'finder does not promise another account\'s deterministic dungeon item');}
+    $disabledDungeons=array_values(array_filter(DungeonRules::catalog()['dungeons'],static fn($d)=>($d['enabled']??true)===false));
+    sourceCheck(count($disabledDungeons)===6,'six retired dungeons retain their definitions');
+    foreach($disabledDungeons as$dungeon){
+        $dungeons=S::search(1,['treasure_code'=>$dungeon['treasure_code']]);
+        sourceCheck(!array_filter($dungeons['sources'],static fn($s)=>$s['id']==='dungeon:'.$dungeon['dungeon_code']),'disabled dungeon has no relic acquisition source: '.$dungeon['dungeon_code']);
+        foreach($dungeon['item_codes']as$itemCode){
+            $dungeonItems=S::search(1,['item_code'=>$itemCode]);
+            sourceCheck(!array_filter($dungeonItems['sources'],static fn($s)=>$s['id']==='dungeon:'.$dungeon['dungeon_code']),'disabled dungeon has no item acquisition source: '.$dungeon['dungeon_code'].'/'.$itemCode);
+        }
+    }
     sourceCheck(!array_filter(S::search(1,['treasure_code'=>60400102])['sources'],static fn($s)=>$s['id']==='dungeon:melusina_well'),'legacy maps do not advertise unreachable Melusina rewards');
     sourceCheck(!array_filter(S::search(1,['item_code'=>10309001])['sources'],static fn($s)=>str_starts_with($s['id'],'melusina:')),'legacy maps do not advertise quest fragment sources');
     $db->execute("INSERT INTO worlds(id,name,slug,status,map_size)VALUES(3,'Luxembourg sources','item-sources-luxembourg','running',256)");
     \Conquer\Game\World\WorldMapProfile::configureEmptyWorld(3);
     $db->execute("INSERT INTO cities(id,player_id,world_id,name,coord_x,coord_y,castle_level)VALUES(3,1,3,'Regional city',418,846,1)");
     $db->execute('INSERT INTO city_troops(city_id,troop_code,count)VALUES(3,50100101,20)');
-    $db->execute("INSERT INTO player_lord_talents(player_id,world_id,talent_code,rank)VALUES(1,3,'infantry_0',1)");
     WorldContext::bind(3,1);
+    $untrainedRegional=array_values(array_filter(S::search(1,['treasure_code'=>60400102])['sources'],static fn($s)=>$s['id']==='dungeon:melusina_well'));
+    sourceCheck(count($untrainedRegional)===1&&$untrainedRegional[0]['status']==='unavailable'&&$untrainedRegional[0]['reason']['key']==='sources.talent','Melusina advertises the real specialization prerequisite');
+    $db->execute("INSERT INTO player_lord_talents(player_id,world_id,talent_code,rank)VALUES(1,3,'infantry_0',1)");
     $regional=array_values(array_filter(S::search(1,['treasure_code'=>60400102])['sources'],static fn($s)=>$s['id']==='dungeon:melusina_well'));
     sourceCheck(count($regional)===1&&$regional[0]['status']==='available'&&$regional[0]['reason']['key']!=='sources.not_rotation','permanent Melusina rewards remain available outside the weekly rotation with current specializations');
     sourceCheck(in_array('melusina.key_rule',array_column($regional[0]['notes'],'key'),true),'permanent reward source explains its party key requirement');
+    $dungeon=current(array_filter(DungeonRules::permanentDungeons(),static fn($d)=>$d['dungeon_code']==='melusina_well'));
+    $itemCodes=$dungeon['item_codes'];$selected=$itemCodes[1%count($itemCodes)];
+    $dungeonItems=S::search(1,['item_code'=>$selected]);
+    sourceCheck((bool)array_filter($dungeonItems['sources'],static fn($s)=>$s['id']==='dungeon:melusina_well'),'Melusina item source follows account-specific reward selection');
+    if(count($itemCodes)>1&&$itemCodes[0]!==$selected){$other=S::search(1,['item_code'=>$itemCodes[0]]);sourceCheck(!array_filter($other['sources'],static fn($s)=>$s['id']==='dungeon:melusina_well'),'finder does not promise another account\'s deterministic dungeon item');}
     foreach([10309001,10309002]as$code){
         $questSources=array_values(array_filter(S::search(1,['item_code'=>$code])['sources'],static fn($s)=>$s['id']==='melusina:'.$code));
         sourceCheck(count($questSources)===1&&$questSources[0]['destination']['dungeon_code']==='melusina_well'&&$questSources[0]['reason']['key']==='melusina.sources_accept','quest acquisition source routes to acceptance without auto-accepting '.$code);

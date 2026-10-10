@@ -31,7 +31,13 @@ APP.append('city_terrain_app')
 BACKEND.append('retired_mythic_relics')
 APP.append('retired_mythic_relics_app')
 APP.append('inventory_relics_app')
+# The weekly dungeons are disabled; exercise the enabled adventure and shutdown lifecycle.
+BACKEND.remove('dungeon_lifecycle')
+BACKEND += ['dungeon_availability', 'melusina_lifecycle', 'item_sources']
+APP[APP.index('dungeon_app')] = 'melusina_app'
+STATIC.append('melusina_panel')
 FIXTURE_FLAGS={'territory_main_report':['--territory'],'monster_report_app':['--monster-reports'],'hospital_quick_heal_app':['--hospital'],'map_search_app':['--regional-bosses','--chat','--map-search'],'research_app':['--speed-bonuses']}
+FIXTURE_FLAGS['melusina_app'] = ['--melusina']
 
 def main():
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')
@@ -76,10 +82,16 @@ def main():
                     deadline=time.monotonic()+60
                     while True:
                         fixture_log.seek(0)
-                        if 'Synthetic preview ready' in fixture_log.read(): break
+                        fixture_output=fixture_log.read()
+                        if 'Synthetic preview ready' in fixture_output: break
                         if fixture.poll() is not None or time.monotonic()>deadline: raise RuntimeError('Preview did not start: '+name)
                         time.sleep(.1)
                     environment[variable[1]]='http://127.0.0.1:'+str(port)
+                    if name=='melusina_app':
+                        fixture_root=re.search(r'^Melusina fixture root: ([^\r\n]+)$',fixture_output,re.MULTILINE)
+                        if not fixture_root or not re.fullmatch(r'conquer_feature_test_[a-f0-9]{12}',Path(fixture_root[1]).name):
+                            raise RuntimeError('Missing disposable Melusina fixture root')
+                        environment['MELUSINA_FIXTURE_ROOT']=fixture_root[1]
                 result=subprocess.run(command,cwd=ROOT,env=environment,capture_output=True,text=True,encoding='utf-8',errors='replace')
             finally:
                 if fixture is not None:
