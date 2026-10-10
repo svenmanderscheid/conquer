@@ -2,6 +2,7 @@
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
 const { createConfig } = require('../mobile/scripts/configure.cjs');
+const { inspectFirebaseConfig, requireFirebaseConfig } = require('../mobile/scripts/push-config.cjs');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
@@ -14,9 +15,46 @@ test('prototype preserves the game origin and subdirectory without broad navigat
   assert.equal(config.server.cleartext, false);
   assert.equal(config.android.allowMixedContent, false);
   assert.equal(config.server.allowNavigation, undefined);
-  assert.deepEqual(config.includePlugins, ['@capacitor/app']);
+  assert.deepEqual(config.includePlugins, ['@capacitor/app', '@capacitor/push-notifications']);
   assert.equal(config.plugins.App.disableBackButtonHandler, false);
+  assert.deepEqual(config.plugins.PushNotifications.presentationOptions, ['alert', 'sound']);
   assert.equal(config.appName, 'Union of Kingdoms');
+});
+
+test('Firebase setup checks the exact Android variant and rejects missing, mismatched or incomplete configuration', () => {
+  const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'uok-mobile-push-'));
+  const app = path.join(temporaryRoot, 'app');
+  fs.mkdirSync(path.join(app, 'src/debug'), {recursive: true});
+  fs.mkdirSync(path.join(app, 'src/release'), {recursive: true});
+  const client = packageName => ({client_info: {mobilesdk_app_id: '1:123456:android:abcdef', android_client_info: {package_name: packageName}}, api_key: [{current_key: 'synthetic-test-api-key'}]});
+  const config = packages => ({project_info: {project_number: '123456', project_id: 'synthetic-push-fixture'}, client: packages.map(client)});
+  const write = (target, value) => fs.writeFileSync(target, JSON.stringify(value));
+  const common = path.join(app, 'google-services.json');
+  const debug = path.join(app, 'src/debug/google-services.json');
+  const release = path.join(app, 'src/release/google-services.json');
+  try {
+    assert.equal(inspectFirebaseConfig(temporaryRoot, 'release').ready, false);
+    assert.throws(() => requireFirebaseConfig(temporaryRoot, 'release'), /com\.unionofkingdoms\.app/);
+    assert.throws(() => inspectFirebaseConfig(temporaryRoot, '../release'), /Unknown Android build variant/);
+    fs.writeFileSync(common, '{broken-json');
+    assert.match(inspectFirebaseConfig(temporaryRoot, 'release').reason, /not valid JSON/);
+    write(common, config(['com.unionofkingdoms.app']));
+    assert.equal(requireFirebaseConfig(temporaryRoot, 'release').path, common);
+    assert.equal(inspectFirebaseConfig(temporaryRoot, 'debug').ready, false, 'A release client cannot configure the debug package');
+    write(debug, config(['com.unionofkingdoms.app.prototype']));
+    assert.equal(requireFirebaseConfig(temporaryRoot, 'debug').path, debug);
+    write(release, config(['com.other.app']));
+    assert.equal(inspectFirebaseConfig(temporaryRoot, 'release').ready, false, 'A broken variant override cannot fall back silently');
+    write(release, {...config(['com.unionofkingdoms.app']), project_info: {}});
+    assert.match(inspectFirebaseConfig(temporaryRoot, 'release').reason, /incomplete/);
+    write(release, config(['com.unionofkingdoms.app']));
+    assert.equal(requireFirebaseConfig(temporaryRoot, 'release').path, release);
+  } finally {
+    const resolved = path.resolve(temporaryRoot);
+    assert.equal(path.dirname(resolved), path.resolve(os.tmpdir()));
+    assert(path.basename(resolved).startsWith('uok-mobile-push-'));
+    fs.rmSync(resolved, {recursive: true, force: true});
+  }
 });
 
 test('configuration rejects insecure or credential-bearing game URLs', () => {

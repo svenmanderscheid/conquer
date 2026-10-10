@@ -189,6 +189,7 @@ $base = htmlspecialchars(APP_BASE, ENT_QUOTES);
 <script src="<?= $base ?>/assets/js/game-audio.js?v=<?= filemtime(__DIR__ . '/../assets/js/game-audio.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/extra-events.js?v=<?= filemtime(__DIR__ . '/../assets/js/extra-events.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/rally-notifications.js?v=<?= filemtime(__DIR__ . '/../assets/js/rally-notifications.js') ?>" defer></script>
+<script src="<?= $base ?>/assets/js/device-notifications.js?v=<?= filemtime(__DIR__ . '/../assets/js/device-notifications.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/game.js?v=<?= filemtime(__DIR__ . '/../assets/js/game.js') ?>" defer></script>
 <script type="application/json" id="uok-layout-config"><?= json_encode($uiLayoutProfiles ?? \Conquer\Game\Ui\LayoutSettings::read()['profiles'],JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_THROW_ON_ERROR) ?></script>
 <script type="application/json" id="uok-layout-catalog"><?= json_encode(\Conquer\Game\Ui\LayoutSettings::catalog(),JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_THROW_ON_ERROR) ?></script>

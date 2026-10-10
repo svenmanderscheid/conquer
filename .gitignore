@@ -9,6 +9,7 @@ config/secrets.php
 config/local.php
 config/discord.php
 config/mail.php
+config/push.php
 .env
 .env.local
 .env.*.local
@@ -52,7 +53,7 @@ vendor/
 !assets/city3d/vendor/
 !assets/city3d/vendor/**
 composer.phar
-composer.lock
+# Keep the server dependency lockfile reproducible.
 
 # NPM (if any frontend tooling added — not currently planned)
 node_modules/

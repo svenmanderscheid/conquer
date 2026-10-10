@@ -88,13 +88,39 @@ Die folgenden Befehle werden im Verzeichnis `mobile` ausgeführt:
 pnpm install --frozen-lockfile
 pnpm configure
 pnpm android:sync
-pnpm doctor
+pnpm run doctor
 pnpm android:open
 ```
 
-`pnpm configure` erzeugt die lokale Capacitor-Konfiguration. `pnpm android:sync` erstellt die gebündelte Fehlerseite und synchronisiert sie mit dem vorhandenen Android-Projekt. `pnpm web` baut diese Webdateien bei Bedarf separat. `pnpm doctor` prüft Voraussetzungen; ein erfolgreicher Lauf ist weder ein APK-Build noch ein Gerätetest.
+`pnpm configure` erzeugt die lokale Capacitor-Konfiguration. `pnpm android:sync` erstellt die gebündelte Fehlerseite und synchronisiert sie mit dem vorhandenen Android-Projekt. `pnpm web` baut diese Webdateien bei Bedarf separat. `pnpm run doctor` prüft Voraussetzungen; ein erfolgreicher Lauf ist weder ein APK-Build noch ein Gerätetest.
 
 Nach Einrichtung der Android-Werkzeuge und Anschluss des Testgeräts kann der Debug-Build aus Android Studio oder mit `pnpm android:run` gebaut und gestartet werden. Nach Änderungen an der Konfiguration oder den gebündelten Webdateien zuerst erneut `pnpm android:sync` ausführen. Das native Projekt unter `android/` bleibt erhalten; es muss nicht bei jedem Start neu erzeugt werden.
+
+## Benachrichtigungen auf Android (10. Oktober 2026)
+
+Auf ausdrücklichen Nutzerauftrag ist das offizielle Modul `@capacitor/push-notifications` **8.1.3** jetzt in der gemeinsamen Hülle eingebunden und mit Android synchronisiert. Die zuvor installierte Fassung `0.2.0 (4)` enthält dieses Modul noch nicht. Deshalb wurde am 10. Oktober der neue signierte Build `0.3.0 (5)` erstellt und anschließend per USB auf dem S23 Ultra aktualisiert. Anmeldung, ausdrückliche Android-Freigabe und tatsächlicher Empfang einer Testmeldung im Hintergrund sind bestätigt; Antippen und die übrige vollständige Geräteabnahme werden getrennt geprüft. Es wurde nichts in Google Play hochgeladen.
+
+**Neuer Push-Build:** **`0.3.0` / Versionscode `5`**, Paket-ID `com.unionofkingdoms.app`, bestehende Upload-Signierung und Spieladresse `https://play.unionofkingdoms.com/`. `pnpm run android:release --online` führte `bundleRelease`, `assembleRelease` und `lintRelease` erfolgreich aus (App-Lint: 0 Fehler, 9 Warnungen). Die fertigen APK/AAB und Prüfsummen liegen unter `artifacts/android/Union-of-Kingdoms-0.3.0-release.apk`, `.aab` und `.json`. APK-Signatur, AAB-Signatur, identische bisherige Zertifikatskennung, bundletool, ZIP-Integrität, native Push-Erweiterung, Firebase-IDs und Berechtigungen wurden geprüft. Keine privaten Schlüssel im Paket. Die durch Firebase hinzugefügte native DataStore-Bibliothek ist in allen vier ABIs auf 16 KB ausgerichtet; die APK-ZIP-Ausrichtung wurde ebenfalls geprüft. Belege: `output/android-push-release-20261010/`. Beim Build war kein USB-Gerät verbunden; eine Veröffentlichung oder Geräteabnahme ist damit nicht erfolgt.
+
+Vorbereitung geprüft: Alle vier Tests in `tests/mobile_config.cjs` und der Abgleich der Versionsmetadaten bestanden. Der Gradle-Abhängigkeitsbericht für `releaseRuntimeClasspath` löste die neue FCM-Laufzeit `firebase-messaging:25.0.1` und ihre Abhängigkeiten ohne fehlende Einträge auf. Dieser reine Auflösungslauf kompiliert keine APK und benötigt keine Ersatz-Firebase-Datei. Bericht: `output/android-push-preparation/release-runtime-dependencies.txt`.
+
+**Firebase und Server eingerichtet:** Das vorhandene Cloud-Projekt `union-of-kingdoms-push` ist jetzt als aktives Firebase-Projekt im kostenlosen Spark-Tarif freigegeben. Release- und Debug-App sind registriert und ihre echten Clientdateien liegen in den unten angegebenen, ignorierten Variantendateien mit eingeschränkten lokalen Berechtigungen. Der private Serverschlüssel liegt außerhalb des Webroots; die eigene Rolle erlaubt nur `cloudmessaging.messages.create`. Die echte Google-OAuth-/FCM-Prüfung mit `validate_only:true` bestand mit HTTP 200; Web- und Android-Verfügbarkeit sind am HTTPS-Spielserver aktiv. Dieser Prüfmodus stellt keine Nachricht zu. Diese Schritte sind auf dem angeschlossenen S23 Ultra durchgeführt: Update installiert, Gerätebenachrichtigungen aktiviert, Android-Berechtigung erteilt und echte Hintergrund-Testmeldung um 17:51 Uhr empfangen. Die Freigabe gilt nur für dieses Konto und Gerät. Details: `docs/PUSH_NOTIFICATIONS.md`.
+
+`pnpm android:release` bricht weiterhin vor dem Build ab, wenn die Release-Datei fehlt, ungültig ist oder zur falschen Paket-ID gehört. Direkte Gradle-Builds prüfen die Firebase-Datei ebenfalls durch das Google-Services-Plugin.
+
+Einrichtung im eigenen Firebase-Projekt:
+
+1. Die Android-App **`com.unionofkingdoms.app`** registrieren und deren `google-services.json` lokal unter **`mobile/android/app/src/release/google-services.json`** speichern.
+2. Für einen getrennten Debug-Gerätetest zusätzlich **`com.unionofkingdoms.app.prototype`** registrieren und deren Datei unter **`mobile/android/app/src/debug/google-services.json`** speichern. Die Paketnamen müssen genau stimmen. Eine gemeinsame Datei unter `mobile/android/app/google-services.json` wird ebenfalls unterstützt, wenn sie die passenden Clients enthält; eine Variantendatei hat Vorrang.
+3. Die FCM-HTTP-v1-Zustellung auf dem PHP-Server einrichten. Private Service-Account-Schlüssel bleiben ausschließlich in der geschützten Serverkonfiguration; sie gehören weder in `google-services.json` noch ins App-Paket. Alle Firebase-Konfigurationsdateien sind lokal von Git ausgeschlossen. Die Übersicht für den Server steht in `docs/PUSH_NOTIFICATIONS.md`.
+4. `pnpm configure`, `pnpm android:sync` und `pnpm run doctor` ausführen. Vor einem weiteren Play-Testbuild den Versionscode erhöhen und die bestehenden Signierschlüssel verwenden.
+5. Mit einem Testkonto die neue App installieren und in **Settings → Device notifications** ausdrücklich aktivieren. Android 13 und neuer fragt nach der Betriebssystem-Berechtigung. Danach Testnachricht, Vordergrund, Hintergrund, Prozessneustart, Antippen einer Nachricht, Abmelden und Deaktivieren prüfen. Die vorhandene echte Gerätetestliste bleibt ebenfalls offen.
+
+Der Benachrichtigungskanal heißt technisch `uok_game`; sein sichtbarer Name kommt aus dem gemeinsamen Sprachsystem. Das weiße Statussymbol verwendet die bereits freigegebene VIP-Krone. Firebase Messaging startet zunächst ohne automatische Registrierung; das offizielle Plugin aktiviert die Registrierung erst beim ausdrücklichen Einschalten und deaktiviert sie beim Ausschalten. Die Hülle lässt sichtbare Meldungen auch im Vordergrund zu. Eine Nachricht öffnet die gemeinsame Spieloberfläche; Spielregeln und Aufträge bleiben serverseitig.
+
+`node --test tests/mobile_config.cjs` prüft die Plugin-Konfiguration sowie fehlende, fehlerhafte, unvollständige und zur falschen Variante gehörende Firebase-Dateien an synthetischen lokalen Fixtures. Diese Tests und `android:sync` bestätigen keine echte FCM-Zustellung. Native iOS-Projekte sind weiterhin nicht angelegt; iPhone-Web-Push verwendet die zum Home-Bildschirm hinzugefügte Web-App.
+
+Offizielle Einrichtung: [Capacitor Push Notifications](https://capacitorjs.com/docs/apis/push-notifications), [Firebase Android Client](https://firebase.google.com/docs/cloud-messaging/android/client), [Firebase-Projektkonfiguration](https://firebase.google.com/docs/projects/learn-more#config-files-objects).
 
 ## Eine andere Testadresse verwenden
 

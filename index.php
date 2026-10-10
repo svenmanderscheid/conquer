@@ -602,6 +602,12 @@ if (str_starts_with($path, '/api/')) {
     // Notifications / poll
     $router->get('/api/notifications/poll',  [\Conquer\Api\Handlers\NotificationHandler::class, 'poll']);
     $router->post('/api/notifications/read', [\Conquer\Api\Handlers\NotificationHandler::class, 'markRead']);
+    $router->get('/api/push/status', [\Conquer\Api\Handlers\PushHandler::class, 'status']);
+    $router->post('/api/push/status', [\Conquer\Api\Handlers\PushHandler::class, 'status']);
+    $router->post('/api/push/subscribe', [\Conquer\Api\Handlers\PushHandler::class, 'subscribe']);
+    $router->post('/api/push/unsubscribe', [\Conquer\Api\Handlers\PushHandler::class, 'unsubscribe']);
+    $router->post('/api/push/preferences', [\Conquer\Api\Handlers\PushHandler::class, 'preferences']);
+    $router->post('/api/push/test', [\Conquer\Api\Handlers\PushHandler::class, 'test']);
 
     \Conquer\Security\ApiOperation::begin((int)$session['player_id'],$method,$path);
     if (!$router->dispatch($method, $path)) {

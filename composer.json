@@ -1,0 +1,16 @@
+{
+    "name": "union-of-kingdoms/game",
+    "description": "Union of Kingdoms server dependencies",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.2",
+        "google/auth": "^1.48",
+        "minishlink/web-push": "^11.0",
+        "guzzlehttp/guzzle": "^7.10"
+    },
+    "config": {
+        "allow-plugins": false,
+        "sort-packages": true
+    }
+}

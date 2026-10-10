@@ -2,6 +2,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
+const { inspectFirebaseConfig } = require('./push-config.cjs');
 const mobile = path.resolve(__dirname, '..');
 let missing = 0;
 function check(label, ready, hint = '') {
@@ -10,6 +11,11 @@ function check(label, ready, hint = '') {
 }
 check('Node.js 22+', Number(process.versions.node.split('.')[0]) >= 22);
 check('Capacitor dependencies', fs.existsSync(path.join(mobile, 'node_modules/@capacitor/cli')), 'Run pnpm install --frozen-lockfile in mobile.');
+check('Native Push Notifications plugin', fs.existsSync(path.join(mobile, 'node_modules/@capacitor/push-notifications')), 'Run pnpm install --frozen-lockfile in mobile.');
+for (const variant of ['debug', 'release']) {
+  const firebase = inspectFirebaseConfig(path.join(mobile, 'android'), variant);
+  check(`Firebase ${variant} (${firebase.packageName})`, firebase.ready, firebase.reason);
+}
 check('Game configuration', fs.existsSync(path.join(mobile, 'capacitor.config.json')), 'Run pnpm configure.');
 check('Bundled connection screen', fs.existsSync(path.join(mobile, 'www/index.html')), 'Run pnpm web.');
 check('Android project', fs.existsSync(path.join(mobile, 'android/gradlew.bat')));

@@ -5837,6 +5837,21 @@ body.reduced-motion .ui-press-ready,body.reduced-motion .ui-press-ready.ui-is-pr
 }
 body.reduced-motion .map-overlay-shell .atlas-target-actions .atlas-action-disc { transition:none!important; }
 
+/* Device notification controls remain reachable in the shared settings dialog. */
+.device-notification-settings { margin-block:20px;min-width:0; }
+.device-notification-settings p { line-height:1.45;overflow-wrap:anywhere; }
+.device-notification-settings > small { display:block;line-height:1.45;margin-top:14px; }
+.device-notification-settings .device-notification-status { padding:12px;border:1px solid var(--ui-line);border-radius:12px;background:var(--ui-card);color:var(--ui-ink); }
+.device-notification-settings .device-notification-status[data-state="enabled"] { background:var(--ui-green-soft);color:var(--ui-green-dark); }
+.device-notification-settings .device-notification-status:is([data-state="denied"],[data-state="failed"]) { color:var(--ui-red-dark); }
+.device-notification-settings .device-notification-actions { display:flex;flex-wrap:wrap;gap:10px; }
+body.mobile-game #panel-dialog .device-notification-settings .device-notification-actions button { min-height:44px;max-width:100%;white-space:normal;overflow-wrap:anywhere; }
+.device-notification-settings [hidden] { display:none!important; }
+.device-notification-settings .device-notification-feedback { color:var(--ui-muted); }
+@media(max-width:380px) {
+  .device-notification-settings .device-notification-actions button { flex:1 1 100%; }
+}
+
 /* The adviser explains the next real milestone before opening its existing action. */
 .kingdom-intro .kingdom-intro-next {
   margin-top:12px;padding:12px;border:1px solid var(--ui-line);border-radius:12px;

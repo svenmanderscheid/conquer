@@ -1,6 +1,6 @@
 'use strict';
 // Never put authenticated documents, API responses, admin screens, or auth requests in CacheStorage.
-const BUILD='union-of-kingdoms-public-v12-cream-gold';
+const BUILD='union-of-kingdoms-public-v13-device-notifications';
 const ROOT=new URL(self.registration.scope),PREFIX=ROOT.pathname,CACHE=BUILD+':'+PREFIX;
 const OFFLINE=new URL('offline.html',ROOT).href;
 const PRELOAD=['offline.html','favicon.ico','apple-touch-icon.png','assets/icons/conquer-32.png','assets/icons/conquer-maskable-512.png','assets/icons/conquer-192.png','assets/icons/conquer-512.png'];
@@ -60,5 +60,46 @@ self.addEventListener('fetch',event=>{
         // Content hashes make these public files reusable without a network round trip.
         if(immutableLocale(url)){const cached=await cache.match(request);if(cached)return cached;}
         try{const response=await publicFetch(request);if(response.ok)await store(request,response);return response;}catch{return await cache.match(request)||Response.error();}
+    })());
+});
+
+// Push payloads contain generic, server-localized notices, never player messages or resources.
+// A notification click only opens a read-only game view; it cannot submit a game action.
+function notificationTarget(value){
+    const fallback=new URL('city#city',ROOT).href;
+    try{
+        const url=new URL(typeof value==='string'?value:'city#city',ROOT);
+        if(url.origin!==ROOT.origin||url.username||url.password||url.search||localPath(url)!=='city')return fallback;
+        if(!['#city','#reports','#settings','#worlds','#army','#research'].includes(url.hash))return fallback;
+        return url.href;
+    }catch{return fallback;}
+}
+function notificationText(value,fallback,max){return typeof value==='string'&&value.trim()?value.slice(0,max):fallback;}
+self.addEventListener('push',event=>event.waitUntil((async()=>{
+    let payload={};
+    try{const value=event.data?.json();if(value&&typeof value==='object'&&!Array.isArray(value))payload=value;}catch{}
+    const title='Union of Kingdoms';
+    const body=notificationText(payload.body,'There is news from your kingdom. Open the game to view it.',240);
+    const tag=typeof payload.tag==='string'&&/^[a-zA-Z0-9_-]{1,80}$/.test(payload.tag)?payload.tag:'uok-update';
+    await self.registration.showNotification(title,{
+        body,tag,icon:new URL('assets/icons/conquer-192.png',ROOT).href,
+        badge:new URL('assets/icons/conquer-32.png',ROOT).href,
+        data:{url:notificationTarget(payload.url)},
+    });
+})()));
+self.addEventListener('notificationclick',event=>{
+    event.notification.close();
+    const target=notificationTarget(event.notification.data?.url);
+    event.waitUntil((async()=>{
+        const windows=await self.clients.matchAll({type:'window',includeUncontrolled:true});
+        for(const client of windows){
+            try{
+                if(localPath(new URL(client.url))!=='city')continue;
+                // Do not redirect an admin, another scoped app, or an unrelated website.
+                const navigated=await client.navigate(target);
+                if(navigated){await navigated.focus();return;}
+            }catch{}
+        }
+        await self.clients.openWindow(target);
     })());
 });

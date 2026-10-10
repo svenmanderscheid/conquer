@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { createHash } = require('node:crypto');
 const { spawnSync } = require('node:child_process');
+const { requireFirebaseConfig } = require('./push-config.cjs');
 const mobile = path.resolve(__dirname, '..');
 const android = path.join(mobile, 'android');
 const destination = path.resolve(mobile, '../artifacts/android');
@@ -14,6 +15,7 @@ function run(command, args, cwd) {
 }
 
 try {
+  requireFirebaseConfig(android, 'release');
   if (!fs.existsSync(path.join(android, 'key.properties'))) {
     throw new Error('Upload signing is missing. For a new app run pnpm signing:init; for an existing app restore its original upload key.');
   }

@@ -20,8 +20,11 @@ function createConfig(gameUrl) {
     server: { url: url.href, cleartext: false, errorPath: 'index.html' },
     android: { allowMixedContent: false },
     // The official App plugin routes Android Back through WebView history.
-    includePlugins: ['@capacitor/app'],
-    plugins: { App: { disableBackButtonHandler: false } }
+    includePlugins: ['@capacitor/app', '@capacitor/push-notifications'],
+    plugins: {
+      App: { disableBackButtonHandler: false },
+      PushNotifications: { presentationOptions: ['alert', 'sound'] }
+    }
   };
 }
 

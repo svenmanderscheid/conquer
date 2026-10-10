@@ -12,3 +12,8 @@ mobile.local.json
 local.properties
 key.properties
 .signing/
+# Firebase client configuration and server credentials stay local.
+google-services.json
+GoogleService-Info.plist
+*service-account*.json
+*firebase-adminsdk*.json

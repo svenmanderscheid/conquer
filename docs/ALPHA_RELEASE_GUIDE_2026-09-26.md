@@ -2,6 +2,8 @@
 
 Stand: 26.09.2026. Diese Anleitung ersetzt den historischen Sprint-0-Ablauf in `HOSTINGER_SETUP.md`. Sie beschreibt den geprüften lokalen Aufbau; Hostinger-Einstellungen und Live-Datenbank wurden in dieser Prüfung nicht aufgerufen oder verändert. Es wurde nichts gepusht oder veröffentlicht.
 
+**Ergänzung 10. Oktober 2026 – Gerätebenachrichtigungen:** Die Push-Anbindung ergänzt erstmals Composer-Abhängigkeiten im Serverprojekt. Für dieses Feature gelten die Einrichtungsschritte in [PUSH_NOTIFICATIONS.md](PUSH_NOTIFICATIONS.md): Composer-Pakete aus dem Lockfile installieren, Migration `0145_web_push.sql` anwenden, private Web-Push-/Firebase-Konfiguration bereitstellen und den Versandjob einrichten. Die ältere Aussage unten, dass kein Composer-Schritt nötig sei, gilt für diesen neuen Funktionsumfang nicht mehr. Die Android-Anbindung benötigt außerdem eine passende Firebase-Konfiguration und einen neuen App-Build; das Aktualisieren der Webdateien allein genügt dafür nicht.
+
 ## Verbindliche Aufteilung von Website und Spiel
 
 - `https://unionofkingdoms.com/` und `https://www.unionofkingdoms.com/`: öffentliche Website und Alpha-Warteliste. Keine Spieleranmeldung auf der Website; Login und Key-Einlösung verlinken auf die Spiel-Subdomain.

@@ -25,6 +25,7 @@ final class Session
 
     public static function create(int $playerId, string $ip, string $userAgent): void
     {
+        \Conquer\Game\Notification\PushService::revokeCookie($_COOKIE[self::COOKIE_NAME] ?? null);
         $db         = Connection::getInstance();
         $token      = bin2hex(random_bytes(32));
         $csrfToken  = bin2hex(random_bytes(32));
@@ -45,6 +46,7 @@ final class Session
     public static function destroy(): void
     {
         $token = $_COOKIE[self::COOKIE_NAME] ?? null;
+        \Conquer\Game\Notification\PushService::revokeCookie($token);
         if ($token !== null && self::isValidTokenFormat($token)) {
             Connection::getInstance()->execute(
                 'DELETE FROM sessions WHERE token = ?',
