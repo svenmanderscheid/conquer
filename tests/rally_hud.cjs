@@ -58,7 +58,7 @@ async function assertRallySkillSnapshots(page){
   await page.goto('https://rally-hud.fixture/');
   await page.addScriptTag({content:require('./fixtures/isolated_locale.cjs')('de')});
   await page.evaluate(require('./fixtures/hud_navigation.cjs'));
-  for(const name of ['game-overlay','world-march-hud'])await page.addScriptTag({content:fs.readFileSync(path.join(root,'assets/js',name+'.js'),'utf8')});
+  for(const name of ['game-overlay','world-march-hud','extra-events'])await page.addScriptTag({content:fs.readFileSync(path.join(root,'assets/js',name+'.js'),'utf8')});
   await page.evaluate(()=>{
    document.body.classList.add('world-mode','playfield-mode');document.body.classList.remove('city-mode');
    window.fixtureNow=Date.parse('2030-01-01T12:00:00Z');
@@ -67,6 +67,7 @@ async function assertRallySkillSnapshots(page){
    window.fixtureRallies=[{id:9,world_id:1,result:{alliance_id:2},leader_player_id:8,status:'gathering',launch_at:'2030-01-01 12:03:00'}];
    const parse=s=>Date.parse(String(s).replace(' ','T').replace(/Z?$/,'Z')),context={base:'',getState:()=>fixtureState,getKingdom:()=>fixtureKingdom,getRallies:()=>fixtureRallies,now:()=>fixtureNow,date:parse,fmt:String,esc:String,openDialog:()=>{},countdown:String};
    window.fixtureOverlay=ConquerOverlay(context);fixtureOverlay.update();
+   window.fixtureExtraEvents=ConquerExtraEvents({...context,navigate:()=>{}});fixtureExtraEvents.update();
    const host=document.querySelector('#content');host.replaceChildren();host.classList.add('atlas-shell','map-overlay-shell');
    window.rallyHud=ConquerMarchHud({host,getContext:()=>({...context,esc:String}),follow:()=>{},locate:()=>{},stop:()=>{},focus:()=>{},getSelected:()=>null});rallyHud.sync(fixtureState);
   });
@@ -79,18 +80,33 @@ async function assertRallySkillSnapshots(page){
    await page.screenshot({path:path.join(output,`${width}x${height}.png`)});
    assert(placement.inside,`${width}x${height}: rally HUD remains inside the viewport`);
    assert(placement.buttons.every(button=>button.width>=44&&button.height>=44&&button.hit),`${width}x${height}: rally controls are reachable 44px targets: ${JSON.stringify(placement.buttons)}`);
-   const shortcut=await alert.evaluate(el=>{const box=el.getBoundingClientRect(),hit=document.elementFromPoint(box.x+box.width/2,box.y+box.height/2);return {inside:box.left>=0&&box.top>=0&&box.right<=innerWidth+1&&box.bottom<=innerHeight+1,touch:box.width>=44&&box.height>=44,hit:el===hit||el.contains(hit)};});
-   assert(shortcut.inside&&shortcut.touch&&shortcut.hit,`${width}x${height}: alliance rally shortcut remains reachable: ${JSON.stringify(shortcut)}`);
+   for(const scene of ['city','world'])for(const scheduled of [false,true]){
+    await page.evaluate(({scene,scheduled})=>{document.body.classList.toggle('city-mode',scene==='city');document.body.classList.toggle('world-mode',scene==='world');fixtureState.extra_events=scheduled?[{id:1,target:'events',icon:'events',name:'Fixture event',description:'Fixture event description',ends_at:'2030-01-02 12:00:00'}]:[];fixtureExtraEvents.update();fixtureOverlay.update();},{scene,scheduled});
+    assert(await alert.isVisible(),`${width}x${height}: alliance rally shortcut is visible in ${scene}`);
+    const shortcut=await alert.evaluate(el=>{const box=el.getBoundingClientRect(),hit=document.elementFromPoint(box.x+box.width/2,box.y+box.height/2),events=[...document.querySelectorAll('.hud-right-tools [data-id="events"],#hud-extra-event')].filter(button=>button.checkVisibility({visibilityProperty:true})),event=events[0]?.getBoundingClientRect();return {inside:box.left>=0&&box.top>=0&&box.right<=innerWidth+1&&box.bottom<=innerHeight+1,touch:box.width>=44&&box.height>=44,hit:el===hit||el.contains(hit),eventCount:events.length,belowEvent:!!event&&box.top>=event.bottom-1&&box.top-event.bottom<=12&&Math.abs(box.left-event.left)<2};});
+    assert(shortcut.inside&&shortcut.touch&&shortcut.hit,`${width}x${height}, ${scene}, scheduled event ${scheduled}: alliance rally shortcut remains reachable: ${JSON.stringify(shortcut)}`);
+    assert.equal(shortcut.eventCount,1,'Only the current Events button is visible');
+    assert(shortcut.belowEvent,`${width}x${height}, ${scene}, scheduled event ${scheduled}: Rally is directly beneath Events: ${JSON.stringify(shortcut)}`);
+    await page.screenshot({path:path.join(output,`${width}x${height}-${scene}${scheduled?'-scheduled':''}.png`)});
+   }
+   await page.evaluate(()=>{fixtureState.extra_events=[];fixtureExtraEvents.update();});
   }
   await page.evaluate(()=>{fixtureRallies.push({id:10,leader_player_id:9,status:'marching',arrival_time:'2030-01-01 12:00:15'},{id:11,leader_player_id:7,status:'gathering',launch_at:'2030-01-01 12:01:00'},{id:12,leader_player_id:9,world_id:2,status:'gathering',launch_at:'2030-01-01 12:01:00'},{id:13,leader_player_id:9,result:{alliance_id:3},status:'gathering',launch_at:'2030-01-01 12:01:00'});fixtureOverlay.update();});
-  assert.equal(await page.locator('#hud-rally-count').innerText(),'2','Own, other-world and other-alliance rallies are excluded');
-  assert.equal(await page.locator('#hud-rally-status').innerText(),await page.evaluate(()=>ConquerLocale.t('rally.hud.start',{time:'3:00'})),'Gathering countdown takes priority over marching arrivals');
+  assert.equal(await page.locator('#hud-rally-count').innerText(),'3','Own and allied rallies are included; other-world and other-alliance rallies are excluded');
+  assert.equal(await page.locator('#hud-rally-status').innerText(),await page.evaluate(()=>ConquerLocale.t('rally.hud.start',{time:'1:00'})),'Own rally countdown participates and gathering takes priority over marching arrivals');
+  await page.evaluate(()=>{window.fixtureSavedRallies=fixtureRallies;fixtureRallies=fixtureRallies.filter(row=>row.id===11);fixtureOverlay.update();});
+  assert(await alert.isVisible(),'A leader sees the shortcut when only their own rally is active');
+  assert.equal(await page.locator('#hud-rally-count').innerText(),'1');
+  await page.evaluate(()=>{fixtureKingdom.alliance=null;fixtureOverlay.update();});
+  assert(await alert.isHidden(),'Leaving the alliance hides stale rallies without alliance metadata');
+  await page.evaluate(()=>{fixtureKingdom.alliance={id:2};fixtureRallies=fixtureSavedRallies;fixtureOverlay.update();});
   await page.evaluate(()=>{fixtureRallies=fixtureRallies.filter(row=>row.id===10);fixtureRallies[0].arrival_time=null;fixtureOverlay.update();});
   assert.equal(await page.locator('#hud-rally-status').innerText(),await page.evaluate(()=>ConquerLocale.t('rally.hud.pending')),'Missing countdown never displays NaN');
   await page.evaluate(()=>{fixtureRallies=[];fixtureOverlay.update();});assert(await alert.isHidden());assert.equal(await page.locator('#hud-rally-count').textContent(),'0');
+  assert(await page.locator('.hud-right-tools [data-id="events"]').isVisible(),'Events remains visible without rallies or scheduled events');
   await page.evaluate(()=>{fixtureRallies=[{id:14,leader_player_id:8,status:'gathering',launch_at:'2030-01-01 12:02:00'}];fixtureOverlay.update();});assert(await alert.isVisible(),'A new allied rally restores the shortcut');
   await page.evaluate(()=>{fixtureState.marches[0].state='marching';fixtureState.marches[0].arrival_time='2030-01-01 12:09:00';rallyHud.sync(fixtureState)});assert.match(await march.innerText(),/Rally kommt an in/);assert.match(await march.innerText(),/00:09:00/);
   await assertRallySkillSnapshots(page);
-  assert.deepEqual(errors,[]);console.log('PASS rally leader start/arrival countdown, alliance alert, HUD placement, saved boss skills in details/join, historical reports and legacy/non-monster exclusion');
+  assert.deepEqual(errors,[]);console.log('PASS rally leader start/arrival countdown, own and allied rally alerts in city/world, Events/Rally placement with scheduled events in five viewports, saved boss skills in details/join, historical reports and legacy/non-monster exclusion');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});

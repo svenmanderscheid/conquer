@@ -220,6 +220,7 @@
   "rally.member.troops": "Truppen",
   "rally.join.deploy": "Entsenden",
   "rally.hud.label": "Rallys",
+  "rally.notice.started": "{player} hat eine Rally gegen {monster} gestartet.",
   "rally.hud.open": "Allianz-Rallys öffnen",
   "rally.hud.start": "Start {time}",
   "rally.hud.arrival": "Ankunft {time}",

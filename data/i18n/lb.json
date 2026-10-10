@@ -72,6 +72,7 @@
   "rally.level": "Stuf {level}",
   "rally.distance": "{count} Felder ewech",
   "rally.target.monster": "Monster",
+  "rally.notice.started": "{player} huet eng Rally géint {monster} gestart.",
   "rally.target.territory": "Allianzgebitt",
   "rally.target.player": "Spiller",
   "rally.target.conquest": "Eroberungszil",

@@ -181,6 +181,7 @@
   "rally.level": "Niveau {level}",
   "rally.distance": "À {count} cases",
   "rally.target.monster": "Monstre",
+  "rally.notice.started": "{player} a lancé un ralliement contre {monster}.",
   "rally.target.territory": "Territoire d’alliance",
   "rally.target.player": "Joueur",
   "rally.target.conquest": "Cible de conquête",

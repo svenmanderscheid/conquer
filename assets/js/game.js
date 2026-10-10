@@ -81,19 +81,68 @@
     panelHost.addEventListener('scroll',rememberView,{capture:true,passive:true});
     panelDialog.addEventListener('click',rememberView,true);
     const toastElement=$('#toast');
+    const rallyToastQueue=[];
+    let rallyToastScope='';
     let panelTrigger=null;
     let sceneHosts=null;
     let sceneTransitionToken=0,sceneTransitionTimer=0,sceneCommitPending=false,navigationVersion=0;
     const isPlayfield=tab=>tab==='city'||tab==='world';
     const mobilePages=window.ConquerMobilePages?.({navigate,getRoute:()=>current,getPlayfield:()=>playfield,closeChat:()=>worldChat?.close()});
     const now = () => Date.now() + offset;
+    const rallyNotifications=window.ConquerRallyNotifications({announce:announceRallies});
     const commands=window.ConquerCommandReceipts({scope:()=>`${base}:${state?.city.player_id||state?.player.name}:${state?.city.world_id||window.CONQUER_WORLD||1}`});
     function commandRecovery(){
         if(!commands.pending())return;
         openDialog('<h2>Auftrag prüfen</h2><p>Die Antwort auf deinen letzten Auftrag fehlt. Setze denselben Auftrag sicher fort, bevor du einen weiteren startest. Bereits ausgeführte Aufträge werden nur bestätigt; ein noch nicht ausgeführter Auftrag wird dabei gestartet. Truppen werden nicht doppelt abgezogen.</p><button type="button" class="button" data-action="command-retry">Auftrag sicher fortsetzen</button>',{focusHeading:true});
     }
-    function placeToast() { const host=$('#game-dialog').open?$('#game-dialog'):panelDialog.open?panelDialog:document.body;if(toastElement.parentElement!==host)host.append(toastElement); }
-    function toast(message) { placeToast();toastElement.textContent=i18n?.text(message)??message;toastElement.classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toastElement.classList.remove('visible'),3200); }
+    function positionToast() {
+        if(toastElement.dataset.rallyNotice!=='true')return;
+        const resources=$('#resources')?.getBoundingClientRect();
+        const top=Math.ceil(Math.max(0,resources?.bottom||0)+8);
+        let scale=1;
+        for(let parent=toastElement.parentElement;parent;parent=parent.parentElement)scale*=parseFloat(getComputedStyle(parent).zoom)||1;
+        toastElement.style.setProperty('--toast-top',`${top/scale}px`);
+        toastElement.style.removeProperty('--toast-max-width');
+        const controls=[...document.querySelectorAll('#hud-left-tools button,.hud-right-tools button,.hud-profile')]
+            .filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden').map(el=>el.getBoundingClientRect());
+        let left=12,right=innerWidth-12;
+        // A wrapped notice can reach the next row, so measure again at the narrower width.
+        for(let pass=0;pass<2;pass++){
+            const bottom=top+Math.max(44,toastElement.offsetHeight*scale);
+            for(const box of controls){
+                if(box.bottom<=top||box.top>=bottom)continue;
+                if(box.right<=innerWidth/2)left=Math.max(left,box.right+8);
+                else if(box.left>=innerWidth/2)right=Math.min(right,box.left-8);
+            }
+            const width=Math.max(1,Math.min(520,right-left));
+            toastElement.style.setProperty('--toast-max-width',`${width/scale}px`);
+            toastElement.style.setProperty('--toast-left',`${Math.max(left+width/2,Math.min(innerWidth/2,right-width/2))/scale}px`);
+        }
+    }
+    function nextRallyToast() {
+        if(document.hidden||appLifecycle?.isActive()===false||rallyToastScope!==JSON.stringify(rallyContext())){rallyToastQueue.length=0;return;}
+        const message=rallyToastQueue.shift();if(message)toast(message,{rally:true});
+    }
+    function announceRallies(rows) {
+        const scope=JSON.stringify(rallyContext());
+        if(rallyToastScope!==scope)rallyToastQueue.length=0;
+        rallyToastScope=scope;
+        rallyToastQueue.push(...rows.map(r=>t('rally.notice.started',{
+            player:r.leader?.name||r.leader_name||r.leader_username||t('rally.unknown_player'),
+            monster:r.result?.monster?.name||r.target_name||t('rally.target.monster')
+        })));
+        if(toastElement.dataset.rallyNotice!=='true'||!toastElement.classList.contains('visible'))nextRallyToast();
+    }
+    function placeToast() { const host=$('#game-dialog').open?$('#game-dialog'):panelDialog.open?panelDialog:document.body;if(toastElement.parentElement!==host)host.append(toastElement);positionToast(); }
+    function toast(message,{rally=false}={}) {
+        toastElement.dataset.rallyNotice=String(rally);
+        toastElement.toggleAttribute('data-user-content',rally);
+        toastElement.textContent=rally?message:i18n?.text(message)??message;placeToast();
+        toastElement.classList.add('visible');clearTimeout(toastTimer);
+        toastTimer=setTimeout(()=>{toastElement.classList.remove('visible');nextRallyToast();},rally?5000:3200);
+    }
+    const toastResizeObserver=typeof ResizeObserver==='function'?new ResizeObserver(positionToast):null;
+    if($('#resources'))toastResizeObserver?.observe($('#resources'));
     async function api(path, payload) {
         if(!payload&&Date.now()<apiRetryAt)throw new Error('Bitte warte einen Moment und versuche es erneut.');
         let response;
@@ -138,6 +187,7 @@
             &&(!r.world_id||Number(r.world_id)===context.worldId)
             &&(!r.result?.alliance_id||context.allianceId===null||Number(r.result.alliance_id)===context.allianceId));
         rallyPanel.sync(allianceRallies);marchPanel.updateRallies?.(allianceRallies);
+        if(!document.hidden&&appLifecycle?.isActive()!==false)rallyNotifications.observe(allianceRallies,{...context,serverTime:now()/1000});
         return true;
     }
     async function refresh(renderPage = true) {
@@ -792,12 +842,12 @@
             panelNeedsResize=false;render();
         },150);
     }
-    window.addEventListener('resize',()=>{panelNeedsResize=true;resizePanel();});
+    window.addEventListener('resize',()=>{panelNeedsResize=true;resizePanel();positionToast();});
     panelHost.addEventListener('focusout',resizePanel);
     $('#game-dialog').addEventListener('close',resizePanel);
     setInterval(()=>{if(document.hidden||appLifecycle?.isActive()===false)return;updateExtraEvent();rallyPanel.updateTime();marchPanel.update();queueSpeedups.update();activeEffects.update();treasurePanel.updateTime();tradingPanel.updateTime();panels.updateHospitalTime();document.querySelectorAll('[data-end]').forEach(el=>{const text=duration((date(el.dataset.end)-now())/1000);if(el.textContent!==text)el.textContent=text;});},1000);
     appLifecycle=window.ConquerPolling({onAvailabilityChange:({active,online})=>{
-        if(!active){comfort.pause();return;}
+        if(!active){comfort.pause();rallyNotifications.pause();rallyToastQueue.length=0;if(toastElement.dataset.rallyNotice==='true')toastElement.classList.remove('visible');return;}
         connectionStatus(online?'refreshing':'offline');
     },delay:()=>Math.max(apiRetryAt-Date.now(),current==='world'||state?.marches?.length||state?.build_queue?.length||state?.troop_queue?.length||state?.research_queue?.length?5000:15000),refresh:async()=>{
         if(busy) return;

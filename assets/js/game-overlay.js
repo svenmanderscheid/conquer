@@ -85,8 +85,8 @@ window.ConquerOverlay = function (ctx) {
     }
     function rallyAlert(){
         const button=$('hud-alliance-rallies');if(!button)return;
-        const state=getState(),kingdom=getKingdom(),playerId=Number(state?.player?.id||state?.city?.player_id),worldId=Number(state?.city?.world_id),allianceId=Number(kingdom?.alliance?.id||0);
-        const rallies=(getRallies()||[]).filter(r=>Number(r.leader_player_id)!==playerId&&['gathering','marching'].includes(r.status)
+        const state=getState(),kingdom=getKingdom(),worldId=Number(state?.city?.world_id),allianceId=Number(kingdom?.alliance?.id||0);
+        const rallies=(getRallies()||[]).filter(r=>allianceId>0&&['gathering','marching'].includes(r.status)
             &&(!r.world_id||Number(r.world_id)===worldId)&&(!r.result?.alliance_id||Number(r.result.alliance_id)===allianceId));
         button.hidden=!rallies.length;
         $('hud-rally-count').textContent=String(rallies.length);

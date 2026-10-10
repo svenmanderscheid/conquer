@@ -103,10 +103,10 @@ $base = htmlspecialchars(APP_BASE, ENT_QUOTES);
   <button id="hud-report" class="hud-edge-button hud-report-button" data-action="bug-report-open" aria-label="Bug oder Idee melden" aria-haspopup="dialog"><span class="hud-edge-art" aria-hidden="true"><img src="<?= $base ?>/assets/art/menu-icons-v2/bug-report.png" alt=""></span><span class="hud-edge-label">Melden</span></button>
   <button id="hud-menu" class="hud-edge-button" data-action="menu-more" aria-label="Spielmenü öffnen" aria-haspopup="dialog"><span class="hud-edge-art"><img src="<?= $base ?>/assets/art/menu-icons-v2/menu.png" alt=""></span><span class="hud-edge-label">Menü</span></button>
   <div class="hud-event-stack">
-  <button type="button" id="hud-alliance-rallies" class="hud-edge-button hud-rally-alert" data-world-only data-action="rally-list" aria-label="<?= htmlspecialchars(\Conquer\Game\Locale::t('rally.hud.open'), ENT_QUOTES) ?>" hidden><span class="hud-edge-art"><img src="<?= $base ?>/assets/art/menu-icons-v2/alliance.png" alt=""><b id="hud-rally-count" class="hud-rally-count" aria-hidden="true">0</b></span><span class="hud-edge-label" data-i18n="rally.hud.label"><?= htmlspecialchars(\Conquer\Game\Locale::t('rally.hud.label'), ENT_QUOTES) ?></span><small id="hud-rally-status" class="hud-edge-status"></small></button>
-  <button type="button" id="hud-extra-event" class="hud-edge-button hud-extra-event" data-action="tab" hidden><span class="hud-edge-art"><img src="<?= $base ?>/assets/art/menu-icons-v2/events.png" alt=""></span><span class="hud-edge-label" data-user-content></span></button>
-  </div>
   <button class="hud-edge-button" data-action="tab" data-id="events" aria-label="Weltereignisse öffnen"><span class="hud-edge-art"><img src="<?= $base ?>/assets/art/menu-icons-v2/events.png" alt=""></span><span class="hud-edge-label">Events</span></button>
+  <button type="button" id="hud-extra-event" class="hud-edge-button hud-extra-event" data-action="tab" hidden><span class="hud-edge-art"><img src="<?= $base ?>/assets/art/menu-icons-v2/events.png" alt=""></span><span class="hud-edge-label" data-user-content></span></button>
+  <button type="button" id="hud-alliance-rallies" class="hud-edge-button hud-rally-alert" data-action="rally-list" aria-label="<?= htmlspecialchars(\Conquer\Game\Locale::t('rally.hud.open'), ENT_QUOTES) ?>" hidden><span class="hud-edge-art"><img src="<?= $base ?>/assets/art/menu-icons-v2/alliance.png" alt=""><b id="hud-rally-count" class="hud-rally-count" aria-hidden="true">0</b></span><span class="hud-edge-label" data-i18n="rally.hud.label"><?= htmlspecialchars(\Conquer\Game\Locale::t('rally.hud.label'), ENT_QUOTES) ?></span><small id="hud-rally-status" class="hud-edge-status"></small></button>
+  </div>
 </nav>
 <aside id="world-chat" class="world-chat" aria-label="Welt- und Allianzchat" hidden></aside>
 <nav id="navigation" class="game-dock" aria-label="Spielbereiche"></nav>
@@ -185,6 +185,7 @@ $base = htmlspecialchars(APP_BASE, ENT_QUOTES);
 <script src="<?= $base ?>/assets/js/game-comfort.js?v=<?= filemtime(__DIR__ . '/../assets/js/game-comfort.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/game-audio.js?v=<?= filemtime(__DIR__ . '/../assets/js/game-audio.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/extra-events.js?v=<?= filemtime(__DIR__ . '/../assets/js/extra-events.js') ?>" defer></script>
+<script src="<?= $base ?>/assets/js/rally-notifications.js?v=<?= filemtime(__DIR__ . '/../assets/js/rally-notifications.js') ?>" defer></script>
 <script src="<?= $base ?>/assets/js/game.js?v=<?= filemtime(__DIR__ . '/../assets/js/game.js') ?>" defer></script>
 <script type="application/json" id="uok-layout-config"><?= json_encode($uiLayoutProfiles ?? \Conquer\Game\Ui\LayoutSettings::read()['profiles'],JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_THROW_ON_ERROR) ?></script>
 <script type="application/json" id="uok-layout-catalog"><?= json_encode(\Conquer\Game\Ui\LayoutSettings::catalog(),JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_THROW_ON_ERROR) ?></script>

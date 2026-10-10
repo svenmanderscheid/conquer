@@ -7,6 +7,7 @@ assert(helpers.includes('function acceptRallies('));
 const fixture=vm.runInNewContext(`(()=>{
     let state,kingdom,allianceRallies=[],rallyRequestSequence=0,rallyAppliedSequence=0,rallyDataScope='';
     const window={CONQUER_WORLD:1},updates=[],marchUpdates=[];
+    const document={hidden:false},appLifecycle=null,now=()=>Date.now(),rallyNotifications={observe(){}};
     const rallyPanel={sync:rows=>updates.push(rows.map(row=>row.id))},marchPanel={updateRallies:rows=>marchUpdates.push(rows.map(row=>row.id))};
     ${helpers}
     return {beginRallyRequest,acceptRallies,syncRallyScope,

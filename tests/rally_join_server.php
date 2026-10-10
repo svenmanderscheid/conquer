@@ -69,6 +69,10 @@ try {
     rallyJoinCheck($call('rally/list',null,4)['json']['data']['rallies']===[], 'unallied map has no rally menu data');
     $listing = $call('rally/list')['json']['data']['rallies'];
     rallyJoinCheck(count($listing)===1 && (int)$listing[0]['id']===$rallyId && $listing[0]['leader']['coord_x']===30 && $listing[0]['leader']['coord_y']===40, 'allied list exposes the rally and the actual host city coordinates');
+    $leaderListing = $call('rally/list',null,1)['json']['data']['rallies'];
+    $otherMemberListing = $call('rally/list',null,3)['json']['data']['rallies'];
+    rallyJoinCheck(count($leaderListing)===1 && (int)$leaderListing[0]['id']===$rallyId && count($otherMemberListing)===1 && (int)$otherMemberListing[0]['id']===$rallyId, 'leader and alliance members who have not joined see the same active rally');
+    rallyJoinCheck($listing[0]['leader_name']==='RallyJoinFixture1' && $listing[0]['result']['monster']['name']===$definition['name'] && $listing[0]['target_name']===$definition['name'].' Lv. '.$definition['level'] && !empty($listing[0]['created_at']) && $leaderListing[0]['created_at']===$listing[0]['created_at'], 'rally notifications receive the actual leader name, monster name and shared creation time');
     rallyJoinCheck((int)$listing[0]['target_x']===70 && $listing[0]['troops'][50100101]===100 && (int)$listing[0]['capacity']>=300, 'list supplies target, captain troops and authoritative capacity');
     $first = $call('rally/join',$join);
     rallyJoinCheck($first['status']===200 && $first['json']['data']['joined']===true, 'deploy sends a real allied army: '.json_encode($first['json']));
