@@ -1802,7 +1802,7 @@ if (!array_key_exists($activeTab, $tabs)) $activeTab = 'upgrade';
                             <!-- Silver Chest -->
                             <div style="background:#ede0c4;border:2px solid rgba(139,90,43,0.4);border-radius:12px;padding:16px;text-align:center">
                                 <div style="font-size:3rem;margin-bottom:8px">🪙</div>
-                                <div style="font-weight:800;color:#8b6f47;font-size:0.9rem;margin-bottom:4px">Silbertruhe</div>
+                                <div style="font-weight:800;color:#8b6f47;font-size:0.9rem;margin-bottom:4px">Blaue Schatztruhe</div>
                                 <div style="font-size:0.72rem;color:#8b6f47;margin-bottom:12px">
                                     Kostenlos: <span x-text="chestStatus.free_silver_remaining"></span>/5 heute
                                 </div>

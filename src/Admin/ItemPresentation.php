@@ -13,7 +13,7 @@ final class ItemPresentation
         if(!empty($d['icon']))$image='items/'.$d['icon'];
         elseif($category==='resource_pack')$image=in_array($d['resource'],['food','lumber','stone','gold'],true)?'ui-resources/'.$d['resource'].'.png':'items/gems.svg';
         elseif($category==='speedup')$image='items/speedup.svg';
-        elseif($category==='chest')$image='items/chest-'.($d['chest_type']??'silver').'.svg';
+        elseif($category==='chest')$image=($d['chest_type']??'silver')==='silver'?'items/daily-chest-blue-v1.png':'items/chest-'.$d['chest_type'].'.svg';
         elseif($category==='ap_refill')$image='items/energy.svg';
         elseif($category==='vip_point')$image='items/prestige.svg';
         elseif($category==='fragment_pack')$image='items/fragment-'.($d['fragment_grade']??$d['rarity']??'normal').'.svg';

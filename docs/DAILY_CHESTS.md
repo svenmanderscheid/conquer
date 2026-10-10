@@ -2,6 +2,8 @@
 
 Die Schatzkammer bietet neben den Relikten einen Tab **Schatztruhe**. Kostenlose Öffnungen setzen eine Schatzkammer ab Stufe 1 in der aktiven Welt voraus. Truhen im Inventar bleiben unabhängig davon verwendbar.
 
+Die blaue Schatztruhe ist derselbe Truhentyp wie die früher als Silbertruhe bezeichnete Monsterbelohnung (Gegenstand `10105001`, interner Typ `silver`). Schatzkammer, Inventar, Monsterbeute, Belohnungsbelege und Verwaltung verwenden einheitlich „Blaue Schatztruhe“ bzw. die gemeinsame Übersetzung und das freigegebene Bild `assets/art/items/daily-chest-blue-v1.png`. Bestehende Kennungen, Bestände, Beutetabellen und kostenlose Öffnungen bleiben erhalten.
+
 - **Blaue Schatztruhe:** zehn kostenlose Öffnungen je UTC-Kalendertag. Zwischen zwei Öffnungen müssen mindestens 600 Sekunden liegen, auch über Mitternacht hinweg. Die erste Öffnung ist sofort verfügbar.
 - **Goldene Schatztruhe:** eine kostenlose Öffnung alle 86.400 Sekunden, gerechnet ab der letzten Öffnung. Die erste Öffnung ist sofort verfügbar.
 - Limits und Zeitstempel gelten für das gesamte Spielerkonto. Ein Weltwechsel erzeugt keine zusätzlichen kostenlosen Truhen.
@@ -26,3 +28,5 @@ Gegenstände landen im tatsächlichen `player_inventory`, Reliktfragmente in `pl
 `php tests/daily_chests.php` prüft echte Vergaben in einer temporären Datenbank, Quoten, UTC-Mitternacht, sekundengenaue Freigabe, rollende Goldzeit, Weltwechsel, Hausvoraussetzung, vorhandene Truhen, Transaktionsrollback, bezahlte Öffnungen, zwei konkurrierende Prozesse und den authentifizierten HTTP-Endpunkt einschließlich CSRF. Der Test prüft außerdem alle VIP-Angebote auf positive Beutegewichte in Silber und Gold.
 
 `node tests/treasure_panel.cjs` prüft die vorhandene Reliktausrüstung und beide Tabs auf Desktop, kleinen Smartphones und im Querformat sowie Timer, explizite kostenlose Aktionen, Beuteanzeige, Tageswechsel und die Gebäudesperre.
+
+Die Vereinheitlichung der blauen Truhe wurde am 10. Oktober 2026 in der echten Haupt-App mit einem temporären Testspielstand geprüft: Stadt, Inventar, Schatzkammer und Monsterbeute bei 1280×800, 390×844, 320×568 und 844×390. Alle 16 Ansichten bestanden ohne Browserfehler oder fehlende Bilder. Nachweise: `output/playwright/blue-chest-consistency/`. Katalog- und Belohnungsprüfungen (`tests/reward_catalog.cjs`, `tests/reward_presentation.php`) sowie die englischen, deutschen und französischen Namen einschließlich historischer Belege bestanden ebenfalls. Dies sind lokale Browserprüfungen, keine Veröffentlichung oder Geräteabnahme.

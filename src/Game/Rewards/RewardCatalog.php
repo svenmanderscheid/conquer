@@ -100,7 +100,7 @@ final class RewardCatalog
                 $out[$key] = ['key'=>$key,'name'=>$d['name'],'subtitle'=>$d['theme'],'image'=>'dungeons/'.($d['art_code']??$key).'.webp','definition'=>$d];
             }
         } elseif ($type === 'chest') {
-            foreach (self::json('chest_drops')['chests'] as $key=>$d) $out[$key] = ['key'=>$key,'name'=>['silver'=>'Silbertruhe','gold'=>'Goldtruhe','platinum'=>'Platintruhe'][$key] ?? $key,'subtitle'=>'Schatzkammer · gewichtete Ziehungen','image'=>'items/chest-'.$key.'.svg','definition'=>$d];
+            foreach (self::json('chest_drops')['chests'] as $key=>$d) $out[$key] = ['key'=>$key,'name'=>['silver'=>'Blaue Schatztruhe','gold'=>'Goldtruhe','platinum'=>'Platintruhe'][$key] ?? $key,'subtitle'=>'Schatzkammer · gewichtete Ziehungen','image'=>$key==='silver'?'items/daily-chest-blue-v1.png':'items/chest-'.$key.'.svg','definition'=>$d];
         } elseif ($type === 'expedition') {
             foreach (\Conquer\Game\Expedition\EncounterCatalog::BOSSES as $boss=>$b) foreach (\Conquer\Game\Expedition\EncounterCatalog::DIFFICULTIES as $difficulty=>$d) {
                 $key = $boss.'.'.$difficulty;

@@ -23,8 +23,9 @@ window.ConquerRewards = (() => {
         const catalog=treasure?kingdom.treasures?.items:kingdom.inventory_catalog||kingdom.inventory;
         const def=(catalog||[]).find(i=>Number(treasure?i.treasure_code:i.item_code||i.code)===code)||{};
         const item={...def,...drop},relic=treasure?window.ConquerRelicPresentation:null;
+        const blueChest=!treasure&&!resource&&(code===10105001||item.category==='chest'&&item.chest_type==='silver');
         const relicKind=treasure?(window.ConquerLocale?.t(wholeRelic?'reward.kind.relic':'reward.kind.fragment')??(wholeRelic?'Whole relic':'Relic fragments')):'';
-        const name=relic?relic.name(item):drop.name_de||def.name_de||drop.name||def.name||drop.label||(treasure?relicKind:resource?resourceNames[drop.resource]:'Gegenstand');
+        const name=blueChest?(window.ConquerLocale?.t('copy.6990c4e0b87e245a')??def.name_de??def.name??'Blue treasure chest'):relic?relic.name(item):drop.name_de||def.name_de||drop.name||def.name||drop.label||(treasure?relicKind:resource?resourceNames[drop.resource]:'Gegenstand');
         const file=treasure?(drop.icon||def.icon||'fragment.svg'):presentationFile(item,drop.icon||def.icon);
         const icon=relic?relic.image(base,item):resource&&['food','lumber','stone','gold'].includes(drop.resource)?`${window.ConquerItemArt?.resourceUrl(base,drop.resource) || `${base}/assets/art/ui-resources/${drop.resource}.png`}`:asset(base,resource&&drop.resource==='gems'?'gems.svg':file);
         const grade=relic?relic.grade(item):item.rarity||item.grade;
