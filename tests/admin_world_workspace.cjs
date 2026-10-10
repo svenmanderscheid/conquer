@@ -207,6 +207,42 @@ module.exports = async ({page, base, errors}) => {
           if (!await details.evaluate(element => element.open)) await details.locator('summary').first().click();
         }
         await fit(`${locale} ${width}x${height} ${key}`);
+        if (key === 'gifts') {
+          const gift = workspace.locator('form[action$="/gift"]');
+          const picker = gift.locator('[data-item-picker]');
+          const dialog = page.locator('#item-picker-dialog');
+          await gift.locator('[name=title]').fill('Fixture item selection');
+          await gift.locator('[name=quantity]').fill('3');
+          await picker.click();
+          assert(await dialog.isVisible(), 'World gifts open the shared item catalog');
+          await page.locator('#item-picker-search').fill('10103001');
+          assert.equal(await dialog.locator('[data-pick-item="10103001"]').count(), 1,
+            'The gift catalog can search an ordinary item by code');
+          assert.equal(await dialog.locator('[data-pick-item^="relic:"], [data-pick-item^="treasure:"], [data-pick-item^="fragment:"]').count(), 0,
+            'Gift selection excludes reward-only relic targets');
+          assert(await dialog.evaluate(element => {
+            const box = element.getBoundingClientRect();
+            return box.left >= 0 && box.right <= innerWidth + 1 && box.top >= 0 && box.bottom <= innerHeight + 1
+              && element.scrollWidth <= element.clientWidth + 1;
+          }), 'The gift picker fits the viewport');
+          await page.screenshot({path: path.join(out, `gift-picker-${locale}-${width}x${height}.png`)});
+          await dialog.locator('[data-pick-item="10103001"]').click();
+          assert.equal(await gift.locator('[name=item_code]').inputValue(), '10103001',
+            'Choosing an item updates the submitted gift value');
+          assert.equal(await dialog.isVisible(), false, 'Choosing an item closes the catalog');
+          assert(await picker.evaluate(element => element === document.activeElement),
+            'Selection restores focus to the gift picker');
+          assert.equal(await gift.locator('[name=title]').inputValue(), 'Fixture item selection');
+          assert.equal(await gift.locator('[name=quantity]').inputValue(), '3');
+          await picker.click();
+          await page.keyboard.press('Escape');
+          assert.equal(await gift.locator('[name=item_code]').inputValue(), '10103001',
+            'Cancelling the catalog preserves the gift item');
+          await picker.click();
+          await dialog.locator('[data-pick-item="0"]').click();
+          assert.equal(await gift.locator('[name=item_code]').inputValue(), '0',
+            'The optional gift item can be removed');
+        }
         await workspace.locator(`[data-world-panel="${key}"]`).first().evaluate(element =>
           element.scrollIntoView({block: 'start', behavior: 'instant'}));
         await page.screenshot({path: path.join(out, `${key}-${locale}-${width}x${height}.png`)});
