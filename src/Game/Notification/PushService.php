@@ -148,6 +148,7 @@ final class PushService
             $cursor = (int)$db->query('SELECT COALESCE(MAX(id),0) FROM notifications')->fetchColumn();
             $db->execute('UPDATE push_subscriptions SET completions=?,security=?,last_notification_id=?,updated_at=UTC_TIMESTAMP() WHERE id=?', [(int)$prefs['completions'],(int)$prefs['security'],$cursor,$row['id']]);
             foreach ($prefs as $category=>$enabled) if (!$enabled) $db->execute('DELETE FROM push_deliveries WHERE subscription_id=? AND category=? AND completed_at IS NULL', [$row['id'],$category]);
+            if(!$prefs['security'])$db->execute("DELETE FROM push_deliveries WHERE subscription_id=? AND category IN ('alliance','messages') AND completed_at IS NULL",[$row['id']]);
         });
     }
 
@@ -176,9 +177,17 @@ final class PushService
     public static function category(string $type): ?string
     {
         return match ($type) {
-            'build_complete','research_complete','train_complete','heal_complete' => 'completions',
-            'battle_incoming','scouted','wall_destroyed' => 'security',
+            'build_complete','research_complete','train_complete','heal_complete','farm_returned' => 'completions',
+            'battle_incoming','scout_incoming','rally_incoming','wall_destroyed' => 'security',
+            'alliance_rally_player','alliance_rally_monster' => 'alliance',
+            'private_message' => 'messages',
             default => null,
         };
+    }
+
+    /** Keep existing device preferences compatible; community channel mutes also apply. */
+    public static function enabled(array $subscription,string $category): bool
+    {
+        return $category==='test'||!empty($subscription[$category==='completions'?'completions':'security']);
     }
 }

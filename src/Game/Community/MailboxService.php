@@ -108,6 +108,7 @@ final class MailboxService
         $singleWorld=(int)$db->query('SELECT COUNT(*) FROM cities WHERE player_id=?',[$player])->fetchColumn()===1;
         foreach($rows as $r){
             $d=self::decode($r['data_json']);$scope=(int)($d['world_id']??0);
+            if(!empty($d['push_only']))continue;
             if (($d['report_enabled'] ?? true) === false) continue;
             if(!$scope&&isset($d['city_id']))$scope=(int)$db->query('SELECT world_id FROM cities WHERE id=? AND player_id=?',[$d['city_id'],$player])->fetchColumn();
             if(($scope&&$scope!==$world)||(!$scope&&!$singleWorld)||$r['type']==='battle_report')continue;

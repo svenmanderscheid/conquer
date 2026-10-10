@@ -222,6 +222,8 @@ final class MarchTick
                 [$marchId],
             );
 
+            if((int)$march['march_type']===9)NotificationService::push($playerId,'farm_returned',[
+                'world_id'=>(int)$march['world_id'],'push_only'=>true,'march_id'=>$marchId]);
             $log->info('[MarchTick] March ' . $marchId . ' completed — troops returned to city ' . $cityId);
             });
         }

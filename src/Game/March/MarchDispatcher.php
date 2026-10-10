@@ -468,7 +468,9 @@ final class MarchDispatcher
             if($clean)MarchArmy::reserve($db,$cityId,$clean);
             if($type!==self::MARCH_SUPPORT)\Conquer\Game\WorldRules::relinquishShield($playerId,$cityId);
             $db->execute("INSERT INTO marches(player_id,world_id,march_type,march_skin,march_speed_bonus_pct,origin_city_id,target_x,target_y,target_type,target_id,troops_json,haul_json,departure_time,arrival_time,state) VALUES(?,?,?,?,?,?,?, ?,2,?,?,?,UTC_TIMESTAMP(),DATE_ADD(UTC_TIMESTAMP(),INTERVAL ? SECOND),'marching')",[$playerId,$world,$type,$skinSnapshot['march_skin'],$skinSnapshot['bonus_pct'],$cityId,$targetX,$targetY,(int)$target['id'],json_encode($clean),json_encode($travel),$seconds]);
-            return $db->lastInsertId();
+            $marchId=$db->lastInsertId();
+            \Conquer\Game\Notification\NotificationEvents::cityMarch($playerId,(int)$target['player_id'],$world,$marchId,$type);
+            return $marchId;
         }));}finally{$db->query('SELECT RELEASE_LOCK(?)',[$lock]);}
     }
 

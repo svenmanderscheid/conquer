@@ -32,7 +32,9 @@ final class RallyService
             if(array_sum($clean)>$capacity)throw new \RuntimeException('Die Allianzhalle bietet nicht genug Platz für diese Rally.');
             MarchArmy::reserve($db,$leaderCityId,$clean);WorldRules::relinquishShield($leaderId,$leaderCityId);
             $db->execute("INSERT INTO rallies(world_id,leader_player_id,leader_city_id,march_skin,march_speed_bonus_pct,target_player_id,target_city_id,target_x,target_y,rally_minutes,troops_json,message,result_json,status,launch_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,'gathering',DATE_ADD(UTC_TIMESTAMP(),INTERVAL ? MINUTE))",[(int)$origin['world_id'],$leaderId,$leaderCityId,$skinSnapshot['march_skin'],$skinSnapshot['bonus_pct'],$targetPlayerId,$target['id'],$targetX,$targetY,$rallyMinutes,json_encode($clean),mb_substr($message,0,512),json_encode(['alliance_id'=>$alliance,'capacity'=>$capacity]),$rallyMinutes]);
-            return $db->lastInsertId();
+            $rallyId=$db->lastInsertId();
+            \Conquer\Game\Notification\NotificationEvents::rallyStarted($leaderId,(int)$origin['world_id'],$rallyId,$alliance,$targetPlayerId);
+            return $rallyId;
         }));
     }
 

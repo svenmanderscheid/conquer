@@ -205,6 +205,7 @@ final class SocialService
     {
         $db=Connection::getInstance();$db->execute('INSERT INTO community_message_meta(world_id,channel,message_id,reply_to_id,mentions_json) VALUES(?,?,?,?,?)',[$world,$channel,$id,$metadata['reply_to_id'],json_encode($metadata['mentions'],JSON_THROW_ON_ERROR)]);
         if($channel==='private')foreach([[$player,$peer],[$peer,$player]] as [$owner,$partner])$db->execute('INSERT IGNORE INTO community_conversations(world_id,player_id,partner_id) VALUES(?,?,?)',[$world,$owner,$partner]);
+        if($channel==='private')\Conquer\Game\Notification\NotificationEvents::privateMessage($player,(int)$peer,$world,$id);
     }
 
     public static function assertCanCommunicate(int $sender,int $recipient,int $world):void

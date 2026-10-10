@@ -48,7 +48,7 @@ try {
     pushCheck((int)$db->query('SELECT COUNT(*) FROM push_subscriptions')->fetchColumn()===1,'subscription retries are idempotent');
     pushCheck(Push::status($s1,$subscription['endpoint'])['enabled']&&!Push::status($s1)['enabled']&&!Push::status($s2,$subscription['endpoint'])['enabled'],'status is current device and account only');
     pushCheck(Worker::capture()===0,'historical backlog before opt-in is excluded');
-    $notice();$notice('scouted');$notice('welcome_back');$notice('build_complete',2);$notice('build_complete',1,999);
+    $notice();$notice('scout_incoming');$notice('welcome_back');$notice('build_complete',2);$notice('build_complete',1,999);
     pushCheck(Worker::capture()===2&&Worker::capture()===0,'capture filters category/owner/world and deduplicates independent of report mute');
     // A smaller allocated ID commits after a larger ID was already captured.
     $cfg=require $fixture->sessionPath().'/config/database.php';
@@ -61,7 +61,7 @@ try {
     pushCheck(Worker::capture()===1,'out-of-order commit is captured on overlap scan');
     $payloads=[];$result=Worker::dispatch(static function(array $sub,array $payload)use(&$payloads):string{$payloads[]=$payload;return 'sent';});
     pushCheck($result['sent']===4&&Worker::dispatch(static fn()=>'sent')['sent']===0,'successful sends are never replayed');
-    pushCheck(array_keys($payloads[0])===['title','body','tag','url']&&!str_contains(json_encode($payloads),'PRIVATE')&&preg_match('/^uok-[a-f0-9]{32}$/D',$payloads[0]['tag'])===1,'external payload contains only generic localized text and opaque tag');
+    pushCheck(array_keys($payloads[0])===['title','body','tag','url']&&!str_contains(json_encode($payloads),'PRIVATE')&&preg_match('/^uok-[a-f0-9]{32}$/D',$payloads[0]['tag'])===1,'external payload contains only approved localized text and opaque tag');
     $db->execute("INSERT INTO building_queue(city_id,building_code,level_to,started_at,finishes_at)VALUES(1,'farm',6,UTC_TIMESTAMP(),DATE_SUB(UTC_TIMESTAMP(),INTERVAL 1 SECOND))");
     $db->execute("INSERT INTO troop_queue(city_id,troop_code,count,barrack_slot,started_at,finishes_at)VALUES(1,50100101,7,1,UTC_TIMESTAMP(),DATE_SUB(UTC_TIMESTAMP(),INTERVAL 1 SECOND))");
     $db->execute("INSERT INTO research_queue(player_id,world_id,research_code,level_to,finishes_at)VALUES(1,1,'food_production',1,DATE_SUB(UTC_TIMESTAMP(),INTERVAL 1 SECOND))");
@@ -74,7 +74,7 @@ try {
     pushCheck((int)$db->query("SELECT COUNT(*) FROM push_deliveries WHERE category='test'")->fetchColumn()===1,'replayed test request queues only once per minute');
     for($i=0;$i<4;$i++){$db->execute('UPDATE push_deliveries SET next_attempt_at=UTC_TIMESTAMP() WHERE completed_at IS NULL');Worker::dispatch(static fn()=>'retry');}
     pushCheck((int)$db->query("SELECT attempts FROM push_deliveries WHERE category='test'")->fetchColumn()===4&&$db->query("SELECT outcome FROM push_deliveries WHERE category='test'")->fetchColumn()==='failed','network retries stop after four attempts');
-    Push::updatePreferences($s1,$subscription['endpoint'],['completions'=>false]);$notice();$notice('scouted');
+    Push::updatePreferences($s1,$subscription['endpoint'],['completions'=>false]);$notice();$notice('scout_incoming');
     pushCheck(Worker::capture()===1,'disabled category is not delivered');
     Push::unsubscribe($s2,$subscription['endpoint']);
     pushCheck(Push::status($s1,$subscription['endpoint'])['enabled'],'another account cannot unsubscribe device');
@@ -89,7 +89,7 @@ try {
     $original=Push::owned($s1,$nativeEndpoint);
     for($i=0;$i<9;$i++)Push::subscribe($s1,['platform'=>'android','token'=>str_repeat('extra-token-'.$i.'-',6)]);
     Push::subscribe($s2,['platform'=>'android','token'=>str_repeat('foreign-token-',6)]);
-    $notice('scouted');Worker::capture();
+    $notice('scout_incoming');Worker::capture();
     $db->execute('UPDATE push_subscriptions SET completions=0 WHERE id=?',[$original['id']]);
     $rotation=['platform'=>'android','token'=>str_repeat('rotated-token-',6),'previous_token'=>str_repeat('native-token-',6)];
     Push::subscribe($s1,$rotation);Push::subscribe($s1,$rotation);

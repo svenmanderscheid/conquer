@@ -57,7 +57,9 @@ final class MonsterRally
             ActionPoints::deduct($playerId,$cost);MarchArmy::reserve($db,$cityId,$troops);
             $meta=['alliance_id'=>$alliance,'monster'=>$definition,'monster_code'=>(int)$target['monster_code'],'capacity'=>$capacity,'ap_cost'=>$cost,'drops'=>self::drops($definition)];
             $db->execute("INSERT INTO rallies(world_id,leader_player_id,leader_city_id,march_skin,march_speed_bonus_pct,target_kind,target_monster_id,target_x,target_y,rally_minutes,troops_json,message,result_json,status,launch_at) VALUES(?,?,?,?,?,'monster',?,?,?,?,?,?,?,'gathering',DATE_ADD(UTC_TIMESTAMP(),INTERVAL ? MINUTE))",[$world,$playerId,$cityId,$skinSnapshot['march_skin'],$skinSnapshot['bonus_pct'],$target['id'],$x,$y,$minutes,json_encode($troops),mb_substr($message,0,512),json_encode($meta),$minutes]);
-            return $db->lastInsertId();
+            $rallyId=$db->lastInsertId();
+            \Conquer\Game\Notification\NotificationEvents::rallyStarted($playerId,$world,$rallyId,$alliance,null,(string)$definition['name']);
+            return $rallyId;
         }));
     }
 

@@ -44,7 +44,7 @@ final class NotificationService
     // Notifications predating multi-world support belong to the original world.
     private const WORLD_FILTER = "COALESCE(CAST(JSON_UNQUOTE(JSON_EXTRACT(data_json,'$.world_id')) AS UNSIGNED),1)=?";
     // Keep completion records for building readiness even when report delivery is disabled.
-    private const DELIVERY_FILTER = "COALESCE(JSON_UNQUOTE(JSON_EXTRACT(data_json,'$.report_enabled')),'true')<>'false'";
+    private const DELIVERY_FILTER = "COALESCE(JSON_UNQUOTE(JSON_EXTRACT(data_json,'$.report_enabled')),'true')<>'false' AND COALESCE(JSON_UNQUOTE(JSON_EXTRACT(data_json,'$.push_only')),'false')<>'true'";
 
     // -------------------------------------------------------------------------
     // Write
