@@ -116,8 +116,6 @@
   "crystal_shop.teleports": "Teleports",
   "crystal_shop.buffs": "Buffs",
   "crystal_shop.vip_points": "VIP Points",
-  "crystal_shop.materials": "Materials",
-  "crystal_shop.badges_purchased": "{quantity} Alliance Badges added to your inventory.",
   "crystal_shop.vip_rate": "1 VIP Point costs 1 Crystal.",
   "crystal_shop.vip_pack": "{points} VIP Points",
   "crystal_shop.vip_pack_description": "Use this pack from your inventory to gain {points} VIP Points.",

@@ -116,8 +116,6 @@
   "crystal_shop.teleports": "Téléportations",
   "crystal_shop.buffs": "Bonus",
   "crystal_shop.vip_points": "Points VIP",
-  "crystal_shop.materials": "Matériaux",
-  "crystal_shop.badges_purchased": "{quantity} insignes d’alliance ajoutés à votre inventaire.",
   "crystal_shop.vip_rate": "1 point VIP coûte 1 cristal.",
   "crystal_shop.vip_pack": "{points} points VIP",
   "crystal_shop.vip_pack_description": "Utilisez ce pack depuis votre inventaire pour gagner {points} points VIP.",
