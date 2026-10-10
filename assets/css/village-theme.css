@@ -1576,8 +1576,8 @@ body.mobile-game .map-overlay-shell .atlas-target-actions.is-own-village .atlas-
   border:1px solid var(--ui-line);border-radius:9px;background:var(--ui-card);color:var(--ui-primary);box-shadow:0 2px color-mix(in srgb,var(--ui-frame) 35%,transparent);
   translate:none;scale:none;text-shadow:none;transition:transform .16s ease,filter .16s ease;
 }
-body.mobile-game .map-overlay-shell .atlas-target-actions.is-own-village .atlas-action:hover { translate:none;transform:translateY(-2px);filter:none; }
-body.mobile-game .map-overlay-shell .atlas-target-actions.is-own-village .atlas-action:active { translate:none;transform:translateY(1px); }
+body.mobile-game .map-overlay-shell .atlas-target-actions.is-own-village .atlas-action:hover { translate:none;transform:none;filter:none; }
+body.mobile-game .map-overlay-shell .atlas-target-actions.is-own-village .atlas-action:active { translate:none;transform:none; }
 body.mobile-game .map-overlay-shell .atlas-target-actions.is-own-village .atlas-action:focus-visible { translate:none;filter:none;outline:3px solid var(--ui-gold);outline-offset:2px; }
 body.mobile-game .map-overlay-shell .atlas-target-actions.is-own-village .atlas-action-disc {
   position:static;display:grid;place-items:center;width:23px;height:23px;min-width:23px;border:0;border-radius:0;background:transparent;color:inherit;box-shadow:none;filter:none;clip-path:none;
@@ -5658,9 +5658,19 @@ body.mobile-game .painted-village-building:not([aria-pressed="true"])>.painted-b
 :is(body.mobile-game,body.welcome,body.play-login-page,body.report-page) .ui-press-ready {
   transition:translate 170ms cubic-bezier(.2,.75,.25,1),box-shadow 170ms ease-out,filter 170ms ease-out;
 }
-:is(body.mobile-game,body.welcome,body.play-login-page,body.report-page) .ui-press-ready.ui-is-pressed:not(:disabled):not([aria-disabled=true]) {
+:is(body.mobile-game,body.welcome,body.play-login-page,body.report-page) .ui-press-ready.ui-is-pressed:not(.atlas-action):not(:disabled):not([aria-disabled=true]) {
   translate:0 3px!important;filter:brightness(.98);
   box-shadow:inset 0 1px 3px #29344120,0 1px 0 var(--ui-press-edge,var(--ui-primary-edge)),0 2px 4px #29344114!important;
+  transition-duration:65ms;
+}
+/* Map actions use translate for their radial layout. Keep the native button's
+   hit area fixed; only its medallion sinks when pressed, including by keyboard. */
+body.mobile-game .map-overlay-shell .atlas-target-actions .atlas-action-disc {
+  transition:transform 170ms cubic-bezier(.2,.75,.25,1),box-shadow 170ms ease-out;
+}
+body.mobile-game .map-overlay-shell .atlas-target-actions .atlas-action.ui-is-pressed:not(:disabled):not([aria-disabled=true]) .atlas-action-disc {
+  transform:translateY(3px);
+  box-shadow:inset 0 1px var(--ui-card-light),0 1px var(--ui-frame);
   transition-duration:65ms;
 }
 @media(prefers-reduced-motion:reduce) {
@@ -5668,6 +5678,10 @@ body.mobile-game .painted-village-building:not([aria-pressed="true"])>.painted-b
   :is(body.mobile-game,body.welcome,body.play-login-page,body.report-page) .ui-press-ready.ui-is-pressed { transition:none!important; }
 }
 body.reduced-motion .ui-press-ready,body.reduced-motion .ui-press-ready.ui-is-pressed { transition:none!important; }
+@media(prefers-reduced-motion:reduce) {
+  body.mobile-game .map-overlay-shell .atlas-target-actions .atlas-action-disc { transition:none!important; }
+}
+body.reduced-motion .map-overlay-shell .atlas-target-actions .atlas-action-disc { transition:none!important; }
 
 /* The adviser explains the next real milestone before opening its existing action. */
 .kingdom-intro .kingdom-intro-next {

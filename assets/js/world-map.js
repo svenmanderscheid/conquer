@@ -7,7 +7,7 @@ window.ConquerWorld = (() => {
   let painted=null,paintedLoading=false;
   function loadPainted(){
     if(paintedLoading)return;paintedLoading=true;
-    import(`${context.base}/assets/js/world-painted.js?v=10`).then(async module=>{
+    import(`${context.base}/assets/js/world-painted.js?v=11`).then(async module=>{
       await module.init(context.base,invalidateArtwork,()=>!sceneVisible||motionReduced()||cameraGesture());
       painted=module;invalidateArtwork();
     }).catch(error=>{console.warn('Painted world fallback',error);loadScenery();});
@@ -823,7 +823,15 @@ window.ConquerWorld = (() => {
     const commands=view.el.querySelector('.atlas-target-actions');commands.hidden=memory.panel!=='actions'||!target;document.body.classList.toggle('world-target-open',!commands.hidden);document.body.classList.toggle('world-target-village',!commands.hidden&&!!target&&isCompactTarget(target));
     for(const panel of ['search','navigation'])view.el.querySelector(`[data-atlas="${panel}"]`).setAttribute('aria-expanded',String(memory.panel===panel));
     view.el.querySelector('.map-overlay-search-toggle').classList.toggle('is-filtered',memory.filter!=='all'||!!memory.search);
-    const detailSignature=JSON.stringify([memory.selected,memory.cell,target?.data,context.teleport?.item_code||null,motionReduced(),memory.searchRun?.key===searchKey(),memory.searchRun?.targetKey]);if(detailSignature!==view.detailStamp){view.detailStamp=detailSignature;view.el.querySelector('.atlas-detail').innerHTML=details(target);commands.innerHTML=targetActions(target);updateSearchControls();}
+    const detailSignature=JSON.stringify([memory.selected,memory.cell,target?.data,context.teleport?.item_code||null,motionReduced(),memory.searchRun?.key===searchKey(),memory.searchRun?.targetKey]);
+    if(detailSignature!==view.detailStamp){
+      view.detailStamp=detailSignature;view.el.querySelector('.atlas-detail').innerHTML=details(target);
+      // Polls may change player data without changing any menu content. Retain
+      // the native buttons so an in-progress press can still produce its click.
+      const actions=targetActions(target);
+      if(actions!==view.actionStamp){view.actionStamp=actions;commands.innerHTML=actions;}
+      updateSearchControls();
+    }
   }
   function updateFooter(){if(!view)return;const visible=view.targets.filter(t=>t.kind!=='home'&&matching(t)).length;view.el.querySelector('.atlas-status').textContent=`${visible} Ziele im erkundeten Gebiet`;view.el.querySelector('.atlas-march-count').textContent=`${context.state.marches?.length||0} / ${(context.state.army_limits?.march_slots||3)+(context.state.army_limits?.gather_march_slots||0)+(context.state.army_limits?.hunt_march_slots||0)} Märsche unterwegs`;}
   // Decorative terrain uses the same pre-rendered 3D language as settlements,

@@ -24,7 +24,7 @@ function bindHitBounds(button,target,img){
   binding={button,enabled:false,src:null};hitBindings.set(img,binding);
   img.addEventListener('load',()=>updateHitBounds(img,binding));
  }
- binding.enabled=target.kind==='monsters'||target.kind==='nodes';
+ binding.enabled=['monsters','nodes','home','players','neutral_villages'].includes(target.kind);
  updateHitBounds(img,binding);
 }
 function updateHitBounds(img,binding){

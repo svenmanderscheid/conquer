@@ -5,7 +5,7 @@ const root=path.resolve(__dirname,'..'),pending=new Map(),loads=new Map(),reads=
 class ImageStub {
  set src(src){this.source=src;loads.set(src,(loads.get(src)||0)+1);const waiting=pending.get(src)||[];waiting.push(this);pending.set(src,waiting);}
 }
-const sandbox={Image:ImageStub,console,window:{},getComputedStyle:img=>({width:String(img.boxWidth),height:String(img.boxHeight)}),document:{createElement:()=>({getContext(){let image;return{drawImage:value=>{image=value;},getImageData:()=>{reads.set(image.source,(reads.get(image.source)||0)+1);if(image.fail)throw Error('unreadable pixels');return{data:image.pixels};}};}})}};
+const sandbox={Image:ImageStub,console,window:{ConquerCastleSkins:{get:()=>({id:'test-skin'})}},getComputedStyle:img=>({width:String(img.boxWidth),height:String(img.boxHeight)}),document:{createElement:()=>({getContext(){let image;return{drawImage:value=>{image=value;},getImageData:()=>{reads.set(image.source,(reads.get(image.source)||0)+1);if(image.fail)throw Error('unreadable pixels');return{data:image.pixels};}};}})}};
 vm.createContext(sandbox);
 const source=fs.readFileSync(path.join(root,'assets/js/world-painted.js'),'utf8').replace(/^import .*;\r?\n/gm,'').replace(/export /g,'');
 vm.runInContext(source+'\nglobalThis.testBind=bind;',sandbox);
@@ -37,6 +37,21 @@ function insets(item){return item.properties.get('--sprite-hit-clip').match(/[\d
  const cut=insets(orc),size=145/70,left=-size/2+size*cut[3]/100;
  assert(left>-1&&left<0,'fully transparent orc margin no longer reaches adjacent tile centre');
  assert(cut[0]/100<.18&&1-cut[2]/100>.18,'existing upper-body image tap remains inside hit bounds');
+ // All village kinds expose their visible roof above the occupied ground tiles.
+ // A roof in the northern neighbour's tile must remain part of this castle.
+ const villages=['home','players','neutral_villages'].map(kind=>{const item=marker('/castle-roof.png',3.7125*44,3.78*44);bind(item,{kind,data:{city_skin:'test-skin'}});return item;});
+ assert(villages.every(item=>item.button.dataset.spriteHitBounds==='pending'));
+ assert.equal(loads.get('/castle-roof.png'),1,'village kinds share the castle alpha read');
+ resolve('/castle-roof.png',{width:100,height:100,points:[[20,5],[79,89]]});await settle();
+ for(const village of villages){
+  const inset=insets(village),box=village.img,ratio=Math.min(box.boxWidth/100,box.boxHeight/100),letterbox=(box.boxHeight-100*ratio)/2;
+  assert(Math.abs(inset[0]/100*box.boxHeight-(letterbox+5*ratio))<.00001,'castle contain padding is excluded');
+  const imageTop=1.5*44-.245*44-box.boxHeight,roof=imageTop+inset[0]/100*box.boxHeight;
+  assert(roof<-1.5*44,'visible castle roof remains hittable above the footprint');
+  assert.equal(village.properties.get('--sprite-hit-clip').startsWith('inset('),true);
+  assert.equal(village.img.style.cssText,'','castle illustration geometry stays unchanged');
+ }
+ assert.equal(reads.get('/castle-roof.png'),1);
  // Resolve old and new sources out of order; old alpha data cannot win.
  const changed=marker('/old.png');bind(changed);changed.img.src='/new.png';bind(changed);
  resolve('/new.png',{points:[[0,0],[9,9]]});await settle();assert.deepEqual(insets(changed),[0,0,0,0]);
@@ -49,6 +64,9 @@ function insets(item){return item.properties.get('--sprite-hit-clip').match(/[\d
  const failed=marker('/failed.png');bind(failed);resolve('/failed.png',{fail:true});await settle();assert.equal(failed.button.dataset.spriteHitBounds,undefined,'failed read does not leave image hits pending');
  assert.equal(failed.properties.has('--sprite-hit-clip'),false);
  const css=fs.readFileSync(path.join(root,'assets/css/world-atlas.css'),'utf8');
- assert.match(css,/\.atlas-marker--monsters>img,\.atlas-marker--nodes>img\{[^}]*clip-path:var\(--sprite-hit-clip,none\)/,'clip applies to images, never visible animation canvases');
- console.log('PASS world sprite hit bounds: faint pixels, shared source cache, neighbouring charm centre, portrait taps, letterboxing, source races, blank and unreadable images.');
+ const hitRule=css.match(/\.atlas-marker:is\(([^)]+)\)>img\{([^}]+)\}/);
+ assert(hitRule,'hit clip applies to images, never visible animation canvases');
+ for(const kind of ['monsters','nodes','home','players','neutral_villages'])assert(hitRule[1].split(',').includes(`.atlas-marker--${kind}`),`${kind} artwork forwards taps to its marker`);
+ assert.match(hitRule[2],/pointer-events:auto!important/);assert.match(hitRule[2],/clip-path:var\(--sprite-hit-clip,none\)/);
+ console.log('PASS world sprite hit bounds: faint pixels, shared source cache, neighbouring charm centre, village roofs, portrait taps, letterboxing, source races, blank and unreadable images.');
 })().catch(error=>{console.error(error);process.exitCode=1;});
